@@ -45,11 +45,11 @@ public class ConfigurationLoaderTest extends UnitilsTestNG{
 	private ConfigurationLoader sut;
 	
 	/** PropertiesReader used by sut */
-	@InjectInto(property="propertiesReader")
+	@InjectInto(property = "propertiesReader")
 	Mock<PropertiesReader> propertiesReader;
 
 	/** Logger used by sut */
-	@InjectIntoStatic(target=ConfigurationLoader.class, property="logger")
+	@InjectIntoStatic(target = ConfigurationLoader.class, property = "logger")
 	Mock<Log> usedLogger;
 
 	/** Faked default Properties (unitils.properties) */
@@ -80,7 +80,7 @@ public class ConfigurationLoaderTest extends UnitilsTestNG{
 	// SetUp
 	//-----------------------------------------------------------------------------------
 	@BeforeMethod
-	public void setUp(){
+	public void setUp() {
 		sut = new ConfigurationLoader();
 		
 		CUSTOM_PROPERTIES_FILE_NAME = "unitils-custom.properties";
@@ -116,13 +116,12 @@ public class ConfigurationLoaderTest extends UnitilsTestNG{
 	 * 
 	 */
 	@Test
-	public void testLoadConfiguration_noDefaultConfigurationFound(){
+	public void testLoadConfiguration_noDefaultConfigurationFound() {
 		String expectedMessage = "Configuration file: " + ConfigurationLoader.DEFAULT_PROPERTIES_FILE_NAME + " not found in classpath.";
-		String fileName = null;
-    
-		try{
-			propertiesReader.returns(null).loadPropertiesFileFromClasspath(same(fileName));
-	        sut.loadConfiguration(fileName);
+
+        try {
+			propertiesReader.returns(null).loadPropertiesFileFromClasspath(null);
+	        sut.loadConfiguration(null);
 	    	fail("Exception expected.");
 	    } catch(UnitilsException ue){
 	    	assertEquals(expectedMessage, ue.getMessage());
@@ -143,7 +142,7 @@ public class ConfigurationLoaderTest extends UnitilsTestNG{
 	 * 
 	 */
 	@Test
-	public void testLoadConfiguration_onlyDefaultConfigurationFound(){		
+	public void testLoadConfiguration_onlyDefaultConfigurationFound() {
 		String fileName = null;
 		
 		propertiesReader.returns(unitilsDefaultProperties).loadPropertiesFileFromClasspath(ConfigurationLoader.DEFAULT_PROPERTIES_FILE_NAME);
@@ -171,7 +170,7 @@ public class ConfigurationLoaderTest extends UnitilsTestNG{
 	 * 
 	 */
 	@Test
-	public void testLoadConfiguration_defaultAndCustomConfigurationFound(){
+	public void testLoadConfiguration_defaultAndCustomConfigurationFound() {
 		customLocalConfigurationFileName = "my-unitils.properties";
 		Properties expectedProperties = new Properties();
 		expectedProperties = unitilsDefaultProperties;
@@ -203,7 +202,7 @@ public class ConfigurationLoaderTest extends UnitilsTestNG{
 	 *  </ul>
 	 */
 	@Test
-	public void testLoadConfiguration_allConfigurationssFoundWithUserConfigurationFromHomeDir(){
+	public void testLoadConfiguration_allConfigurationsFoundWithUserConfigurationFromHomeDir() {
 		customLocalConfigurationFileName = "my-unitils.properties";
 		Properties expectedProperties = new Properties();
 		expectedProperties = unitilsDefaultProperties;
@@ -234,7 +233,7 @@ public class ConfigurationLoaderTest extends UnitilsTestNG{
 	 *  </ul>
 	 */
 	@Test
-	public void testLoadConfiguration_allConfigurationsFoundWithUserConfigurationFromClasspath(){
+	public void testLoadConfiguration_allConfigurationsFoundWithUserConfigurationFromClasspath() {
 		customLocalConfigurationFileName = "my-unitils.properties";
 		Properties expectedProperties = new Properties();
 		expectedProperties = unitilsDefaultProperties;

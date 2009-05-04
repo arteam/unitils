@@ -103,7 +103,7 @@ public class UnitilsIntegrationTest {
     @Before
     public void cleanDatabase() {
 //		Thread.currentThread().setContextClassLoader(classUsageLoggingClassLoader);
-        DatabaseUnitils.cleanSchemas();
+        DatabaseUnitils.cleanDatabase();
     }
     
     @Test

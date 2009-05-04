@@ -1,6 +1,11 @@
 package org.unitils.dbmaintainer.structure;
 
 import org.apache.commons.lang.StringUtils;
+import org.dbmaintain.config.DbMaintainConfigurationLoader;
+import org.dbmaintain.config.PropertiesDbMaintainConfigurer;
+import org.dbmaintain.dbsupport.DbSupport;
+import org.dbmaintain.launch.DbMaintain;
+import org.dbmaintain.util.DbMaintainException;
 import org.junit.After;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -8,17 +13,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.dbsupport.DefaultSQLHandler;
-import org.unitils.core.dbsupport.SQLHandler;
-import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.clean.DBClearer;
+import org.unitils.core.util.ConfigUtils;
 import org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator;
 import static org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator.PROPKEY_DTD_FILENAME;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 
-import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileReader;
 import java.sql.Connection;
@@ -40,10 +40,9 @@ public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
     /* The file to which to write the DTD */
     private File dtdFile;
 
-    /* DataSource for the test database. */
-    @TestDataSource
-    private DataSource dataSource = null;
+    DbSupport dbSupport;
 
+    DbMaintain dbMaintain;
 
     /**
      * Initializes the test by creating following tables in the test database:
@@ -58,11 +57,15 @@ public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
         configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", DtdDataSetStructureGenerator.class.getName());
         configuration.setProperty(PROPKEY_DTD_FILENAME, dtdFile.getPath());
 
-        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler);
-        DBClearer dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler);
+        Properties dbMaintainProperties = new DbMaintainConfigurationLoader().loadDefaultConfiguration();
+        dbMaintainProperties.putAll(configuration);
+        PropertiesDbMaintainConfigurer propertiesDbMaintainConfigurer = new PropertiesDbMaintainConfigurer(dbMaintainProperties, new org.dbmaintain.dbsupport.impl.DefaultSQLHandler());
+        dbSupport = propertiesDbMaintainConfigurer.getDefaultDbSupport();
+        dbMaintain = new DbMaintain(propertiesDbMaintainConfigurer);
 
-        dbClearer.clearSchemas();
+        dataSetStructureGenerator = ConfigUtils.getConfiguredInstanceOf(DataSetStructureGenerator.class, configuration);
+
+        clearDatabase();
         createTestTables();
     }
 
@@ -72,7 +75,7 @@ public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
      */
     @After
     public void tearDown() throws Exception {
-        dropTestTables();
+        clearDatabase();
     }
 
 
@@ -107,7 +110,7 @@ public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
         Connection conn = null;
         Statement st = null;
         try {
-            conn = dataSource.getConnection();
+            conn = dbSupport.getDataSource().getConnection();
             st = conn.createStatement();
             st.execute("create table tableOne(columnA varchar(1) not null, columnB varchar(1) not null, columnC varchar(1))");
             st.execute("create table tableTwo(column1 varchar(1), column2 varchar(1))");
@@ -117,29 +120,15 @@ public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
         }
     }
 
-
-    /**
-     * Removes the test database tables
-     */
-    private void dropTestTables() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
+    private void clearDatabase() {
+        dbMaintain.clearDatabase();
         try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            try {
-                st.executeUpdate("drop table TABLEONE");
-            } catch (SQLException e) {
-                // Ignored
-            }
-            try {
-                st.executeUpdate("drop table TABLETWO");
-            } catch (SQLException e) {
-                // Ignored
-            }
-        } finally {
-            closeQuietly(conn, st, null);
+            dbSupport.dropTable(dbSupport.getDefaultSchemaName(), "DBMAINTAIN_SCRIPTS");
+        } catch (DbMaintainException e) {
+            e.printStackTrace();
+            // Ignored, thrown if DBMAINTAIN_SCRIPTS doesn't exists, which is not a problem
         }
     }
+
 
 }

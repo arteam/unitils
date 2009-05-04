@@ -25,7 +25,7 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import static org.unitils.database.SQLUnitils.*;
 import org.unitils.database.annotations.TestDataSource;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
+import static org.unitils.database.DatabaseModule.PROPKEY_DATABASE_DIALECT;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.util.PropertyUtils;
 

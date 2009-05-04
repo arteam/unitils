@@ -15,20 +15,21 @@
  */
 package org.unitils.dbmaintainer.structure.impl;
 
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.write;
-
 import org.apache.commons.lang.StringUtils;
+import org.dbmaintain.dbsupport.DbSupport;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.FilteredDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.filter.IncludeTableFilter;
 import org.dbunit.dataset.xml.FlatDtdWriter;
+import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
+import org.unitils.database.DatabaseModule;
 import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
-import org.unitils.dbmaintainer.util.BaseDatabaseAccessor;
 import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.write;
 import org.unitils.util.PropertyUtils;
 
 import java.io.File;
@@ -40,14 +41,14 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
- * Implementation of {@link DataSetStructureGenerator} for the DbUnit {@link FlatXmlDataSet} XML test data files format
+ * Implementation of {@link DataSetStructureGenerator} for the DbUnit <code>FlatXmlDataSet</code> XML test data files format
  * <p/>
  * todo test and fix for hsqldb (see sample project)
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DtdDataSetStructureGenerator extends BaseDatabaseAccessor implements DataSetStructureGenerator {
+public class DtdDataSetStructureGenerator implements DataSetStructureGenerator {
 
     /* Property key of the filename of the generated DTD  */
     public static final String PROPKEY_DTD_FILENAME = "dtdGenerator.dtd.filename";
@@ -55,15 +56,16 @@ public class DtdDataSetStructureGenerator extends BaseDatabaseAccessor implement
     /* The DTD file name */
     private String dtdFileName;
 
+    private DbSupport defaultDbSupport;
 
     /**
      * Initializes the generator by retrieving the name for the DTD file.
      *
      * @param configuration The config, not null
      */
-    @Override
-    protected void doInit(Properties configuration) {
+    public void init(Properties configuration) {
         dtdFileName = PropertyUtils.getString(PROPKEY_DTD_FILENAME, configuration);
+        defaultDbSupport = getDatabaseModule().getDbMaintainFacade().getDefaultDbSupport();
     }
 
 
@@ -110,8 +112,8 @@ public class DtdDataSetStructureGenerator extends BaseDatabaseAccessor implement
     protected String generateDtdContent() {
         Connection conn = null;
         try {
-            conn = sqlHandler.getDataSource().getConnection();
-            IDatabaseConnection dbUnitDatabaseConnection = new DatabaseConnection(conn, defaultDbSupport.getSchemaName());
+            conn = defaultDbSupport.getDataSource().getConnection();
+            IDatabaseConnection dbUnitDatabaseConnection = new DatabaseConnection(conn, defaultDbSupport.getDefaultSchemaName());
 
             StringWriter stringWriter = new StringWriter();
 
@@ -120,7 +122,7 @@ public class DtdDataSetStructureGenerator extends BaseDatabaseAccessor implement
 
             // create a dataset for the database content
             // filter out all system table names
-            Set<String> tableNames = defaultDbSupport.getTableNames();
+            Set<String> tableNames = defaultDbSupport.getTableNames(defaultDbSupport.getDefaultSchemaName());
             IDataSet actualDataSet = dbUnitDatabaseConnection.createDataSet();
             IDataSet filteredActualDataSet = new FilteredDataSet(new IncludeTableFilter(tableNames.toArray(new String[0])), actualDataSet);
 
@@ -132,5 +134,10 @@ public class DtdDataSetStructureGenerator extends BaseDatabaseAccessor implement
         } finally {
             DbUtils.closeQuietly(conn);
         }
+    }
+
+
+    protected DatabaseModule getDatabaseModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
     }
 }

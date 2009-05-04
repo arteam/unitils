@@ -16,7 +16,7 @@
 package org.unitils.core.util;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.core.dbsupport.DbSupport;
+import org.dbmaintain.dbsupport.DbSupport;
 
 /**
  * Utilities for creating and dropping test tables, views....
@@ -37,7 +37,7 @@ public class SQLTestUtils {
         for (String tableName : tableNames) {
             try {
                 String correctCaseTableName = dbSupport.toCorrectCaseIdentifier(tableName);
-                dbSupport.dropTable(correctCaseTableName);
+                dbSupport.dropTable(dbSupport.getDefaultSchemaName(), correctCaseTableName);
             } catch (UnitilsException e) {
                 // Ignored
             }
@@ -55,7 +55,7 @@ public class SQLTestUtils {
         for (String viewName : viewNames) {
             try {
                 String correctCaseViewName = dbSupport.toCorrectCaseIdentifier(viewName);
-                dbSupport.dropView(correctCaseViewName);
+                dbSupport.dropView(dbSupport.getDefaultSchemaName(), correctCaseViewName);
             } catch (UnitilsException e) {
                 // Ignored
             }
@@ -73,7 +73,7 @@ public class SQLTestUtils {
         for (String materializedViewName : materializedViewNames) {
             try {
                 String correctCaseViewName = dbSupport.toCorrectCaseIdentifier(materializedViewName);
-                dbSupport.dropMaterializedView(correctCaseViewName);
+                dbSupport.dropMaterializedView(dbSupport.getDefaultSchemaName(), correctCaseViewName);
             } catch (UnitilsException e) {
                 // Ignored
             }
@@ -91,7 +91,7 @@ public class SQLTestUtils {
         for (String synonymName : synonymNames) {
             try {
                 String correctCaseSynonymName = dbSupport.toCorrectCaseIdentifier(synonymName);
-                dbSupport.dropSynonym(correctCaseSynonymName);
+                dbSupport.dropSynonym(dbSupport.getDefaultSchemaName(), correctCaseSynonymName);
             } catch (UnitilsException e) {
                 // Ignored
             }
@@ -109,7 +109,7 @@ public class SQLTestUtils {
         for (String sequenceName : sequenceNames) {
             try {
                 String correctCaseSequenceName = dbSupport.toCorrectCaseIdentifier(sequenceName);
-                dbSupport.dropSequence(correctCaseSequenceName);
+                dbSupport.dropSequence(dbSupport.getDefaultSchemaName(), correctCaseSequenceName);
             } catch (UnitilsException e) {
                 // Ignored
             }
@@ -127,7 +127,7 @@ public class SQLTestUtils {
         for (String triggerName : triggerNames) {
             try {
                 String correctCaseTriggerName = dbSupport.toCorrectCaseIdentifier(triggerName);
-                dbSupport.dropTrigger(correctCaseTriggerName);
+                dbSupport.dropTrigger(dbSupport.getDefaultSchemaName(), correctCaseTriggerName);
             } catch (UnitilsException e) {
                 // Ignored
             }
@@ -145,7 +145,7 @@ public class SQLTestUtils {
         for (String typeName : typeNames) {
             try {
                 String correctCaseTypeName = dbSupport.toCorrectCaseIdentifier(typeName);
-                dbSupport.dropType(correctCaseTypeName);
+                dbSupport.dropType(dbSupport.getDefaultSchemaName(), correctCaseTypeName);
             } catch (UnitilsException e) {
                 // Ignored
             }

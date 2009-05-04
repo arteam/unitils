@@ -77,9 +77,12 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit4 {
      */
     @Test
     public void testInsertDefaultDataSet() throws Exception {
+        assertTestTableExists();
         dbUnitModule.insertDefaultDataSet(DataSetTestSubClass_dataSetAnnotationOnSubClass.class);
         assertLoadedDataSet("DbUnitModuleDataSetTest$DataSetTestSubClass_dataSetAnnotationOnSubClass.xml");
     }
+
+
 
 
     /**
@@ -242,6 +245,11 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit4 {
         assertEquals(expectedDataSetName, dataSet);
     }
 
+
+    private void assertTestTableExists() {
+        executeUpdate("insert into test values ('testje', 'boe')", dataSource);
+        assertEquals("testje", getItemAsString("select dataset from test", dataSource));
+    }
 
     /**
      * Utility method to create the test table.
