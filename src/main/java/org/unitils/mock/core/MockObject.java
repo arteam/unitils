@@ -35,6 +35,7 @@ import org.unitils.mock.proxy.ProxyInvocationHandler;
 import static org.unitils.mock.proxy.ProxyUtil.createInstanceOfType;
 import static org.unitils.mock.proxy.ProxyUtil.createProxy;
 import org.unitils.util.CallStackUtils;
+import static org.unitils.util.MethodUtils.*;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -49,7 +50,6 @@ import java.util.List;
  * @author Kenny Claes
  */
 public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHolder {
-
 
     /* The name of the mock (e.g. the name of the field) */
     protected String name;
@@ -71,6 +71,9 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
 
     /* The mock proxy instance */
     protected T instance;
+
+    /* The hash code that is returned when the hashCode method is called */
+    protected Integer mockObjectHashCode = new Object().hashCode();
 
 
     /**
@@ -356,14 +359,14 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
         StackTraceElement[] invokedAt = getInvokedAt();
         ArgumentMatcherRepository.getInstance().registerStartOfMatchingInvocation(invokedAt[0].getLineNumber());
         getSyntaxMonitor().startDefinition(name, behaviorDefinitionMethodName, proxyInvocationHandler, invokedAt);
-        return createMockObjectProxy(proxyInvocationHandler);
+        return createProxy(mockedClass, proxyInvocationHandler);
     }
 
     protected T startAssertion(ProxyInvocationHandler proxyInvocationHandler, String assertMethodName) {
         StackTraceElement[] invokedAt = getInvokedAt();
         ArgumentMatcherRepository.getInstance().registerStartOfMatchingInvocation(invokedAt[0].getLineNumber());
         getSyntaxMonitor().startDefinition(name, assertMethodName, proxyInvocationHandler, invokedAt);
-        return createMockObjectProxy(proxyInvocationHandler);
+        return createProxy(mockedClass, proxyInvocationHandler);
     }
 
     //
@@ -372,7 +375,16 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
 
     protected Object handleMockObjectInvocation(ProxyInvocation proxyInvocation) throws Throwable {
         getSyntaxMonitor().assertNotExpectingInvocation();
-        
+
+        if (isEqualsMethod(proxyInvocation.getMethod())) {
+            Object other = proxyInvocation.getArguments().get(0);
+            return proxyInvocation.getProxy() == other;
+        } else if (isHashCodeMethod(proxyInvocation.getMethod())) {
+            return mockObjectHashCode;
+        } else if (isCloneMethod(proxyInvocation.getMethod())) {
+            return proxyInvocation.getProxy();
+        }
+
         BehaviorDefiningInvocation behaviorDefiningInvocation = getMatchingBehaviorDefiningInvocation(proxyInvocation);
         MockBehavior mockBehavior = getMockBehavior(proxyInvocation, behaviorDefiningInvocation);
 
@@ -477,14 +489,18 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
     //
     // Factory methods
     //
-
+    @SuppressWarnings("unchecked")
     protected T createInstance() {
-        return createMockObjectProxy(new MockObjectInvocationHandler());
-    }
-
-
-    protected T createMockObjectProxy(ProxyInvocationHandler invocationHandler) {
-        return createProxy(mockedClass, invocationHandler);
+        Class<?> superClass;
+        Class<?>[] interfaces;
+        if (mockedClass.isInterface()) {
+            superClass = Object.class;
+            interfaces = new Class<?>[] {mockedClass, Cloneable.class};
+        } else {
+            superClass = mockedClass;
+            interfaces = new Class<?>[] {Cloneable.class};
+        }
+        return (T) createProxy(superClass, interfaces, new MockObjectInvocationHandler());
     }
 
 

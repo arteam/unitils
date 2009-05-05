@@ -21,13 +21,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
-import org.unitils.mock.MockUnitils;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
+import org.unitils.core.util.CloneUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertEquals;
 
 /**
  * Tests the mock object functionality.
@@ -38,12 +42,15 @@ import java.util.Set;
 public class MockObjectTest {
 
     /* Class under test */
-    private MockObject<TestClass> mockObject;
-    
+    private MockObject<TestClass> mockObject1, mockObject2;
+    private MockObject<MockReturning> mockReturningOtherMock;
 
     @Before
     public void setUp() {
-        mockObject = new MockObject<TestClass>("testMock", TestClass.class, false, new Scenario(null));
+        Scenario scenario = new Scenario(null);
+        mockObject1 = new MockObject<TestClass>("testMock", TestClass.class, false, scenario);
+        mockObject2 = new MockObject<TestClass>("testMock", TestClass.class, false, scenario);
+        mockReturningOtherMock = new MockObject<MockReturning>("testMock", MockReturning.class, false, scenario);
     }
 
 
@@ -53,10 +60,10 @@ public class MockObjectTest {
      */
     @Test
     public void testReturns() {
-        mockObject.returns("aValue").testMethodString();
+        mockObject1.returns("aValue").testMethodString();
 
-        String result1 = mockObject.getMock().testMethodString();
-        String result2 = mockObject.getMock().testMethodString();
+        String result1 = mockObject1.getMock().testMethodString();
+        String result2 = mockObject1.getMock().testMethodString();
         assertLenientEquals("aValue", result1);
         assertLenientEquals("aValue", result2);
     }
@@ -68,10 +75,10 @@ public class MockObjectTest {
      */
     @Test
     public void testOnceReturns() {
-        mockObject.onceReturns("aValue").testMethodString();
+        mockObject1.onceReturns("aValue").testMethodString();
 
-        String result1 = mockObject.getMock().testMethodString();
-        String result2 = mockObject.getMock().testMethodString();
+        String result1 = mockObject1.getMock().testMethodString();
+        String result2 = mockObject1.getMock().testMethodString();
         assertLenientEquals("aValue", result1);
         assertNull(result2);
     }
@@ -83,7 +90,7 @@ public class MockObjectTest {
      */
     @Test
     public void testReturns_defaultBehaviorObject() {
-        String result = mockObject.getMock().testMethodString();
+        String result = mockObject1.getMock().testMethodString();
         assertLenientEquals(null, result);
     }
 
@@ -94,7 +101,7 @@ public class MockObjectTest {
      */
     @Test
     public void testReturns_defaultBehaviorNumber() {
-        int result = mockObject.getMock().testMethodNumber();
+        int result = mockObject1.getMock().testMethodNumber();
         assertLenientEquals(0, result);
     }
 
@@ -105,7 +112,7 @@ public class MockObjectTest {
      */
     @Test
     public void testReturns_defaultBehaviorList() {
-        List<String> result = mockObject.getMock().testMethodList();
+        List<String> result = mockObject1.getMock().testMethodList();
         assertLenientEquals(0, result.size());
     }
 
@@ -116,7 +123,7 @@ public class MockObjectTest {
      */
     @Test
     public void testReturns_defaultBehaviorSet() {
-        Set<String> result = mockObject.getMock().testMethodSet();
+        Set<String> result = mockObject1.getMock().testMethodSet();
         assertLenientEquals(0, result.size());
     }
 
@@ -127,7 +134,7 @@ public class MockObjectTest {
      */
     @Test
     public void testReturns_defaultBehaviorMap() {
-        Map<String, String> result = mockObject.getMock().testMethodMap();
+        Map<String, String> result = mockObject1.getMock().testMethodMap();
         assertLenientEquals(0, result.size());
     }
 
@@ -138,17 +145,17 @@ public class MockObjectTest {
      */
     @Test
     public void testRaises() {
-        mockObject.raises(new ThreadDeath()).testMethodString();
+        mockObject1.raises(new ThreadDeath()).testMethodString();
 
         boolean exception1 = false;
         try {
-            mockObject.getMock().testMethodString();
+            mockObject1.getMock().testMethodString();
         } catch (ThreadDeath e) {
             exception1 = true;
         }
         boolean exception2 = false;
         try {
-            mockObject.getMock().testMethodString();
+            mockObject1.getMock().testMethodString();
         } catch (ThreadDeath e) {
             exception2 = true;
         }
@@ -163,17 +170,17 @@ public class MockObjectTest {
      */
     @Test
     public void testOnceRaises() {
-        mockObject.onceRaises(new ThreadDeath()).testMethodString();
+        mockObject1.onceRaises(new ThreadDeath()).testMethodString();
 
         boolean exception1 = false;
         try {
-            mockObject.getMock().testMethodString();
+            mockObject1.getMock().testMethodString();
         } catch (ThreadDeath e) {
             exception1 = true;
         }
         boolean exception2 = false;
         try {
-            mockObject.getMock().testMethodString();
+            mockObject1.getMock().testMethodString();
         } catch (ThreadDeath e) {
             exception2 = true;
         }
@@ -184,10 +191,10 @@ public class MockObjectTest {
 
     @Test
     public void testRaises_exceptionClass() {
-        mockObject.raises(IllegalArgumentException.class).testMethodString();
+        mockObject1.raises(IllegalArgumentException.class).testMethodString();
 
         try {
-            mockObject.getMock().testMethodString();
+            mockObject1.getMock().testMethodString();
             fail("Expected exception");
         } catch (IllegalArgumentException e) {
             // expected
@@ -197,10 +204,10 @@ public class MockObjectTest {
 
     @Test
     public void testOnceRaises_exceptionClass() {
-        mockObject.onceRaises(IllegalArgumentException.class).testMethodString();
+        mockObject1.onceRaises(IllegalArgumentException.class).testMethodString();
 
         try {
-            mockObject.getMock().testMethodString();
+            mockObject1.getMock().testMethodString();
             fail("Expected exception");
         } catch (IllegalArgumentException e) {
             // expected
@@ -215,10 +222,10 @@ public class MockObjectTest {
     @Test
     public void testPerforms() {
         TestMockBehavior testMockBehavior = new TestMockBehavior();
-        mockObject.performs(testMockBehavior).testMethodString();
+        mockObject1.performs(testMockBehavior).testMethodString();
 
-        mockObject.getMock().testMethodString();
-        mockObject.getMock().testMethodString();
+        mockObject1.getMock().testMethodString();
+        mockObject1.getMock().testMethodString();
         assertLenientEquals(2, testMockBehavior.invocationCount);
     }
 
@@ -230,10 +237,10 @@ public class MockObjectTest {
     @Test
     public void testOncePerforms() {
         TestMockBehavior testMockBehavior = new TestMockBehavior();
-        mockObject.oncePerforms(testMockBehavior).testMethodString();
+        mockObject1.oncePerforms(testMockBehavior).testMethodString();
 
-        mockObject.getMock().testMethodString();
-        mockObject.getMock().testMethodString();
+        mockObject1.getMock().testMethodString();
+        mockObject1.getMock().testMethodString();
         assertLenientEquals(1, testMockBehavior.invocationCount);
     }
 
@@ -242,36 +249,72 @@ public class MockObjectTest {
     @Test
     public void testInvocationSpreadOverMoreThanOneLine() {
         TestMockBehavior testMockBehavior = new TestMockBehavior();
-        mockObject.performs(testMockBehavior).testMethodParam(
+        mockObject1.performs(testMockBehavior).testMethodParam(
               notNull(List.class));
-        mockObject.getMock().testMethodParam(null);
+        mockObject1.getMock().testMethodParam(null);
         assertEquals(0, testMockBehavior.invocationCount);
-        mockObject.getMock().testMethodParam(new ArrayList<String>());
+        mockObject1.getMock().testMethodParam(new ArrayList<String>());
         assertEquals(1, testMockBehavior.invocationCount);
     }
 
     @Test
     public void testCorrectAssertionFailedStackTrace() {
         try {
-            mockObject.assertInvoked().testMethodString();
+            mockObject1.assertInvoked().testMethodString();
             fail();
         } catch (AssertionError e) {
             assertTopOfStackTracePointsToCurrentTest(e, "testCorrectAssertionFailedStackTrace");
         }
 
         try {
-            mockObject.getMock().testMethodString();
-            mockObject.assertNotInvoked().testMethodString();
+            mockObject1.getMock().testMethodString();
+            mockObject1.assertNotInvoked().testMethodString();
             fail();
         } catch (AssertionError e) {
             assertTopOfStackTracePointsToCurrentTest(e, "testCorrectAssertionFailedStackTrace");
         }
 
         try {
-            mockObject.assertInvokedInSequence().testMethodArray();
+            mockObject1.assertInvokedInSequence().testMethodArray();
             fail();
         } catch (AssertionError e) {
             assertTopOfStackTracePointsToCurrentTest(e, "testCorrectAssertionFailedStackTrace");
+        }
+    }
+
+    @Test
+    public void testEquals() {
+        assertTrue(mockObject1.getMock().equals(mockObject1.getMock()));
+        assertFalse(mockObject1.getMock().equals(mockObject2.getMock()));
+    }
+
+    @Test
+    public void testHashcode() {
+        assertTrue(mockObject1.getMock().hashCode() == mockObject1.getMock().hashCode());
+        assertFalse(mockObject1.getMock().hashCode() == mockObject2.getMock().hashCode());
+    }
+
+    @Test
+    public void testDeepCloneEqualToOriginal() {
+        assertTrue(mockObject1.getMock() instanceof Cloneable);
+        TestClass clone = CloneUtil.createDeepClone(mockObject1.getMock());
+        assertEquals(mockObject1.getMock(), clone);
+    }
+
+    /**
+     * Test written for bugfix: if a mocked method returns another mock object, this other mock object is cloned
+     * at each invocation and added to the scenario. Because the mock object references the scenario, the scenario
+     * itself is also cloned each time. The result is that, at each invocation, the amount of objects which is cloned
+     * is twice the amount of the previous one. This quickly results in a large time delay. The bug fix involves that
+     * the mock object proxy now implements the {@link Cloneable} interface and the {@link Object#clone()} method
+     * returns the mock object proxy itself.
+     */
+    @Test(timeout = 1000)
+    public void testMockThatReturnsOtherMock() {
+        mockReturningOtherMock.returns(mockObject1.getMock()).getOtherMock();
+        
+        for (int i = 0; i < 50; i++) {
+            mockReturningOtherMock.getMock().getOtherMock().testMethodString();
         }
     }
 
@@ -300,6 +343,7 @@ public class MockObjectTest {
 
         public void testMethodParam(List<String> param);
 
+        public Object clone();
     }
 
 
@@ -315,4 +359,10 @@ public class MockObjectTest {
             return null;
         }
     }
+
+
+    private static interface MockReturning {
+
+        TestClass getOtherMock();
+    };
 }

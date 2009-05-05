@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * todo javadoc
- *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
@@ -78,7 +76,7 @@ public class DummyObjectUtilTest {
     }
 
     @Test
-    public void instanceOfFormatAdvise() {
+    public void instanceOfDummyObject() {
         TestClass dummy = DummyObjectUtil.createDummy(TestClass.class);
         assertTrue(dummy instanceof DummyObject);
         List<?> dummyList = DummyObjectUtil.createDummy(List.class);
@@ -92,7 +90,7 @@ public class DummyObjectUtilTest {
     }
 
     @Test
-    public void cloneEqualToOriginal() {
+    public void deepCloneEqualToOriginal() {
         TestClass dummy = DummyObjectUtil.createDummy(TestClass.class);
         TestClass clone = CloneUtil.createDeepClone(dummy);
         assertEquals(dummy, clone);
