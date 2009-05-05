@@ -15,13 +15,12 @@
  */
 package org.unitils.mock.dummy;
 
-import java.lang.reflect.Method;
-
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 import org.unitils.mock.proxy.ProxyInvocationHandler;
 import org.unitils.mock.proxy.ProxyUtil;
+import static org.unitils.util.MethodUtils.*;
 
 /**
  * Class for handling the dummy object behavior. A dummy object is a proxy that will return
@@ -88,46 +87,11 @@ public class DummyObjectUtil {
                 return dummyObjectHashCode;
             } else if (isCloneMethod(invocation.getMethod())) {
                 return invocation.getProxy();
-            } else if (isToStringMethod(invocation.getMethod()) || isFormatAdviseFormatMethod(invocation.getMethod())) {
+            } else if (isToStringMethod(invocation.getMethod())) {
                 return "DUMMY " + dummyObjectClass.getSimpleName() + "@" + Integer.toHexString(dummyObjectHashCode);
             }
             return dummyObjectBehavior.execute(invocation);
         }
-
-
-
-        /**
-         * @param method The method to check, not null
-         * @return True if the given method is the equals method
-         */
-        protected boolean isEqualsMethod(Method method) {
-            return "equals".equals(method.getName())
-                    && 1 == method.getParameterTypes().length
-                    && Object.class.equals(method.getParameterTypes()[0]);
-        }
-
-
-        /**
-         * @param method The method to check, not null
-         * @return True if the given method is the equals method
-         */
-        protected boolean isHashCodeMethod(Method method) {
-            return "hashCode".equals(method.getName())
-                    && 0 == method.getParameterTypes().length;
-        }
-        protected boolean isToStringMethod(Method method) {
-            return "toString".equals(method.getName())
-                    && 0 == method.getParameterTypes().length;
-        }
         
-        protected boolean isCloneMethod(Method method) {
-            return "clone".equals(method.getName()) 
-                    && 0 == method.getParameterTypes().length;
-        }
-        
-        protected boolean isFormatAdviseFormatMethod(Method method) {
-            return "$_format".equals(method.getName())
-            && 0 == method.getParameterTypes().length;
-        }
     }
 }
