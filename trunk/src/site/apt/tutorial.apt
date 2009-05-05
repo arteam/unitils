@@ -841,12 +841,8 @@ dbMaintainer.autoCreateExecutedScriptsTable=true
 ** Post processing scripts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~	
 	
-	It's often useful to have one or more database post-processing scripts: e.g. a script that compiles all PL/SQL procedures, that adds any missing grants, or that re-calculates
-	the Oracle statistics. A folder containing post-processing scripts can be configured as follows:
+	It's often useful to have one or more database post-processing scripts: e.g. a script that compiles all PL/SQL procedures, that adds any missing grants, or that re-calculates the Oracle statistics. Scripts are automatically recognized as post-processing scripts if they are located in the subdirectory postprocessing of the scripts root dir. To change the directory in which post processing scripts are located, you can use dbMaintainer.postProcessingScript.directoryName
 	
-+----+
-dbMaintainer.postProcessingScript.locations=myproject/postprocessingscripts
-+----+
 	
 ** {Preserving items}
 ~~~~~~~~~~~~~~~~~~~~~
