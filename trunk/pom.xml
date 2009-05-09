@@ -188,7 +188,7 @@
         <dependency>
             <groupId>org.dbmaintain</groupId>
             <artifactId>dbmaintain</artifactId>
-            <version>1.0</version>
+            <version>SNAPSHOT</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
