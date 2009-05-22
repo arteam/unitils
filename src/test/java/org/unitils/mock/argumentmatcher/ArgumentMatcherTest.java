@@ -17,20 +17,14 @@ package org.unitils.mock.argumentmatcher;
 
 import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.mock.ArgumentMatchers.eq;
-import static org.unitils.mock.ArgumentMatchers.isNull;
-import static org.unitils.mock.ArgumentMatchers.lenEq;
-import static org.unitils.mock.ArgumentMatchers.notNull;
-import static org.unitils.mock.ArgumentMatchers.refEq;
-import static org.unitils.mock.ArgumentMatchers.same;
+import org.junit.Before;
+import org.junit.Test;
+import static org.unitils.mock.ArgumentMatchers.*;
+import org.unitils.mock.core.MockObject;
+import org.unitils.mock.core.Scenario;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.unitils.mock.core.MockObject;
-import org.unitils.mock.core.Scenario;
 
 /**
  * Tests the usage of argment matchers.
@@ -43,10 +37,12 @@ public class ArgumentMatcherTest {
     /* Test mock object */
     private MockObject<TestClass> mockObject;
 
+    private Scenario scenario;
 
     @Before
     public void setUp() {
-        mockObject = new MockObject<TestClass>("testMock", TestClass.class, false, new Scenario(null));
+        scenario = new Scenario(null);
+        mockObject = new MockObject<TestClass>("testMock", TestClass.class, false, scenario);
     }
 
 
@@ -100,29 +96,29 @@ public class ArgumentMatcherTest {
         assertFalse(result);
         mockObject.assertNotInvoked().testMethodString(eq("test"));
     }
-    
-    
+
+
     /**
      * Tests the equals argument matcher in case the object changes between the behavior definition,
      * the actual method call and the assert statement. Since the eq() argument matcher uses the original
-     * object reference and not a copy of the object, the values should keep on matching. 
+     * object reference and not a copy of the object, the values should keep on matching.
      */
     @Test
     public void testEqualsArgumentMatcher_objectChangesBetweenCalls() {
         List<String> list = new ArrayList<String>();
-        
+
         mockObject.returns(true).testMethodObject(eq(list));
-        
+
         list.add("test");
         assertTrue(mockObject.getMock().testMethodObject(list));
-        
+
         List<String> nonEqualList = new ArrayList<String>();
         assertFalse(mockObject.getMock().testMethodObject(nonEqualList));
-        
+
         List<String> equalList = new ArrayList<String>();
         equalList.add("test");
         assertTrue(mockObject.getMock().testMethodObject(equalList));
-        
+
         list.add("test");
         mockObject.assertInvoked().testMethodObject(eq(list));
     }
@@ -222,8 +218,8 @@ public class ArgumentMatcherTest {
         boolean result = mockObject.getMock().testMethodString(null);
         assertFalse(result);
     }
-    
-    
+
+
     /**
      * The lenient argument matcher should not do lenient argument matching if
      * 0 is directly passed instead of being somewhere in the hierarchy
@@ -231,14 +227,14 @@ public class ArgumentMatcherTest {
     @Test
     public void testLenEqArgumentMatcher_zero() {
         mockObject.returns(true).testMethodInteger(0);
-        
+
         boolean result = mockObject.getMock().testMethodInteger(1);
         assertFalse(result);
-        
+
         mockObject.assertNotInvoked().testMethodInteger(0);
     }
-    
-    
+
+
     /**
      * The lenient argument matcher should not do lenient argument matching if
      * false is directly passed instead of being somewhere in the hierarchy
@@ -246,35 +242,35 @@ public class ArgumentMatcherTest {
     @Test
     public void testLenEqArgumentMatcher_false() {
         mockObject.returns(true).testMethodBoolean(false);
-        
+
         boolean result = mockObject.getMock().testMethodBoolean(true);
         assertFalse(result);
-        
+
         mockObject.assertNotInvoked().testMethodBoolean(false);
     }
-    
-    
+
+
     /**
      * Tests the lenient equals argument matcher in case the object changes between the behavior definition,
-     * the actual method call and the assert statement. Since the lenEq() argument matcher uses the a copy of 
-     * the object, the values should not match anymore. 
+     * the actual method call and the assert statement. Since the lenEq() argument matcher uses the a copy of
+     * the object, the values should not match anymore.
      */
     @Test
     public void testLenEqArgumentMatcher_objectChangesBetweenCalls() {
         List<String> list = new ArrayList<String>();
-        
+
         mockObject.returns(true).testMethodObject(lenEq(list));
-        
+
         list.add("test");
         assertFalse(mockObject.getMock().testMethodObject(list));
-        
+
         List<String> emptyList = new ArrayList<String>();
         assertTrue(mockObject.getMock().testMethodObject(emptyList));
-        
+
         List<String> oneElementList = new ArrayList<String>();
         oneElementList.add("test");
         assertFalse(mockObject.getMock().testMethodObject(oneElementList));
-        
+
         list.add("test");
         mockObject.assertNotInvoked().testMethodObject(lenEq(list));
         mockObject.assertInvoked().testMethodObject(lenEq(emptyList));
@@ -289,8 +285,8 @@ public class ArgumentMatcherTest {
         mockObject.assertNotInvoked().testMethodObject(lenEq(list));
         mockObject.assertInvoked().testMethodObject(lenEq(new ArrayList<String>()));
     }
-    
-    
+
+
     /**
      * Tests the reflection equals argument matcher, for an matching argument.
      */
@@ -337,25 +333,25 @@ public class ArgumentMatcherTest {
         boolean result = mockObject.getMock().testMethodString(null);
         assertFalse(result);
     }
-    
-    
+
+
     /**
      * Tests the lenient equals argument matcher in case the object changes between the behavior definition,
-     * the actual method call and the assert statement. Since the lenEq() argument matcher uses the a copy of 
-     * the object, the values should not match anymore. 
+     * the actual method call and the assert statement. Since the lenEq() argument matcher uses the a copy of
+     * the object, the values should not match anymore.
      */
     @Test
     public void testRefEqArgumentMatcher_objectChangesBetweenCalls() {
         List<String> list = new ArrayList<String>();
-        
+
         mockObject.returns(true).testMethodObject(refEq(list));
-        
+
         list.add("test");
         assertFalse(mockObject.getMock().testMethodObject(list));
-        
+
         List<String> emptyList = new ArrayList<String>();
         assertTrue(mockObject.getMock().testMethodObject(emptyList));
-        
+
         List<String> oneElementList = new ArrayList<String>();
         oneElementList.add("test");
         assertFalse(mockObject.getMock().testMethodObject(oneElementList));
@@ -423,17 +419,17 @@ public class ArgumentMatcherTest {
     /**
      * Tests the same argument matcher in case the object changes between the behavior definition,
      * the actual method call and the assert statement. Since the same() argument matcher uses the original
-     * object reference and not a copy of the object, the values should keep on matching. 
+     * object reference and not a copy of the object, the values should keep on matching.
      */
     @Test
     public void testSameArgumentMatcher_objectChangesBetweenCalls() {
         List<String> list = new ArrayList<String>();
 
         mockObject.returns(true).testMethodObject(same(list));
-        
+
         list.add("test");
         assertTrue(mockObject.getMock().testMethodObject(list));
-        
+
         List<String> equalList = new ArrayList<String>();
         equalList.add("test");
         assertFalse(mockObject.getMock().testMethodObject(equalList));
@@ -477,7 +473,6 @@ public class ArgumentMatcherTest {
         mockObject.assertInvoked().testMethodObject(list);
     }
 
-    
 
     /**
      * Interface that is mocked during the tests
@@ -487,11 +482,11 @@ public class ArgumentMatcherTest {
         boolean testMethodString(String arg1);
 
         boolean testMethodObject(Object arg1);
-        
+
         boolean testMethodInteger(int arg1);
-        
+
         boolean testMethodBoolean(boolean arg1);
-        
+
     }
 
 }
