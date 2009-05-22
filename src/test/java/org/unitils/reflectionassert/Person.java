@@ -13,25 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert.report;
+package org.unitils.reflectionassert;
 
-import org.unitils.reflectionassert.difference.Difference;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
- * Creates a report of the given differences.
- *
- * @author Tim Ducheyne
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
-public interface DifferenceReport {
+public class Person {
 
+    private String fName;
+    private String lName;
+    private String userName;
+    private List<Car> cars;
 
-    /**
-     * Creates a report.
-     *
-     * @param difference The difference to output, null for a match
-     * @return The report, not null
-     */
-    public String createReport(Difference difference);
+    public Person(String fName, String lName, String userName, Car... cars) {
+        this.fName = fName;
+        this.lName = lName;
+        this.userName = userName;
+        this.cars = Arrays.asList(cars);
+    }
 
 }

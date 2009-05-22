@@ -50,8 +50,11 @@ public class ReflectionComparator {
 
     /**
      * A cache of results, so that comparisons are only performed once and infinite loops because of cycles are avoided
+     * A different cache is used dependent on whether only the first difference is required or whether we need all
+     * differences, since the resulting {@link Difference} objects differ. 
      */
-    protected Map<Object, Map<Object, Difference>> cachedResults = new IdentityHashMap<Object, Map<Object, Difference>>();
+    protected Map<Object, Map<Object, Difference>> firstDifferenceCachedResults = new IdentityHashMap<Object, Map<Object, Difference>>();
+    protected Map<Object, Map<Object, Difference>> allDifferencesCachedResults = new IdentityHashMap<Object, Map<Object, Difference>>();
 
 
     /**
@@ -100,7 +103,7 @@ public class ReflectionComparator {
      */
     public Difference getDifference(Object left, Object right, boolean onlyFirstDifference) {
         // check whether difference is available in cache
-        Map<Object, Difference> cachedResult = cachedResults.get(left);
+        Map<Object, Difference> cachedResult = getCachedDifference(left, onlyFirstDifference);
         if (cachedResult != null) {
             if (cachedResult.containsKey(right)) {
                 // found difference in cache, return cached value
@@ -108,7 +111,7 @@ public class ReflectionComparator {
             }
         } else {
             cachedResult = new IdentityHashMap<Object, Difference>();
-            cachedResults.put(left, cachedResult);
+            saveResultInCache(left, cachedResult, onlyFirstDifference);
         }
         cachedResult.put(right, null);
 
@@ -131,5 +134,21 @@ public class ReflectionComparator {
         // register outcome in cache
         cachedResult.put(right, result);
         return result;
+    }
+
+    protected void saveResultInCache(Object left, Map<Object, Difference> cachedResult, boolean onlyFirstDifference) {
+        if (onlyFirstDifference) {
+            firstDifferenceCachedResults.put(left, cachedResult);
+        } else {
+            allDifferencesCachedResults.put(left, cachedResult);
+        }
+    }
+
+    protected Map<Object, Difference> getCachedDifference(Object left, boolean onlyFirstDifference) {
+        if (onlyFirstDifference) {
+            return firstDifferenceCachedResults.get(left);
+        } else {
+            return allDifferencesCachedResults.get(left);
+        }
     }
 }

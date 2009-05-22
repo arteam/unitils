@@ -60,6 +60,16 @@ public interface DifferenceVisitor<T, A> {
 
 
     /**
+     * Visits a class difference.
+     *
+     * @param classDifference The difference
+     * @param argument        An optional argument, null if NA
+     * @return The result
+     */
+    T visit(ClassDifference classDifference, A argument);
+
+
+    /**
      * Visits a map difference.
      *
      * @param mapDifference The difference

@@ -211,14 +211,14 @@ public class LenientOrderCollectionComparator implements Comparator {
             // ends the recursion
             // check if we found a new best match
             if (currentMatchingScore < difference.getBestMatchingScore()) {
-                difference.getBestMatchingIndexes().putAll(currentMatchingIndexes);
+                difference.addBestMatchingIndexes(currentMatchingIndexes);
 
                 // all remaining elements are missing elements
                 for (Integer leftIndex : leftIndexes) {
-                    difference.setBestMatchingIndexes(leftIndex, -1);
+                    difference.addBestMatchingIndexes(leftIndex, -1);
                 }
                 for (Integer rightIndex : rightIndexes) {
-                    difference.setBestMatchingIndexes(-1, rightIndex);
+                    difference.addBestMatchingIndexes(-1, rightIndex);
                 }
                 difference.setBestMatchingScore(currentMatchingScore);
             }

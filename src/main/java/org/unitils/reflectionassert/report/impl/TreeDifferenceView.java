@@ -17,7 +17,9 @@ package org.unitils.reflectionassert.report.impl;
 
 import org.unitils.reflectionassert.difference.*;
 import org.unitils.reflectionassert.report.DifferenceView;
+import static org.unitils.reflectionassert.report.impl.DefaultDifferenceReport.MatchType.NO_MATCH;
 import org.unitils.core.util.ObjectFormatter;
+import static org.apache.commons.lang.ClassUtils.getShortClassName;
 
 import java.util.List;
 import java.util.Map;
@@ -84,6 +86,15 @@ public class TreeDifferenceView implements DifferenceView {
     }
 
 
+    protected String formatDifference(ClassDifference classDifference, String fieldName) {
+        StringBuilder result = new StringBuilder();
+        result.append((fieldName == null) ? "" : fieldName + ":");
+        result.append("Expected: object of type ").append(getShortClassName(classDifference.getLeftClass()));
+        result.append(", actual: object of type ").append(getShortClassName(classDifference.getRightClass())).append("\n");
+        return result.toString();
+    }
+
+
     /**
      * Creates a string representation of a collection difference.
      *
@@ -126,21 +137,28 @@ public class TreeDifferenceView implements DifferenceView {
         result.append(formatDifference((Difference) mapDifference, fieldName));
 
         for (Map.Entry<Object, Difference> valueDifference : mapDifference.getValueDifferences().entrySet()) {
-            String innerFieldName = createFieldName(fieldName, objectFormatter.format(valueDifference.getKey()), true);
+            String innerFieldName = createFieldName(fieldName, formatObject(valueDifference.getKey()), true);
             result.append(valueDifference.getValue().accept(treeDifferenceFormatterVisitor, innerFieldName));
         }
 
         Map<?, ?> leftMap = mapDifference.getLeftMap();
         Map<?, ?> rightMap = mapDifference.getRightMap();
         for (Object leftKey : mapDifference.getLeftMissingKeys()) {
-            String innerFieldName = createFieldName(fieldName, objectFormatter.format(leftKey), true);
+            String innerFieldName = createFieldName(fieldName, formatObject(leftKey), true);
             result.append(formatValues(innerFieldName, leftMap.get(leftKey), ""));
         }
         for (Object rightKey : mapDifference.getRightMissingKeys()) {
-            String innerFieldName = createFieldName(fieldName, objectFormatter.format(rightKey), true);
+            String innerFieldName = createFieldName(fieldName, formatObject(rightKey), true);
             result.append(formatValues(innerFieldName, rightMap.get(rightKey), ""));
         }
         return result.toString();
+    }
+
+    protected String formatObject(Object object) {
+        if (object == NO_MATCH) {
+            return "--no match--";
+        }
+        return objectFormatter.format(object);
     }
 
 
@@ -162,12 +180,12 @@ public class TreeDifferenceView implements DifferenceView {
 
             if (leftIndex == -1) {
                 String innerFieldName = createFieldName(fieldName, "[x," + rightIndex + "]", false);
-                result.append(formatValues(innerFieldName, "", objectFormatter.format(unorderedCollectionDifference.getRightList().get(rightIndex))));
+                result.append(formatValues(innerFieldName, NO_MATCH, unorderedCollectionDifference.getRightList().get(rightIndex)));
                 continue;
             }
             if (rightIndex == -1) {
                 String innerFieldName = createFieldName(fieldName, "[" + leftIndex + ",x]", false);
-                result.append(formatValues(innerFieldName, objectFormatter.format(unorderedCollectionDifference.getLeftList().get(leftIndex)), ""));
+                result.append(formatValues(innerFieldName, unorderedCollectionDifference.getLeftList().get(leftIndex), NO_MATCH));
                 continue;
             }
 
@@ -196,12 +214,12 @@ public class TreeDifferenceView implements DifferenceView {
 
         String prefix = (fieldName == null) ? "" : fieldName;
         result.append(prefix);
-        result.append(" =>  ");
-        result.append(objectFormatter.format(leftValue));
+        result.append(" expected: ");
+        result.append(formatObject(leftValue));
         result.append("\n");
         result.append(prefix);
-        result.append(" =>  ");
-        result.append(objectFormatter.format(rightValue));
+        result.append("   actual: ");
+        result.append(formatObject(rightValue));
         result.append("\n\n");
         return result.toString();
     }
@@ -240,6 +258,10 @@ public class TreeDifferenceView implements DifferenceView {
 
         public String visit(ObjectDifference objectDifference, String fieldName) {
             return formatDifference(objectDifference, fieldName);
+        }
+
+        public String visit(ClassDifference classDifference, String fieldName) {
+            return formatDifference(classDifference, fieldName);
         }
 
         public String visit(MapDifference mapDifference, String fieldName) {

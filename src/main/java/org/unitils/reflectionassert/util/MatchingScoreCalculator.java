@@ -138,6 +138,10 @@ public class MatchingScoreCalculator {
             return getMatchingScore(objectDifference);
         }
 
+        public Integer visit(ClassDifference classDifference, Integer argument) {
+            return getMatchingScore(classDifference);
+        }
+
         public Integer visit(MapDifference mapDifference, Integer argument) {
             return getMatchingScore(mapDifference);
         }

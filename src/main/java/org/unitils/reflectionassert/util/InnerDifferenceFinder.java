@@ -78,6 +78,11 @@ public class InnerDifferenceFinder {
             return objectDifference.getFieldDifferences().get(fieldName);
         }
 
+        
+        public Difference visit(ClassDifference classDifference, String argument) {
+            return null;
+        }
+
 
         /**
          * Returns the difference at the given key. The string represenation (using the object formatter) of the keys
