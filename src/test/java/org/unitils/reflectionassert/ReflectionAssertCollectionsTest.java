@@ -127,7 +127,7 @@ public class ReflectionAssertCollectionsTest {
     /**
      * Test for with a collection that has one element less.
      */
-    @Test()
+    @Test(expected = AssertionFailedError.class)
     public void testAssertEquals_oneElementLess() {
         assertReflectionEquals(listA, listOneElementLess);
     }
