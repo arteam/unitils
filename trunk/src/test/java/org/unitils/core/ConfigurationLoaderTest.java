@@ -24,8 +24,8 @@ import static org.testng.AssertJUnit.fail;
 import org.unitils.UnitilsJUnit4;
 import static org.unitils.core.ConfigurationLoader.*;
 import org.unitils.core.util.PropertiesReader;
-import org.unitils.inject.annotation.InjectInto;
-import org.unitils.inject.annotation.InjectIntoStatic;
+import org.unitils.inject.annotation.InjectIntoByType;
+import org.unitils.inject.annotation.InjectIntoStaticByType;
 import org.unitils.inject.annotation.TestedObject;
 import org.unitils.mock.Mock;
 
@@ -45,11 +45,11 @@ public class ConfigurationLoaderTest extends UnitilsJUnit4 {
     private ConfigurationLoader configurationLoader;
 
     /* PropertiesReader used by sut */
-    @InjectInto(property = "propertiesReader")
+    @InjectIntoByType
     private Mock<PropertiesReader> propertiesReader;
 
     /* Logger used by sut */
-    @InjectIntoStatic(target = ConfigurationLoader.class, property = "logger")
+    @InjectIntoStaticByType(target = ConfigurationLoader.class)
     private Mock<Log> usedLogger;
 
     /* Faked default Properties (unitils.properties) */

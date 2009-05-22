@@ -49,7 +49,7 @@ import java.util.List;
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
-public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHolder {
+public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHolder<T> {
 
     /* The name of the mock (e.g. the name of the field) */
     protected String name;
@@ -91,8 +91,8 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
         this.scenario = scenario;
         this.instance = createInstance();
     }
-    
-    
+
+
     //
     // Implementation of the ObjectToInjectHolder interface. Implementing this interface makes sure that the 
     // proxy instance is injected instead of this object (which doesn't directly implement the mocked interface)
@@ -104,7 +104,7 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
      *
      * @return The mock proxy instance, not null
      */
-    public Object getObjectToInject() {
+    public T getObjectToInject() {
         return instance;
     }
 
@@ -112,7 +112,7 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
     /**
      * @return The type of the object to inject (i.e. the mocked type), not null.
      */
-    public Class<?> getObjectToInjectType() {
+    public Class<T> getObjectToInjectType() {
         return mockedClass;
     }
 
@@ -130,13 +130,13 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
     public T getMock() {
         return instance;
     }
-    
-    
+
+
     public Class<?> getMockedClass() {
         return mockedClass;
     }
 
-    
+
     /**
      * Defines behavior for this mock so that it will return the given value when the invocation following
      * this call matches the observed behavior. E.g.
@@ -316,7 +316,7 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
     /**
      * Asserts that an invocation that matches the invocation following this call has been observed
      * on this mock object during this test.
-     * 
+     *
      * @return The proxy instance that will record the method call, not null
      */
     @MatchStatement
@@ -328,11 +328,11 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
 
     /**
      * Asserts that an invocation that matches the invocation following this call has been observed
-     * on this mock object during this test. 
+     * on this mock object during this test.
      * <p/>
-     * If this method is used multiple times during the current test, the sequence of the observed method 
+     * If this method is used multiple times during the current test, the sequence of the observed method
      * calls has to be the same as the sequence of the calls to this method.
-     * 
+     *
      * @return The proxy instance that will record the method call, not null
      */
     @MatchStatement
@@ -345,7 +345,7 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
     /**
      * Asserts that no invocation that matches the invocation following this call has been observed
      * on this mock object during this test.
-     * 
+     *
      * @return The proxy instance that will record the method call, not null
      */
     @MatchStatement
@@ -495,10 +495,10 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
         Class<?>[] interfaces;
         if (mockedClass.isInterface()) {
             superClass = Object.class;
-            interfaces = new Class<?>[] {mockedClass, Cloneable.class};
+            interfaces = new Class<?>[]{mockedClass, Cloneable.class};
         } else {
             superClass = mockedClass;
-            interfaces = new Class<?>[] {Cloneable.class};
+            interfaces = new Class<?>[]{Cloneable.class};
         }
         return (T) createProxy(superClass, interfaces, new MockObjectInvocationHandler());
     }
@@ -545,8 +545,8 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
         ArgumentMatcherRepository.getInstance().registerEndOfMatchingInvocation();
         return result;
     }
-    
-   
+
+
     protected SyntaxMonitor getSyntaxMonitor() {
         return scenario.getSyntaxMonitor();
     }
