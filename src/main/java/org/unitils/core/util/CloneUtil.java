@@ -18,6 +18,8 @@ package org.unitils.core.util;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 import org.unitils.core.UnitilsException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
@@ -37,7 +39,10 @@ import java.util.Map;
  */
 public class CloneUtil {
 
-    /* Objenisis instance for creating new instances of types */
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(CloneUtil.class);
+
+    /* Objenesis instance for creating new instances of types */
     private static Objenesis objenesis = new ObjenesisStd();
 
 
@@ -76,37 +81,32 @@ public class CloneUtil {
      * @return The clone, the instance to clone if the clone could not be made
      */
     protected static Object cloneObject(Object instanceToClone, Map<Object, Object> cloneCache) throws Throwable {
-        // check for null
         if (instanceToClone == null) {
             return null;
         }
         // check whether the instance was already cloned, this will preserve the object graph
-        Object clonedInstance = cloneCache.get(instanceToClone);
-        if (clonedInstance != null) {
-            return clonedInstance;
+        if (cloneCache.containsKey(instanceToClone)) {
+            return cloneCache.get(instanceToClone);
         }
-        // check for immutable values such as primitive values
-        clonedInstance = getValueIfImmutable(instanceToClone);
-        if (clonedInstance != null) {
-            return clonedInstance;
+        // if the value is immutable, return the instance itself
+        if (isImmutable(instanceToClone)) {
+            return instanceToClone;
         }
         // check for arrays
         if (instanceToClone.getClass().isArray()) {
-            clonedInstance = cloneArray(instanceToClone, cloneCache);
+            return cloneArray(instanceToClone, cloneCache);
         }
         // if the instance is cloneable, try to clone it
-        if (clonedInstance == null) {
-            clonedInstance = createInstanceUsingClone(instanceToClone);
+        if (instanceToClone instanceof Cloneable) {
+            return createInstanceUsingClone(instanceToClone);
         }
         // try to clone it ourselves
-        if (clonedInstance == null) {
-            clonedInstance = createInstanceUsingObjenesis(instanceToClone);
+        Object clonedInstance = createInstanceUsingObjenesis(instanceToClone);
 
-            // Unable to create an instance
-            if (clonedInstance == null) {
-                // todo log warning
-                return instanceToClone;
-            }
+        // Unable to create an instance
+        if (clonedInstance == null) {
+            logger.warn("Could not create an instance of class " + instanceToClone.getClass() + " using objenesis");
+            return instanceToClone;
         }
         // cache the clone
         cloneCache.put(instanceToClone, clonedInstance);
@@ -123,16 +123,16 @@ public class CloneUtil {
      * @param instanceToClone The instance, not null
      * @return The instance if it is immutable, else null
      */
-    protected static Object getValueIfImmutable(Object instanceToClone) {
+    protected static boolean isImmutable(Object instanceToClone) {
         Class<?> clazz = instanceToClone.getClass();
 
         if (clazz.isPrimitive() || clazz.isEnum() || clazz.isAnnotation()) {
-            return instanceToClone;
+            return true;
         }
         if (instanceToClone instanceof Number || instanceToClone instanceof String || instanceToClone instanceof Character || instanceToClone instanceof Boolean) {
-            return instanceToClone;
+            return true;
         }
-        return null;
+        return false;
     }
 
 
@@ -143,9 +143,6 @@ public class CloneUtil {
      * @return The clone if it could be cloned, else null
      */
     protected static Object createInstanceUsingClone(Object instanceToClone) {
-        if (!(instanceToClone instanceof Cloneable)) {
-            return null;
-        }
         try {
             Method cloneMethod = Object.class.getDeclaredMethod("clone");
             cloneMethod.setAccessible(true);
@@ -210,9 +207,11 @@ public class CloneUtil {
      * @return The cloned array, not null
      */
     protected static Object cloneArray(Object arrayToClone, Map<Object, Object> cloneCache) throws Throwable {
-        // todo add to cache to avoid infinite loops
         int lenght = Array.getLength(arrayToClone);
         Object clonedArray = Array.newInstance(arrayToClone.getClass().getComponentType(), lenght);
+        // Make sure we put the array in the cache before we start cloning the elements, since the array itself may also
+        // be one of the elements, and in this case we want to reuse the same element, to avoid infinite recursion.
+        cloneCache.put(arrayToClone, clonedArray);
 
         for (int i = 0; i < lenght; i++) {
             Object elementValue = Array.get(arrayToClone, i);
