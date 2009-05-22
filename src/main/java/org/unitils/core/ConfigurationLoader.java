@@ -15,21 +15,19 @@
  */
 package org.unitils.core;
 
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-
-import java.io.InputStream;
-import java.util.Properties;
-
+import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.util.PropertiesReader;
 import org.unitils.util.PropertyUtils;
 
+import java.util.Properties;
+
 
 /**
  * Utility that loads the configuration of unitils.
  * <p/>
- * Unitils settings can be defined in 3 files:<ul>
+ * Unitils settings can be defined in 3 files and in the system properties:<ul>
  * <li><b>unitils-default.properties</b> - a fixed file packaged in the unitils jar that contains all predefined defaults.
  * This file should normally not be modified.</li>
  * <li><b>unitils.properties</b> - a file somewhere in the classpath or user.home dir that contains all custom configuration
@@ -38,6 +36,7 @@ import org.unitils.util.PropertyUtils;
  * <li><b>unitils-local.properties</b> - a file somewhere in the classpath or user.home that contains machine/user local
  * configuration. Eg the database schema specific to the local user could be defined here. Settings in this file
  * will override the unitil default and custom settings.</li>
+ * <li><b>system properties</b> - These settings override all other settings.</li>
  * </ul>
  * The name of the custom settings file (unitils.properties) is defined by the {@link #PROPKEY_CUSTOM_CONFIGURATION}
  * property in the default settings. The name of the local settings file (unitils-local.propeties) is defined
@@ -47,9 +46,15 @@ import org.unitils.util.PropertyUtils;
  * A runtime exception is thrown when the default properties cannot be loaded.
  * A warning is logged when the custom propreties cannot be loaded.
  * A debug message is logged when the local properties cannot be loaded.
+ * <p/>
+ * Ant-like property place holders, e.g. ${holder} will be expanded if needed  all property place holders to actual values.
+ * For example suppose you have a property defined as follows: root.dir=/usr/home
+ * Expanding following ${root.dir}/somesubdir
+ * will then give following result: /usr/home/somesubdir
  *
  * @author Tim Ducheyne
  * @author Filip Neven
+ * @author Fabian Krueger
  */
 public class ConfigurationLoader {
 
@@ -72,8 +77,10 @@ public class ConfigurationLoader {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(ConfigurationLoader.class);
 
-    /** reads properties from configuration file */
-	private PropertiesReader propertiesReader = new PropertiesReader();
+    /**
+     * reads properties from configuration file
+     */
+    private PropertiesReader propertiesReader = new PropertiesReader();
 
 
     /**
@@ -82,50 +89,94 @@ public class ConfigurationLoader {
      * @return the settings, not null
      */
     public Properties loadConfiguration() {
-        return loadConfiguration(null);
+        Properties properties = new Properties();
+
+        loadDefaultConfiguration(properties);
+        loadCustomConfiguration(properties);
+        loadLocalConfiguration(properties);
+        loadSystemProperties(properties);
+        expandPropertyValues(properties);
+        return properties;
     }
 
 
     /**
-     * Creates and loads all configuration settings.
+     * Load the default properties file that is distributed with unitils (unitils-default.properties)
      *
-     * @param customConfigurationFileName The name of the custom configuration file.
-     *                                    May be null: if so, the fileName is retrieved from the default properties.
-     * @return the settings, not null
+     * @param properties The instance to add to loaded properties to, not null
      */
-    public Properties loadConfiguration(String customConfigurationFileName) {
-        Properties properties = new Properties();
-
-        // Load the default properties file, that is distributed with unitils (unitils-default.properties)
+    protected void loadDefaultConfiguration(Properties properties) {
         Properties defaultProperties = propertiesReader.loadPropertiesFileFromClasspath(DEFAULT_PROPERTIES_FILE_NAME);
         if (defaultProperties == null) {
             throw new UnitilsException("Configuration file: " + DEFAULT_PROPERTIES_FILE_NAME + " not found in classpath.");
         }
         properties.putAll(defaultProperties);
+    }
 
-        // Load the custom project level configuration file (unitils.properties)
-        if (customConfigurationFileName == null) {
-            customConfigurationFileName = PropertyUtils.getString(PROPKEY_CUSTOM_CONFIGURATION, properties);
-        }
+
+    /**
+     * Load the custom project level configuration file (unitils.properties)
+     *
+     * @param properties The instance to add to loaded properties to, not null
+     */
+    protected void loadCustomConfiguration(Properties properties) {
+        String customConfigurationFileName = PropertyUtils.getString(PROPKEY_CUSTOM_CONFIGURATION, properties);
         Properties customProperties = propertiesReader.loadPropertiesFileFromClasspath(customConfigurationFileName);
         if (customProperties == null) {
             logger.warn("No custom configuration file " + customConfigurationFileName + " found.");
         } else {
             properties.putAll(customProperties);
         }
+    }
 
-        // Load the local configuration file from the user home, or from the classpath
+
+    /**
+     * Load the local configuration file from the user home, or from the classpath
+     *
+     * @param properties The instance to add to loaded properties to, not null
+     */
+    protected void loadLocalConfiguration(Properties properties) {
         String localConfigurationFileName = PropertyUtils.getString(PROPKEY_LOCAL_CONFIGURATION, properties);
         Properties localProperties = propertiesReader.loadPropertiesFileFromUserHome(localConfigurationFileName);
         if (localProperties == null) {
             localProperties = propertiesReader.loadPropertiesFileFromClasspath(localConfigurationFileName);
         }
         if (localProperties == null) {
-            logger.info("No custom configuration file " + localConfigurationFileName + " found.");
+            logger.info("No local configuration file " + localConfigurationFileName + " found.");
         } else {
             properties.putAll(localProperties);
         }
+    }
 
-        return properties;
+
+    /**
+     * Load the environment properties.
+     *
+     * @param properties The instance to add to loaded properties to, not null
+     */
+    protected void loadSystemProperties(Properties properties) {
+        properties.putAll(System.getProperties());
+    }
+
+
+    /**
+     * Expands all property place holders to actual values. For example
+     * suppose you have a property defined as follows: root.dir=/usr/home
+     * Expanding following ${root.dir}/somesubdir
+     * will then give following result: /usr/home/somesubdir
+     *
+     * @param properties The properties, not null
+     */
+    protected void expandPropertyValues(Properties properties) {
+        for (Object key : properties.keySet()) {
+            Object value = properties.get(key);
+            try {
+                String expandedValue = StrSubstitutor.replace(value, properties);
+                properties.put(key, expandedValue);
+            } catch (Exception e) {
+                throw new UnitilsException("Unable to load unitils configuration. Could not expand property value for key: " + key + ", value " + value, e);
+            }
+        }
+
     }
 }

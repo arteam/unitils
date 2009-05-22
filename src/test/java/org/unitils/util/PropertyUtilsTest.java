@@ -297,23 +297,4 @@ public class PropertyUtilsTest extends TestCase {
         }
     }
 
-
-    /**
-     * Test for getting a property that contains a place holder, e.g. ${something}
-     */
-    public void testGetString_expandProperty() {
-        String result = getString("expandProperty", testProperties);
-        assertEquals("A test value", result);
-    }
-
-
-    /**
-     * Test for getting a property that contains a place holder, e.g. ${something}
-     */
-    public void testGetString_expandSystemProperty() {
-        String result = getString("expandSystemProperty", testProperties);
-        assertFalse(result.contains("${user.home}"));
-        assertTrue(result.length() > 0);
-    }
-
 }

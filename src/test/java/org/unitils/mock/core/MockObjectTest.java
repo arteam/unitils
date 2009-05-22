@@ -15,23 +15,21 @@
  */
 package org.unitils.mock.core;
 
-import static org.junit.Assert.*;
-import static org.unitils.mock.ArgumentMatchers.*;
+import static junit.framework.Assert.*;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.core.util.CloneUtil;
+import static org.unitils.mock.ArgumentMatchers.notNull;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
-import org.unitils.core.util.CloneUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertEquals;
 
 /**
  * Tests the mock object functionality.
@@ -244,13 +242,13 @@ public class MockObjectTest {
         assertLenientEquals(1, testMockBehavior.invocationCount);
     }
 
-    
+
     @SuppressWarnings("unchecked")
     @Test
     public void testInvocationSpreadOverMoreThanOneLine() {
         TestMockBehavior testMockBehavior = new TestMockBehavior();
         mockObject1.performs(testMockBehavior).testMethodParam(
-              notNull(List.class));
+                notNull(List.class));
         mockObject1.getMock().testMethodParam(null);
         assertEquals(0, testMockBehavior.invocationCount);
         mockObject1.getMock().testMethodParam(new ArrayList<String>());
@@ -312,7 +310,7 @@ public class MockObjectTest {
     @Test(timeout = 1000)
     public void testMockThatReturnsOtherMock() {
         mockReturningOtherMock.returns(mockObject1.getMock()).getOtherMock();
-        
+
         for (int i = 0; i < 50; i++) {
             mockReturningOtherMock.getMock().getOtherMock().testMethodString();
         }
@@ -343,7 +341,7 @@ public class MockObjectTest {
 
         public void testMethodParam(List<String> param);
 
-        public Object clone();
+        public Object clone() throws CloneNotSupportedException;
     }
 
 
@@ -364,5 +362,5 @@ public class MockObjectTest {
     private static interface MockReturning {
 
         TestClass getOtherMock();
-    };
+    }
 }
