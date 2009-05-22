@@ -60,7 +60,7 @@ public class ArgumentMatcherPositionFinderTest {
 
     /* A target method without args on the proxy */
     private Method noArgumentsProxyMethod;
-    
+
     private Method valueReturningProxyMethod;
 
     /**
@@ -118,12 +118,12 @@ public class ArgumentMatcherPositionFinderTest {
         List<Integer> result = getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, multiLineInvocationLineNrFrom, multiLineInvocationLineNrTo);
         assertReflectionEquals(asList(0, 2), result);
     }
-    
+
     @Test(expected = UnitilsException.class)
     public void testGetArgumentMatcherIndexes_nestedArgumentMatcher() {
         getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, nestedArgumentMatcherLineNr, nestedArgumentMatcherLineNr);
     }
-    
+
     @Test(expected = UnitilsException.class)
     public void testGetArgumentMatcherIndexes_nestedMethodInvocation() {
         getArgumentMatcherIndexes(TestClass.class, "test", valueReturningProxyMethod, nestedMethodInvocationLineNr, nestedMethodInvocationLineNr);
@@ -145,9 +145,9 @@ public class ArgumentMatcherPositionFinderTest {
     public static class TestClass {
 
         MockObject<MockedClass> mockObject = new MockObject<MockedClass>("testMock", MockedClass.class, false, new Scenario(null));
-        
+
         MockBehavior dummyBehavior = DummyObjectUtil.createDummy(MockBehavior.class);
-        
+
         public void test() {
             // regular invocation
             mockObject.performs(dummyBehavior).someMethod(notNull(String.class), "aValue", notNull(String.class));
@@ -182,7 +182,7 @@ public class ArgumentMatcherPositionFinderTest {
 
         public void someMethod() {
         }
-        
+
         public String valueReturningMethod(String param1, String param2, String param3) {
             return null;
         }

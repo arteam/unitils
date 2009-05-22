@@ -15,32 +15,25 @@
  */
 package org.unitils.mock.argumentmatcher;
 
-import static org.objectweb.asm.Opcodes.INVOKESTATIC;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Type;
 import static org.objectweb.asm.Type.getMethodDescriptor;
+import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.analysis.*;
+import org.unitils.core.UnitilsException;
+import org.unitils.mock.annotation.ArgumentMatcher;
+import org.unitils.mock.annotation.MatchStatement;
+import org.unitils.mock.proxy.ProxyInvocation;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import static org.unitils.util.ReflectionUtils.getClassWithName;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.LineNumberNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.analysis.Analyzer;
-import org.objectweb.asm.tree.analysis.AnalyzerException;
-import org.objectweb.asm.tree.analysis.BasicValue;
-import org.objectweb.asm.tree.analysis.Interpreter;
-import org.objectweb.asm.tree.analysis.Value;
-import org.unitils.core.UnitilsException;
-import org.unitils.mock.annotation.ArgumentMatcher;
-import org.unitils.mock.annotation.MatchStatement;
-import org.unitils.mock.proxy.ProxyInvocation;
 
 /**
  * Utility class for locating argument matchers in method invocations.
@@ -130,15 +123,16 @@ public class ArgumentMatcherPositionFinder {
     /**
      * Locates the argument matchers for the method invocation on the given line.
      *
-     * @param classNode     The class containing the method invocation, not null
-     * @param methodNode    The method containing the method invocation, not null
-     * @param invokedMethod The invocation to look for, not null
-     * @param fromLineNr    The begin line-nr of the invocation
-     * @param toLineNr      The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line)
+     * @param classNode             The class containing the method invocation, not null
+     * @param methodNode            The method containing the method invocation, not null
+     * @param interpretedClass      The current class, not null
+     * @param interpretedMethodName The current method name, not null
+     * @param invokedMethod         The invocation to look for, not null
+     * @param fromLineNr            The begin line-nr of the invocation
+     * @param toLineNr              The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line)
      * @return The argument indexes, null if method was not found, empty if method found but there are no matchers
      */
-    protected static List<Integer> findArgumentMatcherIndexes(ClassNode classNode, MethodNode methodNode, Class<?> interpretedClass, String interpretedMethodName,
-                                                              Method invokedMethod, int fromLineNr, int toLineNr) {
+    protected static List<Integer> findArgumentMatcherIndexes(ClassNode classNode, MethodNode methodNode, Class<?> interpretedClass, String interpretedMethodName, Method invokedMethod, int fromLineNr, int toLineNr) {
         String invokedMethodName = invokedMethod.getName();
         String invokedMethodDescriptor = getMethodDescriptor(invokedMethod);
         try {
@@ -216,32 +210,24 @@ public class ArgumentMatcherPositionFinder {
      * operand stack.
      * <p/>
      * This interpreter works as follows to find the argument matchers: if a method call instruction is found that is
-     * an argument matcher we always return the {@link #ARGUMENT_MATCHER} value. For other instructions
-     * a {@link #REGULAR_VALUE} is returned, unless one of its operands is a an {@link #ARGUMENT_MATCHER} value, in
-     * that case an {@link #ARGUMENT_MATCHER} value is returned.
-     * <p/>
-     * a {@link #ARGUMENT_MATCHER} value, we've found the index of the argument matcher.
-     * When the actual invoked method is found, we then just have to look at the operands: if one of the operands in
+     * an argument matcher we return an ArugmentMatcherValue. For other instructions an ArugmentMatcherValue is returned if
+     * one of its operands was a an ArugmentMatcherValue. When the actual invoked method is found, we then just
+     * have to look at the operands: if one of the operands is an ArugmentMatcherValue, we've found the index of the argument matcher.
      * <p/>
      * For example:<br>
      * mock.methodCall(0, gt(2))   would give<br>
      * 1) load 0<br>
-     * .... stack ( REGULAR_VALUE )<br>
+     * .... stack ( NotAnArgumentMatcherValue )<br>
      * 2) load 2<br>
-     * .... stack ( REGULAR_VALUE, REGULAR_VALUE)<br>
+     * .... stack ( NotAnArgumentMatcherValue, NotAnArgumentMatcherValue)<br>
      * 3) invoke argment matcher (pops last operand)<br>
-     * .... stack ( REGULAR_VALUE, ARGUMENT_MATCHER)<br>
+     * .... stack ( NotAnArgumentMatcherValue, ArgumentMatcherValue)<br>
      * 4) invoke mock method using last 2 operands => we've found an argument matcher as second operand
      */
-    protected static class MethodInterpreter implements Interpreter {
+    protected static class MethodInterpreter extends BasicInterpreter {
 
-        /* The value to use for non-argument matcher operands */
-        protected static final Value REGULAR_VALUE = BasicValue.UNINITIALIZED_VALUE;
 
-        /* The value to use for argument matcher operands */
-        protected static final Value ARGUMENT_MATCHER = BasicValue.REFERENCE_VALUE;
-
-        protected Class<?> interpretedMethodClass;
+        protected Class<?> interpretedClass;
 
         protected String interpretedMethodName;
 
@@ -259,23 +245,30 @@ public class ArgumentMatcherPositionFinder {
 
         protected boolean currentlyInMatchStatement = false;
 
-        protected boolean matchStatementFound = false;
+        protected boolean matchStatementFound;
 
         /* The resulting indexes or null if method was not found */
         protected List<Integer> resultArgumentMatcherIndexes;
+
+        /* The line nrs that were already treated */
+        protected Set<Integer> lineNrs = new HashSet<Integer>();
+
+        /* True if the current line was already processed and should be skipped */
+        protected boolean lineAlreaydProcessed;
 
 
         /**
          * Creates an interpreter.
          *
+         * @param interpretedClass        The current class, not null
+         * @param interpretedMethodName   The current method name, not null
          * @param invokedMethodName       The method to look for, not null
          * @param invokedMethodDescriptor The signature of the method to look for, not null
          * @param fromLineNr              The begin line-nr of the invocation
          * @param toLineNr                The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line)
          */
-        public MethodInterpreter(Class<?> interpretedMethodClass, String interpretedMethodName, String invokedMethodName,
-                                 String invokedMethodDescriptor, int fromLineNr, int toLineNr) {
-            this.interpretedMethodClass = interpretedMethodClass;
+        public MethodInterpreter(Class<?> interpretedClass, String interpretedMethodName, String invokedMethodName, String invokedMethodDescriptor, int fromLineNr, int toLineNr) {
+            this.interpretedClass = interpretedClass;
             this.interpretedMethodName = interpretedMethodName;
             this.invokedMethodName = invokedMethodName;
             this.invokedMethodDescriptor = invokedMethodDescriptor;
@@ -301,79 +294,36 @@ public class ArgumentMatcherPositionFinder {
          */
         public void setCurrentLineNr(int currentLineNr) {
             this.currentLineNr = currentLineNr;
+            lineAlreaydProcessed = lineNrs.contains(currentLineNr);
+            lineNrs.add(currentLineNr);
         }
 
 
-        /**
-         * Handles new values.
-         *
-         * @param type The type of the new value
-         * @return A {@link #REGULAR_VALUE}
-         */
-        public Value newValue(Type type) {
-            return REGULAR_VALUE;
+        @Override
+        public Value copyOperation(AbstractInsnNode insn, Value value) throws AnalyzerException {
+            Value resultValue = super.copyOperation(insn, value);
+            return getValue(resultValue, value);
         }
 
 
-        /**
-         * Handles an instruction without operands.
-         *
-         * @param instructionNode The instruction
-         * @return A {@link #REGULAR_VALUE}
-         */
-        public Value newOperation(AbstractInsnNode instructionNode) throws AnalyzerException {
-            return REGULAR_VALUE;
+        @Override
+        public Value unaryOperation(AbstractInsnNode insn, Value value) throws AnalyzerException {
+            Value resultValue = super.unaryOperation(insn, value);
+            return getValue(resultValue, value);
         }
 
 
-        /**
-         * Handles push or pop value on stack instruction.
-         *
-         * @param instructionNode The instruction
-         * @param value           The operand
-         * @return The same value
-         */
-        public Value copyOperation(AbstractInsnNode instructionNode, Value value) throws AnalyzerException {
-            return value;
+        @Override
+        public Value binaryOperation(AbstractInsnNode insn, Value value1, Value value2) throws AnalyzerException {
+            Value resultValue = super.binaryOperation(insn, value1, value2);
+            return getValue(resultValue, value1, value2);
         }
 
 
-        /**
-         * Handles an instruction with 1 operand.
-         *
-         * @param instructionNode The instruction
-         * @param value           The operand
-         * @return The same value
-         */
-        public Value unaryOperation(AbstractInsnNode instructionNode, Value value) throws AnalyzerException {
-            return value;
-        }
-
-
-        /**
-         * Handles an instruction with 2 operands.
-         *
-         * @param instructionNode The instruction
-         * @param value1          The first operand
-         * @param value2          The second operand
-         * @return The merged values
-         */
-        public Value binaryOperation(AbstractInsnNode instructionNode, Value value1, Value value2) throws AnalyzerException {
-            return REGULAR_VALUE;
-        }
-
-
-        /**
-         * Handles an instruction with 3 operands.
-         *
-         * @param instructionNode The instruction
-         * @param value1          The first operand
-         * @param value2          The second operand
-         * @param value3          The third operand
-         * @return The merged values
-         */
-        public Value ternaryOperation(AbstractInsnNode instructionNode, Value value1, Value value2, Value value3) throws AnalyzerException {
-            return REGULAR_VALUE;
+        @Override
+        public Value ternaryOperation(AbstractInsnNode insn, Value value1, Value value2, Value value3) throws AnalyzerException {
+            Value resultValue = super.ternaryOperation(insn, value1, value2, value3);
+            return getValue(resultValue, value1, value2, value3);
         }
 
 
@@ -382,17 +332,24 @@ public class ArgumentMatcherPositionFinder {
          *
          * @param instructionNode The instruction
          * @param values          The operands
-         * @return The merged values or an {@link #ARGUMENT_MATCHER} value if an argument matcher method was found
+         * @return The merged values or an ArugmentMatcherValue if an argument matcher method was found
          */
+        @Override
         @SuppressWarnings({"unchecked"})
         public Value naryOperation(AbstractInsnNode instructionNode, List values) throws AnalyzerException {
+            Value resultValue = super.naryOperation(instructionNode, values);
+
+            // skip if the line was already processed
+            if (lineAlreaydProcessed) {
+                return getValue(resultValue, values);
+            }
             // check whether we are on the line we're interested in
             if (currentLineNr < fromLineNr || currentLineNr > toLineNr) {
-                return REGULAR_VALUE;
+                return getValue(resultValue, values);
             }
             // check wheter its a method call
             if (!(instructionNode instanceof MethodInsnNode)) {
-                return REGULAR_VALUE;
+                return getValue(resultValue, values);
             }
 
             // check whether it's the method we're interested in
@@ -408,11 +365,11 @@ public class ArgumentMatcherPositionFinder {
                 boolean isStatic = methodInsnNode.getOpcode() == INVOKESTATIC;
                 resultArgumentMatcherIndexes = new ArrayList<Integer>();
                 for (int i = 0; i < values.size(); i++) {
-                    if (values.get(i) == ARGUMENT_MATCHER) {
+                    if (values.get(i) instanceof ArgumentMatcherValue) {
                         resultArgumentMatcherIndexes.add(isStatic ? i : i - 1);
                     }
                 }
-                return REGULAR_VALUE;
+                return createArgumentMatcherValue(resultValue);
             }
 
             Method matcherMethod = getMethod(methodInsnNode);
@@ -431,31 +388,31 @@ public class ArgumentMatcherPositionFinder {
                         throwUnitilsException("An argument matcher cannot be used outside the context of a match statement");
                     }
                     // we've found an argument matcher
-                    return ARGUMENT_MATCHER;
+                    return createArgumentMatcherValue(resultValue);
                 }
             }
 
             // If the method is not an argument matcher, make sure none of the arguments of this method is an argument matcher,
             // since this is not supported
             for (Value value : (List<Value>) values) {
-                if (value == ARGUMENT_MATCHER) {
+                if (value instanceof ArgumentMatcherValue) {
                     throwUnitilsException("An argument matcher's return value cannot be used inside an expression");
                 }
             }
             // nothing special found
-            return REGULAR_VALUE;
+            return getValue(resultValue, values);
         }
 
 
         /**
-         * Throws a {@link UnitilsException} with the given error message. The stacktrace is modified, to make
+         * Throws a {@link org.unitils.core.UnitilsException} with the given error message. The stacktrace is modified, to make
          * it point to the line of code that was analyzed by this class.
          *
          * @param errorMessage The error message
          */
         protected void throwUnitilsException(String errorMessage) {
             UnitilsException exception = new UnitilsException(errorMessage);
-            exception.setStackTrace(new StackTraceElement[]{new StackTraceElement(interpretedMethodClass.getName(), interpretedMethodName, interpretedMethodClass.getName(), currentLineNr)});
+            exception.setStackTrace(new StackTraceElement[]{new StackTraceElement(interpretedClass.getName(), interpretedMethodName, interpretedClass.getName(), currentLineNr)});
             throw exception;
         }
 
@@ -467,8 +424,13 @@ public class ArgumentMatcherPositionFinder {
          * @param value2 The second value
          * @return The merged value
          */
+        @Override
         public Value merge(Value value1, Value value2) {
-            return REGULAR_VALUE;
+            Value resultValue = super.merge(value1, value2);
+            if (value1 instanceof ArgumentMatcherValue || value2 instanceof ArgumentMatcherValue) {
+                return createArgumentMatcherValue(resultValue);
+            }
+            return resultValue;
         }
 
 
@@ -493,8 +455,63 @@ public class ArgumentMatcherPositionFinder {
             }
             return null;
         }
+
+
+        /**
+         * @param resultValue The result value
+         * @param values      The values that can be ArgumentMatcherValues
+         * @return The result value, or a ArgumentMatcherValue of the same type if one of the values is an ArgumentMatcherValue
+         */
+        protected Value getValue(Value resultValue, Value... values) {
+            if (values != null) {
+                for (Value value : values) {
+                    if (value instanceof ArgumentMatcherValue) {
+                        return createArgumentMatcherValue(resultValue);
+                    }
+                }
+            }
+            return resultValue;
+        }
+
+
+        /**
+         * @param resultValue The result value
+         * @param values      The values that can be ArgumentMatcherValues
+         * @return The result value, or a ArgumentMatcherValue of the same type if one of the values is an ArgumentMatcherValue
+         */
+        protected Value getValue(Value resultValue, List<Value> values) {
+            if (values != null) {
+                for (Value value : values) {
+                    if (value instanceof ArgumentMatcherValue) {
+                        return createArgumentMatcherValue(resultValue);
+                    }
+                }
+            }
+            return resultValue;
+        }
+
+
+        /**
+         * @param resultValue The result value
+         * @return An ArgumentMatcherValue of the same type
+         */
+        protected ArgumentMatcherValue createArgumentMatcherValue(Value resultValue) {
+            if (resultValue == null || !(resultValue instanceof BasicValue)) {
+                return new ArgumentMatcherValue(null);
+            }
+            Type type = ((BasicValue) resultValue).getType();
+            return new ArgumentMatcherValue(type);
+        }
     }
 
+    /**
+     * A value representing a found argument matcher invocation
+     */
+    protected static class ArgumentMatcherValue extends BasicValue {
+
+        public ArgumentMatcherValue(Type type) {
+            super(type);
+        }
+    }
 
 }
-
