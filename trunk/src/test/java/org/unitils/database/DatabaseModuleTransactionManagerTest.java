@@ -49,10 +49,9 @@ public class DatabaseModuleTransactionManagerTest extends UnitilsJUnit4 {
 
     DatabaseModule databaseModule;
 
-    Mock<DataSource> mockDataSource = createMock(DataSource.class);
+    Mock<DataSource> mockDataSource;
 
-    Mock<Connection> mockConnection1 = createMock(Connection.class),
-            mockConnection2 = createMock(Connection.class);
+    Mock<Connection> mockConnection1, mockConnection2;
 
     /* The unitils configuration */
     protected Properties configuration;

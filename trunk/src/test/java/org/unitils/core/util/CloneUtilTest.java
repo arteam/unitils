@@ -133,6 +133,15 @@ public class CloneUtilTest {
         assertSame(references.references, references);
     }
 
+    @Test
+    public void testCloneNestedArray() {
+        Object[] array = new Object[2];
+        array[0] = "string";
+        array[1] = array;
+        Object[] clone = CloneUtil.createDeepClone(array);
+        assertSame(clone, clone[1]);
+    }
+
 
     protected static class SimpleValues {
 
