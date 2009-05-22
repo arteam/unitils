@@ -77,7 +77,7 @@ public class Unitils {
 
     /* Listener that observes the execution of tests */
     private TestListener testListener;
-    
+
     /* Repository for all modules that are currently active in Unitils */
     private ModulesRepository modulesRepository;
 
@@ -86,7 +86,7 @@ public class Unitils {
 
     /* Object keeping track of the unit test that is currently running */
     private TestContext testContext;
-    
+
 
     /**
      * Creates a new instance.
@@ -95,25 +95,16 @@ public class Unitils {
         testContext = new TestContext();
     }
 
-    
-	/**
+
+    /**
      * Initializes unitils with the configuration files.
      */
     public void init() {
-        init((String) null);
-    }
-
-
-    /**
-     * Initializes unitils with the given custom configuration file
-     *
-     * @param customConfigurationFileName The name of the custom configuration file
-     */
-    public void init(String customConfigurationFileName) {
         ConfigurationLoader configurationLoader = new ConfigurationLoader();
-        Properties properties = configurationLoader.loadConfiguration(customConfigurationFileName);
+        Properties properties = configurationLoader.loadConfiguration();
         init(properties);
     }
+
 
     /**
      * Initializes Unitils with the given configuration. All the modules that are configured in the given configuration
@@ -122,58 +113,59 @@ public class Unitils {
      * @param configuration The config, not null
      */
     public void init(Properties configuration) {
-    	//verifyPackaging(configuration);
+        //verifyPackaging(configuration);
         this.configuration = configuration;
         modulesRepository = createModulesRepository(configuration);
         testListener = new UnitilsTestListener();
         afterInitModules();
     }
-    
-    
+
+
     /**
      * Gives all modules the opportunity to performs initialization that
      * can only work after all other modules have been initialized
      */
     protected void afterInitModules() {
-    	for (Module module : modulesRepository.getModules()) {
-    		module.afterInit();
-    	}
+        for (Module module : modulesRepository.getModules()) {
+            module.afterInit();
+        }
     }
-    
-    
+
+
     /**
      * Verifies that we're not working with a distribution that includes the necessary classes from spring,
      * while spring is in the classpath anyway.
-     * 
+     *
      * @param configuration The configuration
      */
     protected void verifyPackaging(Properties configuration) {
-    	String springCoreClassName = configuration.getProperty("spring.core.someClass.name");
-    	String unitilsPackagedWithSpring = "org.unitils.includeddeps." + springCoreClassName;
-    	
-		if (isClassAvailable(springCoreClassName) && isClassAvailable(unitilsPackagedWithSpring)) {
-			throw new IllegalStateException("It appears that you're using the unitils distribution that is packaged with " +
-					"its dependency to spring, while spring is also in your classpath. This is not supported. The spring-packaged " +
-					"distribution can only be used when you're not using spring at all. Please replace unitils-spring-included-version.jar " +
-					"with unitils-version.jar");
-		}
-	}
+        String springCoreClassName = configuration.getProperty("spring.core.someClass.name");
+        String unitilsPackagedWithSpring = "org.unitils.includeddeps." + springCoreClassName;
 
-    
+        if (isClassAvailable(springCoreClassName) && isClassAvailable(unitilsPackagedWithSpring)) {
+            throw new IllegalStateException("It appears that you're using the unitils distribution that is packaged with " +
+                    "its dependency to spring, while spring is also in your classpath. This is not supported. The spring-packaged " +
+                    "distribution can only be used when you're not using spring at all. Please replace unitils-spring-included-version.jar " +
+                    "with unitils-version.jar");
+        }
+    }
+
+
     /**
      * Utility method that verifies whether the class with the given fully qualified classname is available
      * in the classpath.
+     *
      * @param className The name of the class
      * @return True if the class with the given name is available
      */
-	protected boolean isClassAvailable(String className) {
-		try {
-			Thread.currentThread().getContextClassLoader().loadClass(className);
-			return true;
-		} catch (ClassNotFoundException e) {
-			return false;
-		}
-	}
+    protected boolean isClassAvailable(String className) {
+        try {
+            Thread.currentThread().getContextClassLoader().loadClass(className);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
 
 
     /**
@@ -218,7 +210,7 @@ public class Unitils {
     }
 
 
-	/**
+    /**
      * Configures all unitils modules using the given <code>Properties</code> object, and stores them in a {@link
      * ModulesRepository}. The configuration of the modules is delegated to a {@link ModulesLoader} instance.
      *
@@ -241,9 +233,9 @@ public class Unitils {
     private class UnitilsTestListener extends TestListener {
 
 
-		@Override
-		public void beforeTestClass(Class<?> testClass) {
-			TestContext testContext = getTestContext();
+        @Override
+        public void beforeTestClass(Class<?> testClass) {
+            TestContext testContext = getTestContext();
             testContext.setTestClass(testClass);
             testContext.setTestObject(null);
             testContext.setTestMethod(null);
@@ -252,12 +244,12 @@ public class Unitils {
             for (Module module : modules) {
                 modulesRepository.getTestListener(module).beforeTestClass(testClass);
             }
-		}
-		
-		
-		@Override
-		public void afterCreateTestObject(Object testObject) {
-			TestContext testContext = getTestContext();
+        }
+
+
+        @Override
+        public void afterCreateTestObject(Object testObject) {
+            TestContext testContext = getTestContext();
             testContext.setTestClass(testObject.getClass());
             testContext.setTestObject(testObject);
             testContext.setTestMethod(null);
@@ -266,10 +258,10 @@ public class Unitils {
             for (Module module : modules) {
                 modulesRepository.getTestListener(module).afterCreateTestObject(testObject);
             }
-		}
+        }
 
 
-		@Override
+        @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
             TestContext testContext = getTestContext();
             testContext.setTestClass(testObject.getClass());
@@ -323,7 +315,7 @@ public class Unitils {
                 modulesRepository.getTestListener(module).afterTestTearDown(testObject, testMethod);
             }
         }
-        
+
     }
 
 }

@@ -17,7 +17,6 @@ package org.unitils.util;
 
 import org.unitils.core.UnitilsException;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-import org.apache.commons.lang.text.StrSubstitutor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +40,7 @@ public class PropertyUtils {
      * @return The trimmed string value, not null
      */
     public static String getString(String propertyName, Properties properties) {
-        String value = getProperty(propertyName, properties);
+        String value = properties.getProperty(propertyName);
         if (value == null || "".equals(value.trim())) {
             throw new UnitilsException("No value found for property " + propertyName);
         }
@@ -59,7 +58,7 @@ public class PropertyUtils {
      * @return The trimmed string value, not null
      */
     public static String getString(String propertyName, String defaultValue, Properties properties) {
-        String value = getProperty(propertyName, properties);
+        String value = properties.getProperty(propertyName);
         if (value == null || "".equals(value.trim())) {
             return defaultValue;
         }
@@ -93,7 +92,7 @@ public class PropertyUtils {
      * @return The trimmed string list, empty or exception if none found
      */
     public static List<String> getStringList(String propertyName, Properties properties, boolean required) {
-        String values = getProperty(propertyName, properties);
+        String values = properties.getProperty(propertyName);
         if (values == null || "".equals(values.trim())) {
             if (required) {
                 throw new UnitilsException("No value found for property " + propertyName);
@@ -122,7 +121,7 @@ public class PropertyUtils {
      * @return The boolean value, not null
      */
     public static boolean getBoolean(String propertyName, Properties properties) {
-        String value = getProperty(propertyName, properties);
+        String value = properties.getProperty(propertyName);
         if (value == null || "".equals(value.trim())) {
             throw new UnitilsException("No value found for property " + propertyName);
         }
@@ -140,7 +139,7 @@ public class PropertyUtils {
      * @return The boolean value, not null
      */
     public static boolean getBoolean(String propertyName, boolean defaultValue, Properties properties) {
-        String value = getProperty(propertyName, properties);
+        String value = properties.getProperty(propertyName);
         if (value == null || "".equals(value.trim())) {
             return defaultValue;
         }
@@ -157,7 +156,7 @@ public class PropertyUtils {
      * @return The long value, not null
      */
     public static long getLong(String propertyName, Properties properties) {
-        String value = getProperty(propertyName, properties);
+        String value = properties.getProperty(propertyName);
         if (value == null || "".equals(value.trim())) {
             throw new UnitilsException("No value found for property " + propertyName);
         }
@@ -181,7 +180,7 @@ public class PropertyUtils {
      * @return The long value, not null
      */
     public static long getLong(String propertyName, long defaultValue, Properties properties) {
-        String value = getProperty(propertyName, properties);
+        String value = properties.getProperty(propertyName);
         if (value == null || "".equals(value.trim())) {
             return defaultValue;
         }
@@ -203,7 +202,7 @@ public class PropertyUtils {
      * @return The int value, not null
      */
     public static int getInt(String propertyName, Properties properties) {
-        String value = getProperty(propertyName, properties);
+        String value = properties.getProperty(propertyName);
         if (value == null || "".equals(value.trim())) {
             throw new UnitilsException("No value found for property " + propertyName);
         }
@@ -227,7 +226,7 @@ public class PropertyUtils {
      * @return The int value, not null
      */
     public static int getInt(String propertyName, int defaultValue, Properties properties) {
-        String value = getProperty(propertyName, properties);
+        String value = properties.getProperty(propertyName);
         if (value == null || "".equals(value.trim())) {
             return defaultValue;
         }
@@ -248,7 +247,7 @@ public class PropertyUtils {
      * @return True if the property exitsts
      */
     public static boolean containsProperty(String propertyName, Properties properties) {
-        return getProperty(propertyName, properties) != null;
+        return properties.getProperty(propertyName) != null;
     }
 
 
@@ -283,41 +282,6 @@ public class PropertyUtils {
             return defaultValue;
         }
         return (T) createInstanceOfType(className, false);
-    }
-
-
-    /**
-     * Gets a property from the System or from the given properties.
-     *
-     * @param propertyName The name of the property, not null
-     * @param properties   The properties if not found in System, not null
-     * @return The property value, null if not found
-     */
-    private static String getProperty(String propertyName, Properties properties) {
-        String value = System.getProperty(propertyName);
-        if (value == null) {
-            value = properties.getProperty(propertyName);
-        }
-        return expandPropertyValue(value, properties);
-    }
-
-
-    /**
-     * Expands all property place holders to actual values. For example
-     * suppose you have a property defined as follows: root.dir=/usr/home
-     * Expanding following ${root.dir}/somesubdir
-     * will then give following result: /usr/home/somesubdir
-     *
-     * @param propertyValue The property value to expand
-     * @param properties    The properties, not null
-     * @return The expanded property value
-     */
-    private static String expandPropertyValue(String propertyValue, Properties properties) {
-        if (propertyValue == null) {
-            return null;
-        }
-        String result = StrSubstitutor.replace(propertyValue, properties);
-        return StrSubstitutor.replaceSystemProperties(result);
     }
 
 }

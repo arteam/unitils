@@ -190,7 +190,7 @@
             <artifactId>dbmaintain</artifactId>
             <version>1.0</version>
             <scope>compile</scope>
-            <optional>true</optional>
+            <optional>true</optional>            
         </dependency>
         <dependency>
             <groupId>org.dbunit</groupId>
@@ -212,6 +212,12 @@
             <version>2.3</version>
             <scope>compile</scope>
             <optional>true</optional>
+            <exclusions>  <!-- not needed dependencies -->
+              <exclusion>
+                  <groupId>cglib</groupId>
+                  <artifactId>cglib-nodep</artifactId>
+              </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>ant</groupId>
@@ -343,7 +349,7 @@
 	      <groupId>org.objenesis</groupId>
     	  <artifactId>objenesis</artifactId>
 	      <version>1.1</version>
-          <optional>true</optional>
+          <optional>true</optional>          
 	</dependency>
 
         <!-- Test dependencies -->
