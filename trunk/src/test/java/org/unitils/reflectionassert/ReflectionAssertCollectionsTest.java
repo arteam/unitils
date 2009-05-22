@@ -15,9 +15,9 @@
  */
 package org.unitils.reflectionassert;
 
-import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
@@ -31,7 +31,7 @@ import java.util.List;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ReflectionAssertCollectionsTest extends TestCase {
+public class ReflectionAssertCollectionsTest {
 
     /* A test collection */
     private List<String> listA;
@@ -58,9 +58,8 @@ public class ReflectionAssertCollectionsTest extends TestCase {
     /**
      * Initializes the test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         listA = Arrays.asList("el1", "el2");
         listB = Arrays.asList("el1", "el2");
         listDifferentOrder = Arrays.asList("el2", "el1");
@@ -74,6 +73,7 @@ public class ReflectionAssertCollectionsTest extends TestCase {
     /**
      * Test for two equal collections.
      */
+    @Test
     public void testAssertReflectionEquals() {
         assertReflectionEquals(listA, listB);
     }
@@ -82,20 +82,16 @@ public class ReflectionAssertCollectionsTest extends TestCase {
     /**
      * Test for two equal collections but with different order.
      */
+    @Test(expected = AssertionFailedError.class)
     public void testAssertReflectionEquals_notEqualsDifferentOrder() {
-        try {
-            assertReflectionEquals(listA, listDifferentOrder);
-            Assert.fail("Expected AssertionFailedError");
-
-        } catch (AssertionFailedError e) {
-            // Expected
-        }
+        assertReflectionEquals(listA, listDifferentOrder);
     }
 
 
     /**
      * Test for two equal collections but with different order.
      */
+    @Test
     public void testAssertReflectionEquals_equalsDifferentOrder() {
         assertReflectionEquals(listA, listDifferentOrder, LENIENT_ORDER);
     }
@@ -104,6 +100,7 @@ public class ReflectionAssertCollectionsTest extends TestCase {
     /**
      * Test for two equal collections but with different order.
      */
+    @Test
     public void testAssertLenientEquals_equalsDifferentOrder() {
         assertLenientEquals(listA, listDifferentOrder);
     }
@@ -112,56 +109,36 @@ public class ReflectionAssertCollectionsTest extends TestCase {
     /**
      * Test for two collections with different elements.
      */
+    @Test(expected = AssertionFailedError.class)
     public void testAssertEquals_differentListSameSize() {
-        try {
-            assertReflectionEquals(listA, listDifferentValues);
-            Assert.fail("Expected AssertionFailedError");
-
-        } catch (AssertionFailedError e) {
-            // Expected
-        }
+        assertReflectionEquals(listA, listDifferentValues);
     }
 
 
     /**
      * Test for a collection with a duplicate element.
      */
+    @Test(expected = AssertionFailedError.class)
     public void testAssertEquals_duplicateElement() {
-        try {
-            assertReflectionEquals(listA, listDuplicateElement);
-            Assert.fail("Expected AssertionFailedError");
-
-        } catch (AssertionFailedError e) {
-            // Expected
-        }
+        assertReflectionEquals(listA, listDuplicateElement);
     }
 
 
     /**
      * Test for with a collection that has one element less.
      */
+    @Test()
     public void testAssertEquals_oneElementLess() {
-        try {
-            assertReflectionEquals(listA, listOneElementLess);
-            Assert.fail("Expected AssertionFailedError");
-
-        } catch (AssertionFailedError e) {
-            // Expected
-        }
+        assertReflectionEquals(listA, listOneElementLess);
     }
 
 
     /**
      * Test for with a collection that has one element more.
      */
+    @Test(expected = AssertionFailedError.class)
     public void testAssertEquals_oneElementMore() {
-        try {
-            assertReflectionEquals(listA, listOneElementMore);
-            Assert.fail("Expected AssertionFailedError");
-
-        } catch (AssertionFailedError e) {
-            // Expected
-        }
+        assertReflectionEquals(listA, listOneElementMore);
     }
 
 }

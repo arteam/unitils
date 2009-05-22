@@ -19,6 +19,7 @@ import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.comparator.Comparator;
 import org.unitils.reflectionassert.difference.Difference;
 import org.unitils.reflectionassert.difference.ObjectDifference;
+import org.unitils.reflectionassert.difference.ClassDifference;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -65,7 +66,7 @@ public class ObjectComparator implements Comparator {
         // check different class type
         Class<?> clazz = left.getClass();
         if (!clazz.isAssignableFrom(right.getClass())) {
-            return new Difference("Different class types. Left: " + clazz + ", right: " + right.getClass(), left, right);
+            return new ClassDifference("Different classes. Left: " + clazz + ", right: " + right.getClass(), left, right, left.getClass(), right.getClass());
         }
         // compare all fields of the object using reflection
         ObjectDifference difference = new ObjectDifference("Different field values", left, right);

@@ -39,7 +39,7 @@ public class UnorderedCollectionDifference extends Difference {
 
     /* The left object as a list */
     private List<?> leftList;
-
+    
     /* The right object as a list */
     private List<?> rightList;
 
@@ -107,10 +107,13 @@ public class UnorderedCollectionDifference extends Difference {
     /**
      * Sets the given left and right index as best matching elements.
      *
-     * @param leftIndex  The index of the left element
-     * @param rightIndex The index of the right element
+     * @param indexesToAdd the best matching indexes to add, not null
      */
-    public void setBestMatchingIndexes(int leftIndex, int rightIndex) {
+    public void addBestMatchingIndexes(Map<Integer, Integer> indexesToAdd) {
+        bestMatchingIndexes.putAll(indexesToAdd);
+    }
+
+    public void addBestMatchingIndexes(int leftIndex, int rightIndex) {
         bestMatchingIndexes.put(leftIndex, rightIndex);
     }
 

@@ -13,25 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert.report;
-
-import org.unitils.reflectionassert.difference.Difference;
+package org.unitils.reflectionassert;
 
 /**
- * Creates a report of the given differences.
- *
- * @author Tim Ducheyne
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
-public interface DifferenceReport {
+public class Car {
 
+    private String brand;
 
-    /**
-     * Creates a report.
-     *
-     * @param difference The difference to output, null for a match
-     * @return The report, not null
-     */
-    public String createReport(Difference difference);
-
+    public Car(String brand) {
+        this.brand = brand;
+    }
 }

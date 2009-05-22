@@ -29,29 +29,23 @@ import org.unitils.reflectionassert.report.DifferenceReport;
  */
 public class DefaultDifferenceReport implements DifferenceReport {
 
+    public static final int MAX_LINE_SIZE = 110;
+
+    public static enum MatchType {NO_MATCH};
 
     /**
      * Creates a report.
      *
-     * @param message    An optional message
      * @param difference The difference to output, null for a match
      * @return The report, not null
      */
-    public String createReport(String message, Difference difference) {
-        if (difference == null) {
-            return "No differences found.";
-        }
-
+    public String createReport(Difference difference) {
         StringBuilder result = new StringBuilder();
-        if (!StringUtils.isEmpty(message)) {
-            result.append(message);
-            result.append("\n\n");
-        }
-
-        result.append("Found following differences:\n\n");
+        result.append(new SimpleDifferenceView().createView(difference)).append("\n\n");
+        result.append("--- Found following differences ---\n");
         result.append(new DefaultDifferenceView().createView(difference));
         if (!Difference.class.equals(difference.getClass())) {
-            result.append("\n\n--- Difference details ---\n\n");
+            result.append("\n--- Difference detail tree ---\n");
             result.append(new TreeDifferenceView().createView(difference));
         }
         return result.toString();
