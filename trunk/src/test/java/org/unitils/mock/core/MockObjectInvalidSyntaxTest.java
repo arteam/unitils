@@ -68,7 +68,6 @@ public class MockObjectInvalidSyntaxTest {
 
 
     @Test(expected = UnitilsException.class)
-    @Ignore
     public void incompleteBehaviorDefinition_performs() {
         mockObject1.performs(new MockBehavior() {
             public Object execute(ProxyInvocation mockInvocation) throws Throwable {
