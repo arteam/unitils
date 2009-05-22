@@ -15,32 +15,23 @@
  */
 package org.unitils.inject.util;
 
-import static org.unitils.util.ReflectionUtils.getFieldValue;
-import static org.unitils.util.ReflectionUtils.getFieldWithName;
-import static org.unitils.util.ReflectionUtils.getFieldsAssignableFrom;
-import static org.unitils.util.ReflectionUtils.getGetter;
-import static org.unitils.util.ReflectionUtils.getSettersAssignableFrom;
-import static org.unitils.util.ReflectionUtils.getSettersOfType;
-import static org.unitils.util.ReflectionUtils.invokeMethod;
-import static org.unitils.util.ReflectionUtils.setFieldValue;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Set;
-
 import ognl.DefaultMemberAccess;
 import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
+import static org.unitils.util.ReflectionUtils.*;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Set;
 
 /**
  * Class containing static methods that implement explicit injection using OGNL expressions, and auto-injection by type.
@@ -162,39 +153,35 @@ public class InjectionUtils {
         }
         return injectIntoSetterByType(objectToInject, objectToInjectType, null, targetClass, true);
     }
-    
-    
+
+
     public static void injectIntoAnnotated(Object objectToInject, Object target, Class<? extends Annotation> annotation) {
-    	injectIntoAnnotatedFields(objectToInject, target, annotation);
-    	injectIntoAnnotatedMethods(objectToInject, target, annotation);
+        injectIntoAnnotatedFields(objectToInject, target, annotation);
+        injectIntoAnnotatedMethods(objectToInject, target, annotation);
     }
-    
-    
+
+
     public static void injectIntoAnnotatedMethods(Object objectToInject, Object target, Class<? extends Annotation> annotation) {
-    	Set<Method> annotatedFields = AnnotationUtils.getMethodsAnnotatedWith(target.getClass(), annotation);
-    	for (Method annotatedField : annotatedFields) {
-    		try {
-				annotatedField.invoke(target, objectToInject);
-			} catch (IllegalArgumentException e) {
-				throw new UnitilsException("Method " + annotatedField.getName() + " annotated with " + annotation.getName()
-						+ " must have exactly one argument with a type equal to or a superclass / implemented interface of " 
-						+ objectToInject.getClass().getSimpleName());
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    	}
+        Set<Method> annotatedMethods = AnnotationUtils.getMethodsAnnotatedWith(target.getClass(), annotation);
+        for (Method annotatedMethod : annotatedMethods) {
+            try {
+                annotatedMethod.invoke(target, objectToInject);
+            } catch (IllegalArgumentException e) {
+                throw new UnitilsException("Method " + annotatedMethod.getName() + " annotated with " + annotation.getName() + " must have exactly one argument with a type equal to or a superclass / implemented interface of " + objectToInject.getClass().getSimpleName());
+            } catch (IllegalAccessException e) {
+                throw new UnitilsException("Unable to inject value into following method annotated with " + annotation.getName() + ": " + annotatedMethod.getName(), e);
+            } catch (InvocationTargetException e) {
+                throw new UnitilsException("Unable to inject value into following method annotated with " + annotation.getName() + ": " + annotatedMethod.getName(), e);
+            }
+        }
     }
 
 
-	public static void injectIntoAnnotatedFields(Object objectToInject, Object target, Class<? extends Annotation> annotation) {
-    	Set<Field> annotatedFields = AnnotationUtils.getFieldsAnnotatedWith(target.getClass(), annotation);
-    	for (Field annotatedField : annotatedFields) {
-    		setFieldValue(target, annotatedField, objectToInject);
-    	}
+    public static void injectIntoAnnotatedFields(Object objectToInject, Object target, Class<? extends Annotation> annotation) {
+        Set<Field> annotatedFields = AnnotationUtils.getFieldsAnnotatedWith(target.getClass(), annotation);
+        for (Field annotatedField : annotatedFields) {
+            setFieldValue(target, annotatedField, objectToInject);
+        }
     }
 
 

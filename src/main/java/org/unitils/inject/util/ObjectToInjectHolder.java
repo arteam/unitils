@@ -21,9 +21,9 @@ package org.unitils.inject.util;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface ObjectToInjectHolder {
+public interface ObjectToInjectHolder<T> {
 
-    Object getObjectToInject();
+    T getObjectToInject();
 
-    Class<?> getObjectToInjectType();
+    Class<T> getObjectToInjectType();
 }

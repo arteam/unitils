@@ -15,42 +15,25 @@
  */
 package org.unitils.inject;
 
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-import static org.unitils.util.ReflectionUtils.getFieldValue;
-import static org.unitils.util.ReflectionUtils.getFieldWithName;
-import static org.unitils.util.ReflectionUtils.setFieldValue;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
-import org.unitils.inject.annotation.InjectInto;
-import org.unitils.inject.annotation.InjectIntoByType;
-import org.unitils.inject.annotation.InjectIntoStatic;
-import org.unitils.inject.annotation.InjectIntoStaticByType;
-import org.unitils.inject.annotation.TestedObject;
-import org.unitils.inject.util.InjectionUtils;
-import org.unitils.inject.util.ObjectToInjectHolder;
-import org.unitils.inject.util.PropertyAccess;
-import org.unitils.inject.util.Restore;
-import org.unitils.inject.util.ValueToRestore;
+import org.unitils.inject.annotation.*;
+import org.unitils.inject.util.*;
+import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 import org.unitils.util.PropertyUtils;
+import static org.unitils.util.ReflectionUtils.*;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.*;
 
 /**
  * Module for injecting annotated objects into other objects. The intended usage is to inject mock objects, but it can
@@ -92,7 +75,7 @@ public class InjectModule implements Module {
      * @param configuration The configuration, not null
      */
     @SuppressWarnings("unchecked")
-	public void init(Properties configuration) {
+    public void init(Properties configuration) {
         defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(InjectModule.class, configuration, InjectInto.class, InjectIntoStatic.class, InjectIntoByType.class, InjectIntoStaticByType.class);
         createTestedObjectsIfNullEnabled = PropertyUtils.getBoolean(PROPKEY_CREATE_TESTEDOBJECTS_IF_NULL_ENABLED, configuration);
     }
@@ -102,10 +85,10 @@ public class InjectModule implements Module {
      * No after initialization needed for this module
      */
     public void afterInit() {
-	}
+    }
 
 
-	/**
+    /**
      * For all fields annotated with {@link TestedObject} that are still null after the test fixture, an object is
      * created of the field's declared type and assigned to the field. If the field's declared type is an interface or
      * abstract class, or if the type doesn't have a default constructor, a warning is produced.
@@ -113,7 +96,7 @@ public class InjectModule implements Module {
      * @param testObject The test instance, not null
      */
     public void createTestedObjectsIfNull(Object testObject) {
-    	Set<Field> testedObjectFields = getFieldsAnnotatedWith(testObject.getClass(), TestedObject.class);
+        Set<Field> testedObjectFields = getFieldsAnnotatedWith(testObject.getClass(), TestedObject.class);
         for (Field testedObjectField : testedObjectFields) {
             if (getFieldValue(testObject, testedObjectField) == null) {
                 createObjectForField(testObject, testedObjectField);
@@ -131,19 +114,18 @@ public class InjectModule implements Module {
     protected void createObjectForField(Object testObject, Field testedObjectField) {
         Class<?> declaredClass = testedObjectField.getType();
         if (declaredClass.isInterface()) {
-            logger.warn("Field " + testedObjectField.getName() + " (annotated with @TestedObject) has type " + testedObjectField.getType().getSimpleName()
-                    + " which is an interface type. It is not automatically instantiated.");
+            logger.warn("Field " + testedObjectField.getName() + " (annotated with @TestedObject) has type " + testedObjectField.getType().getSimpleName() + " which is an interface type. It is not automatically instantiated.");
+
         } else if (Modifier.isAbstract(declaredClass.getModifiers())) {
-            logger.warn("Field " + testedObjectField.getName() + " (annotated with @TestedObject) has type " + testedObjectField.getDeclaringClass().getSimpleName()
-                    + " which is an abstract class. It is not automatically instantiated.");
+            logger.warn("Field " + testedObjectField.getName() + " (annotated with @TestedObject) has type " + testedObjectField.getDeclaringClass().getSimpleName() + " which is an abstract class. It is not automatically instantiated.");
+
         } else {
             try {
                 declaredClass.getDeclaredConstructor();
                 Object instance = createInstanceOfType(declaredClass, true);
                 setFieldValue(testObject, testedObjectField, instance);
             } catch (NoSuchMethodException e) {
-                logger.warn("Field " + testedObjectField.getName() + " (annotated with @TestedObject) has type " + testedObjectField.getDeclaringClass().getSimpleName()
-                        + " which has no default (parameterless) constructor. It is not automatically instantiated.");
+                logger.warn("Field " + testedObjectField.getName() + " (annotated with @TestedObject) has type " + testedObjectField.getDeclaringClass().getSimpleName() + " which has no default (parameterless) constructor. It is not automatically instantiated.");
             }
         }
     }
@@ -168,7 +150,7 @@ public class InjectModule implements Module {
      * @param test The instance to inject into, not null
      */
     public void injectAll(Object test) {
-    	Set<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectInto.class);
+        Set<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectInto.class);
         for (Field field : fields) {
             inject(test, field);
         }
@@ -181,7 +163,7 @@ public class InjectModule implements Module {
      * @param test The instance to inject into, not null
      */
     public void injectAllByType(Object test) {
-    	Set<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectIntoByType.class);
+        Set<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectIntoByType.class);
         for (Field field : fields) {
             injectByType(test, field);
         }
@@ -194,7 +176,7 @@ public class InjectModule implements Module {
      * @param test The instance to inject into, not null
      */
     public void injectAllStatic(Object test) {
-    	Set<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectIntoStatic.class);
+        Set<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectIntoStatic.class);
         for (Field field : fields) {
             injectStatic(test, field);
         }
@@ -207,7 +189,7 @@ public class InjectModule implements Module {
      * @param test The instance to inject into, not null
      */
     public void injectAllStaticByType(Object test) {
-    	Set<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectIntoStaticByType.class);
+        Set<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectIntoStaticByType.class);
         for (Field field : fields) {
             injectStaticByType(test, field);
         }
@@ -242,9 +224,7 @@ public class InjectModule implements Module {
 
         List<Object> targets = getTargets(InjectInto.class, fieldToInject, injectIntoAnnotation.target(), test);
         if (targets.size() == 0) {
-            throw new UnitilsException(getSituatedErrorMessage(InjectInto.class, fieldToInject, "The target should either be " +
-                    "specified explicitly using the target property, or by using the @" + TestedObject.class.getSimpleName() +
-                    " annotation"));
+            throw new UnitilsException(getSituatedErrorMessage(InjectInto.class, fieldToInject, "The target should either be specified explicitly using the target property, or by using the @" + TestedObject.class.getSimpleName() + " annotation"));
         }
 
         for (Object target : targets) {
@@ -298,14 +278,11 @@ public class InjectModule implements Module {
 
         Object objectToInject = getObjectToInject(test, fieldToInject);
         Class<?> objectToInjectType = getObjectToInjectType(test, fieldToInject);
-        PropertyAccess propertyAccess = getEnumValueReplaceDefault(InjectIntoByType.class, "propertyAccess",
-                injectIntoByTypeAnnotation.propertyAccess(), defaultAnnotationPropertyValues);
+        PropertyAccess propertyAccess = getEnumValueReplaceDefault(InjectIntoByType.class, "propertyAccess", injectIntoByTypeAnnotation.propertyAccess(), defaultAnnotationPropertyValues);
 
         List<Object> targets = getTargets(InjectIntoByType.class, fieldToInject, injectIntoByTypeAnnotation.target(), test);
         if (targets.size() == 0) {
-            throw new UnitilsException(getSituatedErrorMessage(InjectIntoByType.class, fieldToInject, "The target should either be " +
-                    "specified explicitly using the target property, or by using the @" + TestedObject.class.getSimpleName() +
-                    " annotation"));
+            throw new UnitilsException(getSituatedErrorMessage(InjectIntoByType.class, fieldToInject, "The target should either be specified explicitly using the target property, or by using the @" + TestedObject.class.getSimpleName() + " annotation"));
         }
 
         for (Object target : targets) {
@@ -333,37 +310,50 @@ public class InjectModule implements Module {
         Class<?> targetClass = injectIntoStaticByTypeAnnotation.target();
         Object objectToInject = getObjectToInject(test, fieldToAutoInjectStatic);
         Class<?> objectToInjectType = getObjectToInjectType(test, fieldToAutoInjectStatic);
-        
+
         Restore restore = getEnumValueReplaceDefault(InjectIntoStaticByType.class, "restore", injectIntoStaticByTypeAnnotation.restore(), defaultAnnotationPropertyValues);
-        PropertyAccess propertyAccess = getEnumValueReplaceDefault(InjectIntoStaticByType.class, "propertyAccess",
-                injectIntoStaticByTypeAnnotation.propertyAccess(), defaultAnnotationPropertyValues);
+        PropertyAccess propertyAccess = getEnumValueReplaceDefault(InjectIntoStaticByType.class, "propertyAccess", injectIntoStaticByTypeAnnotation.propertyAccess(), defaultAnnotationPropertyValues);
         try {
             Object oldValue = InjectionUtils.injectIntoStaticByType(objectToInject, objectToInjectType, targetClass, propertyAccess);
-            storeValueToRestoreAfterTest(targetClass, null, fieldToAutoInjectStatic.getType(), propertyAccess, oldValue, restore);
+            storeValueToRestoreAfterTest(targetClass, null, objectToInjectType, propertyAccess, oldValue, restore);
 
         } catch (UnitilsException e) {
             throw new UnitilsException(getSituatedErrorMessage(InjectIntoStaticByType.class, fieldToAutoInjectStatic, e.getMessage()), e);
         }
     }
-    
-    
+
+
+    /**
+     * Gets the value from the given field. If the value is a holder for an object to inject, the wrapped object is returned.
+     * For example in case of a field declared as Mock<MyClass>, this will return the proxy of the mock instead of the mock itself.
+     *
+     * @param test          The test, not null
+     * @param fieldToInject The field, not null
+     * @return The object
+     */
     protected Object getObjectToInject(Object test, Field fieldToInject) {
         Object fieldValue = getFieldValue(test, fieldToInject);
-        if (fieldValue instanceof ObjectToInjectHolder) {
-            return ((ObjectToInjectHolder) fieldValue).getObjectToInject();
-        } else {
-            return fieldValue;
+        if (fieldValue instanceof ObjectToInjectHolder<?>) {
+            return ((ObjectToInjectHolder<?>) fieldValue).getObjectToInject();
         }
+        return fieldValue;
     }
-    
-    
+
+
+    /**
+     * Gets the type of the given field. If the field is a holder for an object to inject, the wrapped type is returned.
+     * For example in case of a field declared as Mock<MyClass>, this will return MyClass instead of Mock<MyClass>
+     *
+     * @param test          The test, not null
+     * @param fieldToInject The field, not null
+     * @return The object
+     */
     protected Class<?> getObjectToInjectType(Object test, Field fieldToInject) {
         Object fieldValue = getFieldValue(test, fieldToInject);
-        if (fieldValue instanceof ObjectToInjectHolder) {
-            return ((ObjectToInjectHolder) fieldValue).getObjectToInjectType();
-        } else {
-            return fieldToInject.getType();
+        if (fieldValue instanceof ObjectToInjectHolder<?>) {
+            return ((ObjectToInjectHolder<?>) fieldValue).getObjectToInjectType();
         }
+        return fieldToInject.getType();
     }
 
 
@@ -436,7 +426,7 @@ public class InjectModule implements Module {
         List<Object> targets;
         if ("".equals(targetName)) {
             // Default targetName, so it is probably not specfied. Return all objects that are annotated with the TestedObject annotation.
-        	Set<Field> testedObjectFields = getFieldsAnnotatedWith(test.getClass(), TestedObject.class);
+            Set<Field> testedObjectFields = getFieldsAnnotatedWith(test.getClass(), TestedObject.class);
             targets = new ArrayList<Object>(testedObjectFields.size());
             for (Field testedObjectField : testedObjectFields) {
                 targets.add(getFieldValue(test, testedObjectField));
@@ -463,8 +453,7 @@ public class InjectModule implements Module {
      * @return A situated error message
      */
     protected String getSituatedErrorMessage(Class<? extends Annotation> annotationClass, Field annotatedField, String errorDescription) {
-        return "Error while processing @" + annotationClass.getSimpleName() + " annotation on field " + annotatedField.getName()
-                + " of class " + annotatedField.getDeclaringClass().getSimpleName() + ": " + errorDescription;
+        return "Error while processing @" + annotationClass.getSimpleName() + " annotation on field " + annotatedField.getName() + " of class " + annotatedField.getDeclaringClass().getSimpleName() + ": " + errorDescription;
     }
 
 
