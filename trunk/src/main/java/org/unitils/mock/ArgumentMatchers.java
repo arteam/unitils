@@ -17,12 +17,7 @@ package org.unitils.mock;
 
 import org.unitils.mock.annotation.ArgumentMatcher;
 import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
-import org.unitils.mock.argumentmatcher.impl.EqualsArgumentMatcher;
-import org.unitils.mock.argumentmatcher.impl.LenEqArgumentMatcher;
-import org.unitils.mock.argumentmatcher.impl.NotNullArgumentMatcher;
-import org.unitils.mock.argumentmatcher.impl.NullArgumentMatcher;
-import org.unitils.mock.argumentmatcher.impl.RefEqArgumentMatcher;
-import org.unitils.mock.argumentmatcher.impl.SameArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.*;
 import org.unitils.util.CallStackUtils;
 
 /**
@@ -77,6 +72,62 @@ public class ArgumentMatchers {
     }
 
 
+    @ArgumentMatcher
+    public static boolean anyBoolean() {
+        registerArgumentMatcher(new AnyArgumentMatcher(Boolean.class));
+        return false;
+    }
+
+
+    @ArgumentMatcher
+    public static byte anyByte() {
+        registerArgumentMatcher(new AnyArgumentMatcher(Byte.class));
+        return 0;
+    }
+
+
+    @ArgumentMatcher
+    public static short anyShort() {
+        registerArgumentMatcher(new AnyArgumentMatcher(Short.class));
+        return 0;
+    }
+
+
+    @ArgumentMatcher
+    public static char anyChar() {
+        registerArgumentMatcher(new AnyArgumentMatcher(Character.class));
+        return 0;
+    }
+
+
+    @ArgumentMatcher
+    public static int anyInt() {
+        registerArgumentMatcher(new AnyArgumentMatcher(Integer.class));
+        return 0;
+    }
+
+
+    @ArgumentMatcher
+    public static long anyLong() {
+        registerArgumentMatcher(new AnyArgumentMatcher(Long.class));
+        return 0;
+    }
+
+
+    @ArgumentMatcher
+    public static float anyFloat() {
+        registerArgumentMatcher(new AnyArgumentMatcher(Float.class));
+        return 0;
+    }
+
+
+    @ArgumentMatcher
+    public static double anyDouble() {
+        registerArgumentMatcher(new AnyArgumentMatcher(Double.class));
+        return 0;
+    }
+
+
     protected static <T> void registerArgumentMatcher(org.unitils.mock.argumentmatcher.ArgumentMatcher argumentMatcher) {
         ArgumentMatcherRepository.getInstance().registerArgumentMatcher(argumentMatcher, getInvokedAtLineNr());
     }
@@ -84,5 +135,5 @@ public class ArgumentMatchers {
     static int getInvokedAtLineNr() {
         return CallStackUtils.getInvocationStackTrace(ArgumentMatchers.class)[0].getLineNumber();
     }
-    
+
 }
