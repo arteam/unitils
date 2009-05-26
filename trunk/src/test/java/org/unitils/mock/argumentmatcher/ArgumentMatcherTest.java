@@ -37,11 +37,9 @@ public class ArgumentMatcherTest {
     /* Test mock object */
     private MockObject<TestClass> mockObject;
 
-    private Scenario scenario;
-
     @Before
     public void setUp() {
-        scenario = new Scenario(null);
+        Scenario scenario = new Scenario(null);
         mockObject = new MockObject<TestClass>("testMock", TestClass.class, false, scenario);
     }
 
