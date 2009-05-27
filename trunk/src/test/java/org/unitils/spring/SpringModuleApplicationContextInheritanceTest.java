@@ -60,7 +60,7 @@ public class SpringModuleApplicationContextInheritanceTest {
      * Both super and sub class have annotations with values and custom create methods.
      */
     @Test
-    public void testCreateApplicationContext_overridden() {
+    public void testCreateApplicationContext_overriden() {
         SpringTestCustomCreate springTest1 = new SpringTestCustomCreate();
         ApplicationContext applicationContext = springModule.getApplicationContext(springTest1);
 

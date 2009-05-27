@@ -18,26 +18,28 @@ package org.unitils.dbmaintainer.structure;
 import static org.apache.commons.lang.StringUtils.deleteWhitespace;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.config.DbMaintainConfigurationLoader;
-import org.dbmaintain.config.PropertiesDbMaintainConfigurer;
-import org.dbmaintain.dbsupport.DbSupport;
-import org.dbmaintain.launch.DbMaintain;
-import org.dbmaintain.util.DbMaintainException;
 import org.junit.After;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.util.ConfigUtils;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
+import org.unitils.core.dbsupport.SQLHandler;
+
 import static org.unitils.database.SQLUnitils.executeUpdate;
+import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator;
-import static org.unitils.database.DatabaseModule.PROPKEY_DATABASE_DIALECT;
+import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import org.unitils.util.PropertyUtils;
 
+import javax.sql.DataSource;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -63,12 +65,12 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
     /* The target directory for the test xsd files */
     private File xsdDirectory;
 
+    /* DataSource for the test database. */
+    @TestDataSource
+    private DataSource dataSource = null;
+
     /* True if current test is not for the current dialect */
     private boolean disabled;
-
-    DbSupport dbSupport;
-
-    DbMaintain dbMaintain;
 
 
     /**
@@ -93,15 +95,11 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
         configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", XsdDataSetStructureGenerator.class.getName());
         configuration.setProperty(XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
 
-        Properties dbMaintainProperties = new DbMaintainConfigurationLoader().loadDefaultConfiguration();
-        dbMaintainProperties.putAll(configuration);
-        PropertiesDbMaintainConfigurer propertiesDbMaintainConfigurer = new PropertiesDbMaintainConfigurer(dbMaintainProperties, new org.dbmaintain.dbsupport.impl.DefaultSQLHandler());
-        dbSupport = propertiesDbMaintainConfigurer.getDefaultDbSupport();
-        dbMaintain = new DbMaintain(propertiesDbMaintainConfigurer);
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
+        dataSetStructureGenerator = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler);
+        DBClearer dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler);
 
-        dataSetStructureGenerator = ConfigUtils.getConfiguredInstanceOf(DataSetStructureGenerator.class, configuration);
-
-        clearDatabase();
+        dbClearer.clearSchemas();
         createTestTables();
     }
 
@@ -114,7 +112,7 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
         if (disabled) {
             return;
         }
-        clearDatabase();
+        dropTestTables();
         try {
             deleteDirectory(xsdDirectory);
         } catch (Exception e) {
@@ -157,21 +155,17 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
      * Creates the test tables.
      */
     private void createTestTables() {
-        executeUpdate("create table TABLE_1(columnA int not null identity, columnB varchar(1) not null, columnC varchar(1))", dbSupport.getDataSource());
-        executeUpdate("create table TABLE_2(column1 varchar(1), column2 varchar(1))", dbSupport.getDataSource());
+        executeUpdate("create table TABLE_1(columnA int not null identity, columnB varchar(1) not null, columnC varchar(1))", dataSource);
+        executeUpdate("create table TABLE_2(column1 varchar(1), column2 varchar(1))", dataSource);
     }
 
 
     /**
      * Removes the test database tables
      */
-    private void clearDatabase() {
-        dbMaintain.clearDatabase();
-        try {
-            dbSupport.dropTable(dbSupport.getDefaultSchemaName(), "DBMAINTAIN_SCRIPTS");
-        } catch (DbMaintainException e) {
-            // Ignored, thrown if DBMAINTAIN_SCRIPTS doesn't exists, which is not a problem
-        }
+    private void dropTestTables() {
+        executeUpdateQuietly("drop table TABLE_1", dataSource);
+        executeUpdateQuietly("drop table TABLE_2", dataSource);
     }
 
 

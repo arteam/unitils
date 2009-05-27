@@ -15,23 +15,20 @@
  */
 package org.unitils.database;
 
+import static org.easymock.EasyMock.*;
+import org.junit.After;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.jdbc.datasource.ConnectionProxy;
-import org.unitils.UnitilsJUnit4;
-import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.Unitils;
 import org.unitils.database.annotations.Transactional;
-import org.unitils.database.datasource.UnitilsDataSource;
 import static org.unitils.database.util.TransactionMode.*;
-import org.unitils.mock.Mock;
-import static org.unitils.mock.MockUnitils.createMock;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Method;
 import java.sql.Connection;
-import java.util.Properties;
 
 /**
  * Tests verifying whether the SimpleTransactionManager functions correctly.
@@ -39,65 +36,60 @@ import java.util.Properties;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DatabaseModuleTransactionManagerTest extends UnitilsJUnit4 {
+public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransactionalTestBase {
 
-    TransactionsDisabledTest transactionsDisabledTest;
+    private DatabaseModule databaseModule;
 
-    RollbackTest rollbackTest;
+    private TransactionsDisabledTest transactionsDisabledTest;
 
-    CommitTest commitTest;
+    private RollbackTest rollbackTest;
 
-    DatabaseModule databaseModule;
+    private CommitTest commitTest;
 
-    Mock<DataSource> mockDataSource;
-
-    Mock<Connection> mockConnection1, mockConnection2;
-
-    /* The unitils configuration */
-    protected Properties configuration;
 
     /**
-     * Initializes the mocked datasource and connections.
+     * Initializes the test fixture.
      */
     @Before
-    public void initialize() throws Exception {
-        final Mock<UnitilsDataSource> mockUnitilsDataSource = createMock(UnitilsDataSource.class);
-        mockUnitilsDataSource.returns(mockDataSource.getMock()).getDataSource();
-
-        mockDataSource.onceReturns(mockConnection1.getMock()).getConnection();
-        mockDataSource.onceReturns(mockConnection2.getMock()).getConnection();
-
-        configuration = new ConfigurationLoader().loadConfiguration();
-        databaseModule = new DatabaseModule() {
-            @Override
-            protected void initUnitilsDataSources() {
-                this.defaultUnitilsDataSource = mockUnitilsDataSource.getMock();
-            }
-        };
-        databaseModule.init(configuration);
-        databaseModule.afterInit();
+    public void setUp() throws Exception {
+        configuration.setProperty("unitils.module.spring.enabled", "false");
+        Unitils.getInstance().init(configuration);
+        databaseModule = getDatabaseModule();
 
         transactionsDisabledTest = new TransactionsDisabledTest();
         rollbackTest = new RollbackTest();
         commitTest = new CommitTest();
     }
 
+
+    /**
+     * Cleans up test by resetting the unitils instance.
+     */
+    @After
+    public void tearDown() throws Exception {
+        Unitils.getInstance().init();
+    }
+
+
     /**
      * Tests for a test with transactions disabled
      */
     @Test
     public void testWithTransactionsDisabled() throws Exception {
+        mockConnection1.close();
+        mockConnection2.close();
+        replay(mockConnection1, mockConnection2);
+
         Method testMethod = TransactionsDisabledTest.class.getMethod("test", new Class[]{});
         databaseModule.startTransactionForTestMethod(transactionsDisabledTest, testMethod);
-        Connection conn1 = databaseModule.getDefaultUnitilsDataSourceAndActivateTransactionIfNeeded().getDataSource().getConnection();
+        Connection conn1 = databaseModule.getDataSourceAndActivateTransactionIfNeeded().getConnection();
         conn1.close();
-        Connection conn2 = databaseModule.getDefaultUnitilsDataSourceAndActivateTransactionIfNeeded().getDataSource().getConnection();
+        Connection conn2 = databaseModule.getDataSourceAndActivateTransactionIfNeeded().getConnection();
         conn2.close();
         assertNotSame(conn1, conn2);
         databaseModule.endTransactionForTestMethod(transactionsDisabledTest, testMethod);
 
-        mockConnection1.assertInvoked().close();
-        mockConnection2.assertInvoked().close();
+        verify(mockConnection1, mockConnection2);
     }
 
 
@@ -106,8 +98,11 @@ public class DatabaseModuleTransactionManagerTest extends UnitilsJUnit4 {
      */
     @Test
     public void testRollback() throws Exception {
-        mockConnection1.onceReturns(true).getAutoCommit();
-        mockConnection1.onceReturns(false).getAutoCommit();
+        expect(mockConnection1.getAutoCommit()).andReturn(true).andReturn(false).anyTimes();
+        mockConnection1.setAutoCommit(false);
+        mockConnection1.rollback();
+        mockConnection1.close();
+        replay(mockConnection1, mockConnection2);
 
         Method testMethod = RollbackTest.class.getMethod("test", new Class[]{});
         DataSource dataSource = databaseModule.getTransactionalDataSourceAndActivateTransactionIfNeeded(rollbackTest);
@@ -121,9 +116,7 @@ public class DatabaseModuleTransactionManagerTest extends UnitilsJUnit4 {
         assertSame(targetConnection1, targetConnection2);
         databaseModule.endTransactionForTestMethod(rollbackTest, testMethod);
 
-        mockConnection1.assertInvoked().setAutoCommit(false);
-        mockConnection1.assertInvoked().rollback();
-        mockConnection1.assertInvoked().close();
+        verify(mockConnection1, mockConnection2);
     }
 
 
@@ -132,8 +125,11 @@ public class DatabaseModuleTransactionManagerTest extends UnitilsJUnit4 {
      */
     @Test
     public void testCommit() throws Exception {
-        mockConnection1.onceReturns(true).getAutoCommit();
-        mockConnection1.returns(false).getAutoCommit();
+        expect(mockConnection1.getAutoCommit()).andReturn(true).andReturn(false).anyTimes();
+        mockConnection1.setAutoCommit(false);
+        mockConnection1.commit();
+        mockConnection1.close();
+        replay(mockConnection1, mockConnection2);
 
         Method testMethod = CommitTest.class.getMethod("test", new Class[]{});
         DataSource dataSource = databaseModule.getTransactionalDataSourceAndActivateTransactionIfNeeded(commitTest);
@@ -147,9 +143,7 @@ public class DatabaseModuleTransactionManagerTest extends UnitilsJUnit4 {
         assertSame(targetConnection1, targetConnection2);
         databaseModule.endTransactionForTestMethod(commitTest, testMethod);
 
-        mockConnection1.assertInvoked().setAutoCommit(false);
-        mockConnection1.assertInvoked().commit();
-        mockConnection1.assertInvoked().close();
+        verify(mockConnection1, mockConnection2);
     }
 
 

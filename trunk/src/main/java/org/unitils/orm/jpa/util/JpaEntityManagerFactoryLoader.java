@@ -80,7 +80,7 @@ public class JpaEntityManagerFactoryLoader implements OrmPersistenceUnitLoader<E
 
 
     protected DataSource getDataSource() {
-        return getDatabaseModule().getDefaultUnitilsDataSource().getDataSource();
+        return getDatabaseModule().getDataSource();
     }
 
 

@@ -16,6 +16,7 @@
 package org.unitils.database;
 
 import org.unitils.core.Unitils;
+import org.unitils.dbmaintainer.DBMaintainer;
 
 import javax.sql.DataSource;
 
@@ -79,7 +80,7 @@ public class DatabaseUnitils {
 
     /**
      * Determines whether the test database is outdated and, if that is the case, updates the database with the
-     * latest changes.
+     * latest changes. See {@link DBMaintainer} for more information.
      */
     public static void updateDatabase() {
         getDatabaseModule().updateDatabase();
@@ -93,23 +94,23 @@ public class DatabaseUnitils {
      * reinitializing the database after having reorganized the scripts folder.
      */
     public static void resetDatabaseState() {
-        getDatabaseModule().markDatabaseAsUpToDate();
+        getDatabaseModule().resetDatabaseState();
     }
 
 
     /**
      * Clears all configured schema's. I.e. drops all tables, views and other database objects.
      */
-    public static void clearDatabase() {
-        getDatabaseModule().clearDatabase();
+    public static void clearSchemas() {
+        getDatabaseModule().clearSchemas();
     }
 
 
     /**
      * Cleans all configured schema's. I.e. removes all data from its database tables.
      */
-    public static void cleanDatabase() {
-        getDatabaseModule().cleanDatabase();
+    public static void cleanSchemas() {
+        getDatabaseModule().cleanSchemas();
     }
 
 

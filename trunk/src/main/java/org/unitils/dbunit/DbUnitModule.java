@@ -25,11 +25,14 @@ import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
+import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.DbSupportFactory;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
+import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.core.util.ConfigUtils;
 import static org.unitils.core.util.ConfigUtils.getInstanceOf;
 import org.unitils.database.DatabaseModule;
-import org.unitils.database.DatabasePostProcessor;
-import org.unitils.database.datasource.UnitilsDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
@@ -41,11 +44,10 @@ import org.unitils.dbunit.util.MultiSchemaDataSet;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
 import static org.unitils.util.ModuleUtils.*;
-import org.unitils.util.PropertyUtils;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 import static org.unitils.util.ReflectionUtils.getClassWithName;
-import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -74,8 +76,6 @@ public class DbUnitModule implements Module {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DbUnitModule.class);
 
-    public static final String PROPERTY_GENERATE_DATASET_STRUCTURE = "dbMaintainer.generateDataSetStructure.enabled";
-
     /**
      * Map holding the default configuration of the dbunit module annotations
      */
@@ -96,9 +96,6 @@ public class DbUnitModule implements Module {
      */
     protected Properties configuration;
 
-    protected boolean generateDatasetStructure;
-
-    protected DataSetStructureGenerator dataSetStructureGenerator;
 
     /**
      * Initializes the DbUnitModule using the given Configuration
@@ -109,10 +106,6 @@ public class DbUnitModule implements Module {
     public void init(Properties configuration) {
         this.configuration = configuration;
         defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(DbUnitModule.class, configuration, DataSet.class, ExpectedDataSet.class);
-        generateDatasetStructure = PropertyUtils.getBoolean(PROPERTY_GENERATE_DATASET_STRUCTURE, configuration);
-        if (generateDatasetStructure) {
-            dataSetStructureGenerator = ConfigUtils.getConfiguredInstanceOf(DataSetStructureGenerator.class, configuration);
-        }
     }
 
 
@@ -120,13 +113,6 @@ public class DbUnitModule implements Module {
      * No after initialization needed for this module
      */
     public void afterInit() {
-        if (generateDatasetStructure) {
-            getDatabaseModule().registerDatabasePostProcessor(new DatabasePostProcessor() {
-                public void postProcessDatabase() {
-                    dataSetStructureGenerator.generateDataSetStructure();
-                }
-            });
-        }
     }
 
 
@@ -412,27 +398,28 @@ public class DbUnitModule implements Module {
      */
     protected DbUnitDatabaseConnection createDbUnitConnection(String schemaName) {
         // A DbSupport instance is fetched in order to get the schema name in correct case
-        UnitilsDataSource unitilsDataSource = getDatabaseModule().getDefaultUnitilsDataSourceAndActivateTransactionIfNeeded();
+        DataSource dataSource = getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded();
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
+        DbSupport dbSupport = getDbSupport(configuration, sqlHandler, schemaName);
 
         // Create connection
-        DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(unitilsDataSource.getDataSource(), schemaName);
+        DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(dataSource, dbSupport.getSchemaName());
         DatabaseConfig config = connection.getConfig();
 
         // Make sure that dbunit's correct IDataTypeFactory, that handles dbms specific data type issues, is used
-        IDataTypeFactory dataTypeFactory = getInstanceOf(IDataTypeFactory.class, configuration, unitilsDataSource.getDialect());
+        IDataTypeFactory dataTypeFactory = getInstanceOf(IDataTypeFactory.class, configuration, dbSupport.getDatabaseDialect());
         config.setProperty(PROPERTY_DATATYPE_FACTORY, dataTypeFactory);
         // Make sure that table and column names are escaped using the dbms-specific identifier quote string
-        String identifierQuoteString = unitilsDataSource.getIdentifierQuoteString();
-        config.setProperty(DatabaseConfig.PROPERTY_ESCAPE_PATTERN, identifierQuoteString + '?' + identifierQuoteString);
+        config.setProperty(PROPERTY_ESCAPE_PATTERN, dbSupport.getIdentifierQuoteString() + '?' + dbSupport.getIdentifierQuoteString());
         // Make sure that batched statements are used to insert the data into the database
         config.setProperty(FEATURE_BATCHED_STATEMENTS, "true");
-        // Make sure that Oracle's recycled tables (BIN$) are ignored (value is used directly instead of constant to ensure dbunit-2.2 compatibility)
+        // Make sure that Oracle's recycled tables (BIN$) are ignored (value is used to ensure dbunit-2.2 compliancy)
         config.setProperty("http://www.dbunit.org/features/skipOracleRecycleBinTables", "true");
 
         return connection;
     }
 
-    
+
     /**
      * Closes (i.e. return to the pool) the JDBC Connection that is currently in use by the DbUnitDatabaseConnection
      */
@@ -510,7 +497,7 @@ public class DbUnitModule implements Module {
      */
     protected DataSetFactory getDataSetFactory(Class<? extends DataSetFactory> dataSetFactoryClass) {
         DataSetFactory dataSetFactory = createInstanceOfType(dataSetFactoryClass, false);
-        dataSetFactory.init(configuration, getDefaultUnitilsDataSource().getDefaultSchemaName());
+        dataSetFactory.init(configuration, getDefaultDbSupport().getSchemaName());
         return dataSetFactory;
     }
 
@@ -536,8 +523,10 @@ public class DbUnitModule implements Module {
     /**
      * @return The default DbSupport (the one that connects to the default database schema)
      */
-    protected UnitilsDataSource getDefaultUnitilsDataSource() {
-        return getDatabaseModule().getDefaultUnitilsDataSourceAndActivateTransactionIfNeeded();
+    protected DbSupport getDefaultDbSupport() {
+        DataSource dataSource = getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded();
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
+        return DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler);
     }
 
 
