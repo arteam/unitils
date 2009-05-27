@@ -268,7 +268,7 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
     
     
     protected DataSource getDataSource() {
-    	return getDatabaseModule().getDefaultUnitilsDataSourceAndActivateTransactionIfNeeded().getDataSource();
+    	return getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded();
     }
     
     

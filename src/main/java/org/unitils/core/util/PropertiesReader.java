@@ -24,6 +24,7 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 
 /**
@@ -42,7 +43,8 @@ public class PropertiesReader {
      * @param propertiesFileName The name of the properties file
      * @return The Properties object, null if the properties file wasn't found.
      */
-	public Properties loadPropertiesFileFromUserHome(String propertiesFileName) {
+	public Properties loadPropertiesFileFromUserHome(
+			String propertiesFileName) {
         InputStream inputStream = null;
         try {
         	if("".equals(propertiesFileName)){
@@ -76,7 +78,7 @@ public class PropertiesReader {
 	public Properties loadPropertiesFileFromClasspath(String propertiesFileName) {
         InputStream inputStream = null;
         try {
-        	if ("".equals(propertiesFileName)){
+        	if("".equals(propertiesFileName)){
         		throw new IllegalArgumentException("Properties Filename must be given.");
         	}
             Properties properties = new Properties();

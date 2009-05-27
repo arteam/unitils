@@ -18,6 +18,9 @@ package org.unitils.mock.dummy;
 import static junit.framework.Assert.*;
 import org.junit.Test;
 import org.unitils.core.util.CloneUtil;
+import org.unitils.dbmaintainer.script.ExecutedScript;
+import org.unitils.dbmaintainer.script.Script;
+import org.unitils.dbmaintainer.script.ScriptContentHandle;
 import org.unitils.mock.MockUnitils;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
@@ -81,6 +84,14 @@ public class DummyObjectUtilTest {
         assertTrue(dummy instanceof DummyObject);
         List<?> dummyList = DummyObjectUtil.createDummy(List.class);
         assertTrue(dummyList instanceof DummyObject);
+    }
+
+    @Test
+    public void refEquals() {
+        Script script = new Script("01_script1.sql", 0L, MockUnitils.createDummy(ScriptContentHandle.class));
+        ExecutedScript executedScript1 = new ExecutedScript(script, null, false);
+        ExecutedScript executedScript2 = new ExecutedScript(script, null, false);
+        assertLenientEquals(executedScript1, executedScript2);
     }
 
     @Test

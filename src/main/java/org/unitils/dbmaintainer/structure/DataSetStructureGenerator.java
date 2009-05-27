@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.structure;
 
-import org.unitils.core.util.Configurable;
+import org.unitils.dbmaintainer.util.DatabaseAccessing;
 
 /**
  * Generator for structure files, such as dtd or xml schema, for a DbUnit flat-xml data set file.
@@ -23,7 +23,7 @@ import org.unitils.core.util.Configurable;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface DataSetStructureGenerator extends Configurable {
+public interface DataSetStructureGenerator extends DatabaseAccessing {
 
 
     /**

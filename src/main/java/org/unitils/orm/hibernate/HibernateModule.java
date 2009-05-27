@@ -213,7 +213,7 @@ public class HibernateModule extends OrmModule<SessionFactory, Session, Configur
 
 
     protected DataSource getDataSource() {
-    	return getDatabaseModule().getDefaultUnitilsDataSourceAndActivateTransactionIfNeeded().getDataSource();
+    	return getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded();
     }
     
     

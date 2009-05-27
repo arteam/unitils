@@ -66,7 +66,7 @@ public class DatabaseModuleTest extends UnitilsJUnit4 {
 		assertNotNull(dbTest.dataSourceFromField);
 		assertNotNull(dbTest.dataSourceFromMethod);
 		assertSame(dbTest.dataSourceFromField, dbTest.dataSourceFromMethod);
-		assertTrue(databaseModule.updateDatabaseCalled);
+		assertTrue(databaseModule.updateDataSchemaCalled);
 	}
 
 
@@ -92,10 +92,10 @@ public class DatabaseModuleTest extends UnitilsJUnit4 {
 	 */
 	public class TestDatabaseModule extends DatabaseModule {
 
-		private boolean updateDatabaseCalled = false;
+		private boolean updateDataSchemaCalled = false;
 
-        public void updateDatabase() {
-			updateDatabaseCalled = true;
+		public void updateDatabase(SQLHandler sqlHandler) {
+			updateDataSchemaCalled = true;
 		}
 	}
 
