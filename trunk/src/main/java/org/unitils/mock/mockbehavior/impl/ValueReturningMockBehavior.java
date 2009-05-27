@@ -16,6 +16,7 @@
 package org.unitils.mock.mockbehavior.impl;
 
 import org.unitils.core.UnitilsException;
+import org.unitils.inject.util.ObjectToInjectHolder;
 import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 import static org.unitils.util.ReflectionUtils.isAssignable;
@@ -39,7 +40,7 @@ public class ValueReturningMockBehavior implements ValidatableMockBehavior {
      * @param valueToReturn The value
      */
     public ValueReturningMockBehavior(Object valueToReturn) {
-        this.valueToReturn = valueToReturn;
+        this.valueToReturn = unwrapValueToReturnIfNeeded(valueToReturn);
     }
 
 
@@ -55,8 +56,7 @@ public class ValueReturningMockBehavior implements ValidatableMockBehavior {
             throw new UnitilsException("Trying to make a void method return a value");
         }
         if (valueToReturn != null && !isAssignable(valueToReturn.getClass(), returnType)) {
-            throw new UnitilsException("Trying to make a method return a value who's type is not compatible with the return type. Value type: "
-                    + valueToReturn.getClass() + ", return type: " + returnType);
+            throw new UnitilsException("Trying to make a method return a value who's type is not compatible with the return type. Value type: " + valueToReturn.getClass() + ", return type: " + returnType);
         }
     }
 
@@ -71,4 +71,19 @@ public class ValueReturningMockBehavior implements ValidatableMockBehavior {
         return valueToReturn;
     }
 
+
+    /**
+     * If the value to return is an wrapper object, e.g. a mock, this will return the wrapped instance instead
+     * of the wrapper.
+     *
+     * @param valueToReturn The return value
+     * @return The return value or the wrapped object if unwrapped
+     */
+    protected Object unwrapValueToReturnIfNeeded(Object valueToReturn) {
+        if (valueToReturn != null && valueToReturn instanceof ObjectToInjectHolder) {
+            ObjectToInjectHolder objectToInjectHolder = (ObjectToInjectHolder) valueToReturn;
+            return objectToInjectHolder.getObjectToInject();
+        }
+        return valueToReturn;
+    }
 }
