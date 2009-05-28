@@ -64,6 +64,18 @@ public class Schema {
 
 
     /**
+     * @return The names of the tables of the schema, not null
+     */
+    public List<String> getTableNames() {
+        List<String> tableNames = new ArrayList<String>();
+        for (Table table : tables) {
+            tableNames.add(table.getName());
+        }
+        return tableNames;
+    }
+
+
+    /**
      * Gets the table for the given name. The name is case insensitive.
      *
      * @param tableName The table name to look for, not null

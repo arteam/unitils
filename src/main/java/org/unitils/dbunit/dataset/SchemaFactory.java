@@ -42,9 +42,22 @@ public class SchemaFactory {
      * @return The data set schema, not null
      */
     public Schema createSchemaForDbUnitDataSet(String schemaName, IDataSet dbUnitDataSet) {
+        return createSchemaForDbUnitDataSet(schemaName, dbUnitDataSet, null);
+    }
+
+
+    /**
+     * Creates a data set schema for the given DbUnit dataset.
+     *
+     * @param schemaName      The schema name that this data set is for, not null
+     * @param dbUnitDataSet   The DbUnit data set, not null
+     * @param tablesToInclude Only tables with these names will be returned the rest will be ignored, null for all tables
+     * @return The data set schema, not null
+     */
+    public Schema createSchemaForDbUnitDataSet(String schemaName, IDataSet dbUnitDataSet, List<String> tablesToInclude) {
         Schema result = new Schema(schemaName);
         try {
-            addTables(dbUnitDataSet, result);
+            addTables(dbUnitDataSet, result, tablesToInclude);
             return result;
 
         } catch (DataSetException e) {
@@ -56,14 +69,20 @@ public class SchemaFactory {
     /**
      * Adds the tables of the DbUnit dataset to the given schema.
      *
-     * @param dbUnitDataSet The DbUnit dataset containing the tables, not null
-     * @param schema        The schema to add the tables to, not null
+     * @param dbUnitDataSet   The DbUnit dataset containing the tables, not null
+     * @param schema          The schema to add the tables to, not null
+     * @param tablesToInclude Only tables with these names will be returned the rest will be ignored, null for all tables
      */
-    protected void addTables(IDataSet dbUnitDataSet, Schema schema) throws DataSetException {
+    protected void addTables(IDataSet dbUnitDataSet, Schema schema, List<String> tablesToInclude) throws DataSetException {
         ITableIterator dbUnitTableIterator = dbUnitDataSet.iterator();
         while (dbUnitTableIterator.next()) {
             ITable dbUnitTable = dbUnitTableIterator.getTable();
             String tableName = dbUnitTable.getTableMetaData().getTableName();
+
+            if (shouldIgnoreTable(tableName, tablesToInclude)) {
+                continue;
+            }
+
             List<String> primaryKeyColumnNames = getPrimaryKeyColumnNames(dbUnitTable);
 
             Table table = schema.getTable(tableName);
@@ -73,6 +92,24 @@ public class SchemaFactory {
             }
             addRows(dbUnitTable, table, primaryKeyColumnNames);
         }
+    }
+
+
+    /**
+     * @param tableName       The table name to check, not null
+     * @param tablesToInclude Names of tables to include, null for all tables
+     * @return True if the table name should be included
+     */
+    protected boolean shouldIgnoreTable(String tableName, List<String> tablesToInclude) {
+        if (tablesToInclude == null) {
+            return false;
+        }
+        for (String tableToInclude : tablesToInclude) {
+            if (tableToInclude.equalsIgnoreCase(tableName)) {
+                return false;
+            }
+        }
+        return true;
     }
 
 
