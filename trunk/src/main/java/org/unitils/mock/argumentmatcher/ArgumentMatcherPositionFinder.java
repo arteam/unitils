@@ -243,18 +243,12 @@ public class ArgumentMatcherPositionFinder {
         /* The line that is currently being analyzed */
         protected int currentLineNr = 0;
 
-        protected boolean currentlyInMatchStatement = false;
+        protected Method currentMatcherMethod;
 
-        protected boolean matchStatementFound;
+        protected Set<MethodInsnNode> handledMethodInsnNodes = new HashSet<MethodInsnNode>();
 
         /* The resulting indexes or null if method was not found */
         protected List<Integer> resultArgumentMatcherIndexes;
-
-        /* The line nrs that were already treated */
-        protected Set<Integer> lineNrs = new HashSet<Integer>();
-
-        /* True if the current line was already processed and should be skipped */
-        protected boolean lineAlreaydProcessed;
 
 
         /**
@@ -294,8 +288,6 @@ public class ArgumentMatcherPositionFinder {
          */
         public void setCurrentLineNr(int currentLineNr) {
             this.currentLineNr = currentLineNr;
-            lineAlreaydProcessed = lineNrs.contains(currentLineNr);
-            lineNrs.add(currentLineNr);
         }
 
 
@@ -339,70 +331,99 @@ public class ArgumentMatcherPositionFinder {
         public Value naryOperation(AbstractInsnNode instructionNode, List values) throws AnalyzerException {
             Value resultValue = super.naryOperation(instructionNode, values);
 
-            // skip if the line was already processed
-            if (lineAlreaydProcessed) {
-                return getValue(resultValue, values);
-            }
-            // check whether we are on the line we're interested in
-            if (currentLineNr < fromLineNr || currentLineNr > toLineNr) {
-                return getValue(resultValue, values);
-            }
-            // check wheter its a method call
             if (!(instructionNode instanceof MethodInsnNode)) {
                 return getValue(resultValue, values);
             }
 
-            // check whether it's the method we're interested in
+            // check whether we are interested in the instruction
             MethodInsnNode methodInsnNode = (MethodInsnNode) instructionNode;
-            if (invokedMethodName.equals(methodInsnNode.name) && invokedMethodDescriptor.equals(methodInsnNode.desc)) {
-                if (!currentlyInMatchStatement) {
-                    throwUnitilsException("Method invocation occurs more than once within the same clause");
-                }
-                currentlyInMatchStatement = false;
+            if (instructionOutOfRange(methodInsnNode) || instructionAlreadyHandled(methodInsnNode)) {
+                return getValue(resultValue, values);
+            }
 
-                // we've found the method, now check which operands are argument matchers
-                // for non-static invocations the first operand is always 'this'
-                boolean isStatic = methodInsnNode.getOpcode() == INVOKESTATIC;
-                resultArgumentMatcherIndexes = new ArrayList<Integer>();
-                for (int i = 0; i < values.size(); i++) {
-                    if (values.get(i) instanceof ArgumentMatcherValue) {
-                        resultArgumentMatcherIndexes.add(isStatic ? i : i - 1);
-                    }
+            if (isInvokedMethod(methodInsnNode)) {
+                if (resultArgumentMatcherIndexes != null) {
+                    throwUnitilsException("Method invocation occurs more than once within the same clause. Method name: " + invokedMethodName);
                 }
+                // we've found the method, now check which operands are argument matchers
+                resultArgumentMatcherIndexes = getArgumentMatcherIndexes(methodInsnNode, values);
+                currentMatcherMethod = null;
                 return createArgumentMatcherValue(resultValue);
             }
 
-            Method matcherMethod = getMethod(methodInsnNode);
-            if (matcherMethod != null) {
+            Method method = getMethod(methodInsnNode);
+            if (method != null) {
                 // check whether the method is a match statement
-                if (matcherMethod.getAnnotation(MatchStatement.class) != null) {
-                    if (matchStatementFound) {
-                        throwUnitilsException("Two match statements found on the same line. This is not supported");
+                if (isMatcherMethod(method)) {
+                    if (currentMatcherMethod != null && currentMatcherMethod != method) {
+                        throwUnitilsException("Two match statements found on the same line. This is not supported.");
                     }
-                    matchStatementFound = true;
-                    currentlyInMatchStatement = true;
+                    currentMatcherMethod = method;
                 }
                 // check whether the method is an argument matcher (i.e. has the @ArgumentMatcher annotation)
-                if (matcherMethod.getAnnotation(ArgumentMatcher.class) != null) {
-                    if (!currentlyInMatchStatement) {
-                        throwUnitilsException("An argument matcher cannot be used outside the context of a match statement");
+                if (isArgumentMatcherMethod(method)) {
+                    if (currentMatcherMethod == null) {
+                        throwUnitilsException("An argument matcher cannot be used outside the context of a match statement.");
                     }
                     // we've found an argument matcher
                     return createArgumentMatcherValue(resultValue);
                 }
             }
 
-            // If the method is not an argument matcher, make sure none of the arguments of this method is an argument matcher,
-            // since this is not supported
-            for (Value value : (List<Value>) values) {
-                if (value instanceof ArgumentMatcherValue) {
-                    throwUnitilsException("An argument matcher's return value cannot be used inside an expression");
-                }
-            }
+            // If the method is not an argument matcher, make sure none of the arguments of this method is an argument matcher, since this is not supported
+            verifyThatArgumentMatchersNotUsedInExpression((List<Value>) values);
+
             // nothing special found
             return getValue(resultValue, values);
         }
 
+
+        protected boolean instructionOutOfRange(AbstractInsnNode instructionNode) {
+            return currentLineNr < fromLineNr || toLineNr < currentLineNr;
+        }
+
+
+        protected boolean instructionAlreadyHandled(MethodInsnNode methodInsnNode) {
+            return !handledMethodInsnNodes.add(methodInsnNode);
+        }
+
+
+        protected boolean isInvokedMethod(MethodInsnNode methodInsnNode) {
+            return invokedMethodName.equals(methodInsnNode.name) && invokedMethodDescriptor.equals(methodInsnNode.desc);
+        }
+
+
+        protected List<Integer> getArgumentMatcherIndexes(MethodInsnNode methodInsnNode, List values) {
+            List<Integer> result = new ArrayList<Integer>();
+
+            // for non-static invocations the first operand is always 'this'
+            boolean isStatic = methodInsnNode.getOpcode() == INVOKESTATIC;
+            for (int i = 0; i < values.size(); i++) {
+                if (values.get(i) instanceof ArgumentMatcherValue) {
+                    result.add(isStatic ? i : i - 1);
+                }
+            }
+            return result;
+        }
+
+
+        protected boolean isMatcherMethod(Method method) {
+            return method.getAnnotation(MatchStatement.class) != null;
+        }
+
+
+        protected boolean isArgumentMatcherMethod(Method method) {
+            return method.getAnnotation(ArgumentMatcher.class) != null;
+        }
+
+
+        protected void verifyThatArgumentMatchersNotUsedInExpression(List<Value> values) {
+            for (Value value : values) {
+                if (value instanceof ArgumentMatcherValue) {
+                    throwUnitilsException("An argument matcher's return value cannot be used inside an expression.");
+                }
+            }
+        }
 
         /**
          * Throws a {@link org.unitils.core.UnitilsException} with the given error message. The stacktrace is modified, to make
@@ -411,9 +432,12 @@ public class ArgumentMatcherPositionFinder {
          * @param errorMessage The error message
          */
         protected void throwUnitilsException(String errorMessage) {
-            UnitilsException exception = new UnitilsException(errorMessage);
-            exception.setStackTrace(new StackTraceElement[]{new StackTraceElement(interpretedClass.getName(), interpretedMethodName, interpretedClass.getName(), currentLineNr)});
-            throw exception;
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(errorMessage);
+            stringBuilder.append("\n at ");
+            stringBuilder.append(new StackTraceElement(interpretedClass.getName(), interpretedMethodName, interpretedClass.getName(), currentLineNr).toString());
+            stringBuilder.append("\n");
+            throw new UnitilsException(stringBuilder.toString());
         }
 
 

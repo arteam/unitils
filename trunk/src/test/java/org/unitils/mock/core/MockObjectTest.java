@@ -24,9 +24,6 @@ import static org.unitils.mock.ArgumentMatchers.notNull;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Tests the mock object functionality.
  *
@@ -50,13 +47,26 @@ public class MockObjectTest {
 
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testInvocationSpreadOverMoreThanOneLine() {
         TestMockBehavior testMockBehavior = new TestMockBehavior();
-        mockObject1.performs(testMockBehavior).testMethodParam(notNull(List.class));
-        mockObject1.getMock().testMethodParam(null);
+
+        mockObject1.performs( //
+                testMockBehavior
+        ).      //
+                testMethod(//
+                notNull(//
+                        String.class//
+                ));
+
+        mockObject1. //
+                getMock().//
+                testMethod(//
+                null);
         assertEquals(0, testMockBehavior.invocationCount);
-        mockObject1.getMock().testMethodParam(new ArrayList<String>());
+
+        mockObject1.getMock().//
+                testMethod( //
+                "value");
         assertEquals(1, testMockBehavior.invocationCount);
     }
 
@@ -64,7 +74,7 @@ public class MockObjectTest {
     @Test
     public void testAssertInvokedFailure() {
         try {
-            mockObject1.assertInvoked().testMethodString();
+            mockObject1.assertInvoked().testMethod(null);
             fail();
         } catch (AssertionError e) {
             assertTopOfStackTracePointsToCurrentTest(e, "testAssertInvokedFailure");
@@ -75,8 +85,8 @@ public class MockObjectTest {
     @Test
     public void testAssertNotInvokedFailure() {
         try {
-            mockObject1.getMock().testMethodString();
-            mockObject1.assertNotInvoked().testMethodString();
+            mockObject1.getMock().testMethod(null);
+            mockObject1.assertNotInvoked().testMethod(null);
             fail();
         } catch (AssertionError e) {
             assertTopOfStackTracePointsToCurrentTest(e, "testAssertNotInvokedFailure");
@@ -135,7 +145,7 @@ public class MockObjectTest {
         mockReturningOtherMock.returns(mockObject1.getMock()).getOtherMock();
 
         for (int i = 0; i < 50; i++) {
-            mockReturningOtherMock.getMock().getOtherMock().testMethodString();
+            mockReturningOtherMock.getMock().getOtherMock().testMethod(null);
         }
     }
 
@@ -152,11 +162,9 @@ public class MockObjectTest {
      */
     private static interface TestClass {
 
-        public String testMethodString();
+        public String testMethod(String arg);
 
         public int[] testMethodArray();
-
-        public void testMethodParam(List<String> param);
 
         public Object clone() throws CloneNotSupportedException;
     }
