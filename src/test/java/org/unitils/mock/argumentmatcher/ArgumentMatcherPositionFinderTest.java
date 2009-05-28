@@ -43,7 +43,7 @@ import org.unitils.mock.mockbehavior.MockBehavior;
 public class ArgumentMatcherPositionFinderTest {
 
     /* The line nrs of the proxy method invocations in the TestClass.test method */
-    private int invocationLineNr = 153;
+    private int invocationLineNr = 156;
     private int noMatcherInvocationLineNr = invocationLineNr + 2;
     private int doubleInvocationLineNr = invocationLineNr + 4;
     private int multiLineInvocationLineNrFrom = invocationLineNr + 6;
@@ -113,16 +113,19 @@ public class ArgumentMatcherPositionFinderTest {
         getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, doubleInvocationLineNr, doubleInvocationLineNr);
     }
 
+
     @Test
     public void testGetArgumentMatcherIndexes_invocationOnMultipleLines() {
         List<Integer> result = getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, multiLineInvocationLineNrFrom, multiLineInvocationLineNrTo);
         assertReflectionEquals(asList(0, 2), result);
     }
 
+
     @Test(expected = UnitilsException.class)
     public void testGetArgumentMatcherIndexes_nestedArgumentMatcher() {
         getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, nestedArgumentMatcherLineNr, nestedArgumentMatcherLineNr);
     }
+
 
     @Test(expected = UnitilsException.class)
     public void testGetArgumentMatcherIndexes_nestedMethodInvocation() {

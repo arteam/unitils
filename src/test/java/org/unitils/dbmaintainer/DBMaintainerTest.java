@@ -190,11 +190,11 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
             dbMaintainer.updateDatabase();
             fail("A UnitilsException should have been thrown");
         } catch (UnitilsException e) {
-            // Expected
+            // expected
         }
-        
         mockExecutedScriptInfoSource.assertInvoked().registerExecutedScript(new ExecutedScript(scripts.get(0), null, false));
     }
+    
 
     @Test
     public void testUpdateDatabase_ErrorInPostProcessingCodeScripts() {
