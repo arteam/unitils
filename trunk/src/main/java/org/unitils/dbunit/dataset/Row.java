@@ -83,7 +83,7 @@ public class Row {
     public void addPrimaryKeyColumn(Column primaryKeyColumn) {
         Column existingColumn = getColumn(primaryKeyColumn.getName());
         if (existingColumn != null) {
-            throw new UnitilsException("Unable to add primary column to data set row. A column for this name already exists. Column name: " + primaryKeyColumn.getName() + ", existing value: " + existingColumn.getValue() + ", new value: " + primaryKeyColumn.getValue());
+            throw new UnitilsException("Unable to add primary column to data set row. Duplicate column name: " + primaryKeyColumn.getName());
         }
         primaryKeyColumns.add(primaryKeyColumn);
     }
@@ -98,7 +98,7 @@ public class Row {
     public void addColumn(Column column) {
         Column existingColumn = getColumn(column.getName());
         if (existingColumn != null) {
-            throw new UnitilsException("Unable to add column to data set row. A column for this name already exists. Column name: " + column.getName() + ", existing value: " + existingColumn.getValue() + ", new value: " + column.getValue());
+            throw new UnitilsException("Unable to add column to data set row. Duplicate column name: " + column.getName());
         }
         columns.add(column);
     }

@@ -23,6 +23,8 @@ import org.unitils.dbunit.dataset.comparison.RowDifference;
 import org.unitils.dbunit.dataset.comparison.SchemaDifference;
 import org.unitils.dbunit.dataset.comparison.TableDifference;
 
+import java.util.List;
+
 /**
  * Assert class that offers assert methods for testing things that are specific to DbUnit.
  *
@@ -65,8 +67,10 @@ public class DataSetAssert {
      */
     public void assertEqualDbUnitDataSets(String schemaName, IDataSet expectedDataSet, IDataSet actualDataSet) {
         SchemaFactory dbUnitDataSetBuilder = new SchemaFactory();
-        Schema actualSchema = dbUnitDataSetBuilder.createSchemaForDbUnitDataSet(schemaName, actualDataSet);
         Schema expectedSchema = dbUnitDataSetBuilder.createSchemaForDbUnitDataSet(schemaName, expectedDataSet);
+
+        List<String> expectedTableNames = expectedSchema.getTableNames();
+        Schema actualSchema = dbUnitDataSetBuilder.createSchemaForDbUnitDataSet(schemaName, actualDataSet, expectedTableNames);
 
         assertEqualSchemas(expectedSchema, actualSchema);
     }
