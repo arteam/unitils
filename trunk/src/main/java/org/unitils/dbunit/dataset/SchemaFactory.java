@@ -15,11 +15,9 @@
  */
 package org.unitils.dbunit.dataset;
 
-import org.dbunit.dataset.DataSetException;
-import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.ITable;
-import org.dbunit.dataset.ITableIterator;
+import org.dbunit.dataset.*;
 import org.dbunit.dataset.datatype.DataType;
+import org.dbunit.dataset.filter.IncludeTableFilter;
 import org.unitils.core.UnitilsException;
 
 import java.util.ArrayList;
@@ -42,7 +40,15 @@ public class SchemaFactory {
      * @return The data set schema, not null
      */
     public Schema createSchemaForDbUnitDataSet(String schemaName, IDataSet dbUnitDataSet) {
-        return createSchemaForDbUnitDataSet(schemaName, dbUnitDataSet, null);
+        Schema result = new Schema(schemaName);
+        try {
+            addTables(dbUnitDataSet, result);
+            return result;
+
+        } catch (DataSetException e) {
+            throw new UnitilsException("Unable to create data set for db unit data set. Schema name: " + schemaName, e);
+        }
+
     }
 
 
@@ -55,33 +61,22 @@ public class SchemaFactory {
      * @return The data set schema, not null
      */
     public Schema createSchemaForDbUnitDataSet(String schemaName, IDataSet dbUnitDataSet, List<String> tablesToInclude) {
-        Schema result = new Schema(schemaName);
-        try {
-            addTables(dbUnitDataSet, result, tablesToInclude);
-            return result;
-
-        } catch (DataSetException e) {
-            throw new UnitilsException("Unable to create data set for db unit data set. Schema name: " + schemaName, e);
-        }
+        IDataSet filteredDataSet = new FilteredDataSet(new IncludeTableFilter(tablesToInclude.toArray(new String[tablesToInclude.size()])), dbUnitDataSet);
+        return createSchemaForDbUnitDataSet(schemaName, filteredDataSet);
     }
 
 
     /**
      * Adds the tables of the DbUnit dataset to the given schema.
      *
-     * @param dbUnitDataSet   The DbUnit dataset containing the tables, not null
-     * @param schema          The schema to add the tables to, not null
-     * @param tablesToInclude Only tables with these names will be returned the rest will be ignored, null for all tables
+     * @param dbUnitDataSet The DbUnit dataset containing the tables, not null
+     * @param schema        The schema to add the tables to, not null
      */
-    protected void addTables(IDataSet dbUnitDataSet, Schema schema, List<String> tablesToInclude) throws DataSetException {
+    protected void addTables(IDataSet dbUnitDataSet, Schema schema) throws DataSetException {
         ITableIterator dbUnitTableIterator = dbUnitDataSet.iterator();
         while (dbUnitTableIterator.next()) {
             ITable dbUnitTable = dbUnitTableIterator.getTable();
             String tableName = dbUnitTable.getTableMetaData().getTableName();
-
-            if (shouldIgnoreTable(tableName, tablesToInclude)) {
-                continue;
-            }
 
             List<String> primaryKeyColumnNames = getPrimaryKeyColumnNames(dbUnitTable);
 
