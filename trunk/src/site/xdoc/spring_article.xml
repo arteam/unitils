@@ -283,7 +283,7 @@ and recreate it from scratch, starting again from the first script.</p>
 <h3>Conclusion</h3>
 
 <p>In this article we've tried to demonstrate how Unitils can improve your tests, using a few simple examples. If you're curious to learn more about Unitils, check out the 
-<a href="tutorial.html">tutorial</a>, <a href="cookbook.html">cookbook</a> and our <a href="guidelines.html">unit testing guidelines</a>.</p>
+<a href="tutorial.html">tutorial</a> and the <a href="cookbook.html">cookbook</a>.</p>
 
 <p>We value your opinion. Let us know what you think. If you have any comments, tips or questions please post them on the user forum or contact us directly by sending 
 a mail to <i>filip_neven at users.sourceforge.net</i> or <i>tim_ducheyne at users.sourceforge.net</i>.</p>

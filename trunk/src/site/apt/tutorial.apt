@@ -10,7 +10,7 @@ Tutorial
     Unitils originates from an attempt to get a more pragmatic view on unit testing. It started as a set of guidelines and resulted in an open source library containing utilities 
 	that facilitate the application of these guidelines.
 
-    This tutorial will show you, using examples, what Unitils can do for your projects. The testing guidelines that are behind the features can be found on the {{{guidelines.html}guidelines page}}. 
+    This tutorial will show you, using examples, what Unitils can do for your projects. 
     If you want to learn how you can setup Unitils to get started quickly, read the {{{cookbook.html}cookbook}}.
 
 
