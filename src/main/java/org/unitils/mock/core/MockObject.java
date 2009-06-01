@@ -529,8 +529,9 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
     protected List<ArgumentMatcher> createArgumentMatchers(ProxyInvocation proxyInvocation) {
         List<ArgumentMatcher> result = new ArrayList<ArgumentMatcher>();
 
-        int matchInvocationStartLineNr = ArgumentMatcherRepository.getInstance().getMatchInvocationStartLineNr();
-        int matchInvocationEndLineNr = ArgumentMatcherRepository.getInstance().getMatchInvocationEndLineNr();
+        int lineNr = proxyInvocation.getInvokedAt().getLineNumber();
+        int matchInvocationStartLineNr = Math.min(lineNr, ArgumentMatcherRepository.getInstance().getMatchInvocationStartLineNr());
+        int matchInvocationEndLineNr = Math.max(lineNr, ArgumentMatcherRepository.getInstance().getMatchInvocationEndLineNr());
         List<Integer> argumentMatcherIndexes = getArgumentMatcherIndexes(proxyInvocation, matchInvocationStartLineNr, matchInvocationEndLineNr);
 
         int argumentIndex = 0;
