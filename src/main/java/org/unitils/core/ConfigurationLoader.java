@@ -120,7 +120,7 @@ public class ConfigurationLoader {
      * @param properties The instance to add to loaded properties to, not null
      */
     protected void loadCustomConfiguration(Properties properties) {
-        String customConfigurationFileName = PropertyUtils.getString(PROPKEY_CUSTOM_CONFIGURATION, properties);
+        String customConfigurationFileName = getConfigurationFileName(PROPKEY_CUSTOM_CONFIGURATION, properties);
         Properties customProperties = propertiesReader.loadPropertiesFileFromClasspath(customConfigurationFileName);
         if (customProperties == null) {
             logger.warn("No custom configuration file " + customConfigurationFileName + " found.");
@@ -136,7 +136,7 @@ public class ConfigurationLoader {
      * @param properties The instance to add to loaded properties to, not null
      */
     protected void loadLocalConfiguration(Properties properties) {
-        String localConfigurationFileName = PropertyUtils.getString(PROPKEY_LOCAL_CONFIGURATION, properties);
+        String localConfigurationFileName = getConfigurationFileName(PROPKEY_LOCAL_CONFIGURATION, properties);
         Properties localProperties = propertiesReader.loadPropertiesFileFromUserHome(localConfigurationFileName);
         if (localProperties == null) {
             localProperties = propertiesReader.loadPropertiesFileFromClasspath(localConfigurationFileName);
@@ -178,5 +178,22 @@ public class ConfigurationLoader {
             }
         }
 
+    }
+
+
+    /**
+     * Gets the configuration file name from the system properties or if not defined, from the given loaded properties.
+     * An exception is raised if no value is defined.
+     *
+     * @param propertyName The name of the property that defines the local/custom file name, not null
+     * @param properties   The propertis that were already loaded, not null
+     * @return The property value, not null
+     */
+    protected String getConfigurationFileName(String propertyName, Properties properties) {
+        String configurationFileName = System.getProperty(propertyName);
+        if (configurationFileName != null) {
+            return configurationFileName;
+        }
+        return PropertyUtils.getString(propertyName, properties);
     }
 }
