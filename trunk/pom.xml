@@ -86,7 +86,8 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-release-plugin</artifactId>
-				<configuration>					
+				<configuration>				
+					<goals>deploy assembly:assembly</goals>
 					<tagBase>https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases</tagBase>
 				</configuration>
 			</plugin>
