@@ -1,0 +1,8 @@
+<antlib>
+    <taskdef name="scriptjarcreator"
+             classname="org.unitils.dbmaintainer.util.ant.DbScriptJarCreatorTask"/>
+    <taskdef name="scriptjardatabaseresetter"
+             classname="org.unitils.dbmaintainer.util.ant.DbScriptJarDatabaseResetterTask"/>
+    <taskdef name="scriptjarrunner"
+             classname="org.unitils.dbmaintainer.util.ant.DbScriptJarRunnerTask"/>
+</antlib>
