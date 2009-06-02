@@ -19,6 +19,12 @@
             </includes>
         </fileSet>
         <fileSet>
+            <includes>
+                <include>src/main/**</include>
+                <include>src/test/**</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>${project.build.directory}/site/apidocs</directory>
             <outputDirectory>docs/apidocs</outputDirectory>
             <includes>
