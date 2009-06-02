@@ -16,6 +16,7 @@
 package org.unitils.core;
 
 import org.apache.commons.logging.Log;
+import org.junit.After;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,9 +69,6 @@ public class ConfigurationLoaderTest extends UnitilsJUnit4 {
     private final String LOCAL_PROPERTIES_FILE_NAME = "unitils-local.properties";
 
 
-    //-----------------------------------------------------------------------------------
-    // SetUp
-    //-----------------------------------------------------------------------------------
     @Before
     public void setUp() {
         configurationLoader = new ConfigurationLoader();
@@ -88,9 +86,13 @@ public class ConfigurationLoaderTest extends UnitilsJUnit4 {
     }
 
 
-    //-----------------------------------------------------------------------------------
-    // Test
-    //-----------------------------------------------------------------------------------
+    @After
+    public void cleanup() {
+        System.clearProperty(PROPKEY_CUSTOM_CONFIGURATION);
+        System.clearProperty(PROPKEY_LOCAL_CONFIGURATION);
+    }
+
+
     /**
      * Test scenario:
      * <ul>
@@ -203,6 +205,28 @@ public class ConfigurationLoaderTest extends UnitilsJUnit4 {
         assertDefaultPropertiesLoaded(returnedProperties);
         assertCustomPropertiesLoaded(returnedProperties);
         assertLocalPropertiesLoaded(returnedProperties);
+    }
+
+
+    @Test
+    public void customConfigurationFileNameOverriddenBySystemProperty() {
+        System.setProperty(PROPKEY_CUSTOM_CONFIGURATION, "custom-filename.properties");
+        propertiesReader.returns(unitilsDefaultProperties).loadPropertiesFileFromClasspath(DEFAULT_PROPERTIES_FILE_NAME);
+
+        Properties returnedProperties = configurationLoader.loadConfiguration();
+
+        propertiesReader.assertInvoked().loadPropertiesFileFromClasspath("custom-filename.properties");
+    }
+
+
+    @Test
+    public void localConfigurationFileNameOverriddenBySystemProperty() {
+        System.setProperty(PROPKEY_LOCAL_CONFIGURATION, "custom-local-filename.properties");
+        propertiesReader.returns(unitilsDefaultProperties).loadPropertiesFileFromClasspath(DEFAULT_PROPERTIES_FILE_NAME);
+
+        Properties returnedProperties = configurationLoader.loadConfiguration();
+
+        propertiesReader.assertInvoked().loadPropertiesFileFromClasspath("custom-local-filename.properties");
     }
 
 
