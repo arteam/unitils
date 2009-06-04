@@ -86,6 +86,9 @@ public class Column {
      * @return The difference, null if none found
      */
     public ColumnDifference compare(Column actualColumn) {
+        if (actualColumn.getValue() == value) {
+            return null;
+        }
         Object castedValue = getCastedValue(actualColumn.getType());
         if (!castedValue.equals(actualColumn.getValue())) {
             return new ColumnDifference(this, actualColumn);

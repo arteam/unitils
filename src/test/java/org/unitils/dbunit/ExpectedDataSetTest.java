@@ -147,6 +147,16 @@ public class ExpectedDataSetTest extends UnitilsJUnit4 {
     }
 
 
+    /**
+     * Test with a dataset containing an explicit null value ([null])
+     * This used to give a NullPointerException (UNI-148)
+     */
+    @Test
+    public void testExplicitNullValue() throws Exception {
+        assertEqualDataSet("nullValue");
+    }
+
+
     private void assertDifferentDataSet(String methodName) throws Exception {
         try {
             assertEqualDataSet(methodName);
@@ -196,6 +206,11 @@ public class ExpectedDataSetTest extends UnitilsJUnit4 {
 
         @ExpectedDataSet("xxxxxx.xml")
         public void testNotFound2() {
+        }
+
+        @DataSet("ExpectedDataSetTest-nullValue.xml")
+        @ExpectedDataSet("ExpectedDataSetTest-nullValue.xml")
+        public void nullValue() {
         }
     }
 
