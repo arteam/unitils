@@ -34,7 +34,7 @@ public class ColumnComparisonTest {
 
 
     @Test
-    public void testEqualStringValue() throws Exception {
+    public void equalStringValue() throws Exception {
         Column expectedValue = new Column("column", VARCHAR, "value");
         Column actualValue = new Column("column", VARCHAR, "value");
 
@@ -45,7 +45,7 @@ public class ColumnComparisonTest {
 
 
     @Test
-    public void testDifferentStringValue() throws Exception {
+    public void differentStringValue() throws Exception {
         Column expectedValue = new Column("column", VARCHAR, "value");
         Column actualValue = new Column("column", VARCHAR, "xxxx");
 
@@ -56,7 +56,7 @@ public class ColumnComparisonTest {
 
 
     @Test
-    public void testEqualDateValue() throws Exception {
+    public void equalDateValue() throws Exception {
         Column expectedValue = new Column("column", VARCHAR, "2009-06-10");
         Column actualValue = new Column("column", DATE, new GregorianCalendar(2009, 5, 10).getTime());
 
@@ -67,7 +67,7 @@ public class ColumnComparisonTest {
 
 
     @Test
-    public void testDifferentDateValue() throws Exception {
+    public void differentDateValue() throws Exception {
         Column expectedValue = new Column("column", VARCHAR, "1980-01-05");
         Column actualValue = new Column("column", DATE, new GregorianCalendar(2009, 5, 10).getTime());
 
@@ -78,7 +78,7 @@ public class ColumnComparisonTest {
 
 
     @Test
-    public void testEqualDoubleValue() throws Exception {
+    public void equalDoubleValue() throws Exception {
         Column expectedValue = new Column("column", VARCHAR, "-1.00");
         Column actualValue = new Column("column", DOUBLE, -1.0);
 
@@ -89,7 +89,7 @@ public class ColumnComparisonTest {
 
 
     @Test
-    public void testDifferentDoubleValue() throws Exception {
+    public void differentDoubleValue() throws Exception {
         Column expectedValue = new Column("column", VARCHAR, "-1.00");
         Column actualValue = new Column("column", DOUBLE, -5);
 
@@ -100,9 +100,18 @@ public class ColumnComparisonTest {
 
 
     @Test(expected = UnitilsException.class)
-    public void testInvalidType() throws Exception {
+    public void invalidType() throws Exception {
         Column expectedValue = new Column("column", VARCHAR, "xxxxxxx");
         Column actualValue = new Column("column", DOUBLE, -5);
+
+        expectedValue.compare(actualValue);
+    }
+
+
+    @Test
+    public void nullValues() throws Exception {
+        Column expectedValue = new Column("column", VARCHAR, null);
+        Column actualValue = new Column("column", VARCHAR, null);
 
         expectedValue.compare(actualValue);
     }
