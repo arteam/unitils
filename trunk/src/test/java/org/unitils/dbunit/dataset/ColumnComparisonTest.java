@@ -113,6 +113,31 @@ public class ColumnComparisonTest {
         Column expectedValue = new Column("column", VARCHAR, null);
         Column actualValue = new Column("column", VARCHAR, null);
 
-        expectedValue.compare(actualValue);
+        ColumnDifference result = expectedValue.compare(actualValue);
+
+        assertNull(result);
     }
+
+
+    @Test
+    public void nullExpectedValue() throws Exception {
+        Column expectedValue = new Column("column", VARCHAR, null);
+        Column actualValue = new Column("column", VARCHAR, "xxxxxxx");
+
+        ColumnDifference result = expectedValue.compare(actualValue);
+
+        assertNotNull(result);
+    }
+
+
+    @Test
+    public void nullActualValue() throws Exception {
+        Column expectedValue = new Column("column", VARCHAR, "xxxxxxx");
+        Column actualValue = new Column("column", VARCHAR, null);
+
+        ColumnDifference result = expectedValue.compare(actualValue);
+
+        assertNotNull(result);
+    }
+
 }
