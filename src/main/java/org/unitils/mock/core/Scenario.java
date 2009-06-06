@@ -22,7 +22,6 @@ import org.unitils.mock.report.impl.DefaultScenarioReport;
 import org.unitils.mock.report.impl.DetailedObservedInvocationsReport;
 import org.unitils.mock.report.impl.ObservedInvocationsReport;
 import org.unitils.mock.report.impl.SuggestedAssertsReport;
-
 import static org.unitils.util.ReflectionUtils.getSimpleMethodName;
 
 import java.util.ArrayList;
@@ -49,26 +48,32 @@ public class Scenario {
 
     protected SyntaxMonitor syntaxMonitor = new SyntaxMonitor();
 
+
     public Scenario() {
         this(null);
     }
+
 
     public Scenario(Object testObject) {
         this.testObject = testObject;
     }
 
+
     public Object getTestObject() {
         return testObject;
     }
+
 
     public SyntaxMonitor getSyntaxMonitor() {
         return syntaxMonitor;
     }
 
+
     public void addObservedMockInvocation(ObservedInvocation mockInvocation) {
         observedInvocations.add(mockInvocation);
         invocationVerificationStatuses.add(UNVERIFIED);
     }
+
 
     public List<ObservedInvocation> getObservedInvocations() {
         return observedInvocations;
@@ -151,20 +156,20 @@ public class Scenario {
         ScenarioReport fullScenarioReport = new DefaultScenarioReport();
         return fullScenarioReport.createReport(this);
     }
-    
-    
+
+
     public String createObservedInvocationsReport() {
         ObservedInvocationsReport observedInvocationsReport = new ObservedInvocationsReport();
         return observedInvocationsReport.createReport(this.getObservedInvocations());
     }
-    
-    
+
+
     public String createDetailedObservedInvocationsReport() {
         DetailedObservedInvocationsReport observedInvocationsReport = new DetailedObservedInvocationsReport();
         return observedInvocationsReport.createReport(this.getObservedInvocations());
     }
-    
-    
+
+
     public String createSuggestedAssertsReport() {
         SuggestedAssertsReport suggestedAssertsReport = new SuggestedAssertsReport();
         return suggestedAssertsReport.createReport(testObject, getObservedInvocations());

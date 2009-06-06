@@ -15,19 +15,6 @@
  */
 package org.unitils.mock;
 
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ReflectionUtils.getFieldsOfType;
-import static org.unitils.util.ReflectionUtils.invokeMethod;
-import static org.unitils.util.ReflectionUtils.setFieldValue;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Properties;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
@@ -39,7 +26,13 @@ import org.unitils.mock.core.MockObject;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.dummy.DummyObjectUtil;
 import org.unitils.util.AnnotationUtils;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import org.unitils.util.PropertyUtils;
+import static org.unitils.util.ReflectionUtils.*;
+
+import java.lang.reflect.*;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * Module for testing with mock objects.
@@ -54,21 +47,21 @@ public class MockModule implements Module {
     private static Log logger = LogFactory.getLog(MockModule.class);
 
     public static final String PROPERTY_LOG_FULL_SCENARIO_REPORT = "mockModule.logFullScenarioReport";
-    
+
     public static final String PROPERTY_LOG_OBSERVED_SCENARIO = "mockModule.logObservedScenario";
-    
+
     public static final String PROPERTY_LOG_DETAILED_OBSERVED_SCENARIO = "mockModule.logDetailedObservedScenario";
-    
+
     public static final String PROPERTY_LOG_SUGGESTED_ASSERTS = "mockModule.logSuggestedAsserts";
 
     protected Scenario scenario;
-    
+
     protected boolean logFullScenarioReport;
-    
+
     protected boolean logObservedScenario;
-    
+
     protected boolean logDetailedObservedScenario;
-    
+
     protected boolean logSuggestedAsserts;
 
 
@@ -106,20 +99,20 @@ public class MockModule implements Module {
         String report = "\n\n" + scenario.createFullReport();
         logger.info(report);
     }
-    
-    
+
+
     public void logObservedScenario() {
         String report = "\n\nObserved scenario:\n\n" + scenario.createObservedInvocationsReport();
         logger.info(report);
     }
-    
-    
+
+
     public void logDetailedObservedScenario() {
         String report = "\n\nDetailed observed scenario:\n\n" + scenario.createDetailedObservedInvocationsReport();
         logger.info(report);
     }
 
-    
+
     public void logSuggestedAsserts() {
         String report = "\n\nSuggested assert statements:\n\n" + scenario.createSuggestedAssertsReport();
         logger.info(report);
@@ -129,8 +122,8 @@ public class MockModule implements Module {
     protected Mock<?> createMock(Field field, boolean partial) {
         return createMock(field.getName(), getMockedClass(field), partial);
     }
-    
-    
+
+
     public <T> Mock<T> createMock(String name, Class<T> type, boolean partial) {
         return new MockObject<T>(name, type, partial, getScenario());
     }
@@ -198,7 +191,7 @@ public class MockModule implements Module {
         Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), AfterCreateMock.class);
         for (Method method : methods) {
             try {
-                invokeMethod(testObject, method, mockObject.getMock(), name, ((MockObject<?>)mockObject).getMockedClass());
+                invokeMethod(testObject, method, mockObject.getMock(), name, ((MockObject<?>) mockObject).getMockedClass());
 
             } catch (InvocationTargetException e) {
                 throw new UnitilsException("An exception occurred while invoking an after create mock method.", e);
@@ -221,7 +214,7 @@ public class MockModule implements Module {
 
     /**
      * Test listener that handles the scenario and mock creation, and makes sure a final syntax check
-     * is performed after each test and that scenario reports are logged if required. 
+     * is performed after each test and that scenario reports are logged if required.
      */
     protected class MockTestListener extends TestListener {
 
