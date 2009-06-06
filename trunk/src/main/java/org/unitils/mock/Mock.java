@@ -20,12 +20,12 @@ import org.unitils.mock.core.MockObject;
 import org.unitils.mock.mockbehavior.MockBehavior;
 
 /**
- * Declares the contract for a controller object that enables defining the behavior of methods of a mock object, 
- * or for performing assert statements that verify that certain calls were effectively made. A method is also defined 
+ * Declares the contract for a controller object that enables defining the behavior of methods of a mock object,
+ * or for performing assert statements that verify that certain calls were effectively made. A method is also defined
  * that provides access to the actual mock object.
  * <p/>
  * If Unitils encounters a field declared as {@link Mock}, a {@link MockObject} is automatically instantiated and
- * assigned to the declared field. 
+ * assigned to the declared field.
  */
 public interface Mock<T> {
 
@@ -74,8 +74,8 @@ public interface Mock<T> {
      */
     @MatchStatement
     T raises(Throwable exception);
-    
-    
+
+
     /**
      * Defines behavior for this mock so that it raises an instance of the given exception class when the invocation following
      * this call matches the observed behavior. E.g.
@@ -111,7 +111,7 @@ public interface Mock<T> {
     @MatchStatement
     T performs(MockBehavior mockBehavior);
 
-    
+
     /**
      * Defines behavior for this mock so that it will return the given value when the invocation following
      * this call matches the observed behavior. E.g.
@@ -130,7 +130,7 @@ public interface Mock<T> {
     @MatchStatement
     T onceReturns(Object returnValue);
 
-    
+
     /**
      * Defines behavior for this mock so that it raises an instance of the given exception class when the invocation following
      * this call matches the observed behavior. E.g.
@@ -148,8 +148,8 @@ public interface Mock<T> {
      */
     @MatchStatement
     T onceRaises(Throwable exception);
-    
-    
+
+
     /**
      * Defines behavior for this mock so that it raises an instance of the given exception class when the invocation following
      * this call matches the observed behavior. E.g.
@@ -168,7 +168,7 @@ public interface Mock<T> {
     @MatchStatement
     T onceRaises(Class<? extends Throwable> exceptionClass);
 
-    
+
     /**
      * Defines behavior for this mock so that will be performed when the invocation following
      * this call matches the observed behavior. E.g.
@@ -187,36 +187,43 @@ public interface Mock<T> {
     @MatchStatement
     T oncePerforms(MockBehavior mockBehavior);
 
-    
+
     /**
      * Asserts that an invocation that matches the invocation following this call has been observed
      * on this mock object during this test.
-     * 
+     *
      * @return The proxy instance that will record the method call, not null
      */
     @MatchStatement
     T assertInvoked();
-    
-    
+
+
     /**
      * Asserts that an invocation that matches the invocation following this call has been observed
-     * on this mock object during this test. 
+     * on this mock object during this test.
      * <p/>
-     * If this method is used multiple times during the current test, the sequence of the observed method 
+     * If this method is used multiple times during the current test, the sequence of the observed method
      * calls has to be the same as the sequence of the calls to this method.
-     * 
+     *
      * @return The proxy instance that will record the method call, not null
      */
     @MatchStatement
     T assertInvokedInSequence();
 
-    
+
     /**
      * Asserts that no invocation that matches the invocation following this call has been observed
      * on this mock object during this test.
-     * 
+     *
      * @return The proxy instance that will record the method call, not null
      */
     @MatchStatement
     T assertNotInvoked();
+
+
+    /**
+     * Removes all behavior defined for this mock.
+     * This will only remove the behavior, not the observed invocations for this mock.
+     */
+    void resetBehavior();
 }

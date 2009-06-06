@@ -355,12 +355,24 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
     }
 
 
+    /**
+     * Removes all behavior defined for this mock.
+     * This will only remove the behavior, not the observed invocations for this mock.
+     */
+    @MatchStatement
+    public void resetBehavior() {
+        oneTimeMatchingMockBehaviors.clear();
+        alwaysMatchingMockBehaviors.clear();
+    }
+
+
     protected T startBehaviorDefinition(ProxyInvocationHandler proxyInvocationHandler, String behaviorDefinitionMethodName) {
         StackTraceElement[] invokedAt = getInvokedAt();
         ArgumentMatcherRepository.getInstance().registerStartOfMatchingInvocation(invokedAt[0].getLineNumber());
         getSyntaxMonitor().startDefinition(name, behaviorDefinitionMethodName, proxyInvocationHandler, invokedAt);
         return createProxy(mockedClass, proxyInvocationHandler);
     }
+
 
     protected T startAssertion(ProxyInvocationHandler proxyInvocationHandler, String assertMethodName) {
         StackTraceElement[] invokedAt = getInvokedAt();

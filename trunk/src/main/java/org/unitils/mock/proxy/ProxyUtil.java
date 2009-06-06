@@ -47,6 +47,7 @@ public class ProxyUtil {
         return createProxy(proxiedClass, new Class<?>[0], invocationHandler);
     }
 
+
     /**
      * Creates a proxy object for the given type. All method invocations will be passed to the given invocation handler.
      *
