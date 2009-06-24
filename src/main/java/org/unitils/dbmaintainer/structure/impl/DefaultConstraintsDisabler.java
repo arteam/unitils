@@ -41,7 +41,7 @@ public class DefaultConstraintsDisabler extends BaseDatabaseAccessor implements 
      */
     public void disableConstraints() {
         for (DbSupport dbSupport : dbSupports) {
-            logger.info("Disabling contraints in database schema " + dbSupport.getSchemaName());
+            logger.info("Disabling constraints in database schema " + dbSupport.getSchemaName());
 
             // first disable referential constraints to avoid conflicts
             disableReferentialConstraints(dbSupport);
