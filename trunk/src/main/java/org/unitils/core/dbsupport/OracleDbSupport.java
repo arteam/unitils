@@ -228,7 +228,9 @@ public class OracleDbSupport extends DbSupport {
             alterStatement = connection.createStatement();
 
             // to be sure no recycled items are handled, all items with a name that starts with BIN$ will be filtered out.
-            resultSet = queryStatement.executeQuery("select TABLE_NAME, CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE in ('U', 'C', 'V', 'O') and OWNER = '" + getSchemaName() + "' and CONSTRAINT_NAME not like 'BIN$%' and STATUS <> 'DISABLED'");
+            // The 'O' type of constraints are ignored. These constraints are generated when a view is created with
+            // the with read-only option and can't be disabled with an alter table
+            resultSet = queryStatement.executeQuery("select TABLE_NAME, CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE in ('U', 'C', 'V') and OWNER = '" + getSchemaName() + "' and CONSTRAINT_NAME not like 'BIN$%' and STATUS <> 'DISABLED'");
             while (resultSet.next()) {
                 String tableName = resultSet.getString("TABLE_NAME");
                 String constraintName = resultSet.getString("CONSTRAINT_NAME");
