@@ -15,20 +15,24 @@
  */
 package org.unitils.mock.core;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests the reset behavior of the mock object.
+ * Tests chaining of methods when defining behavior and assertions (UNI-153).
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class MockObjectResetTest {
+public class MockObjectChainedMethodsTest {
 
     /* Class under test */
     private MockObject<TestClass> mockObject;
+
+    /* Class under test */
+    private MockObject<TestClass> mockObject2;
+
 
     @Before
     public void setUp() {
@@ -38,14 +42,22 @@ public class MockObjectResetTest {
 
 
     @Test
-    public void resetBehavior() {
-        mockObject.onceReturns("aValue").testMethod();
-        mockObject.returns("aValue").testMethod();
+    public void chainedBehavior() {
+        mockObject.returns("value").getTestClass().getValue();
 
-        mockObject.resetBehavior();
+        String result = mockObject.getMock().getTestClass().getValue();
 
-        String result = mockObject.getMock().testMethod();
-        assertNull(result);
+        assertEquals("value", result);
+    }
+
+
+    @Test
+    public void doubleChainedBehavior() {
+        mockObject.returns("value").getTestClass().getTestClass().getValue();
+
+        String result = mockObject.getMock().getTestClass().getTestClass().getValue();
+
+        assertEquals("value", result);
     }
 
 
@@ -54,7 +66,9 @@ public class MockObjectResetTest {
      */
     private static interface TestClass {
 
-        public String testMethod();
+        public String getValue();
+
+        public TestClass getTestClass();
 
     }
 

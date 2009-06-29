@@ -57,7 +57,7 @@ public class SuggestedAssertsReportTest {
     public void setUp() {
         suggestedAssertsReport = new SuggestedAssertsReport();
         scenario = new Scenario(null);
-        testMock = new MockObject<TestInterface>("testMock", TestInterface.class, false, scenario);
+        testMock = new MockObject<TestInterface>("testMock", TestInterface.class, scenario);
         testProxy = testMock.getMock();
     }
 

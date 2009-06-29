@@ -19,7 +19,7 @@ import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 import org.unitils.mock.proxy.ProxyInvocationHandler;
-import org.unitils.mock.proxy.ProxyUtil;
+import static org.unitils.mock.proxy.ProxyUtils.createProxy;
 import static org.unitils.util.MethodUtils.*;
 
 /**
@@ -40,16 +40,7 @@ public class DummyObjectUtil {
      */
     @SuppressWarnings("unchecked")
     public static <T> T createDummy(Class<T> type) {
-        Class<?> superClass;
-        Class<?>[] interfaces;
-        if (type.isInterface()) {
-            superClass = Object.class;
-            interfaces = new Class<?>[] {type, DummyObject.class, Cloneable.class};
-        } else {
-            superClass = type;
-            interfaces = new Class<?>[] {DummyObject.class, Cloneable.class};
-        }
-        return (T) ProxyUtil.createProxy(superClass, interfaces, new DummyObjectInvocationHandler(type));
+        return createProxy(type, new Class<?>[]{DummyObject.class, Cloneable.class}, new DummyObjectInvocationHandler(type));
     }
 
 
@@ -58,19 +49,18 @@ public class DummyObjectUtil {
      */
     public static class DummyObjectInvocationHandler implements ProxyInvocationHandler {
 
-        private Class<?> dummyObjectClass;
-        
+        /* The type of the dummy object */
+        private Class<?> dummyObjectType;
+
         /* The hash code that is returned when the hashCode method is called */
         private Integer dummyObjectHashCode = new Object().hashCode();
 
         /* The behavior that will return the default values */
         private MockBehavior dummyObjectBehavior = new DefaultValueReturningMockBehavior();
 
-        /**
-         * @param dummyObjectClass
-         */
-        public DummyObjectInvocationHandler(Class<?> dummyObjectClass) {
-            this.dummyObjectClass = dummyObjectClass;
+
+        public DummyObjectInvocationHandler(Class<?> dummyObjectType) {
+            this.dummyObjectType = dummyObjectType;
         }
 
         /**
@@ -88,10 +78,10 @@ public class DummyObjectUtil {
             } else if (isCloneMethod(invocation.getMethod())) {
                 return invocation.getProxy();
             } else if (isToStringMethod(invocation.getMethod())) {
-                return "DUMMY " + dummyObjectClass.getSimpleName() + "@" + Integer.toHexString(dummyObjectHashCode);
+                return "DUMMY " + dummyObjectType.getSimpleName() + "@" + Integer.toHexString(dummyObjectHashCode);
             }
             return dummyObjectBehavior.execute(invocation);
         }
-        
+
     }
 }

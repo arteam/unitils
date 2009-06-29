@@ -41,8 +41,8 @@ public class MockObjectTest {
     @Before
     public void setUp() {
         Scenario scenario = new Scenario(null);
-        mockObject = new MockObject<TestClass>("testMock", TestClass.class, false, scenario);
-        equalMockObject = new MockObject<TestClass>("testMock", TestClass.class, false, scenario);
+        mockObject = new MockObject<TestClass>("testMock", TestClass.class, scenario);
+        equalMockObject = new MockObject<TestClass>("testMock", TestClass.class, scenario);
     }
 
 

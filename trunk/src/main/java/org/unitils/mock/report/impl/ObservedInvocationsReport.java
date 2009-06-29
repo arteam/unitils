@@ -101,8 +101,7 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
         Class<?> resultType = method.getReturnType();
         if (!Void.TYPE.equals(resultType)) {
             result.append(" -> ");
-            String resultAsString = objectFormatter.format(observedInvocation.getResultAtInvocationTime());
-            result.append(formatValue(resultAsString, resultType, currentLargeObjects, allLargeObjects, largeObjectNameIndexes));
+            result.append(formatValue(observedInvocation.getResultAtInvocationTime(), resultType, currentLargeObjects, allLargeObjects, largeObjectNameIndexes));
         }
         return result.toString();
     }

@@ -22,6 +22,7 @@ import org.unitils.core.UnitilsException;
 
 import java.lang.reflect.Method;
 import static java.lang.reflect.Modifier.isAbstract;
+import java.util.ArrayList;
 import java.util.Arrays;
 import static java.util.Arrays.asList;
 import java.util.List;
@@ -33,7 +34,7 @@ import java.util.List;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class ProxyUtil {
+public class ProxyUtils {
 
 
     /**
@@ -49,6 +50,25 @@ public class ProxyUtil {
 
 
     /**
+     * @param object The object to check
+     * @return The proxied type, null if the object is not a proxy
+     */
+    public static Class<?> getProxiedTypeIfProxy(Object object) {
+        if (object == null) {
+            return null;
+        }
+        Class<?> type = object.getClass();
+        if (object instanceof Factory) {
+            Callback callback = ((Factory) object).getCallback(0);
+            if (callback instanceof ProxyMethodInterceptor) {
+                return ((ProxyMethodInterceptor) callback).getProxiedType();
+            }
+        }
+        return null;
+    }
+
+
+    /**
      * Creates a proxy object for the given type. All method invocations will be passed to the given invocation handler.
      *
      * @param proxiedClass          The type to proxy, not null
@@ -59,16 +79,26 @@ public class ProxyUtil {
     @SuppressWarnings("unchecked")
     public static <T> T createProxy(Class<T> proxiedClass, Class<?>[] implementedInterfaces, ProxyInvocationHandler invocationHandler) {
         Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(proxiedClass);
-        if (implementedInterfaces.length != 0) {
-            enhancer.setInterfaces(implementedInterfaces);
+
+        List<Class<?>> interfaces = new ArrayList<Class<?>>();
+        if (proxiedClass.isInterface()) {
+            enhancer.setSuperclass(Object.class);
+            interfaces.add(proxiedClass);
+        } else {
+            enhancer.setSuperclass(proxiedClass);
+        }
+        if (implementedInterfaces != null && implementedInterfaces.length > 0) {
+            interfaces.addAll(asList(implementedInterfaces));
+        }
+        if (!interfaces.isEmpty()) {
+            enhancer.setInterfaces(interfaces.toArray(new Class<?>[interfaces.size()]));
         }
         enhancer.setCallbackType(MethodInterceptor.class);
         enhancer.setUseFactory(true);
         Class<T> enhancedTargetClass = enhancer.createClass();
 
         Factory proxy = (Factory) createInstanceOfType(enhancedTargetClass);
-        proxy.setCallbacks(new Callback[]{new ProxyMethodInterceptor(invocationHandler)});
+        proxy.setCallbacks(new Callback[]{new ProxyMethodInterceptor(proxiedClass, invocationHandler)});
         return (T) proxy;
     }
 
@@ -86,34 +116,41 @@ public class ProxyUtil {
         Objenesis objenesis = new ObjenesisStd();
         return (T) objenesis.newInstance(clazz);
     }
-
+    
 
     /**
-     * First finds a trace element in which a cglib proxy method was invoked. Then it returns the following stack trace
-     * element. This element is the method call that was proxied by the proxy method.
+     * First finds a trace element in which a cglib proxy method was invoked. Then it returns the rest of the stack trace following that
+     * element. The stack trace starts with the element rh  r is the method call that was proxied by the proxy method.
      *
-     * @param stackTraceElements The stack trace, not null
-     * @return The proxied method trace element, not null
+     * @return The proxied method trace, not null
      */
-    public static StackTraceElement getProxiedMethodStackTraceElement(StackTraceElement[] stackTraceElements) {
+    public static StackTraceElement[] getProxiedMethodStackTrace() {
+        List<StackTraceElement> stackTrace = new ArrayList<StackTraceElement>();
+
         boolean foundProxyMethod = false;
+        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
         for (StackTraceElement stackTraceElement : stackTraceElements) {
             if (foundProxyMethod) {
+                stackTrace.add(stackTraceElement);
+
+            } else if (stackTraceElement.getClassName().contains("$$EnhancerByCGLIB$$")) {
                 // found the proxy method element, the next element is the proxied method element
-                return stackTraceElement;
-            }
-            if (stackTraceElement.getClassName().contains("$$EnhancerByCGLIB$$")) {
                 foundProxyMethod = true;
             }
         }
-        throw new UnitilsException("No invocation of a cglib proxy method found in stacktrace: " + Arrays.toString(stackTraceElements));
+        if (stackTrace.isEmpty()) {
+            throw new UnitilsException("No invocation of a cglib proxy method found in stacktrace: " + Arrays.toString(stackTraceElements));
+        }
+        return stackTrace.toArray(new StackTraceElement[stackTrace.size()]);
     }
 
 
     /**
      * A cglib method intercepter that will delegate the invocations to the given invocation hanlder.
      */
-    public static class ProxyMethodInterceptor implements MethodInterceptor {
+    public static class ProxyMethodInterceptor<T> implements MethodInterceptor {
+
+        private Class<T> proxiedType;
 
         /* The invocation handler */
         private ProxyInvocationHandler invocationHandler;
@@ -122,12 +159,13 @@ public class ProxyUtil {
         /**
          * Creates an interceptor.
          *
+         * @param proxiedType       The proxied type, not null
          * @param invocationHandler The handler to delegate the invocations to, not null
          */
-        public ProxyMethodInterceptor(ProxyInvocationHandler invocationHandler) {
+        public ProxyMethodInterceptor(Class<T> proxiedType, ProxyInvocationHandler invocationHandler) {
+            this.proxiedType = proxiedType;
             this.invocationHandler = invocationHandler;
         }
-
 
         /**
          * Intercepts the method call by wrapping the invocation in a {@link CglibProxyInvocation} and delegating the
@@ -140,9 +178,15 @@ public class ProxyUtil {
          * @return The value to return for the method call, ignored for void methods
          */
         public Object intercept(Object proxy, Method method, Object[] arguments, MethodProxy methodProxy) throws Throwable {
-            StackTraceElement invokedAt = getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace());
-            ProxyInvocation invocation = new CglibProxyInvocation(method, asList(arguments), invokedAt, proxy, methodProxy);
+            ProxyInvocation invocation = new CglibProxyInvocation(method, asList(arguments), getProxiedMethodStackTrace(), proxy, methodProxy);
             return invocationHandler.handleInvocation(invocation);
+        }
+
+        /**
+         * @return The proxied type, not null
+         */
+        public Class<?> getProxiedType() {
+            return proxiedType;
         }
     }
 
@@ -165,7 +209,7 @@ public class ProxyUtil {
          * @param proxy       The proxy, not null
          * @param methodProxy The cglib method proxy, not null
          */
-        public CglibProxyInvocation(Method method, List<Object> arguments, StackTraceElement invokedAt, Object proxy, MethodProxy methodProxy) {
+        public CglibProxyInvocation(Method method, List<Object> arguments, StackTraceElement[] invokedAt, Object proxy, MethodProxy methodProxy) {
             super(proxy, method, arguments, invokedAt);
             this.methodProxy = methodProxy;
         }

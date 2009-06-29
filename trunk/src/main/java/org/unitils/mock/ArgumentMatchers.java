@@ -18,7 +18,7 @@ package org.unitils.mock;
 import org.unitils.mock.annotation.ArgumentMatcher;
 import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
 import org.unitils.mock.argumentmatcher.impl.*;
-import org.unitils.util.CallStackUtils;
+import static org.unitils.util.StackTraceUtils.getInvocationLineNr;
 
 /**
  * todo javadoc
@@ -129,11 +129,8 @@ public class ArgumentMatchers {
 
 
     protected static <T> void registerArgumentMatcher(org.unitils.mock.argumentmatcher.ArgumentMatcher argumentMatcher) {
-        ArgumentMatcherRepository.getInstance().registerArgumentMatcher(argumentMatcher, getInvokedAtLineNr());
-    }
-
-    static int getInvokedAtLineNr() {
-        return CallStackUtils.getInvocationStackTrace(ArgumentMatchers.class)[0].getLineNumber();
+        ArgumentMatcherRepository argumentMatcherRepository = ArgumentMatcherRepository.getInstance();
+        argumentMatcherRepository.registerArgumentMatcher(argumentMatcher, getInvocationLineNr(ArgumentMatchers.class));
     }
 
 }
