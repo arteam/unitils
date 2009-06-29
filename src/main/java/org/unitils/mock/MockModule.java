@@ -23,6 +23,7 @@ import org.unitils.core.UnitilsException;
 import org.unitils.mock.annotation.AfterCreateMock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.core.MockObject;
+import org.unitils.mock.core.PartialMockObject;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.dummy.DummyObjectUtil;
 import org.unitils.util.AnnotationUtils;
@@ -30,7 +31,9 @@ import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import org.unitils.util.PropertyUtils;
 import static org.unitils.util.ReflectionUtils.*;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.Set;
 
@@ -119,51 +122,56 @@ public class MockModule implements Module {
     }
 
 
-    protected Mock<?> createMock(Field field, boolean partial) {
-        return createMock(field.getName(), getMockedClass(field), partial);
+    public <T> Mock<T> createMock(String name, Class<T> type) {
+        return new MockObject<T>(name, type, getScenario());
     }
 
 
-    public <T> Mock<T> createMock(String name, Class<T> type, boolean partial) {
-        return new MockObject<T>(name, type, partial, getScenario());
+    public <T> Mock<T> createPartialMock(String name, Class<T> type) {
+        return new PartialMockObject<T>(name, type, getScenario());
     }
 
 
     protected Class<?> getMockedClass(Field field) {
-        Type type = field.getGenericType();
-        if (type instanceof ParameterizedType) {
-            Type[] argumentTypes = ((ParameterizedType) type).getActualTypeArguments();
-            if (argumentTypes.length == 1 && argumentTypes[0] instanceof Class<?>) {
-                return (Class<?>) argumentTypes[0];
-            }
+        Class<?> type = getGenericType(field);
+        if (type == null) {
+            throw new UnitilsException("Unable to determine type of mock. A mock should be declared using the generic Mock<YourTypeToMock> or PartialMock<YourTypeToMock> types. Field; " + field);
         }
-        throw new UnitilsException("Unable to determine type of mock. A mock should be declared using the generic Mock<YourTypeToMock> " +
-                "or PartialMock<YourTypeToMock> types. Used type; " + type);
+        return type;
     }
 
 
     protected void createAndInjectMocksIntoTest(Object testObject) {
         Set<Field> mockFields = getFieldsOfType(testObject.getClass(), Mock.class, false);
         for (Field field : mockFields) {
-            // TODO find solution for fields that are instantiated in declaration - a not-null check is not the 
-            // right solution, since TestNG reuses the same test instance in every test.
-            //if (getFieldValue(testObject, field) == null) {
-            Mock<?> mock = createMock(field, false);
-            setFieldValue(testObject, field, mock);
-            callAfterCreateMockMethods(testObject, mock, field.getName(), field.getType());
-            //}
+            Mock<?> mock = getFieldValue(testObject, field);
+            if (mock != null) {
+                mock.resetBehavior();
+                continue;
+            }
+            mock = createMock(field.getName(), getMockedClass(field));
+            injectMock(testObject, field, mock);
         }
+    }
 
+
+    protected void createAndInjectPartialMocksIntoTest(Object testObject) {
         Set<Field> partialMockFields = getFieldsOfType(testObject.getClass(), PartialMock.class, false);
         for (Field field : partialMockFields) {
-            // TODO find solution for fields that are instantiated in declaration - a not-null check is not the 
-            // right solution, since TestNG reuses the same test instance in every test.
-            //if (getFieldValue(testObject, field) == null) {
-            Mock<?> mock = createMock(field, true);
-            setFieldValue(testObject, field, mock);
-            callAfterCreateMockMethods(testObject, mock, field.getName(), field.getType());
-            //}
+            Mock<?> mock = getFieldValue(testObject, field);
+            if (mock != null) {
+                mock.resetBehavior();
+                continue;
+            }
+            mock = createPartialMock(field.getName(), getMockedClass(field));
+            injectMock(testObject, field, mock);
         }
+    }
+
+
+    protected void injectMock(Object testObject, Field field, Mock<?> mock) {
+        setFieldValue(testObject, field, mock);
+        callAfterCreateMockMethods(testObject, mock, field.getName(), field.getType());
     }
 
 
@@ -191,7 +199,7 @@ public class MockModule implements Module {
         Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), AfterCreateMock.class);
         for (Method method : methods) {
             try {
-                invokeMethod(testObject, method, mockObject.getMock(), name, ((MockObject<?>) mockObject).getMockedClass());
+                invokeMethod(testObject, method, mockObject.getMock(), name, ((MockObject<?>) mockObject).getMockedType());
 
             } catch (InvocationTargetException e) {
                 throw new UnitilsException("An exception occurred while invoking an after create mock method.", e);
@@ -230,7 +238,6 @@ public class MockModule implements Module {
             if (scenario == null) {
                 return;
             }
-            scenario.getSyntaxMonitor().assertNotExpectingInvocation();
             if (logFullScenarioReport) {
                 logFullScenarioReport();
                 return;

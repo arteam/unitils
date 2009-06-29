@@ -53,12 +53,12 @@ public class ArgumentMatcherPositionFinder {
      * @param toLineNr        The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line)
      * @return The argument indexes, empty if there are no matchers
      */
-    public static List<Integer> getArgumentMatcherIndexes(ProxyInvocation proxyInvocation, int fromLineNr, int toLineNr) {
+    public static List<Integer> getArgumentMatcherIndexes(ProxyInvocation proxyInvocation, int fromLineNr, int toLineNr, int index) {
         Class<?> testClass = getClassWithName(proxyInvocation.getInvokedAt().getClassName());
         String testMethodName = proxyInvocation.getInvokedAt().getMethodName();
         Method method = proxyInvocation.getMethod();
 
-        return getArgumentMatcherIndexes(testClass, testMethodName, method, fromLineNr, toLineNr);
+        return getArgumentMatcherIndexes(testClass, testMethodName, method, fromLineNr, toLineNr, index);
     }
 
 
@@ -74,7 +74,7 @@ public class ArgumentMatcherPositionFinder {
      * @return The argument indexes, empty if there are no matchers
      */
     @SuppressWarnings({"unchecked"})
-    public static List<Integer> getArgumentMatcherIndexes(Class<?> clazz, String methodName, Method invokedMethod, int fromLineNr, int toLineNr) {
+    public static List<Integer> getArgumentMatcherIndexes(Class<?> clazz, String methodName, Method invokedMethod, int fromLineNr, int toLineNr, int index) {
         // read the bytecode of the test class
         ClassNode restClassNode = readClass(clazz);
 
@@ -85,7 +85,7 @@ public class ArgumentMatcherPositionFinder {
             // another method with the same name may exist
             // if no result was found it could be that the line nr was for the other method, so continue with the search
             if (methodName.equals(testMethodNode.name)) {
-                List<Integer> result = findArgumentMatcherIndexes(restClassNode, testMethodNode, clazz, methodName, invokedMethod, fromLineNr, toLineNr);
+                List<Integer> result = findArgumentMatcherIndexes(restClassNode, testMethodNode, clazz, methodName, invokedMethod, fromLineNr, toLineNr, index);
                 if (result != null) {
                     return result;
                 }
@@ -132,12 +132,12 @@ public class ArgumentMatcherPositionFinder {
      * @param toLineNr              The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line)
      * @return The argument indexes, null if method was not found, empty if method found but there are no matchers
      */
-    protected static List<Integer> findArgumentMatcherIndexes(ClassNode classNode, MethodNode methodNode, Class<?> interpretedClass, String interpretedMethodName, Method invokedMethod, int fromLineNr, int toLineNr) {
+    protected static List<Integer> findArgumentMatcherIndexes(ClassNode classNode, MethodNode methodNode, Class<?> interpretedClass, String interpretedMethodName, Method invokedMethod, int fromLineNr, int toLineNr, int index) {
         String invokedMethodName = invokedMethod.getName();
         String invokedMethodDescriptor = getMethodDescriptor(invokedMethod);
         try {
             // analyze the instructions in the method
-            MethodInterpreter methodInterpreter = new MethodInterpreter(interpretedClass, interpretedMethodName, invokedMethodName, invokedMethodDescriptor, fromLineNr, toLineNr);
+            MethodInterpreter methodInterpreter = new MethodInterpreter(interpretedClass, interpretedMethodName, invokedMethodName, invokedMethodDescriptor, fromLineNr, toLineNr, index);
             Analyzer analyzer = new MethodAnalyzer(methodNode, methodInterpreter);
             analyzer.analyze(classNode.name, methodNode);
             // retrieve the found matcher indexes, if any
@@ -240,8 +240,12 @@ public class ArgumentMatcherPositionFinder {
         /* The line nrs between which the invocation can be found */
         protected int fromLineNr, toLineNr;
 
+        protected int index;
+
         /* The line that is currently being analyzed */
         protected int currentLineNr = 0;
+
+        protected int currentIndex = 1;
 
         protected Method currentMatcherMethod;
 
@@ -261,13 +265,14 @@ public class ArgumentMatcherPositionFinder {
          * @param fromLineNr              The begin line-nr of the invocation
          * @param toLineNr                The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line)
          */
-        public MethodInterpreter(Class<?> interpretedClass, String interpretedMethodName, String invokedMethodName, String invokedMethodDescriptor, int fromLineNr, int toLineNr) {
+        public MethodInterpreter(Class<?> interpretedClass, String interpretedMethodName, String invokedMethodName, String invokedMethodDescriptor, int fromLineNr, int toLineNr, int index) {
             this.interpretedClass = interpretedClass;
             this.interpretedMethodName = interpretedMethodName;
             this.invokedMethodName = invokedMethodName;
             this.invokedMethodDescriptor = invokedMethodDescriptor;
             this.fromLineNr = fromLineNr;
             this.toLineNr = toLineNr;
+            this.index = index;
         }
 
 
@@ -337,11 +342,14 @@ public class ArgumentMatcherPositionFinder {
 
             // check whether we are interested in the instruction
             MethodInsnNode methodInsnNode = (MethodInsnNode) instructionNode;
-            if (instructionOutOfRange(methodInsnNode) || instructionAlreadyHandled(methodInsnNode)) {
+            if (instructionOutOfRange() || instructionAlreadyHandled(methodInsnNode)) {
                 return getValue(resultValue, values);
             }
 
             if (isInvokedMethod(methodInsnNode)) {
+                if (currentIndex++ != index) {
+                    return getValue(resultValue, values);
+                }
                 if (resultArgumentMatcherIndexes != null) {
                     throwUnitilsException("Method invocation occurs more than once within the same clause. Method name: " + invokedMethodName);
                 }
@@ -355,9 +363,6 @@ public class ArgumentMatcherPositionFinder {
             if (method != null) {
                 // check whether the method is a match statement
                 if (isMatcherMethod(method)) {
-                    if (currentMatcherMethod != null && currentMatcherMethod != method) {
-                        throwUnitilsException("Two match statements found on the same line. This is not supported.");
-                    }
                     currentMatcherMethod = method;
                 }
                 // check whether the method is an argument matcher (i.e. has the @ArgumentMatcher annotation)
@@ -370,15 +375,12 @@ public class ArgumentMatcherPositionFinder {
                 }
             }
 
-            // If the method is not an argument matcher, make sure none of the arguments of this method is an argument matcher, since this is not supported
-            verifyThatArgumentMatchersNotUsedInExpression((List<Value>) values);
-
             // nothing special found
             return getValue(resultValue, values);
         }
 
 
-        protected boolean instructionOutOfRange(AbstractInsnNode instructionNode) {
+        protected boolean instructionOutOfRange() {
             return currentLineNr < fromLineNr || toLineNr < currentLineNr;
         }
 
@@ -416,14 +418,6 @@ public class ArgumentMatcherPositionFinder {
             return method.getAnnotation(ArgumentMatcher.class) != null;
         }
 
-
-        protected void verifyThatArgumentMatchersNotUsedInExpression(List<Value> values) {
-            for (Value value : values) {
-                if (value instanceof ArgumentMatcherValue) {
-                    throwUnitilsException("An argument matcher's return value cannot be used inside an expression.");
-                }
-            }
-        }
 
         /**
          * Throws a {@link org.unitils.core.UnitilsException} with the given error message. The stacktrace is modified, to make
@@ -504,14 +498,34 @@ public class ArgumentMatcherPositionFinder {
          * @return The result value, or a ArgumentMatcherValue of the same type if one of the values is an ArgumentMatcherValue
          */
         protected Value getValue(Value resultValue, List<Value> values) {
-            if (values != null) {
-                for (Value value : values) {
-                    if (value instanceof ArgumentMatcherValue) {
-                        return createArgumentMatcherValue(resultValue);
-                    }
-                }
+            int nrOfArgumentMatcherValues = getNrOfArgumentMacherValues(values);
+
+            if (nrOfArgumentMatcherValues > 1) {
+                throwUnitilsException("An argument matcher cannot be used in an expression.");
+            }
+            if (nrOfArgumentMatcherValues == 1) {
+                return createArgumentMatcherValue(resultValue);
             }
             return resultValue;
+        }
+
+
+        /**
+         * @param values The values that can be ArgumentMatcherValues
+         * @return The nr of values that are an ArgumentMatcherValue
+         */
+        protected int getNrOfArgumentMacherValues(List<Value> values) {
+            if (values == null) {
+                return 0;
+            }
+
+            int count = 0;
+            for (Value value : values) {
+                if (value instanceof ArgumentMatcherValue) {
+                    count++;
+                }
+            }
+            return count;
         }
 
 

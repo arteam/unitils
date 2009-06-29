@@ -17,7 +17,7 @@ package org.unitils.mock;
 
 import org.unitils.core.Unitils;
 import org.unitils.mock.dummy.DummyObjectUtil;
-import org.unitils.util.CallStackUtils;
+import static org.unitils.util.StackTraceUtils.getInvocationStackTrace;
 
 /**
  * @author Filip Neven
@@ -28,7 +28,7 @@ public class MockUnitils {
 
 
     public static void assertNoMoreInvocations() {
-        getMockModule().assertNoMoreInvocations(getAssertedAt());
+        getMockModule().assertNoMoreInvocations(getInvocationStackTrace(MockUnitils.class));
     }
 
 
@@ -38,23 +38,24 @@ public class MockUnitils {
 
 
     public static <T> Mock<T> createMock(Class<T> type) {
-        return getMockModule().createMock("mock" + type.getSimpleName(), type, false);
+        return getMockModule().createMock("mock" + type.getSimpleName(), type);
     }
 
 
     public static <T> Mock<T> createMock(String name, Class<T> type) {
-        return getMockModule().createMock(name, type, false);
+        return getMockModule().createMock(name, type);
     }
 
 
     public static <T> PartialMock<T> createPartialMock(Class<T> type) {
-        return (PartialMock<T>) getMockModule().createMock("mock" + type.getSimpleName(), type, true);
+        return (PartialMock<T>) getMockModule().createPartialMock("mock" + type.getSimpleName(), type);
     }
 
 
     public static <T> PartialMock<T> createPartialMock(String name, Class<T> type) {
-        return (PartialMock<T>) getMockModule().createMock(name, type, true);
+        return (PartialMock<T>) getMockModule().createPartialMock(name, type);
     }
+    
 
     public static void logFullScenarioReport() {
         getMockModule().logFullScenarioReport();
@@ -74,12 +75,6 @@ public class MockUnitils {
     public void logSuggestedAsserts() {
         getMockModule().logSuggestedAsserts();
     }
-
-
-    private static StackTraceElement[] getAssertedAt() {
-        return CallStackUtils.getInvocationStackTrace(MockUnitils.class);
-    }
-
 
     private static MockModule getMockModule() {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(MockModule.class);

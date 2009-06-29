@@ -48,7 +48,7 @@ public class ObservedInvocationsReportTest {
     public void setUp() {
         observedInvocationsView = new ObservedInvocationsReport();
         scenario = new Scenario(null);
-        testMock = new MockObject<TestInterface>("testMock", TestInterface.class, false, scenario);
+        testMock = new MockObject<TestInterface>("testMock", TestInterface.class, scenario);
     }
 
 

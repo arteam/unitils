@@ -19,6 +19,7 @@ import static org.apache.commons.lang.StringUtils.rightPad;
 import static org.apache.commons.lang.StringUtils.uncapitalize;
 import org.unitils.core.util.ObjectFormatter;
 import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.proxy.ProxyUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -80,7 +81,7 @@ public abstract class ProxyInvocationsReport {
             return formattedObject.getName();
         }
 
-        String objectRepresentation = objectFormatter.format(object);
+        String objectRepresentation = formatObject(object);
         if (objectRepresentation.length() <= MAX_INLINE_PARAMETER_LENGTH) {
             // The object representation is small enough to be shown inline
             return objectRepresentation;
@@ -125,6 +126,19 @@ public abstract class ProxyInvocationsReport {
     protected String formatInvocationIndex(int invocationIndex, int totalInvocationNumber) {
         int padSize = String.valueOf(totalInvocationNumber).length() + 2;
         return rightPad(invocationIndex + ".", padSize);
+    }
+
+
+    /**
+     * @param object The object
+     * @return A string representation of the object, not null
+     */
+    protected String formatObject(Object object) {
+        Class<?> proxiedType = ProxyUtils.getProxiedTypeIfProxy(object);
+        if (proxiedType != null) {
+            return "Mock<" + proxiedType.getSimpleName() + ">";
+        }
+        return objectFormatter.format(object);
     }
 
 

@@ -15,6 +15,8 @@
  */
 package org.unitils.mock.proxy;
 
+import static org.unitils.core.util.CloneUtil.createDeepClone;
+
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -39,43 +41,43 @@ public abstract class ProxyInvocation {
     /* The arguments at the time that they were used */
     private List<Object> argumentsAtInvocationTime;
 
-    /* The location of the invocation */
-    private StackTraceElement invokedAt;
+    /* The trace of the invocation */
+    private StackTraceElement[] invokedAtTrace;
 
 
     /**
      * Creates an invocation.
      *
-     * @param proxy     The proxy on which the method was called, not null
-     * @param method    The method that was called, not null
-     * @param arguments The arguments that were used, not null
-     * @param invokedAt The location of the invocation, not null
+     * @param proxy          The proxy on which the method was called, not null
+     * @param method         The method that was called, not null
+     * @param arguments      The arguments that were used, not null
+     * @param invokedAtTrace The trace of the invocation, not null
      */
-    public ProxyInvocation(Object proxy, Method method, List<Object> arguments, StackTraceElement invokedAt) {
-        this(proxy, method, arguments, arguments, invokedAt);
+    public ProxyInvocation(Object proxy, Method method, List<Object> arguments, StackTraceElement[] invokedAtTrace) {
+        this.proxy = proxy;
+        this.method = method;
+        this.arguments = arguments;
+        this.argumentsAtInvocationTime = arguments;
+        this.invokedAtTrace = invokedAtTrace;
     }
 
 
     /**
-     * Creates an invocation.
+     * Creates a copy of the given proxy invocation.
      *
-     * The argumentsAtInvocationTime can be set as copies (deep clones) of the arguments at the time of
+     * The argumentsAtInvocationTime will be set as copies (deep clones) of the arguments at the time of
      * the invocation. This way the original values can still be used later-on even when changes
      * occur to the original values (pass-by-value vs pass-by-reference). If not explicitly set, this will return the
      * same values as the arguments.
      *
-     * @param proxy                     The proxy on which the method was called, not null
-     * @param method                    The method that was called, not null
-     * @param arguments                 The arguments that were used by reference, not null
-     * @param argumentsAtInvocationTime The arguments at the time that they were used, not null
-     * @param invokedAt                 The location of the invocation, not null
+     * @param proxyInvocation The proxy invocation to copy, not null
      */
-    public ProxyInvocation(Object proxy, Method method, List<Object> arguments, List<Object> argumentsAtInvocationTime, StackTraceElement invokedAt) {
-        this.proxy = proxy;
-        this.method = method;
-        this.arguments = arguments;
-        this.argumentsAtInvocationTime = argumentsAtInvocationTime;
-        this.invokedAt = invokedAt;
+    public ProxyInvocation(ProxyInvocation proxyInvocation) {
+        this.proxy = proxyInvocation.getProxy();
+        this.method = proxyInvocation.getMethod();
+        this.arguments = proxyInvocation.getArguments();
+        this.argumentsAtInvocationTime = createDeepClone(arguments);
+        this.invokedAtTrace = proxyInvocation.getInvokedAtTrace();
     }
 
 
@@ -129,10 +131,26 @@ public abstract class ProxyInvocation {
 
 
     /**
+     * @return The trace of the invocation, not null
+     */
+    public StackTraceElement[] getInvokedAtTrace() {
+        return invokedAtTrace;
+    }
+
+
+    /**
      * @return The location of the invocation, not null
      */
     public StackTraceElement getInvokedAt() {
-        return invokedAt;
+        return invokedAtTrace[0];
+    }
+
+
+    /**
+     * @return The line nr of the invocation
+     */
+    public int getLineNumber() {
+        return getInvokedAt().getLineNumber();
     }
 
 }

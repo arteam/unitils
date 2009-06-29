@@ -41,7 +41,7 @@ public class MockObjectPartialMockTest {
     @Before
     public void setUp() {
         TestClass.invocationCount = 0;
-        mockObject = new MockObject<TestClass>("testMock", TestClass.class, true, new Scenario(null));
+        mockObject = new PartialMockObject<TestClass>("testMock", TestClass.class, new Scenario(null));
     }
 
 

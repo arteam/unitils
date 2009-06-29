@@ -15,16 +15,15 @@
  */
 package org.unitils.mock.core;
 
-import static org.unitils.mock.ArgumentMatchers.notNull;
-
-import java.io.IOException;
-import java.util.ArrayList;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
+import static org.unitils.mock.ArgumentMatchers.notNull;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * todo javadoc
@@ -35,119 +34,124 @@ import org.unitils.mock.proxy.ProxyInvocation;
 public class MockObjectInvalidSyntaxTest {
 
     /* Class under test */
-    private MockObject<TestClass> mockObject1, mockObject2;
+    private MockObject<TestClass> mockObject;
 
 
     @Before
     public void setUp() {
         Scenario scenario = new Scenario(null);
-        mockObject1 = new MockObject<TestClass>("testMock1", TestClass.class, false, scenario);
-        mockObject2 = new MockObject<TestClass>("testMock2", TestClass.class, false, scenario);
+        mockObject = new MockObject<TestClass>("testMock1", TestClass.class, scenario);
     }
 
 
     @Test(expected = UnitilsException.class)
     public void incompleteBehaviorDefinition_returns_followedBySecondBehaviorDefinition() {
-        mockObject1.returns("aValue");
-        mockObject2.returns("aValue");
+        mockObject.returns("aValue");
+        mockObject.returns("aValue");
     }
+
 
     @Test(expected = UnitilsException.class)
     public void incompleteBehaviorDefinition_returns_followedByActualInvocation() {
-        mockObject1.returns("aValue");
-        mockObject2.getMock().testMethod();
+        mockObject.returns("aValue");
+        mockObject.getMock().testMethod();
     }
 
 
     @Test(expected = UnitilsException.class)
     public void incompleteBehaviorDefinition_raises() {
-        mockObject1.raises(new RuntimeException());
-        mockObject2.returns("aValue");
+        mockObject.raises(new RuntimeException());
+        mockObject.returns("aValue");
     }
 
 
     @Test(expected = UnitilsException.class)
     public void incompleteBehaviorDefinition_performs() {
-        mockObject1.performs(new MockBehavior() {
+        mockObject.performs(new MockBehavior() {
             public Object execute(ProxyInvocation mockInvocation) throws Throwable {
                 return null;
             }
         });
-        mockObject2.assertInvoked();
+        mockObject.assertInvoked();
     }
 
 
     @Test(expected = UnitilsException.class)
     public void incompleteBehaviorDefinition_onceReturns() {
-        mockObject1.onceReturns("aValue");
-        mockObject2.returns("aValue");
+        mockObject.onceReturns("aValue");
+        mockObject.returns("aValue");
     }
 
 
     @Test(expected = UnitilsException.class)
     public void incompleteBehaviorDefinition_onceRaises() {
-        mockObject1.onceRaises(new RuntimeException());
-        mockObject2.returns("aValue");
+        mockObject.onceRaises(new RuntimeException());
+        mockObject.returns("aValue");
     }
 
 
     @Test(expected = UnitilsException.class)
     public void incompleteBehaviorDefinition_oncePerforms() {
-        mockObject1.oncePerforms(new MockBehavior() {
+        mockObject.oncePerforms(new MockBehavior() {
             public Object execute(ProxyInvocation mockInvocation) throws Throwable {
                 return null;
             }
         });
-        mockObject2.assertInvoked();
+        mockObject.assertInvoked();
     }
 
 
     @Test(expected = UnitilsException.class)
     public void incompleteAssertStatement_assertInvoked() {
-        mockObject1.assertInvoked();
-        mockObject2.assertInvoked();
+        mockObject.assertInvoked();
+        mockObject.assertInvoked();
     }
 
 
     @Test(expected = UnitilsException.class)
     public void incompleteAssertStatement_assertInvokedInOrder() {
-        mockObject1.assertInvokedInSequence();
-        mockObject2.assertInvoked();
+        mockObject.assertInvokedInSequence();
+        mockObject.assertInvoked();
     }
 
 
     @Test(expected = UnitilsException.class)
     public void incompleteAssertStatement_assertNotInvoked() {
-        mockObject1.assertNotInvoked();
-        mockObject2.assertNotInvoked();
+        mockObject.assertNotInvoked();
+        mockObject.assertNotInvoked();
     }
 
     @Test(expected = UnitilsException.class)
     public void tryToLetVoidMethodReturnValue() {
-        mockObject1.returns("value").testMethod();
+        mockObject.returns("value").testMethod();
+        mockObject.getMock().testMethod();
     }
 
 
     @Test(expected = UnitilsException.class)
     public void tryToLetMethodReturnIncompatibleReturnValue() {
-        mockObject1.returns(new ArrayList<String>()).testMethod();
+        mockObject.returns(new ArrayList<String>()).testMethod();
+        mockObject.getMock().testMethod();
     }
-    
+
+
     @Test(expected = UnitilsException.class)
     public void tryToLetMethodThrowUndeclaredCheckedException() {
-        mockObject1.raises(IOException.class).testMethod();
+        mockObject.raises(IOException.class).testMethod();
+        mockObject.getMock().testMethod();
     }
 
 
     @Test(expected = UnitilsException.class)
     public void argumentMatcherUsedOutsideBehaviorDefinition() {
         String notNull = notNull(String.class);
-        mockObject1.raises(IllegalArgumentException.class).testMethodArgument(notNull);
+        mockObject.raises(IllegalArgumentException.class).testMethodArgument(notNull);
     }
-    
+
+
     @Test(expected = UnitilsException.class)
     public void nestedBehaviorDefintionCall() {
-        mockObject1.raises(IllegalArgumentException.class).testMethodArgument(mockObject1.returns("aValue").testMethodReturningString());
+        mockObject.raises(IllegalArgumentException.class).testMethodArgument(mockObject.returns("aValue").testMethodReturningString());
     }
 
 

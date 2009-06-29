@@ -16,11 +16,14 @@
 package org.unitils.mock.core;
 
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
+import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
+import org.unitils.mock.argumentmatcher.impl.DefaultArgumentMatcher;
 import org.unitils.mock.mockbehavior.MockBehavior;
-import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 
-import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -46,33 +49,22 @@ public class BehaviorDefiningInvocation extends ProxyInvocation {
 
 
     /**
-     * Creates an invocation.
+     * Creates a behavior defining invocation for the given prosy invocation.
      *
      * The argumentsAtInvocationTime should be copies (deep clones) of the arguments at the time of
      * the invocation. This way the original values can still be used later-on even when changes
      * occur to the original values (pass-by-value vs pass-by-reference).
      *
-     * @param proxy                     The proxy on which the method was called, not null
-     * @param mockName                  The name of the mock, e.g. the field name, not null
-     * @param method                    The method that was called, not null
-     * @param arguments                 The arguments that were used by reference, not null
-     * @param argumentsAtInvocationTime The copies of the arguments at the time that they were used, not null
-     * @param invokedAt                 The location of the invocation, not null
-     * @param argumentMatchers          The argument matchers to use when matching the invocation, not null
-     * @param mockBehavior              The behavior to execute, not null
+     * @param proxyInvocation The proxy invocation, not null
+     * @param mockName        The name of the mock, e.g. the field name, not null
+     * @param mockBehavior    The behavior to execute, not null
      */
-    public BehaviorDefiningInvocation(Object proxy, String mockName, Method method, List<Object> arguments, List<Object> argumentsAtInvocationTime,
-                                      StackTraceElement invokedAt, List<ArgumentMatcher> argumentMatchers, MockBehavior mockBehavior) {
-        super(proxy, method, arguments, argumentsAtInvocationTime, invokedAt);
+    public BehaviorDefiningInvocation(ProxyInvocation proxyInvocation, String mockName, MockBehavior mockBehavior) {
+        super(proxyInvocation);
         this.mockName = mockName;
-        this.argumentMatchers = argumentMatchers;
+        this.argumentMatchers = createArgumentMatchers(proxyInvocation);
         this.mockBehavior = mockBehavior;
         this.used = false;
-
-        // check whether the mock behavior can applied for this invocation
-        if (mockBehavior instanceof ValidatableMockBehavior) {
-            ((ValidatableMockBehavior) mockBehavior).assertCanExecute(this);
-        }
     }
 
 
@@ -97,6 +89,11 @@ public class BehaviorDefiningInvocation extends ProxyInvocation {
      */
     public MockBehavior getMockBehavior() {
         return mockBehavior;
+    }
+
+
+    public void setMockBehavior(MockBehavior mockBehavior) {
+        this.mockBehavior = mockBehavior;
     }
 
 
@@ -141,4 +138,28 @@ public class BehaviorDefiningInvocation extends ProxyInvocation {
     }
 
 
+    protected List<ArgumentMatcher> createArgumentMatchers(ProxyInvocation proxyInvocation) {
+        List<ArgumentMatcher> result = new ArrayList<ArgumentMatcher>();
+
+        ArgumentMatcherRepository argumentMatcherRepository = ArgumentMatcherRepository.getInstance();
+        int lineNr = proxyInvocation.getInvokedAt().getLineNumber();
+        argumentMatcherRepository.registerEndOfMatchingInvocation(lineNr, proxyInvocation.getMethod().getName());
+
+        int matchInvocationStartLineNr = argumentMatcherRepository.getMatchInvocationStartLineNr();
+        int matchInvocationEndLineNr = argumentMatcherRepository.getMatchInvocationEndLineNr();
+        int matchInvocationIndex = argumentMatcherRepository.getMatchInvocationIndex();
+        List<Integer> argumentMatcherIndexes = getArgumentMatcherIndexes(proxyInvocation, matchInvocationStartLineNr, matchInvocationEndLineNr, matchInvocationIndex);
+
+        int argumentIndex = 0;
+        Iterator<ArgumentMatcher> argumentMatcherIterator = ArgumentMatcherRepository.getInstance().getArgumentMatchers().iterator();
+        for (Object argument : proxyInvocation.getArguments()) {
+            if (argumentMatcherIndexes.contains(argumentIndex++)) {
+                result.add(argumentMatcherIterator.next());
+            } else {
+                result.add(new DefaultArgumentMatcher(argument));
+            }
+        }
+        argumentMatcherRepository.reset();
+        return result;
+    }
 }

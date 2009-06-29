@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 
 /**
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class MethodUtils {
 

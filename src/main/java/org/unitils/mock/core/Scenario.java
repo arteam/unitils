@@ -46,8 +46,6 @@ public class Scenario {
 
     protected Object testObject;
 
-    protected SyntaxMonitor syntaxMonitor = new SyntaxMonitor();
-
 
     public Scenario() {
         this(null);
@@ -61,11 +59,6 @@ public class Scenario {
 
     public Object getTestObject() {
         return testObject;
-    }
-
-
-    public SyntaxMonitor getSyntaxMonitor() {
-        return syntaxMonitor;
     }
 
 
@@ -97,7 +90,7 @@ public class Scenario {
     }
 
 
-    public void assertInvoked(BehaviorDefiningInvocation assertInvocation, StackTraceElement[] assertedAt) {
+    public void assertInvoked(BehaviorDefiningInvocation assertInvocation) {
         for (int i = 0; i < observedInvocations.size(); i++) {
             ObservedInvocation observedInvocation = observedInvocations.get(i);
             VerificationStatus invocationVerificationStatus = invocationVerificationStatuses.get(i);
@@ -107,18 +100,18 @@ public class Scenario {
                 return;
             }
         }
-        AssertionError assertionError = new AssertionError(getAssertInvokedErrorMessage(assertInvocation, assertedAt[0]));
-        assertionError.setStackTrace(assertedAt);
+        AssertionError assertionError = new AssertionError(getAssertInvokedErrorMessage(assertInvocation, assertInvocation.getInvokedAt()));
+        assertionError.setStackTrace(assertInvocation.getInvokedAtTrace());
         throw assertionError;
     }
 
 
-    public void assertInvokedInOrder(BehaviorDefiningInvocation behaviorDefiningInvocation, StackTraceElement[] assertedAt) {
+    public void assertInvokedInOrder(BehaviorDefiningInvocation assertInvocation) {
         ObservedInvocation matchingInvocation = null;
         for (int i = 0; i < observedInvocations.size(); i++) {
             ObservedInvocation observedInvocation = observedInvocations.get(i);
             VerificationStatus invocationVerificationStatus = invocationVerificationStatuses.get(i);
-            if (matchingInvocation == null && invocationVerificationStatus == UNVERIFIED && behaviorDefiningInvocation.matches(observedInvocation)) {
+            if (matchingInvocation == null && invocationVerificationStatus == UNVERIFIED && assertInvocation.matches(observedInvocation)) {
                 // Found a match that's not verified yet. Mark as verified in order.
                 invocationVerificationStatuses.set(i, VERIFIED_IN_ORDER);
                 matchingInvocation = observedInvocation;
@@ -126,26 +119,26 @@ public class Scenario {
             }
             // If we found a match, then check if there's no subsequent observed invocation that's already verified using assertInvokedInOrder()
             if (matchingInvocation != null && invocationVerificationStatus == VERIFIED_IN_ORDER) {
-                AssertionError assertionError = new AssertionError(getInvokedOutOfOrderErrorMessage(behaviorDefiningInvocation, matchingInvocation, observedInvocation, assertedAt[0]));
-                assertionError.setStackTrace(assertedAt);
+                AssertionError assertionError = new AssertionError(getInvokedOutOfOrderErrorMessage(assertInvocation, matchingInvocation, observedInvocation, assertInvocation.getInvokedAt()));
+                assertionError.setStackTrace(assertInvocation.getInvokedAtTrace());
                 throw assertionError;
             }
         }
         if (matchingInvocation == null) {
-            AssertionError assertionError = new AssertionError(getAssertInvokedErrorMessage(behaviorDefiningInvocation, assertedAt[0]));
-            assertionError.setStackTrace(assertedAt);
+            AssertionError assertionError = new AssertionError(getAssertInvokedErrorMessage(assertInvocation, assertInvocation.getInvokedAt()));
+            assertionError.setStackTrace(assertInvocation.getInvokedAtTrace());
             throw assertionError;
         }
     }
 
 
-    public void assertNotInvoked(BehaviorDefiningInvocation behaviorDefiningInvocation, StackTraceElement[] assertedAt) {
+    public void assertNotInvoked(BehaviorDefiningInvocation assertInvocation) {
         for (int i = 0; i < observedInvocations.size(); i++) {
             ObservedInvocation observedInvocation = observedInvocations.get(i);
             VerificationStatus invocationVerificationStatus = invocationVerificationStatuses.get(i);
-            if (invocationVerificationStatus == UNVERIFIED && behaviorDefiningInvocation.matches(observedInvocation)) {
-                AssertionError assertionError = new AssertionError(getAssertNotInvokedErrorMessage(behaviorDefiningInvocation, observedInvocation, assertedAt));
-                assertionError.setStackTrace(assertedAt);
+            if (invocationVerificationStatus == UNVERIFIED && assertInvocation.matches(observedInvocation)) {
+                AssertionError assertionError = new AssertionError(getAssertNotInvokedErrorMessage(assertInvocation, observedInvocation, assertInvocation.getInvokedAtTrace()));
+                assertionError.setStackTrace(assertInvocation.getInvokedAtTrace());
                 throw assertionError;
             }
         }
@@ -203,8 +196,7 @@ public class Scenario {
     }
 
 
-    protected String getInvokedOutOfOrderErrorMessage(BehaviorDefiningInvocation behaviorDefiningInvocation, ObservedInvocation matchingInvocation,
-                                                      ObservedInvocation outOfOrderInvocation, StackTraceElement assertedAt) {
+    protected String getInvokedOutOfOrderErrorMessage(BehaviorDefiningInvocation behaviorDefiningInvocation, ObservedInvocation matchingInvocation, ObservedInvocation outOfOrderInvocation, StackTraceElement assertedAt) {
         StringBuilder message = new StringBuilder();
         message.append("Invocation of ");
         message.append(getSimpleMethodName(matchingInvocation.getMethod()));
