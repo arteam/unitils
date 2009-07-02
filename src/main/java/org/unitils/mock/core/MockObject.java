@@ -22,6 +22,7 @@ import org.unitils.mock.annotation.MatchStatement;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.ExceptionThrowingMockBehavior;
 import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
+import org.unitils.mock.proxy.ProxyInvocationHandler;
 import static org.unitils.mock.proxy.ProxyUtils.createInstanceOfType;
 
 /**
@@ -59,7 +60,7 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
     /* The mock proxy instance */
     protected T mock;
 
-    protected static SyntaxMonitor syntaxMonitor = new SyntaxMonitor();
+    protected static SyntaxMonitor syntaxMonitor;
 
 
     /**
@@ -74,15 +75,18 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
         this.mockedType = mockedType;
         this.scenario = scenario;
 
-        this.oneTimeMatchingBehaviorDefiner = createBehaviorDefiner(name, mockedType, scenario, syntaxMonitor);
-        this.alwaysMatchingBehaviorDefiner = createBehaviorDefiner(name, mockedType, scenario, syntaxMonitor);
+        this.oneTimeMatchingBehaviorDefiner = createBehaviorDefiner(name);
+        this.alwaysMatchingBehaviorDefiner = createBehaviorDefiner(name);
 
+        this.assertInvokedVerifier = createAssertInvokedVerifier(name, scenario);
+        this.assertNotInvokedVerifier = createAssertNotInvokedVerifier(name, scenario);
+        this.assertInvokedInSequenceVerifier = createAssertInvokedInSequenceVerifier(name, scenario);
+
+        if (syntaxMonitor == null) {
+            syntaxMonitor = createSyntaxMonitor();
+        }
         this.mockProxy = createMockProxy(oneTimeMatchingBehaviorDefiner, alwaysMatchingBehaviorDefiner, scenario, syntaxMonitor);
         this.mock = mockProxy.getProxyInstance(name, mockedType);
-
-        this.assertInvokedVerifier = createAssertInvokedVerifier(name, mockedType, scenario, syntaxMonitor);
-        this.assertNotInvokedVerifier = createAssertNotInvokedVerifier(name, mockedType, scenario, syntaxMonitor);
-        this.assertInvokedInSequenceVerifier = createAssertInvokedInSequenceVerifier(name, mockedType, scenario, syntaxMonitor);
     }
 
 
@@ -149,7 +153,8 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
      */
     @MatchStatement
     public T returns(Object returnValue) {
-        return alwaysMatchingBehaviorDefiner.getProxyInstance("returns", new ValueReturningMockBehavior(returnValue));
+        ProxyInvocationHandler proxyInvocationHandler = alwaysMatchingBehaviorDefiner.createProxyInvocationHandler(new ValueReturningMockBehavior(returnValue));
+        return syntaxMonitor.getProxyInstance(name, mockedType, proxyInvocationHandler);
     }
 
 
@@ -169,7 +174,8 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
      */
     @MatchStatement
     public T raises(Throwable exception) {
-        return alwaysMatchingBehaviorDefiner.getProxyInstance("raises", new ExceptionThrowingMockBehavior(exception));
+        ProxyInvocationHandler proxyInvocationHandler = alwaysMatchingBehaviorDefiner.createProxyInvocationHandler(new ExceptionThrowingMockBehavior(exception));
+        return syntaxMonitor.getProxyInstance(name, mockedType, proxyInvocationHandler);
     }
 
 
@@ -190,7 +196,8 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
     @MatchStatement
     public T raises(Class<? extends Throwable> exceptionClass) {
         Throwable exception = createInstanceOfType(exceptionClass);
-        return alwaysMatchingBehaviorDefiner.getProxyInstance("raises", new ExceptionThrowingMockBehavior(exception));
+        ProxyInvocationHandler proxyInvocationHandler = alwaysMatchingBehaviorDefiner.createProxyInvocationHandler(new ExceptionThrowingMockBehavior(exception));
+        return syntaxMonitor.getProxyInstance(name, mockedType, proxyInvocationHandler);
     }
 
 
@@ -210,7 +217,8 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
      */
     @MatchStatement
     public T performs(MockBehavior mockBehavior) {
-        return alwaysMatchingBehaviorDefiner.getProxyInstance("performs", mockBehavior);
+        ProxyInvocationHandler proxyInvocationHandler = alwaysMatchingBehaviorDefiner.createProxyInvocationHandler(mockBehavior);
+        return syntaxMonitor.getProxyInstance(name, mockedType, proxyInvocationHandler);
     }
 
 
@@ -231,7 +239,8 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
      */
     @MatchStatement
     public T onceReturns(Object returnValue) {
-        return oneTimeMatchingBehaviorDefiner.getProxyInstance("onceReturns", new ValueReturningMockBehavior(returnValue));
+        ProxyInvocationHandler proxyInvocationHandler = oneTimeMatchingBehaviorDefiner.createProxyInvocationHandler(new ValueReturningMockBehavior(returnValue));
+        return syntaxMonitor.getProxyInstance(name, mockedType, proxyInvocationHandler);
     }
 
 
@@ -252,7 +261,8 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
      */
     @MatchStatement
     public T onceRaises(Throwable exception) {
-        return oneTimeMatchingBehaviorDefiner.getProxyInstance("onceRaises", new ExceptionThrowingMockBehavior(exception));
+        ProxyInvocationHandler proxyInvocationHandler = oneTimeMatchingBehaviorDefiner.createProxyInvocationHandler(new ExceptionThrowingMockBehavior(exception));
+        return syntaxMonitor.getProxyInstance(name, mockedType, proxyInvocationHandler);
     }
 
 
@@ -274,7 +284,8 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
     @MatchStatement
     public T onceRaises(Class<? extends Throwable> exceptionClass) {
         Throwable exception = createInstanceOfType(exceptionClass);
-        return oneTimeMatchingBehaviorDefiner.getProxyInstance("onceRaises", new ExceptionThrowingMockBehavior(exception));
+        ProxyInvocationHandler proxyInvocationHandler = oneTimeMatchingBehaviorDefiner.createProxyInvocationHandler(new ExceptionThrowingMockBehavior(exception));
+        return syntaxMonitor.getProxyInstance(name, mockedType, proxyInvocationHandler);
     }
 
 
@@ -295,7 +306,8 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
      */
     @MatchStatement
     public T oncePerforms(MockBehavior mockBehavior) {
-        return oneTimeMatchingBehaviorDefiner.getProxyInstance("oncePerforms", mockBehavior);
+        ProxyInvocationHandler proxyInvocationHandler = oneTimeMatchingBehaviorDefiner.createProxyInvocationHandler(mockBehavior);
+        return syntaxMonitor.getProxyInstance(name, mockedType, proxyInvocationHandler);
     }
 
 
@@ -307,7 +319,8 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
      */
     @MatchStatement
     public T assertInvoked() {
-        return assertInvokedVerifier.getProxyInstance("assertInvoked");
+        ProxyInvocationHandler proxyInvocationHandler = assertInvokedVerifier.createProxyInvocationHandler();
+        return syntaxMonitor.getProxyInstance(name, mockedType, proxyInvocationHandler);
     }
 
 
@@ -322,7 +335,8 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
      */
     @MatchStatement
     public T assertInvokedInSequence() {
-        return assertInvokedInSequenceVerifier.getProxyInstance("assertInvokedInOrder");
+        ProxyInvocationHandler proxyInvocationHandler = assertInvokedInSequenceVerifier.createProxyInvocationHandler();
+        return syntaxMonitor.getProxyInstance(name, mockedType, proxyInvocationHandler);
     }
 
 
@@ -334,7 +348,8 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
      */
     @MatchStatement
     public T assertNotInvoked() {
-        return assertNotInvokedVerifier.getProxyInstance("assertNotInvoked");
+        ProxyInvocationHandler proxyInvocationHandler = assertNotInvokedVerifier.createProxyInvocationHandler();
+        return syntaxMonitor.getProxyInstance(name, mockedType, proxyInvocationHandler);
     }
 
 
@@ -355,35 +370,47 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
     }
 
 
-    protected BehaviorDefiner<T> createBehaviorDefiner(String name, Class<T> mockedType, Scenario scenario, SyntaxMonitor syntaxMonitor) {
-        return new MockObjectBehaviorDefiner<T>(name, mockedType, scenario, syntaxMonitor);
+    protected BehaviorDefiner<T> createBehaviorDefiner(String name) {
+        return new MockObjectBehaviorDefiner<T>(name);
     }
 
 
-    protected AssertInvokedInSequenceVerifier<T> createAssertInvokedInSequenceVerifier(String name, Class<T> mockedType, Scenario scenario, SyntaxMonitor syntaxMonitor) {
-        return new AssertInvokedInSequenceVerifier<T>(name, mockedType, scenario, syntaxMonitor);
+    protected AssertInvokedInSequenceVerifier<T> createAssertInvokedInSequenceVerifier(String mockName, Scenario scenario) {
+        return new AssertInvokedInSequenceVerifier<T>(mockName, scenario);
     }
 
 
-    protected AssertNotInvokedVerifier<T> createAssertNotInvokedVerifier(String name, Class<T> mockedType, Scenario scenario, SyntaxMonitor syntaxMonitor) {
-        return new AssertNotInvokedVerifier<T>(name, mockedType, scenario, syntaxMonitor);
+    protected AssertNotInvokedVerifier<T> createAssertNotInvokedVerifier(String mockName, Scenario scenario) {
+        return new AssertNotInvokedVerifier<T>(mockName, scenario);
     }
 
 
-    protected AssertInvokedVerifier<T> createAssertInvokedVerifier(String name, Class<T> mockedType, Scenario scenario, SyntaxMonitor syntaxMonitor) {
-        return new AssertInvokedVerifier<T>(name, mockedType, scenario, syntaxMonitor);
+    protected AssertInvokedVerifier<T> createAssertInvokedVerifier(String mockName, Scenario scenario) {
+        return new AssertInvokedVerifier<T>(mockName, scenario);
     }
 
 
-    protected static class MockObjectBehaviorDefiner<T> extends BehaviorDefiner<T> {
+    protected SyntaxMonitor createSyntaxMonitor() {
+        return new SyntaxMonitor();
+    }
 
-        public MockObjectBehaviorDefiner(String mockName, Class<T> mockedType, Scenario scenario, SyntaxMonitor syntaxMonitor) {
-            super(mockName, mockedType, scenario, syntaxMonitor);
+
+    protected class MockObjectBehaviorDefiner<T> extends BehaviorDefiner<T> {
+
+        public MockObjectBehaviorDefiner(String mockName) {
+            super(mockName);
         }
 
         @SuppressWarnings({"unchecked"})
-        public Mock<?> createInnerMock(String name, Class<?> mockedType, Scenario scenario) {
-            return new MockObject(name, mockedType, scenario);
+        protected Mock<?> createInnerMock(String name, Class<?> mockedType) {
+            try {
+                if (Void.class.equals(mockedType)) {
+                    return null;
+                }
+                return new MockObject(name, mockedType, scenario);
+            } catch (Throwable t) {
+                return null;
+            }
         }
     }
 

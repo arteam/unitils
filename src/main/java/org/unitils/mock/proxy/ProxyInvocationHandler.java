@@ -28,8 +28,8 @@ public interface ProxyInvocationHandler {
     /**
      * Handles the given method invocation of the proxy.
      *
-     * @param invocation The method invocation, not null
+     * @param proxyInvocation The method invocation, not null
      * @return The result value for the method invocation
      */
-    Object handleInvocation(ProxyInvocation invocation) throws Throwable;
+    Object handleInvocation(ProxyInvocation proxyInvocation) throws Throwable;
 }

@@ -46,15 +46,13 @@ public class StackTraceUtils {
         for (int i = currentStackTrace.length - 1; i >= 0; i--) {
             String className = currentStackTrace[i].getClassName();
             Class<?> clazz = getClassWithName(className);
-            if (invokedInterface.isAssignableFrom(clazz)) {
-                int invokedAtIndex = i + 1;
-                StackTraceElement[] result = new StackTraceElement[currentStackTrace.length - invokedAtIndex];
-                System.arraycopy(currentStackTrace, invokedAtIndex, result, 0, currentStackTrace.length - invokedAtIndex);
+            if (invokedInterface.isAssignableFrom(clazz) || className.contains("$$")) {
+                StackTraceElement[] result = new StackTraceElement[currentStackTrace.length - i];
+                System.arraycopy(currentStackTrace, i, result, 0, currentStackTrace.length - i);
                 return result;
             }
         }
         throw new UnitilsException("No invocation of a method of " + invokedInterface.getName() + " found in the current stacktrace");
     }
-
 
 }

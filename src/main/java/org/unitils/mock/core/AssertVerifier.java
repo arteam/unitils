@@ -17,8 +17,6 @@ package org.unitils.mock.core;
 
 import org.unitils.mock.proxy.ProxyInvocation;
 import org.unitils.mock.proxy.ProxyInvocationHandler;
-import static org.unitils.mock.proxy.ProxyUtils.createProxy;
-import static org.unitils.util.StackTraceUtils.getInvocationStackTrace;
 
 public abstract class AssertVerifier<T> {
 
@@ -28,24 +26,15 @@ public abstract class AssertVerifier<T> {
     /* The name of the mock (e.g. the name of the field) */
     protected String mockName;
 
-    /* The class type that is mocked */
-    protected Class<T> mockedType;
 
-    protected SyntaxMonitor syntaxMonitor;
-
-
-    public AssertVerifier(String mockName, Class<T> mockedType, Scenario scenario, SyntaxMonitor syntaxMonitor) {
+    public AssertVerifier(String mockName, Scenario scenario) {
         this.mockName = mockName;
-        this.mockedType = mockedType;
         this.scenario = scenario;
-        this.syntaxMonitor = syntaxMonitor;
     }
 
 
-    public T getProxyInstance(String definingMethodName) {
-        StackTraceElement[] invocationStackTrace = getInvocationStackTrace(MockObject.class);
-        syntaxMonitor.startBehaviorDefinition(mockName, definingMethodName, invocationStackTrace);
-        return createProxy(mockedType, new InvocationHandler());
+    public ProxyInvocationHandler createProxyInvocationHandler() {
+        return new InvocationHandler();
     }
 
 
@@ -55,7 +44,6 @@ public abstract class AssertVerifier<T> {
     protected class InvocationHandler implements ProxyInvocationHandler {
 
         public Object handleInvocation(ProxyInvocation proxyInvocation) throws Throwable {
-            syntaxMonitor.endBehaviorDefinition(proxyInvocation);
             handleAssertVerificationInvocation(proxyInvocation);
             return null;
         }

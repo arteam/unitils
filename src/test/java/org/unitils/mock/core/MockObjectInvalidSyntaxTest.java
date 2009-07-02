@@ -120,6 +120,7 @@ public class MockObjectInvalidSyntaxTest {
         mockObject.assertNotInvoked();
         mockObject.assertNotInvoked();
     }
+    
 
     @Test(expected = UnitilsException.class)
     public void tryToLetVoidMethodReturnValue() {
