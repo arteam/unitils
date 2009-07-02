@@ -16,8 +16,12 @@
 package org.unitils.mock.core;
 
 import org.unitils.core.UnitilsException;
+import org.unitils.mock.Mock;
 import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
 import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.proxy.ProxyInvocationHandler;
+import static org.unitils.mock.proxy.ProxyUtils.createProxy;
+import static org.unitils.util.StackTraceUtils.getInvocationStackTrace;
 
 /**
  * @author Filip Neven
@@ -32,36 +36,50 @@ public class SyntaxMonitor {
     protected StackTraceElement[] invokedAt;
 
 
-    public void startBehaviorDefinition(String mockObjectName, String methodName, StackTraceElement[] invokedAt) {
+    public <T> T getProxyInstance(String mockName, Class<T> mockedType, ProxyInvocationHandler matchingInvocationHandler) {
         assertNotExpectingInvocation();
-        this.mockName = mockObjectName;
-        this.definingMethodName = methodName;
-        this.invokedAt = invokedAt;
-        ArgumentMatcherRepository.getInstance().registerStartOfMatchingInvocation(invokedAt[0].getLineNumber());
+        this.mockName = mockName;
+
+        this.invokedAt = getInvocationStackTrace(Mock.class);
+        this.definingMethodName = invokedAt[0].getMethodName();
+        ArgumentMatcherRepository.getInstance().registerStartOfMatchingInvocation(invokedAt[1].getLineNumber());
+        return createProxy(mockedType, new InvocationHandler(matchingInvocationHandler));
     }
 
-
-    public void endBehaviorDefinition(ProxyInvocation proxyInvocation) {
-        ArgumentMatcherRepository.getInstance().registerEndOfMatchingInvocation(proxyInvocation.getLineNumber(), "todo");
-        reset();
-    }
 
     public void reset() {
         this.mockName = null;
-        this.definingMethodName = null;
         this.invokedAt = null;
+        this.definingMethodName = null;
     }
 
 
     public void assertNotExpectingInvocation() {
-        if (mockName != null) {
-            UnitilsException exception = new UnitilsException("Invalid syntax. " + mockName + "." + definingMethodName +
-                    "() must be followed by a method invocation on the returned proxy. E.g. " + mockName + "." + definingMethodName + "().myMethod();");
+        if (mockName != null && !mockName.contains(".")) {
+            UnitilsException exception = new UnitilsException("Invalid syntax. " + mockName + "." + definingMethodName + "() must be followed by a method invocation on the returned proxy. E.g. " + mockName + "." + definingMethodName + "().myMethod();");
             exception.setStackTrace(invokedAt);
             reset();
             throw exception;
         }
+        reset();
     }
 
 
+    protected class InvocationHandler implements ProxyInvocationHandler {
+
+        private ProxyInvocationHandler matchingInvocationHandler;
+
+        public InvocationHandler(ProxyInvocationHandler matchingInvocationHandler) {
+            this.matchingInvocationHandler = matchingInvocationHandler;
+        }
+
+        @SuppressWarnings({"unchecked"})
+        public Object handleInvocation(ProxyInvocation proxyInvocation) throws Throwable {
+            ArgumentMatcherRepository.getInstance().registerEndOfMatchingInvocation(proxyInvocation.getLineNumber(), proxyInvocation.getMethod().getName());
+            reset();
+            Object result = matchingInvocationHandler.handleInvocation(proxyInvocation);
+            ArgumentMatcherRepository.getInstance().reset();
+            return result;
+        }
+    }
 }

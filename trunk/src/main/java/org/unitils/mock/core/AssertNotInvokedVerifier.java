@@ -20,8 +20,8 @@ import org.unitils.mock.proxy.ProxyInvocation;
 public class AssertNotInvokedVerifier<T> extends AssertVerifier<T> {
 
 
-    public AssertNotInvokedVerifier(String name, Class<T> mockedType, Scenario scenario, SyntaxMonitor syntaxMonitor) {
-        super(name, mockedType, scenario, syntaxMonitor);
+    public AssertNotInvokedVerifier(String mockName, Scenario scenario) {
+        super(mockName, scenario);
     }
 
 

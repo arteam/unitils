@@ -142,9 +142,6 @@ public class BehaviorDefiningInvocation extends ProxyInvocation {
         List<ArgumentMatcher> result = new ArrayList<ArgumentMatcher>();
 
         ArgumentMatcherRepository argumentMatcherRepository = ArgumentMatcherRepository.getInstance();
-        int lineNr = proxyInvocation.getInvokedAt().getLineNumber();
-        argumentMatcherRepository.registerEndOfMatchingInvocation(lineNr, proxyInvocation.getMethod().getName());
-
         int matchInvocationStartLineNr = argumentMatcherRepository.getMatchInvocationStartLineNr();
         int matchInvocationEndLineNr = argumentMatcherRepository.getMatchInvocationEndLineNr();
         int matchInvocationIndex = argumentMatcherRepository.getMatchInvocationIndex();

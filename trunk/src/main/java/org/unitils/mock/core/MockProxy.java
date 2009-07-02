@@ -94,7 +94,7 @@ public class MockProxy<T> {
         if (isCloneMethod(proxyInvocation.getMethod())) {
             return proxyInvocation.getProxy();
         }
-        return proxyInvocation.getMethod().invoke(proxyInvocation.getProxy(), proxyInvocation.getArguments());
+        return proxyInvocation.getMethod().invoke(proxyInvocation.getProxy(), proxyInvocation.getArguments().toArray());
     }
 
 
