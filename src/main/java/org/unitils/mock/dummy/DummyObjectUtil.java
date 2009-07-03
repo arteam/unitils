@@ -20,7 +20,6 @@ import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 import org.unitils.mock.proxy.ProxyInvocationHandler;
 import static org.unitils.mock.proxy.ProxyUtils.createProxy;
-import static org.unitils.util.MethodUtils.*;
 
 /**
  * Class for handling the dummy object behavior. A dummy object is a proxy that will return
@@ -70,16 +69,6 @@ public class DummyObjectUtil {
          * @return The result value for the method invocation
          */
         public Object handleInvocation(ProxyInvocation invocation) throws Throwable {
-            if (isEqualsMethod(invocation.getMethod())) {
-                Object other = invocation.getArguments().get(0);
-                return invocation.getProxy() == other;
-            } else if (isHashCodeMethod(invocation.getMethod())) {
-                return dummyObjectHashCode;
-            } else if (isCloneMethod(invocation.getMethod())) {
-                return invocation.getProxy();
-            } else if (isToStringMethod(invocation.getMethod())) {
-                return "DUMMY " + dummyObjectType.getSimpleName() + "@" + Integer.toHexString(dummyObjectHashCode);
-            }
             return dummyObjectBehavior.execute(invocation);
         }
 

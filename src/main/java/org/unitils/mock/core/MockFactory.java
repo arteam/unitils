@@ -15,21 +15,14 @@
  */
 package org.unitils.mock.core;
 
-import org.unitils.mock.mockbehavior.MockBehavior;
-import org.unitils.mock.mockbehavior.impl.OriginalBehaviorInvokingMockBehavior;
-import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.Mock;
 
-public class PartialMockInvoker<T> extends MockProxy<T> {
-
-
-    public PartialMockInvoker(BehaviorDefinition behaviorDefinition, Scenario scenario, SyntaxMonitor syntaxMonitor) {
-        super(behaviorDefinition, scenario, syntaxMonitor);
-    }
+/**
+ * todo javadoc
+ */
+public interface MockFactory {
 
 
-    @Override
-    protected MockBehavior getDefaultMockBehavior(ProxyInvocation proxyInvocation) {
-        return new OriginalBehaviorInvokingMockBehavior();
-    }
+    <T> Mock<T> createMock(String name, Class<T> mockedType);
 
 }

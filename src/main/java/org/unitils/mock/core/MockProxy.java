@@ -22,16 +22,11 @@ import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 import org.unitils.mock.proxy.ProxyInvocationHandler;
 import static org.unitils.mock.proxy.ProxyUtils.createProxy;
-import static org.unitils.util.MethodUtils.*;
 
 public class MockProxy<T> {
 
 
-    /* Mock behaviors that are removed once they have been matched */
-    protected BehaviorDefiner<T> oneTimeMatchingBehaviorDefiner;
-
-    /* Mock behaviors that can be matched and re-used for several invocation */
-    protected BehaviorDefiner<T> alwaysMatchingBehaviorDefiner;
+    protected BehaviorDefinition behaviorDefinition;
 
     /* The scenario that will record all observed invocations */
     protected Scenario scenario;
@@ -39,9 +34,8 @@ public class MockProxy<T> {
     protected SyntaxMonitor syntaxMonitor;
 
 
-    public MockProxy(BehaviorDefiner<T> oneTimeMatchingBehaviorDefiner, BehaviorDefiner<T> alwaysMatchingBehaviorDefiner, Scenario scenario, SyntaxMonitor syntaxMonitor) {
-        this.oneTimeMatchingBehaviorDefiner = oneTimeMatchingBehaviorDefiner;
-        this.alwaysMatchingBehaviorDefiner = alwaysMatchingBehaviorDefiner;
+    public MockProxy(BehaviorDefinition behaviorDefinition, Scenario scenario, SyntaxMonitor syntaxMonitor) {
+        this.behaviorDefinition = behaviorDefinition;
         this.scenario = scenario;
         this.syntaxMonitor = syntaxMonitor;
     }
@@ -54,13 +48,9 @@ public class MockProxy<T> {
 
 
     protected Object handleMockInvocation(String mockName, ProxyInvocation proxyInvocation) throws Throwable {
-        if (Object.class.equals(proxyInvocation.getMethod().getDeclaringClass())) {
-            return handleObjectClassMethodInvocation(proxyInvocation);
-        }
-
         syntaxMonitor.assertNotExpectingInvocation();
 
-        BehaviorDefiningInvocation behaviorDefiningInvocation = getMatchingBehaviorDefiningInvocation(proxyInvocation);
+        BehaviorDefiningInvocation behaviorDefiningInvocation = behaviorDefinition.getMatchingBehaviorDefiningInvocation(proxyInvocation);
         MockBehavior mockBehavior = getMockBehavior(proxyInvocation, behaviorDefiningInvocation);
         if (mockBehavior instanceof ValidatableMockBehavior) {
             ((ValidatableMockBehavior) mockBehavior).assertCanExecute(proxyInvocation);
@@ -82,43 +72,6 @@ public class MockProxy<T> {
         return result;
     }
 
-
-    protected Object handleObjectClassMethodInvocation(ProxyInvocation proxyInvocation) throws Throwable {
-        if (isEqualsMethod(proxyInvocation.getMethod())) {
-            Object other = proxyInvocation.getArguments().get(0);
-            return proxyInvocation.getProxy() == other;
-        }
-        if (isHashCodeMethod(proxyInvocation.getMethod())) {
-            return super.hashCode();
-        }
-        if (isCloneMethod(proxyInvocation.getMethod())) {
-            return proxyInvocation.getProxy();
-        }
-        return proxyInvocation.getMethod().invoke(proxyInvocation.getProxy(), proxyInvocation.getArguments().toArray());
-    }
-
-
-    protected BehaviorDefiningInvocation getMatchingBehaviorDefiningInvocation(ProxyInvocation proxyInvocation) throws Throwable {
-        // Check if there is a one-time matching behavior that hasn't been invoked yet
-        for (BehaviorDefiningInvocation behaviorDefiningInvocation : oneTimeMatchingBehaviorDefiner.getBehaviorDefiningInvocations()) {
-            if (behaviorDefiningInvocation.isUsed()) {
-                continue;
-            }
-            if (behaviorDefiningInvocation.matches(proxyInvocation)) {
-                behaviorDefiningInvocation.markAsUsed();
-                return behaviorDefiningInvocation;
-            }
-        }
-
-        // Check if there is an always-matching behavior
-        for (BehaviorDefiningInvocation behaviorDefiningInvocation : alwaysMatchingBehaviorDefiner.getBehaviorDefiningInvocations()) {
-            if (behaviorDefiningInvocation.matches(proxyInvocation)) {
-                behaviorDefiningInvocation.markAsUsed();
-                return behaviorDefiningInvocation;
-            }
-        }
-        return null;
-    }
 
     protected MockBehavior getMockBehavior(ProxyInvocation proxyInvocation, BehaviorDefiningInvocation behaviorDefiningInvocation) {
         if (behaviorDefiningInvocation != null) {

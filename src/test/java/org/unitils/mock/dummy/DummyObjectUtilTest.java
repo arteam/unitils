@@ -97,7 +97,7 @@ public class DummyObjectUtilTest {
     @Test
     public void toStringMethod() {
         TestClass dummy = DummyObjectUtil.createDummy(TestClass.class);
-        assertEquals("DUMMY TestClass@" + Integer.toHexString(dummy.hashCode()), dummy.toString());
+        assertEquals("TestClass@" + Integer.toHexString(dummy.hashCode()), dummy.toString());
     }
 
     @Test

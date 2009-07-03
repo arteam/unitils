@@ -16,20 +16,20 @@
 package org.unitils.mock.core;
 
 import org.unitils.mock.mockbehavior.MockBehavior;
-import org.unitils.mock.mockbehavior.impl.OriginalBehaviorInvokingMockBehavior;
-import org.unitils.mock.proxy.ProxyInvocation;
 
-public class PartialMockInvoker<T> extends MockProxy<T> {
+/**
+ * todo javadoc
+ */
+public class OneTimeMatchingBehaviorDefiner<T> extends BehaviorDefiner<T> {
 
 
-    public PartialMockInvoker(BehaviorDefinition behaviorDefinition, Scenario scenario, SyntaxMonitor syntaxMonitor) {
-        super(behaviorDefinition, scenario, syntaxMonitor);
+    public OneTimeMatchingBehaviorDefiner(String mockName, MockBehavior mockBehavior, BehaviorDefinition behaviorDefinition, MockFactory mockFactory) {
+        super(mockName, mockBehavior, behaviorDefinition, mockFactory);
     }
 
 
-    @Override
-    protected MockBehavior getDefaultMockBehavior(ProxyInvocation proxyInvocation) {
-        return new OriginalBehaviorInvokingMockBehavior();
+    protected void addBehaviorDefiningInvocation(BehaviorDefiningInvocation behaviorDefiningInvocation, BehaviorDefinition behaviorDefinition) {
+        behaviorDefinition.addOneTimeMatchingbehaviorDefiningInvocation(behaviorDefiningInvocation);
     }
 
 }

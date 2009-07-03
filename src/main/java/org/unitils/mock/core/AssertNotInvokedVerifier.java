@@ -17,7 +17,7 @@ package org.unitils.mock.core;
 
 import org.unitils.mock.proxy.ProxyInvocation;
 
-public class AssertNotInvokedVerifier<T> extends AssertVerifier<T> {
+public class AssertNotInvokedVerifier extends AssertVerifier {
 
 
     public AssertNotInvokedVerifier(String mockName, Scenario scenario) {

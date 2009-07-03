@@ -18,7 +18,7 @@ package org.unitils.mock.core;
 import org.unitils.mock.proxy.ProxyInvocation;
 import org.unitils.mock.proxy.ProxyInvocationHandler;
 
-public abstract class AssertVerifier<T> {
+public abstract class AssertVerifier implements ProxyInvocationHandler {
 
     /* The scenario that will record all observed invocations */
     protected Scenario scenario;
@@ -33,19 +33,11 @@ public abstract class AssertVerifier<T> {
     }
 
 
-    public ProxyInvocationHandler createProxyInvocationHandler() {
-        return new InvocationHandler();
-    }
-
-
     protected abstract void handleAssertVerificationInvocation(ProxyInvocation proxyInvocation);
 
 
-    protected class InvocationHandler implements ProxyInvocationHandler {
-
-        public Object handleInvocation(ProxyInvocation proxyInvocation) throws Throwable {
-            handleAssertVerificationInvocation(proxyInvocation);
-            return null;
-        }
+    public Object handleInvocation(ProxyInvocation proxyInvocation) throws Throwable {
+        handleAssertVerificationInvocation(proxyInvocation);
+        return null;
     }
 }
