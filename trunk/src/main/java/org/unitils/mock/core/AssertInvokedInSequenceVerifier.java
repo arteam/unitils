@@ -17,7 +17,7 @@ package org.unitils.mock.core;
 
 import org.unitils.mock.proxy.ProxyInvocation;
 
-public class AssertInvokedInSequenceVerifier<T> extends AssertVerifier<T> {
+public class AssertInvokedInSequenceVerifier extends AssertVerifier {
 
 
     public AssertInvokedInSequenceVerifier(String mockName, Scenario scenario) {

@@ -29,7 +29,7 @@ import static org.unitils.util.StackTraceUtils.getInvocationStackTrace;
  */
 public class SyntaxMonitor {
 
-    protected String mockName;
+    protected String currentMockName;
 
     protected String definingMethodName;
 
@@ -38,7 +38,7 @@ public class SyntaxMonitor {
 
     public <T> T getProxyInstance(String mockName, Class<T> mockedType, ProxyInvocationHandler matchingInvocationHandler) {
         assertNotExpectingInvocation();
-        this.mockName = mockName;
+        this.currentMockName = mockName;
 
         this.invokedAt = getInvocationStackTrace(Mock.class);
         this.definingMethodName = invokedAt[0].getMethodName();
@@ -48,15 +48,15 @@ public class SyntaxMonitor {
 
 
     public void reset() {
-        this.mockName = null;
+        this.currentMockName = null;
         this.invokedAt = null;
         this.definingMethodName = null;
     }
 
 
     public void assertNotExpectingInvocation() {
-        if (mockName != null && !mockName.contains(".")) {
-            UnitilsException exception = new UnitilsException("Invalid syntax. " + mockName + "." + definingMethodName + "() must be followed by a method invocation on the returned proxy. E.g. " + mockName + "." + definingMethodName + "().myMethod();");
+        if (currentMockName != null && !currentMockName.contains(".")) {
+            UnitilsException exception = new UnitilsException("Invalid syntax. " + currentMockName + "." + definingMethodName + "() must be followed by a method invocation on the returned proxy. E.g. " + currentMockName + "." + definingMethodName + "().myMethod();");
             exception.setStackTrace(invokedAt);
             reset();
             throw exception;

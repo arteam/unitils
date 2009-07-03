@@ -19,6 +19,7 @@ import net.sf.cglib.proxy.*;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 import org.unitils.core.UnitilsException;
+import static org.unitils.util.MethodUtils.*;
 
 import java.lang.reflect.Method;
 import static java.lang.reflect.Modifier.isAbstract;
@@ -116,7 +117,7 @@ public class ProxyUtils {
         Objenesis objenesis = new ObjenesisStd();
         return (T) objenesis.newInstance(clazz);
     }
-    
+
 
     /**
      * First finds a trace element in which a cglib proxy method was invoked. Then it returns the rest of the stack trace following that
@@ -178,6 +179,18 @@ public class ProxyUtils {
          * @return The value to return for the method call, ignored for void methods
          */
         public Object intercept(Object proxy, Method method, Object[] arguments, MethodProxy methodProxy) throws Throwable {
+            if (isFinalizeMethod(method)) {
+                return null;
+            } else if (isEqualsMethod(method)) {
+                return proxy == arguments[0];
+            } else if (isHashCodeMethod(method)) {
+                return super.hashCode();
+            } else if (isCloneMethod(method)) {
+                return proxy;
+            } else if (isToStringMethod(method)) {
+                return getProxiedType().getSimpleName() + "@" + Integer.toHexString(super.hashCode());
+            }
+
             ProxyInvocation invocation = new CglibProxyInvocation(method, asList(arguments), getProxiedMethodStackTrace(), proxy, methodProxy);
             return invocationHandler.handleInvocation(invocation);
         }
@@ -188,6 +201,7 @@ public class ProxyUtils {
         public Class<?> getProxiedType() {
             return proxiedType;
         }
+
     }
 
 

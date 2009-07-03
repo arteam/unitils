@@ -13,9 +13,7 @@ public class MethodUtils {
      * @return True if the given method is the {@link Object#equals} method
      */
     public static boolean isEqualsMethod(Method method) {
-        return "equals".equals(method.getName())
-                && 1 == method.getParameterTypes().length
-                && Object.class.equals(method.getParameterTypes()[0]);
+        return "equals".equals(method.getName()) && 1 == method.getParameterTypes().length && Object.class.equals(method.getParameterTypes()[0]);
     }
 
 
@@ -24,8 +22,7 @@ public class MethodUtils {
      * @return True if the given method is the {@link Object#hashCode} method
      */
     public static boolean isHashCodeMethod(Method method) {
-        return "hashCode".equals(method.getName())
-                && 0 == method.getParameterTypes().length;
+        return "hashCode".equals(method.getName()) && 0 == method.getParameterTypes().length;
     }
 
 
@@ -34,8 +31,7 @@ public class MethodUtils {
      * @return True if the given method is the {@link Object#toString} method
      */
     public static boolean isToStringMethod(Method method) {
-        return "toString".equals(method.getName())
-                && 0 == method.getParameterTypes().length;
+        return "toString".equals(method.getName()) && 0 == method.getParameterTypes().length;
     }
 
 
@@ -44,7 +40,11 @@ public class MethodUtils {
      * @return True if the given method is the {@link Object#clone} method
      */
     public static boolean isCloneMethod(Method method) {
-        return "clone".equals(method.getName())
-                && 0 == method.getParameterTypes().length;
+        return "clone".equals(method.getName()) && 0 == method.getParameterTypes().length;
+    }
+
+
+    public static boolean isFinalizeMethod(Method method) {
+        return "finalize".equals(method.getName()) && 0 == method.getParameterTypes().length;
     }
 }
