@@ -29,6 +29,9 @@ import java.util.List;
  */
 public abstract class ProxyInvocation {
 
+    /* The name of the mock, e.g. the field name */
+    private String mockName;
+
     /* The proxy on which the method was called */
     private Object proxy;
 
@@ -48,12 +51,14 @@ public abstract class ProxyInvocation {
     /**
      * Creates an invocation.
      *
+     * @param mockName       The name of the mock, e.g. the field name, not null
      * @param proxy          The proxy on which the method was called, not null
      * @param method         The method that was called, not null
      * @param arguments      The arguments that were used, not null
      * @param invokedAtTrace The trace of the invocation, not null
      */
-    public ProxyInvocation(Object proxy, Method method, List<Object> arguments, StackTraceElement[] invokedAtTrace) {
+    public ProxyInvocation(String mockName, Object proxy, Method method, List<Object> arguments, StackTraceElement[] invokedAtTrace) {
+        this.mockName = mockName;
         this.proxy = proxy;
         this.method = method;
         this.arguments = arguments;
@@ -73,6 +78,7 @@ public abstract class ProxyInvocation {
      * @param proxyInvocation The proxy invocation to copy, not null
      */
     public ProxyInvocation(ProxyInvocation proxyInvocation) {
+        this.mockName = proxyInvocation.getMockName();
         this.proxy = proxyInvocation.getProxy();
         this.method = proxyInvocation.getMethod();
         this.arguments = proxyInvocation.getArguments();
@@ -92,7 +98,15 @@ public abstract class ProxyInvocation {
 
 
     /**
-     * @return The proxy on which the method was called
+     * @return The name of the mock, e.g. the field name, not null
+     */
+    public String getMockName() {
+        return mockName;
+    }
+
+
+    /**
+     * @return The proxy on which the method was called, not null
      */
     public Object getProxy() {
         return proxy;

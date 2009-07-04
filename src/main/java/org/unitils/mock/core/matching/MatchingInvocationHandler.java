@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright 2006-2007,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock.core.matching;
 
+import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import org.unitils.mock.proxy.ProxyInvocation;
 
-public class AssertNotInvokedVerifier extends AssertVerifier {
+import java.util.List;
+
+public interface MatchingInvocationHandler {
 
 
-    public AssertNotInvokedVerifier(String mockName, Scenario scenario) {
-        super(mockName, scenario);
-    }
-
-
-    protected void handleAssertVerificationInvocation(ProxyInvocation proxyInvocation) {
-        BehaviorDefiningInvocation behaviorDefiningInvocation = new BehaviorDefiningInvocation(proxyInvocation, mockName, null);
-        scenario.assertNotInvoked(behaviorDefiningInvocation);
-    }
-
+    Object handleInvocation(ProxyInvocation proxyInvocation, List<ArgumentMatcher> argumentMatchers) throws Throwable;
 }
