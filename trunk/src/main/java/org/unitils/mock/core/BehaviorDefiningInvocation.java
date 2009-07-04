@@ -16,14 +16,9 @@
 package org.unitils.mock.core;
 
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
-import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
-import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
-import org.unitils.mock.argumentmatcher.impl.DefaultArgumentMatcher;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -35,8 +30,6 @@ import java.util.List;
  */
 public class BehaviorDefiningInvocation extends ProxyInvocation {
 
-    /* The name of the mock, e.g. the field name */
-    private String mockName;
 
     /* The argument matchers to use when matching the invocation */
     private List<ArgumentMatcher> argumentMatchers;
@@ -55,24 +48,15 @@ public class BehaviorDefiningInvocation extends ProxyInvocation {
      * the invocation. This way the original values can still be used later-on even when changes
      * occur to the original values (pass-by-value vs pass-by-reference).
      *
-     * @param proxyInvocation The proxy invocation, not null
-     * @param mockName        The name of the mock, e.g. the field name, not null
-     * @param mockBehavior    The behavior to execute, not null
+     * @param proxyInvocation  The proxy invocation, not null
+     * @param mockBehavior     The behavior to execute, not null
+     * @param argumentMatchers The argument matchers to use when matching the invocation, not null
      */
-    public BehaviorDefiningInvocation(ProxyInvocation proxyInvocation, String mockName, MockBehavior mockBehavior) {
+    public BehaviorDefiningInvocation(ProxyInvocation proxyInvocation, MockBehavior mockBehavior, List<ArgumentMatcher> argumentMatchers) {
         super(proxyInvocation);
-        this.mockName = mockName;
-        this.argumentMatchers = createArgumentMatchers(proxyInvocation);
+        this.argumentMatchers = argumentMatchers;
         this.mockBehavior = mockBehavior;
         this.used = false;
-    }
-
-
-    /**
-     * @return The name of the mock, e.g. the field name, not null
-     */
-    public String getMockName() {
-        return mockName;
     }
 
 
@@ -137,26 +121,4 @@ public class BehaviorDefiningInvocation extends ProxyInvocation {
         return true;
     }
 
-
-    protected List<ArgumentMatcher> createArgumentMatchers(ProxyInvocation proxyInvocation) {
-        List<ArgumentMatcher> result = new ArrayList<ArgumentMatcher>();
-
-        ArgumentMatcherRepository argumentMatcherRepository = ArgumentMatcherRepository.getInstance();
-        int matchInvocationStartLineNr = argumentMatcherRepository.getMatchInvocationStartLineNr();
-        int matchInvocationEndLineNr = argumentMatcherRepository.getMatchInvocationEndLineNr();
-        int matchInvocationIndex = argumentMatcherRepository.getMatchInvocationIndex();
-        List<Integer> argumentMatcherIndexes = getArgumentMatcherIndexes(proxyInvocation, matchInvocationStartLineNr, matchInvocationEndLineNr, matchInvocationIndex);
-
-        int argumentIndex = 0;
-        Iterator<ArgumentMatcher> argumentMatcherIterator = ArgumentMatcherRepository.getInstance().getArgumentMatchers().iterator();
-        for (Object argument : proxyInvocation.getArguments()) {
-            if (argumentMatcherIndexes.contains(argumentIndex++)) {
-                result.add(argumentMatcherIterator.next());
-            } else {
-                result.add(new DefaultArgumentMatcher(argument));
-            }
-        }
-        argumentMatcherRepository.reset();
-        return result;
-    }
 }

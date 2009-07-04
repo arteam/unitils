@@ -13,60 +13,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock.core.matching.impl;
 
 import org.unitils.mock.Mock;
+import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+import org.unitils.mock.core.BehaviorDefiningInvocation;
+import org.unitils.mock.core.BehaviorDefiningInvocations;
+import org.unitils.mock.core.MockFactory;
+import org.unitils.mock.core.matching.MatchingInvocationHandler;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
-import org.unitils.mock.proxy.ProxyInvocationHandler;
 
-public abstract class BehaviorDefiner<T> implements ProxyInvocationHandler {
+import java.util.List;
 
-    /* The name of the mock (e.g. the name of the field) */
-    protected String mockName;
+public class BehaviorDefiningMatchingInvocationHandler implements MatchingInvocationHandler {
 
     protected MockBehavior mockBehavior;
 
     protected MockFactory mockFactory;
 
-    protected BehaviorDefinition behaviorDefinition;
+    protected BehaviorDefiningInvocations behaviorDefinition;
 
 
-    public BehaviorDefiner(String mockName, MockBehavior mockBehavior, BehaviorDefinition behaviorDefinition, MockFactory mockFactory) {
-        this.mockName = mockName;
+    public BehaviorDefiningMatchingInvocationHandler(MockBehavior mockBehavior, BehaviorDefiningInvocations behaviorDefinition, MockFactory mockFactory) {
         this.mockBehavior = mockBehavior;
         this.behaviorDefinition = behaviorDefinition;
         this.mockFactory = mockFactory;
     }
 
 
-    protected Object handleBehaviorDefiningInvocation(ProxyInvocation proxyInvocation, MockBehavior mockBehavior) {
+    public Object handleInvocation(ProxyInvocation proxyInvocation, List<ArgumentMatcher> argumentMatchers) throws Throwable {
         if (mockBehavior instanceof ChainedMockBehavior) {
             ((ChainedMockBehavior) mockBehavior).installChain();
         }
-        BehaviorDefiningInvocation behaviorDefiningInvocation = new BehaviorDefiningInvocation(proxyInvocation, mockName, mockBehavior);
+        BehaviorDefiningInvocation behaviorDefiningInvocation = new BehaviorDefiningInvocation(proxyInvocation, mockBehavior, argumentMatchers);
         addBehaviorDefiningInvocation(behaviorDefiningInvocation, behaviorDefinition);
         return createChainedMock(proxyInvocation, behaviorDefiningInvocation);
     }
 
 
-    protected abstract void addBehaviorDefiningInvocation(BehaviorDefiningInvocation behaviorDefiningInvocation, BehaviorDefinition behaviorDefinition);
+    protected void addBehaviorDefiningInvocation(BehaviorDefiningInvocation behaviorDefiningInvocation, BehaviorDefiningInvocations behaviorDefinition) {
+        behaviorDefinition.addBehaviorDefiningInvocation(behaviorDefiningInvocation);
+    }
 
 
     protected Object createChainedMock(ProxyInvocation proxyInvocation, BehaviorDefiningInvocation behaviorDefiningInvocation) {
         Class<?> innerMockType = proxyInvocation.getMethod().getReturnType();
-        String innerMockName = mockName + "." + proxyInvocation.getMethod().getName();
+        String innerMockName = proxyInvocation.getMockName() + "." + proxyInvocation.getMethod().getName();
 
         Mock<?> mock = mockFactory.createMock(innerMockName, innerMockType);
         if (mock == null) {
             return null;
         }
         return mock.performs(new ChainedMockBehavior(mock, behaviorDefiningInvocation));
-    }
-
-    public Object handleInvocation(ProxyInvocation proxyInvocation) throws Throwable {
-        return handleBehaviorDefiningInvocation(proxyInvocation, mockBehavior);
     }
 
 

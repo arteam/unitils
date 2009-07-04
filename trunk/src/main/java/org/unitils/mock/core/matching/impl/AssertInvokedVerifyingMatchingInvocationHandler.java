@@ -13,31 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock.core.matching.impl;
 
+import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+import org.unitils.mock.core.BehaviorDefiningInvocation;
+import org.unitils.mock.core.Scenario;
+import org.unitils.mock.core.matching.MatchingInvocationHandler;
 import org.unitils.mock.proxy.ProxyInvocation;
-import org.unitils.mock.proxy.ProxyInvocationHandler;
 
-public abstract class AssertVerifier implements ProxyInvocationHandler {
+import java.util.List;
+
+public class AssertInvokedVerifyingMatchingInvocationHandler implements MatchingInvocationHandler {
 
     /* The scenario that will record all observed invocations */
     protected Scenario scenario;
 
-    /* The name of the mock (e.g. the name of the field) */
-    protected String mockName;
 
-
-    public AssertVerifier(String mockName, Scenario scenario) {
-        this.mockName = mockName;
+    public AssertInvokedVerifyingMatchingInvocationHandler(Scenario scenario) {
         this.scenario = scenario;
     }
 
 
-    protected abstract void handleAssertVerificationInvocation(ProxyInvocation proxyInvocation);
-
-
-    public Object handleInvocation(ProxyInvocation proxyInvocation) throws Throwable {
-        handleAssertVerificationInvocation(proxyInvocation);
+    public Object handleInvocation(ProxyInvocation proxyInvocation, List<ArgumentMatcher> argumentMatchers) throws Throwable {
+        BehaviorDefiningInvocation behaviorDefiningInvocation = new BehaviorDefiningInvocation(proxyInvocation, null, argumentMatchers);
+        scenario.assertInvoked(behaviorDefiningInvocation);
         return null;
     }
+
 }

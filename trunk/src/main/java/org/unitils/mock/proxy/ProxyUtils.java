@@ -41,44 +41,27 @@ public class ProxyUtils {
     /**
      * Creates a proxy object for the given type. All method invocations will be passed to the given invocation handler.
      *
+     * @param mockName          The name of the mock, not null
      * @param proxiedClass      The type to proxy, not null
      * @param invocationHandler The handler that will handle the method invocations of the proxy, not null.
      * @return The proxy object, not null
      */
-    public static <T> T createProxy(Class<T> proxiedClass, ProxyInvocationHandler invocationHandler) {
-        return createProxy(proxiedClass, new Class<?>[0], invocationHandler);
-    }
-
-
-    /**
-     * @param object The object to check
-     * @return The proxied type, null if the object is not a proxy
-     */
-    public static Class<?> getProxiedTypeIfProxy(Object object) {
-        if (object == null) {
-            return null;
-        }
-        Class<?> type = object.getClass();
-        if (object instanceof Factory) {
-            Callback callback = ((Factory) object).getCallback(0);
-            if (callback instanceof ProxyMethodInterceptor) {
-                return ((ProxyMethodInterceptor) callback).getProxiedType();
-            }
-        }
-        return null;
+    public static <T> T createProxy(String mockName, Class<T> proxiedClass, ProxyInvocationHandler invocationHandler) {
+        return createProxy(mockName, proxiedClass, new Class<?>[0], invocationHandler);
     }
 
 
     /**
      * Creates a proxy object for the given type. All method invocations will be passed to the given invocation handler.
      *
+     * @param mockName              The name of the mock, not null
      * @param proxiedClass          The type to proxy, not null
      * @param implementedInterfaces Additional interfaces that the proxy must implement, not null
      * @param invocationHandler     The handler that will handle the method invocations of the proxy, not null.
      * @return The proxy object, not null
      */
     @SuppressWarnings("unchecked")
-    public static <T> T createProxy(Class<T> proxiedClass, Class<?>[] implementedInterfaces, ProxyInvocationHandler invocationHandler) {
+    public static <T> T createProxy(String mockName, Class<T> proxiedClass, Class<?>[] implementedInterfaces, ProxyInvocationHandler invocationHandler) {
         Enhancer enhancer = new Enhancer();
 
         List<Class<?>> interfaces = new ArrayList<Class<?>>();
@@ -99,8 +82,27 @@ public class ProxyUtils {
         Class<T> enhancedTargetClass = enhancer.createClass();
 
         Factory proxy = (Factory) createInstanceOfType(enhancedTargetClass);
-        proxy.setCallbacks(new Callback[]{new ProxyMethodInterceptor(proxiedClass, invocationHandler)});
+        proxy.setCallbacks(new Callback[]{new ProxyMethodInterceptor(mockName, proxiedClass, invocationHandler)});
         return (T) proxy;
+    }
+
+
+    /**
+     * @param object The object to check
+     * @return The proxied type, null if the object is not a proxy
+     */
+    public static Class<?> getProxiedTypeIfProxy(Object object) {
+        if (object == null) {
+            return null;
+        }
+        Class<?> type = object.getClass();
+        if (object instanceof Factory) {
+            Callback callback = ((Factory) object).getCallback(0);
+            if (callback instanceof ProxyMethodInterceptor) {
+                return ((ProxyMethodInterceptor) callback).getProxiedType();
+            }
+        }
+        return null;
     }
 
 
@@ -151,6 +153,8 @@ public class ProxyUtils {
      */
     public static class ProxyMethodInterceptor<T> implements MethodInterceptor {
 
+        private String mockName;
+
         private Class<T> proxiedType;
 
         /* The invocation handler */
@@ -160,10 +164,12 @@ public class ProxyUtils {
         /**
          * Creates an interceptor.
          *
+         * @param mockName          The name of the mock, not null
          * @param proxiedType       The proxied type, not null
          * @param invocationHandler The handler to delegate the invocations to, not null
          */
-        public ProxyMethodInterceptor(Class<T> proxiedType, ProxyInvocationHandler invocationHandler) {
+        public ProxyMethodInterceptor(String mockName, Class<T> proxiedType, ProxyInvocationHandler invocationHandler) {
+            this.mockName = mockName;
             this.proxiedType = proxiedType;
             this.invocationHandler = invocationHandler;
         }
@@ -191,7 +197,7 @@ public class ProxyUtils {
                 return getProxiedType().getSimpleName() + "@" + Integer.toHexString(super.hashCode());
             }
 
-            ProxyInvocation invocation = new CglibProxyInvocation(method, asList(arguments), getProxiedMethodStackTrace(), proxy, methodProxy);
+            ProxyInvocation invocation = new CglibProxyInvocation(mockName, method, asList(arguments), getProxiedMethodStackTrace(), proxy, methodProxy);
             return invocationHandler.handleInvocation(invocation);
         }
 
@@ -217,14 +223,15 @@ public class ProxyUtils {
         /**
          * Creates an invocation.
          *
+         * @param mockName          The name of the mock, not null
          * @param method      The method that was called, not null
          * @param arguments   The arguments that were used, not null
          * @param invokedAt   The location of the invocation, not null
          * @param proxy       The proxy, not null
          * @param methodProxy The cglib method proxy, not null
          */
-        public CglibProxyInvocation(Method method, List<Object> arguments, StackTraceElement[] invokedAt, Object proxy, MethodProxy methodProxy) {
-            super(proxy, method, arguments, invokedAt);
+        public CglibProxyInvocation(String mockName, Method method, List<Object> arguments, StackTraceElement[] invokedAt, Object proxy, MethodProxy methodProxy) {
+            super(mockName, proxy, method, arguments, invokedAt);
             this.methodProxy = methodProxy;
         }
 

@@ -39,8 +39,8 @@ public class DummyObjectUtil {
      */
     @SuppressWarnings("unchecked")
     public static <T> T createDummy(Class<T> type) {
-        return createProxy(type, new Class<?>[]{DummyObject.class, Cloneable.class}, new DummyObjectInvocationHandler(type));
-    }
+        return createProxy("todo", type, new Class<?>[]{DummyObject.class, Cloneable.class}, new DummyObjectInvocationHandler(type));
+    }                              //todo mock name
 
 
     /**

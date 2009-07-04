@@ -32,7 +32,7 @@ public class GetProxiedTypeIfProxyUtilTest {
 
     @Test
     public void proxyInterface() {
-        Object proxy = createProxy(TestInterface.class, new DummyProxyInvocationHandler());
+        Object proxy = createProxy("mock", TestInterface.class, new DummyProxyInvocationHandler());
         Class<?> result = getProxiedTypeIfProxy(proxy);
 
         assertEquals(TestInterface.class, result);
@@ -41,7 +41,7 @@ public class GetProxiedTypeIfProxyUtilTest {
 
     @Test
     public void proxyClass() {
-        Object proxy = createProxy(TestClass.class, new DummyProxyInvocationHandler());
+        Object proxy = createProxy("mock", TestClass.class, new DummyProxyInvocationHandler());
         Class<?> result = getProxiedTypeIfProxy(proxy);
 
         assertEquals(TestClass.class, result);
