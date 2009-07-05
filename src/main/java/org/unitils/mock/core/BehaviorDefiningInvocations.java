@@ -15,15 +15,22 @@
  */
 package org.unitils.mock.core;
 
-import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class BehaviorDefiningInvocations {
 
+    protected boolean removeWhenUsed;
 
     protected List<BehaviorDefiningInvocation> behaviorDefiningInvocations = new ArrayList<BehaviorDefiningInvocation>();
+
+
+    public BehaviorDefiningInvocations(boolean removeWhenUsed) {
+        this.removeWhenUsed = removeWhenUsed;
+    }
 
 
     public void addBehaviorDefiningInvocation(BehaviorDefiningInvocation behaviorDefiningInvocation) {
@@ -36,21 +43,14 @@ public class BehaviorDefiningInvocations {
     }
 
 
-    public BehaviorDefiningInvocation getUnusedMatchingBehaviorDefiningInvocation(ProxyInvocation proxyInvocation) {
-        for (BehaviorDefiningInvocation behaviorDefiningInvocation : behaviorDefiningInvocations) {
-            if (behaviorDefiningInvocation.isUsed()) {
-                continue;
-            }
-            if (behaviorDefiningInvocation.matches(proxyInvocation)) {
-                return behaviorDefiningInvocation;
-            }
-        }
-        return null;
-    }
-
     public BehaviorDefiningInvocation getMatchingBehaviorDefiningInvocation(ProxyInvocation proxyInvocation) {
-        for (BehaviorDefiningInvocation behaviorDefiningInvocation : behaviorDefiningInvocations) {
+        Iterator<BehaviorDefiningInvocation> iterator = behaviorDefiningInvocations.iterator();
+        while (iterator.hasNext()) {
+            BehaviorDefiningInvocation behaviorDefiningInvocation = iterator.next();
             if (behaviorDefiningInvocation.matches(proxyInvocation)) {
+                if (removeWhenUsed) {
+                    iterator.remove();
+                }
                 return behaviorDefiningInvocation;
             }
         }

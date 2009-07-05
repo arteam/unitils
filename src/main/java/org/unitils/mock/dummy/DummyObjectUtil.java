@@ -17,9 +17,9 @@ package org.unitils.mock.dummy;
 
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
-import org.unitils.mock.proxy.ProxyInvocation;
-import org.unitils.mock.proxy.ProxyInvocationHandler;
-import static org.unitils.mock.proxy.ProxyUtils.createProxy;
+import org.unitils.mock.core.proxy.ProxyInvocation;
+import org.unitils.mock.core.proxy.ProxyInvocationHandler;
+import static org.unitils.mock.core.proxy.ProxyUtils.createProxy;
 
 /**
  * Class for handling the dummy object behavior. A dummy object is a proxy that will return
@@ -39,8 +39,8 @@ public class DummyObjectUtil {
      */
     @SuppressWarnings("unchecked")
     public static <T> T createDummy(Class<T> type) {
-        return createProxy("todo", type, new Class<?>[]{DummyObject.class, Cloneable.class}, new DummyObjectInvocationHandler(type));
-    }                              //todo mock name
+        return createProxy(type.getSimpleName(), type, new Class<?>[]{DummyObject.class, Cloneable.class}, new DummyObjectInvocationHandler(type));
+    }
 
 
     /**

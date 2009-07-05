@@ -15,8 +15,10 @@
  */
 package org.unitils.util;
 
-import org.unitils.core.UnitilsException;
+import static org.unitils.mock.core.proxy.ProxyUtils.isProxyClassName;
 import static org.unitils.util.ReflectionUtils.getClassWithName;
+
+import static java.lang.System.arraycopy;
 
 /**
  * Class offering utilities involving the call stack
@@ -39,20 +41,31 @@ public class StackTraceUtils {
 
     /**
      * @param invokedInterface Class/interface to which an invocation can be found in the current call stack
-     * @return Stacktrace that indicates the most recent method call in the stack that calls a method from the given class
+     * @return Stacktrace that indicates the most recent method call in the stack that calls a method from the given class, null if not found
      */
     public static StackTraceElement[] getInvocationStackTrace(Class<?> invokedInterface) {
+        return getInvocationStackTrace(invokedInterface, true);
+    }
+
+
+    public static StackTraceElement[] getInvocationStackTrace(Class<?> invokedInterface, boolean included) {
         StackTraceElement[] currentStackTrace = Thread.currentThread().getStackTrace();
         for (int i = currentStackTrace.length - 1; i >= 0; i--) {
             String className = currentStackTrace[i].getClassName();
             Class<?> clazz = getClassWithName(className);
-            if (invokedInterface.isAssignableFrom(clazz) || className.contains("$$")) {
-                StackTraceElement[] result = new StackTraceElement[currentStackTrace.length - i];
-                System.arraycopy(currentStackTrace, i, result, 0, currentStackTrace.length - i);
-                return result;
+            if (invokedInterface.isAssignableFrom(clazz) || isProxyClassName(className)) {
+                int index = included ? i : i + 1;
+                return getStackTraceStartingFrom(currentStackTrace, index);
             }
         }
-        throw new UnitilsException("No invocation of a method of " + invokedInterface.getName() + " found in the current stacktrace");
+        return null;
+    }
+
+
+    public static StackTraceElement[] getStackTraceStartingFrom(StackTraceElement[] stackTraceElements, int index) {
+        StackTraceElement[] result = new StackTraceElement[stackTraceElements.length - index];
+        arraycopy(stackTraceElements, index, result, 0, stackTraceElements.length - index);
+        return result;
     }
 
 }

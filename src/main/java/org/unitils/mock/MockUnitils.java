@@ -16,6 +16,7 @@
 package org.unitils.mock;
 
 import org.unitils.core.Unitils;
+import org.unitils.mock.core.MockObject;
 import org.unitils.mock.dummy.DummyObjectUtil;
 import static org.unitils.util.StackTraceUtils.getInvocationStackTrace;
 
@@ -28,7 +29,7 @@ public class MockUnitils {
 
 
     public static void assertNoMoreInvocations() {
-        getMockModule().assertNoMoreInvocations(getInvocationStackTrace(MockUnitils.class));
+        MockObject.getScenario().assertNoMoreInvocations(getInvocationStackTrace(MockUnitils.class, false));
     }
 
 
@@ -55,7 +56,7 @@ public class MockUnitils {
     public static <T> PartialMock<T> createPartialMock(String name, Class<T> type) {
         return (PartialMock<T>) getMockModule().createPartialMock(name, type);
     }
-    
+
 
     public static void logFullScenarioReport() {
         getMockModule().logFullScenarioReport();

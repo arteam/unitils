@@ -38,9 +38,8 @@ public class MockObjectReturningOtherMockTest {
 
     @Before
     public void setUp() {
-        Scenario scenario = new Scenario(null);
-        mockReturning = new MockObject<MockReturning>("testMock", MockReturning.class, scenario);
-        mockObject = new MockObject<TestClass>("testMock", TestClass.class, scenario);
+        mockReturning = new MockObject<MockReturning>("testMock", MockReturning.class, this);
+        mockObject = new MockObject<TestClass>("testMock", TestClass.class, this);
     }
 
 

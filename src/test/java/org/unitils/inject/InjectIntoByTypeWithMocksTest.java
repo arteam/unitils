@@ -25,7 +25,6 @@ import org.unitils.inject.annotation.InjectIntoStaticByType;
 import org.unitils.inject.annotation.TestedObject;
 import org.unitils.mock.Mock;
 import org.unitils.mock.core.MockObject;
-import org.unitils.mock.core.Scenario;
 
 import java.util.Map;
 import java.util.Properties;
@@ -87,21 +86,21 @@ public class InjectIntoByTypeWithMocksTest {
         public InjectTarget injectTarget = new InjectTarget();
 
         @InjectIntoByType
-        public Mock<Properties> mockedProperties = new MockObject<Properties>("test", Properties.class, new Scenario());
+        public Mock<Properties> mockedProperties = new MockObject<Properties>("test", Properties.class, this);
     }
 
 
     public static class InjectIntoStaticByTypeWithMock {
 
         @InjectIntoStaticByType(target = InjectStaticTarget.class)
-        public Mock<Properties> mockedProperties = new MockObject<Properties>("test", Properties.class, new Scenario());
+        public Mock<Properties> mockedProperties = new MockObject<Properties>("test", Properties.class, this);
     }
 
 
     public static class NoFieldOfMockedTypeFound {
 
         @InjectIntoStaticByType(target = InjectStaticTarget.class)
-        public Mock<Map> mockedProperties = new MockObject<Map>("test", Map.class, new Scenario());
+        public Mock<Map> mockedProperties = new MockObject<Map>("test", Map.class, this);
     }
 
 

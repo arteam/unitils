@@ -57,8 +57,6 @@ public class MockModule implements Module {
 
     public static final String PROPERTY_LOG_SUGGESTED_ASSERTS = "mockModule.logSuggestedAsserts";
 
-    protected Scenario scenario;
-
     protected boolean logFullScenarioReport;
 
     protected boolean logObservedScenario;
@@ -87,37 +85,30 @@ public class MockModule implements Module {
 
 
     public Scenario getScenario() {
-        return scenario;
-    }
-
-
-    public void assertNoMoreInvocations(StackTraceElement[] assertedAt) {
-        if (scenario != null) {
-            scenario.assertNoMoreInvocations(assertedAt);
-        }
+        return MockObject.getScenario();
     }
 
 
     public void logFullScenarioReport() {
-        String report = "\n\n" + scenario.createFullReport();
+        String report = "\n\n" + getScenario().createFullReport();
         logger.info(report);
     }
 
 
     public void logObservedScenario() {
-        String report = "\n\nObserved scenario:\n\n" + scenario.createObservedInvocationsReport();
+        String report = "\n\nObserved scenario:\n\n" + getScenario().createObservedInvocationsReport();
         logger.info(report);
     }
 
 
     public void logDetailedObservedScenario() {
-        String report = "\n\nDetailed observed scenario:\n\n" + scenario.createDetailedObservedInvocationsReport();
+        String report = "\n\nDetailed observed scenario:\n\n" + getScenario().createDetailedObservedInvocationsReport();
         logger.info(report);
     }
 
 
     public void logSuggestedAsserts() {
-        String report = "\n\nSuggested assert statements:\n\n" + scenario.createSuggestedAssertsReport();
+        String report = "\n\nSuggested assert statements:\n\n" + getScenario().createSuggestedAssertsReport();
         logger.info(report);
     }
 
@@ -228,16 +219,12 @@ public class MockModule implements Module {
 
         @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
-            scenario = new Scenario(testObject);
             createAndInjectMocksIntoTest(testObject);
             createAndInjectDummiesIntoTest(testObject);
         }
 
         @Override
         public void afterTestTearDown(Object testObject, Method testMethod) {
-            if (scenario == null) {
-                return;
-            }
             if (logFullScenarioReport) {
                 logFullScenarioReport();
                 return;

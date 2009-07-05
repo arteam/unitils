@@ -20,7 +20,7 @@ import org.unitils.mock.core.ObservedInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
 import org.unitils.mock.mockbehavior.impl.OriginalBehaviorInvokingMockBehavior;
-import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.util.*;
 

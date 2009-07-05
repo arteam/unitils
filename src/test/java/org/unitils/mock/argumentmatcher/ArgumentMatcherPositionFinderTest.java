@@ -15,23 +15,21 @@
  */
 package org.unitils.mock.argumentmatcher;
 
-import static java.util.Arrays.asList;
 import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.core.UnitilsException;
 import static org.unitils.mock.ArgumentMatchers.notNull;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
+import org.unitils.mock.core.MockObject;
+import org.unitils.mock.dummy.DummyObjectUtil;
+import org.unitils.mock.mockbehavior.MockBehavior;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.unitils.util.ReflectionUtils.getMethod;
 
 import java.lang.reflect.Method;
+import static java.util.Arrays.asList;
 import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.unitils.core.UnitilsException;
-import org.unitils.mock.core.MockObject;
-import org.unitils.mock.core.Scenario;
-import org.unitils.mock.dummy.DummyObjectUtil;
-import org.unitils.mock.mockbehavior.MockBehavior;
 
 /**
  * Tests the finding of the argument matchers in a proxy method invocation.
@@ -43,7 +41,7 @@ import org.unitils.mock.mockbehavior.MockBehavior;
 public class ArgumentMatcherPositionFinderTest {
 
     /* The line nrs of the proxy method invocations in the TestClass.test method */
-    private int invocationLineNr = 173;
+    private int invocationLineNr = 171;
     private int noMatcherInvocationLineNr = invocationLineNr + 2;
     private int twoSameInvocationsOnSameLineLineNr = invocationLineNr + 4;
     private int twoDifferentInvocationsOnSameLineLineNr = invocationLineNr + 6;
@@ -164,7 +162,7 @@ public class ArgumentMatcherPositionFinderTest {
      */
     public static class TestClass {
 
-        MockObject<MockedClass> mockObject = new MockObject<MockedClass>("testMock", MockedClass.class, new Scenario(null));
+        MockObject<MockedClass> mockObject = new MockObject<MockedClass>("testMock", MockedClass.class, this);
 
         MockBehavior dummyBehavior = DummyObjectUtil.createDummy(MockBehavior.class);
 

@@ -18,7 +18,7 @@ package org.unitils.mock.core;
 import org.unitils.mock.PartialMock;
 
 /**
- * Implementation of a Mock and PartialMock.
+ * Implementation of a PartialMock.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -32,16 +32,16 @@ public class PartialMockObject<T> extends MockObject<T> implements PartialMock<T
      *
      * @param name        The name of the mock, e.g. the field-name, not null
      * @param mockedClass The mock type that will be proxied, not null
-     * @param scenario    The scenario, not null
+     * @param testObject  The test object, not null
      */
-    public PartialMockObject(String name, Class<T> mockedClass, Scenario scenario) {
-        super(name, mockedClass, scenario);
+    public PartialMockObject(String name, Class<T> mockedClass, Object testObject) {
+        super(name, mockedClass, testObject);
     }
 
 
     @Override
     protected MockProxy<T> createMockProxy() {
-        return new PartialMockProxy<T>(oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, scenario, matchingInvocationBuilder);
+        return new PartialMockProxy<T>(name, mockedType, oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, scenario, matchingInvocationBuilder);
     }
 
 }

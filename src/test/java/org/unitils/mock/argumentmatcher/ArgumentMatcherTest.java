@@ -21,7 +21,6 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.unitils.mock.ArgumentMatchers.*;
 import org.unitils.mock.core.MockObject;
-import org.unitils.mock.core.Scenario;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +38,7 @@ public class ArgumentMatcherTest {
 
     @Before
     public void setUp() {
-        Scenario scenario = new Scenario(null);
-        mockObject = new MockObject<TestClass>("testMock", TestClass.class, scenario);
+        mockObject = new MockObject<TestClass>("testMock", TestClass.class, this);
     }
 
 

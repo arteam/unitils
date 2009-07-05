@@ -16,7 +16,7 @@
 package org.unitils.mock.mockbehavior;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.core.proxy.ProxyInvocation;
 
 
 /**

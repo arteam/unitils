@@ -17,7 +17,7 @@ package org.unitils.mock.mockbehavior.impl;
 
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
-import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.util.Arrays;
 
@@ -60,9 +60,8 @@ public class ExceptionThrowingMockBehavior implements ValidatableMockBehavior {
                 return;
             }
         }
-        throw new UnitilsException("Trying to make a method throw an exception that it doesn't declare. Exception type: " + exceptionToThrow.getClass() + 
-                (exceptionTypes.length > 0 ? ", declared exceptions: " + Arrays.toString(exceptionTypes) :
-                                             ", no declared exceptions"));
+        throw new UnitilsException("Trying to make a method throw an exception that it doesn't declare. Exception type: " + exceptionToThrow.getClass() +
+                (exceptionTypes.length > 0 ? ", declared exceptions: " + Arrays.toString(exceptionTypes) : ", no declared exceptions"));
     }
 
 

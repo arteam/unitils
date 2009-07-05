@@ -16,15 +16,15 @@
 package org.unitils.mock.core;
 
 import org.unitils.mock.core.matching.MatchingInvocationBuilder;
+import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.OriginalBehaviorInvokingMockBehavior;
-import org.unitils.mock.proxy.ProxyInvocation;
 
 public class PartialMockProxy<T> extends MockProxy<T> {
 
 
-    public PartialMockProxy(BehaviorDefiningInvocations oneTimeMatchingBehaviorDefiningInvocations, BehaviorDefiningInvocations alwaysMatchingBehaviorDefiningInvocations, Scenario scenario, MatchingInvocationBuilder syntaxMonitor) {
-        super(oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, scenario, syntaxMonitor);
+    public PartialMockProxy(String mockName, Class<T> mockedType, BehaviorDefiningInvocations oneTimeMatchingBehaviorDefiningInvocations, BehaviorDefiningInvocations alwaysMatchingBehaviorDefiningInvocations, Scenario scenario, MatchingInvocationBuilder syntaxMonitor) {
+        super(mockName, mockedType, oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, scenario, syntaxMonitor);
     }
 
 

@@ -13,15 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core.matching;
+package org.unitils.mock.core.proxy;
 
-import org.unitils.mock.argumentmatcher.ArgumentMatcher;
-import org.unitils.mock.core.proxy.ProxyInvocation;
+/**
+ * A class for handling method invocations of a proxy.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
+ * @author Kenny Claes
+ */
+public interface ProxyInvocationHandler {
 
-import java.util.List;
 
-public interface MatchingInvocationHandler {
-
-
-    Object handleInvocation(ProxyInvocation proxyInvocation, List<ArgumentMatcher> argumentMatchers) throws Throwable;
+    /**
+     * Handles the given method invocation of the proxy.
+     *
+     * @param proxyInvocation The method invocation, not null
+     * @return The result value for the method invocation
+     */
+    Object handleInvocation(ProxyInvocation proxyInvocation) throws Throwable;
 }

@@ -23,7 +23,7 @@ import org.unitils.mock.core.MockFactory;
 import org.unitils.mock.core.matching.MatchingInvocationHandler;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
-import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.util.List;
 

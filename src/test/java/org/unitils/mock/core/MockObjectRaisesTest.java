@@ -35,8 +35,7 @@ public class MockObjectRaisesTest {
 
     @Before
     public void setUp() {
-        Scenario scenario = new Scenario(null);
-        mockObject = new MockObject<TestClass>("testMock", TestClass.class, scenario);
+        mockObject = new MockObject<TestClass>("testMock", TestClass.class, this);
     }
 
 

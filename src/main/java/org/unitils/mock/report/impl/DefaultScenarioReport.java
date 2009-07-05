@@ -16,12 +16,11 @@
 package org.unitils.mock.report.impl;
 
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
-
-import java.util.List;
-
 import org.unitils.mock.core.ObservedInvocation;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.report.ScenarioReport;
+
+import java.util.List;
 
 /**
  * Creates a report of the given scenario. This will first output an overview of
@@ -50,17 +49,17 @@ public class DefaultScenarioReport implements ScenarioReport {
         result.append("Observed scenario:\n\n");
         result.append(new ObservedInvocationsReport().createReport(observedInvocations));
         result.append("\n");
-        
-        result.append("Suggested assert statements:\n\n");
+
         String suggestedAssertsReport = new SuggestedAssertsReport().createReport(scenario.getTestObject(), observedInvocations);
         if (isNotEmpty(suggestedAssertsReport)) {
+            result.append("\nSuggested assert statements:\n\n");
             result.append(suggestedAssertsReport);
             result.append("\n");
         }
-        
-        result.append("Detailed scenario:\n\n");
+
+        result.append("\nDetailed scenario:\n\n");
         result.append(new DetailedObservedInvocationsReport().createReport(observedInvocations));
-        
+
         return result.toString();
     }
 

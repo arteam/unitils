@@ -17,20 +17,19 @@ package org.unitils.mock.report.impl;
 
 import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
 import org.unitils.mock.core.MockObject;
-import org.unitils.mock.core.Scenario;
+import static org.unitils.mock.core.MockObject.getScenario;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Test for the report that shows the suggested assert statements.
- * 
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
@@ -39,74 +38,82 @@ public class SuggestedAssertsReportTest {
     /* class under test */
     private SuggestedAssertsReport suggestedAssertsReport;
 
-    /* Test scenario */
-    private Scenario scenario;
-
     /* Test mock that uses the scenario */
     private Mock<TestInterface> testMock;
-    
-    /* Proxy of the testMock */ 
+
+    /* Proxy of the testMock */
     private TestInterface testProxy;
-    
+
     /* Test data, which is a field of this class: if used, the suggested assert must refer to this field */
     private String testDataStr = "someString";
 
 
-    /** Initializes the test. */
+    /**
+     * Initializes the test.
+     */
     @Before
     public void setUp() {
         suggestedAssertsReport = new SuggestedAssertsReport();
-        scenario = new Scenario(null);
-        testMock = new MockObject<TestInterface>("testMock", TestInterface.class, scenario);
+        testMock = new MockObject<TestInterface>("testMock", TestInterface.class, this);
         testProxy = testMock.getMock();
     }
 
 
-    /** Simple values like strings and integers must be showed directly in the suggested assert */
+    /**
+     * Simple values like strings and integers must be showed directly in the suggested assert
+     */
     @Test
     public void simpleValues() {
         testProxy.testMethodString("someValue");
         testProxy.testMethodInt(2);
         testProxy.testMethodInteger(3);
 
-        String report = suggestedAssertsReport.createReport(this, scenario.getObservedInvocations());
-        
+        String report = suggestedAssertsReport.createReport(this, getScenario().getObservedInvocations());
+
         assertTrue(report.contains("testMock.assertInvoked().testMethodString(\"someValue\");"));
         assertTrue(report.contains("testMock.assertInvoked().testMethodInt(2);"));
         assertTrue(report.contains("testMock.assertInvoked().testMethodInteger(3);"));
     }
-    
-    /** If an argument refers to the same object as a field of the test object, the test object's field must be used */
+
+    /**
+     * If an argument refers to the same object as a field of the test object, the test object's field must be used
+     */
     @Test
     public void testObjectFields() {
         testProxy.testMethodString(testDataStr);
 
-        String report = suggestedAssertsReport.createReport(this, scenario.getObservedInvocations());
-        
+        String report = suggestedAssertsReport.createReport(this, getScenario().getObservedInvocations());
+
         assertTrue(report.contains("testMock.assertInvoked().testMethodString(testDataStr);"));
     }
-    
-    /** Objects that are not simple values are replaced by null in the suggested assert */
+
+    /**
+     * Objects that are not simple values are replaced by null in the suggested assert
+     */
     @Test
     public void objects() {
         testProxy.testMethodObject(new ArrayList<String>());
 
-        String report = suggestedAssertsReport.createReport(this, scenario.getObservedInvocations());
-        
+        String report = suggestedAssertsReport.createReport(this, getScenario().getObservedInvocations());
+
         assertTrue(report.contains("testMock.assertInvoked().testMethodObject(null);"));
     }
-    
-    /** Methods that return something are not included in the report */
+
+    /**
+     * Methods that return something are not included in the report
+     */
     @Test
     public void onlySuggestAssertsForVoids() {
         testProxy.testMethodReturnsString();
 
-        String report = suggestedAssertsReport.createReport(this, scenario.getObservedInvocations());
-        
+        String report = suggestedAssertsReport.createReport(this, getScenario().getObservedInvocations());
+
         assertFalse(report.contains("testMock.assertInvoked().testMethodReturnsString()"));
     }
-    
-    /** Methods which have been stubbed are not included in the report */
+
+    /**
+     * Methods which have been stubbed are not included in the report
+     */
     @Test
     public void dontSuggestAssertsForStubbedMethods() {
         testMock.raises(UnitilsException.class).testMethodString("someValue");
@@ -117,23 +124,23 @@ public class SuggestedAssertsReportTest {
         }
         testProxy.testMethodString("otherValue");
 
-        String report = suggestedAssertsReport.createReport(this, scenario.getObservedInvocations());
-        
+        String report = suggestedAssertsReport.createReport(this, getScenario().getObservedInvocations());
+
         assertFalse(report.contains("testMock.assertInvoked().testMethodString(\"someValue\");"));
         assertTrue(report.contains("testMock.assertInvoked().testMethodString(\"otherValue\");"));
     }
-    
+
     public static interface TestInterface {
 
         public String testMethodReturnsString();
 
         public void testMethodString(String arg1);
-        
+
         public void testMethodInt(int arg1);
-        
+
         public void testMethodInteger(Integer arg1);
-        
+
         public void testMethodObject(List<String> arg1);
     }
-    
+
 }

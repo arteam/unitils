@@ -21,9 +21,9 @@ import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
 import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
 import org.unitils.mock.argumentmatcher.impl.DefaultArgumentMatcher;
-import org.unitils.mock.proxy.ProxyInvocation;
-import org.unitils.mock.proxy.ProxyInvocationHandler;
-import static org.unitils.mock.proxy.ProxyUtils.createProxy;
+import org.unitils.mock.core.proxy.ProxyInvocation;
+import org.unitils.mock.core.proxy.ProxyInvocationHandler;
+import static org.unitils.mock.core.proxy.ProxyUtils.createProxy;
 import static org.unitils.util.StackTraceUtils.getInvocationStackTrace;
 
 import java.util.ArrayList;
