@@ -31,10 +31,13 @@ public class StackTraceUtils {
 
     /**
      * @param invokedClass The class for which an invocation can be found in the current call stack
-     * @return the line nr of the invocation in that class, an exception if not found
+     * @return the line nr of the invocation in that class, -1 if not found
      */
     public static int getInvocationLineNr(Class<?> invokedClass) {
-        StackTraceElement[] invocationStackTrace = getInvocationStackTrace(invokedClass);
+        StackTraceElement[] invocationStackTrace = getInvocationStackTrace(invokedClass, false);
+        if (invocationStackTrace == null){
+            return -1;
+        }
         return invocationStackTrace[0].getLineNumber();
     }
 
