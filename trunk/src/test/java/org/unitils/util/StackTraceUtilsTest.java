@@ -17,6 +17,8 @@ package org.unitils.util;
 
 import static junit.framework.Assert.assertEquals;
 import org.junit.Test;
+import org.junit.Assert;
+import static org.junit.Assert.assertNull;
 import org.unitils.core.UnitilsException;
 import static org.unitils.util.StackTraceUtils.getInvocationLineNr;
 import static org.unitils.util.StackTraceUtils.getInvocationStackTrace;
@@ -35,40 +37,49 @@ public class StackTraceUtilsTest {
     @Test
     public void lineNr() {
         int result = testClass.lineNrTest();
-        assertEquals(37, result);
-    }
-
-
-    @Test(expected = UnitilsException.class)
-    public void lineNrNotFound() {
-        getInvocationLineNr(String.class);
+        assertEquals(39, result);
     }
 
 
     @Test
-    public void invocationStackTrace() {
-        StackTraceElement[] result = testClass.stackTraceTest();
+    public void lineNrNotFound() {
+        int result = getInvocationLineNr(String.class);
+        assertEquals(-1, result);
+    }
+
+
+    @Test
+    public void invocationStackTrace_interfaceIncluded() {
+        StackTraceElement[] result = testClass.stackTraceTest(true);
+        assertEquals(TestClass.class.getName(), result[0].getClassName());
+    }
+
+
+    @Test
+    public void invocationStackTrace_interfaceNotIncuded() {
+        StackTraceElement[] result = testClass.stackTraceTest(false);
         assertEquals(StackTraceUtilsTest.class.getName(), result[0].getClassName());
     }
 
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void invocationStackTraceNotFound() {
-        getInvocationStackTrace(String.class);
+        StackTraceElement[] result  = getInvocationStackTrace(String.class);
+        assertNull(result);
     }
 
 
     private interface TestInterface {
 
-        public StackTraceElement[] stackTraceTest();
+        public StackTraceElement[] stackTraceTest(boolean included);
 
         public int lineNrTest();
     }
 
     private class TestClass implements TestInterface {
 
-        public StackTraceElement[] stackTraceTest() {
-            return getStackTrace();
+        public StackTraceElement[] stackTraceTest(boolean included) {
+            return getStackTrace(included);
         }
 
         public int lineNrTest() {
@@ -76,8 +87,8 @@ public class StackTraceUtilsTest {
         }
     }
 
-    private StackTraceElement[] getStackTrace() {
-        return getInvocationStackTrace(TestInterface.class);
+    private StackTraceElement[] getStackTrace(boolean included) {
+        return getInvocationStackTrace(TestInterface.class, included);
     }
 
     private int getLineNr() {

@@ -34,8 +34,8 @@ public class ReflectionUtilsGetGenericTypesTest {
 
     @Test
     public void generic() throws Exception {
-        Class<?> result = getGenericType(getFieldWithName(TestClass.class, "notGenericField", false));
-        assertEquals(Object.class, result);
+        Class<?> result = getGenericType(getFieldWithName(TestClass.class, "genericField", false));
+        assertEquals(String.class, result);
     }
 
 
