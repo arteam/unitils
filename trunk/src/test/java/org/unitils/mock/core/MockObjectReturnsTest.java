@@ -38,8 +38,7 @@ public class MockObjectReturnsTest {
 
     @Before
     public void setUp() {
-        Scenario scenario = new Scenario(null);
-        mockObject = new MockObject<TestClass>("testMock", TestClass.class, scenario);
+        mockObject = new MockObject<TestClass>("testMock", TestClass.class, this);
     }
 
 
@@ -133,7 +132,7 @@ public class MockObjectReturnsTest {
      */
     @Test
     public void returnsMock() {
-        MockObject<Set> mockedSet = new MockObject<Set>("mock", Set.class, new Scenario());
+        MockObject<Set> mockedSet = new MockObject<Set>("mock", Set.class, this);
         mockObject.returns(mockedSet).testMethodSet();
 
         Set<String> result = mockObject.getMock().testMethodSet();

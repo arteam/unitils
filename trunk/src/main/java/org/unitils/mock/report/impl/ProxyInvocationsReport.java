@@ -18,8 +18,8 @@ package org.unitils.mock.report.impl;
 import static org.apache.commons.lang.StringUtils.rightPad;
 import static org.apache.commons.lang.StringUtils.uncapitalize;
 import org.unitils.core.util.ObjectFormatter;
-import org.unitils.mock.proxy.ProxyInvocation;
-import org.unitils.mock.proxy.ProxyUtils;
+import org.unitils.mock.core.proxy.ProxyInvocation;
+import org.unitils.mock.core.proxy.ProxyUtils;
 
 import java.util.List;
 import java.util.Map;

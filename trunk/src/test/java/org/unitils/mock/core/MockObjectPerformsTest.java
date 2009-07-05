@@ -17,8 +17,8 @@ package org.unitils.mock.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
-import org.unitils.mock.proxy.ProxyInvocation;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 /**
@@ -35,8 +35,7 @@ public class MockObjectPerformsTest {
 
     @Before
     public void setUp() {
-        Scenario scenario = new Scenario(null);
-        mockObject = new MockObject<TestClass>("testMock", TestClass.class, scenario);
+        mockObject = new MockObject<TestClass>("testMock", TestClass.class, this);
     }
 
 

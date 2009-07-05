@@ -19,8 +19,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
 import static org.unitils.mock.ArgumentMatchers.notNull;
+import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
-import org.unitils.mock.proxy.ProxyInvocation;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,8 +39,7 @@ public class MockObjectInvalidSyntaxTest {
 
     @Before
     public void setUp() {
-        Scenario scenario = new Scenario(null);
-        mockObject = new MockObject<TestClass>("testMock1", TestClass.class, scenario);
+        mockObject = new MockObject<TestClass>("testMock1", TestClass.class, this);
     }
 
 
@@ -120,7 +119,7 @@ public class MockObjectInvalidSyntaxTest {
         mockObject.assertNotInvoked();
         mockObject.assertNotInvoked();
     }
-    
+
 
     @Test(expected = UnitilsException.class)
     public void tryToLetVoidMethodReturnValue() {

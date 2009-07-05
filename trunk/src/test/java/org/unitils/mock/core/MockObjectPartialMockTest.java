@@ -19,8 +19,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
+import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
-import org.unitils.mock.proxy.ProxyInvocation;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 /**
@@ -41,7 +41,7 @@ public class MockObjectPartialMockTest {
     @Before
     public void setUp() {
         TestClass.invocationCount = 0;
-        mockObject = new PartialMockObject<TestClass>("testMock", TestClass.class, new Scenario(null));
+        mockObject = new PartialMockObject<TestClass>("testMock", TestClass.class, this);
     }
 
 

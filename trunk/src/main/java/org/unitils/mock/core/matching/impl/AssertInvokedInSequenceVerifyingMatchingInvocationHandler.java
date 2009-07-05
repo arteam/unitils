@@ -19,7 +19,7 @@ import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import org.unitils.mock.core.BehaviorDefiningInvocation;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.core.matching.MatchingInvocationHandler;
-import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.util.List;
 

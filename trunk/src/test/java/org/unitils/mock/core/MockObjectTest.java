@@ -16,13 +16,12 @@
 package org.unitils.mock.core;
 
 import static junit.framework.Assert.*;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.util.CloneUtil;
 import static org.unitils.mock.ArgumentMatchers.notNull;
+import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
-import org.unitils.mock.proxy.ProxyInvocation;
 
 /**
  * Tests the mock object functionality.
@@ -40,9 +39,8 @@ public class MockObjectTest {
 
     @Before
     public void setUp() {
-        Scenario scenario = new Scenario(null);
-        mockObject = new MockObject<TestClass>("testMock", TestClass.class, scenario);
-        equalMockObject = new MockObject<TestClass>("testMock", TestClass.class, scenario);
+        mockObject = new MockObject<TestClass>("testMock", TestClass.class, this);
+        equalMockObject = new MockObject<TestClass>("testMock", TestClass.class, this);
     }
 
 
@@ -75,40 +73,6 @@ public class MockObjectTest {
     public void invokedMethodOnDifferentLine() throws Exception {
         mockObject.returns(null).//
                 testMethod(null);
-    }
-
-
-    @Test
-    public void testAssertInvokedFailure() {
-        try {
-            mockObject.assertInvoked().testMethod(null);
-            fail();
-        } catch (AssertionError e) {
-            assertTopOfStackTracePointsToCurrentTest(e, "testAssertInvokedFailure");
-        }
-    }
-
-
-    @Test
-    public void testAssertNotInvokedFailure() {
-        try {
-            mockObject.getMock().testMethod(null);
-            mockObject.assertNotInvoked().testMethod(null);
-            fail();
-        } catch (AssertionError e) {
-            assertTopOfStackTracePointsToCurrentTest(e, "testAssertNotInvokedFailure");
-        }
-    }
-
-
-    @Test
-    public void testAssertInvokedInSequenceFailure() {
-        try {
-            mockObject.assertInvokedInSequence().testMethodArray();
-            fail();
-        } catch (AssertionError e) {
-            assertTopOfStackTracePointsToCurrentTest(e, "testAssertInvokedInSequenceFailure");
-        }
     }
 
 

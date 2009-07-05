@@ -16,7 +16,7 @@
 package org.unitils.mock.core;
 
 import static org.unitils.mock.core.Scenario.VerificationStatus.*;
-import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.report.ScenarioReport;
 import org.unitils.mock.report.impl.DefaultScenarioReport;
 import org.unitils.mock.report.impl.DetailedObservedInvocationsReport;
@@ -47,13 +47,15 @@ public class Scenario {
     protected Object testObject;
 
 
-    public Scenario() {
-        this(null);
+    public Scenario(Object testObject, Object atestObject) {
+        this.testObject = testObject;
     }
 
 
-    public Scenario(Object testObject) {
+    public void reset(Object testObject) {
         this.testObject = testObject;
+        observedInvocations.clear();
+        invocationVerificationStatuses.clear();
     }
 
 
@@ -214,7 +216,6 @@ public class Scenario {
         StringBuilder message = new StringBuilder();
         message.append("No more invocations expected, yet observed following calls:\n");
         message.append(new ObservedInvocationsReport().createReport(unexpectedInvocations));
-        message.append("\n");
         message.append(getAssertLocationIndication(assertedAt));
         message.append("\n\n");
         message.append(createFullReport());

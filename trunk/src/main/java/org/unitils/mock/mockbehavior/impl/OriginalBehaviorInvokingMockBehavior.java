@@ -17,7 +17,7 @@ package org.unitils.mock.mockbehavior.impl;
 
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
-import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import static java.lang.reflect.Modifier.isAbstract;
 
@@ -32,6 +32,7 @@ import static java.lang.reflect.Modifier.isAbstract;
  * @author Kenny Claes
  */
 public class OriginalBehaviorInvokingMockBehavior implements ValidatableMockBehavior {
+
 
     /**
      * Checks whether the mock behavior can be executed for the given invocation.

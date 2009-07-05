@@ -17,7 +17,7 @@ package org.unitils.mock.core;
 
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import org.unitils.mock.mockbehavior.MockBehavior;
-import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.util.List;
 
@@ -98,7 +98,7 @@ public class BehaviorDefiningInvocation extends ProxyInvocation {
      * Returns whether or not the given {@link ProxyInvocation} matches this object's predefined <code>Method</code> and arguments.
      *
      * @param proxyInvocation the {@link ProxyInvocation} to match.
-     * @return true when given {@link org.unitils.mock.proxy.ProxyInvocation} matches, false otherwise.
+     * @return true when given {@link org.unitils.mock.core.proxy.ProxyInvocation} matches, false otherwise.
      */
     public boolean matches(ProxyInvocation proxyInvocation) {
         if (!getMethod().equals(proxyInvocation.getMethod())) {

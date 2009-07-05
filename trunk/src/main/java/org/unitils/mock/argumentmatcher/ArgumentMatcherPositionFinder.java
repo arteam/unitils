@@ -23,7 +23,7 @@ import org.objectweb.asm.tree.analysis.*;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.annotation.ArgumentMatcher;
 import org.unitils.mock.annotation.MatchStatement;
-import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.core.proxy.ProxyInvocation;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import static org.unitils.util.ReflectionUtils.getClassWithName;
 

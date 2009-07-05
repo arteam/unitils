@@ -15,14 +15,13 @@
  */
 package org.unitils.mock.report.impl;
 
-import static org.junit.Assert.assertTrue;
-
 import org.apache.commons.lang.StringUtils;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.mock.Mock;
 import org.unitils.mock.core.MockObject;
-import org.unitils.mock.core.Scenario;
+import static org.unitils.mock.core.MockObject.getScenario;
 
 /**
  * Test for the creating an overview representation of a scenario.
@@ -36,40 +35,41 @@ public class ObservedInvocationsReportTest {
     /* class under test */
     private ObservedInvocationsReport observedInvocationsView;
 
-    /* Test scenario */
-    private Scenario scenario;
-
     /* Test mock that uses the scenario */
     private Mock<TestInterface> testMock;
 
 
-    /** Initializes the test. */
+    /**
+     * Initializes the test.
+     */
     @Before
     public void setUp() {
         observedInvocationsView = new ObservedInvocationsReport();
-        scenario = new Scenario(null);
-        testMock = new MockObject<TestInterface>("testMock", TestInterface.class, scenario);
+        testMock = new MockObject<TestInterface>("testMock", TestInterface.class, this);
     }
 
 
-    /** Test for creating a view containing 2 mock invocations. */
+    /**
+     * Test for creating a view containing 2 mock invocations.
+     */
     @Test
     public void testCreateView() {
-        TestInterface testProxy = testMock.getMock();
-        testProxy.testMethod1("value1");
-        testProxy.testMethod2();
+        testMock.getMock().testMethod1("value1");
+        testMock.getMock().testMethod2();
 
-        String result = observedInvocationsView.createReport(scenario.getObservedInvocations());
+        String result = observedInvocationsView.createReport(getScenario().getObservedInvocations());
 
         assertTrue(result.contains("testMethod1"));
         assertTrue(result.contains("testMethod2"));
     }
 
 
-    /** Test for creating a view when there were no mock invocations. */
+    /**
+     * Test for creating a view when there were no mock invocations.
+     */
     @Test
     public void testCreateView_noInvocations() {
-        String result = observedInvocationsView.createReport(scenario.getObservedInvocations());
+        String result = observedInvocationsView.createReport(getScenario().getObservedInvocations());
         assertTrue(StringUtils.isEmpty(result));
     }
 
@@ -80,10 +80,9 @@ public class ObservedInvocationsReportTest {
      */
     @Test
     public void testCreateView_largeArgumentValue() {
-        TestInterface testProxy = testMock.getMock();
-        testProxy.testMethod1("012345678901234567891");
+        testMock.getMock().testMethod1("012345678901234567891");
 
-        String result = observedInvocationsView.createReport(scenario.getObservedInvocations());
+        String result = observedInvocationsView.createReport(getScenario().getObservedInvocations());
         assertTrue(result.contains("string1"));
     }
 
@@ -95,15 +94,16 @@ public class ObservedInvocationsReportTest {
     @Test
     public void testCreateView_largeResultValue() {
         testMock.returns("012345678901234567891").testMethod1(null);
-        TestInterface testProxy = testMock.getMock();
-        testProxy.testMethod1(null);
+        testMock.getMock().testMethod1(null);
 
-        String result = observedInvocationsView.createReport(scenario.getObservedInvocations());
+        String result = observedInvocationsView.createReport(getScenario().getObservedInvocations());
         assertTrue(result.contains("string1"));
     }
 
 
-    /** Test interface which is mocked */
+    /**
+     * Test interface which is mocked
+     */
     public static interface TestInterface {
 
         public String testMethod1(String arg1);

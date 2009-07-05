@@ -21,7 +21,6 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.unitils.mock.ArgumentMatchers.*;
 import org.unitils.mock.core.MockObject;
-import org.unitils.mock.core.Scenario;
 
 /**
  * Tests the usage of anyInt, anyLong, etc argment matchers.
@@ -34,12 +33,10 @@ public class ArgumentMatcherAnyTest {
     /* Test mock object */
     private MockObject<TestClass> mockObject;
 
-    private Scenario scenario;
 
     @Before
     public void setUp() {
-        scenario = new Scenario(null);
-        mockObject = new MockObject<TestClass>("testMock", TestClass.class, scenario);
+        mockObject = new MockObject<TestClass>("testMock", TestClass.class, this);
     }
 
 

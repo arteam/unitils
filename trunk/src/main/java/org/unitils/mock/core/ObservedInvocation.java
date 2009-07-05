@@ -15,8 +15,8 @@
  */
 package org.unitils.mock.core;
 
+import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
-import org.unitils.mock.proxy.ProxyInvocation;
 
 /**
  * @author Filip Neven
@@ -24,8 +24,6 @@ import org.unitils.mock.proxy.ProxyInvocation;
  * @author Kenny Claes
  */
 public class ObservedInvocation extends ProxyInvocation {
-
-    private String mockName;
 
     private Object resultAtInvocationTime;
 
@@ -42,13 +40,11 @@ public class ObservedInvocation extends ProxyInvocation {
      * occur to the original values (pass-by-value vs pass-by-reference).
      *
      * @param proxyInvocation            The proxy invocation, not null
-     * @param mockName                   The name of the mock, e.g. the field name, not null
      * @param behaviorDefiningInvocation The invocation that defined the behavior, null if there is no behavior
      * @param mockBehavior               The executed behavior, not null
      */
-    public ObservedInvocation(ProxyInvocation proxyInvocation, String mockName, BehaviorDefiningInvocation behaviorDefiningInvocation, MockBehavior mockBehavior) {
+    public ObservedInvocation(ProxyInvocation proxyInvocation, BehaviorDefiningInvocation behaviorDefiningInvocation, MockBehavior mockBehavior) {
         super(proxyInvocation);
-        this.mockName = mockName;
         this.behaviorDefiningInvocation = behaviorDefiningInvocation;
         this.mockBehavior = mockBehavior;
     }
@@ -56,11 +52,6 @@ public class ObservedInvocation extends ProxyInvocation {
 
     public void setResultAtInvocationTime(Object result) {
         this.resultAtInvocationTime = result;
-    }
-
-
-    public String getMockName() {
-        return mockName;
     }
 
 
