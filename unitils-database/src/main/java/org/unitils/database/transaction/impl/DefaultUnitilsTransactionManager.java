@@ -22,10 +22,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.transaction.UnitilsTransactionManager;
-import org.unitils.spring.SpringModule;
 
 import javax.sql.DataSource;
 import java.util.*;
@@ -200,11 +198,5 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
         this.transactionManagementConfigurations = configurations;
     }
 
-    /**
-     * @return The Spring module
-     */
-    protected SpringModule getSpringModule() {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(SpringModule.class);
-    }
 
 }
