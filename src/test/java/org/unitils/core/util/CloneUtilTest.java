@@ -19,16 +19,14 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import org.junit.Before;
 import org.junit.Test;
+import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import static java.util.Arrays.asList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * todo javadoc
@@ -64,7 +62,7 @@ public class CloneUtilTest {
 
     @Test
     public void testCreateDeepClone() {
-        SimpleValues result = CloneUtil.createDeepClone(simpleValues1);
+        SimpleValues result = createDeepClone(simpleValues1);
         assertReflectionEquals(simpleValues1, result);
         assertNotSame(simpleValues1, result);
         assertSame(simpleValues1.stringValue, result.stringValue);
@@ -76,7 +74,7 @@ public class CloneUtilTest {
 
     @Test
     public void testCreateDeepClone_clonedTwice() {
-        SimpleValues result = CloneUtil.createDeepClone(CloneUtil.createDeepClone(simpleValues1));
+        SimpleValues result = createDeepClone(createDeepClone(simpleValues1));
         assertReflectionEquals(simpleValues1, result);
         assertNotSame(simpleValues1, result);
     }
@@ -85,7 +83,7 @@ public class CloneUtilTest {
     @Test
     public void testCreateDeepClone_topLevelCollection() {
         List<?> aList = Arrays.asList(1, new int[]{1, 2});
-        List<?> result = CloneUtil.createDeepClone(aList);
+        List<?> result = createDeepClone(aList);
 
         assertReflectionEquals(aList, result);
         assertNotSame(aList, result);
@@ -96,22 +94,22 @@ public class CloneUtilTest {
 
     @Test
     public void testCreateDeepClone_collections() {
-        Collections result = CloneUtil.createDeepClone(collections);
+        Collections result = createDeepClone(collections);
         assertReflectionEquals(collections, result);
         assertNotSame(collections, result);
         assertNotSame(collections.listValue, result.listValue);
         assertNotSame(collections.mapValue, result.mapValue);
     }
-    
-    
+
+
     @Test
     public void testCreateDeepClone_InnerClass() throws IllegalArgumentException, IllegalAccessException {
         ClassWithInnerClass classWithInnerClass = new ClassWithInnerClass();
-        ClassWithInnerClass result = CloneUtil.createDeepClone(classWithInnerClass);
+        ClassWithInnerClass result = createDeepClone(classWithInnerClass);
         assertReflectionEquals(classWithInnerClass, result);
         result.inner.setString();
     }
-    
+
     @Test
     public void testCreateDeepClone_AnonymousClass() throws IllegalArgumentException, IllegalAccessException {
         Comparable<String> anonymousClass = new Comparable<String>() {
@@ -119,14 +117,14 @@ public class CloneUtilTest {
                 return 0;
             }
         };
-        Comparable<String> result = CloneUtil.createDeepClone(anonymousClass);
+        Comparable<String> result = createDeepClone(anonymousClass);
         assertReflectionEquals(anonymousClass, result);
     }
 
 
     @Test
     public void testCreateDeepClone_loop() {
-        References result = CloneUtil.createDeepClone(references);
+        References result = createDeepClone(references);
         assertReflectionEquals(references, result);
         assertNotSame(references, result);
         assertNotSame(references.references, result.references);
@@ -138,7 +136,7 @@ public class CloneUtilTest {
         Object[] array = new Object[2];
         array[0] = "string";
         array[1] = array;
-        Object[] clone = CloneUtil.createDeepClone(array);
+        Object[] clone = createDeepClone(array);
         assertSame(clone, clone[1]);
     }
 
@@ -179,18 +177,18 @@ public class CloneUtilTest {
             this.references = references;
         }
     }
-    
+
     protected static class ClassWithInnerClass {
-        
+
         String str;
         Inner inner = new Inner();
-        
+
         class Inner {
             void setString() {
                 str = "value";
             }
         }
-        
+
     }
 
 
