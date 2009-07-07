@@ -24,7 +24,7 @@ import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.get
 import org.unitils.mock.core.MockObject;
 import org.unitils.mock.dummy.DummyObjectUtil;
 import org.unitils.mock.mockbehavior.MockBehavior;
-import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
+import static org.unitils.mock.core.proxy.ReflectionAssert.assertReflectionEquals;
 import static org.unitils.util.ReflectionUtils.getMethod;
 
 import java.lang.reflect.Method;

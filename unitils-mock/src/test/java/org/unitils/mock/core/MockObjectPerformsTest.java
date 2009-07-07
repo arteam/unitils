@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
+import static org.unitils.mock.core.proxy.ReflectionAssert.assertLenientEquals;
 
 /**
  * Tests the mock object functionality.
