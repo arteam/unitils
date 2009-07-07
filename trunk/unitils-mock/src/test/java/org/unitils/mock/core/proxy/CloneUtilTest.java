@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.core.util;
+package org.unitils.mock.core.proxy;
 
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;

@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import org.junit.Before;
 import org.junit.Test;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
+import static org.unitils.mock.core.proxy.ReflectionAssert.assertLenientEquals;
 
 import java.util.List;
 import java.util.Map;
