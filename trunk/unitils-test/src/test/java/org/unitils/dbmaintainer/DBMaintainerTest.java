@@ -16,13 +16,6 @@
 package org.unitils.dbmaintainer;
 
 import static org.junit.Assert.fail;
-import static org.unitils.mock.MockUnitils.assertNoMoreInvocations;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
@@ -42,6 +35,12 @@ import org.unitils.inject.annotation.TestedObject;
 import org.unitils.mock.ArgumentMatchers;
 import org.unitils.mock.Mock;
 import org.unitils.mock.MockUnitils;
+import static org.unitils.mock.MockUnitils.assertNoMoreInvocations;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Tests the main algorithm of the DBMaintainer, using mocks for all implementation classes.
@@ -52,33 +51,33 @@ import org.unitils.mock.MockUnitils;
 public class DBMaintainerTest extends UnitilsJUnit4 {
 
     @InjectIntoByType
-    Mock<ExecutedScriptInfoSource> mockExecutedScriptInfoSource;
+    private Mock<ExecutedScriptInfoSource> mockExecutedScriptInfoSource;
 
     @InjectIntoByType
-    Mock<ScriptSource> mockScriptSource;
+    private Mock<ScriptSource> mockScriptSource;
 
     @InjectIntoByType
-    Mock<DefaultScriptRunner> mockScriptRunner;
+    private Mock<DefaultScriptRunner> mockScriptRunner;
 
     @InjectIntoByType
-    Mock<DBClearer> mockDbClearer;
+    private Mock<DBClearer> mockDbClearer;
 
     @InjectIntoByType
-    Mock<ConstraintsDisabler> mockConstraintsDisabler;
+    private Mock<ConstraintsDisabler> mockConstraintsDisabler;
 
     @InjectIntoByType
-    Mock<SequenceUpdater> mockSequenceUpdater;
+    private Mock<SequenceUpdater> mockSequenceUpdater;
 
     @InjectIntoByType
-    Mock<DataSetStructureGenerator> mockDataSetStructureGenerator;
+    private Mock<DataSetStructureGenerator> mockDataSetStructureGenerator;
 
     @TestedObject
-    DBMaintainer dbMaintainer;
+    private DBMaintainer dbMaintainer;
 
     /* Test database update scripts */
-    List<Script> scripts, postProcessingScripts;
-    List<ExecutedScript> alreadyExecutedScripts;
-    ScriptContentHandle sciptContentHandle1, sciptContentHandle2, postProcessingSciptContentHandle1, postProcessingSciptContentHandle2;
+    private List<Script> scripts, postProcessingScripts;
+    private List<ExecutedScript> alreadyExecutedScripts;
+    private ScriptContentHandle sciptContentHandle1, sciptContentHandle2, postProcessingSciptContentHandle1, postProcessingSciptContentHandle2;
 
 
     /**
@@ -96,21 +95,21 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         scripts = new ArrayList<Script>();
         sciptContentHandle1 = MockUnitils.createDummy(ScriptContentHandle.class);
         Script script1 = new Script("01_script1.sql", 0L, sciptContentHandle1);
-		scripts.add(script1);
-		sciptContentHandle2 = MockUnitils.createDummy(ScriptContentHandle.class);
+        scripts.add(script1);
+        sciptContentHandle2 = MockUnitils.createDummy(ScriptContentHandle.class);
         Script script2 = new Script("02_script2.sql", 0L, sciptContentHandle2);
-		scripts.add(script2);
+        scripts.add(script2);
 
         alreadyExecutedScripts = new ArrayList<ExecutedScript>();
         alreadyExecutedScripts.add(new ExecutedScript(script1, null, true));
         alreadyExecutedScripts.add(new ExecutedScript(script2, null, true));
-        
+
         postProcessingScripts = new ArrayList<Script>();
         postProcessingSciptContentHandle1 = MockUnitils.createDummy(ScriptContentHandle.class);
         postProcessingScripts.add(new Script("post-script1.sql", 0L, postProcessingSciptContentHandle1));
         postProcessingSciptContentHandle2 = MockUnitils.createDummy(ScriptContentHandle.class);
         postProcessingScripts.add(new Script("post-script2.sql", 0L, postProcessingSciptContentHandle2));
-        
+
         HashSet<ExecutedScript> hashSet = new HashSet<ExecutedScript>(alreadyExecutedScripts);
         mockExecutedScriptInfoSource.returns(hashSet).getExecutedScripts();
     }
@@ -123,7 +122,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         expectPostProcessingScripts(postProcessingScripts);
 
         dbMaintainer.updateDatabase();
-        
+
         assertNoMoreInvocations();
     }
 
@@ -139,7 +138,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         expectPostProcessingScripts(postProcessingScripts);
 
         dbMaintainer.updateDatabase();
-        
+
         assertScriptsExecutedAndDbVersionSet();
     }
 
@@ -155,7 +154,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         expectPostProcessingScripts(postProcessingScripts);
 
         dbMaintainer.updateDatabase();
-        
+
         mockDbClearer.assertInvoked().clearSchemas();
         mockExecutedScriptInfoSource.assertInvoked().clearAllExecutedScripts();
         assertScriptsExecutedAndDbVersionSet();
@@ -168,7 +167,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         expectPostProcessingScripts(postProcessingScripts);
 
         dbMaintainer.updateDatabase();
-        
+
         mockDbClearer.assertInvoked().clearSchemas();
         mockExecutedScriptInfoSource.assertInvoked().clearAllExecutedScripts();
         assertScriptsExecutedAndDbVersionSet();
@@ -194,7 +193,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         }
         mockExecutedScriptInfoSource.assertInvoked().registerExecutedScript(new ExecutedScript(scripts.get(0), null, false));
     }
-    
+
 
     @Test
     public void testUpdateDatabase_ErrorInPostProcessingCodeScripts() {
@@ -209,17 +208,17 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         } catch (UnitilsException e) {
             // Expected
         }
-        
+
         assertScriptsExecutedAndDbVersionSet();
     }
-    
+
     @Test
     public void testUpdateDatabase_isInitialFromScratchUpdate() {
         expectFromScratchUpdateRecommended();
         expectPostProcessingScripts(postProcessingScripts);
-        
+
         dbMaintainer.updateDatabase();
-        
+
         mockDbClearer.assertInvoked().clearSchemas();
         mockExecutedScriptInfoSource.assertInvoked().clearAllExecutedScripts();
         assertScriptsExecutedAndDbVersionSet();
@@ -263,7 +262,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 
 
     private void assertScriptsExecutedAndDbVersionSet() {
-    	mockExecutedScriptInfoSource.assertInvokedInSequence().registerExecutedScript(new ExecutedScript(scripts.get(0), null, null));
+        mockExecutedScriptInfoSource.assertInvokedInSequence().registerExecutedScript(new ExecutedScript(scripts.get(0), null, null));
         mockScriptRunner.assertInvokedInSequence().execute(scripts.get(0).getScriptContentHandle());
         mockExecutedScriptInfoSource.assertInvokedInSequence().updateExecutedScript(new ExecutedScript(scripts.get(0), null, null));
         mockExecutedScriptInfoSource.assertInvokedInSequence().registerExecutedScript(new ExecutedScript(scripts.get(1), null, null));
@@ -297,5 +296,5 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
     private void expectAllScripts(List<Script> scripts) {
         mockScriptSource.returns(scripts).getAllUpdateScripts();
     }
-    
+
 }

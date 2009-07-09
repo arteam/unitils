@@ -47,17 +47,23 @@ public class Scenario {
     protected Object testObject;
 
 
-    public Scenario(Object testObject, Object atestObject) {
+    public Scenario(Object testObject) {
         this.testObject = testObject;
     }
 
 
-    public void reset(Object testObject) {
-        this.testObject = testObject;
+    public void reset() {
         observedInvocations.clear();
         invocationVerificationStatuses.clear();
     }
 
+
+    public void setTestObject(Object testObject) {
+        if (this.testObject != testObject) {
+            reset();
+        }
+        this.testObject = testObject;
+    }
 
     public Object getTestObject() {
         return testObject;

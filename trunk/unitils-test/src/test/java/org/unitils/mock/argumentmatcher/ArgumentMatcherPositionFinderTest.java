@@ -24,7 +24,7 @@ import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.get
 import org.unitils.mock.core.MockObject;
 import org.unitils.mock.dummy.DummyObjectUtil;
 import org.unitils.mock.mockbehavior.MockBehavior;
-import static org.unitils.mock.core.proxy.ReflectionAssert.assertReflectionEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.unitils.util.ReflectionUtils.getMethod;
 
 import java.lang.reflect.Method;
@@ -172,9 +172,9 @@ public class ArgumentMatcherPositionFinderTest {
             // invocation without argument matchers
             mockObject.performs(dummyBehavior).someMethod("aValue", "aValue", "aValue");
             // 2 same invocations on same line  DO NOT FORMAT
-            mockObject.performs(dummyBehavior).someMethod(notNull(String.class), "aValue", "aValue"); mockObject.performs(dummyBehavior).someMethod("aValue", "aValue", notNull(String.class));
+            mockObject.performs(dummyBehavior).someMethod(notNull(String.class), "aValue", "aValue");mockObject.performs(dummyBehavior).someMethod("aValue", "aValue", notNull(String.class));
             // 2 different invocations on same line  DO NOT FORMAT
-            mockObject.performs(dummyBehavior).someMethod(notNull(String.class), "aValue", "aValue"); mockObject.performs(dummyBehavior).valueReturningMethod("aValue", "aValue", notNull(String.class));
+            mockObject.performs(dummyBehavior).someMethod(notNull(String.class), "aValue", "aValue");mockObject.performs(dummyBehavior).valueReturningMethod("aValue", "aValue", notNull(String.class));
             // Invocation spread over multiple lines
             mockObject.performs(dummyBehavior).someMethod(notNull(String.class),
                     "aValue",

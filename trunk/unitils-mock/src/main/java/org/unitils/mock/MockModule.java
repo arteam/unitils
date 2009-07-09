@@ -113,13 +113,13 @@ public class MockModule implements Module {
     }
 
 
-    public <T> Mock<T> createMock(String name, Class<T> type) {
-        return new MockObject<T>(name, type, getScenario());
+    public <T> Mock<T> createMock(Object testObject, String name, Class<T> type) {
+        return new MockObject<T>(name, type, testObject);
     }
 
 
-    public <T> Mock<T> createPartialMock(String name, Class<T> type) {
-        return new PartialMockObject<T>(name, type, getScenario());
+    public <T> Mock<T> createPartialMock(Object testObject, String name, Class<T> type) {
+        return new PartialMockObject<T>(name, type, testObject);
     }
 
 
@@ -140,7 +140,7 @@ public class MockModule implements Module {
                 mock.resetBehavior();
                 continue;
             }
-            mock = createMock(field.getName(), getMockedClass(field));
+            mock = createMock(testObject, field.getName(), getMockedClass(field));
             injectMock(testObject, field, mock);
         }
     }
@@ -154,7 +154,7 @@ public class MockModule implements Module {
                 mock.resetBehavior();
                 continue;
             }
-            mock = createPartialMock(field.getName(), getMockedClass(field));
+            mock = createPartialMock(testObject, field.getName(), getMockedClass(field));
             injectMock(testObject, field, mock);
         }
     }

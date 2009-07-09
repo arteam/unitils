@@ -18,7 +18,6 @@ package org.unitils.mock.core.proxy;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import org.junit.Test;
-import org.unitils.core.UnitilsException;
 import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationLineNr;
 import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationStackTrace;
 
@@ -36,7 +35,7 @@ public class StackTraceUtilsTest {
     @Test
     public void lineNr() {
         int result = testClass.lineNrTest();
-        assertEquals(39, result);
+        assertEquals(37, result);
     }
 
 
