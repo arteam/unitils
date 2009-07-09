@@ -16,6 +16,7 @@
         <module>unitils-mock</module>
         <module>unitils-orm</module>
         <module>unitils-spring</module>
+        <module>unitils-test</module>
     </modules>
 
     <!-- Project information -->
