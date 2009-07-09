@@ -38,26 +38,6 @@ public class MockUnitils {
     }
 
 
-    public static <T> Mock<T> createMock(Class<T> type) {
-        return getMockModule().createMock("mock" + type.getSimpleName(), type);
-    }
-
-
-    public static <T> Mock<T> createMock(String name, Class<T> type) {
-        return getMockModule().createMock(name, type);
-    }
-
-
-    public static <T> PartialMock<T> createPartialMock(Class<T> type) {
-        return (PartialMock<T>) getMockModule().createPartialMock("mock" + type.getSimpleName(), type);
-    }
-
-
-    public static <T> PartialMock<T> createPartialMock(String name, Class<T> type) {
-        return (PartialMock<T>) getMockModule().createPartialMock(name, type);
-    }
-
-
     public static void logFullScenarioReport() {
         getMockModule().logFullScenarioReport();
     }

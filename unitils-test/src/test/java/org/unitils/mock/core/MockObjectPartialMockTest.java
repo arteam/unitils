@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
-import static org.unitils.mock.core.proxy.ReflectionAssert.assertLenientEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 /**
  * Tests the mock object functionality for partial mocks.

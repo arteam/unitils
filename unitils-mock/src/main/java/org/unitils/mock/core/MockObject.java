@@ -53,9 +53,9 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
     protected BehaviorDefiningInvocations alwaysMatchingBehaviorDefiningInvocations;
 
     /* The scenario that will record all observed invocations */
-    protected static Scenario scenario;
+    protected volatile static Scenario scenario;
 
-    protected static MatchingInvocationBuilder matchingInvocationBuilder;
+    protected volatile static MatchingInvocationBuilder matchingInvocationBuilder;
 
 
     public static Scenario getScenario() {
@@ -81,8 +81,8 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
         }
         if (scenario == null) {
             scenario = createScenario(testObject);
-        } else if (scenario.getTestObject() != testObject) {
-            scenario.reset(testObject);
+        } else {
+            scenario.setTestObject(testObject);
         }
         this.mockProxy = createMockProxy();
     }
@@ -414,7 +414,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
 
 
     protected Scenario createScenario(Object testObject) {
-        return new Scenario(testObject, testObject);
+        return new Scenario(testObject);
     }
 
     protected MatchingInvocationBuilder createMatchingInvocationBuilder() {
