@@ -9,6 +9,7 @@
     </parent>
     <artifactId>unitils-database</artifactId>
     <packaging>jar</packaging>
+    <name>Unitils database module</name>
 
     <dependencies>
         <dependency>

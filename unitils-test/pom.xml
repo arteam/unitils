@@ -9,6 +9,7 @@
     </parent>
     <artifactId>unitils-test</artifactId>
     <packaging>jar</packaging>
+    <name>Unit tests of Unitils</name>
 
     <!-- Dependencies -->
     <dependencies>

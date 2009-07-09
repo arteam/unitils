@@ -9,6 +9,7 @@
     </parent>
     <artifactId>unitils-spring</artifactId>
     <packaging>jar</packaging>
+    <name>Unitils Spring module</name>
 
     <dependencies>
         <dependency>

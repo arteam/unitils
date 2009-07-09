@@ -9,6 +9,7 @@
     </parent>
     <artifactId>unitils-orm</artifactId>
     <packaging>jar</packaging>
+    <name>Unitils orm module</name>
 
     <dependencies>
         <dependency>

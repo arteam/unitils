@@ -9,6 +9,7 @@
     </parent>
     <artifactId>unitils-dbmaintainer</artifactId>
     <packaging>jar</packaging>
+    <name>Unitils DbMaintainer module</name>
 
 
     <!-- Dependencies -->

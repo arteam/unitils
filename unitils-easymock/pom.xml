@@ -9,6 +9,7 @@
     </parent>
     <artifactId>unitils-easymock</artifactId>
     <packaging>jar</packaging>
+    <name>Unitils EasyMock module</name>
 
     <dependencies>
         <dependency>

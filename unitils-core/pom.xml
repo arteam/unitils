@@ -9,11 +9,9 @@
     </parent>
     <artifactId>unitils-core</artifactId>
     <packaging>jar</packaging>
+    <name>Unitils core module</name>
 
-    <!-- Dependencies -->
     <dependencies>
-
-        <!-- Required compile dependencies -->
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
