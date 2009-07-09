@@ -89,7 +89,7 @@ public class TestNGUnitilsInvocationTest extends UnitilsInvocationTestBase {
     @Test
     public void testSuccessfulRun() throws Exception {
         testExecutor.runTests(testClass1, testClass2);
-        assertInvocationSequence(testClass1, testClass2);
+        assertInvocationOrder(testClass1, testClass2);
     }
 
 

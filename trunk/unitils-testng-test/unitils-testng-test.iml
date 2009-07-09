@@ -17,7 +17,7 @@
     <orderEntry type="library" name="Maven: ognl:ognl:2.6.9" level="project" />
     <orderEntry type="module" module-name="unitils-testng" />
     <orderEntry type="library" name="Maven: org.testng:testng:jdk15:5.8" level="project" />
-    <orderEntry type="module" module-name="unitils-junit-test" />
+    <orderEntry type="module" module-name="unitils-test" />
     <orderEntry type="module" module-name="unitils-inject" />
     <orderEntry type="module" module-name="unitils-spring" />
     <orderEntry type="library" name="Maven: org.springframework:spring-core:2.5.2" level="project" />

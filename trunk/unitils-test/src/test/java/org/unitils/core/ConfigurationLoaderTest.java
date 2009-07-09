@@ -17,11 +17,9 @@ package org.unitils.core;
 
 import org.apache.commons.logging.Log;
 import org.junit.After;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.fail;
 import org.unitils.UnitilsJUnit4;
 import static org.unitils.core.ConfigurationLoader.*;
 import org.unitils.core.util.PropertiesReader;
