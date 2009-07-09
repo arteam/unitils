@@ -9,6 +9,7 @@
     </parent>
     <artifactId>unitils-mock</artifactId>
     <packaging>jar</packaging>
+    <name>Unitils mock module</name>
 
     <dependencies>
         <dependency>

@@ -9,6 +9,7 @@
     </parent>
     <artifactId>unitils-inject</artifactId>
     <packaging>jar</packaging>
+    <name>Unitils inject module</name>
 
     <dependencies>
         <dependency>

@@ -9,6 +9,7 @@
     </parent>
     <artifactId>unitils-dbunit</artifactId>
     <packaging>jar</packaging>
+    <name>Unitils DbUnit module</name>
 
     <dependencies>
         <dependency>
