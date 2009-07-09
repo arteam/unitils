@@ -8,6 +8,7 @@
 
     <modules>
         <module>unitils-core</module>
+        <module>unitils-testng</module>        
         <module>unitils-database</module>
         <module>unitils-dbmaintainer</module>
         <module>unitils-dbunit</module>
@@ -16,7 +17,9 @@
         <module>unitils-mock</module>
         <module>unitils-orm</module>
         <module>unitils-spring</module>
+        
         <module>unitils-test</module>
+        <module>unitils-testng-test</module>
     </modules>
 
     <!-- Project information -->
