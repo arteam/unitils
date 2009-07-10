@@ -53,13 +53,13 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
     protected BehaviorDefiningInvocations alwaysMatchingBehaviorDefiningInvocations;
 
     /* The scenario that will record all observed invocations */
-    protected volatile static Scenario scenario;
+    protected static ThreadLocal<Scenario> scenarioThreadLocal = new ThreadLocal<Scenario>();
 
-    protected volatile static MatchingInvocationBuilder matchingInvocationBuilder;
+    protected static ThreadLocal<MatchingInvocationBuilder> matchingInvocationBuilderThreadLocal = new ThreadLocal<MatchingInvocationBuilder>();
 
 
-    public static Scenario getScenario() {
-        return scenario;
+    public static Scenario getCurrentScenario() {
+        return scenarioThreadLocal.get();
     }
 
 
@@ -76,12 +76,11 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
         this.mockedType = mockedType;
         this.oneTimeMatchingBehaviorDefiningInvocations = createOneTimeMatchingBehaviorDefiningInvocations();
         this.alwaysMatchingBehaviorDefiningInvocations = createAlwaysMatchingBehaviorDefiningInvocations();
-        if (matchingInvocationBuilder == null) {
-            matchingInvocationBuilder = createMatchingInvocationBuilder();
-        }
-        if (scenario == null) {
-            scenario = createScenario(testObject);
-        } else {
+
+        Scenario scenario = getScenario(testObject);
+        if (scenario.getTestObject() != testObject) {
+            scenario.reset();
+            getMatchingInvocationBuilder().reset();
             scenario.setTestObject(testObject);
         }
         this.mockProxy = createMockProxy();
@@ -359,7 +358,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
     public void resetBehavior() {
         oneTimeMatchingBehaviorDefiningInvocations.clear();
         alwaysMatchingBehaviorDefiningInvocations.clear();
-        matchingInvocationBuilder.reset();
+        getMatchingInvocationBuilder().reset();
     }
 
 
@@ -368,7 +367,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
             if (Void.class.equals(mockedType) || mockedType.isPrimitive() || mockedType.isArray()) {
                 return null;
             }
-            return new MockObject<M>(name, mockedType, scenario);
+            return new MockObject<M>(name, mockedType, getCurrentScenario().getTestObject());
         } catch (Throwable t) {
             return null;
         }
@@ -376,12 +375,29 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
 
 
     protected T startMatchingInvocation(MatchingInvocationHandler matchingInvocationHandler) {
-        return matchingInvocationBuilder.startMatchingInvocation(name, mockedType, (matchingInvocationHandler));
+        return getMatchingInvocationBuilder().startMatchingInvocation(name, mockedType, matchingInvocationHandler);
     }
 
+    protected synchronized MatchingInvocationBuilder getMatchingInvocationBuilder() {
+        MatchingInvocationBuilder matchingInvocationBuilder = matchingInvocationBuilderThreadLocal.get();
+        if (matchingInvocationBuilder == null) {
+            matchingInvocationBuilder = createMatchingInvocationBuilder();
+            matchingInvocationBuilderThreadLocal.set(matchingInvocationBuilder);
+        }
+        return matchingInvocationBuilder;
+    }
+
+    protected synchronized Scenario getScenario(Object testObject) {
+        Scenario scenario = scenarioThreadLocal.get();
+        if (scenario == null) {
+            scenario = createScenario(testObject);
+            scenarioThreadLocal.set(scenario);
+        }
+        return scenario;
+    }
 
     protected MockProxy<T> createMockProxy() {
-        return new MockProxy<T>(name, mockedType, oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, scenario, matchingInvocationBuilder);
+        return new MockProxy<T>(name, mockedType, oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, getCurrentScenario(), getMatchingInvocationBuilder());
     }
 
     protected MatchingInvocationHandler createOneTimeMatchingBehaviorDefiningMatchingInvocationHandler(MockBehavior mockBehavior) {
@@ -401,15 +417,15 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
     }
 
     protected MatchingInvocationHandler createAssertInvokedVerifyingMatchingInvocationHandler() {
-        return new AssertInvokedVerifyingMatchingInvocationHandler(scenario);
+        return new AssertInvokedVerifyingMatchingInvocationHandler(getCurrentScenario());
     }
 
     protected MatchingInvocationHandler createAssertInvokedInSequenceVerifyingMatchingInvocationHandler() {
-        return new AssertInvokedInSequenceVerifyingMatchingInvocationHandler(scenario);
+        return new AssertInvokedInSequenceVerifyingMatchingInvocationHandler(getCurrentScenario());
     }
 
     protected MatchingInvocationHandler createAssertNotInvokedVerifyingMatchingInvocationHandler() {
-        return new AssertNotInvokedVerifyingMatchingInvocationHandler(scenario);
+        return new AssertNotInvokedVerifyingMatchingInvocationHandler(getCurrentScenario());
     }
 
 

@@ -45,11 +45,11 @@ import java.util.Collection;
  * @see UnitilsJUnit4Test_TestClass1
  */
 @RunWith(Parameterized.class)
-public class UnitilsInvocationExceptionTest extends UnitilsInvocationTestBase {
+public class JUnitUnitilsInvocationExceptionTest extends UnitilsInvocationTestBase {
 
-    Class<?> testClass;
+    private Class<?> testClass;
 
-    public UnitilsInvocationExceptionTest(TestFramework testFramework, TestExecutor testExecutor, Class<?> testClass) {
+    public JUnitUnitilsInvocationExceptionTest(TestFramework testFramework, TestExecutor testExecutor, Class<?> testClass) {
         super(testFramework, testExecutor);
         this.testClass = testClass;
     }

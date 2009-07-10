@@ -15,6 +15,7 @@
  */
 package org.unitils;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,11 +50,11 @@ import java.util.Collection;
  * @see UnitilsJUnit4Test_TestClass2
  */
 @RunWith(Parameterized.class)
-public class UnitilsInvocationTest extends UnitilsInvocationTestBase {
+public class JUnitUnitilsInvocationTest extends UnitilsInvocationTestBase {
 
-    Class<?> testClass1, testClass2;
+    private Class<?> testClass1, testClass2;
 
-    public UnitilsInvocationTest(TestFramework testFramework, TestExecutor testExecutor, Class<?> testClass1, Class<?> testClass2) {
+    public JUnitUnitilsInvocationTest(TestFramework testFramework, TestExecutor testExecutor, Class<?> testClass1, Class<?> testClass2) {
         super(testFramework, testExecutor);
         this.testClass1 = testClass1;
         this.testClass2 = testClass2;
@@ -72,7 +73,13 @@ public class UnitilsInvocationTest extends UnitilsInvocationTestBase {
 
     @Before
     public void resetJunit3() {
+        UnitilsJUnit3Test_EmptyTestClass.setTracingTestListener(tracingTestListener);
         InjectionUtils.injectIntoStatic(null, UnitilsJUnit3.class, "currentTestClass");
+    }
+
+    @After
+    public void tearDown() {
+        UnitilsJUnit3Test_EmptyTestClass.setTracingTestListener(null);
     }
 
 

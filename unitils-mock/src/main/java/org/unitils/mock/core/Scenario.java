@@ -58,15 +58,12 @@ public class Scenario {
     }
 
 
-    public void setTestObject(Object testObject) {
-        if (this.testObject != testObject) {
-            reset();
-        }
-        this.testObject = testObject;
-    }
-
     public Object getTestObject() {
         return testObject;
+    }
+
+    public void setTestObject(Object testObject) {
+        this.testObject = testObject;
     }
 
 

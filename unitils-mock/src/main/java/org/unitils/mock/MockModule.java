@@ -85,7 +85,7 @@ public class MockModule implements Module {
 
 
     public Scenario getScenario() {
-        return MockObject.getScenario();
+        return MockObject.getCurrentScenario();
     }
 
 

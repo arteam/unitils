@@ -41,7 +41,7 @@ public class PartialMockObject<T> extends MockObject<T> implements PartialMock<T
 
     @Override
     protected MockProxy<T> createMockProxy() {
-        return new PartialMockProxy<T>(name, mockedType, oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, scenario, matchingInvocationBuilder);
+        return new PartialMockProxy<T>(name, mockedType, oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, getCurrentScenario(), getMatchingInvocationBuilder());
     }
 
 }

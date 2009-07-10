@@ -69,7 +69,7 @@ public class TestNGUnitilsInvocationTest extends UnitilsInvocationTestBase {
 
 
     @Before
-    public void init() throws Exception {
+    public void initialize() throws Exception {
         UnitilsTestNGTestBase.setTracingTestListener(tracingTestListener);
         UnitilsTestNGTest_EmptyTestClass.setTracingTestListener(tracingTestListener);
         UnitilsTestNGTest_GroupsTest.setTracingTestListener(tracingTestListener);
