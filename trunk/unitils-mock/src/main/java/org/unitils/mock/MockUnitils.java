@@ -29,7 +29,7 @@ public class MockUnitils {
 
 
     public static void assertNoMoreInvocations() {
-        MockObject.getScenario().assertNoMoreInvocations(getInvocationStackTrace(MockUnitils.class, false));
+        MockObject.getCurrentScenario().assertNoMoreInvocations(getInvocationStackTrace(MockUnitils.class, false));
     }
 
 

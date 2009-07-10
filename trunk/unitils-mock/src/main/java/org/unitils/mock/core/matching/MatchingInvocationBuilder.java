@@ -43,7 +43,7 @@ public class MatchingInvocationBuilder {
     protected StackTraceElement[] invokedAt;
 
 
-    public <T> T startMatchingInvocation(String mockName, Class<T> mockedType, MatchingInvocationHandler matchingInvocationHandler) {
+    public synchronized <T> T startMatchingInvocation(String mockName, Class<T> mockedType, MatchingInvocationHandler matchingInvocationHandler) {
         assertNotExpectingInvocation();
         this.currentMockName = mockName;
 
@@ -54,14 +54,14 @@ public class MatchingInvocationBuilder {
     }
 
 
-    public void reset() {
+    public synchronized void reset() {
         this.currentMockName = null;
         this.invokedAt = null;
         this.definingMethodName = null;
     }
 
 
-    public void assertNotExpectingInvocation() {
+    public synchronized void assertNotExpectingInvocation() {
         if (currentMockName != null && !currentMockName.contains(".")) {
             UnitilsException exception = new UnitilsException("Invalid syntax. " + currentMockName + "." + definingMethodName + "() must be followed by a method invocation on the returned proxy. E.g. " + currentMockName + "." + definingMethodName + "().myMethod();");
             exception.setStackTrace(invokedAt);

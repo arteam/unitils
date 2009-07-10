@@ -26,7 +26,6 @@ import static org.unitils.TracingTestListener.ListenerInvocation.*;
 import org.unitils.TracingTestListener.TestFramework;
 import static org.unitils.TracingTestListener.TestFramework.*;
 import static org.unitils.TracingTestListener.TestInvocation.*;
-import org.unitils.UnitilsInvocationTest.UnitilsJUnit3Test_EmptyTestClass;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.inject.util.InjectionUtils;
@@ -84,7 +83,6 @@ abstract public class UnitilsInvocationTestBase {
         tracingTestListener = new TracingTestListener();
 
         UnitilsJUnit3TestBase.setTracingTestListener(tracingTestListener);
-        UnitilsJUnit3Test_EmptyTestClass.setTracingTestListener(tracingTestListener);
         SpringUnitilsJUnit38TestBase.setTracingTestListener(tracingTestListener);
 
         UnitilsJUnit4TestBase.setTracingTestListener(tracingTestListener);
@@ -96,7 +94,6 @@ abstract public class UnitilsInvocationTestBase {
     @After
     public void cleanUp() throws Exception {
         UnitilsJUnit3TestBase.setTracingTestListener(null);
-        UnitilsJUnit3Test_EmptyTestClass.setTracingTestListener(null);
         SpringUnitilsJUnit38TestBase.setTracingTestListener(null);
 
         UnitilsJUnit4TestBase.setTracingTestListener(null);

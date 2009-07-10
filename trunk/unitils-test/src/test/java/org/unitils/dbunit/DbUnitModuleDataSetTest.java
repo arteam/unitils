@@ -153,10 +153,10 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit4 {
 
     @Test
     public void testInsertDataSet_defaultPackageDataSet() throws Exception {
-        Class<?> defaultPackageDataSetTestClass = Class.forName("DefaultPackageDataSetTest");
-        Object testInstance = defaultPackageDataSetTestClass.newInstance();
-        dbUnitModule.insertDataSet(defaultPackageDataSetTestClass.getMethod("testMethod1"), testInstance);
-        assertLoadedDataSet("DefaultPackageDataSetTest.xml");
+        Class<?> defaultPackageDataSetClass = Class.forName("DefaultPackageDataSet");
+        Object testInstance = defaultPackageDataSetClass.newInstance();
+        dbUnitModule.insertDataSet(defaultPackageDataSetClass.getMethod("testMethod1"), testInstance);
+        assertLoadedDataSet("DefaultPackageDataSet.xml");
     }
 
 

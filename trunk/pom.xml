@@ -19,7 +19,7 @@
         <module>unitils-spring</module>
         
         <module>unitils-test</module>
-        <module>unitils-testng-test</module>
+        <!--module>unitils-testng-test</module-->       <!-- todo convert tests to TestNG -->
     </modules>
 
     <!-- Project information -->

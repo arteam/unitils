@@ -38,8 +38,7 @@ public class ToplinkJpaProviderSupport implements JpaProviderSupport {
     }
 
 
-    public Object getProviderSpecificConfigurationObject(
-            PersistenceProvider persistenceProvider) {
+    public Object getProviderSpecificConfigurationObject(PersistenceProvider persistenceProvider) {
         return null;
     }
 

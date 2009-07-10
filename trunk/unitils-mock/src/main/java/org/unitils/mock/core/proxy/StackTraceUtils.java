@@ -15,6 +15,7 @@
  */
 package org.unitils.mock.core.proxy;
 
+import org.unitils.core.UnitilsException;
 import static org.unitils.mock.core.proxy.ProxyUtils.isProxyClassName;
 import static org.unitils.util.ReflectionUtils.getClassWithName;
 
@@ -55,7 +56,13 @@ public class StackTraceUtils {
         StackTraceElement[] currentStackTrace = Thread.currentThread().getStackTrace();
         for (int i = currentStackTrace.length - 1; i >= 0; i--) {
             String className = currentStackTrace[i].getClassName();
-            Class<?> clazz = getClassWithName(className);
+            Class<?> clazz;
+            try {
+                clazz = getClassWithName(className);
+            } catch (UnitilsException e) {
+                // unable to load class, this should never happen for the class we are looking for
+                continue;
+            }
             if (invokedInterface.isAssignableFrom(clazz) || isProxyClassName(className)) {
                 int index = included ? i : i + 1;
                 return getStackTraceStartingFrom(currentStackTrace, index);

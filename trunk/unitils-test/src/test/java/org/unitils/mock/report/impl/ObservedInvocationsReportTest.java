@@ -21,7 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.mock.Mock;
 import org.unitils.mock.core.MockObject;
-import static org.unitils.mock.core.MockObject.getScenario;
+import static org.unitils.mock.core.MockObject.getCurrentScenario;
 
 /**
  * Test for the creating an overview representation of a scenario.
@@ -57,7 +57,7 @@ public class ObservedInvocationsReportTest {
         testMock.getMock().testMethod1("value1");
         testMock.getMock().testMethod2();
 
-        String result = observedInvocationsView.createReport(getScenario().getObservedInvocations());
+        String result = observedInvocationsView.createReport(getCurrentScenario().getObservedInvocations());
 
         assertTrue(result.contains("testMethod1"));
         assertTrue(result.contains("testMethod2"));
@@ -69,7 +69,7 @@ public class ObservedInvocationsReportTest {
      */
     @Test
     public void testCreateView_noInvocations() {
-        String result = observedInvocationsView.createReport(getScenario().getObservedInvocations());
+        String result = observedInvocationsView.createReport(getCurrentScenario().getObservedInvocations());
         assertTrue(StringUtils.isEmpty(result));
     }
 
@@ -82,7 +82,7 @@ public class ObservedInvocationsReportTest {
     public void testCreateView_largeArgumentValue() {
         testMock.getMock().testMethod1("012345678901234567891");
 
-        String result = observedInvocationsView.createReport(getScenario().getObservedInvocations());
+        String result = observedInvocationsView.createReport(getCurrentScenario().getObservedInvocations());
         assertTrue(result.contains("string1"));
     }
 
@@ -96,7 +96,7 @@ public class ObservedInvocationsReportTest {
         testMock.returns("012345678901234567891").testMethod1(null);
         testMock.getMock().testMethod1(null);
 
-        String result = observedInvocationsView.createReport(getScenario().getObservedInvocations());
+        String result = observedInvocationsView.createReport(getCurrentScenario().getObservedInvocations());
         assertTrue(result.contains("string1"));
     }
 

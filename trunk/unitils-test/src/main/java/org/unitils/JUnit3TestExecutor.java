@@ -22,38 +22,43 @@ import junit.textui.TestRunner;
 
 
 class JUnit3TestExecutor implements TestExecutor {
-	
-	private TestResult result;
 
-	JUnit3TestExecutor() {
-		super();
-	}
-	
-	@SuppressWarnings("unchecked")
-	public void runTests(Class<?>... testClasses) throws Exception {
-		TestSuite suite = new TestSuite();
+    private TestResult result;
+
+    JUnit3TestExecutor() {
+        super();
+    }
+
+    @SuppressWarnings("unchecked")
+    public void runTests(Class<?>... testClasses) throws Exception {
+        TestSuite suite = new TestSuite();
         for (Class<?> testClass : testClasses) {
-        	Class<? extends TestCase> junit3TestClass = (Class<? extends TestCase>) testClass;
-        	suite.addTestSuite(junit3TestClass);
+            Class<? extends TestCase> junit3TestClass = (Class<? extends TestCase>) testClass;
+            suite.addTestSuite(junit3TestClass);
         }
         TestRunner testRunner = new TestRunner();
-        result = testRunner.doRun(suite);
-	}
-	
-	public void runTests(String testGroup, Class<?>... testClasses)
-			throws Exception {
-		runTests(testClasses);
-	}
 
-	public int getRunCount() {
-		return result.runCount();
-	}
+        try {
+            result = testRunner.doRun(suite);
+        } catch (Exception e) {
+            // ignore
+        }
+    }
 
-	public int getFailureCount() {
-		return result.errorCount() + result.failureCount();
-	}
+    public void runTests(String testGroup, Class<?>... testClasses)
+            throws Exception {
+        runTests(testClasses);
+    }
 
-	public int getIgnoreCount() {
-		return 0;
-	}
+    public int getRunCount() {
+        return result.runCount();
+    }
+
+    public int getFailureCount() {
+        return result.errorCount() + result.failureCount();
+    }
+
+    public int getIgnoreCount() {
+        return 0;
+    }
 }
