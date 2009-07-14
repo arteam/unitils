@@ -111,7 +111,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
     }
 
     //
-    // Implementation of the Mock and PartialMock interfaces
+    // Implementation of the Mock interfaces
     //
 
     /**
@@ -373,6 +373,10 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
         }
     }
 
+
+    public String getName() {
+        return name;
+    }
 
     protected T startMatchingInvocation(MatchingInvocationHandler matchingInvocationHandler) {
         return getMatchingInvocationBuilder().startMatchingInvocation(name, mockedType, matchingInvocationHandler);

@@ -19,7 +19,6 @@ import static org.apache.commons.lang.StringUtils.rightPad;
 import static org.apache.commons.lang.StringUtils.uncapitalize;
 import org.unitils.core.util.ObjectFormatter;
 import org.unitils.mock.core.proxy.ProxyInvocation;
-import org.unitils.mock.core.proxy.ProxyUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -134,10 +133,6 @@ public abstract class ProxyInvocationsReport {
      * @return A string representation of the object, not null
      */
     protected String formatObject(Object object) {
-        Class<?> proxiedType = ProxyUtils.getProxiedTypeIfProxy(object);
-        if (proxiedType != null) {
-            return "Mock<" + proxiedType.getSimpleName() + ">";
-        }
         return objectFormatter.format(object);
     }
 

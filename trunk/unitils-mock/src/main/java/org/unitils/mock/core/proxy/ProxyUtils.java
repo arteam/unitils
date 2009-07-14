@@ -19,6 +19,7 @@ import net.sf.cglib.proxy.*;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 import org.unitils.core.UnitilsException;
+import org.unitils.mock.core.MockObject;
 import static org.unitils.util.MethodUtils.*;
 
 import java.lang.reflect.Method;
@@ -97,9 +98,12 @@ public class ProxyUtils {
         }
         Class<?> type = object.getClass();
         if (object instanceof Factory) {
-            Callback callback = ((Factory) object).getCallback(0);
-            if (callback instanceof ProxyMethodInterceptor) {
-                return ((ProxyMethodInterceptor) callback).getProxiedType();
+            Callback[] callbacks = ((Factory) object).getCallbacks();
+            if (callbacks == null || callbacks.length == 0) {
+                return null;
+            }
+            if (callbacks[0] instanceof ProxyMethodInterceptor) {
+                return ((ProxyMethodInterceptor) callbacks[0]).getProxiedType();
             }
         }
         return null;
@@ -123,6 +127,28 @@ public class ProxyUtils {
 
     public static boolean isProxyClassName(String className) {
         return className.contains("$$EnhancerByCGLIB$$");
+    }
+
+
+    /**
+     * @param object The object to check
+     * @return The proxied type, null if the object is not a proxy or mock
+     */
+    public static String getMockName(Object object) {
+        if (object == null) {
+            return null;
+        }
+        if (object instanceof MockObject) {
+            return ((MockObject) object).getName();
+        }
+        Class<?> type = object.getClass();
+        if (object instanceof Factory) {
+            Callback callback = ((Factory) object).getCallback(0);
+            if (callback instanceof ProxyMethodInterceptor) {
+                return ((ProxyMethodInterceptor) callback).mockName;
+            }
+        }
+        return null;
     }
 
 
