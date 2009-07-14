@@ -22,7 +22,7 @@
     <orderEntry type="library" exported="" name="Maven: org.hibernate:hibernate:3.2.5.ga" level="project" />
     <orderEntry type="library" exported="" name="Maven: net.sf.ehcache:ehcache:1.2.3" level="project" />
     <orderEntry type="library" exported="" name="Maven: javax.transaction:jta:1.0.1B" level="project" />
-    <orderEntry type="library" exported="" name="Maven: asm:asm-attrs:1.5.3" level="project" />
+    <orderEntry type="library" exported="" name="Maven: asm:asm-attrs:2.2.3" level="project" />
     <orderEntry type="library" exported="" name="Maven: dom4j:dom4j:1.6.1" level="project" />
     <orderEntry type="library" exported="" name="Maven: antlr:antlr:2.7.6" level="project" />
     <orderEntry type="library" exported="" name="Maven: cglib:cglib:2.2" level="project" />

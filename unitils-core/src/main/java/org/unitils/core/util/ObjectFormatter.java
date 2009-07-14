@@ -111,12 +111,20 @@ public class ObjectFormatter {
         }
         Class<?> dummyObjectClass = getDummyObjectClass();
         if (dummyObjectClass != null && dummyObjectClass.isAssignableFrom(object.getClass())) {
+            result.append("Dummy<");
             result.append(object.toString());
+            result.append(">");
             return;
         }
         Class<?> type = object.getClass();
         if (type.isPrimitive() || type.isEnum()) {
             result.append(String.valueOf(object));
+            return;
+        }
+        if (formatMock(object, result)) {
+            return;
+        }
+        if (formatProxy(object, result)) {
             return;
         }
         if (type.getName().startsWith("java.lang")) {
@@ -304,6 +312,39 @@ public class ObjectFormatter {
     }
 
 
+    protected boolean formatMock(Object object, StringBuilder result) {
+        try {
+            Class<?> proxyUtilsClass = getProxyUtilsClass();
+            if (proxyUtilsClass == null) {
+                return false;
+            }
+            String mockName = (String) proxyUtilsClass.getMethod("getMockName", Object.class).invoke(null, object);
+            if (mockName == null) {
+                return false;
+            }
+            result.append("Mock<");
+            result.append(mockName);
+            result.append(">");
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+
+    protected boolean formatProxy(Object object, StringBuilder result) {
+        String className = getShortClassName(object.getClass());
+        int index = className.indexOf("..EnhancerByCGLIB..");
+        if (index > 0) {
+            result.append("Proxy<");
+            result.append(className.substring(0, index));
+            result.append(">");
+            return true;
+        }
+        return false;
+    }
+
+
     /**
      * @return The interface that represents a dummy object. If the DummyObject interface is not in the
      *         classpath, null is returned.
@@ -311,6 +352,19 @@ public class ObjectFormatter {
     protected Class<?> getDummyObjectClass() {
         try {
             return Class.forName("org.unitils.mock.dummy.DummyObject");
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
+
+
+    /**
+     * @return The proxy utils. null if not in classpath
+     */
+    protected Class<?> getProxyUtilsClass() {
+        try {
+
+            return Class.forName("org.unitils.mock.core.proxy.ProxyUtils");
         } catch (ClassNotFoundException e) {
             return null;
         }
