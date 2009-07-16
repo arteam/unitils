@@ -38,6 +38,12 @@ import java.util.*;
 public class ObservedInvocationsReport extends ProxyInvocationsReport {
 
 
+
+    public ObservedInvocationsReport(Object testedObject) {
+        super(testedObject);
+    }
+
+
     /**
      * Creates a string representation of the given invocations as described in the class javadoc.
      *
@@ -87,9 +93,10 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
         result.append('(');
         Class<?>[] argumentTypes = method.getParameterTypes();
         if (argumentTypes.length > 0) {
-            Iterator<Object> arguments = observedInvocation.getArgumentsAtInvocationTime().iterator();
+            Iterator<Object> arguments = observedInvocation.getArguments().iterator();
+            Iterator<Object> argumentsAtInvocationTime = observedInvocation.getArgumentsAtInvocationTime().iterator();
             for (Class<?> argumentType : argumentTypes) {
-                result.append(formatValue(arguments.next(), argumentType, currentLargeObjects, allLargeObjects, largeObjectNameIndexes));
+                result.append(formatValue(argumentsAtInvocationTime.next(), arguments.next(), argumentType, currentLargeObjects, allLargeObjects, largeObjectNameIndexes));
                 result.append(", ");
             }
             // remove the last comma
@@ -101,7 +108,9 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
         Class<?> resultType = method.getReturnType();
         if (!Void.TYPE.equals(resultType)) {
             result.append(" -> ");
-            result.append(formatValue(observedInvocation.getResultAtInvocationTime(), resultType, currentLargeObjects, allLargeObjects, largeObjectNameIndexes));
+            Object resultValue = observedInvocation.getResult();
+            Object resultAtInvocationTime = observedInvocation.getResultAtInvocationTime();
+            result.append(formatValue(resultAtInvocationTime, resultValue, resultType, currentLargeObjects, allLargeObjects, largeObjectNameIndexes));
         }
         return result.toString();
     }

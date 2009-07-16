@@ -43,8 +43,8 @@ public class ObservedInvocationsReportTest {
      * Initializes the test.
      */
     @Before
-    public void setUp() {
-        observedInvocationsView = new ObservedInvocationsReport();
+    public void initialize() {
+        observedInvocationsView = new ObservedInvocationsReport(this);
         testMock = new MockObject<TestInterface>("testMock", TestInterface.class, this);
     }
 
@@ -53,12 +53,11 @@ public class ObservedInvocationsReportTest {
      * Test for creating a view containing 2 mock invocations.
      */
     @Test
-    public void testCreateView() {
+    public void createReport() {
         testMock.getMock().testMethod1("value1");
         testMock.getMock().testMethod2();
 
         String result = observedInvocationsView.createReport(getCurrentScenario().getObservedInvocations());
-
         assertTrue(result.contains("testMethod1"));
         assertTrue(result.contains("testMethod2"));
     }
@@ -68,7 +67,7 @@ public class ObservedInvocationsReportTest {
      * Test for creating a view when there were no mock invocations.
      */
     @Test
-    public void testCreateView_noInvocations() {
+    public void noInvocations() {
         String result = observedInvocationsView.createReport(getCurrentScenario().getObservedInvocations());
         assertTrue(StringUtils.isEmpty(result));
     }
@@ -79,7 +78,7 @@ public class ObservedInvocationsReportTest {
      * This value should have been replaced inline by string1 and then appended afterwards in a separate list.
      */
     @Test
-    public void testCreateView_largeArgumentValue() {
+    public void largeArgumentValue() {
         testMock.getMock().testMethod1("012345678901234567891");
 
         String result = observedInvocationsView.createReport(getCurrentScenario().getObservedInvocations());
@@ -92,7 +91,7 @@ public class ObservedInvocationsReportTest {
      * This value should have been replaced inline by string1 and then appended afterwards in a separate list.
      */
     @Test
-    public void testCreateView_largeResultValue() {
+    public void largeResultValue() {
         testMock.returns("012345678901234567891").testMethod1(null);
         testMock.getMock().testMethod1(null);
 

@@ -157,13 +157,13 @@ public class Scenario {
 
 
     public String createObservedInvocationsReport() {
-        ObservedInvocationsReport observedInvocationsReport = new ObservedInvocationsReport();
+        ObservedInvocationsReport observedInvocationsReport = new ObservedInvocationsReport(testObject);
         return observedInvocationsReport.createReport(this.getObservedInvocations());
     }
 
 
     public String createDetailedObservedInvocationsReport() {
-        DetailedObservedInvocationsReport observedInvocationsReport = new DetailedObservedInvocationsReport();
+        DetailedObservedInvocationsReport observedInvocationsReport = new DetailedObservedInvocationsReport(testObject);
         return observedInvocationsReport.createReport(this.getObservedInvocations());
     }
 
@@ -187,8 +187,6 @@ public class Scenario {
         return message.toString();
     }
 
-
-    // todo check message
     protected String getAssertInvokedErrorMessage(ProxyInvocation proxyInvocation, StackTraceElement invokedAt) {
         StringBuilder message = new StringBuilder();
         message.append("Expected invocation of ");
@@ -199,7 +197,6 @@ public class Scenario {
         message.append(createFullReport());
         return message.toString();
     }
-
 
     protected String getInvokedOutOfOrderErrorMessage(BehaviorDefiningInvocation behaviorDefiningInvocation, ObservedInvocation matchingInvocation, ObservedInvocation outOfOrderInvocation, StackTraceElement assertedAt) {
         StringBuilder message = new StringBuilder();
@@ -214,11 +211,10 @@ public class Scenario {
         return message.toString();
     }
 
-
     protected String getNoMoreInvocationsErrorMessage(List<ObservedInvocation> unexpectedInvocations, StackTraceElement assertedAt) {
         StringBuilder message = new StringBuilder();
         message.append("No more invocations expected, yet observed following calls:\n");
-        message.append(new ObservedInvocationsReport().createReport(unexpectedInvocations));
+        message.append(new ObservedInvocationsReport(testObject).createReport(unexpectedInvocations));
         message.append(getAssertLocationIndication(assertedAt));
         message.append("\n\n");
         message.append(createFullReport());

@@ -193,6 +193,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
     @MatchStatement
     public T raises(Class<? extends Throwable> exceptionClass) {
         Throwable exception = createInstanceOfType(exceptionClass);
+        exception.fillInStackTrace();
         MatchingInvocationHandler matchingInvocationHandler = createAlwaysMatchingBehaviorDefiningMatchingInvocationHandler(new ExceptionThrowingMockBehavior(exception));
         return startMatchingInvocation(matchingInvocationHandler);
     }

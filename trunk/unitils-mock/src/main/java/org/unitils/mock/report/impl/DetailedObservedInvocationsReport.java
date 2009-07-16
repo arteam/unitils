@@ -17,10 +17,10 @@ package org.unitils.mock.report.impl;
 
 import org.unitils.mock.core.BehaviorDefiningInvocation;
 import org.unitils.mock.core.ObservedInvocation;
+import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
 import org.unitils.mock.mockbehavior.impl.OriginalBehaviorInvokingMockBehavior;
-import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.util.*;
 
@@ -50,6 +50,11 @@ import java.util.*;
  * @author Tim Ducheyne
  */
 public class DetailedObservedInvocationsReport extends ObservedInvocationsReport {
+
+
+    public DetailedObservedInvocationsReport(Object testedObject) {
+        super(testedObject);
+    }
 
 
     /**
