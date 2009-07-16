@@ -16,7 +16,6 @@
 package org.unitils.mock.core;
 
 import org.unitils.mock.core.matching.MatchingInvocationBuilder;
-import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.proxy.ProxyInvocationHandler;
 import static org.unitils.mock.core.proxy.ProxyUtils.createProxy;
@@ -59,21 +58,22 @@ public class MockProxy<T> {
 
         BehaviorDefiningInvocation behaviorDefiningInvocation = getMatchingBehaviorDefiningInvocation(proxyInvocation);
         MockBehavior mockBehavior = getMockBehavior(proxyInvocation, behaviorDefiningInvocation);
+        Object result = performMockBehavior(proxyInvocation, mockBehavior);
 
-        ObservedInvocation mockInvocation = new ObservedInvocation(proxyInvocation, behaviorDefiningInvocation, mockBehavior);
-        scenario.addObservedMockInvocation(mockInvocation);
-
-        Object result = null;
-        if (mockBehavior != null) {
-            // check whether the mock behavior can applied for this invocation
-            if (mockBehavior instanceof ValidatableMockBehavior) {
-                ((ValidatableMockBehavior) mockBehavior).assertCanExecute(proxyInvocation);
-            }
-            result = mockBehavior.execute(proxyInvocation);
-        }
-
-        mockInvocation.setResultAtInvocationTime(createDeepClone(result));
+        scenario.addObservedMockInvocation(new ObservedInvocation(result, proxyInvocation, behaviorDefiningInvocation, mockBehavior));
         return result;
+    }
+
+
+    protected Object performMockBehavior(ProxyInvocation proxyInvocation, MockBehavior mockBehavior) throws Throwable {
+        if (mockBehavior == null) {
+            return null;
+        }
+        // check whether the mock behavior can applied for this invocation
+        if (mockBehavior instanceof ValidatableMockBehavior) {
+            ((ValidatableMockBehavior) mockBehavior).assertCanExecute(proxyInvocation);
+        }
+        return mockBehavior.execute(proxyInvocation);
     }
 
 

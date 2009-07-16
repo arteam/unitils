@@ -19,9 +19,14 @@ import static org.apache.commons.lang.StringUtils.rightPad;
 import static org.apache.commons.lang.StringUtils.uncapitalize;
 import org.unitils.core.util.ObjectFormatter;
 import org.unitils.mock.core.proxy.ProxyInvocation;
+import static org.unitils.util.ReflectionUtils.getAllFields;
+import static org.unitils.util.ReflectionUtils.getFieldValue;
 
+import java.lang.reflect.Field;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A base class for reports about proxy invocations.
@@ -42,10 +47,15 @@ public abstract class ProxyInvocationsReport {
      */
     public static int MAX_INLINE_PARAMETER_LENGTH = 20;
 
-    /**
-     * Formatter for arguments and return values
-     */
+
     protected ObjectFormatter objectFormatter = new ObjectFormatter(OBJECT_FORMATTER_MAX_RECURSION_DEPT);
+
+    protected Map<Object, String> testedObjectFieldValuesAndNames;
+
+
+    public ProxyInvocationsReport(Object testedObject) {
+        testedObjectFieldValuesAndNames = getFieldValuesAndNames(testedObject);
+    }
 
 
     /**
@@ -66,31 +76,36 @@ public abstract class ProxyInvocationsReport {
      * <p/>
      * E.g. string1, myClass1
      *
-     * @param object                 The value to format, not null
+     * @param valueAtInvocationTime  The value to format, not null
+     * @param value                  The value to format by reference, not null
      * @param type                   The type of the large value, not null
      * @param currentLargeObjects    The current the large values, not null
      * @param allLargeObjects        All large values per value, not null
      * @param largeObjectNameIndexes The current indexes to use for the large value names (per value type), not null
      * @return The value or the replaced name, not null
      */
-    protected String formatValue(Object object, Class<?> type, List<FormattedObject> currentLargeObjects, Map<Object, FormattedObject> allLargeObjects, Map<Class<?>, Integer> largeObjectNameIndexes) {
-        if (allLargeObjects.containsKey(object)) {
-            FormattedObject formattedObject = allLargeObjects.get(object);
+    protected String formatValue(Object valueAtInvocationTime, Object value, Class<?> type, List<FormattedObject> currentLargeObjects, Map<Object, FormattedObject> allLargeObjects, Map<Class<?>, Integer> largeObjectNameIndexes) {
+        if (allLargeObjects.containsKey(valueAtInvocationTime)) {
+            FormattedObject formattedObject = allLargeObjects.get(valueAtInvocationTime);
             currentLargeObjects.add(formattedObject);
             return formattedObject.getName();
         }
 
-        String objectRepresentation = formatObject(object);
-        if (objectRepresentation.length() <= MAX_INLINE_PARAMETER_LENGTH) {
-            // The object representation is small enough to be shown inline
-            return objectRepresentation;
+        String objectRepresentation = formatObject(valueAtInvocationTime);
+
+        String valueName = testedObjectFieldValuesAndNames.get(value);
+        if (valueName == null) {
+            if (objectRepresentation.length() <= MAX_INLINE_PARAMETER_LENGTH) {
+                // The object representation is small enough to be shown inline
+                return objectRepresentation;
+            }
+            // The object representation is to large to be shown inline. Generate a name for it, which can be shown as a replacement.
+            valueName = createLargeValueName(type, largeObjectNameIndexes);
         }
-        // The object representation is to large to be shown inline. Generate a name for it, which can be shown as a replacement.
-        String largeObjectName = createLargeValueName(type, largeObjectNameIndexes);
-        FormattedObject formattedObject = new FormattedObject(largeObjectName, objectRepresentation);
-        allLargeObjects.put(object, formattedObject);
+        FormattedObject formattedObject = new FormattedObject(valueName, objectRepresentation);
+        allLargeObjects.put(valueAtInvocationTime, formattedObject);
         currentLargeObjects.add(formattedObject);
-        return largeObjectName;
+        return valueName;
     }
 
 
@@ -134,6 +149,28 @@ public abstract class ProxyInvocationsReport {
      */
     protected String formatObject(Object object) {
         return objectFormatter.format(object);
+    }
+
+
+    /**
+     * Gets all the field values in the given test object with their corresponding field names.
+     *
+     * @param testedObject The test object
+     * @return The values and names in an identity map, empty if tested object is null
+     */
+    protected Map<Object, String> getFieldValuesAndNames(Object testedObject) {
+        Map<Object, String> result = new IdentityHashMap<Object, String>();
+        if (testedObject == null) {
+            return result;
+        }
+        Set<Field> fields = getAllFields(testedObject.getClass());
+        for (Field field : fields) {
+            Object value = getFieldValue(testedObject, field);
+            if (value != null) {
+                result.put(value, field.getName());
+            }
+        }
+        return result;
     }
 
 

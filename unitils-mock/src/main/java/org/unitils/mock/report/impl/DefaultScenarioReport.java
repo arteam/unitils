@@ -47,7 +47,7 @@ public class DefaultScenarioReport implements ScenarioReport {
             return "No invocations observed.\n";
         }
         result.append("Observed scenario:\n\n");
-        result.append(new ObservedInvocationsReport().createReport(observedInvocations));
+        result.append(new ObservedInvocationsReport(scenario.getTestObject()).createReport(observedInvocations));
         result.append("\n");
 
         String suggestedAssertsReport = new SuggestedAssertsReport().createReport(scenario.getTestObject(), observedInvocations);
@@ -58,7 +58,7 @@ public class DefaultScenarioReport implements ScenarioReport {
         }
 
         result.append("\nDetailed scenario:\n\n");
-        result.append(new DetailedObservedInvocationsReport().createReport(observedInvocations));
+        result.append(new DetailedObservedInvocationsReport(scenario.getTestObject()).createReport(observedInvocations));
 
         return result.toString();
     }

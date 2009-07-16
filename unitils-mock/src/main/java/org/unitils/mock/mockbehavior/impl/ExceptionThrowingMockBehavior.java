@@ -16,8 +16,10 @@
 package org.unitils.mock.mockbehavior.impl;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
+import org.unitils.mock.Mock;
 import org.unitils.mock.core.proxy.ProxyInvocation;
+import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationStackTrace;
+import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
 
 import java.util.Arrays;
 
@@ -72,6 +74,7 @@ public class ExceptionThrowingMockBehavior implements ValidatableMockBehavior {
      * @return Nothing
      */
     public Object execute(ProxyInvocation proxyInvocation) throws Throwable {
+        exceptionToThrow.setStackTrace(getInvocationStackTrace(Mock.class, false));
         throw exceptionToThrow;
     }
 
