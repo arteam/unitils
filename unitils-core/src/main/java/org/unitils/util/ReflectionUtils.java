@@ -76,12 +76,27 @@ public class ReflectionUtils {
      * @throws UnitilsException If an instance could not be created
      */
     public static <T> T createInstanceOfType(Class<T> type, boolean bypassAccessibility) {
+        return createInstanceOfType(type, bypassAccessibility, new Class[0], new Object[0]);
+    }
+
+    /**
+     * Creates an instance of the given type
+     *
+     * @param <T>                 The type of the instance
+     * @param type                The type of the instance
+     * @param bypassAccessibility If true, no exception is thrown if the parameterless constructor is not public
+     * @param argumentTypes       The constructor arg types, not null
+     * @param arguments           The constructor args, not null
+     * @return An instance of this type
+     * @throws UnitilsException If an instance could not be created
+     */
+    public static <T> T createInstanceOfType(Class<T> type, boolean bypassAccessibility, Class[] argumentTypes, Object[] arguments) {
         try {
-            Constructor<T> constructor = type.getDeclaredConstructor();
+            Constructor<T> constructor = type.getDeclaredConstructor(argumentTypes);
             if (bypassAccessibility) {
                 constructor.setAccessible(true);
             }
-            return constructor.newInstance();
+            return constructor.newInstance(arguments);
 
         } catch (InvocationTargetException e) {
             throw new UnitilsException("Error while trying to create object of class " + type.getName(), e.getCause());

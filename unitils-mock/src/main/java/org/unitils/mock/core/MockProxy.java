@@ -16,9 +16,9 @@
 package org.unitils.mock.core;
 
 import org.unitils.mock.core.matching.MatchingInvocationBuilder;
+import static org.unitils.mock.core.proxy.ProxyFactory.createProxy;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.proxy.ProxyInvocationHandler;
-import static org.unitils.mock.core.proxy.ProxyUtils.createProxy;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
@@ -43,7 +43,7 @@ public class MockProxy<T> {
         this.alwaysMatchingBehaviorDefiningInvocations = alwaysMatchingBehaviorDefiningInvocations;
         this.scenario = scenario;
         this.matchingInvocationBuilder = matchingInvocationBuilder;
-        this.proxy = createProxy(mockName, mockedType, new Class<?>[]{Cloneable.class}, new InvocationHandler());
+        this.proxy = createProxy(mockName, new InvocationHandler(), mockedType, Cloneable.class);
     }
 
 
@@ -58,9 +58,19 @@ public class MockProxy<T> {
 
         BehaviorDefiningInvocation behaviorDefiningInvocation = getMatchingBehaviorDefiningInvocation(proxyInvocation);
         MockBehavior mockBehavior = getMockBehavior(proxyInvocation, behaviorDefiningInvocation);
-        Object result = performMockBehavior(proxyInvocation, mockBehavior);
+
+        Throwable throwable = null;
+        Object result = null;
+        try {
+            result = performMockBehavior(proxyInvocation, mockBehavior);
+        } catch (Throwable t) {
+            throwable = t;
+        }
 
         scenario.addObservedMockInvocation(new ObservedInvocation(result, proxyInvocation, behaviorDefiningInvocation, mockBehavior));
+        if (throwable != null) {
+            throw throwable;
+        }
         return result;
     }
 

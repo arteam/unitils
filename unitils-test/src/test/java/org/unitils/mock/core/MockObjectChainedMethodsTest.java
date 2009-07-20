@@ -30,9 +30,6 @@ public class MockObjectChainedMethodsTest {
     /* Class under test */
     private MockObject<TestClass> mockObject;
 
-    /* Class under test */
-    private MockObject<TestClass> mockObject2;
-
 
     @Before
     public void setUp() {
@@ -45,18 +42,56 @@ public class MockObjectChainedMethodsTest {
         mockObject.returns("value").getTestClass().getValue();
 
         String result = mockObject.getMock().getTestClass().getValue();
-
         assertEquals("value", result);
     }
-
 
     @Test
     public void doubleChainedBehavior() {
         mockObject.returns("value").getTestClass().getTestClass().getValue();
 
         String result = mockObject.getMock().getTestClass().getTestClass().getValue();
-
         assertEquals("value", result);
+    }
+
+    @Test
+    public void chainedAssertInvoked() {
+        mockObject.returns("value").getTestClass().getValue();
+
+        mockObject.getMock().getTestClass().getValue();
+        mockObject.assertInvoked().getTestClass().getValue();
+    }
+
+    @Test
+    public void chainedAssertNotInvoked() {
+        mockObject.assertNotInvoked().getTestClass().getValue();
+    }
+
+    @Test(expected = AssertionError.class)
+    public void chainedAssertNotInvokedButInvoked() {
+        mockObject.returns("value").getTestClass().getValue();
+
+        mockObject.getMock().getTestClass().getValue();
+        mockObject.assertNotInvoked().getTestClass().getValue();
+    }
+
+
+    @Test
+    public void chainedAssertInvokedInSequence() {
+        mockObject.returns("value").getTestClass().getValue();
+
+        mockObject.getMock().getTestClass().getValue();
+        mockObject.getMock().getTestClass().getValue();
+        mockObject.assertInvokedInSequence().getTestClass().getValue();
+        mockObject.assertInvokedInSequence().getTestClass().getValue();
+    }
+
+    @Test(expected = AssertionError.class)
+    public void chainedAssertInvokedInSequenceButNotInvoked() {
+        mockObject.returns("value").getTestClass().getValue();
+
+        mockObject.getMock().getTestClass().getValue();
+        mockObject.assertInvokedInSequence().getTestClass().getValue();
+        mockObject.assertInvokedInSequence().getTestClass().getValue();
     }
 
 

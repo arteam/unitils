@@ -21,9 +21,9 @@ import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
 import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
 import org.unitils.mock.argumentmatcher.impl.DefaultArgumentMatcher;
+import static org.unitils.mock.core.proxy.ProxyFactory.createUninitializedProxy;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.proxy.ProxyInvocationHandler;
-import static org.unitils.mock.core.proxy.ProxyUtils.createProxy;
 import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationStackTrace;
 
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public class MatchingInvocationBuilder {
         this.invokedAt = getInvocationStackTrace(Mock.class);
         this.definingMethodName = invokedAt[0].getMethodName();
         ArgumentMatcherRepository.getInstance().registerStartOfMatchingInvocation(invokedAt[1].getLineNumber());
-        return createProxy(mockName, mockedType, new InvocationHandler(matchingInvocationHandler));
+        return createUninitializedProxy(mockName, new InvocationHandler(matchingInvocationHandler), mockedType);
     }
 
 
