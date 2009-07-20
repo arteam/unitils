@@ -24,7 +24,7 @@ import org.unitils.mock.core.matching.impl.AssertInvokedInSequenceVerifyingMatch
 import org.unitils.mock.core.matching.impl.AssertInvokedVerifyingMatchingInvocationHandler;
 import org.unitils.mock.core.matching.impl.AssertNotInvokedVerifyingMatchingInvocationHandler;
 import org.unitils.mock.core.matching.impl.BehaviorDefiningMatchingInvocationHandler;
-import static org.unitils.mock.core.proxy.ProxyUtils.createInstanceOfType;
+import static org.unitils.mock.core.proxy.ProxyFactory.createInitializedOrUnitializedInstanceOfType;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.ExceptionThrowingMockBehavior;
 import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
@@ -192,7 +192,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
      */
     @MatchStatement
     public T raises(Class<? extends Throwable> exceptionClass) {
-        Throwable exception = createInstanceOfType(exceptionClass);
+        Throwable exception = createInitializedOrUnitializedInstanceOfType(exceptionClass);
         exception.fillInStackTrace();
         MatchingInvocationHandler matchingInvocationHandler = createAlwaysMatchingBehaviorDefiningMatchingInvocationHandler(new ExceptionThrowingMockBehavior(exception));
         return startMatchingInvocation(matchingInvocationHandler);
@@ -281,7 +281,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
      */
     @MatchStatement
     public T onceRaises(Class<? extends Throwable> exceptionClass) {
-        Throwable exception = createInstanceOfType(exceptionClass);
+        Throwable exception = createInitializedOrUnitializedInstanceOfType(exceptionClass);
         MatchingInvocationHandler matchingInvocationHandler = createOneTimeMatchingBehaviorDefiningMatchingInvocationHandler(new ExceptionThrowingMockBehavior(exception));
         return startMatchingInvocation(matchingInvocationHandler);
     }
@@ -422,15 +422,15 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
     }
 
     protected MatchingInvocationHandler createAssertInvokedVerifyingMatchingInvocationHandler() {
-        return new AssertInvokedVerifyingMatchingInvocationHandler(getCurrentScenario());
+        return new AssertInvokedVerifyingMatchingInvocationHandler(getCurrentScenario(), this);
     }
 
     protected MatchingInvocationHandler createAssertInvokedInSequenceVerifyingMatchingInvocationHandler() {
-        return new AssertInvokedInSequenceVerifyingMatchingInvocationHandler(getCurrentScenario());
+        return new AssertInvokedInSequenceVerifyingMatchingInvocationHandler(getCurrentScenario(), this);
     }
 
     protected MatchingInvocationHandler createAssertNotInvokedVerifyingMatchingInvocationHandler() {
-        return new AssertNotInvokedVerifyingMatchingInvocationHandler(getCurrentScenario());
+        return new AssertNotInvokedVerifyingMatchingInvocationHandler(getCurrentScenario(), this);
     }
 
 

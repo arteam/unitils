@@ -362,7 +362,6 @@ public class DBMaintainer {
         for (Script script : postProcessingScripts) {
             try {
                 logger.info("Executing post processing script " + script.getFileName());
-
                 scriptRunner.execute(script.getScriptContentHandle());
 
             } catch (UnitilsException e) {

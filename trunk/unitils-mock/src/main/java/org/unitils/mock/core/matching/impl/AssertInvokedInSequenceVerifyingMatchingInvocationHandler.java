@@ -15,29 +15,30 @@
  */
 package org.unitils.mock.core.matching.impl;
 
-import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+import org.unitils.mock.Mock;
 import org.unitils.mock.core.BehaviorDefiningInvocation;
+import org.unitils.mock.core.MockFactory;
 import org.unitils.mock.core.Scenario;
-import org.unitils.mock.core.matching.MatchingInvocationHandler;
-import org.unitils.mock.core.proxy.ProxyInvocation;
-
-import java.util.List;
-
-public class AssertInvokedInSequenceVerifyingMatchingInvocationHandler implements MatchingInvocationHandler {
-
-    /* The scenario that will record all observed invocations */
-    protected Scenario scenario;
 
 
-    public AssertInvokedInSequenceVerifyingMatchingInvocationHandler(Scenario scenario) {
-        this.scenario = scenario;
+/**
+ * @author Tim Ducheyne
+ * @author Filip Neven
+ */
+public class AssertInvokedInSequenceVerifyingMatchingInvocationHandler extends AssertVerifyingMatchingInvocationHandler {
+
+
+    public AssertInvokedInSequenceVerifyingMatchingInvocationHandler(Scenario scenario, MockFactory mockFactory) {
+        super(scenario, mockFactory);
     }
 
 
-    public Object handleInvocation(ProxyInvocation proxyInvocation, List<ArgumentMatcher> argumentMatchers) throws Throwable {
-        BehaviorDefiningInvocation behaviorDefiningInvocation = new BehaviorDefiningInvocation(proxyInvocation, null, argumentMatchers);
+    protected void performAssertion(Scenario scenario, BehaviorDefiningInvocation behaviorDefiningInvocation) {
         scenario.assertInvokedInOrder(behaviorDefiningInvocation);
-        return null;
+    }
+
+    protected Object performChainedAssertion(Mock<?> mock) {
+        return mock.assertInvokedInSequence();
     }
 
 }

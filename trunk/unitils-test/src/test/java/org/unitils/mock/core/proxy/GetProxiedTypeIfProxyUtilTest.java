@@ -18,11 +18,11 @@ package org.unitils.mock.core.proxy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import org.junit.Test;
-import static org.unitils.mock.core.proxy.ProxyUtils.createProxy;
+import static org.unitils.mock.core.proxy.ProxyFactory.createProxy;
 import static org.unitils.mock.core.proxy.ProxyUtils.getProxiedTypeIfProxy;
 
 /**
- * Tests the get proxied type behavior
+ * Tests getting the proxied type from a proxy.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -32,7 +32,7 @@ public class GetProxiedTypeIfProxyUtilTest {
 
     @Test
     public void proxyInterface() {
-        Object proxy = createProxy("mock", TestInterface.class, new DummyProxyInvocationHandler());
+        Object proxy = createProxy("mock", new DummyProxyInvocationHandler(), TestInterface.class);
         Class<?> result = getProxiedTypeIfProxy(proxy);
 
         assertEquals(TestInterface.class, result);
@@ -41,7 +41,7 @@ public class GetProxiedTypeIfProxyUtilTest {
 
     @Test
     public void proxyClass() {
-        Object proxy = createProxy("mock", TestClass.class, new DummyProxyInvocationHandler());
+        Object proxy = createProxy("mock", new DummyProxyInvocationHandler(), TestClass.class);
         Class<?> result = getProxiedTypeIfProxy(proxy);
 
         assertEquals(TestClass.class, result);

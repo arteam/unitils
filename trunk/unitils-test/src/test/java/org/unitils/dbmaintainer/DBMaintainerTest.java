@@ -208,9 +208,9 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         } catch (UnitilsException e) {
             // Expected
         }
-
         assertScriptsExecutedAndDbVersionSet();
     }
+
 
     @Test
     public void testUpdateDatabase_isInitialFromScratchUpdate() {
