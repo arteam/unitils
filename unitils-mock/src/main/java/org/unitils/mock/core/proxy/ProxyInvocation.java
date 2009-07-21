@@ -98,6 +98,23 @@ public abstract class ProxyInvocation {
 
 
     /**
+     * @return The nr of arguments at invocation time that were not null
+     */
+    public int getNrOfNotNullArguments() {
+        if (argumentsAtInvocationTime == null) {
+            return 0;
+        }
+        int count = 0;
+        for (Object argument : argumentsAtInvocationTime) {
+            if (argument != null) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+
+    /**
      * @return The name of the mock, e.g. the field name, not null
      */
     public String getMockName() {

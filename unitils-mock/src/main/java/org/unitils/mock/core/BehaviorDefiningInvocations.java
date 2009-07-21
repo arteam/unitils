@@ -18,9 +18,15 @@ package org.unitils.mock.core;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
+
+/**
+ * todo javadoc
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
+ */
 public class BehaviorDefiningInvocations {
 
     protected boolean removeWhenUsed;
@@ -43,18 +49,38 @@ public class BehaviorDefiningInvocations {
     }
 
 
+    /**
+     * First we find all behavior defining invocations that have matching argument matchers. From these matching
+     * invocations, we then count the nr of not-null (default) arguments. The result will be the
+     * invocation with the lowest number of not-null arguments. If there are multiple invocations with the same
+     * number, the first one is returned. E.g.
+     *
+     * myMethod(null, null);
+     * myMethod("a", null);
+     *
+     * The second one will be returned if the given proxy invocation has the value "a" as first argument.
+     *
+     * @param proxyInvocation The actual invocation to match with, not null
+     * @return The behavior defining invocation that matches best with the actual invocation, null if none found
+     */
     public BehaviorDefiningInvocation getMatchingBehaviorDefiningInvocation(ProxyInvocation proxyInvocation) {
-        Iterator<BehaviorDefiningInvocation> iterator = behaviorDefiningInvocations.iterator();
-        while (iterator.hasNext()) {
-            BehaviorDefiningInvocation behaviorDefiningInvocation = iterator.next();
-            if (behaviorDefiningInvocation.matches(proxyInvocation)) {
-                if (removeWhenUsed) {
-                    iterator.remove();
-                }
-                return behaviorDefiningInvocation;
+        BehaviorDefiningInvocation bestMatchingBehaviorDefiningInvocation = null;
+        int bestMatchingNrOfNotNullArguments = -1;
+
+        for (BehaviorDefiningInvocation behaviorDefiningInvocation : behaviorDefiningInvocations) {
+            if (!behaviorDefiningInvocation.matches(proxyInvocation)) {
+                continue;
+            }
+            int nrOfNotNullArguments = behaviorDefiningInvocation.getNrOfNotNullArguments();
+            if (nrOfNotNullArguments > bestMatchingNrOfNotNullArguments) {
+                bestMatchingBehaviorDefiningInvocation = behaviorDefiningInvocation;
+                bestMatchingNrOfNotNullArguments = nrOfNotNullArguments;
             }
         }
-        return null;
+        if (removeWhenUsed && bestMatchingBehaviorDefiningInvocation != null) {
+            behaviorDefiningInvocations.remove(bestMatchingBehaviorDefiningInvocation);
+        }
+        return bestMatchingBehaviorDefiningInvocation;
     }
 
 
