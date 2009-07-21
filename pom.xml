@@ -8,7 +8,7 @@
 
     <modules>
         <module>unitils-core</module>
-        <module>unitils-testng</module>        
+        <module>unitils-testng</module>
         <module>unitils-database</module>
         <module>unitils-dbmaintainer</module>
         <module>unitils-dbunit</module>
@@ -17,7 +17,7 @@
         <module>unitils-mock</module>
         <module>unitils-orm</module>
         <module>unitils-spring</module>
-        
+
         <module>unitils-test</module>
         <!--module>unitils-testng-test</module-->       <!-- todo convert tests to TestNG -->
     </modules>
@@ -103,7 +103,7 @@
             <plugin>
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
-                    <goals>deploy assembly:assembly</goals>
+                    <goals>deploy package assembly:assembly</goals>
                     <tagBase>https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases</tagBase>
                 </configuration>
             </plugin>

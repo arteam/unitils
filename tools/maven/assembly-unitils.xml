@@ -3,6 +3,164 @@
     <formats>
         <format>zip</format>
     </formats>
+
+    <moduleSets>
+        <!-- unitils-core -->
+        <moduleSet>
+            <includes>
+                <include>org.unitils:unitils-core</include>
+            </includes>
+            <sources>
+                <fileSets>
+                    <fileSet>
+                        <includes>
+                            <include>pom.xml</include>
+                            <include>src/main/**</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <includeDependencies>false</includeDependencies>
+                <outputDirectory>unitils-core</outputDirectory>
+                <unpack>false</unpack>
+            </binaries>
+        </moduleSet>
+
+        <!-- unitils-dbmaintainer -->
+        <moduleSet>
+            <includes>
+                <include>org.unitils:unitils-dbmaintainer</include>
+            </includes>
+            <sources>
+                <fileSets>
+                    <fileSet>
+                        <includes>
+                            <include>pom.xml</include>
+                            <include>src/main/**</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <includeDependencies>false</includeDependencies>
+                <outputDirectory>unitils-dbmaintainer</outputDirectory>
+                <unpack>false</unpack>
+            </binaries>
+        </moduleSet>
+
+        <!-- unitils-dbunit -->
+        <moduleSet>
+            <includes>
+                <include>org.unitils:unitils-dbunit</include>
+            </includes>
+            <sources>
+                <fileSets>
+                    <fileSet>
+                        <includes>
+                            <include>pom.xml</include>
+                            <include>src/main/**</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <includeDependencies>false</includeDependencies>
+                <outputDirectory>unitils-dbunit</outputDirectory>
+                <unpack>false</unpack>
+            </binaries>
+        </moduleSet>
+
+        <!-- unitils-easymock -->
+        <moduleSet>
+            <includes>
+                <include>org.unitils:unitils-easymock</include>
+            </includes>
+            <sources>
+                <fileSets>
+                    <fileSet>
+                        <includes>
+                            <include>pom.xml</include>
+                            <include>src/main/**</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <includeDependencies>false</includeDependencies>
+                <outputDirectory>unitils-easymock</outputDirectory>
+                <unpack>false</unpack>
+            </binaries>
+        </moduleSet>
+
+        <!-- unitils-mock -->
+        <moduleSet>
+            <includes>
+                <include>org.unitils:unitils-mock</include>
+            </includes>
+            <sources>
+                <fileSets>
+                    <fileSet>
+                        <includes>
+                            <include>pom.xml</include>
+                            <include>src/main/**</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <includeDependencies>false</includeDependencies>
+                <outputDirectory>unitils-mock</outputDirectory>
+                <unpack>false</unpack>
+            </binaries>
+        </moduleSet>
+
+        <!-- unitils-orm -->
+        <moduleSet>
+            <includes>
+                <include>org.unitils:unitils-orm</include>
+            </includes>
+            <sources>
+                <fileSets>
+                    <fileSet>
+                        <includes>
+                            <include>pom.xml</include>
+                            <include>src/main/**</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <includeDependencies>false</includeDependencies>
+                <outputDirectory>unitils-orm</outputDirectory>
+                <unpack>false</unpack>
+            </binaries>
+        </moduleSet>
+
+        <!-- unitils-spring -->
+        <moduleSet>
+            <includes>
+                <include>org.unitils:unitils-spring</include>
+            </includes>
+            <sources>
+                <fileSets>
+                    <fileSet>
+                        <includes>
+                            <include>pom.xml</include>
+                            <include>src/main/**</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <includeDependencies>false</includeDependencies>
+                <outputDirectory>unitils-spring</outputDirectory>
+                <unpack>false</unpack>
+            </binaries>
+        </moduleSet>
+
+    </moduleSets>
+
     <fileSets>
         <fileSet>
             <includes>
@@ -12,19 +170,7 @@
                 <include>pom.xml</include>
             </includes>
         </fileSet>
-        <fileSet>
-            <directory>${project.build.directory}</directory>
-            <outputDirectory/>
-            <includes>
-                <include>${project.build.finalName}.jar</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <includes>
-                <include>src/main/**</include>
-                <include>src/test/**</include>
-            </includes>
-        </fileSet>
+
         <fileSet>
             <directory>${project.build.directory}/site/apidocs</directory>
             <outputDirectory>docs/apidocs</outputDirectory>
@@ -33,4 +179,5 @@
             </includes>
         </fileSet>
     </fileSets>
+
 </assembly>
