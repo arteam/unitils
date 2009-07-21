@@ -24,7 +24,7 @@ import static org.unitils.util.CollectionUtils.convertToCollection;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 
@@ -149,7 +149,6 @@ public class LenientOrderCollectionComparator implements Comparator {
      * @param reflectionComparator The comparator for element comparisons, not null
      * @param difference           The root difference to which all differences will be added, not null
      */
-    @SuppressWarnings({"unchecked"})
     protected void fillAllDifferences(ArrayList<Object> leftList, ArrayList<Object> rightList, ReflectionComparator reflectionComparator, UnorderedCollectionDifference difference) {
         // loops over all left and right elements to calculate the differences
         for (int leftIndex = 0; leftIndex < leftList.size(); leftIndex++) {
@@ -161,7 +160,6 @@ public class LenientOrderCollectionComparator implements Comparator {
             }
         }
     }
-
 
     /**
      * Calculates the indexes of the best matching differences for the given unordered collection difference.
@@ -175,73 +173,75 @@ public class LenientOrderCollectionComparator implements Comparator {
      * @param difference The difference to which all indexes will be added, not null
      */
     protected void fillBestMatchingIndexes(ArrayList<Object> leftList, ArrayList<Object> rightList, UnorderedCollectionDifference difference) {
-        ArrayList<Integer> leftIndexes = new ArrayList<Integer>(rightList.size());
-        for (int i = 0; i < leftList.size(); i++) {
-            leftIndexes.add(i);
-        }
-        ArrayList<Integer> rightIndexes = new ArrayList<Integer>(rightList.size());
-        for (int i = 0; i < rightList.size(); i++) {
-            rightIndexes.add(i);
-        }
-
-        HashMap<Integer, Integer> currentMatchingIndexes = new HashMap<Integer, Integer>();
-        MatchingScoreCalculator matchingScoreCalculator = createMatchingScoreCalculator();
-        fillBestMatchingIndexesImpl(leftIndexes, rightIndexes, 0, currentMatchingIndexes, difference, matchingScoreCalculator);
+        ArrayList<Integer> leftIndexes = createIndexList(leftList.size());
+        ArrayList<Integer> rightIndexes = createIndexList(rightList.size());
+        removeMatchingIndexes(leftIndexes, rightIndexes, difference);
+        setBestMatchingIndexes(leftIndexes, rightIndexes, difference);
     }
 
 
     /**
-     * Actual implementation of the best match finding algorithm. This will recursively loop over the different elements in the
-     * collections to find a permutation that has the lowest total matching score. These indexes are then set on the given
+     * Actual implementation of the best match finding algorithm. This will loop over the different elements in the
+     * collections to the match with the lowest total matching score. These indexes are then set on the given
      * difference. The matching scores are determined by the given matchingScoreCalculator.
-     * <p/>
-     * Note: The unordered collection difference should contain the differences of all left-elements with
-     * all right-elements.
      *
-     * @param leftIndexes             The current remaining indexes in the left collection, not null
-     * @param rightIndexes            The current remaining indexes in the right collection, not null
-     * @param currentMatchingScore    The current matching score
-     * @param currentMatchingIndexes  The current indexes pairs, not null
-     * @param difference              The difference to which all indexes will be added, not null
-     * @param matchingScoreCalculator The calculator for determining the scores, not null
+     * @param leftIndexes  The current remaining indexes in the left collection, not null
+     * @param rightIndexes The current remaining indexes in the right collection, not null
+     * @param difference   The difference to which all indexes will be added, not null
      */
-    @SuppressWarnings({"unchecked"})
-    protected void fillBestMatchingIndexesImpl(ArrayList<Integer> leftIndexes, ArrayList<Integer> rightIndexes, int currentMatchingScore, HashMap<Integer, Integer> currentMatchingIndexes, UnorderedCollectionDifference difference, MatchingScoreCalculator matchingScoreCalculator) {
-        if (leftIndexes.isEmpty() || rightIndexes.isEmpty()) {
-            // ends the recursion
-            // check if we found a new best match
-            if (currentMatchingScore < difference.getBestMatchingScore()) {
-                difference.addBestMatchingIndexes(currentMatchingIndexes);
-
-                // all remaining elements are missing elements
-                for (Integer leftIndex : leftIndexes) {
-                    difference.addBestMatchingIndexes(leftIndex, -1);
-                }
-                for (Integer rightIndex : rightIndexes) {
-                    difference.addBestMatchingIndexes(-1, rightIndex);
-                }
-                difference.setBestMatchingScore(currentMatchingScore);
-            }
-            return;
-        }
-
-
+    protected void setBestMatchingIndexes(ArrayList<Integer> leftIndexes, ArrayList<Integer> rightIndexes, UnorderedCollectionDifference difference) {
+        MatchingScoreCalculator matchingScoreCalculator = createMatchingScoreCalculator();
         Map<Integer, Map<Integer, Difference>> differences = difference.getElementDifferences();
 
-        Integer leftIndex = leftIndexes.get(0);
-        for (Integer rightIndex : rightIndexes) {
-            Difference elementDifference = differences.get(leftIndex).get(rightIndex);
-            int matchingScore = matchingScoreCalculator.calculateMatchingScore(elementDifference);
+        for (Integer leftIndex : leftIndexes) {
+            int score = Integer.MAX_VALUE;
+            for (Integer rightIndex : rightIndexes) {
+                Difference elementDifference = differences.get(leftIndex).get(rightIndex);
 
-            ArrayList<Integer> leftIndexesClone = (ArrayList<Integer>) leftIndexes.clone();
-            ArrayList<Integer> rightIndexesClone = (ArrayList<Integer>) rightIndexes.clone();
-            leftIndexesClone.remove(0);
-            rightIndexesClone.remove(rightIndex);
-
-            currentMatchingIndexes.put(leftIndex, rightIndex);
-            fillBestMatchingIndexesImpl(leftIndexesClone, rightIndexesClone, currentMatchingScore + matchingScore, currentMatchingIndexes, difference, matchingScoreCalculator);
-            currentMatchingIndexes.remove(leftIndex);
+                int matchingScore = matchingScoreCalculator.calculateMatchingScore(elementDifference);
+                if (matchingScore < score) {
+                    score = matchingScore;
+                    difference.setBestMatchingIndexes(leftIndex, rightIndex);
+                }
+            }
         }
+    }
+
+    /**
+     * Removes all left and right indexes for which there is a match in the given difference object.
+     *
+     * @param leftIndexes  The indexes, not null
+     * @param rightIndexes The indexes, not null
+     * @param difference   The collection difference, not null
+     */
+    protected void removeMatchingIndexes(ArrayList<Integer> leftIndexes, ArrayList<Integer> rightIndexes, UnorderedCollectionDifference difference) {
+        Map<Integer, Map<Integer, Difference>> differences = difference.getElementDifferences();
+        Iterator<Integer> rightIterator = rightIndexes.iterator();
+        while (rightIterator.hasNext()) {
+            int rightIndex = rightIterator.next();
+            Iterator<Integer> leftIterator = leftIndexes.iterator();
+            while (leftIterator.hasNext()) {
+                int leftIndex = leftIterator.next();
+                Difference elementDifference = differences.get(leftIndex).get(rightIndex);
+                if (elementDifference == null) {
+                    rightIterator.remove();
+                    leftIterator.remove();
+                }
+            }
+        }
+    }
+
+
+    /**
+     * @param size The nr of elements
+     * @return A list containing 0, 1, 2, ..., not null
+     */
+    protected ArrayList<Integer> createIndexList(int size) {
+        ArrayList<Integer> leftIndexes = new ArrayList<Integer>(size);
+        for (int i = 0; i < size; i++) {
+            leftIndexes.add(i);
+        }
+        return leftIndexes;
     }
 
 
