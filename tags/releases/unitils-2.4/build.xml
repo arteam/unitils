@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="unitils" default="build" xmlns:maven="urn:maven-ant-tasks">
+
+    <!-- Performs a clean build and runs the tests -->
+    <target name="build" description="`Performs a clean build">
+        <maven target="clean"/>
+        <maven target="install"/>
+        <antcall target="run-tests"/>
+    </target>
+
+    <!-- Runs all JUnit tests -->
+    <target name="run-tests" depends="load-pom" description="Runs all JUnit tests">
+        <property name="test.outputDirectory" value="${pom.build.directory}/test-output"/>
+        <mkdir dir="${test.outputDirectory}"/>
+        <junit printsummary="true" haltonfailure="true" filtertrace="false" showoutput="false" forkmode="perBatch">
+            <classpath>
+                <path refid="classpath.test"/>
+                <path location="${pom.build.outputDirectory}"/>
+                <path location="${pom.build.testOutputDirectory}"/>
+            </classpath>
+
+            <formatter type="plain"/>
+
+            <batchtest todir="${test.outputDirectory}">
+                <fileset dir="${pom.build.testOutputDirectory}">
+                    <include name="**/*Test.class"/>
+                    <!-- ignore inner classes -->
+                    <exclude name="**/*$*Test.class"/>
+                    <!-- ignore tests in default package -->
+                    <exclude name="*Test.class"/>
+                    <!-- ignore TestNG tests -->
+                    <exclude name="**/*TestNGTest*.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+
+    <!-- Utility tasks -->
+
+    <!-- Loads the unitils pom -->
+    <target name="load-pom">
+        <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-ant-tasks" classpath="lib/ant/maven-ant-tasks-2.0.8.jar"/>
+        <maven:pom id="pom" file="pom.xml"/>
+        <maven:dependencies pomrefid="pom" pathId="classpath.test" filesetId="fileset.test" useScope="test"/>
+    </target>
+
+    <!-- Calls maven for the given target and optional arguments -->
+    <macrodef name="maven">
+        <attribute name="target"/>
+        <attribute name="arg1" default=""/>
+        <attribute name="arg2" default=""/>
+        <attribute name="arg3" default=""/>
+        <sequential>
+            <exec executable="mvn.bat" searchpath="true" failonerror="true">
+                <arg value="@{target}"/>
+                <arg value="@{arg1}"/>
+                <arg value="@{arg2}"/>
+                <arg value="@{arg3}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+</project>
