@@ -51,6 +51,7 @@ public class ArgumentMatcherPositionFinder {
      * @param proxyInvocation The method invocation, not null
      * @param fromLineNr      The begin line-nr of the invocation
      * @param toLineNr        The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line)
+     * @param index           The index of the matcher on that line, 1 for the first, 2 for the second etc
      * @return The argument indexes, empty if there are no matchers
      */
     public static List<Integer> getArgumentMatcherIndexes(ProxyInvocation proxyInvocation, int fromLineNr, int toLineNr, int index) {
@@ -71,6 +72,7 @@ public class ArgumentMatcherPositionFinder {
      * @param invokedMethod The invocation to look for, not null
      * @param fromLineNr    The begin line-nr of the invocation
      * @param toLineNr      The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line)
+     * @param index         The index of the matcher on that line, 1 for the first, 2 for the second etc
      * @return The argument indexes, empty if there are no matchers
      */
     @SuppressWarnings({"unchecked"})
@@ -130,6 +132,7 @@ public class ArgumentMatcherPositionFinder {
      * @param invokedMethod         The invocation to look for, not null
      * @param fromLineNr            The begin line-nr of the invocation
      * @param toLineNr              The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line)
+     * @param index                 The index of the matcher on that line, 1 for the first, 2 for the second etc
      * @return The argument indexes, null if method was not found, empty if method found but there are no matchers
      */
     protected static List<Integer> findArgumentMatcherIndexes(ClassNode classNode, MethodNode methodNode, Class<?> interpretedClass, String interpretedMethodName, Method invokedMethod, int fromLineNr, int toLineNr, int index) {
@@ -264,6 +267,7 @@ public class ArgumentMatcherPositionFinder {
          * @param invokedMethodDescriptor The signature of the method to look for, not null
          * @param fromLineNr              The begin line-nr of the invocation
          * @param toLineNr                The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line)
+         * @param index                   The index of the matcher on that line, 1 for the first, 2 for the second etc
          */
         public MethodInterpreter(Class<?> interpretedClass, String interpretedMethodName, String invokedMethodName, String invokedMethodDescriptor, int fromLineNr, int toLineNr, int index) {
             this.interpretedClass = interpretedClass;

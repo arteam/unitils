@@ -63,10 +63,14 @@ public class ArgumentMatcherRepository {
     /* The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line) */
     private int matchInvocationEndLineNr;
 
+    /* The index of the matcher on that line, 1 for the first, 2 for the second etc */
     private int matchInvocationIndex;
 
-    private String currentMethodName;
-    private int currentMethodLineNr;
+    /* The name of the previous matching method we handled */
+    private String previousMatchingMethodName;
+
+    /* The line nr of the previous method we handled */
+    private int previousMatchingLineNr;
 
 
     /**
@@ -85,14 +89,11 @@ public class ArgumentMatcherRepository {
 
 
     /**
-     * Gets the current argument matchers.
-     *
-     * @return The matchers, not null
+     * @return The current argument matchers, not null
      */
     public List<ArgumentMatcher> getArgumentMatchers() {
         return argumentMatchers;
     }
-
 
     /**
      * @return The begin line-nr of the invocation
@@ -101,7 +102,6 @@ public class ArgumentMatcherRepository {
         return matchInvocationStartLineNr;
     }
 
-
     /**
      * @return The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line)
      */
@@ -109,7 +109,9 @@ public class ArgumentMatcherRepository {
         return matchInvocationEndLineNr;
     }
 
-
+    /**
+     * @return The index of the matcher on that line, 1 for the first, 2 for the second etc
+     */
     public int getMatchInvocationIndex() {
         return matchInvocationIndex;
     }
@@ -128,16 +130,24 @@ public class ArgumentMatcherRepository {
         matchInvocationEndLineNr = lineNr;
     }
 
-
+    /**
+     * Stops the registering of argument matchers.
+     * The argument matchers can now be retrieved using {@link #getArgumentMatchers()}.
+     *
+     * @param lineNr     The current line nr
+     * @param methodName The current method, not null
+     */
     public void registerEndOfMatchingInvocation(int lineNr, String methodName) {
         matchInvocationStartLineNr = Math.min(lineNr, matchInvocationStartLineNr);
         matchInvocationEndLineNr = Math.max(lineNr, matchInvocationEndLineNr);
-        if (lineNr == currentMethodLineNr && methodName.equals(currentMethodName)) {
+
+        if (lineNr == previousMatchingLineNr && methodName.equals(previousMatchingMethodName)) {
+            // this is the same method as last time, increase the index
             matchInvocationIndex++;
         } else {
             matchInvocationIndex = 1;
-            currentMethodName = methodName;
-            currentMethodLineNr = lineNr;
+            previousMatchingMethodName = methodName;
+            previousMatchingLineNr = lineNr;
         }
     }
 
@@ -147,8 +157,10 @@ public class ArgumentMatcherRepository {
      * be called again to be able to register argument matchers.
      */
     public void reset() {
-        argumentMatchers = new ArrayList<ArgumentMatcher>();
+        argumentMatchers.clear();
         acceptingArgumentMatchers = false;
         matchInvocationIndex = 1;
+        previousMatchingMethodName = null;
+        previousMatchingLineNr = 0;
     }
 }

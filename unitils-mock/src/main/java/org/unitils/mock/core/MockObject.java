@@ -18,6 +18,7 @@ package org.unitils.mock.core;
 import org.unitils.core.util.ObjectToInjectHolder;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.MatchStatement;
+import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
 import org.unitils.mock.core.matching.MatchingInvocationBuilder;
 import org.unitils.mock.core.matching.MatchingInvocationHandler;
 import org.unitils.mock.core.matching.impl.AssertInvokedInSequenceVerifyingMatchingInvocationHandler;
@@ -360,6 +361,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
         oneTimeMatchingBehaviorDefiningInvocations.clear();
         alwaysMatchingBehaviorDefiningInvocations.clear();
         getMatchingInvocationBuilder().reset();
+        ArgumentMatcherRepository.getInstance().reset();
     }
 
 
