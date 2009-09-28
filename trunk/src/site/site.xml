@@ -32,7 +32,6 @@
         
         <menu name="Project info">
             <item name="License" href="license.html"/>
-            <item name="Dependencies" href="dependencies.html"/>
             <item name="Team Members" href="http://sourceforge.net/project/memberlist.php?group_id=167201"/>
             <item name="Issue Tracking" href="http://jira.unitils.org"/>
             <item name="Source Repository" href="source-repository.html"/>
