@@ -37,6 +37,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import static java.lang.reflect.Modifier.isAbstract;
 import java.util.*;
 
 /**
@@ -120,7 +121,7 @@ public class InjectModule implements Module {
         if (declaredClass.isInterface()) {
             logger.warn("Field " + testedObjectField.getName() + " (annotated with @TestedObject) has type " + testedObjectField.getType().getSimpleName() + " which is an interface type. It is not automatically instantiated.");
 
-        } else if (Modifier.isAbstract(declaredClass.getModifiers())) {
+        } else if (isAbstract(declaredClass.getModifiers())) {
             logger.warn("Field " + testedObjectField.getName() + " (annotated with @TestedObject) has type " + testedObjectField.getDeclaringClass().getSimpleName() + " which is an abstract class. It is not automatically instantiated.");
 
         } else {

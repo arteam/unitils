@@ -91,6 +91,10 @@ public class ReflectionUtils {
      * @throws UnitilsException If an instance could not be created
      */
     public static <T> T createInstanceOfType(Class<T> type, boolean bypassAccessibility, Class[] argumentTypes, Object[] arguments) {
+
+        if (type.isMemberClass() && !isStatic(type.getModifiers())) {
+            throw new UnitilsException("Creation of an instance of a non-static innerclass is not possible using reflection. The type " + type.getSimpleName() + " is only known in the context of an instance of the enclosing class " + type.getEnclosingClass().getSimpleName() + ". Declare the innerclass as static to make construction possible.");
+        }
         try {
             Constructor<T> constructor = type.getDeclaredConstructor(argumentTypes);
             if (bypassAccessibility) {

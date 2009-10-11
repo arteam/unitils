@@ -18,28 +18,33 @@ package org.unitils.mock.core;
 import static junit.framework.Assert.assertNotNull;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.mock.Mock;
+import org.unitils.mock.PartialMock;
 
+import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Tests the casting of mock objects (UNI-168).
+ * Tests the casting of mock objects (UNI-168 and UNI-169).
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
+@SuppressWarnings({"RedundantCast"})
 public class MockObjectCastTest extends UnitilsJUnit4 {
 
-    private Mock<ClassToMock> mockClass;
+    private PartialMock<MyTimerTask> myTimerTask;
 
 
     @Test
-    public void testCasting() {
-        assertNotNull("Ooops..", (TimerTask) mockClass.getMock());
+    public void testCasting() throws Exception {
+        assertNotNull((TimerTask) myTimerTask.getMock());
+
+        Timer timer = new Timer();
+        timer.schedule(myTimerTask.getMock(), 0);
     }
 
 
-    public class ClassToMock extends TimerTask {
+    public static class MyTimerTask extends TimerTask {
         public void run() {
         }
     }
