@@ -25,6 +25,7 @@ import static org.unitils.mock.core.proxy.ProxyFactory.createUninitializedProxy;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.proxy.ProxyInvocationHandler;
 import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationStackTrace;
+import static org.unitils.mock.core.proxy.StackTraceUtils.getStackTraceStartingFrom;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -64,7 +65,7 @@ public class MatchingInvocationBuilder {
     public synchronized void assertNotExpectingInvocation() {
         if (currentMockName != null && !currentMockName.contains(".")) {
             UnitilsException exception = new UnitilsException("Invalid syntax. " + currentMockName + "." + definingMethodName + "() must be followed by a method invocation on the returned proxy. E.g. " + currentMockName + "." + definingMethodName + "().myMethod();");
-            exception.setStackTrace(invokedAt);
+            exception.setStackTrace(getStackTraceStartingFrom(invokedAt, 1));
             reset();
             throw exception;
         }

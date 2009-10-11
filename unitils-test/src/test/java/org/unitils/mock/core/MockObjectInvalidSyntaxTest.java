@@ -15,6 +15,8 @@
  */
 package org.unitils.mock.core;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
@@ -26,10 +28,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * todo javadoc
+ * Test for verifying syntax problems when defining mock behavior and assertions.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class MockObjectInvalidSyntaxTest {
 
@@ -43,115 +45,176 @@ public class MockObjectInvalidSyntaxTest {
     }
 
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void incompleteBehaviorDefinition_returns_followedBySecondBehaviorDefinition() {
-        mockObject.returns("aValue");
-        mockObject.returns("aValue");
+        try {
+            mockObject.returns("aValue");
+            mockObject.returns("aValue");
+            fail("Expected UnitilsException");
+        } catch (UnitilsException e) {
+            assertCorrectTopLevelClassInStackTrace(e);
+        }
+    }
+
+    private void assertCorrectTopLevelClassInStackTrace(UnitilsException e) {
+        StackTraceElement[] stackTrace = e.getStackTrace();
+        assertEquals(MockObjectInvalidSyntaxTest.class.getName(), stackTrace[0].getClassName());
     }
 
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void incompleteBehaviorDefinition_returns_followedByActualInvocation() {
-        mockObject.returns("aValue");
-        mockObject.getMock().testMethod();
+        try {
+            mockObject.returns("aValue");
+            mockObject.getMock().testMethod();
+        } catch (UnitilsException e) {
+            assertCorrectTopLevelClassInStackTrace(e);
+        }
     }
 
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void incompleteBehaviorDefinition_raises() {
-        mockObject.raises(new RuntimeException());
-        mockObject.returns("aValue");
+        try {
+            mockObject.raises(new RuntimeException());
+            mockObject.returns("aValue");
+        } catch (UnitilsException e) {
+            assertCorrectTopLevelClassInStackTrace(e);
+        }
     }
 
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void incompleteBehaviorDefinition_performs() {
-        mockObject.performs(new MockBehavior() {
-            public Object execute(ProxyInvocation mockInvocation) throws Throwable {
-                return null;
-            }
-        });
-        mockObject.assertInvoked();
+        try {
+            mockObject.performs(new MockBehavior() {
+                public Object execute(ProxyInvocation mockInvocation) throws Throwable {
+                    return null;
+                }
+            });
+            mockObject.assertInvoked();
+        } catch (UnitilsException e) {
+            assertCorrectTopLevelClassInStackTrace(e);
+        }
     }
 
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void incompleteBehaviorDefinition_onceReturns() {
-        mockObject.onceReturns("aValue");
-        mockObject.returns("aValue");
+        try {
+            mockObject.onceReturns("aValue");
+            mockObject.returns("aValue");
+        } catch (UnitilsException e) {
+            assertCorrectTopLevelClassInStackTrace(e);
+        }
     }
 
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void incompleteBehaviorDefinition_onceRaises() {
-        mockObject.onceRaises(new RuntimeException());
-        mockObject.returns("aValue");
+        try {
+            mockObject.onceRaises(new RuntimeException());
+            mockObject.returns("aValue");
+        } catch (UnitilsException e) {
+            assertCorrectTopLevelClassInStackTrace(e);
+        }
     }
 
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void incompleteBehaviorDefinition_oncePerforms() {
-        mockObject.oncePerforms(new MockBehavior() {
-            public Object execute(ProxyInvocation mockInvocation) throws Throwable {
-                return null;
-            }
-        });
-        mockObject.assertInvoked();
+        try {
+            mockObject.oncePerforms(new MockBehavior() {
+                public Object execute(ProxyInvocation mockInvocation) throws Throwable {
+                    return null;
+                }
+            });
+            mockObject.assertInvoked();
+        } catch (UnitilsException e) {
+            assertCorrectTopLevelClassInStackTrace(e);
+        }
     }
 
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void incompleteAssertStatement_assertInvoked() {
-        mockObject.assertInvoked();
-        mockObject.assertInvoked();
+        try {
+            mockObject.assertInvoked();
+            mockObject.assertInvoked();
+        } catch (UnitilsException e) {
+            assertCorrectTopLevelClassInStackTrace(e);
+        }
     }
 
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void incompleteAssertStatement_assertInvokedInOrder() {
-        mockObject.assertInvokedInSequence();
-        mockObject.assertInvoked();
+        try {
+            mockObject.assertInvokedInSequence();
+            mockObject.assertInvoked();
+        } catch (UnitilsException e) {
+            assertCorrectTopLevelClassInStackTrace(e);
+        }
     }
 
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void incompleteAssertStatement_assertNotInvoked() {
-        mockObject.assertNotInvoked();
-        mockObject.assertNotInvoked();
+        try {
+            mockObject.assertNotInvoked();
+            mockObject.assertNotInvoked();
+        } catch (UnitilsException e) {
+            assertCorrectTopLevelClassInStackTrace(e);
+        }
     }
 
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void tryToLetVoidMethodReturnValue() {
-        mockObject.returns("value").testMethod();
-        mockObject.getMock().testMethod();
+        try {
+            mockObject.returns("value").testMethod();
+            mockObject.getMock().testMethod();
+        } catch (UnitilsException e) {
+            assertCorrectTopLevelClassInStackTrace(e);
+        }
     }
 
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void tryToLetMethodReturnIncompatibleReturnValue() {
-        mockObject.returns(new ArrayList<String>()).testMethod();
-        mockObject.getMock().testMethod();
+        try {
+            mockObject.returns(new ArrayList<String>()).testMethod();
+            mockObject.getMock().testMethod();
+        } catch (UnitilsException e) {
+            assertCorrectTopLevelClassInStackTrace(e);
+        }
     }
 
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void tryToLetMethodThrowUndeclaredCheckedException() {
-        mockObject.raises(IOException.class).testMethod();
-        mockObject.getMock().testMethod();
+        try {
+            mockObject.raises(IOException.class).testMethod();
+            mockObject.getMock().testMethod();
+        } catch (UnitilsException e) {
+            assertCorrectTopLevelClassInStackTrace(e);
+        }
     }
 
 
     @Test(expected = UnitilsException.class)
     public void argumentMatcherUsedOutsideBehaviorDefinition() {
-        String notNull = notNull(String.class);
-        mockObject.raises(IllegalArgumentException.class).testMethodArgument(notNull);
+        notNull(String.class);
     }
 
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void nestedBehaviorDefintionCall() {
-        mockObject.raises(IllegalArgumentException.class).testMethodArgument(mockObject.returns("aValue").testMethodReturningString());
+        try {
+            mockObject.raises(IllegalArgumentException.class).testMethodArgument(mockObject.returns("aValue").testMethodReturningString());
+        } catch (UnitilsException e) {
+            assertCorrectTopLevelClassInStackTrace(e);
+        }
     }
 
 

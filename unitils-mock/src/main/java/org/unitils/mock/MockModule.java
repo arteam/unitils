@@ -219,6 +219,7 @@ public class MockModule implements Module {
 
         @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
+            createAndInjectPartialMocksIntoTest(testObject);
             createAndInjectMocksIntoTest(testObject);
             createAndInjectDummiesIntoTest(testObject);
         }

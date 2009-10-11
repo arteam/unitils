@@ -111,7 +111,7 @@ public class ProxyFactory {
         try {
             return createInstanceOfType(clazz, true);
         } catch (UnitilsException e) {
-            logger.warn("Could not create initialized instance of type " + clazz.getSimpleName() + ". No no-arg constructor found. All fields in the instance will have the java default values. Add a default constructor (can be private) if the fields should be initialized.");
+            logger.warn("Could not create initialized instance of type " + clazz.getSimpleName() + ". No no-arg constructor found. All fields in the instance will have the java default values. Add a default constructor (can be private) if the fields should be initialized. If this concerns an innerclass, make sure it is declared static. Partial mocking of non-static innerclasses is not supported.");
         }
         // unable to create type using regular constuctor, try objenesis        
         return createUninitializedInstanceOfType(clazz);
