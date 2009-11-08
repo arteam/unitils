@@ -32,6 +32,33 @@
             </binaries>
         </moduleSet>
 
+        <!-- unitils-database -->
+        <moduleSet>
+            <includes>
+                <include>org.unitils:unitils-database</include>
+            </includes>
+            <sources>
+                <fileSets>
+                    <fileSet>
+                        <includes>
+                            <include>pom.xml</include>
+                            <include>src/main/**</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <outputDirectory>unitils-database</outputDirectory>
+                <dependencySets>
+                    <dependencySet>
+                        <useProjectArtifact>false</useProjectArtifact>
+                        <outputDirectory>unitils-database/lib</outputDirectory>
+                    </dependencySet>
+                </dependencySets>
+                <unpack>false</unpack>
+            </binaries>
+        </moduleSet>
+
         <!-- unitils-dbmaintainer -->
         <moduleSet>
             <includes>
@@ -113,6 +140,33 @@
             </binaries>
         </moduleSet>
 
+        <!-- unitils-inject -->
+        <moduleSet>
+            <includes>
+                <include>org.unitils:unitils-inject</include>
+            </includes>
+            <sources>
+                <fileSets>
+                    <fileSet>
+                        <includes>
+                            <include>pom.xml</include>
+                            <include>src/main/**</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <outputDirectory>unitils-inject</outputDirectory>
+                <dependencySets>
+                    <dependencySet>
+                        <useProjectArtifact>false</useProjectArtifact>
+                        <outputDirectory>unitils-inject/lib</outputDirectory>
+                    </dependencySet>
+                </dependencySets>
+                <unpack>false</unpack>
+            </binaries>
+        </moduleSet>
+
         <!-- unitils-mock -->
         <moduleSet>
             <includes>
@@ -188,6 +242,33 @@
                     <dependencySet>
                         <useProjectArtifact>false</useProjectArtifact>
                         <outputDirectory>unitils-spring/lib</outputDirectory>
+                    </dependencySet>
+                </dependencySets>
+                <unpack>false</unpack>
+            </binaries>
+        </moduleSet>
+
+        <!-- unitils-testng -->
+        <moduleSet>
+            <includes>
+                <include>org.unitils:unitils-testng</include>
+            </includes>
+            <sources>
+                <fileSets>
+                    <fileSet>
+                        <includes>
+                            <include>pom.xml</include>
+                            <include>src/main/**</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <outputDirectory>unitils-testng</outputDirectory>
+                <dependencySets>
+                    <dependencySet>
+                        <useProjectArtifact>false</useProjectArtifact>
+                        <outputDirectory>unitils-testng/lib</outputDirectory>
                     </dependencySet>
                 </dependencySets>
                 <unpack>false</unpack>
