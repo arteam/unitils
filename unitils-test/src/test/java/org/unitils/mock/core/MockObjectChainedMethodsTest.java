@@ -45,6 +45,7 @@ public class MockObjectChainedMethodsTest {
         assertEquals("value", result);
     }
 
+
     @Test
     public void doubleChainedBehavior() {
         mockObject.returns("value").getTestClass().getTestClass().getValue();
@@ -52,6 +53,7 @@ public class MockObjectChainedMethodsTest {
         String result = mockObject.getMock().getTestClass().getTestClass().getValue();
         assertEquals("value", result);
     }
+
 
     @Test
     public void chainedAssertInvoked() {
@@ -61,10 +63,21 @@ public class MockObjectChainedMethodsTest {
         mockObject.assertInvoked().getTestClass().getValue();
     }
 
+
+    @Test
+    public void multipleAssertInvoked() {
+        mockObject.getMock().getTestClass();
+        mockObject.getMock().getTestClass();
+        mockObject.assertInvoked().getTestClass();
+        mockObject.assertInvoked().getTestClass();
+    }
+
+
     @Test
     public void chainedAssertNotInvoked() {
         mockObject.assertNotInvoked().getTestClass().getValue();
     }
+
 
     @Test(expected = AssertionError.class)
     public void chainedAssertNotInvokedButInvoked() {
@@ -84,6 +97,7 @@ public class MockObjectChainedMethodsTest {
         mockObject.assertInvokedInSequence().getTestClass().getValue();
         mockObject.assertInvokedInSequence().getTestClass().getValue();
     }
+
 
     @Test(expected = AssertionError.class)
     public void chainedAssertInvokedInSequenceButNotInvoked() {

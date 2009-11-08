@@ -63,13 +63,18 @@ public class MatchingInvocationBuilder {
 
 
     public synchronized void assertNotExpectingInvocation() {
-        if (currentMockName != null && !currentMockName.contains(".")) {
+        if (currentMockName != null && !isChainedMock(currentMockName)) {
             UnitilsException exception = new UnitilsException("Invalid syntax. " + currentMockName + "." + definingMethodName + "() must be followed by a method invocation on the returned proxy. E.g. " + currentMockName + "." + definingMethodName + "().myMethod();");
             exception.setStackTrace(getStackTraceStartingFrom(invokedAt, 1));
             reset();
             throw exception;
         }
         reset();
+    }
+
+
+    protected boolean isChainedMock(String mockName) {
+        return currentMockName.contains(".");
     }
 
 
