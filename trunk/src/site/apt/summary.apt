@@ -80,24 +80,65 @@ Summary
     * To get started with quickly, there is also a {{{cookbook.html} cookbook}} available, containing step-by-step
       instructions on how to configure your tests.
 
+    * We're starting up a {{{https://sourceforge.net/apps/mediawiki/unitils/index.php?title=Main_Page}wiki}} on which
+      you can find extra information and code samples.
+      
     []
     
 
 * News
 ~~~~~~
 
+  <<2009-10-12 - Release of Unitils 3.0>>
+
+    Unitils provides utilities to simplify unit-testing with JUnit or TestNG. It builds further on DBUnit and EasyMock and integrates with Hibernate and Spring. The goal is to make unit-testing easy and maintainable by offering utilities such as automatic DB-schema maintenance and equality assertion through reflection.
+
+    The unitils modules are now split up in separate applications and artifacts:
+
+    * unitils-mock contains the mocking framework
+    
+    * unitils-inject contains the injection support
+
+    * unitils-dbunit contains db-unit dataset support
+
+    * unitils-orm contains hibernate and JPA functionality
+
+    * unitils-spring contains spring support
+
+    * unitils-dbmaintainer contains the database maintenance
+
+    * unitils-easymock contains support for easymock
+
+    * unitils-testng contains the base classes for TestNG
+
+    []
+
+    This makes it easier to setup everything and to manage the dependencies: just include the desired module as a test dependency. For example
+
++-----+
+<dependency>
+    <groupId>org.unitils</groupId>
+    <artifactId>unitils-mock</artifactId>
+    <version>3.0</version>
+    <scope>test</scope>
+</dependency>
++-----+
+
+    There is a new version of the mock framework, unitils-mock, containing lots of improvements. E.g. better support for partial mocking, better reports and some bug fixes.
+
+    We're starting up a {{{https://sourceforge.net/apps/mediawiki/unitils/index.php?title=Main_Page}wiki}} on which you can find extra information and code samples. 
+
   <<2009-06-02 - Release of Unitils 2.3>>
   
-  This minor release contains a new implementation of the expected dataset behavior, new argument matchers for the mock mock framework
-  and some other small features. It also contains important bug fixes for the mock framework.
-  Check the {{{http://jira.unitils.org/secure/ReleaseNote.jspa?projectId=10000&styleName=Html&version=10010}release notes}} for more details.
-
+    This minor release contains a new implementation of the expected dataset behavior, new argument matchers for the mock mock framework
+    and some other small features. It also contains important bug fixes for the mock framework.
+    Check the {{{http://jira.unitils.org/secure/ReleaseNote.jspa?projectId=10000&styleName=Html&version=10010}release notes}} for more details.
 
   <<2008-12-19 - Release of Unitils 2.1 and 2.2>>
   
-  Unitils 2.1 and 2.2 only contain bugfixes. The release of Unitils 2.1 was immediately followed by a release of version 2.2, because we found an important bug in the 2.1 release, 
-  and we had to bring out a new release since version 2.1 was already published in maven. 
-  Check the {{{http://jira.unitils.org/secure/ReleaseNote.jspa?projectId=10000&styleName=Html&version=10011}release notes}} for more details.
+    Unitils 2.1 and 2.2 only contain bugfixes. The release of Unitils 2.1 was immediately followed by a release of version 2.2, because we found an important bug in the 2.1 release,
+    and we had to bring out a new release since version 2.1 was already published in maven.
+    Check the {{{http://jira.unitils.org/secure/ReleaseNote.jspa?projectId=10000&styleName=Html&version=10011}release notes}} for more details.
 
   <<2008-10-28 - Release of Unitils 2.0>>
 
