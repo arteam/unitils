@@ -49,7 +49,9 @@ public abstract class AssertVerifyingMatchingInvocationHandler implements Matchi
 
     protected Object createChainedMock(ProxyInvocation proxyInvocation) {
         Class<?> innerMockType = proxyInvocation.getMethod().getReturnType();
-        Mock<?> mock = mockFactory.createMock("assertMock", innerMockType);
+        String innerMockName = proxyInvocation.getMockName() + "." + proxyInvocation.getMethod().getName();
+
+        Mock<?> mock = mockFactory.createMock(innerMockName, innerMockType);
         if (mock == null) {
             return null;
         }
