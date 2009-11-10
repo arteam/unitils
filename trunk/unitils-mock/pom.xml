@@ -11,6 +11,48 @@
     <packaging>jar</packaging>
     <name>Unitils mock module</name>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <artifactSet>
+                        <includes>
+                            <include>cglib:cglib</include>
+                            <include>asm:asm</include>
+                            <include>asm:asm-analysis</include>
+                            <include>asm:asm-tree</include>
+                            <include>org.objenesis:objenesis</include>
+                        </includes>
+                    </artifactSet>
+                    <relocations>
+                        <relocation>
+                            <pattern>net.sf.cglib</pattern>
+                            <shadedPattern>thirdparty.net.sf.cglib</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.objectweb</pattern>
+                            <shadedPattern>thirdparty.org.objectweb</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.objenesis</pattern>
+                            <shadedPattern>thirdparty.org.objenesis</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.unitils</groupId>
