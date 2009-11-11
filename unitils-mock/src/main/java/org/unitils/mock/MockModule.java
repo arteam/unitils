@@ -34,6 +34,7 @@ import static org.unitils.util.ReflectionUtils.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Properties;
 import java.util.Set;
 
@@ -113,22 +114,23 @@ public class MockModule implements Module {
     }
 
 
-    public <T> Mock<T> createMock(Object testObject, String name, Class<T> type) {
+    public <T> Mock<T> createMock(Object testObject, String name, Class<?> type) {
         return new MockObject<T>(name, type, testObject);
     }
 
 
-    public <T> Mock<T> createPartialMock(Object testObject, String name, Class<T> type) {
+    public <T> Mock<T> createPartialMock(Object testObject, String name, Class<?> type) {
         return new PartialMockObject<T>(name, type, testObject);
     }
 
 
     protected Class<?> getMockedClass(Field field) {
-        Class<?> type = getGenericType(field);
-        if (type == null) {
-            throw new UnitilsException("Unable to determine type of mock. A mock should be declared using the generic Mock<YourTypeToMock> or PartialMock<YourTypeToMock> types. Field; " + field);
+        try {
+            Type type = getGenericType(field);
+            return getClassForType(type);
+        } catch (UnitilsException e) {
+            throw new UnitilsException("Unable to determine type of mock. A mock should be declared using the generic Mock<YourTypeToMock> or PartialMock<YourTypeToMock> types. Field: " + field, e);
         }
-        return type;
     }
 
 

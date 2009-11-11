@@ -16,15 +16,14 @@
 package org.unitils.inject;
 
 import static org.junit.Assert.assertSame;
-
-import java.util.Properties;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.inject.annotation.InjectIntoByType;
 import org.unitils.inject.annotation.TestedObject;
 import org.unitils.inject.util.PropertyAccess;
+
+import java.util.Properties;
 
 /**
  * Test for the auto injection behavior of the {@link InjectModule}
@@ -35,18 +34,18 @@ import org.unitils.inject.util.PropertyAccess;
 public class InjectModuleInjectIntoByTypeTest {
 
     /* Tested object */
-    InjectModule injectModule;
+    private InjectModule injectModule;
 
     /* Objects that represent 'unit test classes', containing objects that should be injected on other objects. */
-    TestInjectIntoByTypeExplicitTarget testInjectIntoByTypeExplicitTarget = new TestInjectIntoByTypeExplicitTarget();
-    TestInjectIntoByTypeFieldAccess testInjectIntoByTypeFieldAccess = new TestInjectIntoByTypeFieldAccess();
-    TestInjectIntoByTypeAnnotatedTarget testInjectIntoByTypeAnnotatedTarget = new TestInjectIntoByTypeAnnotatedTarget();
-    TestInjectIntoByType_targetPropertyIsSuperType testInjectIntoByType_targetPropertyIsSuperType = new TestInjectIntoByType_targetPropertyIsSuperType();
-    TestInjectIntoByType_targetPropertyIsSuperType_fieldAccess testInjectIntoByType_targetPropertyIsSuperType_fieldAccess = new TestInjectIntoByType_targetPropertyIsSuperType_fieldAccess();
-    TestInjectIntoByTypeToMostSpecificallyTypedProperty testInjectIntoByTypeToMostSpecificallyTypedProperty = new TestInjectIntoByTypeToMostSpecificallyTypedProperty();
-    TestInjectIntoByTypeToMostSpecificallyTypedProperty_fieldAccess testInjectIntoByTypeToMostSpecificallyTypedProperty_fieldAccess = new TestInjectIntoByTypeToMostSpecificallyTypedProperty_fieldAccess();
-    TestInjectIntoByType_targetPropertyOnSuperClass testInjectIntoByType_targetPropertyOnSuperClass = new TestInjectIntoByType_targetPropertyOnSuperClass();
-    TestInjectIntoByType_targetPropertyOnSuperClass_fieldAccess testInjectIntoByType_targetPropertyOnSuperClass_fieldAccess = new TestInjectIntoByType_targetPropertyOnSuperClass_fieldAccess();
+    private TestInjectIntoByTypeExplicitTarget testInjectIntoByTypeExplicitTarget = new TestInjectIntoByTypeExplicitTarget();
+    private TestInjectIntoByTypeFieldAccess testInjectIntoByTypeFieldAccess = new TestInjectIntoByTypeFieldAccess();
+    private TestInjectIntoByTypeAnnotatedTarget testInjectIntoByTypeAnnotatedTarget = new TestInjectIntoByTypeAnnotatedTarget();
+    private TestInjectIntoByType_targetPropertyIsSuperType testInjectIntoByType_targetPropertyIsSuperType = new TestInjectIntoByType_targetPropertyIsSuperType();
+    private TestInjectIntoByType_targetPropertyIsSuperType_fieldAccess testInjectIntoByType_targetPropertyIsSuperType_fieldAccess = new TestInjectIntoByType_targetPropertyIsSuperType_fieldAccess();
+    private TestInjectIntoByTypeToMostSpecificallyTypedProperty testInjectIntoByTypeToMostSpecificallyTypedProperty = new TestInjectIntoByTypeToMostSpecificallyTypedProperty();
+    private TestInjectIntoByTypeToMostSpecificallyTypedProperty_fieldAccess testInjectIntoByTypeToMostSpecificallyTypedProperty_fieldAccess = new TestInjectIntoByTypeToMostSpecificallyTypedProperty_fieldAccess();
+    private TestInjectIntoByType_targetPropertyOnSuperClass testInjectIntoByType_targetPropertyOnSuperClass = new TestInjectIntoByType_targetPropertyOnSuperClass();
+    private TestInjectIntoByType_targetPropertyOnSuperClass_fieldAccess testInjectIntoByType_targetPropertyOnSuperClass_fieldAccess = new TestInjectIntoByType_targetPropertyOnSuperClass_fieldAccess();
 
 
     /**

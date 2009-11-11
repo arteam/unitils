@@ -15,13 +15,18 @@
  */
 package org.unitils.mock.core;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import static org.unitils.mock.ArgumentMatchers.notNull;
 import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Tests the mock object functionality.
@@ -100,6 +105,22 @@ public class MockObjectTest {
         assertTrue(mockObject.getMock() instanceof Cloneable);
         TestClass clone = createDeepClone(mockObject.getMock());
         assertEquals(mockObject.getMock(), clone);
+    }
+
+
+    @Test
+    public void useRawTypeWhenMockingGenericTypes() {
+        MockObject<List<String>> mockObject = new MockObject<List<String>>("testMock", List.class, this);
+
+        mockObject.returns("value").get(0);
+        assertEquals("value", mockObject.getMock().get(0));
+    }
+
+
+    @Test(expected = ClassCastException.class)
+    public void typeMismatch() {
+        MockObject<List<String>> mockObject = new MockObject<List<String>>("testMock", Map.class, this);
+        mockObject.returns("value").get(0);  //raises classcast
     }
 
 

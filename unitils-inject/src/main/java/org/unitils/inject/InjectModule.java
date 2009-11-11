@@ -36,8 +36,8 @@ import static org.unitils.util.ReflectionUtils.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import static java.lang.reflect.Modifier.isAbstract;
+import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -282,7 +282,7 @@ public class InjectModule implements Module {
         InjectIntoByType injectIntoByTypeAnnotation = fieldToInject.getAnnotation(InjectIntoByType.class);
 
         Object objectToInject = getObjectToInject(test, fieldToInject);
-        Class<?> objectToInjectType = getObjectToInjectType(test, fieldToInject);
+        Type objectToInjectType = getObjectToInjectType(test, fieldToInject);
         PropertyAccess propertyAccess = getEnumValueReplaceDefault(InjectIntoByType.class, "propertyAccess", injectIntoByTypeAnnotation.propertyAccess(), defaultAnnotationPropertyValues);
 
         List<Object> targets = getTargets(InjectIntoByType.class, fieldToInject, injectIntoByTypeAnnotation.target(), test);
@@ -314,13 +314,14 @@ public class InjectModule implements Module {
 
         Class<?> targetClass = injectIntoStaticByTypeAnnotation.target();
         Object objectToInject = getObjectToInject(test, fieldToAutoInjectStatic);
-        Class<?> objectToInjectType = getObjectToInjectType(test, fieldToAutoInjectStatic);
+        Type objectToInjectType = getObjectToInjectType(test, fieldToAutoInjectStatic);
+        Class objectToInjectClass = getClassForType(objectToInjectType);
 
         Restore restore = getEnumValueReplaceDefault(InjectIntoStaticByType.class, "restore", injectIntoStaticByTypeAnnotation.restore(), defaultAnnotationPropertyValues);
         PropertyAccess propertyAccess = getEnumValueReplaceDefault(InjectIntoStaticByType.class, "propertyAccess", injectIntoStaticByTypeAnnotation.propertyAccess(), defaultAnnotationPropertyValues);
         try {
             Object oldValue = InjectionUtils.injectIntoStaticByType(objectToInject, objectToInjectType, targetClass, propertyAccess);
-            storeValueToRestoreAfterTest(targetClass, null, objectToInjectType, propertyAccess, oldValue, restore);
+            storeValueToRestoreAfterTest(targetClass, null, objectToInjectClass, propertyAccess, oldValue, restore);
 
         } catch (UnitilsException e) {
             throw new UnitilsException(getSituatedErrorMessage(InjectIntoStaticByType.class, fieldToAutoInjectStatic, e.getMessage()), e);
@@ -353,10 +354,10 @@ public class InjectModule implements Module {
      * @param fieldToInject The field, not null
      * @return The object
      */
-    protected Class<?> getObjectToInjectType(Object test, Field fieldToInject) {
+    protected Type getObjectToInjectType(Object test, Field fieldToInject) {
         Object fieldValue = getFieldValue(test, fieldToInject);
         if (fieldValue instanceof ObjectToInjectHolder<?>) {
-            return ((ObjectToInjectHolder<?>) fieldValue).getObjectToInjectType();
+            return ((ObjectToInjectHolder<?>) fieldValue).getObjectToInjectType(fieldToInject);
         }
         return fieldToInject.getType();
     }

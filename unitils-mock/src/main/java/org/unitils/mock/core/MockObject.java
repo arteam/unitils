@@ -29,6 +29,10 @@ import static org.unitils.mock.core.proxy.ProxyFactory.createInitializedOrUnitia
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.ExceptionThrowingMockBehavior;
 import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
+import static org.unitils.util.ReflectionUtils.getGenericType;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 
 /**
  * Implementation of a Mock.
@@ -67,14 +71,20 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
     /**
      * Creates a mock of the given type for the given scenario.
      *
+     * There is no .class literal for generic types. Therefore you need to pass the raw type when mocking generic types.
+     * E.g. Mock&lt;List&lt;String&gt;&gt; myMock = new MockObject("myMock", List.class, this);
+     *
+     * If the mocked type does not correspond to the declared type, a ClassCastException will occur when the mock
+     * is used.
+     *
      * @param name       The name of the mock, e.g. the field-name, not null
-     * @param mockedType The mock type that will be proxied, not null
+     * @param mockedType The mock type that will be proxied, use the raw type when mocking generic types, not null
      * @param testObject The test object, not null
      */
-
-    public MockObject(String name, Class<T> mockedType, Object testObject) {
+    @SuppressWarnings({"unchecked"})
+    public MockObject(String name, Class<?> mockedType, Object testObject) {
         this.name = name;
-        this.mockedType = mockedType;
+        this.mockedType = (Class<T>) mockedType;
         this.oneTimeMatchingBehaviorDefiningInvocations = createOneTimeMatchingBehaviorDefiningInvocations();
         this.alwaysMatchingBehaviorDefiningInvocations = createAlwaysMatchingBehaviorDefiningInvocations();
 
@@ -105,10 +115,14 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
 
 
     /**
+     * @param field The field that declared this mock object, null if there is no field (or not known)
      * @return The type of the object to inject (i.e. the mocked type), not null.
      */
-    public Class<T> getObjectToInjectType() {
-        return mockedType;
+    public Type getObjectToInjectType(Field field) {
+        if (field == null) {
+            return mockedType;
+        }
+        return getGenericType(field);
     }
 
     //

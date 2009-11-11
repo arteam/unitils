@@ -17,6 +17,7 @@ package org.unitils.util;
 
 import static org.apache.commons.lang.StringUtils.capitalize;
 import org.unitils.core.UnitilsException;
+import org.unitils.core.util.TypeUtils;
 
 import java.lang.reflect.*;
 import static java.lang.reflect.Modifier.isStatic;
@@ -148,7 +149,7 @@ public class ReflectionUtils {
             field.set(object, value);
 
         } catch (IllegalArgumentException e) {
-            throw new UnitilsException("Unable to assign the value to field: " + field.getName() + ". Ensure that this field is of the correct type.", e);
+            throw new UnitilsException("Unable to assign the value to field: " + field.getName() + ". Ensure that this field is of the correct type. Value: " + value, e);
 
         } catch (IllegalAccessException e) {
             // Cannot occur, since field.accessible has been set to true
@@ -182,11 +183,10 @@ public class ReflectionUtils {
                 invokeMethod(object, method, value);
 
             } catch (UnitilsException e) {
-                throw new UnitilsException("Unable to invoke method: " + object.getClass().getSimpleName() + "." + method.getName() + ". Ensure that " +
-                        "this method has following signature: void myMethod(ValueType value).", e);
+                throw new UnitilsException("Unable to invoke method: " + object.getClass().getSimpleName() + "." + method.getName() + ". Ensure that this method has following signature: void myMethod(ValueType value).", e);
+
             } catch (InvocationTargetException e) {
-                throw new UnitilsException("Unable to invoke method: " + object.getClass().getSimpleName() + "." + method.getName() + ". Method " +
-                        "has thrown an exception.", e.getCause());
+                throw new UnitilsException("Unable to invoke method: " + object.getClass().getSimpleName() + "." + method.getName() + ". Method has thrown an exception.", e.getCause());
             }
         }
     }
@@ -248,11 +248,11 @@ public class ReflectionUtils {
      * @param isStatic True if static fields are to be returned, false for non-static
      * @return A list of Fields, empty list if none found
      */
-    public static Set<Field> getFieldsAssignableFrom(Class<?> clazz, Class<?> type, boolean isStatic) {
+    public static Set<Field> getFieldsAssignableFrom(Class<?> clazz, Type type, boolean isStatic) {
         Set<Field> fieldsOfType = new HashSet<Field>();
         Set<Field> allFields = getAllFields(clazz);
         for (Field field : allFields) {
-            if (field.getType().isAssignableFrom(type) && isStatic(field.getModifiers()) == isStatic) {
+            if (isAssignable(type, field.getGenericType()) && isStatic(field.getModifiers()) == isStatic) {
                 fieldsOfType.add(field);
             }
         }
@@ -269,7 +269,7 @@ public class ReflectionUtils {
      * @param isStatic True if static fields are to be returned, false for non-static
      * @return The fields with the given type
      */
-    public static Set<Field> getFieldsOfType(Class<?> clazz, Class<?> type, boolean isStatic) {
+    public static Set<Field> getFieldsOfType(Class<?> clazz, Type type, boolean isStatic) {
         Set<Field> fields = new HashSet<Field>();
         Set<Field> allFields = getAllFields(clazz);
         for (Field field : allFields) {
@@ -289,12 +289,12 @@ public class ReflectionUtils {
      * @param isStatic True if static setters are to be returned, false for non-static
      * @return A list of Methods, empty list if none found
      */
-    public static Set<Method> getSettersAssignableFrom(Class<?> clazz, Class<?> type, boolean isStatic) {
+    public static Set<Method> getSettersAssignableFrom(Class<?> clazz, Type type, boolean isStatic) {
         Set<Method> settersAssignableFrom = new HashSet<Method>();
 
         Set<Method> allMethods = getAllMethods(clazz);
         for (Method method : allMethods) {
-            if (isSetter(method) && method.getParameterTypes()[0].isAssignableFrom(type) && (isStatic == isStatic(method.getModifiers()))) {
+            if (isSetter(method) && isAssignable(type, method.getGenericParameterTypes()[0]) && (isStatic == isStatic(method.getModifiers()))) {
                 settersAssignableFrom.add(method);
             }
         }
@@ -311,12 +311,11 @@ public class ReflectionUtils {
      * @param isStatic True if static setters are to be returned, false for non-static
      * @return All setters for an object of the given type
      */
-    public static Set<Method> getSettersOfType(Class<?> clazz, Class<?> type, boolean isStatic) {
+    public static Set<Method> getSettersOfType(Class<?> clazz, Type type, boolean isStatic) {
         Set<Method> settersOfType = new HashSet<Method>();
         Set<Method> allMethods = getAllMethods(clazz);
         for (Method method : allMethods) {
-            if (isSetter(method) && method.getParameterTypes()[0].equals(type)
-                    && isStatic == isStatic(method.getModifiers())) {
+            if (isSetter(method) && method.getGenericParameterTypes()[0].equals(type) && isStatic == isStatic(method.getModifiers())) {
                 settersOfType.add(method);
             }
         }
@@ -585,44 +584,71 @@ public class ReflectionUtils {
      * @param toType   The to type, not null
      * @return True if assignable
      */
-    public static boolean isAssignable(Class<?> fromType, Class<?> toType) {
-        // handle auto boxing types
-        if (boolean.class.equals(fromType) && Boolean.class.isAssignableFrom(toType) || boolean.class.equals(toType) && Boolean.class.isAssignableFrom(fromType)) {
-            return true;
+    public static boolean isAssignable(Type fromType, Type toType) {
+        if (fromType instanceof Class<?> && toType instanceof Class<?>) {
+            Class<?> fromClass = (Class<?>) fromType;
+            Class<?> toClass = (Class<?>) toType;
+
+            // handle auto boxing types
+            if (boolean.class.equals(fromClass) && Boolean.class.isAssignableFrom(toClass) || boolean.class.equals(toClass) && Boolean.class.isAssignableFrom(fromClass)) {
+                return true;
+            }
+            if (char.class.equals(fromClass) && Character.class.isAssignableFrom(toClass) || char.class.equals(toClass) && Character.class.isAssignableFrom(fromClass)) {
+                return true;
+            }
+            if (int.class.equals(fromClass) && Integer.class.isAssignableFrom(toClass) || int.class.equals(toClass) && Integer.class.isAssignableFrom(fromClass)) {
+                return true;
+            }
+            if (long.class.equals(fromClass) && Long.class.isAssignableFrom(toClass) || long.class.equals(toClass) && Long.class.isAssignableFrom(fromClass)) {
+                return true;
+            }
+            if (float.class.equals(fromClass) && Float.class.isAssignableFrom(toClass) || float.class.equals(toClass) && Float.class.isAssignableFrom(fromClass)) {
+                return true;
+            }
+            if (double.class.equals(fromClass) && Double.class.isAssignableFrom(toClass) || double.class.equals(toClass) && Double.class.isAssignableFrom(fromClass)) {
+                return true;
+            }
+            return toClass.isAssignableFrom(fromClass);
         }
-        if (char.class.equals(fromType) && Character.class.isAssignableFrom(toType) || char.class.equals(toType) && Character.class.isAssignableFrom(fromType)) {
-            return true;
-        }
-        if (int.class.equals(fromType) && Integer.class.isAssignableFrom(toType) || int.class.equals(toType) && Integer.class.isAssignableFrom(fromType)) {
-            return true;
-        }
-        if (long.class.equals(fromType) && Long.class.isAssignableFrom(toType) || long.class.equals(toType) && Long.class.isAssignableFrom(fromType)) {
-            return true;
-        }
-        if (float.class.equals(fromType) && Float.class.isAssignableFrom(toType) || float.class.equals(toType) && Float.class.isAssignableFrom(fromType)) {
-            return true;
-        }
-        if (double.class.equals(fromType) && Double.class.isAssignableFrom(toType) || double.class.equals(toType) && Double.class.isAssignableFrom(fromType)) {
-            return true;
-        }
-        return toType.isAssignableFrom(fromType);
+        return TypeUtils.isAssignable(toType, fromType);
     }
 
 
     /**
      * Gets the T from a Class<T> field declaration.
+     * An exception is raised if the field type is not generic or has more than 1 generic type
      *
      * @param field The field to get the type from, not null
-     * @return The declared generic type, null if not generic or more than 1 generic type
+     * @return The declared generic type
      */
-    public static Class<?> getGenericType(Field field) {
+    public static Type getGenericType(Field field) {
         Type type = field.getGenericType();
         if (type instanceof ParameterizedType) {
             Type[] argumentTypes = ((ParameterizedType) type).getActualTypeArguments();
-            if (argumentTypes.length == 1 && argumentTypes[0] instanceof Class<?>) {
-                return (Class<?>) argumentTypes[0];
+            if (argumentTypes.length == 1) {
+                return argumentTypes[0];
             }
+            throw new UnitilsException("Unable to determine unique generic type for field: " + field + ". The field type declares more than one generic type: " + type);
         }
-        return null;
+        throw new UnitilsException("Unable to determine unique generic type for field: " + field + ". Field type is not a generic type: " + type);
     }
+
+
+    /**
+     * Gets the class instance for the given type instance.
+     *
+     * @param type The type to get a class instance for, not null
+     * @return The class instance, not null
+     */
+    @SuppressWarnings({"unchecked"})
+    public static <T> Class<T> getClassForType(Type type) {
+        if (type instanceof Class<?>) {
+            return (Class<T>) type;
+        }
+        if (type instanceof ParameterizedType) {
+            return (Class<T>) ((ParameterizedType) type).getRawType();
+        }
+        throw new UnitilsException("Unable to convert Type instance " + type + " to a Class instance.");
+    }
+
 }
