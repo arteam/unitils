@@ -26,6 +26,7 @@ import org.unitils.inject.annotation.TestedObject;
 import org.unitils.mock.Mock;
 import org.unitils.mock.core.MockObject;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -59,6 +60,15 @@ public class InjectIntoByTypeWithMocksTest {
 
 
     @Test
+    public void injectIntoByTypeWithGenericTypeMock() {
+        InjectIntoByTypeWithGenericTypeMock injectIntoByTypeWithGenericTypeMock = new InjectIntoByTypeWithGenericTypeMock();
+        injectModule.injectObjects(injectIntoByTypeWithGenericTypeMock);
+
+        assertSame(injectIntoByTypeWithGenericTypeMock.mockedList.getMock(), injectIntoByTypeWithGenericTypeMock.injectTarget.genericType);
+    }
+
+
+    @Test
     public void injectIntoStaticByTypeWithMock() {
         InjectIntoStaticByTypeWithMock injectIntoStaticByTypeWithMock = new InjectIntoStaticByTypeWithMock();
         injectModule.injectObjects(injectIntoStaticByTypeWithMock);
@@ -75,7 +85,7 @@ public class InjectIntoByTypeWithMocksTest {
             fail("Expected UnitilsException");
 
         } catch (UnitilsException e) {
-            assertTrue(e.getMessage().contains("No static field with (super)type Map found in InjectStaticTarget"));
+            assertTrue(e.getMessage().contains("No static field with (super)type interface java.util.Map found in InjectStaticTarget"));
         }
     }
 
@@ -87,6 +97,16 @@ public class InjectIntoByTypeWithMocksTest {
 
         @InjectIntoByType
         public Mock<Properties> mockedProperties = new MockObject<Properties>("test", Properties.class, this);
+    }
+
+
+    public static class InjectIntoByTypeWithGenericTypeMock {
+
+        @TestedObject
+        public InjectTarget injectTarget = new InjectTarget();
+
+        @InjectIntoByType
+        public Mock<Map<String, List<String>>> mockedList = new MockObject<Map<String, List<String>>>("test", Map.class, this);
     }
 
 
@@ -107,6 +127,11 @@ public class InjectIntoByTypeWithMocksTest {
     public static class InjectTarget {
 
         public Properties properties;
+
+        public Map<String, List<String>> genericType;
+
+        public Map<String, String> genericTypeWithSameRawType;
+
     }
 
 

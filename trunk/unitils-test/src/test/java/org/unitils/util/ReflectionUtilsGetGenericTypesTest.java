@@ -16,11 +16,14 @@
 package org.unitils.util;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import org.junit.Test;
+import org.unitils.core.UnitilsException;
 import static org.unitils.util.ReflectionUtils.getFieldWithName;
 import static org.unitils.util.ReflectionUtils.getGenericType;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,22 +37,27 @@ public class ReflectionUtilsGetGenericTypesTest {
 
     @Test
     public void generic() throws Exception {
-        Class<?> result = getGenericType(getFieldWithName(TestClass.class, "genericField", false));
+        Type result = getGenericType(getFieldWithName(TestClass.class, "genericField", false));
         assertEquals(String.class, result);
     }
 
 
-    @Test
+    @Test(expected = UnitilsException.class)
     public void notGeneric() throws Exception {
-        Class<?> result = getGenericType(getFieldWithName(TestClass.class, "notGenericField", false));
-        assertNull(result);
+        getGenericType(getFieldWithName(TestClass.class, "notGenericField", false));
     }
 
 
     @Test
+    public void nestedGeneric() throws Exception {
+        Type result = getGenericType(getFieldWithName(TestClass.class, "nestedGenericField", false));
+        assertEquals(Map.class, ((ParameterizedType) result).getRawType());
+    }
+
+
+    @Test(expected = UnitilsException.class)
     public void moreThanOneGenericType() throws Exception {
-        Class<?> result = getGenericType(getFieldWithName(TestClass.class, "multipleGenericField", false));
-        assertNull(result);
+        getGenericType(getFieldWithName(TestClass.class, "multipleGenericField", false));
     }
 
 
@@ -58,6 +66,8 @@ public class ReflectionUtilsGetGenericTypesTest {
         private Object notGenericField;
 
         private Class<String> genericField;
+
+        private List<Map<String, List<String>>> nestedGenericField;
 
         private Map<String, String> multipleGenericField;
     }

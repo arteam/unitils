@@ -31,6 +31,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Set;
 
 /**
@@ -126,7 +127,7 @@ public class InjectionUtils {
      * @param propertyAccess     Defines if field or setter injection is used
      * @return The object that was replaced by the injection
      */
-    public static Object injectIntoByType(Object objectToInject, Class<?> objectToInjectType, Object target, PropertyAccess propertyAccess) {
+    public static Object injectIntoByType(Object objectToInject, Type objectToInjectType, Object target, PropertyAccess propertyAccess) {
         if (target == null) {
             throw new UnitilsException("Target for injection should not be null");
         }
@@ -147,7 +148,7 @@ public class InjectionUtils {
      * @param propertyAccess     Defines if field or setter injection is used
      * @return The object that was replaced by the injection
      */
-    public static Object injectIntoStaticByType(Object objectToInject, Class<?> objectToInjectType, Class<?> targetClass, PropertyAccess propertyAccess) {
+    public static Object injectIntoStaticByType(Object objectToInject, Type objectToInjectType, Class<?> targetClass, PropertyAccess propertyAccess) {
         if (propertyAccess == PropertyAccess.FIELD) {
             return injectIntoFieldByType(objectToInject, objectToInjectType, null, targetClass, true);
         }
@@ -199,12 +200,17 @@ public class InjectionUtils {
      * @param isStatic           Indicates wether injection should be performed on the target object or on the target class
      * @return The object that was replaced by the injection
      */
-    private static Object injectIntoFieldByType(Object objectToInject, Class<?> objectToInjectType, Object target, Class<?> targetClass, boolean isStatic) {
+    private static Object injectIntoFieldByType(Object objectToInject, Type objectToInjectType, Object target, Class<?> targetClass, boolean isStatic) {
         // Try to find a field with an exact matching type
         Field fieldToInjectTo = null;
-        Set<Field> fieldsWithExactType = ReflectionUtils.getFieldsOfType(targetClass, objectToInjectType, isStatic);
+        Set<Field> fieldsWithExactType = getFieldsOfType(targetClass, objectToInjectType, isStatic);
         if (fieldsWithExactType.size() > 1) {
-            throw new UnitilsException("More than one " + (isStatic ? "static " : "") + "field with exact type " + objectToInjectType.getSimpleName() + " found in " + targetClass.getSimpleName());
+            StringBuilder message = new StringBuilder("More than one " + (isStatic ? "static " : "") + "field with type " + objectToInjectType + " found in " + targetClass.getSimpleName() + ".");
+            if (objectToInjectType instanceof Class<?>) {
+                message.append(" If the target is a generic type, this can be caused by type erasure.");
+            }
+            message.append(" Specify the target field explicitly instead of injecting into by type.");
+            throw new UnitilsException(message.toString());
 
         } else if (fieldsWithExactType.size() == 1) {
             fieldToInjectTo = fieldsWithExactType.iterator().next();
@@ -215,7 +221,7 @@ public class InjectionUtils {
             // this one is taken. Otherwise, an exception is thrown
             Set<Field> fieldsOfType = getFieldsAssignableFrom(targetClass, objectToInjectType, isStatic);
             if (fieldsOfType.size() == 0) {
-                throw new UnitilsException("No " + (isStatic ? "static " : "") + "field with (super)type " + objectToInjectType.getSimpleName() + " found in " + targetClass.getSimpleName());
+                throw new UnitilsException("No " + (isStatic ? "static " : "") + "field with (super)type " + objectToInjectType + " found in " + targetClass.getSimpleName());
             }
             for (Field field : fieldsOfType) {
                 boolean moreSpecific = true;
@@ -233,8 +239,7 @@ public class InjectionUtils {
                 }
             }
             if (fieldToInjectTo == null) {
-                throw new UnitilsException("Multiple candidate target " + (isStatic ? "static " : "") + "fields found in " + targetClass.getSimpleName() +
-                        ", with none of them more specific than all others.");
+                throw new UnitilsException("Multiple candidate target " + (isStatic ? "static " : "") + "fields found in " + targetClass.getSimpleName() + ", with none of them more specific than all others.");
             }
         }
 
@@ -266,12 +271,12 @@ public class InjectionUtils {
      * @param isStatic           Indicates wether injection should be performed on the target object or on the target class
      * @return The object that was replaced by the injection
      */
-    private static Object injectIntoSetterByType(Object objectToInject, Class<?> objectToInjectType, Object target, Class<?> targetClass, boolean isStatic) {
+    private static Object injectIntoSetterByType(Object objectToInject, Type objectToInjectType, Object target, Class<?> targetClass, boolean isStatic) {
         // Try to find a method with an exact matching type
         Method setterToInjectTo = null;
         Set<Method> settersWithExactType = getSettersOfType(targetClass, objectToInjectType, isStatic);
         if (settersWithExactType.size() > 1) {
-            throw new UnitilsException("More than one " + (isStatic ? "static " : "") + "setter with exact type " + objectToInjectType.getSimpleName() + " found in " + targetClass.getSimpleName());
+            throw new UnitilsException("More than one " + (isStatic ? "static " : "") + "setter with type " + objectToInjectType + " found in " + targetClass.getSimpleName());
 
         } else if (settersWithExactType.size() == 1) {
             setterToInjectTo = settersWithExactType.iterator().next();
@@ -282,7 +287,7 @@ public class InjectionUtils {
             // this one is taken. Otherwise, an exception is thrown
             Set<Method> settersOfType = getSettersAssignableFrom(targetClass, objectToInjectType, isStatic);
             if (settersOfType.size() == 0) {
-                throw new UnitilsException("No " + (isStatic ? "static " : "") + "setter with (super)type " + objectToInjectType.getSimpleName() + " found in " + targetClass.getSimpleName());
+                throw new UnitilsException("No " + (isStatic ? "static " : "") + "setter with (super)type " + objectToInjectType + " found in " + targetClass.getSimpleName());
             }
             for (Method setter : settersOfType) {
                 boolean moreSpecific = true;
