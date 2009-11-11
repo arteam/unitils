@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Tests the mock object functionality.
+ * Tests the mock module functionality.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
