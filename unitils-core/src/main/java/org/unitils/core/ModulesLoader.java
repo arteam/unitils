@@ -15,23 +15,12 @@
  */
 package org.unitils.core;
 
-import static org.unitils.util.PropertyUtils.getBoolean;
-import static org.unitils.util.PropertyUtils.getString;
-import static org.unitils.util.PropertyUtils.getStringList;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import static org.unitils.util.PropertyUtils.*;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * A class for loading unitils modules.
@@ -82,7 +71,9 @@ public class ModulesLoader {
      */
     public static final String PROPKEY_MODULE_SUFFIX_RUN_AFTER = ".runAfter";
 
-    /** The logger instance for this class. */
+    /**
+     * The logger instance for this class.
+     */
     private static Log logger = LogFactory.getLog(ModulesLoader.class);
 
 
@@ -137,17 +128,21 @@ public class ModulesLoader {
     /**
      * Creates the modules with the given class names and calls initializes them with the given configuration.
      *
-     * @param moduleNameList the module class names, not null
-     * @param configuration  the configuration, not null
+     * @param moduleNames   the module class names, not null
+     * @param configuration the configuration, not null
      * @return the modules, not null
      */
-    protected List<Module> createAndInitializeModules(List<String> moduleNameList, Properties configuration) {
+    protected List<Module> createAndInitializeModules(List<String> moduleNames, Properties configuration) {
         List<Module> result = new ArrayList<Module>();
-        for (String moduleName : moduleNameList) {
+        for (String moduleName : moduleNames) {
             // get module class name
             String className = getString(PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_CLASS_NAME, configuration);
+            if (!classFileExistsInClasspath(className)) {
+                logger.debug("Skipping module " + moduleName + ". Module class not found in classpath. Module class name: " + className);
+                continue;
+            }
             try {
-                // create module instance
+                // create module instance                
                 Object module = createInstanceOfType(className, true);
                 if (!(module instanceof Module)) {
                     throw new UnitilsException("Unable to load core. Module class is not of type UnitilsModule: " + className);
@@ -155,40 +150,12 @@ public class ModulesLoader {
                 // initialize module
                 ((Module) module).init(configuration);
                 result.add((Module) module);
-
-            } catch (UnitilsException e) {
-                if (e.getCause() instanceof ClassNotFoundException || e.getCause() instanceof NoClassDefFoundError) {
-                    // Class not found, maybe this is caused by a library that is not in the classpath
-                    // Log warning and ingore exception
-                    logInitializationWarning(moduleName, className, e);
-                    continue;
-                }
-                throw e;
-            } catch (NoClassDefFoundError e) {
-                // Class not found, maybe this is caused by a library that is not in the classpath
-                // Log warning and ingore exception
-                logInitializationWarning(moduleName, className, e);
+            } catch (Throwable t) {
+                throw new UnitilsException("An exception occured during the loading of core module " + moduleName + " with module class name " + className, t);
             }
         }
         return result;
     }
-    
-    
-    /**
-     * Logs a warning that a module could not be loaded.
-     * For example a class not found caused by a library that is not in the classpath
-     * @param moduleName TODO
-     * @param className The class name of the module, not null
-     * @param t         The exception, not null
-     */
-    protected void logInitializationWarning(String moduleName, String className, Throwable t) {
-        logger.warn("Unable to create module " + moduleName + " (" + className + "). This causes the module to " +
-                "be implicitly disabled. This is probably caused by a missing library. If you don't need this " +
-                "module, this warning can be avoided by explicitly disabling the module by setting the property " + 
-                PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_ENABLED + "=false");
-        logger.debug("Ignored exception during module initialisation.", t);
-    }
-
 
 
     /**
@@ -241,4 +208,15 @@ public class ModulesLoader {
             }
         }
     }
+
+
+    /**
+     * @param className The name of the class to check, not null
+     * @return True if the classfile exists in the classpath
+     */
+    protected boolean classFileExistsInClasspath(String className) {
+        String classFileName = className.replace('.', '/') + ".class";
+        return getClass().getClassLoader().getResource(classFileName) != null;
+    }
+
 }
