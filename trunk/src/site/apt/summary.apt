@@ -89,9 +89,15 @@ Summary
 * News
 ~~~~~~
 
+  <<2009-11-14 - Release of Unitils 3.1>>
+  
+    This release contains some important fixes for the mock module. 
+    
+    The cglib, asm and objenesis dependencies are now also repackaged into the unitils-mock.jar. This will avoid version problems when your own project also uses versions of these libs, e.g. because you're using hibernate (which uses cglib).    
+    
+    Check the {{{http://jira.unitils.org/secure/ReleaseNote.jspa?projectId=10000&styleName=Html&version=10030}release notes}} for more details.
+  
   <<2009-10-12 - Release of Unitils 3.0>>
-
-    Unitils provides utilities to simplify unit-testing with JUnit or TestNG. It builds further on DBUnit and EasyMock and integrates with Hibernate and Spring. The goal is to make unit-testing easy and maintainable by offering utilities such as automatic DB-schema maintenance and equality assertion through reflection.
 
     The unitils modules are now split up in separate applications and artifacts:
 
@@ -127,6 +133,8 @@ Summary
     There is a new version of the mock framework, unitils-mock, containing lots of improvements. E.g. better support for partial mocking, better reports and some bug fixes.
 
     We're starting up a {{{http://sourceforge.net/apps/mediawiki/unitils/index.php?title=Main_Page}wiki}} on which you can find extra information and code samples. 
+    
+    Check the {{{http://jira.unitils.org/secure/ReleaseNote.jspa?projectId=10000&styleName=Html&version=10020}release notes}} for more details.
 
   <<2009-06-02 - Release of Unitils 2.3>>
   
