@@ -80,7 +80,7 @@ Summary
     * To get started with quickly, there is also a {{{cookbook.html} cookbook}} available, containing step-by-step
       instructions on how to configure your tests.
 
-    * We're starting up a {{{https://sourceforge.net/apps/mediawiki/unitils/index.php?title=Main_Page}wiki}} on which
+    * We're starting up a {{{http://sourceforge.net/apps/mediawiki/unitils/index.php?title=Main_Page}wiki}} on which
       you can find extra information and code samples.
       
     []
@@ -126,7 +126,7 @@ Summary
 
     There is a new version of the mock framework, unitils-mock, containing lots of improvements. E.g. better support for partial mocking, better reports and some bug fixes.
 
-    We're starting up a {{{https://sourceforge.net/apps/mediawiki/unitils/index.php?title=Main_Page}wiki}} on which you can find extra information and code samples. 
+    We're starting up a {{{http://sourceforge.net/apps/mediawiki/unitils/index.php?title=Main_Page}wiki}} on which you can find extra information and code samples. 
 
   <<2009-06-02 - Release of Unitils 2.3>>
   
