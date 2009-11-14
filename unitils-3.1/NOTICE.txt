@@ -1,0 +1,45 @@
+=====================================================
+== NOTICE file corresponding to section 4 d of the Apache License,  ==
+== Version 2.0, in this case for the Unitils distribution.                    ==
+=====================================================
+
+
+This product uses software developed by
+the Apache Software Foundation (http://www.apache.org).
+
+This product uses Hibernate (http://www.hibernate.org) which is 
+licensed under LGPL. 
+
+This product uses TestNG (http://testng.org) which is 
+licensed under Apache License Version 2.0. 
+
+This product uses software developed by the Spring Framework
+Project (http://www.springframework.org).
+
+This product uses OGNL (http://www.opensymphony.com/ognl) which is 
+licensed under OpenSymphony Software License Version 1.1. 
+
+This product uses JUnit (http://www.junit.org) which is 
+licensed under Common Public License Version 1.0. 
+
+This product uses DBUnit (http://www.dbunit.org) which is 
+licensed under LGPL. 
+
+This product uses EasyMock (http://www.easymock.org) which is 
+licensed under MIT License.
+
+This product uses HSQLDB (http://sourceforge.net/projects/junit-addons) which is 
+licensed under Apache Software License.
+
+This product uses Maven (http://maven.apache.org) which is 
+licensed under Apache License Version 2.0. 
+
+This product uses ASM  (http://asm.ow2.org/)
+Copyright (c) 2000-2005 INRIA, France Telecom
+
+This product uses Objenisis (http://objenesis.googlecode.com/svn/docs/index.html)
+Copyright (c) 2003-2009, Objenesis Team and all contributors
+
+This product uses Cglib (http://cglib.sourceforge.net/) which is 
+licensed under Apache License Version 1.1. 
+ 
