@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+
+    <TEST pk="1" column1="value1" column2="xxxx"/>
+
+</dataset>
