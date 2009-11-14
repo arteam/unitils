@@ -1,7 +1,7 @@
-======================================================================
+=====================================================
 == NOTICE file corresponding to section 4 d of the Apache License,  ==
-== Version 2.0, in this case for the Unitils distribution.          ==
-======================================================================
+== Version 2.0, in this case for the Unitils distribution.                    ==
+=====================================================
 
 
 This product uses software developed by
@@ -33,4 +33,13 @@ licensed under Apache Software License.
 
 This product uses Maven (http://maven.apache.org) which is 
 licensed under Apache License Version 2.0. 
+
+This product uses ASM  (http://asm.ow2.org/)
+Copyright (c) 2000-2005 INRIA, France Telecom
+
+This product uses Objenisis (http://objenesis.googlecode.com/svn/docs/index.html)
+Copyright (c) 2003-2009, Objenesis Team and all contributors
+
+This product uses Cglib (http://cglib.sourceforge.net/) which is 
+licensed under Apache License Version 1.1. 
  
