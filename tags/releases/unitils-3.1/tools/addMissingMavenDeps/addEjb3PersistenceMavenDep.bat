@@ -1,0 +1,1 @@
+mvn install:install-file -DgroupId=javax.persistence -DartifactId=ejb -Dversion=3.0-public_review -Dpackaging=jar -Dfile=../../lib/javax-persistence-3.0-public_review.jar
