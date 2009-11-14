@@ -188,6 +188,14 @@
                     <dependencySet>
                         <useProjectArtifact>false</useProjectArtifact>
                         <outputDirectory>unitils-mock/lib</outputDirectory>
+		    <useTransitiveFiltering>true</useTransitiveFiltering>
+		    <excludes>
+			<exclude>cglib:cglib</exclude>
+                              <exclude>asm:asm</exclude>
+                              <exclude>asm:asm-analysis</exclude>
+                              <exclude>asm:asm-tree</exclude>
+                              <exclude>org.objenesis:objenesis</exclude>
+		    </excludes>
                     </dependencySet>
                 </dependencySets>
                 <unpack>false</unpack>
