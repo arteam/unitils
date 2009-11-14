@@ -3,7 +3,7 @@
 
     <groupId>org.unitils</groupId>
     <artifactId>unitils</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -58,7 +58,7 @@
     <distributionManagement>
         <repository>
             <id>sourceforge-repository</id>
-            <url>sftp://web.sourceforge.net/home/groups/u/un/unitils/htdocs/m2-repo</url>
+            <url>sftp://frs.sourceforge.net/home/groups/u/un/unitils/htdocs/m2-repo</url>
         </repository>
     </distributionManagement>
 
