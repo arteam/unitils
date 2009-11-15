@@ -15,9 +15,6 @@
  */
 package org.unitils.dbmaintainer.structure.impl;
 
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.write;
-
 import org.apache.commons.lang.StringUtils;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
@@ -39,8 +36,11 @@ import java.sql.Connection;
 import java.util.Properties;
 import java.util.Set;
 
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.write;
+
 /**
- * Implementation of {@link DataSetStructureGenerator} for the DbUnit {@link FlatXmlDataSet} XML test data files format
+ * Implementation of {@link DataSetStructureGenerator} for the DbUnit {@link org.dbunit.dataset.xml.FlatXmlDataSet} XML test data files format
  * <p/>
  * todo test and fix for hsqldb (see sample project)
  *
@@ -122,7 +122,7 @@ public class DtdDataSetStructureGenerator extends BaseDatabaseAccessor implement
             // filter out all system table names
             Set<String> tableNames = defaultDbSupport.getTableNames();
             IDataSet actualDataSet = dbUnitDatabaseConnection.createDataSet();
-            IDataSet filteredActualDataSet = new FilteredDataSet(new IncludeTableFilter(tableNames.toArray(new String[0])), actualDataSet);
+            IDataSet filteredActualDataSet = new FilteredDataSet(new IncludeTableFilter(tableNames.toArray(new String[tableNames.size()])), actualDataSet);
 
             datasetWriter.write(filteredActualDataSet);
             return stringWriter.toString();
