@@ -18,8 +18,8 @@ package org.unitils.orm.jpa.util;
 import java.lang.reflect.Method;
 
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
+import org.unitils.orm.common.util.AnnotationConfigLoader;
 import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
-import org.unitils.util.AnnotationConfigLoader;
 
 
 /**
