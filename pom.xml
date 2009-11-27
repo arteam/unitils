@@ -17,6 +17,7 @@
         <module>unitils-mock</module>
         <module>unitils-orm</module>
         <module>unitils-spring</module>
+	<module>unitils-tapestry</module>
 
         <module>unitils-test</module>
         <!--module>unitils-testng-test</module-->       <!-- todo convert tests to TestNG -->
@@ -40,6 +41,7 @@
 
     <properties>
         <spring.version>2.5.2</spring.version>
+	<tapestry.version>5.1.0.5</tapestry.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
