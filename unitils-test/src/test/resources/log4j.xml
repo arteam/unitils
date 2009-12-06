@@ -10,12 +10,16 @@
     </appender>
 
     <logger name="org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver">
-        <level value="INFO" />        
+        <level value="INFO"/>
     </logger>
-        
+
+    <logger name="org.unitils">
+        <level value="DEBUG"/>
+    </logger>
+
     <root>
-        <priority value="INFO" />
-        <appender-ref ref="STDOUT" />
+        <priority value="INFO"/>
+        <appender-ref ref="STDOUT"/>
     </root>
-    
+
 </log4j:configuration>
