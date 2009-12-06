@@ -20,6 +20,7 @@
 	<module>unitils-tapestry</module>
 
         <module>unitils-test</module>
+        <module>unitils-dataset</module>
         <!--module>unitils-testng-test</module-->       <!-- todo convert tests to TestNG -->
     </modules>
 

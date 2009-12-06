@@ -15,16 +15,15 @@
  */
 package org.unitils.dbmaintainer.util;
 
-import static org.unitils.core.util.ConfigUtils.getInstanceOf;
-
-import java.util.Properties;
-
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.util.PropertyUtils;
 
+import java.util.Properties;
+
+import static org.unitils.core.util.ConfigUtils.getInstanceOf;
+
 /**
- * Class containing configuration utility methods specifically for the {@link org.unitils.database.DatabaseModule} and
- * related modules
+ * Class containing configuration utility methods.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -40,8 +39,8 @@ public class DatabaseModuleConfigUtils {
     /**
      * Retrieves the concrete instance of the class with the given type as configured by the given <code>Configuration</code>.
      * The concrete instance must extend the class {@link DatabaseAccessing}.
-     * 
-     * @param <T>              The type of the DatabaseTask 
+     *
+     * @param <T>              The type of the DatabaseTask
      * @param databaseTaskType The type of the DatabaseTask, not null
      * @param configuration    The config, not null
      * @param sqlHandler       The sql handler, not null

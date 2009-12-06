@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset variableToken=":">
+
+    <TEST col1="test :0 :1" col2=":1" col3="=:2"/>
+
+</dataset>
