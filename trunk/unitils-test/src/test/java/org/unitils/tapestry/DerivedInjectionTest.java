@@ -2,18 +2,18 @@ package org.unitils.tapestry;
 
 import static org.junit.Assert.assertNotNull;
 
+import org.apache.tapestry5.ioc.annotations.Inject;
 import org.junit.Test;
-import org.unitils.tapestry.annotation.TapestryModule;
-import org.unitils.tapestry.annotation.TapestryService;
+import org.unitils.tapestry.annotation.TapestryRegistry;
 
-@TapestryModule(Module.class)
+@TapestryRegistry(Module.class)
 public class DerivedInjectionTest extends DerivedInjectionTestBase {
 
-	@TapestryService
+	@Inject
 	private Service myTestService;
-	@TapestryService 
+	@Inject
 	private static Service myTestServiceStatic;
-	
+
 	@Test
 	public void testAlsoSuperClassFieldsAreInjected() {
 		assertNotNull(myTestService);
@@ -21,5 +21,5 @@ public class DerivedInjectionTest extends DerivedInjectionTestBase {
 		assertNotNull(testService);
 		assertNotNull(testServiceStatic);
 	}
-	
+
 }

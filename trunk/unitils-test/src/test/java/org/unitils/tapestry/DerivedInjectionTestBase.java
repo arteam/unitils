@@ -1,15 +1,15 @@
 package org.unitils.tapestry;
 
+import org.apache.tapestry5.ioc.annotations.Inject;
 import org.junit.runner.RunWith;
 import org.unitils.UnitilsJUnit4TestClassRunner;
-import org.unitils.tapestry.annotation.TapestryService;
 
 @RunWith(UnitilsJUnit4TestClassRunner.class)
 public abstract class DerivedInjectionTestBase {
 
-	@TapestryService
+	@Inject
 	protected Service testService;
-	@TapestryService
+	@Inject
 	protected static Service testServiceStatic;
 	
 	

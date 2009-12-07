@@ -8,117 +8,109 @@ import static org.junit.Assert.assertTrue;
 import junit.framework.Assert;
 
 import org.apache.tapestry5.ioc.Registry;
+import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.ioc.annotations.InjectService;
+import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.unitils.UnitilsJUnit4TestClassRunner;
-import org.unitils.tapestry.annotation.DoNotInject;
-import org.unitils.tapestry.annotation.TapestryModule;
-import org.unitils.tapestry.annotation.TapestryService;
-import org.unitils.tapestry.annotation.TapestrySymbol;
+import org.unitils.tapestry.annotation.RunBeforeTapestryRegistryIsCreated;
+import org.unitils.tapestry.annotation.TapestryRegistry;
 
 @RunWith(UnitilsJUnit4TestClassRunner.class)
-@TapestryModule(Module.class)
+@TapestryRegistry(Module.class)
 public class TapestryUnitilsModuleTest {
 
-	@TapestryService
+	@Inject
 	private static Service staticTestService;
-	@TapestrySymbol("testSymbol")
+	@Inject
+	@Symbol("testSymbol")
 	private static String staticTestSymbol;
 
-	@TapestryService
+	@Inject
 	private Service testService;
-	@TapestryService(type = Service.class)
-	private Object testServiceAsObject;
-	@TapestryService(type = Service.class, id = "TestService")
-	private Object testServiceAsObjectById;
-	@TapestrySymbol("testSymbol")
+	@InjectService("TestService")
+	private Service testServiceById;
+	@Inject
+	@Symbol("testSymbol")
 	private String testSymbol;
-	@TapestrySymbol(value = "noSuchSymbol", optional = true)
-	private String noSuchSymbol;
 
+	@Inject
 	private Registry registry;
+	@Inject
 	private static Registry staticRegistry;
-	@DoNotInject
-	private Registry registryThatIsNotInjected;
 
-	@TapestryService
+	private Registry registryThatIsNotInjected;
+	private Service serviceThatIsNotInjected;
+
+	@Inject
 	@ServiceMarker
 	private Service2 serviceWithMarker;
-	@TapestryService
+	@Inject
 	@ServiceMarker2
 	private Service2 serviceWithMarker2;
-	
+
 	private static boolean initializeBeforeTapestryRegistryCalled;
-	
+
+	@RunBeforeTapestryRegistryIsCreated
 	public static void initializeBeforeTapestryRegistry() {
 		initializeBeforeTapestryRegistryCalled = true;
 	}
-	
+
 	@Test
-	public void testInitializeBeforeTapestryRegistryIsCalled() {
+	public void initializeBeforeTapestryRegistryIsCalled() {
 		assertTrue(initializeBeforeTapestryRegistryCalled);
 	}
-	
-	
+
 	@Test
-	public void testMarkedServices() {
+	public void injectServicesWithMarkers() {
 		assertNotNull(serviceWithMarker);
 		assertNotNull(serviceWithMarker2);
 		assertFalse(serviceWithMarker == serviceWithMarker2);
 	}
-	
-	@Test
-	public void testNoSuchSymbolIsOptional() {
-		assertNull(noSuchSymbol);
-	}
 
 	@Test
-	public void testDoNotInject() {
+	public void fieldsThatAreNotAnnotatedAreNotInjected() {
 		assertNull(registryThatIsNotInjected);
+		assertNull(serviceThatIsNotInjected);
 	}
 
 	@Test
-	public void testRegistryIsInjected() {
+	public void injectTapestryRegistry() {
 		assertNotNull(registry);
 	}
 
 	@Test
-	public void testStaticRegistryIsInjected() {
+	public void injectStaticTapestryRegistry() {
 		assertNotNull(staticRegistry);
 	}
 
 	@Test
-	public void testStaticTestSymbolIsInjected() {
+	public void injectStaticSymbol() {
 		assertEquals("testSymbolValue", staticTestSymbol);
 	}
 
 	@Test
-	public void testTestSymbolIsInjected() {
+	public void injectSymbol() {
 		assertEquals("testSymbolValue", testSymbol);
 	}
 
 	@Test
-	public void testStaticTestServiceIsInjectd() {
+	public void injectStaticService() {
 		Assert.assertNotNull(staticTestService);
 		Assert.assertEquals("test", staticTestService.test());
 	}
 
 	@Test
-	public void testServiceByTypeIsInjected() {
+	public void injectServiceByType() {
 		Assert.assertNotNull(testService);
 		Assert.assertEquals("test", testService.test());
 	}
 
 	@Test
-	public void testServiceByTypeIsInjectedIntoObject() {
-		Assert.assertNotNull(testServiceAsObject);
-		Assert.assertEquals("test", ((Service) testServiceAsObject).test());
-	}
-
-	@Test
-	public void testServiceByTypeAndIdIsInjectedIntoObject() {
-		Assert.assertNotNull(testServiceAsObjectById);
-		Assert.assertEquals("test", ((Service) testServiceAsObjectById).test());
+	public void injectServiceById() {
+		Assert.assertNotNull(testServiceById);
+		Assert.assertEquals("test", ((Service) testServiceById).test());
 	}
 
 }

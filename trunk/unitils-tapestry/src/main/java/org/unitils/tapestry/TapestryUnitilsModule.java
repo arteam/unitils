@@ -1,80 +1,65 @@
 package org.unitils.tapestry;
 
-import org.apache.tapestry5.ioc.AnnotationProvider;
-import org.apache.tapestry5.ioc.Registry;
-import org.apache.tapestry5.ioc.RegistryBuilder;
-import org.apache.tapestry5.ioc.services.SymbolSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.unitils.core.Module;
-import org.unitils.core.TestListener;
-import org.unitils.core.UnitilsException;
-import org.unitils.tapestry.annotation.Constants;
-import org.unitils.tapestry.annotation.DoNotInject;
-import org.unitils.tapestry.annotation.PrivateTapestryRegistry;
-import org.unitils.tapestry.annotation.TapestryModule;
-import org.unitils.tapestry.annotation.TapestryService;
-import org.unitils.tapestry.annotation.TapestrySymbol;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+
+import org.apache.commons.lang.ClassUtils;
+import org.apache.tapestry5.ioc.AnnotationProvider;
+import org.apache.tapestry5.ioc.Registry;
+import org.apache.tapestry5.ioc.RegistryBuilder;
+import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.ioc.annotations.InjectService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.unitils.core.Module;
+import org.unitils.core.TestListener;
+import org.unitils.core.UnitilsException;
+import org.unitils.tapestry.annotation.RunBeforeTapestryRegistryIsCreated;
+import org.unitils.tapestry.annotation.TapestryRegistry;
 
 /**
- * Unitils module that creates a Tapestry IOC registry for tests and
- * allows service injection into test fields.
+ * Unitils module that creates a Tapestry IOC registry for tests and allows
+ * service injection into test fields. For injection just use the standard
+ * tapestry injection annotations.
  * 
  * Example:
  * 
  * <pre>
- * &#064;TapestryModule( { StorageModule.class })
+ * &#064;TapestryRegistry(MyModule.class)
  * &#064;RunWith(UnitilsJUnit4TestClassRunner.class)
  * public class MyTest {
- *   &#064;TapestryService
- *   private MyService service;
- *   &#064;TapestryService
- *   private static MyService staticService;
- *   &#064;TapestrySymbol(&quot;SymbolSource-Symbol&quot;)
- *   private String value;
+ * 	&#064;Inject
+ * 	private MyService service;
+ * 	&#064;Inject
+ * 	private static MyService staticService;
+ * 	&#064;Inject
+ * 	&#064;Symbol(&quot;SymbolSource-Symbol&quot;)
+ * 	private String value;
  * }
  * </pre>
  * 
- * To inject a marked service, just add the marker annotation to the field,
- * e.g.:
- * 
- * <pre>
- * &#064;TapestryService
- * &#064;MyServices
- * private MyService service;
- * </pre>
- * 
  * To inject the Tapestry {@link Registry} just add a field of type
- * {@link Registry}.
+ * {@link Registry} and add the {@link Inject} annotation.
  * 
- * If you want to prevent that anything is injected at all (e.g. if you do not
- * want the Tapestry registry to be injected) add a {@link DoNotInject}
- * annotation.
- *
- * Test methods marked with {@link PrivateTapestryRegistry} get their own private
+ * Test methods marked with {@link TapestryRegistry} get their own private
  * registry otherwise one registry per test class is created.
- * 
- * If you need to do to anything in your test (e.g. override some system properties)
- * you can implement a static method called <tt>initializeBeforeTapestryRegistry</tt>
- * which will be called before the registry is created.
  */
 public class TapestryUnitilsModule implements Module {
 
-	private static Logger logger = LoggerFactory.getLogger(TapestryUnitilsModule.class);
+	private static Logger logger = LoggerFactory
+			.getLogger(TapestryUnitilsModule.class);
 
 	private Registry registry;
 
 	public void afterInit() {
-		// PRI: TODO patch Unitils to support AfterClass!
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
@@ -90,31 +75,68 @@ public class TapestryUnitilsModule implements Module {
 	public void init(Properties configuration) {
 	}
 
-	protected Registry createRegistryFor(Class<?> testClass) {
+	protected Registry createRegistryFor(Class<?> testClass, Method method) {
 		RegistryBuilder builder = new RegistryBuilder();
-		for (Class<?> module : getTapestryModulesFor(testClass)) {
+		for (Class<?> module : getTapestryModulesFor(testClass, method)) {
 			builder.add(module);
 		}
 		return builder.build();
 	}
 
-	protected List<Class<?>> getTapestryModulesFor(Class<?> testClass) {
-		TapestryModule module = testClass.getAnnotation(TapestryModule.class);
-		return module == null ? new ArrayList<Class<?>>() : Arrays.asList(module.value());
+	protected List<Class<?>> getTapestryModulesFor(Class<?> testClass,
+			Method method) {
+		Set<Class<?>> modules = new HashSet<Class<?>>();
+		
+		boolean addClassModules = true;
+		if (method != null) {
+			TapestryRegistry registry = method.getAnnotation(TapestryRegistry.class);
+			if(registry != null) {
+				modules.addAll(Arrays.asList(registry.value()));
+			}
+			addClassModules = false;
+		}
+		if(addClassModules) {
+			TapestryRegistry registry = testClass.getAnnotation(TapestryRegistry.class);
+			if(registry != null) {
+				modules.addAll(Arrays.asList(registry.value()));
+			}
+		}
+		return new ArrayList<Class<?>>(modules);
 	}
 
-	protected void createAndStartupRegistryFor(Class<?> testClass) {
-		try {
-			Method method = testClass.getMethod("initializeBeforeTapestryRegistry");
-			method.invoke(null);
-		} catch (Exception ignored) {
-		}
+	protected void createAndStartupRegistryFor(Class<?> testClass, Method method) {
+		runMethodsBeforeTapestryRegistryIsCreated(testClass);
 		shutdownRegistry();
 		if (logger.isDebugEnabled()) {
 			logger.debug("starting tapestry registry for " + testClass);
 		}
-		registry = createRegistryFor(testClass);
+		registry = createRegistryFor(testClass, method);
 		registry.performRegistryStartup();
+	}
+
+	private void runMethodsBeforeTapestryRegistryIsCreated(Class<?> testClass) {
+		List<Class<?>> testClasses = new ArrayList<Class<?>>();
+		while(testClass != Object.class) {
+			testClasses.add(0, testClass);
+			testClass = testClass.getSuperclass();
+		}
+		for(Class<?> clazz : testClasses) {
+			for(Method method : clazz.getDeclaredMethods()) {
+				if(method.getAnnotation(RunBeforeTapestryRegistryIsCreated.class) != null) {
+					if(!Modifier.isStatic(method.getModifiers())) {
+						throw new RuntimeException("Cannot call method annotated with @" + ClassUtils.getShortClassName(RunBeforeTapestryRegistryIsCreated.class) + " because it is not static");
+					}
+					if(!Modifier.isPublic(method.getModifiers())) {
+						throw new RuntimeException("Cannot call method annotated with @" + ClassUtils.getShortClassName(RunBeforeTapestryRegistryIsCreated.class) + " because it is not public");
+					}
+					try {
+						method.invoke(null);
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -123,8 +145,7 @@ public class TapestryUnitilsModule implements Module {
 	 */
 	protected void injectTapestryStuff(Object testObject, Class<?> clazz) {
 		for (Field field : clazz.getDeclaredFields()) {
-			injectServiceInto(testObject, field);
-			injectSymbolsInto(testObject, field);
+			injectFieldValue(testObject, field);
 		}
 		Class<?> superClazz = clazz.getSuperclass();
 		if (superClazz != null && superClazz != Object.class) {
@@ -132,34 +153,17 @@ public class TapestryUnitilsModule implements Module {
 		}
 	}
 
-	protected Object getServiceFor(TapestryService serviceAnnotation, final Field field) {
-		Class<?> type = serviceAnnotation.type();
-		if (type == Constants.UseFieldTypeAsServiceType.class) {
-			type = field.getType();
-		}
-		if (Constants.NO_SERVICE_ID.equals(serviceAnnotation.id())) {
-			return registry.getObject(type, new AnnotationProvider() {
-				public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-					return field.getAnnotation(annotationClass);
-				}
-			});
-		} else {
-			return registry.getService(serviceAnnotation.id(), type);
+	protected Object getValueToInjectFor(final Field field) {
+		if (field.getType() == Registry.class) {
+			return registry;
 		}
 
-	}
-
-	protected Object getSymbolFor(TapestrySymbol symbolAnnotation, Field field) {
-		try {
-			return registry.getService(SymbolSource.class).valueForSymbol(symbolAnnotation.value());
-		} catch (RuntimeException ex) {
-			if (symbolAnnotation.optional()) {
-				return null;
-			} else {
-				throw ex;
+		return registry.getObject(field.getType(), new AnnotationProvider() {
+			public <T extends Annotation> T getAnnotation(
+					Class<T> annotationClass) {
+				return field.getAnnotation(annotationClass);
 			}
-		}
-
+		});
 	}
 
 	/**
@@ -167,23 +171,17 @@ public class TapestryUnitilsModule implements Module {
 	 *            Nullable. If null, then the service is only injected into
 	 *            static fields.
 	 */
-	protected void injectServiceInto(Object testObject, Field field) {
-		if (field.getAnnotation(DoNotInject.class) != null) {
-			return;
-		}
-
+	protected void injectFieldValue(Object testObject, Field field) {
 		boolean injectValue = false;
 		Object valueToInject = null;
 		boolean isStatic = Modifier.isStatic(field.getModifiers());
-		if ((testObject == null && !isStatic) || (testObject != null && isStatic)) {
+		if ((testObject == null && !isStatic)
+				|| (testObject != null && isStatic)) {
 			return;
 		}
-		TapestryService serviceAnnotation = field.getAnnotation(TapestryService.class);
-		if (serviceAnnotation != null) {
-			valueToInject = getServiceFor(serviceAnnotation, field);
-			injectValue = true;
-		} else if (field.getType() == Registry.class) {
-			valueToInject = registry;
+		if (field.getAnnotation(Inject.class) != null
+				|| field.getAnnotation(InjectService.class) != null) {
+			valueToInject = getValueToInjectFor(field);
 			injectValue = true;
 		}
 		if (injectValue) {
@@ -193,31 +191,8 @@ public class TapestryUnitilsModule implements Module {
 			try {
 				field.set(testObject, valueToInject);
 			} catch (Exception e) {
-				throw new UnitilsException("cannot inject service into " + field, e);
-			}
-		}
-	}
-
-	/**
-	 * @param testObject
-	 *            Nullable. If null, then the symbol is only injected into
-	 *            static fields.
-	 */
-	protected void injectSymbolsInto(Object testObject, Field field) {
-		TapestrySymbol symbolAnnotation = field.getAnnotation(TapestrySymbol.class);
-		if (symbolAnnotation != null) {
-			boolean isStatic = Modifier.isStatic(field.getModifiers());
-			if ((testObject == null && !isStatic) || (testObject != null && isStatic)) {
-				return;
-			}
-			Object service = getSymbolFor(symbolAnnotation, field);
-			if (!field.isAccessible()) {
-				field.setAccessible(true);
-			}
-			try {
-				field.set(testObject, service);
-			} catch (Exception e) {
-				throw new UnitilsException("cannot inject service into " + field, e);
+				throw new UnitilsException("cannot inject value into " + field,
+						e);
 			}
 		}
 	}
@@ -243,28 +218,29 @@ public class TapestryUnitilsModule implements Module {
 
 		@Override
 		public void beforeTestClass(Class<?> testClass) {
-			createAndStartupRegistryFor(testClass);
+			createAndStartupRegistryFor(testClass, null);
 			injectTapestryStuff(null, testClass);
 		}
 
 		@Override
 		public void beforeTestSetUp(Object testObject, Method testMethod) {
-			currentTestNeedsPrivateRegistry = testMethod.isAnnotationPresent(PrivateTapestryRegistry.class);
+			currentTestNeedsPrivateRegistry = testMethod
+					.isAnnotationPresent(TapestryRegistry.class);
 			if (currentTestNeedsPrivateRegistry) {
 				sharedRegistry = registry;
 				registry = null;
-				createAndStartupRegistryFor(testObject.getClass());
+				createAndStartupRegistryFor(testObject.getClass(), testMethod);
 			}
 			injectTapestryStuff(testObject, testObject.getClass());
 		}
 
 		@Override
 		public void afterTestTearDown(Object testObject, Method testMethod) {
-        	if (currentTestNeedsPrivateRegistry) {
+			if (currentTestNeedsPrivateRegistry) {
 				shutdownRegistry();
 				registry = sharedRegistry;
 				sharedRegistry = null;
 			}
-    	}
+		}
 	}
 }
