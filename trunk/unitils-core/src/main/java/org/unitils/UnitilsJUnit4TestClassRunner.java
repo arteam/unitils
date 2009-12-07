@@ -82,10 +82,10 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
         try {
             testObject = createTest();
         } catch (InvocationTargetException e) {
-            notifier.testAborted(description, e.getCause());
+            testAborted(description, e.getCause(), notifier);
             return;
         } catch (Exception e) {
-            notifier.testAborted(description, e);
+            testAborted(description, e, notifier);
             return;
         }
         TestMethod testMethod = wrapMethod(method);
@@ -93,6 +93,16 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
             getTestListener().afterCreateTestObject(testObject);
         }
         createMethodRoadie(testObject, method, testMethod, notifier, description).run();
+    }
+    
+    /**
+     * Method copied from RunNotifier of JUnit 4.4 in order to keep compatibility with
+     * earlier version. JUnit 4.7 does not have this method anymore. 
+     */
+    private void testAborted(Description description, Throwable cause, RunNotifier notifier) {
+		notifier.fireTestStarted(description);
+		notifier.fireTestFailure(new Failure(description, cause));
+		notifier.fireTestFinished(description);
     }
 
 

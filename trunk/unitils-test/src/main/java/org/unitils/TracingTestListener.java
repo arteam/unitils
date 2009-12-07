@@ -44,7 +44,7 @@ public class TracingTestListener extends TestListener {
 
 	public static enum TestFramework {
 		JUNIT3, 
-		JUNIT4, 
+		JUNIT4,
 		TESTNG
 	}
 	
