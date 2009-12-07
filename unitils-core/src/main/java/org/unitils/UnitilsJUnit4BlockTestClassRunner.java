@@ -1,5 +1,10 @@
 package org.unitils;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.After;
+import org.junit.internal.runners.model.MultipleFailureException;
 import org.junit.internal.runners.statements.InvokeMethod;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -11,7 +16,7 @@ import org.unitils.core.Unitils;
 
 public class UnitilsJUnit4BlockTestClassRunner extends BlockJUnit4ClassRunner {
 
-	private Object testObject;
+	private boolean beforesRun;
 	
     public UnitilsJUnit4BlockTestClassRunner(Class<?> testClass) throws InitializationError {
         super(testClass);
@@ -35,7 +40,7 @@ public class UnitilsJUnit4BlockTestClassRunner extends BlockJUnit4ClassRunner {
 
     @Override
     protected Object createTest() throws Exception {
-        testObject = super.createTest();
+        Object testObject = super.createTest();
         getTestListener().afterCreateTestObject(testObject);
         return testObject;
     }
@@ -45,30 +50,81 @@ public class UnitilsJUnit4BlockTestClassRunner extends BlockJUnit4ClassRunner {
         return new InvokeMethod(frameworkMethod, o) {
             @Override
             public void evaluate() throws Throwable {
-                getTestListener().beforeTestMethod(o, frameworkMethod.getMethod());
                 Throwable threw = null;
                 try {
+                	getTestListener().beforeTestMethod(o, frameworkMethod.getMethod());
                     super.evaluate();
                 } catch (Throwable t) {
                     threw = t;
                 } finally {
                     getTestListener().afterTestMethod(o, frameworkMethod.getMethod(), threw);
                 }
+                if(threw != null) {
+                	throw threw;
+                }
             }
         };
     }
 
     @Override
-    protected Statement methodBlock(final FrameworkMethod frameworkMethod) {
-    	final Statement defaultStatement = super.methodBlock(frameworkMethod);
+    protected Statement withBefores(final FrameworkMethod method, final Object target,
+    		Statement statement) {
+    	final Statement befores = super.withBefores(method, target, statement);
     	return new Statement() {
 			@Override
 			public void evaluate() throws Throwable {
-                getTestListener().beforeTestSetUp(testObject, frameworkMethod.getMethod());
-				defaultStatement.evaluate();
-                getTestListener().afterTestTearDown(testObject, frameworkMethod.getMethod());
+				beforesRun = false;
+				getTestListener().beforeTestSetUp(target, method.getMethod());
+				beforesRun = true;
+				befores.evaluate();
 			}
 		};
+    }
+    
+    @Override
+    protected Statement withAfters(final FrameworkMethod method, final Object target,
+    		Statement statement) {
+		
+    	List<FrameworkMethod> afters= getTestClass().getAnnotatedMethods(After.class);
+		return afters.isEmpty() ? statement :
+			new RunAfters(statement, afters, target, method);
+    }
+    
+    private class RunAfters  extends Statement {
+    	private final Statement fNext;
+    	private final Object fTarget;
+    	private final List<FrameworkMethod> fAfters;
+    	private final FrameworkMethod fMethod;
+    	
+    	public RunAfters(Statement next, List<FrameworkMethod> afters, Object target, FrameworkMethod method) {
+    		fNext= next;
+    		fAfters= afters;
+    		fTarget= target;
+    		fMethod = method;
+    	}
+
+    	@Override
+    	public void evaluate() throws Throwable {
+    		List<Throwable> errors = new ArrayList<Throwable>();
+    		errors.clear();
+    		try {
+    			fNext.evaluate();
+    		} catch (Throwable e) {
+    			errors.add(e);
+    		} finally {
+    			if(beforesRun) {
+	    			for (FrameworkMethod each : fAfters) {
+	    				try {
+	    					each.invokeExplosively(fTarget);
+	    				} catch (Throwable e) {
+	    					errors.add(e);
+	    				}
+	    			}
+    			}
+    			getTestListener().afterTestTearDown(fTarget, fMethod.getMethod());
+    		}
+    		MultipleFailureException.assertEmpty(errors);
+    	}
     }
     
 }
