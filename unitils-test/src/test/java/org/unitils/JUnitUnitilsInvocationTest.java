@@ -65,6 +65,7 @@ public class JUnitUnitilsInvocationTest extends UnitilsInvocationTestBase {
         return Arrays.asList(new Object[][]{
                 {JUNIT3, new JUnit3TestExecutor(), UnitilsJUnit3Test_TestClass1.class, UnitilsJUnit3Test_TestClass2.class},
                 {JUNIT4, new JUnit4TestExecutor(), UnitilsJUnit4Test_TestClass1.class, UnitilsJUnit4Test_TestClass2.class},
+                {JUNIT4, new JUnit4BlockTestExecutor(), UnitilsJUnit4Test_TestClass1.class, UnitilsJUnit4Test_TestClass2.class},
                 //{JUNIT3, new JUnit3TestExecutor(), SpringUnitilsJUnit38Test_TestClass1.class, SpringUnitilsJUnit38Test_TestClass2.class},
                 //{JUNIT4, new JUnit4TestExecutor(), SpringUnitilsJUnit4Test_TestClass1.class, SpringUnitilsJUnit4Test_TestClass2.class},
         });
