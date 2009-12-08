@@ -10,9 +10,9 @@ import org.unitils.tapestry.annotation.TapestryRegistry;
 public class DerivedInjectionTest extends DerivedInjectionTestBase {
 
 	@Inject
-	private Service myTestService;
+	private Person myTestService;
 	@Inject
-	private static Service myTestServiceStatic;
+	private static Person myTestServiceStatic;
 
 	@Test
 	public void testAlsoSuperClassFieldsAreInjected() {

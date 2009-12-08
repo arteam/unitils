@@ -1,5 +1,4 @@
 package org.unitils.tapestry;
 
-public interface Service2 {
-
+public interface Person {
 }

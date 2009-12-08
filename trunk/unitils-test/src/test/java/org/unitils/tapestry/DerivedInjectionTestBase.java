@@ -8,9 +8,9 @@ import org.unitils.UnitilsJUnit4TestClassRunner;
 public abstract class DerivedInjectionTestBase {
 
 	@Inject
-	protected Service testService;
+	protected Person testService;
 	@Inject
-	protected static Service testServiceStatic;
+	protected static Person testServiceStatic;
 	
 	
 }
