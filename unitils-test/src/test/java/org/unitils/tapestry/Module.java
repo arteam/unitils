@@ -11,9 +11,9 @@ public class Module {
 	
 	@SuppressWarnings("unchecked")
 	public static void bind(ServiceBinder binder) {
-		binder.bind(Service.class, ServiceImpl.class).withId("TestService");
-		binder.bind(Service2.class, Service2Impl.class).withId("marker").withMarker(ServiceMarker.class);
-		binder.bind(Service2.class, Service2Impl.class).withId("marker2").withMarker(ServiceMarker2.class);
+		binder.bind(Person.class, Peter.class).withId("TestService");
+		binder.bind(Animal.class, Dog.class).withId("dog").withMarker(DogMarker.class);
+		binder.bind(Animal.class, Cat.class).withId("cat").withMarker(CatMarker.class);
 	}
 
 }
