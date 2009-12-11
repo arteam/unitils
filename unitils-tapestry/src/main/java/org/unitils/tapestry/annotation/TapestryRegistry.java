@@ -10,8 +10,7 @@ import org.apache.tapestry5.ioc.Registry;
 /**
  * If put on a test class, then one registry is created per test - class.
  * 
- * If put on a test method, then a dedicated registry is created for this test method. Note that
- * in this case any static fields with injected services stay untouched!
+ * If put on a test method, then a dedicated registry is created for this test method.
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

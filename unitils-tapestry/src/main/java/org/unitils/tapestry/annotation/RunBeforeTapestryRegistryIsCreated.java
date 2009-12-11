@@ -6,9 +6,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Static methods annotated with this annotation are run once before the tapestry
- * registry is created. This can be used e.g. to initialize any system properties
- * that to configure the used services for unit or integration testing. 
+ * Methods annotated with this annocation are run once before the tapestry registry is created. 
+ * 
+ * The methods must be static if injection into static fields is required by your test, otherwise
+ * the methods may be non static.
+ * 
+ * The methods are run in hierarchical class order. Methods defined in base classes are executed
+ * before methods in derived classes. If non static methods are overwritten only the overwritten
+ * method is executed once.
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

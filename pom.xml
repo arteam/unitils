@@ -17,7 +17,7 @@
         <module>unitils-mock</module>
         <module>unitils-orm</module>
         <module>unitils-spring</module>
-	<module>unitils-tapestry</module>
+        <module>unitils-tapestry</module>
 
         <module>unitils-test</module>
         <module>unitils-dataset</module>

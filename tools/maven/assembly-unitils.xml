@@ -203,10 +203,10 @@
             </binaries>
         </moduleSet>
 
-        <!-- unitils-testng -->
+        <!-- unitils-spring -->
         <moduleSet>
             <includes>
-                <include>org.unitils:unitils-testng</include>
+                <include>org.unitils:unitils-spring</include>
             </includes>
             <sources>
                 <fileSets>
@@ -220,7 +220,29 @@
             </sources>
             <binaries>
                 <includeDependencies>false</includeDependencies>
-                <outputDirectory>unitils-testng</outputDirectory>
+                <outputDirectory>unitils-spring</outputDirectory>
+                <unpack>false</unpack>
+            </binaries>
+        </moduleSet>
+
+        <!-- unitils-tapestry -->
+        <moduleSet>
+            <includes>
+                <include>org.unitils:unitils-tapestry</include>
+            </includes>
+            <sources>
+                <fileSets>
+                    <fileSet>
+                        <includes>
+                            <include>pom.xml</include>
+                            <include>src/main/**</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <includeDependencies>false</includeDependencies>
+                <outputDirectory>unitils-tapestry</outputDirectory>
                 <unpack>false</unpack>
             </binaries>
         </moduleSet>

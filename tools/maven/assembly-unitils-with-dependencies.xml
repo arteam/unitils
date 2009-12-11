@@ -256,10 +256,10 @@
             </binaries>
         </moduleSet>
 
-        <!-- unitils-testng -->
+        <!-- unitils-tapestry -->
         <moduleSet>
             <includes>
-                <include>org.unitils:unitils-testng</include>
+                <include>org.unitils:unitils-tapestry</include>
             </includes>
             <sources>
                 <fileSets>
@@ -272,11 +272,11 @@
                 </fileSets>
             </sources>
             <binaries>
-                <outputDirectory>unitils-testng</outputDirectory>
+                <outputDirectory>unitils-tapestry</outputDirectory>
                 <dependencySets>
                     <dependencySet>
                         <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>unitils-testng/lib</outputDirectory>
+                        <outputDirectory>unitils-tapestry/lib</outputDirectory>
                     </dependencySet>
                 </dependencySets>
                 <unpack>false</unpack>
