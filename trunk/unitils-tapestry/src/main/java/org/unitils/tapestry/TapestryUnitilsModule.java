@@ -4,6 +4,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.ClassUtils;
@@ -45,7 +49,9 @@ import org.unitils.tapestry.annotation.TapestryRegistry;
  * {@link Registry} and add the {@link Inject} annotation.
  * 
  * Test methods marked with {@link TapestryRegistry} get their own private
- * registry otherwise one registry per test class is created.
+ * registry otherwise one registry per test class is created. Injection is 
+ * always done before a test setup is performed (in static as well as non static
+ * fields).
  */
 public class TapestryUnitilsModule implements Module {
 
@@ -224,24 +230,58 @@ public class TapestryUnitilsModule implements Module {
 	}
 
 	private void runBeforeRegistryIsCreatedMethods(Class<?> testClass, Object testObject) {
-		for (Method method : testClass.getMethods()) {
-			if (method.isAnnotationPresent(RunBeforeTapestryRegistryIsCreated.class)) {
-				if (testObject == null && !Modifier.isStatic(method.getModifiers())) {
-					throw new TapestryUnitilsModuleException(
-							String.format("Method must be static but %s is not static",
-									method));
+		// collect all classes in hierarchy order
+		List<Class<?>> classes = new ArrayList<Class<?>>();
+		Class<?> currentClass = testClass;
+		while(currentClass != Object.class) {
+			classes.add(0, currentClass);
+			currentClass = currentClass.getSuperclass();
+		}
+
+		Map<Class<?>, List<Method>> methods = new HashMap<Class<?>, List<Method>>();
+		for(Class<?> clazz : classes) {
+			methods.put(clazz, new ArrayList<Method>());
+		}
+		// collect all static methods by class
+		for(Class<?> clazz : classes) {
+			for(Method method : clazz.getDeclaredMethods()) {
+				if (method.isAnnotationPresent(RunBeforeTapestryRegistryIsCreated.class) && Modifier.isStatic(method.getModifiers())) {
+					methods.get(clazz).add(method);
 				}
-				if (method.getParameterTypes().length != 0) {
-					throw new TapestryUnitilsModuleException(
-							String.format("Method annotated with @%s may not have any parameters, but %s has parameters",
-								ClassUtils.getShortClassName(RunBeforeTapestryRegistryIsCreated.class),
-								method));
-				}
-				try {
-					method.invoke(testObject);
-				} catch (Throwable t) {
-					throw new RuntimeException(String.format(
-							"Error invoking %s", method), t);
+			}
+		}
+		// collect all non static public methods
+		for(Method method : testClass.getMethods()) {
+			if (method.isAnnotationPresent(RunBeforeTapestryRegistryIsCreated.class) && !Modifier.isStatic(method.getModifiers())) {
+				methods.get(method.getDeclaringClass()).add(method);
+			}
+		}
+		for(Class<?> clazz : classes) {
+			for (Method method : methods.get(clazz)) {
+				if (method.isAnnotationPresent(RunBeforeTapestryRegistryIsCreated.class)) {
+					if(!Modifier.isPublic(method.getModifiers())) {
+						throw new TapestryUnitilsModuleException(
+								String.format("Method annotated with @%s must be public",
+										ClassUtils.getShortClassName(RunBeforeTapestryRegistryIsCreated.class),
+										method));
+					}
+					if (testObject == null && !Modifier.isStatic(method.getModifiers())) {
+						throw new TapestryUnitilsModuleException(
+								String.format("Method must be static but %s is not static",
+										method));
+					}
+					if (method.getParameterTypes().length != 0) {
+						throw new TapestryUnitilsModuleException(
+								String.format("Method annotated with @%s may not have any parameters, but %s has parameters",
+										ClassUtils.getShortClassName(RunBeforeTapestryRegistryIsCreated.class),
+										method));
+					}
+					try {
+						method.invoke(testObject);
+					} catch (Throwable t) {
+						throw new RuntimeException(String.format(
+								"Error invoking %s", method), t);
+					}
 				}
 			}
 		}

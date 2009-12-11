@@ -9,6 +9,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.tapestry5.ioc.Registry;
 import org.apache.tapestry5.ioc.RegistryBuilder;
@@ -324,6 +327,24 @@ public class TapestryUnitilsModuleTest {
 			fail("won't be executed because static injection is required");
 		}
 	}
+	
+	@TapestryRegistry(Module.class)
+	public static class PrivateRunBeforeMethod {
+		@RunBeforeTapestryRegistryIsCreated
+		protected static void runBefore() {
+			fail("won't be executed because this method must be private");
+		}
+		
+		public void test() {
+		}
+	}
+	
+	@Test(expected = TapestryUnitilsModuleException.class)
+	public void runBeforeMethodsMustBePublic() {
+		runTest(PrivateRunBeforeMethod.class, true);
+	}
+	
+	
 
 	@TapestryRegistry(value = Module.class, registryFactoryMethodName = "createRegistry")
 	public static class InvalidRegistryMethodWithStaticInjections {
@@ -471,6 +492,14 @@ public class TapestryUnitilsModuleTest {
 		public Person baseService;
 		@Inject
 		public static Person staticBaseService;
+		
+		private static List<String> runBeforeCalls = new ArrayList<String>();
+		
+		@RunBeforeTapestryRegistryIsCreated
+		public static void runBeforeTapestryRegistryIsCreated() {
+			runBeforeCalls.add("1");
+		}
+		
 	}
 
 	@TapestryRegistry(Module.class)
@@ -479,11 +508,49 @@ public class TapestryUnitilsModuleTest {
 		public Person derivedService;
 		@Inject
 		public static Person staticDerivedService;
+		
+		@RunBeforeTapestryRegistryIsCreated
+		public static void runBeforeTapestryRegistryIsCreated() {
+			InjectBase.runBeforeCalls.add("2");
+		}
 
 		public void test() {
 		}
 	}
+	
+	public static abstract class InjectWithOverwrittenRunBeforeMethodsBase {
+		protected List<String> runBeforeCalls = new ArrayList<String>();
+		
+		@RunBeforeTapestryRegistryIsCreated
+		public void runBeforeTapestryRegistryIsCreated() {
+			runBeforeCalls.add("1");
+		}
+	}
+	
+	@TapestryRegistry(Module.class)
+	public static class InjectWithOverwrittenRunBeforeMethods extends InjectWithOverwrittenRunBeforeMethodsBase {
+		@RunBeforeTapestryRegistryIsCreated
+		public void runBeforeTapestryRegistryIsCreated() {
+			runBeforeCalls.add("2");
+		}
+		
+		public void test() {
+		}
+	}
+	
+	@Test
+	public void runBeforeMethodsCanBeOverwritten() {
+		InjectWithOverwrittenRunBeforeMethods testObject = runTest(InjectWithOverwrittenRunBeforeMethods.class, true);
+		assertEquals(Arrays.asList("2"), testObject.runBeforeCalls);
+	}
 
+	@Test
+	public void runBeforeCallsAreExecutedInHierarchyOrder() {
+		InjectBase.runBeforeCalls = new ArrayList<String>();
+		runTest(InjectDerived.class, true);
+		assertEquals(Arrays.asList("1", "2"), InjectBase.runBeforeCalls);
+	}
+	
 	@TapestryRegistry(value = {}, registryFactoryMethodName = "createRegistry", registryFactoryMethodParameter = "test")
 	public static class CustomRegistryFactoryMethodWithParameters {
 		private Registry registry;
