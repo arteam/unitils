@@ -27,6 +27,8 @@ import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.DatabaseModule;
 import org.unitils.dataset.annotation.ExpectedDataSet;
+import org.unitils.dataset.comparison.DataSetComparator;
+import org.unitils.dataset.comparison.ExpectedDataSetAssert;
 import org.unitils.dataset.core.DataSet;
 import org.unitils.dataset.factory.DataSetFactory;
 import org.unitils.dataset.factory.DataSetResolver;
@@ -106,34 +108,66 @@ public class DataSetModule implements Module {
     public void insertDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, Class<? extends DataSetLoader> dataSetLoaderClass) {
         Class<? extends DataSetFactory> dataSetFactoryClass = dataSetAnnotationUtil.getDefaultDataSetFactoryClass();
         DataSetFactory dataSetFactory = createDataSetFactory(dataSetFactoryClass);
-        insertDataSet(dataSetFileNames, variables, testClass, dataSetFactory, dataSetLoaderClass);
+        loadDataSet(dataSetFileNames, variables, testClass, dataSetFactory, dataSetLoaderClass);
     }
 
 
-    protected void insertDataSet(Method testMethod, Object testObject) {
+    protected void loadDataSet(Method testMethod, Object testObject) {
         try {
             Class<?> testClass = testObject.getClass();
             Class<? extends DataSetFactory> dataSetFactoryClass = dataSetAnnotationUtil.getDataSetFactoryClass(testClass, testMethod);
             DataSetFactory dataSetFactory = createDataSetFactory(dataSetFactoryClass);
             List<String> dataSetFileNames = dataSetAnnotationUtil.getDataSetFileNames(testClass, testMethod, dataSetFactory.getDataSetFileExtension());
-            List<String> variables = dataSetAnnotationUtil.getVariables(testClass, testMethod);
+            List<String> variables = dataSetAnnotationUtil.getDataSetVariables(testClass, testMethod);
             Class<? extends DataSetLoader> dataSetLoaderClass = dataSetAnnotationUtil.getDataSetLoaderClass(testClass, testMethod);
 
-            insertDataSet(dataSetFileNames, variables, testClass, dataSetFactory, dataSetLoaderClass);
+            loadDataSet(dataSetFileNames, variables, testClass, dataSetFactory, dataSetLoaderClass);
 
         } catch (Exception e) {
             throw new UnitilsException("Error inserting data set for method " + testMethod, e);
         }
     }
 
-    protected void insertDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, DataSetFactory dataSetFactory, Class<? extends DataSetLoader> dataSetLoaderClass) {
-        List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
-        for (File dataSetFile : dataSetFiles) {
-            insertDataSet(dataSetFile, variables, testClass, dataSetFactory, dataSetLoaderClass);
+    /**
+     * Compares the contents of the expected DbUnitDataSet with the contents of the database. Only the tables and columns
+     * that occur in the expected DbUnitDataSet are compared with the database contents.
+     *
+     * @param testMethod The test method, not null
+     * @param testObject The test object, not null
+     */
+    protected void assertDbContentAsExpected(Method testMethod, Object testObject) {
+        try {
+            Class<?> testClass = testObject.getClass();
+            Class<? extends DataSetFactory> dataSetFactoryClass = dataSetAnnotationUtil.getDataSetFactoryClass(testClass, testMethod);
+            DataSetFactory dataSetFactory = createDataSetFactory(dataSetFactoryClass);
+            List<String> dataSetFileNames = dataSetAnnotationUtil.getExpectedDataSetFileNames(testClass, testMethod, dataSetFactory.getDataSetFileExtension());
+            List<String> variables = dataSetAnnotationUtil.getExpectedDataSetVariables(testClass, testMethod);
+            Class<? extends DataSetComparator> dataSetComparatorClass = dataSetAnnotationUtil.getExpectedDataSetComparatorClass(testClass, testMethod);
+
+            compareDataSet(dataSetFileNames, variables, testClass, dataSetFactory, dataSetComparatorClass);
+
+        } catch (Exception e) {
+            throw new UnitilsException("Error comparing data set for method " + testMethod, e);
         }
     }
 
-    protected void insertDataSet(File dataSetFile, List<String> variables, Class<?> testClass, DataSetFactory dataSetFactory, Class<? extends DataSetLoader> dataSetLoaderClass) {
+
+    protected void loadDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, DataSetFactory dataSetFactory, Class<? extends DataSetLoader> dataSetLoaderClass) {
+        List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
+        for (File dataSetFile : dataSetFiles) {
+            loadDataSet(dataSetFile, variables, testClass, dataSetFactory, dataSetLoaderClass);
+        }
+    }
+
+    protected void compareDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, DataSetFactory dataSetFactory, Class<? extends DataSetComparator> dataSetComparatorClass) {
+        List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
+        for (File dataSetFile : dataSetFiles) {
+            compareDataSet(dataSetFile, variables, testClass, dataSetFactory, dataSetComparatorClass);
+        }
+    }
+
+
+    protected void loadDataSet(File dataSetFile, List<String> variables, Class<?> testClass, DataSetFactory dataSetFactory, Class<? extends DataSetLoader> dataSetLoaderClass) {
         DataSet dataSet = dataSetFactory.createDataSet(dataSetFile);
         if (dataSet == null) {
             // no data set specified
@@ -143,6 +177,19 @@ public class DataSetModule implements Module {
         logger.info("Loading data sets file: " + dataSetFile);
         DataSetLoader dataSetLoader = createDataSetLoader(dataSetLoaderClass);
         dataSetLoader.load(dataSet, variables);
+    }
+
+    protected void compareDataSet(File dataSetFile, List<String> variables, Class<?> testClass, DataSetFactory dataSetFactory, Class<? extends DataSetComparator> dataSetComparatorClass) {
+        DataSet dataSet = dataSetFactory.createDataSet(dataSetFile);
+        if (dataSet == null) {
+            // no data set specified
+            return;
+        }
+
+        logger.info("Comparing data sets file: " + dataSetFile);
+        DataSetComparator dataSetComparator = createDataSetComparator(dataSetComparatorClass);
+        ExpectedDataSetAssert expectedDataSetAssert = createExpectedDataSetAssert();
+        expectedDataSetAssert.assertEqual(dataSet, variables, dataSetComparator);
     }
 
 
@@ -187,6 +234,15 @@ public class DataSetModule implements Module {
         return dataSetLoader;
     }
 
+    /**
+     * @param dataSetComparatorClass The type, not null
+     * @return An initialized data set compare of the given type, not null
+     */
+    protected DataSetComparator createDataSetComparator(Class<? extends DataSetComparator> dataSetComparatorClass) {
+        DataSetComparator dataSetComparator = createInstanceOfType(dataSetComparatorClass, false);
+        dataSetComparator.init(getDataSource());
+        return dataSetComparator;
+    }
 
     /**
      * @return The data set resolver, as configured in the Unitils configuration
@@ -195,6 +251,10 @@ public class DataSetModule implements Module {
         return getConfiguredInstanceOf(DataSetResolver.class, configuration);
     }
 
+    protected ExpectedDataSetAssert createExpectedDataSetAssert() {
+        //todo?? in properties ??
+        return new ExpectedDataSetAssert();
+    }
 
     /**
      * @return The default DbSupport (the one that connects to the default database schema)
@@ -229,7 +289,14 @@ public class DataSetModule implements Module {
 
         @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
-            insertDataSet(testMethod, testObject);
+            loadDataSet(testMethod, testObject);
+        }
+
+        @Override
+        public void afterTestMethod(Object testObject, Method testMethod, Throwable throwable) {
+            if (throwable == null) {
+                assertDbContentAsExpected(testMethod, testObject);
+            }
         }
     }
 

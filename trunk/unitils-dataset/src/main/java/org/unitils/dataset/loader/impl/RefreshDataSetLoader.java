@@ -15,7 +15,6 @@
  */
 package org.unitils.dataset.loader.impl;
 
-import org.unitils.dataset.core.DataSet;
 import org.unitils.dataset.core.Row;
 import org.unitils.dataset.util.InsertPreparedStatementWrapper;
 import org.unitils.dataset.util.PreparedStatementWrapper;
@@ -38,18 +37,18 @@ public class RefreshDataSetLoader extends BaseDataSetLoader {
 
 
     @Override
-    protected int loadRow(String schemaName, String tableName, Row row, DataSet dataSet, List<String> variables, Connection connection) throws Exception {
-        int nrUpdates = super.loadRow(schemaName, tableName, row, dataSet, variables, connection);
+    protected int loadRow(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws Exception {
+        int nrUpdates = super.loadRow(schemaName, tableName, row, variables, connection);
         if (nrUpdates > 0) {
             return nrUpdates;
         }
-        return insertRow(schemaName, tableName, row, dataSet, variables, connection);
+        return insertRow(schemaName, tableName, row, variables, connection);
     }
 
 
-    protected int insertRow(String schemaName, String tableName, Row row, DataSet dataSet, List<String> variables, Connection connection) throws SQLException {
+    protected int insertRow(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws SQLException {
         PreparedStatementWrapper preparedStatementWrapper = createInsertPreparedStatementWrapper(schemaName, tableName, connection);
-        return loadRow(row, dataSet, variables, preparedStatementWrapper);
+        return loadRow(row, variables, preparedStatementWrapper);
     }
 
     protected PreparedStatementWrapper createInsertPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {

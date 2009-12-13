@@ -89,8 +89,8 @@ public class UpdateDataSetLoaderTest extends DataSetLoaderTestBase {
         } catch (Exception e) {
             assertExceptionMessageContains(e, "my_schema");
             assertExceptionMessageContains(e, "table_a");
-            assertExceptionMessageContains(e, "column_1: 1");
-            assertExceptionMessageContains(e, "column_2: 2");
+            assertExceptionMessageContains(e, "column_1=\"1\"");
+            assertExceptionMessageContains(e, "column_2=\"2\"");
         }
     }
 }

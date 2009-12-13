@@ -17,7 +17,6 @@ package org.unitils.dataset.loader.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitils.dataset.core.DataSet;
 import org.unitils.dataset.core.Schema;
 
 import java.sql.Connection;
@@ -41,9 +40,9 @@ public class CleanInsertDataSetLoader extends InsertDataSetLoader {
 
 
     @Override
-    public void loadSchema(Schema schema, DataSet dataSet, List<String> variables, Connection connection) throws SQLException {
+    public void loadSchema(Schema schema, List<String> variables, Connection connection) throws SQLException {
         deleteDataFromTablesInReverseOrder(schema, connection);
-        super.loadSchema(schema, dataSet, variables, connection);
+        super.loadSchema(schema, variables, connection);
     }
 
 

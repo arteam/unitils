@@ -42,10 +42,10 @@ public class UpdatePreparedStatementWrapperTest extends PreparedStatementWrapper
     @Test
     public void addColumn() throws Exception {
         updatePreparedStatementWrapper = new UpdatePreparedStatementWrapper("my_schema", "table_a", connection.getMock());
-        updatePreparedStatementWrapper.addColumn("column_1", "1");
-        updatePreparedStatementWrapper.addColumn("column_2", "2");
-        updatePreparedStatementWrapper.addColumn("pk1", "3");
-        updatePreparedStatementWrapper.addColumn("pk2", "4");
+        updatePreparedStatementWrapper.addColumn(createColumn("column_1", "1"), emptyVariables);
+        updatePreparedStatementWrapper.addColumn(createColumn("column_2", "2"), emptyVariables);
+        updatePreparedStatementWrapper.addColumn(createColumn("pk1", "3"), emptyVariables);
+        updatePreparedStatementWrapper.addColumn(createColumn("pk2", "4"), emptyVariables);
         updatePreparedStatementWrapper.executeUpdate();
 
         connection.assertInvoked().prepareStatement("update my_schema.table_a set column_1=?, column_2=? where pk1=?, pk2=?");
@@ -57,10 +57,10 @@ public class UpdatePreparedStatementWrapperTest extends PreparedStatementWrapper
     @Test
     public void addLiteralColumn() throws Exception {
         updatePreparedStatementWrapper = new UpdatePreparedStatementWrapper("my_schema", "table_a", connection.getMock());
-        updatePreparedStatementWrapper.addLiteralColumn("column_1", "literal1");
-        updatePreparedStatementWrapper.addLiteralColumn("column_2", "literal2");
-        updatePreparedStatementWrapper.addLiteralColumn("pk1", "3");
-        updatePreparedStatementWrapper.addLiteralColumn("pk2", "4");
+        updatePreparedStatementWrapper.addColumn(createColumn("column_1", "=literal1"), emptyVariables);
+        updatePreparedStatementWrapper.addColumn(createColumn("column_2", "=literal2"), emptyVariables);
+        updatePreparedStatementWrapper.addColumn(createColumn("pk1", "=3"), emptyVariables);
+        updatePreparedStatementWrapper.addColumn(createColumn("pk2", "=4"), emptyVariables);
         updatePreparedStatementWrapper.executeUpdate();
 
         connection.assertInvoked().prepareStatement("update my_schema.table_a set column_1=literal1, column_2=literal2 where pk1=3, pk2=4");
@@ -71,7 +71,7 @@ public class UpdatePreparedStatementWrapperTest extends PreparedStatementWrapper
     @Test
     public void noValuesForPkColumns() throws Exception {
         updatePreparedStatementWrapper = new UpdatePreparedStatementWrapper("my_schema", "table_a", connection.getMock());
-        updatePreparedStatementWrapper.addColumn("column_1", "1");
+        updatePreparedStatementWrapper.addColumn(createColumn("column_1", "1"), emptyVariables);
         try {
             updatePreparedStatementWrapper.executeUpdate();
             fail("UnitilsException expected");
@@ -83,8 +83,8 @@ public class UpdatePreparedStatementWrapperTest extends PreparedStatementWrapper
     @Test
     public void noValueForOneOfPkColumns() throws Exception {
         updatePreparedStatementWrapper = new UpdatePreparedStatementWrapper("my_schema", "table_a", connection.getMock());
-        updatePreparedStatementWrapper.addColumn("column_1", "1");
-        updatePreparedStatementWrapper.addColumn("pk1", "3");
+        updatePreparedStatementWrapper.addColumn(createColumn("column_1", "1"), emptyVariables);
+        updatePreparedStatementWrapper.addColumn(createColumn("pk1", "3"), emptyVariables);
         try {
             updatePreparedStatementWrapper.executeUpdate();
             fail("UnitilsException expected");

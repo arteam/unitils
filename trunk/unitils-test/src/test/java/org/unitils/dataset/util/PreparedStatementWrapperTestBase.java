@@ -18,9 +18,12 @@ package org.unitils.dataset.util;
 import org.junit.Before;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
+import org.unitils.dataset.core.Column;
 import org.unitils.mock.Mock;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.sql.Types.INTEGER;
 import static java.sql.Types.VARCHAR;
@@ -38,6 +41,7 @@ public abstract class PreparedStatementWrapperTestBase extends UnitilsJUnit4 {
     protected Mock<ResultSet> primaryKeyResultSet;
     protected Mock<ParameterMetaData> parameterMetaData;
 
+    protected List<String> emptyVariables = new ArrayList<String>();
 
     @Before
     public void initialize() throws Exception {
@@ -68,5 +72,9 @@ public abstract class PreparedStatementWrapperTestBase extends UnitilsJUnit4 {
         for (String pkColumnName : pkColumnNames) {
             assertFalse("Exception did contain pk column name: " + pkColumnName + ". Message: " + e.getMessage(), e.getMessage().contains(pkColumnName));
         }
+    }
+
+    protected Column createColumn(String name, String value) {
+        return new Column(name, value, false, '=', '$');
     }
 }

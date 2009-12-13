@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2009,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
+import org.unitils.dataset.core.Column;
 import org.unitils.dataset.core.DataSet;
+import org.unitils.dataset.core.Schema;
+import org.unitils.dataset.core.Table;
 import org.unitils.dataset.factory.impl.XmlDataSetReader;
 
 import java.io.File;
@@ -51,20 +54,30 @@ public class XmlDataSetReaderDataSetAttributesTest extends UnitilsJUnit4 {
     public void defaultDataSetAttributes() throws Exception {
         DataSet result = xmlDataSetReader.readDataSetXml(getDataSetFile("LessColumnsFirstDataSet.xml"));
 
-        assertFalse(result.isCaseSensitive());
-        assertEquals('=', result.getLiteralToken());
-        assertEquals('$', result.getVariableToken());
-        assertTrue(result.getDeleteTableOrder().isEmpty());
+        Schema schema = result.getSchema("SCHEMA_A");
+        Table table = schema.getTable("TABLE_A");
+        Column column = table.getRow(0).getColumns().get(0);
+        assertFalse(schema.isCaseSensitive());
+        assertFalse(table.isCaseSensitive());
+        assertFalse(column.isCaseSensitive());
+        assertEquals('=', column.getLiteralToken());
+        assertEquals('$', column.getVariableToken());
+        assertTrue(schema.getDeleteTableOrder().isEmpty());
     }
 
     @Test
     public void overridingDataSetAttributes() throws Exception {
         DataSet result = xmlDataSetReader.readDataSetXml(getDataSetFile("OverridingAttributesDataSet.xml"));
 
-        assertTrue(result.isCaseSensitive());
-        assertEquals('%', result.getLiteralToken());
-        assertEquals(':', result.getVariableToken());
-        assertLenientEquals(asList("table1", "table2"), result.getDeleteTableOrder());
+        Schema schema = result.getSchema("SCHEMA_A");
+        Table table = schema.getTable("TABLE_A");
+        Column column = table.getRow(0).getColumns().get(0);
+        assertTrue(schema.isCaseSensitive());
+        assertTrue(table.isCaseSensitive());
+        assertTrue(column.isCaseSensitive());
+        assertEquals('%', column.getLiteralToken());
+        assertEquals(':', column.getVariableToken());
+        assertLenientEquals(asList("table1", "table2"), schema.getDeleteTableOrder());
     }
 
     @Test(expected = UnitilsException.class)
@@ -85,7 +98,7 @@ public class XmlDataSetReaderDataSetAttributesTest extends UnitilsJUnit4 {
     @Test
     public void emptyDeleteTableOrderValue() throws Exception {
         DataSet result = xmlDataSetReader.readDataSetXml(getDataSetFile("EmptyDeleteTableOrderValueDataSet.xml"));
-        assertTrue(result.getDeleteTableOrder().isEmpty());
+        assertTrue(result.getSchema("SCHEMA_A").getDeleteTableOrder().isEmpty());
     }
 
 

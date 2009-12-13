@@ -24,6 +24,7 @@ import org.unitils.mock.Mock;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 
@@ -44,6 +45,8 @@ public abstract class DataSetLoaderTestBase extends UnitilsJUnit4 {
     protected DataSet dataSetWithEmptyTable;
     protected DataSet dataSetWithEmptyRows;
     protected DataSet dataSetWithVariableDeclarations;
+
+    protected Set<String> emptyDeleteTableOrder = new HashSet<String>();
 
 
     @Before
@@ -80,21 +83,21 @@ public abstract class DataSetLoaderTestBase extends UnitilsJUnit4 {
     private DataSet createDataSet() {
         Table tableA = new Table("table_a");
         Row row1 = new Row();
-        row1.addColumn(new Column("column_1", "1"));
-        row1.addColumn(new Column("column_2", "2"));
+        row1.addColumn(createColumn("column_1", "1"));
+        row1.addColumn(createColumn("column_2", "2"));
         tableA.addRow(row1);
         Row row2 = new Row();
-        row2.addColumn(new Column("column_3", "3"));
-        row2.addColumn(new Column("column_4", "4"));
+        row2.addColumn(createColumn("column_3", "3"));
+        row2.addColumn(createColumn("column_4", "4"));
         tableA.addRow(row2);
 
         Table tableB = new Table("table_b");
         Row row3 = new Row();
-        row3.addColumn(new Column("column_5", "5"));
-        row3.addColumn(new Column("column_6", "6"));
+        row3.addColumn(createColumn("column_5", "5"));
+        row3.addColumn(createColumn("column_6", "6"));
         tableB.addRow(row3);
 
-        Schema schema = new Schema("my_schema");
+        Schema schema = new Schema("my_schema", false, emptyDeleteTableOrder);
         schema.addTable(tableA);
         schema.addTable(tableB);
 
@@ -104,12 +107,12 @@ public abstract class DataSetLoaderTestBase extends UnitilsJUnit4 {
     private DataSet createDataSetWithLiteralValues() {
         Table tableA = new Table("table_a");
         Row row = new Row();
-        row.addColumn(new Column("column_1", "=sysdate"));
-        row.addColumn(new Column("column_2", "=null"));
-        row.addColumn(new Column("column_3", "==escaped"));
+        row.addColumn(createColumn("column_1", "=sysdate"));
+        row.addColumn(createColumn("column_2", "=null"));
+        row.addColumn(createColumn("column_3", "==escaped"));
         tableA.addRow(row);
 
-        Schema schema = new Schema("my_schema");
+        Schema schema = new Schema("my_schema", false, emptyDeleteTableOrder);
         schema.addTable(tableA);
         return createDataSet(schema);
     }
@@ -117,19 +120,20 @@ public abstract class DataSetLoaderTestBase extends UnitilsJUnit4 {
     private DataSet createDataSetWithVariableDeclarations() {
         Table tableA = new Table("table_a");
         Row row = new Row();
-        row.addColumn(new Column("column_1", "value $0"));
-        row.addColumn(new Column("column_2", "$1$2"));
-        row.addColumn(new Column("column_3", "escaped $$1"));
-        row.addColumn(new Column("column_4", "=literal $1"));
+        row.addColumn(createColumn("column_1", "value $0"));
+        row.addColumn(createColumn("column_2", "$1$2"));
+        row.addColumn(createColumn("column_3", "escaped $$1"));
+        row.addColumn(createColumn("column_4", "=literal $1"));
         tableA.addRow(row);
 
-        Schema schema = new Schema("my_schema");
+        Schema schema = new Schema("my_schema", false, emptyDeleteTableOrder);
         schema.addTable(tableA);
         return createDataSet(schema);
     }
 
+
     private DataSet createDataSetWithEmptyRows() {
-        Schema schemaWithEmptyRows = new Schema("my_schema");
+        Schema schemaWithEmptyRows = new Schema("my_schema", false, emptyDeleteTableOrder);
         Table tableWithEmptyRows = new Table("table_a");
         tableWithEmptyRows.addRow(new Row());
         tableWithEmptyRows.addRow(new Row());
@@ -138,14 +142,18 @@ public abstract class DataSetLoaderTestBase extends UnitilsJUnit4 {
     }
 
     private DataSet createDataSetWithEmptyTable() {
-        Schema schemaWithEmptyTable = new Schema("my_schema");
+        Schema schemaWithEmptyTable = new Schema("my_schema", false, emptyDeleteTableOrder);
         schemaWithEmptyTable.addTable(new Table("table_a"));
         return createDataSet(schemaWithEmptyTable);
     }
 
     private DataSet createDataSet(Schema schema) {
-        DataSet dataSet = new DataSet(false, new HashSet<String>(), '=', '$');
+        DataSet dataSet = new DataSet();
         dataSet.addSchema(schema);
         return dataSet;
+    }
+
+    private Column createColumn(String name, String value) {
+        return new Column(name, value, false, '=', '$');
     }
 }

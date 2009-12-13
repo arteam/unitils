@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright 2009,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 package org.unitils.dataset.core;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.core.comparison.SchemaDifference;
-import org.unitils.dataset.core.comparison.TableDifference;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A data set schema
@@ -33,6 +33,11 @@ public class Schema {
     /* The name of the data set schema, not null */
     private String name;
 
+    /* True if the schema name is case sensitive */
+    private boolean caseSensitive;
+
+    private Set<String> deleteTableOrder = new HashSet<String>();
+
     /* The tables in the schema, not null */
     private List<Table> tables = new ArrayList<Table>();
 
@@ -42,8 +47,10 @@ public class Schema {
      *
      * @param name The name of the schema, not null
      */
-    public Schema(String name) {
+    public Schema(String name, boolean caseSensitive, Set<String> deleteTableOrder) {
         this.name = name;
+        this.caseSensitive = caseSensitive;
+        this.deleteTableOrder = deleteTableOrder;
     }
 
 
@@ -54,6 +61,13 @@ public class Schema {
         return name;
     }
 
+    public boolean isCaseSensitive() {
+        return caseSensitive;
+    }
+
+    public Set<String> getDeleteTableOrder() {
+        return deleteTableOrder;
+    }
 
     /**
      * @return The tables of the schema, not null
@@ -83,7 +97,7 @@ public class Schema {
      */
     public Table getTable(String tableName) {
         for (Table table : tables) {
-            if (tableName.equalsIgnoreCase(table.getName())) {
+            if (table.hasName(tableName)) {
                 return table;
             }
         }
@@ -104,33 +118,6 @@ public class Schema {
             throw new UnitilsException("Unable to add table to data set. A table with name " + table.getName() + " already exists.");
         }
         tables.add(table);
-    }
-
-
-    /**
-     * Compares the schema with the given actual schema.
-     *
-     * @param actualSchema The schema to compare with, not null
-     * @return The difference, null if none found
-     */
-    public SchemaDifference compare(Schema actualSchema) {
-        SchemaDifference schemaDifference = new SchemaDifference(this, actualSchema);
-
-        for (Table table : getTables()) {
-            Table actualTable = actualSchema.getTable(table.getName());
-            if (actualTable == null) {
-                schemaDifference.addMissingTable(table);
-            } else {
-                TableDifference tableDifference = table.compare(actualTable);
-                if (tableDifference != null) {
-                    schemaDifference.addTableDifference(tableDifference);
-                }
-            }
-        }
-        if (schemaDifference.isMatch()) {
-            return null;
-        }
-        return schemaDifference;
     }
 
 }

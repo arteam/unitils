@@ -28,9 +28,9 @@ import org.unitils.tapestry.annotation.TapestryRegistry;
  * Unitils module that creates a Tapestry IOC registry for tests and allows
  * service injection into test fields. For injection just use the standard
  * tapestry injection annotations.
- * 
+ *
  * Example:
- * 
+ *
  * <pre>
  * &#064;TapestryRegistry(MyModule.class)
  * &#064;RunWith(UnitilsJUnit4TestClassRunner.class)
@@ -44,12 +44,12 @@ import org.unitils.tapestry.annotation.TapestryRegistry;
  * 	private String value;
  * }
  * </pre>
- * 
+ *
  * To inject the Tapestry {@link Registry} just add a field of type
  * {@link Registry} and add the {@link Inject} annotation.
- * 
+ *
  * Test methods marked with {@link TapestryRegistry} get their own private
- * registry otherwise one registry per test class is created. Injection is 
+ * registry otherwise one registry per test class is created. Injection is
  * always done before a test setup is performed (in static as well as non static
  * fields).
  */
@@ -87,7 +87,7 @@ public class TapestryUnitilsModule implements Module {
 			injectTapestryStuff(registry, superClazz, testObject);
 		}
 	}
-	
+
 	private boolean needsStaticInjection(Class<?> testClass) {
 		for (Field field : testClass.getDeclaredFields()) {
 			if(needsInjection(field) && Modifier.isStatic(field.getModifiers())) {
@@ -188,7 +188,7 @@ public class TapestryUnitilsModule implements Module {
 	private Method getRegistryFactoryMethodFor(TapestryRegistry annotation,
 			Class<?> testClass, Object testObject) {
 
-		if (annotation.registryFactoryMethodName().isEmpty())
+		if (annotation.registryFactoryMethodName().length() == 0)
 			return null;
 
 		Method method = null;
@@ -314,7 +314,7 @@ public class TapestryUnitilsModule implements Module {
 				registryToUseForInjection = methodRegistry;
 			} else if(testObject.getClass().isAnnotationPresent(TapestryRegistry.class) && classRegistry == null) {
 				runBeforeRegistryIsCreatedMethods(testObject.getClass(), testObject);
-				classRegistry = createRegistryFor(testObject.getClass().getAnnotation(TapestryRegistry.class), 
+				classRegistry = createRegistryFor(testObject.getClass().getAnnotation(TapestryRegistry.class),
 						testObject.getClass(), testObject);
 				injectTapestryStuff(classRegistry, testObject.getClass(), testObject);
 				registryToUseForInjection = classRegistry;

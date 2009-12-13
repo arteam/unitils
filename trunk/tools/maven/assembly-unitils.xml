@@ -203,10 +203,10 @@
             </binaries>
         </moduleSet>
 
-        <!-- unitils-spring -->
+        <!-- unitils-testng -->
         <moduleSet>
             <includes>
-                <include>org.unitils:unitils-spring</include>
+                <include>org.unitils:unitils-testng</include>
             </includes>
             <sources>
                 <fileSets>
@@ -220,7 +220,7 @@
             </sources>
             <binaries>
                 <includeDependencies>false</includeDependencies>
-                <outputDirectory>unitils-spring</outputDirectory>
+                <outputDirectory>unitils-testng</outputDirectory>
                 <unpack>false</unpack>
             </binaries>
         </moduleSet>

@@ -78,7 +78,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Inherited
 public @interface ExpectedDataSet {
 
-
     /**
      * The file name of the data set. If left empty, the default filename will be
      * used: 'classname'.'methodname'-result.xml. If that file also does not exist, an exception is thrown.
@@ -87,6 +86,30 @@ public @interface ExpectedDataSet {
      */
     String[] value() default {};
 
+    /**
+     * The factory that needs to be used to read the data set files.
+     *
+     * @return An implementation class of {@link DataSetFactory}. Use the default value {@link DataSetFactory}
+     *         to make use of the default DataSetLoadStrategy configured in the unitils configuration.
+     */
     Class<? extends DataSetFactory> factory() default DataSetFactory.class;
 
+    /**
+     * Variables that will be used to fill in possible variable declarations in a data set.
+     *
+     * A data set can contain variable declarations: $0, $1 ...
+     * When the data set is loaded, these declarations are replaced with the given variable values.
+     * The first variable will replace $0, the second $1 ...
+     * When no value is found, the $0 variable declaration will not be replaced and will remain in the data set.
+     *
+     * The character that defines a variable token, e.g. $0, can be defined using the variableToken parameter on the
+     * dataset root xml element. By default $ is used, but you can override this default by setting
+     * the dataset.variabletoken.default unitils property.
+     *
+     * Variable declarations can be escaped by using a double variable token, e.g. $$0 will be replaced by $0
+     * instead of the variable value
+     *
+     * @return The values to use when replacing the variable declarations (e.g. $0) in the data set, empty by default
+     */
+    String[] variables() default {};
 }

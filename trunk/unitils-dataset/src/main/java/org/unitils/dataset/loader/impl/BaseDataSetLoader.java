@@ -43,8 +43,6 @@ public abstract class BaseDataSetLoader implements DataSetLoader {
         this.dataSource = dataSource;
     }
 
-    //todo dataset
-    // todo case sensitive, literal token, variable token
     public void load(DataSet dataSet, List<String> variables) {
         try {
             loadDataSet(dataSet, variables);
@@ -59,96 +57,55 @@ public abstract class BaseDataSetLoader implements DataSetLoader {
 
 
     protected void loadDataSet(DataSet dataSet, List<String> variables) throws SQLException {
-        Connection connection = null;
+        Connection connection = dataSource.getConnection();
         try {
-            connection = dataSource.getConnection();
             for (Schema schema : dataSet.getSchemas()) {
-                loadSchema(schema, dataSet, variables, connection);
+                loadSchema(schema, variables, connection);
             }
         } finally {
             connection.close();
         }
     }
 
-    protected void loadSchema(Schema schema, DataSet dataSet, List<String> variables, Connection connection) throws SQLException {
+    protected void loadSchema(Schema schema, List<String> variables, Connection connection) throws SQLException {
         String schemaName = schema.getName();
         for (Table table : schema.getTables()) {
-            loadTable(schemaName, table, dataSet, variables, connection);
+            loadTable(schemaName, table, variables, connection);
         }
     }
 
-    protected void loadTable(String schemaName, Table table, DataSet dataSet, List<String> variables, Connection connection) {
+    protected void loadTable(String schemaName, Table table, List<String> variables, Connection connection) {
         String tableName = table.getName();
         for (Row row : table.getRows()) {
             if (row.getNrOfColumns() == 0) {
                 continue;
             }
-            loadRowHandleExceptions(schemaName, tableName, row, dataSet, variables, connection);
+            loadRowHandleExceptions(schemaName, tableName, row, variables, connection);
         }
     }
 
-    protected int loadRowHandleExceptions(String schemaName, String tableName, Row row, DataSet dataSet, List<String> variables, Connection connection) {
+    protected int loadRowHandleExceptions(String schemaName, String tableName, Row row, List<String> variables, Connection connection) {
         try {
-            return loadRow(schemaName, tableName, row, dataSet, variables, connection);
+            return loadRow(schemaName, tableName, row, variables, connection);
         } catch (Exception e) {
             throw new UnitilsException("Unable to load data set row for schema: " + schemaName + ", table: " + tableName + ", row: [" + row + "], variables: " + variables, e);
         }
     }
 
-    protected int loadRow(String schemaName, String tableName, Row row, DataSet dataSet, List<String> variables, Connection connection) throws Exception {
+    protected int loadRow(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws Exception {
         PreparedStatementWrapper preparedStatementWrapper = createPreparedStatementWrapper(schemaName, tableName, connection);
-        return loadRow(row, dataSet, variables, preparedStatementWrapper);
+        try {
+            return loadRow(row, variables, preparedStatementWrapper);
+        } finally {
+            preparedStatementWrapper.close();
+        }
     }
 
-    protected int loadRow(Row row, DataSet dataSet, List<String> variables, PreparedStatementWrapper preparedStatementWrapper) throws SQLException {
+    protected int loadRow(Row row, List<String> variables, PreparedStatementWrapper preparedStatementWrapper) throws SQLException {
         for (Column column : row.getColumns()) {
-            String variablesReplacedValue = replaceVariableDeclarations(column.getValue(), variables, dataSet.getVariableToken());
-
-            String literalValue = getLiteralValue(variablesReplacedValue, dataSet.getLiteralToken());
-            if (literalValue != null) {
-                preparedStatementWrapper.addLiteralColumn(column.getName(), literalValue);
-            } else {
-                String value = replaceEscapedLiteralValue(variablesReplacedValue, dataSet.getLiteralToken());
-                preparedStatementWrapper.addColumn(column.getName(), value);
-            }
+            preparedStatementWrapper.addColumn(column, variables);
         }
         return preparedStatementWrapper.executeUpdate();
-    }
-
-
-    protected String replaceVariableDeclarations(String value, List<String> variables, char variableToken) {
-        StringBuilder valueStringBuilder = new StringBuilder(value);
-        for (int variableIndex = 0; variableIndex < variables.size(); variableIndex++) {
-            replaceVariableDeclaration(valueStringBuilder, variableToken, variableIndex, variables.get(variableIndex));
-        }
-        return valueStringBuilder.toString();
-    }
-
-    protected void replaceVariableDeclaration(StringBuilder valueStringBuilder, char variableToken, int variableIndex, String variable) {
-        String variableDeclaration = "" + variableToken + variableIndex;
-        int index = 0;
-        while ((index = valueStringBuilder.indexOf(variableDeclaration, index)) != -1) {
-            if (index > 0 && valueStringBuilder.charAt(index - 1) == variableToken) {
-                valueStringBuilder.deleteCharAt(index - 1);
-            } else {
-                valueStringBuilder.replace(index, index + 2, variable);
-            }
-        }
-    }
-
-
-    protected String replaceEscapedLiteralValue(String value, char literalToken) {
-        if (value.startsWith("" + literalToken + literalToken)) {
-            return value.substring(1);
-        }
-        return value;
-    }
-
-    protected String getLiteralValue(String value, char literalToken) {
-        if (value.startsWith("" + literalToken) && !value.startsWith("" + literalToken + literalToken)) {
-            return value.substring(1);
-        }
-        return null;
     }
 
 }

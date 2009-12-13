@@ -56,7 +56,7 @@ import java.util.Properties;
 public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
 
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(XsdDataSetStructureGeneratorMultiSchemaTest.class);
+    private static Log logger = LogFactory.getLog(org.unitils.dataset.xsd.impl.XsdDataSetStructureGeneratorMultiSchemaTest.class);
 
     /* Tested object */
     private DataSetStructureGenerator dataSetStructureGenerator;

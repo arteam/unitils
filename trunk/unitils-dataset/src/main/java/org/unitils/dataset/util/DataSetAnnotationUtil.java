@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.dataset.DataSetModule;
 import org.unitils.dataset.annotation.DataSet;
 import org.unitils.dataset.annotation.ExpectedDataSet;
+import org.unitils.dataset.comparison.DataSetComparator;
 import org.unitils.dataset.factory.DataSetFactory;
 import org.unitils.dataset.loader.DataSetLoader;
 
@@ -67,7 +68,29 @@ public class DataSetAnnotationUtil {
             return null;
         }
 
-        // Get the dataset file name
+        // Get the data set file names
+        String[] dataSetFileNames = dataSetAnnotation.value();
+        if (dataSetFileNames.length == 0) {
+            // empty means, use default file name, which is the name of the class + extension
+            dataSetFileNames = new String[]{getDefaultDataSetFileName(testClass, fileExtension)};
+        }
+        return asList(dataSetFileNames);
+    }
+
+    /**
+     * @param testClass     The test class, not null
+     * @param testMethod    The test method, not null
+     * @param fileExtension The extension of the data set files (should not start with a '.'), not null
+     * @return The file names that were specified by the ExpectedDataSet annotation, null if not found
+     */
+    public List<String> getExpectedDataSetFileNames(Class<?> testClass, Method testMethod, String fileExtension) {
+        ExpectedDataSet dataSetAnnotation = getMethodOrClassLevelAnnotation(ExpectedDataSet.class, testMethod, testClass);
+        if (dataSetAnnotation == null) {
+            // No @ExpectedDataSet annotation found
+            return null;
+        }
+
+        // Get the data set file names
         String[] dataSetFileNames = dataSetAnnotation.value();
         if (dataSetFileNames.length == 0) {
             // empty means, use default file name, which is the name of the class + extension
@@ -95,8 +118,13 @@ public class DataSetAnnotationUtil {
         return getClassWithName(className);
     }
 
-    public List<String> getVariables(Class<?> testClass, Method testMethod) {
+    public List<String> getDataSetVariables(Class<?> testClass, Method testMethod) {
         String[] variables = getMethodOrClassLevelAnnotationProperty(DataSet.class, "variables", new String[0], testMethod, testClass);
+        return asList(variables);
+    }
+
+    public List<String> getExpectedDataSetVariables(Class<?> testClass, Method testMethod) {
+        String[] variables = getMethodOrClassLevelAnnotationProperty(ExpectedDataSet.class, "variables", new String[0], testMethod, testClass);
         return asList(variables);
     }
 
@@ -110,17 +138,30 @@ public class DataSetAnnotationUtil {
      */
     @SuppressWarnings({"unchecked"})
     public Class<? extends DataSetLoader> getDataSetLoaderClass(Class<?> testClass, Method testMethod) {
-        Class<? extends DataSetLoader> dataSetOperationClass = getMethodOrClassLevelAnnotationProperty(DataSet.class, "loader", DataSetLoader.class, testMethod, testClass);
-        return (Class<? extends DataSetLoader>) getClassValueReplaceDefault(DataSet.class, "loader", dataSetOperationClass, defaultAnnotationPropertyValues, DataSetLoader.class);
+        Class<? extends DataSetLoader> dataSetLoaderClass = getMethodOrClassLevelAnnotationProperty(DataSet.class, "loader", DataSetLoader.class, testMethod, testClass);
+        return (Class<? extends DataSetLoader>) getClassValueReplaceDefault(DataSet.class, "loader", dataSetLoaderClass, defaultAnnotationPropertyValues, DataSetLoader.class);
     }
 
+    /**
+     * Gets the data set compare class that was specified using the compareStrategy parameter on the ExpectedDataSet annotation.
+     * If no loader was specified, the default class found in the Unitils configuration will be returned.
+     *
+     * @param testClass  The test class, not null
+     * @param testMethod The method, not null
+     * @return The DataSetComparator class, not null
+     */
+    @SuppressWarnings({"unchecked"})
+    public Class<? extends DataSetComparator> getExpectedDataSetComparatorClass(Class<?> testClass, Method testMethod) {
+        Class<? extends DataSetComparator> dataSetComparatorClass = getMethodOrClassLevelAnnotationProperty(ExpectedDataSet.class, "comparator", DataSetComparator.class, testMethod, testClass);
+        return (Class<? extends DataSetComparator>) getClassValueReplaceDefault(ExpectedDataSet.class, "comparator", dataSetComparatorClass, defaultAnnotationPropertyValues, DataSetLoader.class);
+    }
 
     /**
      * Gets the name of the default testdata file at class level The default name is constructed as
-     * follows: 'classname without packagename'.xml
+     * follows: 'class name without packagename'.xml
      *
      * @param testClass The test class, not null
-     * @param extension The configured extension of dataset files
+     * @param extension The configured extension of data set files
      * @return The default filename, not null
      */
     protected String getDefaultDataSetFileName(Class<?> testClass, String extension) {
