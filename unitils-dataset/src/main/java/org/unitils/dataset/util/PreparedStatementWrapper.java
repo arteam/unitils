@@ -17,6 +17,8 @@ package org.unitils.dataset.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.unitils.dataset.core.Column;
+import org.unitils.dataset.core.Value;
 
 import java.sql.*;
 import java.util.HashSet;
@@ -36,7 +38,7 @@ public abstract class PreparedStatementWrapper {
     protected String schemaName;
     protected String tableName;
     protected Connection connection;
-
+    protected PreparedStatement preparedStatement;
 
     protected Set<String> remainingPrimaryKeyColumnNames;
 
@@ -48,30 +50,29 @@ public abstract class PreparedStatementWrapper {
         this.remainingPrimaryKeyColumnNames = getPrimaryKeyColumnNames(schemaName, tableName, connection);
     }
 
+    public void addColumn(Column column, List<String> variables) {
+        boolean primaryKey = isRemainingPrimaryKeyColumn(column);
 
-    public void addColumn(String columnName, String value) {
-        boolean primaryKey = isRemainingPrimaryKeyColumn(columnName);
-        addColumnName(columnName, primaryKey);
-        addValue("?", primaryKey);
-        addStatementParameter(value, primaryKey);
-    }
-
-    public void addLiteralColumn(String columnName, String value) {
-        boolean primaryKey = isRemainingPrimaryKeyColumn(columnName);
-        addColumnName(columnName, primaryKey);
-        addValue(value, primaryKey);
+        Value value = column.getValue(variables);
+        if (value.isLiteralValue()) {
+            addLiteralColumn(column.getName(), value.getValue(), primaryKey);
+        } else {
+            addColumn(column.getName(), value.getValue(), primaryKey);
+        }
     }
 
     public int executeUpdate() throws SQLException {
-        String sql = buildStatement();
-        List<String> statementValues = getStatementParameters();
-        logStatement(sql, statementValues);
+        preparedStatement = buildPreparedStatement();
+        return preparedStatement.executeUpdate();
+    }
 
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        try {
-            setStatementValues(preparedStatement, statementValues);
-            return preparedStatement.executeUpdate();
-        } finally {
+    public ResultSet executeQuery() throws SQLException {
+        PreparedStatement preparedStatement = buildPreparedStatement();
+        return preparedStatement.executeQuery();
+    }
+
+    public void close() throws SQLException {
+        if (preparedStatement != null) {
             preparedStatement.close();
         }
     }
@@ -87,6 +88,28 @@ public abstract class PreparedStatementWrapper {
 
     protected abstract List<String> getStatementParameters();
 
+
+    protected void addColumn(String columnName, String value, boolean primaryKey) {
+        addColumnName(columnName, primaryKey);
+        addValue("?", primaryKey);
+        addStatementParameter(value, primaryKey);
+    }
+
+    protected void addLiteralColumn(String columnName, String value, boolean primaryKey) {
+        addColumnName(columnName, primaryKey);
+        addValue(value, primaryKey);
+    }
+
+
+    protected PreparedStatement buildPreparedStatement() throws SQLException {
+        String sql = buildStatement();
+        List<String> statementValues = getStatementParameters();
+        logStatement(sql, statementValues);
+
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        setStatementValues(preparedStatement, statementValues);
+        return preparedStatement;
+    }
 
     protected void setStatementValues(PreparedStatement preparedStatement, List<String> statementValues) throws SQLException {
         if (statementValues.isEmpty()) {
@@ -119,11 +142,11 @@ public abstract class PreparedStatementWrapper {
         return primaryKeyColumnNames;
     }
 
-    protected boolean isRemainingPrimaryKeyColumn(String columnName) {
+    protected boolean isRemainingPrimaryKeyColumn(Column column) {
         Iterator<String> iterator = remainingPrimaryKeyColumnNames.iterator();
         while (iterator.hasNext()) {
             String primaryKeyColumnName = iterator.next();
-            if (primaryKeyColumnName.equalsIgnoreCase(columnName)) {
+            if (column.hasName(primaryKeyColumnName)) {
                 iterator.remove();
                 return true;
             }

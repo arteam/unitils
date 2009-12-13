@@ -78,7 +78,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Inherited
 public @interface DataSet {
 
-
     /**
      * The file name of the data set. If left empty, the default filename will
      * be used: first 'classname'.'testMethodname'.xml will be tried, if that file does not exist,
@@ -88,7 +87,6 @@ public @interface DataSet {
      */
     String[] value() default {};
 
-
     /**
      * Specifies the way that the data set needs to be loaded in the database, e.g. clean insert.
      *
@@ -96,7 +94,6 @@ public @interface DataSet {
      *         to make use of the default loader as configured in the unitils configuration.
      */
     Class<? extends DataSetLoader> loader() default DataSetLoader.class;
-
 
     /**
      * The factory that needs to be used to read the data set files.

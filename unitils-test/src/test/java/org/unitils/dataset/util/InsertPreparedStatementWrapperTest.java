@@ -33,8 +33,8 @@ public class InsertPreparedStatementWrapperTest extends PreparedStatementWrapper
     @Test
     public void addColumn() throws Exception {
         insertPreparedStatementWrapper = new InsertPreparedStatementWrapper("my_schema", "table_a", connection.getMock());
-        insertPreparedStatementWrapper.addColumn("column_1", "1");
-        insertPreparedStatementWrapper.addColumn("column_2", "2");
+        insertPreparedStatementWrapper.addColumn(createColumn("column_1", "1"), emptyVariables);
+        insertPreparedStatementWrapper.addColumn(createColumn("column_2", "2"), emptyVariables);
         insertPreparedStatementWrapper.executeUpdate();
 
         connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_1,column_2) values (?,?)");
@@ -46,8 +46,8 @@ public class InsertPreparedStatementWrapperTest extends PreparedStatementWrapper
     @Test
     public void addLiteralColumn() throws Exception {
         insertPreparedStatementWrapper = new InsertPreparedStatementWrapper("my_schema", "table_a", connection.getMock());
-        insertPreparedStatementWrapper.addLiteralColumn("column_1", "literal1");
-        insertPreparedStatementWrapper.addLiteralColumn("column_2", "literal2");
+        insertPreparedStatementWrapper.addColumn(createColumn("column_1", "=literal1"), emptyVariables);
+        insertPreparedStatementWrapper.addColumn(createColumn("column_2", "=literal2"), emptyVariables);
         insertPreparedStatementWrapper.executeUpdate();
 
         connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_1,column_2) values (literal1,literal2)");

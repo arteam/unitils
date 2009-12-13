@@ -47,6 +47,14 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
     /* The resulting data set */
     private DataSet dataSet;
 
+    private boolean caseSensitive;
+
+    private char literalToken;
+
+    private char variableToken;
+
+    private Set<String> deleteTableOrder;
+
 
     /**
      * Creates a data set SAX content handler
@@ -88,6 +96,10 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
                 defaultSchemaName = uri;
             }
             dataSet = createDataSet(attributes);
+            caseSensitive = getCaseSensitive(attributes);
+            literalToken = getLiteralToken(attributes);
+            variableToken = getVariableToken(attributes);
+            deleteTableOrder = getDeleteTableOrder(attributes);
             return;
         }
         String schemaName = getSchemaName(uri);
@@ -95,11 +107,7 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
     }
 
     protected DataSet createDataSet(Attributes attributes) {
-        Boolean caseSensitive = getCaseSensitive(attributes);
-        Set<String> deleteTableOrder = getDeleteTableOrder(attributes);
-        Character literalToken = getLiteralToken(attributes);
-        Character variableToken = getVariableToken(attributes);
-        return new DataSet(caseSensitive, deleteTableOrder, literalToken, variableToken);
+        return new DataSet();
     }
 
     protected boolean getCaseSensitive(Attributes attributes) {
@@ -135,7 +143,7 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
         }
     }
 
-    protected Character getLiteralToken(Attributes attributes) {
+    protected char getLiteralToken(Attributes attributes) {
         String literalTokenAttribute = attributes.getValue("literalToken");
         if (literalTokenAttribute == null) {
             return defaultLiteralToken;
@@ -146,7 +154,7 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
         return literalTokenAttribute.charAt(0);
     }
 
-    protected Character getVariableToken(Attributes attributes) {
+    protected char getVariableToken(Attributes attributes) {
         String variableTokenAttribute = attributes.getValue("variableToken");
         if (variableTokenAttribute == null) {
             return defaultVariableToken;
@@ -161,7 +169,7 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
     protected void addSchema(String schemaName, String tableName, Attributes attributes, DataSet schemaCollection) {
         Schema schema = schemaCollection.getSchema(schemaName);
         if (schema == null) {
-            schema = new Schema(schemaName);
+            schema = new Schema(schemaName, caseSensitive, deleteTableOrder);
             schemaCollection.addSchema(schema);
         }
         addTable(tableName, schema, attributes);
@@ -170,7 +178,7 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
     protected void addTable(String tableName, Schema schema, Attributes attributes) {
         Table table = schema.getTable(tableName);
         if (table == null) {
-            table = new Table(tableName);
+            table = new Table(tableName, caseSensitive);
             schema.addTable(table);
         }
         addRows(attributes, table);
@@ -179,7 +187,7 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
     protected void addRows(Attributes attributes, Table table) {
         Row row = new Row();
         for (int i = 0; i < attributes.getLength(); i++) {
-            Column column = new Column(attributes.getQName(i), attributes.getValue(i));
+            Column column = new Column(attributes.getQName(i), attributes.getValue(i), caseSensitive, literalToken, variableToken);
             row.addColumn(column);
         }
         table.addRow(row);

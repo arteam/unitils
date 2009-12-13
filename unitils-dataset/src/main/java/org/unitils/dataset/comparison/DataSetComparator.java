@@ -13,16 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.core;
+package org.unitils.dataset.comparison;
 
+import org.unitils.dataset.comparison.impl.DataSetComparison;
+import org.unitils.dataset.core.DataSet;
+
+import javax.sql.DataSource;
+import java.util.List;
 
 /**
- * A builder for creating data set schemas.
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class SchemaFactory {
+public interface DataSetComparator {
 
+    void init(DataSource dataSource);
+
+    DataSetComparison compare(DataSet expectedDataSet, List<String> variables);
 
 }

@@ -15,11 +15,7 @@
  */
 package org.unitils.dataset.core;
 
-import org.unitils.dataset.core.comparison.RowDifference;
-import org.unitils.dataset.core.comparison.TableDifference;
-
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -33,6 +29,8 @@ public class Table {
     /* The name of the table */
     private String name;
 
+    private boolean caseSensitive;
+
     /* The data set rows */
     private List<Row> rows = new ArrayList<Row>();
 
@@ -43,7 +41,17 @@ public class Table {
      * @param name The name of the table, not null
      */
     public Table(String name) {
+        this(name, false);
+    }
+
+    /**
+     * Creates a data set table.
+     *
+     * @param name The name of the table, not null
+     */
+    public Table(String name, boolean caseSensitive) {
         this.name = name;
+        this.caseSensitive = caseSensitive;
     }
 
 
@@ -54,6 +62,9 @@ public class Table {
         return name;
     }
 
+    public boolean isCaseSensitive() {
+        return caseSensitive;
+    }
 
     /**
      * @return The data set rows, not null
@@ -97,63 +108,11 @@ public class Table {
         rows.add(row);
     }
 
-
-    /**
-     * Compares the table with the given actual table.
-     *
-     * @param actualTable The table to compare with, not null
-     * @return The difference, null if none found
-     */
-    public TableDifference compare(Table actualTable) {
-        TableDifference result = new TableDifference(this, actualTable);
-
-        if (isEmpty()) {
-            if (actualTable.isEmpty()) {
-                return null;
-            }
-            return result;
+    public boolean hasName(String tableName) {
+        if (caseSensitive) {
+            return name.equals(tableName);
         }
-
-        compareRows(rows, actualTable, result);
-        if (result.isMatch()) {
-            return null;
-        }
-        return result;
+        return name.equalsIgnoreCase(tableName);
     }
 
-
-    /**
-     * Compares the given rows with the columns of the actual table.
-     *
-     * @param rows        The rows to compare, not null
-     * @param actualTable The rows to compare with, not null
-     * @param result      The result to add the differences to, not null
-     */
-    protected void compareRows(List<Row> rows, Table actualTable, TableDifference result) {
-        List<Row> rowsWithoutMatch = new ArrayList<Row>(rows);
-        for (Row actualRow : actualTable.getRows()) {
-            Iterator<Row> rowIterator = rowsWithoutMatch.iterator();
-            while (rowIterator.hasNext()) {
-                Row row = rowIterator.next();
-
-                if (row.hasDifferentPrimaryKeyColumns(actualRow)) {
-                    continue;
-                }
-                RowDifference rowDifference = row.compare(actualRow);
-                if (rowDifference == null) {
-                    result.setMatchingRow(row, actualRow);
-                    rowIterator.remove();
-                    break;
-                } else {
-                    result.setIfBestRowDifference(rowDifference);
-                }
-            }
-        }
-
-        for (Row row : rowsWithoutMatch) {
-            if (result.getBestRowDifference(row) == null) {
-                result.addMissingRow(row);
-            }
-        }
-    }
 }

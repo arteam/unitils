@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2009,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,7 @@
  */
 package org.unitils.dataset.core;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A data set containing a collection of schema's.
@@ -31,38 +28,6 @@ public class DataSet {
     /* Maps schema names on schema's */
     private Map<String, Schema> schemas = new HashMap<String, Schema>();
 
-    private boolean caseSensitive;
-
-    private Set<String> deleteTableOrder = new HashSet<String>();
-
-    private char literalToken;
-
-    private char variableToken;
-
-
-    public DataSet(boolean caseSensitive, Set<String> deleteTableOrder, char literalToken, char variableToken) {
-        this.caseSensitive = caseSensitive;
-        this.deleteTableOrder = deleteTableOrder;
-        this.literalToken = literalToken;
-        this.variableToken = variableToken;
-    }
-
-
-    public boolean isCaseSensitive() {
-        return caseSensitive;
-    }
-
-    public Set<String> getDeleteTableOrder() {
-        return deleteTableOrder;
-    }
-
-    public char getLiteralToken() {
-        return literalToken;
-    }
-
-    public char getVariableToken() {
-        return variableToken;
-    }
 
     /**
      * Returns the schema for the given name, if any
@@ -74,16 +39,14 @@ public class DataSet {
         return schemas.get(schemaName);
     }
 
-
     /**
-     * Adds a schema.
+     * Adds a schema. If a schema with the same name already exists, it will replace the old one.
      *
      * @param schema The schema, not null
      */
     public void addSchema(Schema schema) {
         schemas.put(schema.getName(), schema);
     }
-
 
     /**
      * @return The names of all schema's, not null
@@ -92,11 +55,11 @@ public class DataSet {
         return schemas.keySet();
     }
 
-
     /**
      * @return The schema's, not null
      */
-    public Set<Schema> getSchemas() {
-        return new HashSet<Schema>(schemas.values());
+    public List<Schema> getSchemas() {
+        return new ArrayList<Schema>(schemas.values());
     }
+
 }
