@@ -3,6 +3,7 @@ package org.unitils.tapestry;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNotSame;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -18,6 +19,7 @@ import org.apache.tapestry5.ioc.RegistryBuilder;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.InjectService;
 import org.apache.tapestry5.ioc.annotations.Symbol;
+import org.easymock.EasyMock;
 import org.junit.Test;
 import org.unitils.tapestry.annotation.RunBeforeTapestryRegistryIsCreated;
 import org.unitils.tapestry.annotation.TapestryRegistry;
@@ -31,7 +33,7 @@ public class TapestryUnitilsModuleTest {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> T runTest(Class<T> testClass, boolean runBeforeClass) {
+	private <T> T runTest(Class<T> testClass, boolean runBeforeClass, String methodName) {
 		if (runBeforeClass) {
 			runBeforeClass(testClass);
 		}
@@ -39,7 +41,7 @@ public class TapestryUnitilsModuleTest {
 		Method testMethod;
 		try {
 			testObject = testClass.newInstance();
-			testMethod = testClass.getMethod("test");
+			testMethod = testClass.getMethod(methodName == null ? "test" : methodName);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -105,39 +107,39 @@ public class TapestryUnitilsModuleTest {
 
 	@Test
 	public void injectServiceIntoStatic() {
-		InjectIntoFields testObject = runTest(InjectIntoFields.class, true);
+		InjectIntoFields testObject = runTest(InjectIntoFields.class, true, null);
 		assertNotNull(testObject.service);
 	}
 
 	@Test
 	public void injectRegistryIntoField() {
-		InjectIntoFields testObject = runTest(InjectIntoFields.class, true);
+		InjectIntoFields testObject = runTest(InjectIntoFields.class, true, null);
 		assertNotNull(testObject.registry);
 	}
 
 	@Test
 	public void injectServiceWithIdIntoField() {
-		InjectIntoFields testObject = runTest(InjectIntoFields.class, true);
+		InjectIntoFields testObject = runTest(InjectIntoFields.class, true, null);
 		assertNotNull(testObject.serviceById);
 		assertEquals("Cat", InjectIntoStaticFields.serviceById.getName());
 	}
 
 	@Test
 	public void injectServiceWithMarkerIntoField() {
-		InjectIntoFields testObject = runTest(InjectIntoFields.class, true);
+		InjectIntoFields testObject = runTest(InjectIntoFields.class, true, null);
 		assertNotNull(testObject.serviceByMarker);
 		assertEquals("Dog", InjectIntoStaticFields.serviceByMarker.getName());
 	}
 
 	@Test
 	public void injectSymbolIntoField() {
-		InjectIntoFields testObject = runTest(InjectIntoFields.class, true);
+		InjectIntoFields testObject = runTest(InjectIntoFields.class, true, null);
 		assertEquals("testSymbolValue", testObject.testSymbol);
 	}
 
 	@Test
 	public void notAnnotatedFieldsAreNotInjected() {
-		InjectIntoFields testObject = runTest(InjectIntoFields.class, true);
+		InjectIntoFields testObject = runTest(InjectIntoFields.class, true, null);
 		assertNull(testObject.notInjectedRegistry);
 		assertNull(testObject.notInjectedService);
 	}
@@ -146,25 +148,21 @@ public class TapestryUnitilsModuleTest {
 	public void useCustomRegistryMethodWithStaticInjection() {
 		runBeforeClass(RegistryMethodWithStaticInjections.class);
 		assertNotNull(RegistryMethodWithStaticInjections.registry);
-		assertSame(RegistryMethodWithStaticInjections.registry,
-				RegistryMethodWithStaticInjections.injectedRegistry);
+		assertSame(RegistryMethodWithStaticInjections.registry, RegistryMethodWithStaticInjections.injectedRegistry);
 	}
 
 	@Test
 	public void useCustomRegistryMethodWithNonStaticInjection() {
-		RegistryMethodWithNonStaticInjections testObject = runTest(
-				RegistryMethodWithNonStaticInjections.class, true);
+		RegistryMethodWithNonStaticInjections testObject = runTest(RegistryMethodWithNonStaticInjections.class, true, null);
 		assertNotNull(testObject.registry);
 		assertSame(testObject.registry, testObject.injectedRegistry);
 	}
 
 	@Test
 	public void useCustomStaticRegistryMethodWithNonStaticInjection() {
-		StaticRegistryMethodWithNonStaticInjections testObject = runTest(
-				StaticRegistryMethodWithNonStaticInjections.class, true);
+		StaticRegistryMethodWithNonStaticInjections testObject = runTest(StaticRegistryMethodWithNonStaticInjections.class, true, null);
 		assertNotNull(StaticRegistryMethodWithNonStaticInjections.registry);
-		assertSame(StaticRegistryMethodWithNonStaticInjections.registry,
-				testObject.injectedRegistry);
+		assertSame(StaticRegistryMethodWithNonStaticInjections.registry, testObject.injectedRegistry);
 	}
 
 	@Test(expected = TapestryUnitilsModuleException.class)
@@ -175,17 +173,17 @@ public class TapestryUnitilsModuleTest {
 	@Test
 	public void runBeforeTapestryRegistryCreationWithStaticInjection() {
 		InjectIntoStaticFields.beforeRegistryCreatedCount = 0;
-		runTest(InjectIntoStaticFields.class, true);
+		runTest(InjectIntoStaticFields.class, true, null);
 		assertEquals(1, InjectIntoStaticFields.beforeRegistryCreatedCount);
 		// the method is not called anymore when tests are executed
-		runTest(InjectIntoStaticFields.class, false);
+		runTest(InjectIntoStaticFields.class, false, null);
 		assertEquals(1, InjectIntoStaticFields.beforeRegistryCreatedCount);
 	}
 
 	@Test
 	public void runBeforeTapestryRegistryCreationWithNonStaticInjection() {
 		InjectIntoFields.staticBeforeRegistryCreatedCount = 0;
-		InjectIntoFields testObject = runTest(InjectIntoFields.class, true);
+		InjectIntoFields testObject = runTest(InjectIntoFields.class, true, null);
 		assertEquals(1, testObject.beforeRegistryCreatedCount);
 		assertEquals(1, InjectIntoFields.staticBeforeRegistryCreatedCount);
 		// the method is not called anymore when tests are executed
@@ -196,7 +194,7 @@ public class TapestryUnitilsModuleTest {
 
 	@Test(expected = TapestryUnitilsModuleException.class)
 	public void tryToUseNonStaticRunBeforeRegistryCreationMethodWithStaticInjection() {
-		runTest(InvalidRunBeforeMethodWithStaticInjections.class, true);
+		runTest(InvalidRunBeforeMethodWithStaticInjections.class, true, null);
 	}
 
 	@Test
@@ -205,7 +203,7 @@ public class TapestryUnitilsModuleTest {
 		// the static fields are not set because the registry is created for the
 		// test method and not for the whole class
 		assertNull(RegistryPerTest.staticRegistry);
-		RegistryPerTest testObject = runTest(RegistryPerTest.class, false);
+		RegistryPerTest testObject = runTest(RegistryPerTest.class, false, null);
 		assertNotNull(RegistryPerTest.staticRegistry);
 		assertSame(RegistryPerTest.staticRegistry, testObject.registry);
 		// the next test get's its own registry
@@ -223,32 +221,45 @@ public class TapestryUnitilsModuleTest {
 
 	@Test
 	public void useRegistryPerTestAndUseClassRegistryForAllNonAnnotatedTests() {
+		Registry lastRegistry = null;
+
 		runBeforeClass(RegistryPerTestWithClassRegistry.class);
-		assertNotNull(RegistryPerTestWithClassRegistry.staticRegistry);
-		Registry classRegistry = RegistryPerTestWithClassRegistry.staticRegistry;
-		RegistryPerTestWithClassRegistry testObject = runTest(
-				RegistryPerTestWithClassRegistry.class, false);
-		assertNotNull(RegistryPerTestWithClassRegistry.staticRegistry);
-		assertSame(RegistryPerTestWithClassRegistry.staticRegistry,
-				testObject.registry);
-		assertNotSame(classRegistry, testObject.registry);
-		runTest(testObject, "testWithoutRegistry");
-		// nothing was done - fields just keep their old values
-		assertSame(classRegistry,
-				RegistryPerTestWithClassRegistry.staticRegistry);
-		assertSame(classRegistry, testObject.registry);
+
+		RegistryPerTestWithClassRegistry testObject = runTest(RegistryPerTestWithClassRegistry.class, false, "testWithoutRegistry1");
+		assertNotNull(testObject.registry);
+		lastRegistry = testObject.registry;
+
+		runTest(testObject, "testWithRegistry");
+		assertNotNull(testObject.registry);
+		assertNotSame(lastRegistry, testObject.registry);
+		lastRegistry = testObject.registry;
+
+		runTest(testObject, "testWithoutRegistry2");
+		assertNotNull(testObject.registry);
+		assertNotSame(lastRegistry, testObject.registry);
 	}
 
 	@Test
 	public void useRegistryPerTestWithCustomRegistryMethod() {
-		RegistryPerTestWithCustomRegistryMethod testObject = runTest(
-				RegistryPerTestWithCustomRegistryMethod.class, true);
+		RegistryPerTestWithCustomRegistryMethod testObject = runTest(RegistryPerTestWithCustomRegistryMethod.class, true, null);
 		assertNotNull(testObject.registry);
+		// assert that the registry is shut down
+		EasyMock.verify(testObject.registry);
+	}
+
+	@Test
+	public void useRegistryPerTestWithCustomRegistryAndRegistryShutdownMethod() {
+		RegistryPerTestWithCustomRegistryAndRegistryShutdownMethod testObject = runTest(RegistryPerTestWithCustomRegistryAndRegistryShutdownMethod.class, true,
+				null);
+		assertNotNull(testObject.registry);
+		assertTrue(testObject.shutdownRegistryCalled);
+		// assert that the registry is shut down
+		EasyMock.verify(testObject.registry);
 	}
 
 	@Test
 	public void useRegistryPerTestWithCustomStaticRegistryMethod() {
-		runTest(RegistryPerTestWithCustomStaticRegistryMethod.class, true);
+		runTest(RegistryPerTestWithCustomStaticRegistryMethod.class, true, null);
 		assertNotNull(RegistryPerTestWithCustomStaticRegistryMethod.registry);
 	}
 
@@ -272,8 +283,9 @@ public class TapestryUnitilsModuleTest {
 		private Registry registry;
 
 		public Registry createRegistry(Class<?>[] modules) {
-			registry = new RegistryBuilder().add(modules).build();
-			registry.performRegistryStartup();
+			registry = EasyMock.createMock(Registry.class);
+			registry.shutdown();
+			EasyMock.replay(registry);
 			return registry;
 		}
 
@@ -282,19 +294,143 @@ public class TapestryUnitilsModuleTest {
 		}
 	}
 
+	public static class RegistryPerTestWithCustomRegistryAndRegistryShutdownMethod {
+
+		private Registry registry;
+		private boolean shutdownRegistryCalled;
+
+		public Registry createRegistry(Class<?>[] modules) {
+			registry = EasyMock.createMock(Registry.class);
+			registry.shutdown();
+			EasyMock.replay(registry);
+			return registry;
+		}
+
+		public void shutdownRegistry(Registry registry) {
+			shutdownRegistryCalled = true;
+			registry.shutdown();
+		}
+
+		@TapestryRegistry(value = Module.class, registryFactoryMethodName = "createRegistry", registryShutdownMethodName = "shutdownRegistry")
+		public void test() {
+		}
+	}
+
+	@TapestryRegistry(value = Module.class, registryFactoryMethodName = "createRegistry", registryShutdownMethodName = "shutdownRegistry")
+	public static class RegistryPerClassWithCustomRegistryAndRegistryShutdownMethod {
+		private Registry registry;
+		private boolean shutdownRegistryCalled;
+
+		public Registry createRegistry(Class<?>[] modules) {
+			registry = EasyMock.createMock(Registry.class);
+			registry.shutdown();
+			EasyMock.replay(registry);
+			return registry;
+		}
+
+		public void shutdownRegistry(Registry registry) {
+			shutdownRegistryCalled = true;
+			registry.shutdown();
+		}
+
+		public void test() {
+		}
+	}
+
+	public static class TestWithoutTapestrySupport {
+		public void test() {
+		}
+	}
+
+	@Test
+	public void useRegistryPerClassWithCustomRegistryAndRegistryShutdownMethod() {
+		RegistryPerClassWithCustomRegistryAndRegistryShutdownMethod testObject = runTest(RegistryPerClassWithCustomRegistryAndRegistryShutdownMethod.class,
+				true, null);
+		assertNotNull(testObject.registry);
+		// assert that the registry is not shut down (registry will be shut down
+		// when the next test executes ...)
+		assertFalse(testObject.shutdownRegistryCalled);
+		runTest(TestWithoutTapestrySupport.class, true, null);
+		assertTrue(testObject.shutdownRegistryCalled);
+		EasyMock.verify(testObject.registry);
+	}
+
 	@TapestryRegistry(Module.class)
 	public static class RegistryPerTestWithClassRegistry {
 		@Inject
-		public static Registry staticRegistry;
+		public Registry registry;
+
+		public void testWithoutRegistry1() {
+		}
+
+		@TapestryRegistry(Module.class)
+		public void testWithRegistry() {
+		}
+
+		public void testWithoutRegistry2() {
+		}
+
+	}
+
+	@TapestryRegistry(value = { Module.class }, createRegistryPerTest = true)
+	public static class AutoRegistryPerTest {
 		@Inject
 		public Registry registry;
 
-		@TapestryRegistry(Module.class)
-		public void test() {
+		public void test1() {
 		}
 
-		public void testWithoutRegistry() {
+		public void test2() {
 		}
+	}
+
+	@Test
+	public void useRegistryPerTestWithClassAnnotationOnly() {
+		Registry lastRegistry = null;
+
+		AutoRegistryPerTest testObject = runTest(AutoRegistryPerTest.class, true, "test1");
+		assertNotNull(testObject.registry);
+		lastRegistry = testObject.registry;
+
+		runTest(testObject, "test2");
+		assertNotNull(testObject.registry);
+		assertNotSame(lastRegistry, testObject.registry);
+	}
+
+	@TapestryRegistry(value = { Module.class }, createRegistryPerTest = true, registryFactoryMethodName = "createRegistry", registryShutdownMethodName = "shutdownRegistry")
+	public static class AutoRegistryPerTestWithCustomRegistryAndRegistryShutdownMethods {
+		@Inject
+		public Registry registry;
+		public int shutdownRegistryCalls;
+
+		public Registry createRegistry(Class<?>... modules) {
+			return EasyMock.createNiceMock(Registry.class);
+		}
+
+		public void shutdownRegistry(Registry registry) {
+			shutdownRegistryCalls++;
+		}
+
+		public void test1() {
+		}
+
+		public void test2() {
+		}
+	}
+
+	@Test
+	public void checkRegistryShutdownWithRegistryPerTestAndClassAnnotationOnly() {
+		Registry lastRegistry = null;
+		
+		AutoRegistryPerTestWithCustomRegistryAndRegistryShutdownMethods testObject = runTest(AutoRegistryPerTestWithCustomRegistryAndRegistryShutdownMethods.class, true, "test1");
+		assertNotNull(testObject.registry);
+		assertEquals(1, testObject.shutdownRegistryCalls);
+		lastRegistry = testObject.registry;
+		
+		runTest(testObject, "test2");
+		assertNotNull(testObject.registry);
+		assertNotSame(lastRegistry, testObject.registry);
+		assertEquals(2, testObject.shutdownRegistryCalls);
 	}
 
 	public static class RegistryPerTest {
@@ -327,24 +463,22 @@ public class TapestryUnitilsModuleTest {
 			fail("won't be executed because static injection is required");
 		}
 	}
-	
+
 	@TapestryRegistry(Module.class)
 	public static class PrivateRunBeforeMethod {
 		@RunBeforeTapestryRegistryIsCreated
 		protected static void runBefore() {
 			fail("won't be executed because this method must be private");
 		}
-		
+
 		public void test() {
 		}
 	}
-	
+
 	@Test(expected = TapestryUnitilsModuleException.class)
 	public void runBeforeMethodsMustBePublic() {
-		runTest(PrivateRunBeforeMethod.class, true);
+		runTest(PrivateRunBeforeMethod.class, true, null);
 	}
-	
-	
 
 	@TapestryRegistry(value = Module.class, registryFactoryMethodName = "createRegistry")
 	public static class InvalidRegistryMethodWithStaticInjections {
@@ -492,14 +626,14 @@ public class TapestryUnitilsModuleTest {
 		public Person baseService;
 		@Inject
 		public static Person staticBaseService;
-		
+
 		private static List<String> runBeforeCalls = new ArrayList<String>();
-		
+
 		@RunBeforeTapestryRegistryIsCreated
 		public static void runBeforeTapestryRegistryIsCreated() {
 			runBeforeCalls.add("1");
 		}
-		
+
 	}
 
 	@TapestryRegistry(Module.class)
@@ -508,7 +642,7 @@ public class TapestryUnitilsModuleTest {
 		public Person derivedService;
 		@Inject
 		public static Person staticDerivedService;
-		
+
 		@RunBeforeTapestryRegistryIsCreated
 		public static void runBeforeTapestryRegistryIsCreated() {
 			InjectBase.runBeforeCalls.add("2");
@@ -517,40 +651,40 @@ public class TapestryUnitilsModuleTest {
 		public void test() {
 		}
 	}
-	
+
 	public static abstract class InjectWithOverwrittenRunBeforeMethodsBase {
 		protected List<String> runBeforeCalls = new ArrayList<String>();
-		
+
 		@RunBeforeTapestryRegistryIsCreated
 		public void runBeforeTapestryRegistryIsCreated() {
 			runBeforeCalls.add("1");
 		}
 	}
-	
+
 	@TapestryRegistry(Module.class)
 	public static class InjectWithOverwrittenRunBeforeMethods extends InjectWithOverwrittenRunBeforeMethodsBase {
 		@RunBeforeTapestryRegistryIsCreated
 		public void runBeforeTapestryRegistryIsCreated() {
 			runBeforeCalls.add("2");
 		}
-		
+
 		public void test() {
 		}
 	}
-	
+
 	@Test
 	public void runBeforeMethodsCanBeOverwritten() {
-		InjectWithOverwrittenRunBeforeMethods testObject = runTest(InjectWithOverwrittenRunBeforeMethods.class, true);
+		InjectWithOverwrittenRunBeforeMethods testObject = runTest(InjectWithOverwrittenRunBeforeMethods.class, true, null);
 		assertEquals(Arrays.asList("2"), testObject.runBeforeCalls);
 	}
 
 	@Test
 	public void runBeforeCallsAreExecutedInHierarchyOrder() {
 		InjectBase.runBeforeCalls = new ArrayList<String>();
-		runTest(InjectDerived.class, true);
+		runTest(InjectDerived.class, true, null);
 		assertEquals(Arrays.asList("1", "2"), InjectBase.runBeforeCalls);
 	}
-	
+
 	@TapestryRegistry(value = {}, registryFactoryMethodName = "createRegistry", registryFactoryMethodParameter = "test")
 	public static class CustomRegistryFactoryMethodWithParameters {
 		private Registry registry;
@@ -592,7 +726,7 @@ public class TapestryUnitilsModuleTest {
 
 	@Test
 	public void nonStaticMethodsCanBeUsedIfNoStaticInjectionIsRequired() {
-		NonStaticMethods testObject = runTest(NonStaticMethods.class, true);
+		NonStaticMethods testObject = runTest(NonStaticMethods.class, true, null);
 		assertNotNull(testObject.injectedRegistry);
 		assertSame(testObject.injectedRegistry, testObject.registry);
 		assertTrue(testObject.runBeforeTapestryCreationCalled);
@@ -600,8 +734,7 @@ public class TapestryUnitilsModuleTest {
 
 	@Test
 	public void passParmetersToRegistryFactoryMethod() {
-		CustomRegistryFactoryMethodWithParameters testObject = runTest(
-				CustomRegistryFactoryMethodWithParameters.class, true);
+		CustomRegistryFactoryMethodWithParameters testObject = runTest(CustomRegistryFactoryMethodWithParameters.class, true, null);
 		assertNotNull(testObject.injectedRegistry);
 		assertSame(testObject.injectedRegistry, testObject.registry);
 		assertEquals("test", testObject.arguments);
@@ -609,7 +742,7 @@ public class TapestryUnitilsModuleTest {
 
 	@Test
 	public void injectionIsDoneThroughHierarchy() {
-		InjectDerived testObject = runTest(InjectDerived.class, true);
+		InjectDerived testObject = runTest(InjectDerived.class, true, null);
 		assertNotNull(testObject.baseService);
 		assertNotNull(testObject.derivedService);
 		assertNotNull(InjectBase.staticBaseService);
