@@ -15,8 +15,6 @@
  */
 package org.unitils;
 
-import static org.unitils.TracingTestListener.TestInvocation.TEST_SET_UP;
-import static org.unitils.TracingTestListener.TestInvocation.TEST_TEAR_DOWN;
 
 /**
  * Base class for the JUnit3 test listener tests.
@@ -37,26 +35,6 @@ abstract public class UnitilsJUnit3TestBase extends UnitilsJUnit3 {
      */
     public static void setTracingTestListener(TracingTestListener testListener) {
         tracingTestListener = testListener;
-    }
-
-
-    /**
-     * Overidden to register the test setup invocation.
-     */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        registerTestInvocation(TEST_SET_UP, null);
-    }
-
-
-    /**
-     * Overidden to register the test teardown invocation.
-     */
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        registerTestInvocation(TEST_TEAR_DOWN, null);
     }
 
 
