@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.util;
+package org.unitils.dataset.core.preparedstatement;
 
 import org.unitils.core.UnitilsException;
 
@@ -26,16 +26,17 @@ import java.util.List;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class UpdatePreparedStatementWrapper extends PreparedStatementWrapper {
+public class UpdatePreparedStatement extends BasePreparedStatement {
 
     protected StringBuilder statementBuilder = new StringBuilder();
     protected StringBuilder whereClauseBuilder = new StringBuilder();
+
     protected List<String> whereValues = new ArrayList<String>();
     protected List<String> statementParameters = new ArrayList<String>();
     protected List<String> whereParameters = new ArrayList<String>();
 
 
-    public UpdatePreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {
+    public UpdatePreparedStatement(String schemaName, String tableName, Connection connection) throws SQLException {
         super(schemaName, tableName, connection);
     }
 
@@ -45,10 +46,9 @@ public class UpdatePreparedStatementWrapper extends PreparedStatementWrapper {
         if (primaryKey) {
             whereClauseBuilder.append(columnName);
             whereClauseBuilder.append('=');
-        } else {
-            statementBuilder.append(columnName);
-            statementBuilder.append('=');
         }
+        statementBuilder.append(columnName);
+        statementBuilder.append('=');
     }
 
     @Override
@@ -56,19 +56,17 @@ public class UpdatePreparedStatementWrapper extends PreparedStatementWrapper {
         if (primaryKey) {
             whereClauseBuilder.append(value);
             whereClauseBuilder.append(", ");
-        } else {
-            statementBuilder.append(value);
-            statementBuilder.append(", ");
         }
+        statementBuilder.append(value);
+        statementBuilder.append(", ");
     }
 
     @Override
     protected void addStatementParameter(String value, boolean primaryKey) {
         if (primaryKey) {
             whereParameters.add(value);
-        } else {
-            statementParameters.add(value);
         }
+        statementParameters.add(value);
     }
 
     @Override

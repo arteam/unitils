@@ -117,8 +117,7 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseAccessor implement
             writer.write("\t\t\t\t<xsd:any namespace=\"" + defaultSchemaName + "\" />\n");
 
             writer.write("\t\t\t</xsd:choice>\n");
-            writer.write("\t\t<xsd:attribute name==\"caseSensitive\" use=\"optional\" type=\"xsd:boolean\" />\n");
-            writer.write("\t\t<xsd:attribute name==\"deleteTableOrder\" use=\"optional\" type=\"xsd:string\" />\n");
+            writer.write("\t\t<xsd:attribute name==\"caseSensitive\" use=\"optional\" type=\"xsd:boolean\" />\n");            
             writer.write("\t\t<xsd:attribute name==\"literalToken\" use=\"optional\" type=\"xsd:string\" />\n");
             writer.write("\t\t<xsd:attribute name==\"variableToken\" use=\"optional\" type=\"xsd:string\" />\n");
             writer.write("\t\t</xsd:complexType>\n");

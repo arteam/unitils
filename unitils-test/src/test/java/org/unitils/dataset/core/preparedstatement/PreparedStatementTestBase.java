@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.util;
+package org.unitils.dataset.core.preparedstatement;
 
 import org.junit.Before;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.core.Column;
+import org.unitils.mock.ArgumentMatchers;
 import org.unitils.mock.Mock;
 
 import java.sql.*;
@@ -29,12 +30,13 @@ import static java.sql.Types.INTEGER;
 import static java.sql.Types.VARCHAR;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.unitils.mock.ArgumentMatchers.anyInt;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public abstract class PreparedStatementWrapperTestBase extends UnitilsJUnit4 {
+public abstract class PreparedStatementTestBase extends UnitilsJUnit4 {
 
     protected Mock<Connection> connection;
     protected Mock<PreparedStatement> preparedStatement;
@@ -49,8 +51,7 @@ public abstract class PreparedStatementWrapperTestBase extends UnitilsJUnit4 {
         connection.returns(primaryKeyResultSet).getMetaData().getPrimaryKeys(null, null, null);
 
         preparedStatement.returns(parameterMetaData).getParameterMetaData();
-        parameterMetaData.returns(VARCHAR).getParameterType(1);
-        parameterMetaData.returns(INTEGER).getParameterType(2);
+        parameterMetaData.returns(VARCHAR).getParameterType(anyInt());
     }
 
 

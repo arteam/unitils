@@ -13,25 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.loader.impl;
-
-import org.unitils.dataset.core.preparedstatement.BasePreparedStatement;
-import org.unitils.dataset.core.preparedstatement.InsertPreparedStatement;
+package org.unitils.dataset.core.preparedstatement;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Loads the data using insert statements.
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class InsertDataSetLoader extends BaseDataSetLoader {
+public abstract class QueryPreparedStatement<T extends QueryResultSet> extends BasePreparedStatement {
 
 
-    protected BasePreparedStatement createPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {
-        return new InsertPreparedStatement(schemaName, tableName, connection);
+    public QueryPreparedStatement(String schemaName, String tableName, Connection connection) throws SQLException {
+        super(schemaName, tableName, connection);
     }
+
+
+    public T executeQuery() throws SQLException {
+        PreparedStatement preparedStatement = buildPreparedStatement();
+        return createResultSetWrapper(preparedStatement.executeQuery());
+    }
+
+    protected abstract T createResultSetWrapper(ResultSet resultSet);
 
 }

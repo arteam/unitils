@@ -1,5 +1,5 @@
 /*
- * Copyright 2009,  Unitils.org
+ * Copyright 2006-2009,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.loader.impl;
+package org.unitils.dataset.core.preparedstatement;
 
-import org.unitils.dataset.core.preparedstatement.BasePreparedStatement;
-import org.unitils.dataset.core.preparedstatement.InsertPreparedStatement;
-
-import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Set;
 
 /**
- * Loads the data using insert statements.
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class InsertDataSetLoader extends BaseDataSetLoader {
+public class ComparisonResultSet extends QueryResultSet {
 
-
-    protected BasePreparedStatement createPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {
-        return new InsertPreparedStatement(schemaName, tableName, connection);
+    public ComparisonResultSet(ResultSet resultSet, Set<String> primaryKeyColumnNames) {
+        super(resultSet, primaryKeyColumnNames);
     }
 
+    public String getExpectedValue(int columnIndex) throws SQLException {
+        return getValue((columnIndex * 2) + 1);
+    }
+
+    public String getActualValue(int columnIndex) throws SQLException {
+        return getValue(columnIndex * 2);
+    }
 }

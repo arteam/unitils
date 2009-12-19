@@ -27,9 +27,7 @@ import org.unitils.dataset.factory.impl.XmlDataSetReader;
 
 import java.io.File;
 
-import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.toFile;
 
 /**
@@ -62,7 +60,6 @@ public class XmlDataSetReaderDataSetAttributesTest extends UnitilsJUnit4 {
         assertFalse(column.isCaseSensitive());
         assertEquals('=', column.getLiteralToken());
         assertEquals('$', column.getVariableToken());
-        assertTrue(schema.getDeleteTableOrder().isEmpty());
     }
 
     @Test
@@ -77,7 +74,6 @@ public class XmlDataSetReaderDataSetAttributesTest extends UnitilsJUnit4 {
         assertTrue(column.isCaseSensitive());
         assertEquals('%', column.getLiteralToken());
         assertEquals(':', column.getVariableToken());
-        assertLenientEquals(asList("table1", "table2"), schema.getDeleteTableOrder());
     }
 
     @Test(expected = UnitilsException.class)
@@ -93,12 +89,6 @@ public class XmlDataSetReaderDataSetAttributesTest extends UnitilsJUnit4 {
     @Test(expected = UnitilsException.class)
     public void invalidVariableTokenValue() throws Exception {
         xmlDataSetReader.readDataSetXml(getDataSetFile("InvalidVariableTokenValueDataSet.xml"));
-    }
-
-    @Test
-    public void emptyDeleteTableOrderValue() throws Exception {
-        DataSet result = xmlDataSetReader.readDataSetXml(getDataSetFile("EmptyDeleteTableOrderValueDataSet.xml"));
-        assertTrue(result.getSchema("SCHEMA_A").getDeleteTableOrder().isEmpty());
     }
 
 

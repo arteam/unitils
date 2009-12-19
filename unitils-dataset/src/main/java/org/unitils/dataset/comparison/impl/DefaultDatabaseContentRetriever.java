@@ -17,8 +17,8 @@ package org.unitils.dataset.comparison.impl;
 
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.comparison.DatabaseContentRetriever;
-import org.unitils.dataset.util.ResultSetWrapper;
-import org.unitils.dataset.util.TableContentPreparedStatementWrapper;
+import org.unitils.dataset.core.preparedstatement.QueryResultSet;
+import org.unitils.dataset.core.preparedstatement.TableContentPreparedStatement;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -71,8 +71,8 @@ public class DefaultDatabaseContentRetriever implements DatabaseContentRetriever
     @SuppressWarnings({"unchecked"})
     protected void getActualTableContent(String schemaName, TableComparison tableComparison, Connection connection, StringBuilder contentBuilder) throws SQLException {
         String tableName = tableComparison.getName();
-        TableContentPreparedStatementWrapper preparedStatementWrapper = createPreparedStatementWrapper(schemaName, tableName, connection);
-        ResultSetWrapper resultSet = preparedStatementWrapper.executeQuery();
+        TableContentPreparedStatement preparedStatementWrapper = createPreparedStatementWrapper(schemaName, tableName, connection);
+        QueryResultSet resultSet = preparedStatementWrapper.executeQuery();
 
         int nrOfColumns = resultSet.getNrOfColumns();
         if (nrOfColumns == 0) {
@@ -133,8 +133,8 @@ public class DefaultDatabaseContentRetriever implements DatabaseContentRetriever
         }
     }
 
-    protected TableContentPreparedStatementWrapper createPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {
-        return new TableContentPreparedStatementWrapper(schemaName, tableName, connection);
+    protected TableContentPreparedStatement createPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {
+        return new TableContentPreparedStatement(schemaName, tableName, connection);
     }
 
 }

@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.util;
+package org.unitils.dataset.core.preparedstatement;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,20 +25,20 @@ import java.util.List;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ComparisonPreparedStatementWrapper extends PreparedStatementWrapper {
+public class ComparisonPreparedStatement extends QueryPreparedStatement<ComparisonResultSet> {
 
     protected StringBuilder identifiersBuilder = new StringBuilder();
     protected StringBuilder columnsBuilder = new StringBuilder();
     protected List<String> statementParameters = new ArrayList<String>();
 
 
-    public ComparisonPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {
+    public ComparisonPreparedStatement(String schemaName, String tableName, Connection connection) throws SQLException {
         super(schemaName, tableName, connection);
     }
 
-    public ResultSetWrapper executeQuery() throws SQLException {
-        PreparedStatement preparedStatement = buildPreparedStatement();
-        return new ResultSetWrapper(preparedStatement.executeQuery(), primaryKeyColumnNames);
+    @Override
+    protected ComparisonResultSet createResultSetWrapper(ResultSet resultSet) {
+        return new ComparisonResultSet(resultSet, primaryKeyColumnNames);
     }
 
 
@@ -54,7 +54,6 @@ public class ComparisonPreparedStatementWrapper extends PreparedStatementWrapper
         columnsBuilder.append(", ");
     }
 
-    @Override
     protected void addStatementParameter(String value, boolean primaryKey) {
         statementParameters.add(value);
     }
@@ -67,6 +66,7 @@ public class ComparisonPreparedStatementWrapper extends PreparedStatementWrapper
     @Override
     protected String buildStatement() {
         buildIdentifierPart();
+        finalizeStatementParts();
 
         StringBuilder sql = new StringBuilder();
         sql.append("select ");
@@ -79,15 +79,20 @@ public class ComparisonPreparedStatementWrapper extends PreparedStatementWrapper
         return sql.toString();
     }
 
-    private void buildIdentifierPart() {
-        if (remainingPrimaryKeyColumnNames.isEmpty()) {
-            identifiersBuilder.append("1, ");
+    protected void buildIdentifierPart() {
+        if (primaryKeyColumnNames.isEmpty()) {
+            return;
         }
-        for (String primaryKeyColumnName : remainingPrimaryKeyColumnNames) {
+        identifiersBuilder.append(", ");
+        for (String primaryKeyColumnName : primaryKeyColumnNames) {
             identifiersBuilder.append(primaryKeyColumnName);
             identifiersBuilder.append(", ");
         }
         identifiersBuilder.setLength(identifiersBuilder.length() - 2);
+    }
+
+    protected void finalizeStatementParts() {
+        columnsBuilder.setLength(columnsBuilder.length() - 2);
     }
 
 }
