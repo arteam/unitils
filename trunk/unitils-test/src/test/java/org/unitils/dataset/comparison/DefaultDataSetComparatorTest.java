@@ -20,14 +20,13 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.dataset.comparison.impl.*;
 import org.unitils.dataset.core.*;
-import org.unitils.dataset.util.ComparisonPreparedStatementWrapper;
-import org.unitils.dataset.util.ResultSetWrapper;
+import org.unitils.dataset.core.preparedstatement.ComparisonPreparedStatement;
+import org.unitils.dataset.core.preparedstatement.ComparisonResultSet;
 import org.unitils.mock.Mock;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -43,8 +42,8 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
 
     private Mock<DataSource> dataSource;
     private Mock<Connection> connection;
-    private Mock<ComparisonPreparedStatementWrapper> preparedStatementWrapper;
-    private Mock<ResultSetWrapper> comparisonResultSet;
+    private Mock<ComparisonPreparedStatement> preparedStatementWrapper;
+    private Mock<ComparisonResultSet> comparisonResultSet;
 
     protected DataSet dataSet;
     protected DataSet emptyDataSet;
@@ -158,13 +157,13 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
         row1.addColumn(createColumn("column_2", "2"));
         tableA.addRow(row1);
 
-        Schema schema = new Schema("my_schema", false, new HashSet<String>());
+        Schema schema = new Schema("my_schema", false);
         schema.addTable(tableA);
         return createDataSet(schema);
     }
 
     private DataSet createEmptyDataSet() {
-        Schema schema = new Schema("my_schema", false, new HashSet<String>());
+        Schema schema = new Schema("my_schema", false);
         schema.addTable(new Table("table_a"));
         return createDataSet(schema);
     }
@@ -182,7 +181,7 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
 
     private class TestDefaultDataSetComparator extends DefaultDataSetComparator {
         @Override
-        protected ComparisonPreparedStatementWrapper createPreparedStatementWrapper(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws Exception {
+        protected ComparisonPreparedStatement createPreparedStatementWrapper(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws Exception {
             return preparedStatementWrapper.getMock();
         }
     }

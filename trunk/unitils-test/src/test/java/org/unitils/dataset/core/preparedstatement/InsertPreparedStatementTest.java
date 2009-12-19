@@ -13,42 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.util;
+package org.unitils.dataset.core.preparedstatement;
 
 import org.junit.Test;
 
-import static java.sql.Types.INTEGER;
 import static java.sql.Types.VARCHAR;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class InsertPreparedStatementWrapperTest extends PreparedStatementWrapperTestBase {
+public class InsertPreparedStatementTest extends PreparedStatementTestBase {
 
     /* Tested object */
-    private InsertPreparedStatementWrapper insertPreparedStatementWrapper;
+    private InsertPreparedStatement insertPreparedStatement;
 
 
     @Test
     public void addColumn() throws Exception {
-        insertPreparedStatementWrapper = new InsertPreparedStatementWrapper("my_schema", "table_a", connection.getMock());
-        insertPreparedStatementWrapper.addColumn(createColumn("column_1", "1"), emptyVariables);
-        insertPreparedStatementWrapper.addColumn(createColumn("column_2", "2"), emptyVariables);
-        insertPreparedStatementWrapper.executeUpdate();
+        insertPreparedStatement = new InsertPreparedStatement("my_schema", "table_a", connection.getMock());
+        insertPreparedStatement.addColumn(createColumn("column_1", "1"), emptyVariables);
+        insertPreparedStatement.addColumn(createColumn("column_2", "2"), emptyVariables);
+        insertPreparedStatement.executeUpdate();
 
         connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_1,column_2) values (?,?)");
         preparedStatement.assertInvoked().setObject(1, "1", VARCHAR);
-        preparedStatement.assertInvoked().setObject(2, "2", INTEGER);
+        preparedStatement.assertInvoked().setObject(2, "2", VARCHAR);
         preparedStatement.assertInvoked().executeUpdate();
     }
 
     @Test
     public void addLiteralColumn() throws Exception {
-        insertPreparedStatementWrapper = new InsertPreparedStatementWrapper("my_schema", "table_a", connection.getMock());
-        insertPreparedStatementWrapper.addColumn(createColumn("column_1", "=literal1"), emptyVariables);
-        insertPreparedStatementWrapper.addColumn(createColumn("column_2", "=literal2"), emptyVariables);
-        insertPreparedStatementWrapper.executeUpdate();
+        insertPreparedStatement = new InsertPreparedStatement("my_schema", "table_a", connection.getMock());
+        insertPreparedStatement.addColumn(createColumn("column_1", "=literal1"), emptyVariables);
+        insertPreparedStatement.addColumn(createColumn("column_2", "=literal2"), emptyVariables);
+        insertPreparedStatement.executeUpdate();
 
         connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_1,column_2) values (literal1,literal2)");
         preparedStatement.assertNotInvoked().getMetaData();

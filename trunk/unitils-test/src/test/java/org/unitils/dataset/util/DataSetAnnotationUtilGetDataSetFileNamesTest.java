@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.dataset.annotation.DataSet;
+import org.unitils.dataset.util.DataSetAnnotationUtil;
 import org.unitils.util.ReflectionUtils;
 
 import java.lang.reflect.Method;

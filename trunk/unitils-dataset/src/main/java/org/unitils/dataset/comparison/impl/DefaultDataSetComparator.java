@@ -20,8 +20,8 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.comparison.DataSetComparator;
 import org.unitils.dataset.core.*;
-import org.unitils.dataset.util.ComparisonPreparedStatementWrapper;
-import org.unitils.dataset.util.ResultSetWrapper;
+import org.unitils.dataset.core.preparedstatement.ComparisonPreparedStatement;
+import org.unitils.dataset.core.preparedstatement.ComparisonResultSet;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -91,7 +91,7 @@ public class DefaultDataSetComparator implements DataSetComparator {
     protected void findMatches(String schemaName, String tableName, Table table, List<String> variables, Connection connection, TableComparison tableComparison) {
         for (Row row : table.getRows()) {
             try {
-                ComparisonPreparedStatementWrapper preparedStatementWrapper = createPreparedStatementWrapper(schemaName, tableName, row, variables, connection);
+                ComparisonPreparedStatement preparedStatementWrapper = createPreparedStatementWrapper(schemaName, tableName, row, variables, connection);
                 try {
                     findMatchesAndTablesThatShouldHaveNoMoreRecords(row, variables, preparedStatementWrapper, tableComparison);
                 } finally {
@@ -109,7 +109,7 @@ public class DefaultDataSetComparator implements DataSetComparator {
                 continue;
             }
             try {
-                ComparisonPreparedStatementWrapper preparedStatementWrapper = createPreparedStatementWrapper(schemaName, tableName, row, variables, connection);
+                ComparisonPreparedStatement preparedStatementWrapper = createPreparedStatementWrapper(schemaName, tableName, row, variables, connection);
                 try {
                     findBestComparisons(row, variables, preparedStatementWrapper, tableComparison);
                 } finally {
@@ -122,8 +122,8 @@ public class DefaultDataSetComparator implements DataSetComparator {
     }
 
 
-    protected void findMatchesAndTablesThatShouldHaveNoMoreRecords(Row row, List<String> variables, ComparisonPreparedStatementWrapper preparedStatementWrapper, TableComparison tableComparison) throws Exception {
-        ResultSetWrapper resultSet = preparedStatementWrapper.executeQuery();
+    protected void findMatchesAndTablesThatShouldHaveNoMoreRecords(Row row, List<String> variables, ComparisonPreparedStatement preparedStatementWrapper, TableComparison tableComparison) throws Exception {
+        ComparisonResultSet resultSet = preparedStatementWrapper.executeQuery();
         while (resultSet.next()) {
             String rowIdentifier = resultSet.getRowIdentifier();
             if (tableComparison.isActualRowWithExactMatch(rowIdentifier)) {
@@ -142,10 +142,10 @@ public class DefaultDataSetComparator implements DataSetComparator {
         resultSet.close();
     }
 
-    protected void findBestComparisons(Row row, List<String> variables, ComparisonPreparedStatementWrapper preparedStatementWrapper, TableComparison tableComparison) throws Exception {
+    protected void findBestComparisons(Row row, List<String> variables, ComparisonPreparedStatement preparedStatementWrapper, TableComparison tableComparison) throws Exception {
         boolean foundActualRow = false;
 
-        ResultSetWrapper resultSet = preparedStatementWrapper.executeQuery();
+        ComparisonResultSet resultSet = preparedStatementWrapper.executeQuery();
         Set<String> primaryKeyColumnNames = preparedStatementWrapper.getPrimaryKeyColumnNames();
 
         while (resultSet.next()) {
@@ -165,7 +165,7 @@ public class DefaultDataSetComparator implements DataSetComparator {
     }
 
 
-    protected RowComparison compareRow(Row row, ResultSetWrapper resultSet) throws SQLException {
+    protected RowComparison compareRow(Row row, ComparisonResultSet resultSet) throws SQLException {
         RowComparison rowComparison = new RowComparison(row);
 
         List<Column> columns = row.getColumns();
@@ -180,8 +180,8 @@ public class DefaultDataSetComparator implements DataSetComparator {
         return rowComparison;
     }
 
-    protected ComparisonPreparedStatementWrapper createPreparedStatementWrapper(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws Exception {
-        ComparisonPreparedStatementWrapper preparedStatementWrapper = new ComparisonPreparedStatementWrapper(schemaName, tableName, connection);
+    protected ComparisonPreparedStatement createPreparedStatementWrapper(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws Exception {
+        ComparisonPreparedStatement preparedStatementWrapper = new ComparisonPreparedStatement(schemaName, tableName, connection);
         for (Column column : row.getColumns()) {
             preparedStatementWrapper.addColumn(column, variables);
         }

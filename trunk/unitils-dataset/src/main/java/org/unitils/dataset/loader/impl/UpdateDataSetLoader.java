@@ -15,11 +15,14 @@
  */
 package org.unitils.dataset.loader.impl;
 
-import org.unitils.dataset.util.PreparedStatementWrapper;
-import org.unitils.dataset.util.UpdatePreparedStatementWrapper;
+import org.unitils.core.UnitilsException;
+import org.unitils.dataset.core.Row;
+import org.unitils.dataset.core.preparedstatement.BasePreparedStatement;
+import org.unitils.dataset.core.preparedstatement.UpdatePreparedStatement;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * @author Tim Ducheyne
@@ -28,8 +31,17 @@ import java.sql.SQLException;
 public class UpdateDataSetLoader extends BaseDataSetLoader {
 
 
-    protected PreparedStatementWrapper createPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {
-        return new UpdatePreparedStatementWrapper(schemaName, tableName, connection);
+    protected BasePreparedStatement createPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {
+        return new UpdatePreparedStatement(schemaName, tableName, connection);
+    }
+
+    @Override
+    protected int loadRow(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws Exception {
+        int nrUpdates = super.loadRow(schemaName, tableName, row, variables, connection);
+        if (nrUpdates == 0) {
+            throw new UnitilsException("Unable to update record for data set. No record found in database with matching primary key values.");
+        }
+        return nrUpdates;
     }
 
 }

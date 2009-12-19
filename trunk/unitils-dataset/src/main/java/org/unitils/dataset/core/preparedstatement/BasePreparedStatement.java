@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.util;
+package org.unitils.dataset.core.preparedstatement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,7 +22,6 @@ import org.unitils.dataset.core.Value;
 
 import java.sql.*;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -30,10 +29,10 @@ import java.util.Set;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public abstract class PreparedStatementWrapper {
+public abstract class BasePreparedStatement {
 
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(PreparedStatementWrapper.class);
+    private static Log logger = LogFactory.getLog(BasePreparedStatement.class);
 
     protected String schemaName;
     protected String tableName;
@@ -44,27 +43,12 @@ public abstract class PreparedStatementWrapper {
     protected Set<String> remainingPrimaryKeyColumnNames;
 
 
-    protected PreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {
+    protected BasePreparedStatement(String schemaName, String tableName, Connection connection) throws SQLException {
         this.schemaName = schemaName;
         this.tableName = tableName;
         this.connection = connection;
         this.primaryKeyColumnNames = getPrimaryKeyColumnNames(schemaName, tableName, connection);
         this.remainingPrimaryKeyColumnNames = new HashSet<String>(primaryKeyColumnNames);
-    }
-
-    public void addColumn(Column column, List<String> variables) {
-        boolean primaryKey = isRemainingPrimaryKeyColumn(column);
-
-        Value value = column.getValue(variables);
-        if (value.isLiteralValue()) {
-            addLiteralColumn(column.getName(), value.getValue(), primaryKey);
-        } else {
-            addColumn(column.getName(), value.getValue(), primaryKey);
-        }
-    }
-
-    public Set<String> getPrimaryKeyColumnNames() {
-        return primaryKeyColumnNames;
     }
 
     public int executeUpdate() throws SQLException {
@@ -78,17 +62,16 @@ public abstract class PreparedStatementWrapper {
         }
     }
 
+    public void addColumn(Column column, List<String> variables) {
+        boolean primaryKey = isPrimaryKeyColumn(column);
 
-    protected abstract void addColumnName(String columnName, boolean primaryKey);
-
-    protected abstract void addValue(String value, boolean primaryKey);
-
-    protected abstract String buildStatement();
-
-    protected abstract void addStatementParameter(String value, boolean primaryKey);
-
-    protected abstract List<String> getStatementParameters();
-
+        Value value = column.getValue(variables);
+        if (value.isLiteralValue()) {
+            addLiteralColumn(column.getName(), value.getValue(), primaryKey);
+        } else {
+            addColumn(column.getName(), value.getValue(), primaryKey);
+        }
+    }
 
     protected void addColumn(String columnName, String value, boolean primaryKey) {
         addColumnName(columnName, primaryKey);
@@ -99,6 +82,21 @@ public abstract class PreparedStatementWrapper {
     protected void addLiteralColumn(String columnName, String value, boolean primaryKey) {
         addColumnName(columnName, primaryKey);
         addValue(value, primaryKey);
+    }
+
+    protected abstract void addColumnName(String columnName, boolean primaryKey);
+
+    protected abstract void addValue(String value, boolean primaryKey);
+
+    protected abstract void addStatementParameter(String value, boolean primaryKey);
+
+    protected abstract String buildStatement();
+
+    protected abstract List<String> getStatementParameters();
+
+
+    public Set<String> getPrimaryKeyColumnNames() {
+        return primaryKeyColumnNames;
     }
 
 
@@ -133,19 +131,6 @@ public abstract class PreparedStatementWrapper {
         }
     }
 
-
-    protected boolean isRemainingPrimaryKeyColumn(Column column) {
-        Iterator<String> iterator = remainingPrimaryKeyColumnNames.iterator();
-        while (iterator.hasNext()) {
-            String primaryKeyColumnName = iterator.next();
-            if (column.hasName(primaryKeyColumnName)) {
-                iterator.remove();
-                return true;
-            }
-        }
-        return false;
-    }
-
     protected Set<String> getPrimaryKeyColumnNames(String schemaName, String tableName, Connection connection) throws SQLException {
         Set<String> primaryKeyColumnNames = new HashSet<String>();
         ResultSet resultSet = connection.getMetaData().getPrimaryKeys(null, schemaName, tableName);
@@ -153,6 +138,16 @@ public abstract class PreparedStatementWrapper {
             primaryKeyColumnNames.add(resultSet.getString("COLUMN_NAME"));
         }
         return primaryKeyColumnNames;
+    }
+
+    protected boolean isPrimaryKeyColumn(Column column) {
+        for (String primaryKeyColumnName : primaryKeyColumnNames) {
+            if (column.hasName(primaryKeyColumnName)) {
+                remainingPrimaryKeyColumnNames.remove(primaryKeyColumnName);
+                return true;
+            }
+        }
+        return false;
     }
 
 

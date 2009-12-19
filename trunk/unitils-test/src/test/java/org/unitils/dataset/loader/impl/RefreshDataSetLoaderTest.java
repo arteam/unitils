@@ -44,11 +44,11 @@ public class RefreshDataSetLoaderTest extends DataSetLoaderTestBase {
         initializePrimaryKeys("column_1", "column_1", "column_3", "column_3", "column_5", "column_5");
         dataSetLoader.load(dataSet, new ArrayList<String>());
 
-        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_2=? where column_1=?");
+        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_1=?, column_2=? where column_1=?");
         connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_1,column_2) values (?,?)");
-        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_4=? where column_3=?");
+        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_3=?, column_4=? where column_3=?");
         connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_3,column_4) values (?,?)");
-        connection.assertInvoked().prepareStatement("update my_schema.table_b set column_6=? where column_5=?");
+        connection.assertInvoked().prepareStatement("update my_schema.table_b set column_5=?, column_6=? where column_5=?");
         connection.assertInvoked().prepareStatement("insert into my_schema.table_b (column_5,column_6) values (?,?)");
     }
 
@@ -58,11 +58,11 @@ public class RefreshDataSetLoaderTest extends DataSetLoaderTestBase {
         preparedStatement.returns(1).executeUpdate(); // update of row was successful
         dataSetLoader.load(dataSet, new ArrayList<String>());
 
-        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_2=? where column_1=?");
+        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_1=?, column_2=? where column_1=?");
         connection.assertNotInvoked().prepareStatement("insert into my_schema.table_a (column_1,column_2) values (?,?)");
-        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_4=? where column_3=?");
+        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_3=?, column_4=? where column_3=?");
         connection.assertNotInvoked().prepareStatement("insert into my_schema.table_a (column_3,column_4) values (?,?)");
-        connection.assertInvoked().prepareStatement("update my_schema.table_b set column_6=? where column_5=?");
+        connection.assertInvoked().prepareStatement("update my_schema.table_b set column_5=?, column_6=? where column_5=?");
         connection.assertNotInvoked().prepareStatement("insert into my_schema.table_b (column_5,column_6) values (?,?)");
     }
 
@@ -70,7 +70,7 @@ public class RefreshDataSetLoaderTest extends DataSetLoaderTestBase {
     public void insertDataSetWithLiteralValues() throws Exception {
         initializePrimaryKeys("column_1");
         dataSetLoader.load(dataSetWithLiteralValues, new ArrayList<String>());
-        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_2=null, column_3=? where column_1=sysdate");
+        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_1=sysdate, column_2=null, column_3=? where column_1=sysdate");
         preparedStatement.assertInvoked().setObject(1, "=escaped", 0);
     }
 

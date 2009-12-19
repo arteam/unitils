@@ -22,9 +22,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
 /**
@@ -52,8 +49,6 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
     private char literalToken;
 
     private char variableToken;
-
-    private Set<String> deleteTableOrder;
 
 
     /**
@@ -99,7 +94,6 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
             caseSensitive = getCaseSensitive(attributes);
             literalToken = getLiteralToken(attributes);
             variableToken = getVariableToken(attributes);
-            deleteTableOrder = getDeleteTableOrder(attributes);
             return;
         }
         String schemaName = getSchemaName(uri);
@@ -122,25 +116,6 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
             return false;
         }
         throw new UnitilsException("Invalid case sensitive attribute value " + caseSensitiveAttribute + ". The value should be 'true' or 'false'.");
-    }
-
-    protected Set<String> getDeleteTableOrder(Attributes attributes) {
-        String deleteTableOrderAttribute = attributes.getValue("deleteTableOrder");
-        if (deleteTableOrderAttribute == null) {
-            return new HashSet<String>();
-        }
-        try {
-            Set<String> tableNames = new HashSet<String>();
-            for (String tableName : attributes.getValue("deleteTableOrder").split(",")) {
-                String trimmedTableName = tableName.trim();
-                if (trimmedTableName.length() != 0) {
-                    tableNames.add(trimmedTableName);
-                }
-            }
-            return tableNames;
-        } catch (Exception e) {
-            throw new UnitilsException("Invalid deleteTableOrder attribute value " + deleteTableOrderAttribute + ". The value should be a comma-separated list of table names.");
-        }
     }
 
     protected char getLiteralToken(Attributes attributes) {
@@ -169,7 +144,7 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
     protected void addSchema(String schemaName, String tableName, Attributes attributes, DataSet schemaCollection) {
         Schema schema = schemaCollection.getSchema(schemaName);
         if (schema == null) {
-            schema = new Schema(schemaName, caseSensitive, deleteTableOrder);
+            schema = new Schema(schemaName, caseSensitive);
             schemaCollection.addSchema(schema);
         }
         addTable(tableName, schema, attributes);

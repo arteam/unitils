@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.util;
+package org.unitils.dataset.core.preparedstatement;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,7 +25,7 @@ import java.util.Set;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ResultSetWrapper {
+public class QueryResultSet {
 
     protected ResultSet resultSet;
 
@@ -33,10 +33,10 @@ public class ResultSetWrapper {
 
     protected int rowIndex;
 
-    private boolean useRowIndexAsIdentifier = false;
+    protected boolean useRowIndexAsIdentifier = false;
 
 
-    public ResultSetWrapper(ResultSet resultSet, Set<String> primaryKeyColumnNames) {
+    public QueryResultSet(ResultSet resultSet, Set<String> primaryKeyColumnNames) {
         this.resultSet = resultSet;
         this.primaryKeyColumnNames = primaryKeyColumnNames;
         this.rowIndex = 0;
@@ -72,18 +72,10 @@ public class ResultSetWrapper {
         return identifier.toString();
     }
 
-
     public String getValue(int columnIndex) throws SQLException {
         return resultSet.getString(columnIndex + 1);
     }
 
-    public String getExpectedValue(int columnIndex) throws SQLException {
-        return resultSet.getString((columnIndex + 1) * 2);
-    }
-
-    public String getActualValue(int columnIndex) throws SQLException {
-        return resultSet.getString((columnIndex * 2) + 1);
-    }
 
     public int getNrOfColumns() throws SQLException {
         return resultSet.getMetaData().getColumnCount();

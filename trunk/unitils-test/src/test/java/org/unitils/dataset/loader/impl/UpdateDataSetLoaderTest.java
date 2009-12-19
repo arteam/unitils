@@ -17,6 +17,7 @@ package org.unitils.dataset.loader.impl;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.core.UnitilsException;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -43,23 +44,38 @@ public class UpdateDataSetLoaderTest extends DataSetLoaderTestBase {
 
     @Test
     public void insertDataSet() throws Exception {
+        preparedStatement.returns(1).executeUpdate(); // update of row was successful
         dataSetLoader.load(dataSet, new ArrayList<String>());
 
-        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_2=? where column_1=?");
-        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_4=? where column_3=?");
-        connection.assertInvoked().prepareStatement("update my_schema.table_b set column_6=? where column_5=?");
+        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_1=?, column_2=? where column_1=?");
+        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_3=?, column_4=? where column_3=?");
+        connection.assertInvoked().prepareStatement("update my_schema.table_b set column_5=?, column_6=? where column_5=?");
+    }
+
+    @Test(expected = UnitilsException.class)
+    public void recordDoesNotExistInDatabase() throws Exception {
+        preparedStatement.returns(0).executeUpdate(); // update of row was not successful
+        dataSetLoader.load(dataSet, new ArrayList<String>());
+
+        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_1=?, column_2=? where column_1=?");
+        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_3=?, column_4=? where column_3=?");
+        connection.assertInvoked().prepareStatement("update my_schema.table_b set column_5=?, column_6=? where column_5=?");
     }
 
     @Test
     public void insertDataSetWithLiteralValues() throws Exception {
+        preparedStatement.returns(1).executeUpdate(); // update of row was successful
         dataSetLoader.load(dataSetWithLiteralValues, new ArrayList<String>());
-        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_2=null, column_3=? where column_1=sysdate");
+
+        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_1=sysdate, column_2=null, column_3=? where column_1=sysdate");
         preparedStatement.assertInvoked().setObject(1, "=escaped", 0);
     }
 
     @Test
     public void schemaWithEmtpyTable() throws Exception {
+        preparedStatement.returns(1).executeUpdate(); // update of row was successful
         dataSetLoader.load(dataSetWithEmptyTable, new ArrayList<String>());
+
         connection.assertNotInvoked().prepareStatement(null);
     }
 
@@ -71,12 +87,14 @@ public class UpdateDataSetLoaderTest extends DataSetLoaderTestBase {
 
     @Test
     public void insertDataSetWithVariableDeclarations() throws Exception {
+        preparedStatement.returns(1).executeUpdate(); // update of row was successful
         dataSetLoader.load(dataSetWithVariableDeclarations, asList("1", "2", "3"));
 
-        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_2=?, column_3=?, column_4=literal 2 where column_1=?");
-        preparedStatement.assertInvoked().setObject(1, "23", 0);
-        preparedStatement.assertInvoked().setObject(2, "escaped $1", 0);
-        preparedStatement.assertInvoked().setObject(3, "value 1", 0);
+        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_1=?, column_2=?, column_3=?, column_4=literal 2 where column_1=?");
+        preparedStatement.assertInvoked().setObject(1, "value 1", 0);
+        preparedStatement.assertInvoked().setObject(2, "23", 0);
+        preparedStatement.assertInvoked().setObject(3, "escaped $1", 0);
+        preparedStatement.assertInvoked().setObject(4, "value 1", 0);
     }
 
     @Test

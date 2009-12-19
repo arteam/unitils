@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.util;
+package org.unitils.dataset.core.preparedstatement;
+
+import org.unitils.dataset.core.preparedstatement.BasePreparedStatement;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,44 +26,59 @@ import java.util.List;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class TableContentPreparedStatementWrapper extends PreparedStatementWrapper {
+public class InsertPreparedStatement extends BasePreparedStatement {
+
+    protected StringBuilder columnNamesPartBuilder = new StringBuilder();
+    protected StringBuilder valuesPartBuilder = new StringBuilder();
+    protected List<String> statementParameters = new ArrayList<String>();
 
 
-    public TableContentPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {
+    public InsertPreparedStatement(String schemaName, String tableName, Connection connection) throws SQLException {
         super(schemaName, tableName, connection);
-    }
-
-    public ResultSetWrapper executeQuery() throws SQLException {
-        PreparedStatement preparedStatement = buildPreparedStatement();
-        return new ResultSetWrapper(preparedStatement.executeQuery(), primaryKeyColumnNames);
     }
 
 
     @Override
     protected void addColumnName(String columnName, boolean primaryKey) {
+        columnNamesPartBuilder.append(columnName);
+        columnNamesPartBuilder.append(',');
     }
 
     @Override
     protected void addValue(String value, boolean primaryKey) {
+        valuesPartBuilder.append(value);
+        valuesPartBuilder.append(',');
     }
 
     @Override
     protected void addStatementParameter(String value, boolean primaryKey) {
+        statementParameters.add(value);
     }
 
     @Override
     protected List<String> getStatementParameters() {
-        return new ArrayList<String>();
+        return statementParameters;
     }
 
     @Override
     protected String buildStatement() {
+        finalizeStatementParts();
+
         StringBuilder sql = new StringBuilder();
-        sql.append("select * from ");
+        sql.append("insert into ");
         sql.append(schemaName);
         sql.append(".");
         sql.append(tableName);
+        sql.append(" (");
+        sql.append(columnNamesPartBuilder);
+        sql.append(") values (");
+        sql.append(valuesPartBuilder);
+        sql.append(')');
         return sql.toString();
     }
 
+    protected void finalizeStatementParts() {
+        columnNamesPartBuilder.setLength(columnNamesPartBuilder.length() - 1);
+        valuesPartBuilder.setLength(valuesPartBuilder.length() - 1);
+    }
 }

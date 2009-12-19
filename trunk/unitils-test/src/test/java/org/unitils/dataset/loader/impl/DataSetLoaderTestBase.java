@@ -23,8 +23,6 @@ import org.unitils.mock.Mock;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 
@@ -45,8 +43,6 @@ public abstract class DataSetLoaderTestBase extends UnitilsJUnit4 {
     protected DataSet dataSetWithEmptyTable;
     protected DataSet dataSetWithEmptyRows;
     protected DataSet dataSetWithVariableDeclarations;
-
-    protected Set<String> emptyDeleteTableOrder = new HashSet<String>();
 
 
     @Before
@@ -97,7 +93,7 @@ public abstract class DataSetLoaderTestBase extends UnitilsJUnit4 {
         row3.addColumn(createColumn("column_6", "6"));
         tableB.addRow(row3);
 
-        Schema schema = new Schema("my_schema", false, emptyDeleteTableOrder);
+        Schema schema = new Schema("my_schema", false);
         schema.addTable(tableA);
         schema.addTable(tableB);
 
@@ -112,7 +108,7 @@ public abstract class DataSetLoaderTestBase extends UnitilsJUnit4 {
         row.addColumn(createColumn("column_3", "==escaped"));
         tableA.addRow(row);
 
-        Schema schema = new Schema("my_schema", false, emptyDeleteTableOrder);
+        Schema schema = new Schema("my_schema", false);
         schema.addTable(tableA);
         return createDataSet(schema);
     }
@@ -126,14 +122,14 @@ public abstract class DataSetLoaderTestBase extends UnitilsJUnit4 {
         row.addColumn(createColumn("column_4", "=literal $1"));
         tableA.addRow(row);
 
-        Schema schema = new Schema("my_schema", false, emptyDeleteTableOrder);
+        Schema schema = new Schema("my_schema", false);
         schema.addTable(tableA);
         return createDataSet(schema);
     }
 
 
     private DataSet createDataSetWithEmptyRows() {
-        Schema schemaWithEmptyRows = new Schema("my_schema", false, emptyDeleteTableOrder);
+        Schema schemaWithEmptyRows = new Schema("my_schema", false);
         Table tableWithEmptyRows = new Table("table_a");
         tableWithEmptyRows.addRow(new Row());
         tableWithEmptyRows.addRow(new Row());
@@ -142,7 +138,7 @@ public abstract class DataSetLoaderTestBase extends UnitilsJUnit4 {
     }
 
     private DataSet createDataSetWithEmptyTable() {
-        Schema schemaWithEmptyTable = new Schema("my_schema", false, emptyDeleteTableOrder);
+        Schema schemaWithEmptyTable = new Schema("my_schema", false);
         schemaWithEmptyTable.addTable(new Table("table_a"));
         return createDataSet(schemaWithEmptyTable);
     }

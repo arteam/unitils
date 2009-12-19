@@ -37,18 +37,18 @@ public class DefaultExpectedDataSetAssert implements ExpectedDataSetAssert {
     protected ObjectFormatter objectFormatter = new ObjectFormatter();
 
     protected DataSetComparator dataSetComparator;
-    protected DatabaseContentRetriever databaseContentLogger;
+    protected DatabaseContentRetriever databaseContentRetriever;
 
 
     /**
      * Initializes the data set assert.
      *
      * @param dataSetComparator     The comparator that will create the data set comparison, not null
-     * @param databaseContentLogger The logger for displaying the database content, null if the content should not be logged
+     * @param databaseContentRetriever The logger for displaying the database content, null if the content should not be logged
      */
-    public void init(DataSetComparator dataSetComparator, DatabaseContentRetriever databaseContentLogger) {
+    public void init(DataSetComparator dataSetComparator, DatabaseContentRetriever databaseContentRetriever) {
         this.dataSetComparator = dataSetComparator;
-        this.databaseContentLogger = databaseContentLogger;
+        this.databaseContentRetriever = databaseContentRetriever;
     }
 
     /**
@@ -64,8 +64,8 @@ public class DefaultExpectedDataSetAssert implements ExpectedDataSetAssert {
         DataSetComparison dataSetComparison = dataSetComparator.compare(expectedDataSet, variables);
         if (!dataSetComparison.isMatch()) {
             String message = generateErrorMessage(dataSetComparison, dataSetComparator);
-            if (databaseContentLogger != null) {
-                String databaseContent = databaseContentLogger.getActualDatabaseContentForDataSetComparison(dataSetComparison);
+            if (databaseContentRetriever != null) {
+                String databaseContent = databaseContentRetriever.getActualDatabaseContentForDataSetComparison(dataSetComparison);
 
                 StringBuilder messageBuilder = new StringBuilder(message);
                 messageBuilder.append("== Actual Database Content ==\n\n");

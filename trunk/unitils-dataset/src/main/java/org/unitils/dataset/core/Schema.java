@@ -18,9 +18,7 @@ package org.unitils.dataset.core;
 import org.unitils.core.UnitilsException;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A data set schema
@@ -36,8 +34,6 @@ public class Schema {
     /* True if the schema name is case sensitive */
     private boolean caseSensitive;
 
-    private Set<String> deleteTableOrder = new HashSet<String>();
-
     /* The tables in the schema, not null */
     private List<Table> tables = new ArrayList<Table>();
 
@@ -45,12 +41,12 @@ public class Schema {
     /**
      * Creates a data set schema.
      *
-     * @param name The name of the schema, not null
+     * @param name          The name of the schema, not null
+     * @param caseSensitive True if the name of the schema is case sensitive
      */
-    public Schema(String name, boolean caseSensitive, Set<String> deleteTableOrder) {
+    public Schema(String name, boolean caseSensitive) {
         this.name = name;
         this.caseSensitive = caseSensitive;
-        this.deleteTableOrder = deleteTableOrder;
     }
 
 
@@ -63,10 +59,6 @@ public class Schema {
 
     public boolean isCaseSensitive() {
         return caseSensitive;
-    }
-
-    public Set<String> getDeleteTableOrder() {
-        return deleteTableOrder;
     }
 
     /**

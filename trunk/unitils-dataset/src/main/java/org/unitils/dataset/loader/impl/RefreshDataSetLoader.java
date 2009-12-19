@@ -16,9 +16,9 @@
 package org.unitils.dataset.loader.impl;
 
 import org.unitils.dataset.core.Row;
-import org.unitils.dataset.util.InsertPreparedStatementWrapper;
-import org.unitils.dataset.util.PreparedStatementWrapper;
-import org.unitils.dataset.util.UpdatePreparedStatementWrapper;
+import org.unitils.dataset.core.preparedstatement.BasePreparedStatement;
+import org.unitils.dataset.core.preparedstatement.InsertPreparedStatement;
+import org.unitils.dataset.core.preparedstatement.UpdatePreparedStatement;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -31,8 +31,8 @@ import java.util.List;
 public class RefreshDataSetLoader extends BaseDataSetLoader {
 
 
-    protected PreparedStatementWrapper createPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {
-        return new UpdatePreparedStatementWrapper(schemaName, tableName, connection);
+    protected BasePreparedStatement createPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {
+        return new UpdatePreparedStatement(schemaName, tableName, connection);
     }
 
 
@@ -47,12 +47,12 @@ public class RefreshDataSetLoader extends BaseDataSetLoader {
 
 
     protected int insertRow(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws SQLException {
-        PreparedStatementWrapper preparedStatementWrapper = createInsertPreparedStatementWrapper(schemaName, tableName, connection);
+        BasePreparedStatement preparedStatementWrapper = createInsertPreparedStatementWrapper(schemaName, tableName, connection);
         return loadRow(row, variables, preparedStatementWrapper);
     }
 
-    protected PreparedStatementWrapper createInsertPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {
-        return new InsertPreparedStatementWrapper(schemaName, tableName, connection);
+    protected BasePreparedStatement createInsertPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {
+        return new InsertPreparedStatement(schemaName, tableName, connection);
     }
 
 }

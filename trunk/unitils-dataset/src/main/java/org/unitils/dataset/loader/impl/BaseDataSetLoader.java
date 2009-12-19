@@ -19,8 +19,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.core.*;
+import org.unitils.dataset.core.preparedstatement.BasePreparedStatement;
 import org.unitils.dataset.loader.DataSetLoader;
-import org.unitils.dataset.util.PreparedStatementWrapper;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -53,7 +53,7 @@ public abstract class BaseDataSetLoader implements DataSetLoader {
         }
     }
 
-    protected abstract PreparedStatementWrapper createPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws Exception;
+    protected abstract BasePreparedStatement createPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws Exception;
 
 
     protected void loadDataSet(DataSet dataSet, List<String> variables) throws SQLException {
@@ -93,7 +93,7 @@ public abstract class BaseDataSetLoader implements DataSetLoader {
     }
 
     protected int loadRow(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws Exception {
-        PreparedStatementWrapper preparedStatementWrapper = createPreparedStatementWrapper(schemaName, tableName, connection);
+        BasePreparedStatement preparedStatementWrapper = createPreparedStatementWrapper(schemaName, tableName, connection);
         try {
             return loadRow(row, variables, preparedStatementWrapper);
         } finally {
@@ -101,7 +101,7 @@ public abstract class BaseDataSetLoader implements DataSetLoader {
         }
     }
 
-    protected int loadRow(Row row, List<String> variables, PreparedStatementWrapper preparedStatementWrapper) throws SQLException {
+    protected int loadRow(Row row, List<String> variables, BasePreparedStatement preparedStatementWrapper) throws SQLException {
         for (Column column : row.getColumns()) {
             preparedStatementWrapper.addColumn(column, variables);
         }
