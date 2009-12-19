@@ -25,14 +25,10 @@ import java.util.List;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ComparisonPreparedStatementWrapper extends PreparedStatementWrapper {
-
-    protected StringBuilder identifiersBuilder = new StringBuilder();
-    protected StringBuilder columnsBuilder = new StringBuilder();
-    protected List<String> statementParameters = new ArrayList<String>();
+public class TableContentPreparedStatementWrapper extends PreparedStatementWrapper {
 
 
-    public ComparisonPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {
+    public TableContentPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {
         super(schemaName, tableName, connection);
     }
 
@@ -44,50 +40,29 @@ public class ComparisonPreparedStatementWrapper extends PreparedStatementWrapper
 
     @Override
     protected void addColumnName(String columnName, boolean primaryKey) {
-        columnsBuilder.append(columnName);
-        columnsBuilder.append(", ");
     }
 
     @Override
     protected void addValue(String value, boolean primaryKey) {
-        columnsBuilder.append(value);
-        columnsBuilder.append(", ");
     }
 
     @Override
     protected void addStatementParameter(String value, boolean primaryKey) {
-        statementParameters.add(value);
     }
 
     @Override
     protected List<String> getStatementParameters() {
-        return statementParameters;
+        return new ArrayList<String>();
     }
 
     @Override
     protected String buildStatement() {
-        buildIdentifierPart();
-
         StringBuilder sql = new StringBuilder();
-        sql.append("select ");
-        sql.append(columnsBuilder);
-        sql.append(identifiersBuilder);
-        sql.append(" from ");
+        sql.append("select * from ");
         sql.append(schemaName);
         sql.append(".");
         sql.append(tableName);
         return sql.toString();
-    }
-
-    private void buildIdentifierPart() {
-        if (remainingPrimaryKeyColumnNames.isEmpty()) {
-            identifiersBuilder.append("1, ");
-        }
-        for (String primaryKeyColumnName : remainingPrimaryKeyColumnNames) {
-            identifiersBuilder.append(primaryKeyColumnName);
-            identifiersBuilder.append(", ");
-        }
-        identifiersBuilder.setLength(identifiersBuilder.length() - 2);
     }
 
 }

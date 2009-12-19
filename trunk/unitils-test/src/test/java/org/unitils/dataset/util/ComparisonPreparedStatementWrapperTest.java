@@ -37,7 +37,7 @@ public class ComparisonPreparedStatementWrapperTest extends PreparedStatementWra
         comparisonPreparedStatementWrapper.addColumn(createColumn("column_2", "2"), emptyVariables);
         comparisonPreparedStatementWrapper.executeQuery();
 
-        connection.assertInvoked().prepareStatement("select column_1, ?, column_2, ? from my_schema.table_a");
+        connection.assertInvoked().prepareStatement("select column_1, ?, column_2, ?, 1 from my_schema.table_a");
         preparedStatement.assertInvoked().setObject(1, "1", VARCHAR);
         preparedStatement.assertInvoked().setObject(2, "2", INTEGER);
         preparedStatement.assertInvoked().executeQuery();
@@ -50,7 +50,7 @@ public class ComparisonPreparedStatementWrapperTest extends PreparedStatementWra
         comparisonPreparedStatementWrapper.addColumn(createColumn("column_2", "=literal2"), emptyVariables);
         comparisonPreparedStatementWrapper.executeQuery();
 
-        connection.assertInvoked().prepareStatement("select column_1, literal1, column_2, literal2 from my_schema.table_a");
+        connection.assertInvoked().prepareStatement("select column_1, literal1, column_2, literal2, 1 from my_schema.table_a");
         preparedStatement.assertNotInvoked().getMetaData();
         preparedStatement.assertInvoked().executeQuery();
     }

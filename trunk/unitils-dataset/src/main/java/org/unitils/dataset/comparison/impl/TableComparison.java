@@ -39,7 +39,7 @@ public class TableComparison {
     /* The best differences of the comparisons between the rows of the tables with the data set row as key */
     private Map<Row, RowComparison> bestRowComparisons = new LinkedHashMap<Row, RowComparison>();
 
-    private Set<Integer> actualRowIndexesWithMatch = new HashSet<Integer>();
+    private Set<String> actualRowIdentifiersWithMatch = new HashSet<String>();
 
     /**
      * Creates a table difference.
@@ -99,11 +99,11 @@ public class TableComparison {
     }
 
     /**
-     * @param actualRowIndex The actual row index in the database >= 1
+     * @param rowIdentifier The identifier of the actual row in the database, not null
      * @return True if the actual row index was already used for a match
      */
-    public boolean isActualRowIndexWithExactMatch(int actualRowIndex) {
-        return actualRowIndexesWithMatch.contains(actualRowIndex);
+    public boolean isActualRowWithExactMatch(String rowIdentifier) {
+        return actualRowIdentifiersWithMatch.contains(rowIdentifier);
     }
 
     /**
@@ -116,16 +116,16 @@ public class TableComparison {
     /**
      * Sets the given difference as best row difference if it is better than the current best row difference.
      *
-     * @param actualRowIndex The index of the actual row in the database >= 1
-     * @param rowComparison  The comparison result, not null
+     * @param rowIdentifier The identifier of the actual row in the database, not null
+     * @param rowComparison The comparison result, not null
      */
-    public void replaceIfBetterRowComparison(int actualRowIndex, RowComparison rowComparison) {
+    public void replaceIfBetterRowComparison(String rowIdentifier, RowComparison rowComparison) {
         Row dataSetRow = rowComparison.getDataSetRow();
         RowComparison currentRowComparison = bestRowComparisons.get(dataSetRow);
         if (currentRowComparison == null || rowComparison.isBetterMatch(currentRowComparison)) {
             bestRowComparisons.put(dataSetRow, rowComparison);
             if (rowComparison.isMatch()) {
-                actualRowIndexesWithMatch.add(actualRowIndex);
+                actualRowIdentifiersWithMatch.add(rowIdentifier);
             }
         }
     }

@@ -30,10 +30,10 @@ import static org.junit.Assert.fail;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ExpectedDataSetAssertTest extends UnitilsJUnit4 {
+public class DefaultExpectedDataSetAssertTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private ExpectedDataSetAssert expectedDataSetAssert = new ExpectedDataSetAssert();
+    private DefaultExpectedDataSetAssert defaultExpectedDataSetAssert = new DefaultExpectedDataSetAssert();
 
     private Mock<DataSetComparator> dataSetComparator;
 
@@ -45,6 +45,8 @@ public class ExpectedDataSetAssertTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
+        defaultExpectedDataSetAssert.init(dataSetComparator.getMock(), null);
+
         matchingDataSetComparison = createMatchingDataSetComparison();
         dataSetComparisonWithDifferences = createDataSetComparisonWithDifferences();
         dataSetComparisonWithMissingRows = createDataSetComparisonWithMissingRows();
@@ -55,14 +57,14 @@ public class ExpectedDataSetAssertTest extends UnitilsJUnit4 {
     @Test
     public void match() {
         dataSetComparator.returns(matchingDataSetComparison).compare(null, null);
-        expectedDataSetAssert.assertEqual(null, null, dataSetComparator.getMock());
+        defaultExpectedDataSetAssert.assertEqual(null, null);
     }
 
     @Test
     public void differences() {
         try {
             dataSetComparator.returns(dataSetComparisonWithDifferences).compare(null, null);
-            expectedDataSetAssert.assertEqual(null, null, dataSetComparator.getMock());
+            defaultExpectedDataSetAssert.assertEqual(null, null);
         } catch (AssertionError e) {
             assertErrorMessageContains("Found differences for table schema_a.table_a", e);
             assertErrorMessageContains("Different database record found for data set row:  column_1=\"1\", column_2=\"2\"", e);
@@ -78,7 +80,7 @@ public class ExpectedDataSetAssertTest extends UnitilsJUnit4 {
     public void missingRows() {
         try {
             dataSetComparator.returns(dataSetComparisonWithMissingRows).compare(null, null);
-            expectedDataSetAssert.assertEqual(null, null, dataSetComparator.getMock());
+            defaultExpectedDataSetAssert.assertEqual(null, null);
         } catch (AssertionError e) {
             assertErrorMessageContains("Found differences for table schema_a.table_a", e);
             assertErrorMessageContains("No database record found for data set row:  column_1=\"1\", column_2=\"2\"", e);
@@ -91,7 +93,7 @@ public class ExpectedDataSetAssertTest extends UnitilsJUnit4 {
     public void expectedTableToBeEmptyButWasNot() {
         try {
             dataSetComparator.returns(dataSetComparisonWithExpectedButNotEmptyTables).compare(null, null);
-            expectedDataSetAssert.assertEqual(null, null, dataSetComparator.getMock());
+            defaultExpectedDataSetAssert.assertEqual(null, null);
         } catch (AssertionError e) {
             assertErrorMessageContains("Expected no more database records in table schema_a.table_a but found more records.", e);
             return;
@@ -111,8 +113,8 @@ public class ExpectedDataSetAssertTest extends UnitilsJUnit4 {
 
     private DataSetComparison createDataSetComparisonWithDifferences() {
         TableComparison tableComparison = new TableComparison("table_a");
-        tableComparison.replaceIfBetterRowComparison(1, createRowDifference1());
-        tableComparison.replaceIfBetterRowComparison(2, createRowDifference2());
+        tableComparison.replaceIfBetterRowComparison("1", createRowDifference1());
+        tableComparison.replaceIfBetterRowComparison("2", createRowDifference2());
         return createDataSetComparison(tableComparison);
     }
 

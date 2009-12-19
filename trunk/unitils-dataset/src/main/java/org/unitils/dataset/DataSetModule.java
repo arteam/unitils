@@ -28,6 +28,7 @@ import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.DatabaseModule;
 import org.unitils.dataset.annotation.ExpectedDataSet;
 import org.unitils.dataset.comparison.DataSetComparator;
+import org.unitils.dataset.comparison.DatabaseContentRetriever;
 import org.unitils.dataset.comparison.ExpectedDataSetAssert;
 import org.unitils.dataset.core.DataSet;
 import org.unitils.dataset.factory.DataSetFactory;
@@ -45,6 +46,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import static org.unitils.core.util.ConfigUtils.getConfiguredInstanceOf;
+import static org.unitils.core.util.ConfigUtils.getInstanceOf;
 import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
@@ -55,7 +57,7 @@ import static org.unitils.util.ReflectionUtils.createInstanceOfType;
  * of the data set files can be specified explicitly as an argument of the annotation. If no file name is specified, it looks
  * for a file in the same directory as the test class named: 'classname without packagename'.xml.
  * <p/>
- * By annotating a method with the {@link ExpectedDataSet} annotation or by calling the {@link #assertDbContentAsExpected}
+ * By annotating a method with the {@link ExpectedDataSet} annotation or by calling the {@link #assertExpectedDataSet}
  * method, the contents of the database can be compared with the contents of a data set. The expected data set can be
  * passed as an argument of the annotation. If no file name is specified it looks for a file in the same directory
  * as the test class that has following name: 'class name without packagename'.'test method name'-result.xml.
@@ -105,12 +107,17 @@ public class DataSetModule implements Module {
     public void afterInit() {
     }
 
-    public void insertDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, Class<? extends DataSetLoader> dataSetLoaderClass) {
+    public void loadDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, Class<? extends DataSetLoader> dataSetLoaderClass) {
         Class<? extends DataSetFactory> dataSetFactoryClass = dataSetAnnotationUtil.getDefaultDataSetFactoryClass();
         DataSetFactory dataSetFactory = createDataSetFactory(dataSetFactoryClass);
         loadDataSet(dataSetFileNames, variables, testClass, dataSetFactory, dataSetLoaderClass);
     }
 
+    public void assertExpectedDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, boolean logDatabaseContentOnAssertionError) {
+        Class<? extends DataSetFactory> dataSetFactoryClass = dataSetAnnotationUtil.getDefaultDataSetFactoryClass();
+        DataSetFactory dataSetFactory = createDataSetFactory(dataSetFactoryClass);
+        assertExpectedDataSet(dataSetFileNames, variables, testClass, dataSetFactory, logDatabaseContentOnAssertionError);
+    }
 
     protected void loadDataSet(Method testMethod, Object testObject) {
         try {
@@ -135,16 +142,16 @@ public class DataSetModule implements Module {
      * @param testMethod The test method, not null
      * @param testObject The test object, not null
      */
-    protected void assertDbContentAsExpected(Method testMethod, Object testObject) {
+    protected void assertExpectedDataSet(Method testMethod, Object testObject) {
         try {
             Class<?> testClass = testObject.getClass();
             Class<? extends DataSetFactory> dataSetFactoryClass = dataSetAnnotationUtil.getDataSetFactoryClass(testClass, testMethod);
             DataSetFactory dataSetFactory = createDataSetFactory(dataSetFactoryClass);
             List<String> dataSetFileNames = dataSetAnnotationUtil.getExpectedDataSetFileNames(testClass, testMethod, dataSetFactory.getDataSetFileExtension());
             List<String> variables = dataSetAnnotationUtil.getExpectedDataSetVariables(testClass, testMethod);
-            Class<? extends DataSetComparator> dataSetComparatorClass = dataSetAnnotationUtil.getExpectedDataSetComparatorClass(testClass, testMethod);
+            boolean logDatabaseContentOnAssertionError = dataSetAnnotationUtil.getLogDatabaseContentOnAssertionError(testClass, testMethod);
 
-            compareDataSet(dataSetFileNames, variables, testClass, dataSetFactory, dataSetComparatorClass);
+            assertExpectedDataSet(dataSetFileNames, variables, testClass, dataSetFactory, logDatabaseContentOnAssertionError);
 
         } catch (Exception e) {
             throw new UnitilsException("Error comparing data set for method " + testMethod, e);
@@ -159,10 +166,10 @@ public class DataSetModule implements Module {
         }
     }
 
-    protected void compareDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, DataSetFactory dataSetFactory, Class<? extends DataSetComparator> dataSetComparatorClass) {
+    protected void assertExpectedDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, DataSetFactory dataSetFactory, boolean logDatabaseContentOnAssertionError) {
         List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
         for (File dataSetFile : dataSetFiles) {
-            compareDataSet(dataSetFile, variables, testClass, dataSetFactory, dataSetComparatorClass);
+            assertExpectedDataSet(dataSetFile, variables, testClass, dataSetFactory, logDatabaseContentOnAssertionError);
         }
     }
 
@@ -179,7 +186,7 @@ public class DataSetModule implements Module {
         dataSetLoader.load(dataSet, variables);
     }
 
-    protected void compareDataSet(File dataSetFile, List<String> variables, Class<?> testClass, DataSetFactory dataSetFactory, Class<? extends DataSetComparator> dataSetComparatorClass) {
+    protected void assertExpectedDataSet(File dataSetFile, List<String> variables, Class<?> testClass, DataSetFactory dataSetFactory, boolean logDatabaseContentOnAssertionError) {
         DataSet dataSet = dataSetFactory.createDataSet(dataSetFile);
         if (dataSet == null) {
             // no data set specified
@@ -187,9 +194,14 @@ public class DataSetModule implements Module {
         }
 
         logger.info("Comparing data sets file: " + dataSetFile);
-        DataSetComparator dataSetComparator = createDataSetComparator(dataSetComparatorClass);
-        ExpectedDataSetAssert expectedDataSetAssert = createExpectedDataSetAssert();
-        expectedDataSetAssert.assertEqual(dataSet, variables, dataSetComparator);
+        DatabaseContentRetriever databaseContentLogger = null;
+        if (logDatabaseContentOnAssertionError) {
+            databaseContentLogger = createDatabaseContentLogger();
+        }
+        DataSetComparator dataSetComparator = createDataSetComparator();
+        ExpectedDataSetAssert expectedDataSetAssert = createExpectedDataSetAssert(dataSetComparator, databaseContentLogger);
+
+        expectedDataSetAssert.assertEqual(dataSet, variables);
     }
 
 
@@ -235,25 +247,34 @@ public class DataSetModule implements Module {
     }
 
     /**
-     * @param dataSetComparatorClass The type, not null
-     * @return An initialized data set compare of the given type, not null
+     * @return An initialized data set comparator, as configured in the Unitils configuration, not null
      */
-    protected DataSetComparator createDataSetComparator(Class<? extends DataSetComparator> dataSetComparatorClass) {
-        DataSetComparator dataSetComparator = createInstanceOfType(dataSetComparatorClass, false);
+    protected DataSetComparator createDataSetComparator() {
+        DataSetComparator dataSetComparator = getInstanceOf(DataSetComparator.class, configuration);
         dataSetComparator.init(getDataSource());
         return dataSetComparator;
     }
 
     /**
-     * @return The data set resolver, as configured in the Unitils configuration
+     * @return An initialized database logger, as configured in the Unitils configuration, not null
+     */
+    protected DatabaseContentRetriever createDatabaseContentLogger() {
+        DatabaseContentRetriever databaseContentLogger = getInstanceOf(DatabaseContentRetriever.class, configuration);
+        databaseContentLogger.init(getDataSource());
+        return databaseContentLogger;
+    }
+
+    protected ExpectedDataSetAssert createExpectedDataSetAssert(DataSetComparator dataSetComparator, DatabaseContentRetriever databaseContentLogger) {
+        ExpectedDataSetAssert expectedDataSetAssert = getInstanceOf(ExpectedDataSetAssert.class, configuration);
+        expectedDataSetAssert.init(dataSetComparator, databaseContentLogger);
+        return expectedDataSetAssert;
+    }
+
+    /**
+     * @return The data set resolver, as configured in the Unitils configuration, not null
      */
     protected DataSetResolver createDataSetResolver() {
         return getConfiguredInstanceOf(DataSetResolver.class, configuration);
-    }
-
-    protected ExpectedDataSetAssert createExpectedDataSetAssert() {
-        //todo?? in properties ??
-        return new ExpectedDataSetAssert();
     }
 
     /**
@@ -295,7 +316,7 @@ public class DataSetModule implements Module {
         @Override
         public void afterTestMethod(Object testObject, Method testMethod, Throwable throwable) {
             if (throwable == null) {
-                assertDbContentAsExpected(testMethod, testObject);
+                assertExpectedDataSet(testMethod, testObject);
             }
         }
     }

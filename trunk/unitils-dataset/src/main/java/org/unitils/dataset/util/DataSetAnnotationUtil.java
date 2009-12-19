@@ -20,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.dataset.DataSetModule;
 import org.unitils.dataset.annotation.DataSet;
 import org.unitils.dataset.annotation.ExpectedDataSet;
-import org.unitils.dataset.comparison.DataSetComparator;
 import org.unitils.dataset.factory.DataSetFactory;
 import org.unitils.dataset.loader.DataSetLoader;
 
@@ -143,17 +142,14 @@ public class DataSetAnnotationUtil {
     }
 
     /**
-     * Gets the data set compare class that was specified using the compareStrategy parameter on the ExpectedDataSet annotation.
-     * If no loader was specified, the default class found in the Unitils configuration will be returned.
+     * Gets the logDatabaseContentOnAssertionError parameter on the ExpectedDataSet annotation.
      *
      * @param testClass  The test class, not null
      * @param testMethod The method, not null
-     * @return The DataSetComparator class, not null
+     * @return True for logging the database content, false otherwise
      */
-    @SuppressWarnings({"unchecked"})
-    public Class<? extends DataSetComparator> getExpectedDataSetComparatorClass(Class<?> testClass, Method testMethod) {
-        Class<? extends DataSetComparator> dataSetComparatorClass = getMethodOrClassLevelAnnotationProperty(ExpectedDataSet.class, "comparator", DataSetComparator.class, testMethod, testClass);
-        return (Class<? extends DataSetComparator>) getClassValueReplaceDefault(ExpectedDataSet.class, "comparator", dataSetComparatorClass, defaultAnnotationPropertyValues, DataSetLoader.class);
+    public boolean getLogDatabaseContentOnAssertionError(Class<?> testClass, Method testMethod) {
+        return getMethodOrClassLevelAnnotationProperty(ExpectedDataSet.class, "logDatabaseContentOnAssertionError", true, testMethod, testClass);
     }
 
     /**
@@ -168,5 +164,4 @@ public class DataSetAnnotationUtil {
         String className = testClass.getName();
         return className.substring(className.lastIndexOf(".") + 1) + '.' + extension;
     }
-
 }
