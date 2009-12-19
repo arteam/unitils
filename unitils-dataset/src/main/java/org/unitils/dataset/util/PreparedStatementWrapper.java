@@ -40,6 +40,7 @@ public abstract class PreparedStatementWrapper {
     protected Connection connection;
     protected PreparedStatement preparedStatement;
 
+    protected Set<String> primaryKeyColumnNames;
     protected Set<String> remainingPrimaryKeyColumnNames;
 
 
@@ -47,7 +48,8 @@ public abstract class PreparedStatementWrapper {
         this.schemaName = schemaName;
         this.tableName = tableName;
         this.connection = connection;
-        this.remainingPrimaryKeyColumnNames = getPrimaryKeyColumnNames(schemaName, tableName, connection);
+        this.primaryKeyColumnNames = getPrimaryKeyColumnNames(schemaName, tableName, connection);
+        this.remainingPrimaryKeyColumnNames = new HashSet<String>(primaryKeyColumnNames);
     }
 
     public void addColumn(Column column, List<String> variables) {
@@ -61,14 +63,13 @@ public abstract class PreparedStatementWrapper {
         }
     }
 
+    public Set<String> getPrimaryKeyColumnNames() {
+        return primaryKeyColumnNames;
+    }
+
     public int executeUpdate() throws SQLException {
         preparedStatement = buildPreparedStatement();
         return preparedStatement.executeUpdate();
-    }
-
-    public ResultSet executeQuery() throws SQLException {
-        PreparedStatement preparedStatement = buildPreparedStatement();
-        return preparedStatement.executeQuery();
     }
 
     public void close() throws SQLException {
@@ -126,21 +127,12 @@ public abstract class PreparedStatementWrapper {
 
     protected void logStatement(String sql, List<String> statementValues) {
         if (statementValues.isEmpty()) {
-            logger.debug("Loading data set values: " + sql);
+            logger.debug(sql);
         } else {
-            logger.debug("Loading data set values: " + sql + " -> " + statementValues);
+            logger.debug(sql + " <- " + statementValues);
         }
     }
 
-
-    protected Set<String> getPrimaryKeyColumnNames(String schemaName, String tableName, Connection connection) throws SQLException {
-        Set<String> primaryKeyColumnNames = new HashSet<String>();
-        ResultSet resultSet = connection.getMetaData().getPrimaryKeys(null, schemaName, tableName);
-        while (resultSet.next()) {
-            primaryKeyColumnNames.add(resultSet.getString("COLUMN_NAME"));
-        }
-        return primaryKeyColumnNames;
-    }
 
     protected boolean isRemainingPrimaryKeyColumn(Column column) {
         Iterator<String> iterator = remainingPrimaryKeyColumnNames.iterator();
@@ -153,4 +145,15 @@ public abstract class PreparedStatementWrapper {
         }
         return false;
     }
+
+    protected Set<String> getPrimaryKeyColumnNames(String schemaName, String tableName, Connection connection) throws SQLException {
+        Set<String> primaryKeyColumnNames = new HashSet<String>();
+        ResultSet resultSet = connection.getMetaData().getPrimaryKeys(null, schemaName, tableName);
+        while (resultSet.next()) {
+            primaryKeyColumnNames.add(resultSet.getString("COLUMN_NAME"));
+        }
+        return primaryKeyColumnNames;
+    }
+
+
 }

@@ -29,13 +29,13 @@ import static java.util.Arrays.asList;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DataSetModuleCleanInsertDataSetTest extends DataSetModuleInsertDataSetTestBase {
+public class DataSetModuleCleanInsertDataSetTest extends DataSetModuleDataSetTestBase {
 
     @Test
     public void cleanInsertDataSet() throws Exception {
         insertValueInTableTest("yyyy");
 
-        dataSetModule.insertDataSet(asList("DataSetModuleDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), CleanInsertDataSetLoader.class);
+        dataSetModule.loadDataSet(asList("DataSetModuleDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), CleanInsertDataSetLoader.class);
         assertValueInTableTest("col1", "xxxx");
         assertValueNotInTableTest("col1", "yyyy");
     }
@@ -45,7 +45,7 @@ public class DataSetModuleCleanInsertDataSetTest extends DataSetModuleInsertData
         insertValueInTableTest("yyyy");
         insertValueInTableDependent("yyyy");
 
-        dataSetModule.insertDataSet(asList("DataSetModuleDataSetTest-dependency.xml"), new ArrayList<String>(), getClass(), CleanInsertDataSetLoader.class);
+        dataSetModule.loadDataSet(asList("DataSetModuleDataSetTest-dependency.xml"), new ArrayList<String>(), getClass(), CleanInsertDataSetLoader.class);
         assertValueInTableTest("col1", "xxxx");
         assertValueInTableDependent("col1", "xxxx");
         assertValueNotInTableTest("col1", "yyyy");
@@ -57,7 +57,7 @@ public class DataSetModuleCleanInsertDataSetTest extends DataSetModuleInsertData
         insertValueInTableTest("yyyy");
         insertValueInTableDependent("yyyy");
 
-        dataSetModule.insertDataSet(asList("DataSetModuleDataSetTest-dependencyWrongOrder.xml"), new ArrayList<String>(), getClass(), CleanInsertDataSetLoader.class);
+        dataSetModule.loadDataSet(asList("DataSetModuleDataSetTest-dependencyWrongOrder.xml"), new ArrayList<String>(), getClass(), CleanInsertDataSetLoader.class);
     }
 
 }

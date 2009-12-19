@@ -20,12 +20,12 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.dataset.comparison.impl.*;
 import org.unitils.dataset.core.*;
-import org.unitils.dataset.util.PreparedStatementWrapper;
+import org.unitils.dataset.util.ComparisonPreparedStatementWrapper;
+import org.unitils.dataset.util.ResultSetWrapper;
 import org.unitils.mock.Mock;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -43,8 +43,8 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
 
     private Mock<DataSource> dataSource;
     private Mock<Connection> connection;
-    private Mock<PreparedStatementWrapper> preparedStatementWrapper;
-    private Mock<ResultSet> resultSet;
+    private Mock<ComparisonPreparedStatementWrapper> preparedStatementWrapper;
+    private Mock<ResultSetWrapper> comparisonResultSet;
 
     protected DataSet dataSet;
     protected DataSet emptyDataSet;
@@ -55,7 +55,7 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
     @Before
     public void initialize() throws Exception {
         dataSource.returns(connection).getConnection();
-        preparedStatementWrapper.returns(resultSet).executeQuery();
+        preparedStatementWrapper.returns(comparisonResultSet).executeQuery();
         defaultDataSetComparator.init(dataSource.getMock());
 
         dataSet = createDataSet();
@@ -121,24 +121,24 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
     private void setResultSetRows(String expectedRow1Col1, String actualRow1Col1, String expectedRow1Col2, String actualRow1Col2,
                                   String expectedRow2Col1, String actualRow2Col1, String expectedRow2Col2, String actualRow2Col2) throws Exception {
         // first run finds the matches
-        resultSet.onceReturns(true).next();
+        comparisonResultSet.onceReturns(true).next();
         setResultSetRowValues(expectedRow1Col1, actualRow1Col1, expectedRow1Col2, actualRow1Col2);
-        resultSet.onceReturns(true).next();
+        comparisonResultSet.onceReturns(true).next();
         setResultSetRowValues(expectedRow2Col1, actualRow2Col1, expectedRow2Col2, actualRow2Col2);
-        resultSet.onceReturns(false).next();
+        comparisonResultSet.onceReturns(false).next();
         // second run finds the best comparisons
-        resultSet.onceReturns(true).next();
+        comparisonResultSet.onceReturns(true).next();
         setResultSetRowValues(expectedRow1Col1, actualRow1Col1, expectedRow1Col2, actualRow1Col2);
-        resultSet.onceReturns(true).next();
+        comparisonResultSet.onceReturns(true).next();
         setResultSetRowValues(expectedRow2Col1, actualRow2Col1, expectedRow2Col2, actualRow2Col2);
-        resultSet.onceReturns(false).next();
+        comparisonResultSet.onceReturns(false).next();
     }
 
     private void setResultSetRowValues(String expectedCol1, String actualCol1, String expectedCol2, String actualCol2) throws Exception {
-        resultSet.onceReturns(actualCol1).getString(1);
-        resultSet.onceReturns(expectedCol1).getString(2);
-        resultSet.onceReturns(actualCol2).getString(3);
-        resultSet.onceReturns(expectedCol2).getString(4);
+        comparisonResultSet.onceReturns(actualCol1).getActualValue(0);
+        comparisonResultSet.onceReturns(expectedCol1).getExpectedValue(0);
+        comparisonResultSet.onceReturns(actualCol2).getActualValue(1);
+        comparisonResultSet.onceReturns(expectedCol2).getExpectedValue(1);
     }
 
     private void assertColumnComparison(int index, String expectedValue, String actualValue, DataSetComparison dataSetComparison) {
@@ -182,7 +182,7 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
 
     private class TestDefaultDataSetComparator extends DefaultDataSetComparator {
         @Override
-        protected PreparedStatementWrapper createPreparedStatementWrapper(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws Exception {
+        protected ComparisonPreparedStatementWrapper createPreparedStatementWrapper(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws Exception {
             return preparedStatementWrapper.getMock();
         }
     }

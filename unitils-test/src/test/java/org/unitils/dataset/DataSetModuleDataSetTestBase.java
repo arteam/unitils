@@ -33,7 +33,7 @@ import static org.unitils.database.SQLUnitils.*;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public abstract class DataSetModuleInsertDataSetTestBase extends UnitilsJUnit4 {
+public abstract class DataSetModuleDataSetTestBase extends UnitilsJUnit4 {
 
     /* Tested object */
     protected DataSetModule dataSetModule;

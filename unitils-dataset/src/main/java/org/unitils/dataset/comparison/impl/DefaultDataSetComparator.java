@@ -21,13 +21,13 @@ import org.unitils.core.UnitilsException;
 import org.unitils.dataset.comparison.DataSetComparator;
 import org.unitils.dataset.core.*;
 import org.unitils.dataset.util.ComparisonPreparedStatementWrapper;
-import org.unitils.dataset.util.PreparedStatementWrapper;
+import org.unitils.dataset.util.ResultSetWrapper;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Tim Ducheyne
@@ -91,7 +91,7 @@ public class DefaultDataSetComparator implements DataSetComparator {
     protected void findMatches(String schemaName, String tableName, Table table, List<String> variables, Connection connection, TableComparison tableComparison) {
         for (Row row : table.getRows()) {
             try {
-                PreparedStatementWrapper preparedStatementWrapper = createPreparedStatementWrapper(schemaName, tableName, row, variables, connection);
+                ComparisonPreparedStatementWrapper preparedStatementWrapper = createPreparedStatementWrapper(schemaName, tableName, row, variables, connection);
                 try {
                     findMatchesAndTablesThatShouldHaveNoMoreRecords(row, variables, preparedStatementWrapper, tableComparison);
                 } finally {
@@ -109,7 +109,7 @@ public class DefaultDataSetComparator implements DataSetComparator {
                 continue;
             }
             try {
-                PreparedStatementWrapper preparedStatementWrapper = createPreparedStatementWrapper(schemaName, tableName, row, variables, connection);
+                ComparisonPreparedStatementWrapper preparedStatementWrapper = createPreparedStatementWrapper(schemaName, tableName, row, variables, connection);
                 try {
                     findBestComparisons(row, variables, preparedStatementWrapper, tableComparison);
                 } finally {
@@ -122,13 +122,11 @@ public class DefaultDataSetComparator implements DataSetComparator {
     }
 
 
-    protected void findMatchesAndTablesThatShouldHaveNoMoreRecords(Row row, List<String> variables, PreparedStatementWrapper preparedStatementWrapper, TableComparison tableComparison) throws Exception {
-        int actualRowIndex = 0;
-
-        ResultSet resultSet = preparedStatementWrapper.executeQuery();
+    protected void findMatchesAndTablesThatShouldHaveNoMoreRecords(Row row, List<String> variables, ComparisonPreparedStatementWrapper preparedStatementWrapper, TableComparison tableComparison) throws Exception {
+        ResultSetWrapper resultSet = preparedStatementWrapper.executeQuery();
         while (resultSet.next()) {
-            actualRowIndex++;
-            if (tableComparison.isActualRowIndexWithExactMatch(actualRowIndex)) {
+            String rowIdentifier = resultSet.getRowIdentifier();
+            if (tableComparison.isActualRowWithExactMatch(rowIdentifier)) {
                 continue;
             }
             if (row.isEmpty()) {
@@ -137,26 +135,26 @@ public class DefaultDataSetComparator implements DataSetComparator {
             }
             RowComparison rowComparison = compareRow(row, resultSet);
             if (rowComparison.isMatch()) {
-                tableComparison.replaceIfBetterRowComparison(actualRowIndex, rowComparison);
+                tableComparison.replaceIfBetterRowComparison(rowIdentifier, rowComparison);
                 break;
             }
         }
         resultSet.close();
     }
 
-    protected void findBestComparisons(Row row, List<String> variables, PreparedStatementWrapper preparedStatementWrapper, TableComparison tableComparison) throws Exception {
-        int actualRowIndex = 0;
-
+    protected void findBestComparisons(Row row, List<String> variables, ComparisonPreparedStatementWrapper preparedStatementWrapper, TableComparison tableComparison) throws Exception {
         boolean foundActualRow = false;
 
-        ResultSet resultSet = preparedStatementWrapper.executeQuery();
+        ResultSetWrapper resultSet = preparedStatementWrapper.executeQuery();
+        Set<String> primaryKeyColumnNames = preparedStatementWrapper.getPrimaryKeyColumnNames();
+
         while (resultSet.next()) {
-            actualRowIndex++;
-            if (tableComparison.isActualRowIndexWithExactMatch(actualRowIndex)) {
+            String rowIdentifier = resultSet.getRowIdentifier();
+            if (tableComparison.isActualRowWithExactMatch(rowIdentifier)) {
                 continue;
             }
             RowComparison rowComparison = compareRow(row, resultSet);
-            tableComparison.replaceIfBetterRowComparison(actualRowIndex, rowComparison);
+            tableComparison.replaceIfBetterRowComparison(rowIdentifier, rowComparison);
             foundActualRow = true;
         }
         if (!foundActualRow) {
@@ -166,16 +164,15 @@ public class DefaultDataSetComparator implements DataSetComparator {
         preparedStatementWrapper.close();
     }
 
-    protected RowComparison compareRow(Row row, ResultSet resultSet) throws SQLException {
+
+    protected RowComparison compareRow(Row row, ResultSetWrapper resultSet) throws SQLException {
         RowComparison rowComparison = new RowComparison(row);
 
         List<Column> columns = row.getColumns();
         for (int index = 0; index < columns.size(); index++) {
             Column column = columns.get(index);
-
-            int resultSetIndex = index * 2;
-            String actualValue = resultSet.getString(resultSetIndex + 1);
-            String expectedValue = resultSet.getString(resultSetIndex + 2);
+            String expectedValue = resultSet.getExpectedValue(index);
+            String actualValue = resultSet.getActualValue(index);
 
             ColumnComparison columnComparison = new ColumnComparison(column, expectedValue, actualValue);
             rowComparison.addColumnComparison(columnComparison);
@@ -183,11 +180,8 @@ public class DefaultDataSetComparator implements DataSetComparator {
         return rowComparison;
     }
 
-    protected PreparedStatementWrapper createPreparedStatementWrapper(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws Exception {
-        PreparedStatementWrapper preparedStatementWrapper = new ComparisonPreparedStatementWrapper(schemaName, tableName, connection);
-        if (row.getNrOfColumns() == 0) {
-            return null;
-        }
+    protected ComparisonPreparedStatementWrapper createPreparedStatementWrapper(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws Exception {
+        ComparisonPreparedStatementWrapper preparedStatementWrapper = new ComparisonPreparedStatementWrapper(schemaName, tableName, connection);
         for (Column column : row.getColumns()) {
             preparedStatementWrapper.addColumn(column, variables);
         }

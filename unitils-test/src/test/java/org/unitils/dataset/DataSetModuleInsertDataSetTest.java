@@ -29,17 +29,17 @@ import static org.junit.Assert.assertFalse;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DataSetModuleInsertDataSetTest extends DataSetModuleInsertDataSetTestBase {
+public class DataSetModuleInsertDataSetTest extends DataSetModuleDataSetTestBase {
 
     @Test
     public void insertDataSet() throws Exception {
-        dataSetModule.insertDataSet(asList("DataSetModuleDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
+        dataSetModule.loadDataSet(asList("DataSetModuleDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
         assertValueInTableTest("col1", "xxxx");
     }
 
     @Test
     public void literalValues() throws Exception {
-        dataSetModule.insertDataSet(asList("DataSetModuleDataSetTest-literalValues.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
+        dataSetModule.loadDataSet(asList("DataSetModuleDataSetTest-literalValues.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
         assertValueInTableTest("col1", "text");
         assertValueInTableTest("col2", "2");
         assertFalse("No value found for col3", getValues("col3", "test").isEmpty());
@@ -48,7 +48,7 @@ public class DataSetModuleInsertDataSetTest extends DataSetModuleInsertDataSetTe
 
     @Test
     public void literalValuesOverriddenLiteralToken() throws Exception {
-        dataSetModule.insertDataSet(asList("DataSetModuleDataSetTest-literalValues-overriddenLiteralToken.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
+        dataSetModule.loadDataSet(asList("DataSetModuleDataSetTest-literalValues-overriddenLiteralToken.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
         assertValueInTableTest("col1", "text");
         assertValueInTableTest("col2", "2");
         assertFalse("No value found for col3", getValues("col3", "test").isEmpty());
@@ -57,7 +57,7 @@ public class DataSetModuleInsertDataSetTest extends DataSetModuleInsertDataSetTe
 
     @Test
     public void variables() throws Exception {
-        dataSetModule.insertDataSet(asList("DataSetModuleDataSetTest-variables.xml"), asList("value1", "2", "now"), getClass(), InsertDataSetLoader.class);
+        dataSetModule.loadDataSet(asList("DataSetModuleDataSetTest-variables.xml"), asList("value1", "2", "now"), getClass(), InsertDataSetLoader.class);
         assertValueInTableTest("col1", "test value1 2");
         assertValueInTableTest("col2", "2");
         assertFalse("No value found for col3", getValues("col3", "test").isEmpty());
@@ -65,7 +65,7 @@ public class DataSetModuleInsertDataSetTest extends DataSetModuleInsertDataSetTe
     
     @Test
     public void variablesOverriddenVariableToken() throws Exception {
-        dataSetModule.insertDataSet(asList("DataSetModuleDataSetTest-variables-overriddenVariableToken.xml"), asList("value1", "2", "now"), getClass(), InsertDataSetLoader.class);
+        dataSetModule.loadDataSet(asList("DataSetModuleDataSetTest-variables-overriddenVariableToken.xml"), asList("value1", "2", "now"), getClass(), InsertDataSetLoader.class);
         assertValueInTableTest("col1", "test value1 2");
         assertValueInTableTest("col2", "2");
         assertFalse("No value found for col3", getValues("col3", "test").isEmpty());

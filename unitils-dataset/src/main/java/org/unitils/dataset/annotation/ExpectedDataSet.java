@@ -87,14 +87,6 @@ public @interface ExpectedDataSet {
     String[] value() default {};
 
     /**
-     * The factory that needs to be used to read the data set files.
-     *
-     * @return An implementation class of {@link DataSetFactory}. Use the default value {@link DataSetFactory}
-     *         to make use of the default DataSetLoadStrategy configured in the unitils configuration.
-     */
-    Class<? extends DataSetFactory> factory() default DataSetFactory.class;
-
-    /**
      * Variables that will be used to fill in possible variable declarations in a data set.
      *
      * A data set can contain variable declarations: $0, $1 ...
@@ -112,4 +104,22 @@ public @interface ExpectedDataSet {
      * @return The values to use when replacing the variable declarations (e.g. $0) in the data set, empty by default
      */
     String[] variables() default {};
+
+    /**
+     * By default, the database content of the tables that were in the expected data set will be outputted to the log.
+     * For performance reasons or when large tables are involved, it is possible to skip this logging by
+     * setting this property to false.
+     *
+     * @return True for logging the database content, false otherwise
+     */
+    boolean logDatabaseContentOnAssertionError() default true;
+
+    /**
+     * The factory that needs to be used to read the data set files.
+     *
+     * @return An implementation class of {@link DataSetFactory}. Use the default value {@link DataSetFactory}
+     *         to make use of the default factory configured in the unitils configuration.
+     */
+    Class<? extends DataSetFactory> factory() default DataSetFactory.class;
+
 }

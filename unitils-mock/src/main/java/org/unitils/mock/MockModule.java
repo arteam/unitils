@@ -27,9 +27,7 @@ import org.unitils.mock.core.PartialMockObject;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.dummy.DummyObjectUtil;
 import org.unitils.util.AnnotationUtils;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import org.unitils.util.PropertyUtils;
-import static org.unitils.util.ReflectionUtils.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -37,6 +35,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Properties;
 import java.util.Set;
+
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.ReflectionUtils.*;
 
 /**
  * Module for testing with mock objects.
@@ -91,26 +92,31 @@ public class MockModule implements Module {
 
 
     public void logFullScenarioReport() {
-        String report = "\n\n" + getScenario().createFullReport();
-        logger.info(report);
+        Scenario scenario = getScenario();
+        if (scenario != null) {
+            logger.info("\n\n" + scenario.createFullReport());
+        }
     }
-
 
     public void logObservedScenario() {
-        String report = "\n\nObserved scenario:\n\n" + getScenario().createObservedInvocationsReport();
-        logger.info(report);
+        Scenario scenario = getScenario();
+        if (scenario != null) {
+            logger.info("\n\nObserved scenario:\n\n" + scenario.createObservedInvocationsReport());
+        }
     }
-
 
     public void logDetailedObservedScenario() {
-        String report = "\n\nDetailed observed scenario:\n\n" + getScenario().createDetailedObservedInvocationsReport();
-        logger.info(report);
+        Scenario scenario = getScenario();
+        if (scenario != null) {
+            logger.info("\n\nDetailed observed scenario:\n\n" + scenario.createDetailedObservedInvocationsReport());
+        }
     }
 
-
     public void logSuggestedAsserts() {
-        String report = "\n\nSuggested assert statements:\n\n" + getScenario().createSuggestedAssertsReport();
-        logger.info(report);
+        Scenario scenario = getScenario();
+        if (scenario != null) {
+            logger.info("\n\nSuggested assert statements:\n\n" + scenario.createSuggestedAssertsReport());
+        }
     }
 
 
