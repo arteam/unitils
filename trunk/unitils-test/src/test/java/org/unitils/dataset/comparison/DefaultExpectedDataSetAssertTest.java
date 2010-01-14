@@ -164,7 +164,7 @@ public class DefaultExpectedDataSetAssertTest extends UnitilsJUnit4 {
     }
 
     private Row createRow(Column... columns) {
-        Row row = new Row();
+        Row row = new Row(null);
         for (Column column : columns) {
             row.addColumn(column);
         }

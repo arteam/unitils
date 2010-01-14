@@ -36,8 +36,8 @@ public class DataSetModuleCleanInsertDataSetTest extends DataSetModuleDataSetTes
         insertValueInTableTest("yyyy");
 
         dataSetModule.loadDataSet(asList("DataSetModuleDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), CleanInsertDataSetLoader.class);
-        assertValueInTableTest("col1", "xxxx");
-        assertValueNotInTableTest("col1", "yyyy");
+        assertValueInTable("test", "col1", "xxxx");
+        assertValueNotInTable("test", "col1", "yyyy");
     }
 
     @Test
@@ -46,10 +46,10 @@ public class DataSetModuleCleanInsertDataSetTest extends DataSetModuleDataSetTes
         insertValueInTableDependent("yyyy");
 
         dataSetModule.loadDataSet(asList("DataSetModuleDataSetTest-dependency.xml"), new ArrayList<String>(), getClass(), CleanInsertDataSetLoader.class);
-        assertValueInTableTest("col1", "xxxx");
-        assertValueInTableDependent("col1", "xxxx");
-        assertValueNotInTableTest("col1", "yyyy");
-        assertValueNotInTableDependent("col1", "yyyy");
+        assertValueInTable("test", "col1", "xxxx");
+        assertValueInTable("dependent", "col1", "xxxx");
+        assertValueNotInTable("test", "col1", "yyyy");
+        assertValueNotInTable("dependent", "col1", "yyyy");
     }
 
     @Test(expected = UnitilsException.class)

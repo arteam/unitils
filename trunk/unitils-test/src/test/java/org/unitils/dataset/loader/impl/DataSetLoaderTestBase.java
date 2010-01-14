@@ -77,7 +77,9 @@ public abstract class DataSetLoaderTestBase extends UnitilsJUnit4 {
 
 
     private DataSet createDataSet() {
-        Table tableA = new Table("table_a");
+        Schema schema = new Schema("my_schema", false);
+
+        Table tableA = new Table("table_a", false);
         Row row1 = new Row();
         row1.addColumn(createColumn("column_1", "1"));
         row1.addColumn(createColumn("column_2", "2"));
@@ -87,13 +89,12 @@ public abstract class DataSetLoaderTestBase extends UnitilsJUnit4 {
         row2.addColumn(createColumn("column_4", "4"));
         tableA.addRow(row2);
 
-        Table tableB = new Table("table_b");
+        Table tableB = new Table("table_b", false);
         Row row3 = new Row();
         row3.addColumn(createColumn("column_5", "5"));
         row3.addColumn(createColumn("column_6", "6"));
         tableB.addRow(row3);
 
-        Schema schema = new Schema("my_schema", false);
         schema.addTable(tableA);
         schema.addTable(tableB);
 
@@ -101,20 +102,23 @@ public abstract class DataSetLoaderTestBase extends UnitilsJUnit4 {
     }
 
     private DataSet createDataSetWithLiteralValues() {
-        Table tableA = new Table("table_a");
+        Schema schema = new Schema("my_schema", false);
+
+        Table tableA = new Table("table_a", false);
         Row row = new Row();
         row.addColumn(createColumn("column_1", "=sysdate"));
         row.addColumn(createColumn("column_2", "=null"));
         row.addColumn(createColumn("column_3", "==escaped"));
         tableA.addRow(row);
 
-        Schema schema = new Schema("my_schema", false);
         schema.addTable(tableA);
         return createDataSet(schema);
     }
 
     private DataSet createDataSetWithVariableDeclarations() {
-        Table tableA = new Table("table_a");
+        Schema schema = new Schema("my_schema", false);
+
+        Table tableA = new Table("table_a", false);
         Row row = new Row();
         row.addColumn(createColumn("column_1", "value $0"));
         row.addColumn(createColumn("column_2", "$1$2"));
@@ -122,7 +126,6 @@ public abstract class DataSetLoaderTestBase extends UnitilsJUnit4 {
         row.addColumn(createColumn("column_4", "=literal $1"));
         tableA.addRow(row);
 
-        Schema schema = new Schema("my_schema", false);
         schema.addTable(tableA);
         return createDataSet(schema);
     }
@@ -130,7 +133,7 @@ public abstract class DataSetLoaderTestBase extends UnitilsJUnit4 {
 
     private DataSet createDataSetWithEmptyRows() {
         Schema schemaWithEmptyRows = new Schema("my_schema", false);
-        Table tableWithEmptyRows = new Table("table_a");
+        Table tableWithEmptyRows = new Table("table_a", false);
         tableWithEmptyRows.addRow(new Row());
         tableWithEmptyRows.addRow(new Row());
         schemaWithEmptyRows.addTable(tableWithEmptyRows);
@@ -139,17 +142,17 @@ public abstract class DataSetLoaderTestBase extends UnitilsJUnit4 {
 
     private DataSet createDataSetWithEmptyTable() {
         Schema schemaWithEmptyTable = new Schema("my_schema", false);
-        schemaWithEmptyTable.addTable(new Table("table_a"));
+        schemaWithEmptyTable.addTable(new Table("table_a", false));
         return createDataSet(schemaWithEmptyTable);
     }
 
-    private DataSet createDataSet(Schema schema) {
+    protected DataSet createDataSet(Schema schema) {
         DataSet dataSet = new DataSet();
         dataSet.addSchema(schema);
         return dataSet;
     }
 
-    private Column createColumn(String name, String value) {
+    protected Column createColumn(String name, String value) {
         return new Column(name, value, false, '=', '$');
     }
 }

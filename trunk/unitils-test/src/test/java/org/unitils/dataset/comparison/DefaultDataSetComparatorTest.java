@@ -54,7 +54,7 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
     @Before
     public void initialize() throws Exception {
         dataSource.returns(connection).getConnection();
-        preparedStatementWrapper.returns(comparisonResultSet).executeQuery();
+        preparedStatementWrapper.returns(comparisonResultSet).executeQuery(null, null);
         defaultDataSetComparator.init(dataSource.getMock());
 
         dataSet = createDataSet();
@@ -151,20 +151,19 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
     }
 
     private DataSet createDataSet() {
-        Table tableA = new Table("table_a");
+        Schema schema = new Schema("my_schema", false);
+        Table table = new Table("table_a", false);
         Row row1 = new Row();
         row1.addColumn(createColumn("column_1", "1"));
         row1.addColumn(createColumn("column_2", "2"));
-        tableA.addRow(row1);
-
-        Schema schema = new Schema("my_schema", false);
-        schema.addTable(tableA);
+        table.addRow(row1);
+        schema.addTable(table);
         return createDataSet(schema);
     }
 
     private DataSet createEmptyDataSet() {
         Schema schema = new Schema("my_schema", false);
-        schema.addTable(new Table("table_a"));
+        schema.addTable(new Table("table_a", false));
         return createDataSet(schema);
     }
 
@@ -181,7 +180,7 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
 
     private class TestDefaultDataSetComparator extends DefaultDataSetComparator {
         @Override
-        protected ComparisonPreparedStatement createPreparedStatementWrapper(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws Exception {
+        protected ComparisonPreparedStatement createPreparedStatementWrapper(Table table, Connection connection) throws Exception {
             return preparedStatementWrapper.getMock();
         }
     }

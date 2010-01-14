@@ -45,11 +45,11 @@ public class RefreshDataSetLoaderTest extends DataSetLoaderTestBase {
         dataSetLoader.load(dataSet, new ArrayList<String>());
 
         connection.assertInvoked().prepareStatement("update my_schema.table_a set column_1=?, column_2=? where column_1=?");
-        connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_1,column_2) values (?,?)");
+        connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_1, column_2) values (?, ?)");
         connection.assertInvoked().prepareStatement("update my_schema.table_a set column_3=?, column_4=? where column_3=?");
-        connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_3,column_4) values (?,?)");
+        connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_3, column_4) values (?, ?)");
         connection.assertInvoked().prepareStatement("update my_schema.table_b set column_5=?, column_6=? where column_5=?");
-        connection.assertInvoked().prepareStatement("insert into my_schema.table_b (column_5,column_6) values (?,?)");
+        connection.assertInvoked().prepareStatement("insert into my_schema.table_b (column_5, column_6) values (?, ?)");
     }
 
     @Test
@@ -59,11 +59,11 @@ public class RefreshDataSetLoaderTest extends DataSetLoaderTestBase {
         dataSetLoader.load(dataSet, new ArrayList<String>());
 
         connection.assertInvoked().prepareStatement("update my_schema.table_a set column_1=?, column_2=? where column_1=?");
-        connection.assertNotInvoked().prepareStatement("insert into my_schema.table_a (column_1,column_2) values (?,?)");
+        connection.assertNotInvoked().prepareStatement("insert into my_schema.table_a (column_1, column_2) values (?, ?)");
         connection.assertInvoked().prepareStatement("update my_schema.table_a set column_3=?, column_4=? where column_3=?");
-        connection.assertNotInvoked().prepareStatement("insert into my_schema.table_a (column_3,column_4) values (?,?)");
+        connection.assertNotInvoked().prepareStatement("insert into my_schema.table_a (column_3, column_4) values (?, ?)");
         connection.assertInvoked().prepareStatement("update my_schema.table_b set column_5=?, column_6=? where column_5=?");
-        connection.assertNotInvoked().prepareStatement("insert into my_schema.table_b (column_5,column_6) values (?,?)");
+        connection.assertNotInvoked().prepareStatement("insert into my_schema.table_b (column_5, column_6) values (?, ?)");
     }
 
     @Test

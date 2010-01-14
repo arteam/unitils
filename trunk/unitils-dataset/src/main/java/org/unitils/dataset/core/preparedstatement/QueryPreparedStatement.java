@@ -15,10 +15,13 @@
  */
 package org.unitils.dataset.core.preparedstatement;
 
+import org.unitils.dataset.core.Row;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * @author Tim Ducheyne
@@ -33,6 +36,12 @@ public abstract class QueryPreparedStatement<T extends QueryResultSet> extends B
 
 
     public T executeQuery() throws SQLException {
+        PreparedStatement preparedStatement = buildPreparedStatement();
+        return createResultSetWrapper(preparedStatement.executeQuery());
+    }
+
+    public T executeQuery(Row row, List<String> variables) throws SQLException {
+        addRow(row, variables);
         PreparedStatement preparedStatement = buildPreparedStatement();
         return createResultSetWrapper(preparedStatement.executeQuery());
     }

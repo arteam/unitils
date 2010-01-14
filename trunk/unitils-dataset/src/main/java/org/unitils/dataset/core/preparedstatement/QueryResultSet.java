@@ -64,11 +64,16 @@ public class QueryResultSet {
             return identifier.toString();
         }
         int index = 1;
+        identifier.append('#');
         for (String primaryKeyColumnName : primaryKeyColumnNames) {
             String primaryKeyValue = resultSet.getString(primaryKeyColumnName);
             identifier.append(primaryKeyColumnName);
+            identifier.append('=');
             identifier.append(primaryKeyValue);
+            identifier.append(',');
         }
+        identifier.setLength(identifier.length() - 1);
+        identifier.append('#');
         return identifier.toString();
     }
 

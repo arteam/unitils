@@ -31,6 +31,50 @@ public class Row {
     /* The columns of the row */
     private List<Column> columns = new ArrayList<Column>();
 
+    /* The table this row belongs to */
+    private Table table;
+
+    /* The parent row that is referenced (foreign key) by this row, null if not defined */
+    private Row parentRow;
+
+
+    /**
+     * Creates a data set row.
+     */
+    public Row() {
+        this(null);
+    }
+
+    /**
+     * Creates a data set row.
+     *
+     * @param parentRow The parent row that is referenced (foreign key) by this row, null if not defined
+     */
+    public Row(Row parentRow) {
+        this.parentRow = parentRow;
+    }
+
+
+    /**
+     * @param table The table this row belongs to, not null
+     */
+    void setTable(Table table) {
+        this.table = table;
+    }
+
+    /**
+     * @return The table this row belongs to, not null
+     */
+    public Table getTable() {
+        return table;
+    }
+
+    /**
+     * @return The parent row that is referenced (foreign key) by this row, null if not defined
+     */
+    public Row getParentRow() {
+        return parentRow;
+    }
 
     /**
      * Gets the column for the given name.

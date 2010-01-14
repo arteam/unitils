@@ -22,6 +22,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.util.Stack;
+
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
 /**
@@ -33,22 +35,24 @@ import static org.apache.commons.lang.StringUtils.isEmpty;
 public class XmlDataSetSaxContentHandler extends DefaultHandler {
 
     /* The schema name to use when none is specified */
-    private String defaultSchemaName;
+    protected String defaultSchemaName;
     /* The case-sensitivity to use when none is specified */
-    private boolean defaultCaseSensitive;
+    protected boolean defaultCaseSensitive;
     /* The literal token to use when none is specified */
-    private char defaultLiteralToken;
+    protected char defaultLiteralToken;
     /*  The variable toke to use when none is specified */
-    private char defaultVariableToken;
+    protected char defaultVariableToken;
 
     /* The resulting data set */
-    private DataSet dataSet;
+    protected DataSet dataSet;
 
-    private boolean caseSensitive;
+    protected boolean caseSensitive;
 
-    private char literalToken;
+    protected char literalToken;
 
-    private char variableToken;
+    protected char variableToken;
+
+    protected Stack<Row> parentRows = new Stack<Row>();
 
 
     /**
@@ -98,6 +102,13 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
         }
         String schemaName = getSchemaName(uri);
         addSchema(schemaName, localName, attributes, dataSet);
+    }
+
+    @Override
+    public void endElement(String uri, String localName, String qName) throws SAXException {
+        if (!"dataset".equals(localName) && !parentRows.isEmpty()) {
+            parentRows.pop();
+        }
     }
 
     protected DataSet createDataSet(Attributes attributes) {
@@ -156,16 +167,25 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
             table = new Table(tableName, caseSensitive);
             schema.addTable(table);
         }
-        addRows(attributes, table);
+        addRow(attributes, table);
     }
 
-    protected void addRows(Attributes attributes, Table table) {
-        Row row = new Row();
+    protected void addRow(Attributes attributes, Table table) {
+        Row parentRow = getParentRow();
+        Row row = new Row(parentRow);
         for (int i = 0; i < attributes.getLength(); i++) {
             Column column = new Column(attributes.getQName(i), attributes.getValue(i), caseSensitive, literalToken, variableToken);
             row.addColumn(column);
         }
         table.addRow(row);
+        parentRows.push(row);
+    }
+
+    protected Row getParentRow() {
+        if (parentRows.isEmpty()) {
+            return null;
+        }
+        return parentRows.peek();
     }
 
     protected String getSchemaName(String uri) {

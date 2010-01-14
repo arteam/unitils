@@ -81,49 +81,48 @@ public class DefaultDataSetComparator implements DataSetComparator {
     }
 
     protected TableComparison compareTable(String schemaName, Table table, List<String> variables, Connection connection) {
-        String tableName = table.getName();
-        TableComparison tableDifference = new TableComparison(tableName);
-        findMatches(schemaName, tableName, table, variables, connection, tableDifference);
-        findBestComparisons(schemaName, tableName, table, variables, connection, tableDifference);
+        TableComparison tableDifference = new TableComparison(table.getName());
+        findMatches(schemaName, table, variables, connection, tableDifference);
+        findBestComparisons(schemaName, table, variables, connection, tableDifference);
         return tableDifference;
     }
 
-    protected void findMatches(String schemaName, String tableName, Table table, List<String> variables, Connection connection, TableComparison tableComparison) {
+    protected void findMatches(String schemaName, Table table, List<String> variables, Connection connection, TableComparison tableComparison) {
         for (Row row : table.getRows()) {
             try {
-                ComparisonPreparedStatement preparedStatementWrapper = createPreparedStatementWrapper(schemaName, tableName, row, variables, connection);
+                ComparisonPreparedStatement preparedStatementWrapper = createPreparedStatementWrapper(table, connection);
                 try {
                     findMatchesAndTablesThatShouldHaveNoMoreRecords(row, variables, preparedStatementWrapper, tableComparison);
                 } finally {
                     preparedStatementWrapper.close();
                 }
             } catch (Exception e) {
-                throw new UnitilsException("Unable to compare data set row for schema: " + schemaName + ", table: " + tableName + ", row: [" + row + "], variables: " + variables, e);
+                throw new UnitilsException("Unable to compare data set row for table: " + table + ", row: [" + row + "], variables: " + variables, e);
             }
         }
     }
 
-    protected void findBestComparisons(String schemaName, String tableName, Table table, List<String> variables, Connection connection, TableComparison tableComparison) {
+    protected void findBestComparisons(String schemaName, Table table, List<String> variables, Connection connection, TableComparison tableComparison) {
         for (Row row : table.getRows()) {
             if (row.isEmpty() || tableComparison.hasMatch(row)) {
                 continue;
             }
             try {
-                ComparisonPreparedStatement preparedStatementWrapper = createPreparedStatementWrapper(schemaName, tableName, row, variables, connection);
+                ComparisonPreparedStatement preparedStatementWrapper = createPreparedStatementWrapper(table, connection);
                 try {
                     findBestComparisons(row, variables, preparedStatementWrapper, tableComparison);
                 } finally {
                     preparedStatementWrapper.close();
                 }
             } catch (Exception e) {
-                throw new UnitilsException("Unable to compare data set row for schema: " + schemaName + ", table: " + tableName + ", row: [" + row + "], variables: " + variables, e);
+                throw new UnitilsException("Unable to compare data set row for table: " + table + ", row: [" + row + "], variables: " + variables, e);
             }
         }
     }
 
 
     protected void findMatchesAndTablesThatShouldHaveNoMoreRecords(Row row, List<String> variables, ComparisonPreparedStatement preparedStatementWrapper, TableComparison tableComparison) throws Exception {
-        ComparisonResultSet resultSet = preparedStatementWrapper.executeQuery();
+        ComparisonResultSet resultSet = preparedStatementWrapper.executeQuery(row, variables);
         while (resultSet.next()) {
             String rowIdentifier = resultSet.getRowIdentifier();
             if (tableComparison.isActualRowWithExactMatch(rowIdentifier)) {
@@ -145,7 +144,7 @@ public class DefaultDataSetComparator implements DataSetComparator {
     protected void findBestComparisons(Row row, List<String> variables, ComparisonPreparedStatement preparedStatementWrapper, TableComparison tableComparison) throws Exception {
         boolean foundActualRow = false;
 
-        ComparisonResultSet resultSet = preparedStatementWrapper.executeQuery();
+        ComparisonResultSet resultSet = preparedStatementWrapper.executeQuery(row, variables);
         Set<String> primaryKeyColumnNames = preparedStatementWrapper.getPrimaryKeyColumnNames();
 
         while (resultSet.next()) {
@@ -180,12 +179,8 @@ public class DefaultDataSetComparator implements DataSetComparator {
         return rowComparison;
     }
 
-    protected ComparisonPreparedStatement createPreparedStatementWrapper(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws Exception {
-        ComparisonPreparedStatement preparedStatementWrapper = new ComparisonPreparedStatement(schemaName, tableName, connection);
-        for (Column column : row.getColumns()) {
-            preparedStatementWrapper.addColumn(column, variables);
-        }
-        return preparedStatementWrapper;
+    protected ComparisonPreparedStatement createPreparedStatementWrapper(Table table, Connection connection) throws Exception {
+        return new ComparisonPreparedStatement(table.getSchema().getName(), table.getName(), connection);
     }
 
 

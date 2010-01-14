@@ -30,27 +30,28 @@ public class InsertPreparedStatementTest extends PreparedStatementTestBase {
 
 
     @Test
-    public void addColumn() throws Exception {
+    public void executeUpdate() throws Exception {
         insertPreparedStatement = new InsertPreparedStatement("my_schema", "table_a", connection.getMock());
-        insertPreparedStatement.addColumn(createColumn("column_1", "1"), emptyVariables);
-        insertPreparedStatement.addColumn(createColumn("column_2", "2"), emptyVariables);
-        insertPreparedStatement.executeUpdate();
+        insertPreparedStatement.executeUpdate(row, emptyVariables);
 
-        connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_1,column_2) values (?,?)");
+        connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_1, column_2, pk1, pk2) values (?, ?, ?, ?)");
         preparedStatement.assertInvoked().setObject(1, "1", VARCHAR);
         preparedStatement.assertInvoked().setObject(2, "2", VARCHAR);
+        preparedStatement.assertInvoked().setObject(3, "3", VARCHAR);
+        preparedStatement.assertInvoked().setObject(4, "4", VARCHAR);
         preparedStatement.assertInvoked().executeUpdate();
     }
 
-    @Test
-    public void addLiteralColumn() throws Exception {
-        insertPreparedStatement = new InsertPreparedStatement("my_schema", "table_a", connection.getMock());
-        insertPreparedStatement.addColumn(createColumn("column_1", "=literal1"), emptyVariables);
-        insertPreparedStatement.addColumn(createColumn("column_2", "=literal2"), emptyVariables);
-        insertPreparedStatement.executeUpdate();
 
-        connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_1,column_2) values (literal1,literal2)");
+    @Test
+    public void literalColumns() throws Exception {
+        insertPreparedStatement = new InsertPreparedStatement("my_schema", "table_a", connection.getMock());
+        insertPreparedStatement.executeUpdate(rowWithLiteralValues, emptyVariables);
+
+        connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_1, column_2, pk1, pk2) values (literal1, literal2, 3, 4)");
         preparedStatement.assertNotInvoked().getMetaData();
         preparedStatement.assertInvoked().executeUpdate();
     }
+
+
 }
