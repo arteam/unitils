@@ -19,6 +19,9 @@ import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.comparator.Comparator;
 import org.unitils.reflectionassert.difference.Difference;
 
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * Comparator for simple cases.
  * Following cases are handled: left and right are the same instance, left or right have a null value,
@@ -50,6 +53,12 @@ public class SimpleCasesComparator implements Comparator {
             return true;
         }
         if (left.getClass().getName().startsWith("java.lang") || right.getClass().getName().startsWith("java.lang")) {
+            return true;
+        }
+        if (left instanceof Date || right instanceof Date) {
+            return true;
+        }
+        if (left instanceof Calendar || right instanceof Calendar) {
             return true;
         }
         if (left instanceof Enum && right instanceof Enum) {
@@ -96,6 +105,20 @@ public class SimpleCasesComparator implements Comparator {
                 return null;
             }
             return new Difference("Different object values", left, right);
+        }
+        // check if dates are equal
+        if (left instanceof Date && right instanceof Date) {
+            if (left.equals(right)) {
+                return null;
+            }
+            return new Difference("Different date values", left, right);
+        }
+        // check if dates are equal
+        if (left instanceof Calendar && right instanceof Calendar) {
+            if (left.equals(right)) {
+                return null;
+            }
+            return new Difference("Different calendar values", left, right);
         }
         // check if enums are equal
         if (left instanceof Enum && right instanceof Enum) {

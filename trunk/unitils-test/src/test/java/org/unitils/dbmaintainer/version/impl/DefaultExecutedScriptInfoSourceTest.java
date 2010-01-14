@@ -15,23 +15,6 @@
  */
 package org.unitils.dbmaintainer.version.impl;
 
-import static java.util.Arrays.asList;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
-import static org.unitils.database.SQLUnitils.executeUpdate;
-import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dbmaintainer.version.impl.DefaultExecutedScriptInfoSource.PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
-
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.util.Date;
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.lang.time.DateUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -45,7 +28,23 @@ import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.script.ExecutedScript;
 import org.unitils.dbmaintainer.script.Script;
-import org.unitils.util.CollectionUtils;
+
+import javax.sql.DataSource;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.Properties;
+
+import static java.util.Arrays.asList;
+import static junit.framework.Assert.*;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import static org.unitils.database.SQLUnitils.executeUpdate;
+import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import static org.unitils.dbmaintainer.version.impl.DefaultExecutedScriptInfoSource.PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.*;
+import static org.unitils.util.CollectionUtils.asSet;
 
 /**
  * Test class for {@link org.unitils.dbmaintainer.version.impl.DefaultExecutedScriptInfoSource}. The implementation is tested using a
@@ -68,9 +67,9 @@ public class DefaultExecutedScriptInfoSourceTest extends UnitilsJUnit4 {
 
     /* The db support instance for the default schema */
     DbSupport defaultDbSupport;
-    
+
     ExecutedScript executedScript1, executedScript2;
-    
+
 
     /**
      * Initialize test fixture and creates a test version table.
@@ -92,13 +91,13 @@ public class DefaultExecutedScriptInfoSourceTest extends UnitilsJUnit4 {
         dropExecutedScriptsTable();
         createExecutedScriptsTable();
     }
-    
+
     @Before
     public void initTestData() throws ParseException {
-    	executedScript1 = new ExecutedScript(new Script("1_script1.sql", 10L, "xxx"), 
-    			DateUtils.parseDate("20/05/2008 10:20:00", new String[] {"dd/MM/yyyy hh:mm:ss"}), true);
-    	executedScript2 = new ExecutedScript(new Script("script2.sql", 20L, "yyy"), 
-    			DateUtils.parseDate("20/05/2008 10:25:00", new String[] {"dd/MM/yyyy hh:mm:ss"}), false);
+        executedScript1 = new ExecutedScript(new Script("1_script1.sql", 10L, "xxx"),
+                DateUtils.parseDate("20/05/2008 10:20:00", new String[]{"dd/MM/yyyy hh:mm:ss"}), true);
+        executedScript2 = new ExecutedScript(new Script("script2.sql", 20L, "yyy"),
+                DateUtils.parseDate("20/05/2008 10:25:00", new String[]{"dd/MM/yyyy hh:mm:ss"}), false);
     }
 
 
@@ -107,7 +106,7 @@ public class DefaultExecutedScriptInfoSourceTest extends UnitilsJUnit4 {
      */
     @After
     public void tearDown() throws Exception {
-    	dropExecutedScriptsTable();
+        dropExecutedScriptsTable();
     }
 
 
@@ -128,8 +127,8 @@ public class DefaultExecutedScriptInfoSourceTest extends UnitilsJUnit4 {
      */
     @Test(expected = UnitilsException.class)
     public void testRegisterExecutedScript_NoExecutedScriptsTable() throws Exception {
-    	dropExecutedScriptsTable();
-    	
+        dropExecutedScriptsTable();
+
         dbVersionSource.registerExecutedScript(executedScript1);
     }
 
@@ -139,36 +138,36 @@ public class DefaultExecutedScriptInfoSourceTest extends UnitilsJUnit4 {
      */
     @Test
     public void testGetDBVersion_noExecutedScriptsTableAutoCreate() throws Exception {
-    	dropExecutedScriptsTable();
+        dropExecutedScriptsTable();
 
-    	dbVersionSourceAutoCreate.registerExecutedScript(executedScript1);
+        dbVersionSourceAutoCreate.registerExecutedScript(executedScript1);
         assertLenientEquals(asList(executedScript1), dbVersionSource.getExecutedScripts());
     }
-    
+
     @Test
     public void testUpdateExecutedScript() {
-    	dbVersionSource.registerExecutedScript(executedScript1);
-    	executedScript1 = new ExecutedScript(executedScript1.getScript(), new Date(), false);
-    	dbVersionSource.updateExecutedScript(executedScript1);
-    	assertLenientEquals(CollectionUtils.asSet(executedScript1), dbVersionSource.getExecutedScripts());
-    	assertLenientEquals(CollectionUtils.asSet(executedScript1), dbVersionSource.getExecutedScripts());
+        dbVersionSource.registerExecutedScript(executedScript1);
+        executedScript1 = new ExecutedScript(executedScript1.getScript(), new Date(), false);
+        dbVersionSource.updateExecutedScript(executedScript1);
+        assertReflectionEquals(asSet(executedScript1), dbVersionSource.getExecutedScripts(), LENIENT_DATES, LENIENT_ORDER, IGNORE_DEFAULTS);
+        assertReflectionEquals(asSet(executedScript1), dbVersionSource.getExecutedScripts(), LENIENT_DATES, LENIENT_ORDER, IGNORE_DEFAULTS);
     }
-    
+
     @Test
     public void testClearAllRegisteredScripts() {
-    	dbVersionSource.registerExecutedScript(executedScript1);
-    	dbVersionSource.registerExecutedScript(executedScript2);
-    	dbVersionSource.clearAllExecutedScripts();
-    	assertEquals(0, dbVersionSource.getExecutedScripts().size());
+        dbVersionSource.registerExecutedScript(executedScript1);
+        dbVersionSource.registerExecutedScript(executedScript2);
+        dbVersionSource.clearAllExecutedScripts();
+        assertEquals(0, dbVersionSource.getExecutedScripts().size());
     }
-    
+
     @Test
     public void testIsFromScratchUpdateRecommended() throws SQLException {
         assertFalse(dbVersionSource.isFromScratchUpdateRecommended());
         assertFalse(dbVersionSourceAutoCreate.isFromScratchUpdateRecommended());
-        
+
         dropExecutedScriptsTable();
-        
+
         assertFalse(dbVersionSource.isFromScratchUpdateRecommended());
         assertTrue(dbVersionSourceAutoCreate.isFromScratchUpdateRecommended());
     }

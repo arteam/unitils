@@ -16,8 +16,9 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import org.unitils.reflectionassert.difference.Difference;
+
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import static org.unitils.reflectionassert.util.InnerDifferenceFinder.getInnerDifference;
 
 
@@ -81,7 +82,6 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
         assertNull(result);
     }
 
-
     /**
      * Test for two equal autoboxing. An autoboxed primitive should be considered equals to the object version.
      */
@@ -91,7 +91,6 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
         assertNull(result);
     }
 
-
     /**
      * Test for two equal primitives as an inner field of an object.
      */
@@ -100,7 +99,6 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
         assertNull(result);
     }
 
-
     /**
      * Test for two equal primitives but of different type (int vs long).
      */
@@ -108,7 +106,6 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
         Difference result = reflectionComparator.getDifference(5L, 5);
         assertNull(result);
     }
-
 
     /**
      * Test for two primitives that contain different values.
@@ -121,7 +118,6 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
         assertEquals(9999, difference.getRightValue());
     }
 
-
     /**
      * Test for two primitives with right value 0.
      */
@@ -132,7 +128,6 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
         assertEquals(2, difference.getLeftValue());
         assertEquals(0, difference.getRightValue());
     }
-
 
     /**
      * Test for two primitives with left value 0.
@@ -145,7 +140,6 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
         assertEquals(2, difference.getRightValue());
     }
 
-
     /**
      * Test for objects with inner primitives that contain different values.
      */
@@ -157,7 +151,6 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
         assertEquals(9999, difference2.getRightValue());
     }
 
-
     /**
      * Tests for equality of two NaN values
      */
@@ -165,7 +158,6 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
         Difference result = reflectionComparator.getDifference(Double.NaN, Float.NaN);
         assertNull(result);
     }
-
 
     /**
      * Tests for equality of a NaN with a 0 value
@@ -176,7 +168,6 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
         assertEquals(0, result.getRightValue());
     }
 
-
     /**
      * Tests for equality of two NEGATIVE_INFINITY values
      */
@@ -184,7 +175,6 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
         Difference result = reflectionComparator.getDifference(Double.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
         assertNull(result);
     }
-
 
     /**
      * Tests for equality of a NEGATIVE_INFINITY with a POSITIVE_INFINITY value
