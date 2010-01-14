@@ -47,6 +47,7 @@ public class CleanInsertDataSetLoader extends InsertDataSetLoader {
 
 
     // delete tables in reverse order    
+
     protected void deleteDataFromTablesInReverseOrder(Schema schema, Connection connection) throws SQLException {
         String schemaName = schema.getName();
 

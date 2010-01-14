@@ -19,14 +19,13 @@ import org.junit.Before;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.core.Column;
-import org.unitils.mock.ArgumentMatchers;
+import org.unitils.dataset.core.Row;
 import org.unitils.mock.Mock;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.sql.Types.INTEGER;
 import static java.sql.Types.VARCHAR;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -43,15 +42,22 @@ public abstract class PreparedStatementTestBase extends UnitilsJUnit4 {
     protected Mock<ResultSet> primaryKeyResultSet;
     protected Mock<ParameterMetaData> parameterMetaData;
 
+    protected Row row;
+    protected Row rowWithLiteralValues;
     protected List<String> emptyVariables = new ArrayList<String>();
 
     @Before
     public void initialize() throws Exception {
+        row = createRow();
+        rowWithLiteralValues = createRowWithLiteralValues();
+
         connection.returns(preparedStatement).prepareStatement(null);
         connection.returns(primaryKeyResultSet).getMetaData().getPrimaryKeys(null, null, null);
 
         preparedStatement.returns(parameterMetaData).getParameterMetaData();
         parameterMetaData.returns(VARCHAR).getParameterType(anyInt());
+
+        initializePrimaryKeys("PK1", "Pk2");
     }
 
 
@@ -73,6 +79,24 @@ public abstract class PreparedStatementTestBase extends UnitilsJUnit4 {
         for (String pkColumnName : pkColumnNames) {
             assertFalse("Exception did contain pk column name: " + pkColumnName + ". Message: " + e.getMessage(), e.getMessage().contains(pkColumnName));
         }
+    }
+
+    private Row createRow() {
+        Row row = new Row();
+        row.addColumn(createColumn("column_1", "1"));
+        row.addColumn(createColumn("column_2", "2"));
+        row.addColumn(createColumn("pk1", "3"));
+        row.addColumn(createColumn("pk2", "4"));
+        return row;
+    }
+
+    private Row createRowWithLiteralValues() {
+        Row row = new Row();
+        row.addColumn(createColumn("column_1", "=literal1"));
+        row.addColumn(createColumn("column_2", "=literal2"));
+        row.addColumn(createColumn("pk1", "=3"));
+        row.addColumn(createColumn("pk2", "=4"));
+        return row;
     }
 
     protected Column createColumn(String name, String value) {

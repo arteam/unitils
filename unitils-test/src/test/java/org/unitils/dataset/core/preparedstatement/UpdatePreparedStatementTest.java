@@ -15,11 +15,10 @@
  */
 package org.unitils.dataset.core.preparedstatement;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
+import org.unitils.dataset.core.Row;
 
-import static java.sql.Types.INTEGER;
 import static java.sql.Types.VARCHAR;
 import static org.junit.Assert.fail;
 
@@ -33,20 +32,10 @@ public class UpdatePreparedStatementTest extends PreparedStatementTestBase {
     private UpdatePreparedStatement updatePreparedStatement;
 
 
-    @Before
-    public void initializePrimaryKeys() throws Exception {
-        initializePrimaryKeys("PK1", "Pk2");
-    }
-
-
     @Test
-    public void addColumn() throws Exception {
+    public void executeUpdate() throws Exception {
         updatePreparedStatement = new UpdatePreparedStatement("my_schema", "table_a", connection.getMock());
-        updatePreparedStatement.addColumn(createColumn("column_1", "1"), emptyVariables);
-        updatePreparedStatement.addColumn(createColumn("column_2", "2"), emptyVariables);
-        updatePreparedStatement.addColumn(createColumn("pk1", "3"), emptyVariables);
-        updatePreparedStatement.addColumn(createColumn("pk2", "4"), emptyVariables);
-        updatePreparedStatement.executeUpdate();
+        updatePreparedStatement.executeUpdate(row, emptyVariables);
 
         connection.assertInvoked().prepareStatement("update my_schema.table_a set column_1=?, column_2=?, pk1=?, pk2=? where pk1=?, pk2=?");
         preparedStatement.assertInvoked().setObject(1, "1", VARCHAR);
@@ -59,13 +48,9 @@ public class UpdatePreparedStatementTest extends PreparedStatementTestBase {
     }
 
     @Test
-    public void addLiteralColumn() throws Exception {
+    public void literalColumns() throws Exception {
         updatePreparedStatement = new UpdatePreparedStatement("my_schema", "table_a", connection.getMock());
-        updatePreparedStatement.addColumn(createColumn("column_1", "=literal1"), emptyVariables);
-        updatePreparedStatement.addColumn(createColumn("column_2", "=literal2"), emptyVariables);
-        updatePreparedStatement.addColumn(createColumn("pk1", "=3"), emptyVariables);
-        updatePreparedStatement.addColumn(createColumn("pk2", "=4"), emptyVariables);
-        updatePreparedStatement.executeUpdate();
+        updatePreparedStatement.executeUpdate(rowWithLiteralValues, emptyVariables);
 
         connection.assertInvoked().prepareStatement("update my_schema.table_a set column_1=literal1, column_2=literal2, pk1=3, pk2=4 where pk1=3, pk2=4");
         preparedStatement.assertNotInvoked().getMetaData();
@@ -74,10 +59,11 @@ public class UpdatePreparedStatementTest extends PreparedStatementTestBase {
 
     @Test
     public void noValuesForPkColumns() throws Exception {
-        updatePreparedStatement = new UpdatePreparedStatement("my_schema", "table_a", connection.getMock());
-        updatePreparedStatement.addColumn(createColumn("column_1", "1"), emptyVariables);
+        Row row = new Row();
+        row.addColumn(createColumn("column_1", "1"));
         try {
-            updatePreparedStatement.executeUpdate();
+            updatePreparedStatement = new UpdatePreparedStatement("my_schema", "table_a", connection.getMock());
+            updatePreparedStatement.executeUpdate(row, emptyVariables);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertExceptionContainsPkColumnNames(e, "PK1", "Pk2");
@@ -86,11 +72,12 @@ public class UpdatePreparedStatementTest extends PreparedStatementTestBase {
 
     @Test
     public void noValueForOneOfPkColumns() throws Exception {
-        updatePreparedStatement = new UpdatePreparedStatement("my_schema", "table_a", connection.getMock());
-        updatePreparedStatement.addColumn(createColumn("column_1", "1"), emptyVariables);
-        updatePreparedStatement.addColumn(createColumn("pk1", "3"), emptyVariables);
+        Row row = new Row();
+        row.addColumn(createColumn("column_1", "1"));
+        row.addColumn(createColumn("pk1", "3"));
         try {
-            updatePreparedStatement.executeUpdate();
+            updatePreparedStatement = new UpdatePreparedStatement("my_schema", "table_a", connection.getMock());
+            updatePreparedStatement.executeUpdate(row, emptyVariables);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertExceptionNotContainsPkColumnNames(e, "PK1");
@@ -100,10 +87,12 @@ public class UpdatePreparedStatementTest extends PreparedStatementTestBase {
 
     @Test
     public void onlyValuesForPkColumns() throws Exception {
+        Row row = new Row();
+        row.addColumn(createColumn("pk1", "1"));
+        row.addColumn(createColumn("pk2", "2"));
+
         updatePreparedStatement = new UpdatePreparedStatement("my_schema", "table_a", connection.getMock());
-        updatePreparedStatement.addColumn(createColumn("pk1", "1"), emptyVariables);
-        updatePreparedStatement.addColumn(createColumn("pk2", "2"), emptyVariables);
-        updatePreparedStatement.executeUpdate();
+        updatePreparedStatement.executeUpdate(row, emptyVariables);
 
         connection.assertInvoked().prepareStatement("update my_schema.table_a set pk1=?, pk2=? where pk1=?, pk2=?");
         preparedStatement.assertInvoked().setObject(1, "1", VARCHAR);

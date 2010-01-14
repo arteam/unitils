@@ -39,7 +39,7 @@ public abstract class DataSetModuleDataSetTestBase extends UnitilsJUnit4 {
     protected DataSetModule dataSetModule;
 
     @TestDataSource
-    private DataSource dataSource;
+    protected DataSource dataSource;
 
 
     @Before
@@ -58,24 +58,14 @@ public abstract class DataSetModuleDataSetTestBase extends UnitilsJUnit4 {
     }
 
 
-    protected void assertValueInTableTest(String columnName, String expectedValue) throws Exception {
-        Set<String> values = getValues(columnName, "test");
-        assertTrue("Expected value " + expectedValue + " in table test, but found " + values, values.contains(expectedValue));
+    protected void assertValueInTable(String tableName, String columnName, String expectedValue) {
+        Set<String> values = getValues(columnName, tableName);
+        assertTrue("Expected value " + expectedValue + " in table " + tableName + ", but found " + values, values.contains(expectedValue));
     }
 
-    protected void assertValueInTableDependent(String columnName, String expectedValue) throws Exception {
-        Set<String> values = getValues(columnName, "dependent");
-        assertTrue("Expected value " + expectedValue + " in table dependent, but found " + values, values.contains(expectedValue));
-    }
-
-    protected void assertValueNotInTableTest(String columnName, String notExpectedValue) throws Exception {
-        Set<String> values = getValues(columnName, "test");
-        assertFalse("Value " + notExpectedValue + " not expected in table test, but found ", values.contains(notExpectedValue));
-    }
-
-    protected void assertValueNotInTableDependent(String columnName, String notExpectedValue) throws Exception {
-        Set<String> values = getValues(columnName, "dependent");
-        assertFalse("Value " + notExpectedValue + " not expected in table dependent, but found " + values, values.contains(notExpectedValue));
+    protected void assertValueNotInTable(String tableName, String columnName, String notExpectedValue) throws Exception {
+        Set<String> values = getValues(columnName, tableName);
+        assertFalse("Value " + notExpectedValue + " not expected in table " + tableName + ", but found ", values.contains(notExpectedValue));
     }
 
     protected Set<String> getValues(String columnName, String table) {

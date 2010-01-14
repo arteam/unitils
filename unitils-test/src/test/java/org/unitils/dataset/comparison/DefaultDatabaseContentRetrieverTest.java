@@ -127,7 +127,7 @@ public class DefaultDatabaseContentRetrieverTest extends UnitilsJUnit4 {
     }
 
     private Row createRow() {
-        Row row = new Row();
+        Row row = new Row(null);
         row.addColumn(createColumn("column_1", "1"));
         return row;
     }
@@ -137,7 +137,7 @@ public class DefaultDatabaseContentRetrieverTest extends UnitilsJUnit4 {
     }
 
     private void setActualRowIdentifiersWithMatch(String identifier) {
-        tableComparison.replaceIfBetterRowComparison(identifier, new RowComparison(new Row()));
+        tableComparison.replaceIfBetterRowComparison(identifier, new RowComparison(new Row(null)));
     }
 
 

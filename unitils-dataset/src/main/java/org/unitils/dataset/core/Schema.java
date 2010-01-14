@@ -57,6 +57,9 @@ public class Schema {
         return name;
     }
 
+    /**
+     * @return True if the name of the schema is case sensitive
+     */
     public boolean isCaseSensitive() {
         return caseSensitive;
     }
@@ -68,7 +71,6 @@ public class Schema {
         return tables;
     }
 
-
     /**
      * @return The names of the tables of the schema, not null
      */
@@ -79,7 +81,6 @@ public class Schema {
         }
         return tableNames;
     }
-
 
     /**
      * Gets the table for the given name. The name is case insensitive.
@@ -96,7 +97,6 @@ public class Schema {
         return null;
     }
 
-
     /**
      * Adds a table to the schema. Only one table with a same name can be added.
      *
@@ -109,7 +109,19 @@ public class Schema {
         if (existingTable != null) {
             throw new UnitilsException("Unable to add table to data set. A table with name " + table.getName() + " already exists.");
         }
+        table.setSchema(this);
         tables.add(table);
+    }
+
+    /**
+     * @param schemaName The name to compare with, not null
+     * @return True if this schema has the same name respecting case sensitivity
+     */
+    public boolean hasName(String schemaName) {
+        if (caseSensitive) {
+            return name.equals(schemaName);
+        }
+        return name.equalsIgnoreCase(schemaName);
     }
 
 }

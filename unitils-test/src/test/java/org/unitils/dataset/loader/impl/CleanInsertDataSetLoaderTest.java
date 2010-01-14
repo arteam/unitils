@@ -45,16 +45,16 @@ public class CleanInsertDataSetLoaderTest extends DataSetLoaderTestBase {
 
         connection.assertInvoked().prepareStatement("delete from my_schema.table_b");
         connection.assertInvoked().prepareStatement("delete from my_schema.table_a");
-        connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_1,column_2) values (?,?)");
-        connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_3,column_4) values (?,?)");
-        connection.assertInvoked().prepareStatement("insert into my_schema.table_b (column_5,column_6) values (?,?)");
+        connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_1, column_2) values (?, ?)");
+        connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_3, column_4) values (?, ?)");
+        connection.assertInvoked().prepareStatement("insert into my_schema.table_b (column_5, column_6) values (?, ?)");
     }
 
     @Test
     public void insertDataSetWithLiteralValues() throws Exception {
         dataSetLoader.load(dataSetWithLiteralValues, new ArrayList<String>());
         connection.assertInvoked().prepareStatement("delete from my_schema.table_a");
-        connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_1,column_2,column_3) values (sysdate,null,?)");
+        connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_1, column_2, column_3) values (sysdate, null, ?)");
         preparedStatement.assertInvoked().setObject(1, "=escaped", 0);
     }
 

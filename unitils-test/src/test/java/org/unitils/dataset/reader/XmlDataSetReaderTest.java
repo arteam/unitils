@@ -26,6 +26,7 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenientEquals;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.toFile;
@@ -70,7 +71,6 @@ public class XmlDataSetReaderTest extends UnitilsJUnit4 {
         assertColumnValues(table.getRow(1), "4");
     }
 
-
     /**
      * Test the loading of a data set with 2 rows for a table, but the first
      * row has less columns than the second one.
@@ -91,6 +91,28 @@ public class XmlDataSetReaderTest extends UnitilsJUnit4 {
 
         assertColumnNames(table.getRow(1), "COLUMN_1", "COLUMN_2", "COLUMN_3");
         assertColumnValues(table.getRow(1), "1", "2", "3");
+    }
+
+    @Test
+    public void parentChild() throws Exception {
+        DataSet result = xmlDataSetReader.readDataSetXml(getDataSetFile("ParentChildDataSet.xml"));
+
+        Schema schema = result.getSchema("SCHEMA_A");
+        assertLenientEquals(new String[]{"TABLE_A", "TABLE_B", "TABLE_C"}, schema.getTableNames());
+
+        Table tableA = schema.getTable("TABLE_A");
+        Row rowA = tableA.getRow(0);
+        assertColumnNames(rowA, "COLUMN_1");
+
+        Table tableB = schema.getTable("TABLE_B");
+        Row rowB = tableB.getRow(0);
+        assertColumnNames(rowB, "COLUMN_2");
+        assertSame(rowA, rowB.getParentRow());
+
+        Table tableC = schema.getTable("TABLE_C");
+        Row rowC = tableC.getRow(0);
+        assertColumnNames(rowC, "COLUMN_3");
+        assertSame(rowB, rowC.getParentRow());
     }
 
 

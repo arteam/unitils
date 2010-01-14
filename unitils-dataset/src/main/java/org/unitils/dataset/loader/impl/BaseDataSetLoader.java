@@ -18,8 +18,11 @@ package org.unitils.dataset.loader.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.core.*;
-import org.unitils.dataset.core.preparedstatement.BasePreparedStatement;
+import org.unitils.dataset.core.DataSet;
+import org.unitils.dataset.core.Row;
+import org.unitils.dataset.core.Schema;
+import org.unitils.dataset.core.Table;
+import org.unitils.dataset.core.preparedstatement.InsertUpdatePreparedStatement;
 import org.unitils.dataset.loader.DataSetLoader;
 
 import javax.sql.DataSource;
@@ -37,6 +40,7 @@ public abstract class BaseDataSetLoader implements DataSetLoader {
     private static Log logger = LogFactory.getLog(BaseDataSetLoader.class);
 
     protected DataSource dataSource;
+    protected DatabaseMetaDataHelper databaseMetaDataHelper;
 
 
     public void init(DataSource dataSource) {
@@ -53,7 +57,7 @@ public abstract class BaseDataSetLoader implements DataSetLoader {
         }
     }
 
-    protected abstract BasePreparedStatement createPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws Exception;
+    protected abstract InsertUpdatePreparedStatement createPreparedStatementWrapper(Table table, Connection connection) throws Exception;
 
 
     protected void loadDataSet(DataSet dataSet, List<String> variables) throws SQLException {
@@ -68,44 +72,35 @@ public abstract class BaseDataSetLoader implements DataSetLoader {
     }
 
     protected void loadSchema(Schema schema, List<String> variables, Connection connection) throws SQLException {
-        String schemaName = schema.getName();
         for (Table table : schema.getTables()) {
-            loadTable(schemaName, table, variables, connection);
+            loadTable(table, variables, connection);
         }
     }
 
-    protected void loadTable(String schemaName, Table table, List<String> variables, Connection connection) {
-        String tableName = table.getName();
+    protected void loadTable(Table table, List<String> variables, Connection connection) {
         for (Row row : table.getRows()) {
             if (row.getNrOfColumns() == 0) {
                 continue;
             }
-            loadRowHandleExceptions(schemaName, tableName, row, variables, connection);
+            loadRowHandleExceptions(row, variables, connection);
         }
     }
 
-    protected int loadRowHandleExceptions(String schemaName, String tableName, Row row, List<String> variables, Connection connection) {
+    protected int loadRowHandleExceptions(Row row, List<String> variables, Connection connection) {
         try {
-            return loadRow(schemaName, tableName, row, variables, connection);
+            return loadRow(row, variables, connection);
         } catch (Exception e) {
-            throw new UnitilsException("Unable to load data set row for schema: " + schemaName + ", table: " + tableName + ", row: [" + row + "], variables: " + variables, e);
+            throw new UnitilsException("Unable to load data set row for table: " + row.getTable() + ", row: [" + row + "], variables: " + variables, e);
         }
     }
 
-    protected int loadRow(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws Exception {
-        BasePreparedStatement preparedStatementWrapper = createPreparedStatementWrapper(schemaName, tableName, connection);
+    protected int loadRow(Row row, List<String> variables, Connection connection) throws Exception {
+        InsertUpdatePreparedStatement preparedStatementWrapper = createPreparedStatementWrapper(row.getTable(), connection);
         try {
-            return loadRow(row, variables, preparedStatementWrapper);
+            return preparedStatementWrapper.executeUpdate(row, variables);
         } finally {
             preparedStatementWrapper.close();
         }
-    }
-
-    protected int loadRow(Row row, List<String> variables, BasePreparedStatement preparedStatementWrapper) throws SQLException {
-        for (Column column : row.getColumns()) {
-            preparedStatementWrapper.addColumn(column, variables);
-        }
-        return preparedStatementWrapper.executeUpdate();
     }
 
 }

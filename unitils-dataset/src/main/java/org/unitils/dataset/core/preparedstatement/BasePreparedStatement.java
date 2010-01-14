@@ -18,12 +18,15 @@ package org.unitils.dataset.core.preparedstatement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.dataset.core.Column;
+import org.unitils.dataset.core.Row;
 import org.unitils.dataset.core.Value;
+import org.unitils.dataset.loader.impl.DatabaseMetaDataHelper;
 
-import java.sql.*;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.sql.Connection;
+import java.sql.ParameterMetaData;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * @author Tim Ducheyne
@@ -39,6 +42,7 @@ public abstract class BasePreparedStatement {
     protected Connection connection;
     protected PreparedStatement preparedStatement;
 
+    protected DatabaseMetaDataHelper databaseMetaDataHelper;
     protected Set<String> primaryKeyColumnNames;
     protected Set<String> remainingPrimaryKeyColumnNames;
 
@@ -47,13 +51,10 @@ public abstract class BasePreparedStatement {
         this.schemaName = schemaName;
         this.tableName = tableName;
         this.connection = connection;
-        this.primaryKeyColumnNames = getPrimaryKeyColumnNames(schemaName, tableName, connection);
-        this.remainingPrimaryKeyColumnNames = new HashSet<String>(primaryKeyColumnNames);
-    }
 
-    public int executeUpdate() throws SQLException {
-        preparedStatement = buildPreparedStatement();
-        return preparedStatement.executeUpdate();
+        databaseMetaDataHelper = createDatabaseMetaDataHelper(connection);
+        this.primaryKeyColumnNames = databaseMetaDataHelper.getPrimaryKeyColumnNames(schemaName, tableName);
+        this.remainingPrimaryKeyColumnNames = new HashSet<String>(primaryKeyColumnNames);
     }
 
     public void close() throws SQLException {
@@ -62,7 +63,22 @@ public abstract class BasePreparedStatement {
         }
     }
 
-    public void addColumn(Column column, List<String> variables) {
+    protected void addRow(Row row, List<String> variables) throws SQLException {
+        List<Column> parentColumnsForChild = createExtraParentColumnsForChild(row);
+        for (Column column : row.getColumns()) {
+            Column parentColumn = getParentColumn(column, parentColumnsForChild);
+            if (parentColumn != null) {
+                logger.warn("Child row contained a value for a parent foreign key column: " + column + ". This value will be ignored and overridden by the actual value of the parent row: " + parentColumn);
+                continue;
+            }
+            addColumn(column, variables);
+        }
+        for (Column foreignKeyColumn : parentColumnsForChild) {
+            addColumn(foreignKeyColumn, variables);
+        }
+    }
+
+    protected void addColumn(Column column, List<String> variables) {
         boolean primaryKey = isPrimaryKeyColumn(column);
 
         Value value = column.getValue(variables);
@@ -131,15 +147,6 @@ public abstract class BasePreparedStatement {
         }
     }
 
-    protected Set<String> getPrimaryKeyColumnNames(String schemaName, String tableName, Connection connection) throws SQLException {
-        Set<String> primaryKeyColumnNames = new HashSet<String>();
-        ResultSet resultSet = connection.getMetaData().getPrimaryKeys(null, schemaName, tableName);
-        while (resultSet.next()) {
-            primaryKeyColumnNames.add(resultSet.getString("COLUMN_NAME"));
-        }
-        return primaryKeyColumnNames;
-    }
-
     protected boolean isPrimaryKeyColumn(Column column) {
         for (String primaryKeyColumnName : primaryKeyColumnNames) {
             if (column.hasName(primaryKeyColumnName)) {
@@ -150,5 +157,39 @@ public abstract class BasePreparedStatement {
         return false;
     }
 
+    protected List<Column> createExtraParentColumnsForChild(Row childRow) throws SQLException {
+        List<Column> result = new ArrayList<Column>();
+        Row parentRow = childRow.getParentRow();
+        if (parentRow == null) {
+            return result;
+        }
+        Map<String, String> parentChildColumnNames = databaseMetaDataHelper.getChildForeignKeyColumns(parentRow.getTable(), childRow.getTable());
+        for (Map.Entry<String, String> entry : parentChildColumnNames.entrySet()) {
+            String parentColumnName = entry.getKey();
+            String childColumnName = entry.getValue();
+
+            Column parentColumn = parentRow.getColumn(parentColumnName);
+            if (parentColumn == null) {
+                continue;
+            }
+            String parentValue = parentColumn.getOriginalValue();
+            result.add(new Column(childColumnName, parentValue, true, (char) 0, (char) 0));
+        }
+        return result;
+    }
+
+
+    protected Column getParentColumn(Column column, List<Column> parentColumns) {
+        for (Column foreignKeyColumn : parentColumns) {
+            if (column.hasName(foreignKeyColumn.getName())) {
+                return foreignKeyColumn;
+            }
+        }
+        return null;
+    }
+
+    protected DatabaseMetaDataHelper createDatabaseMetaDataHelper(Connection connection) {
+        return new DatabaseMetaDataHelper(connection);
+    }
 
 }

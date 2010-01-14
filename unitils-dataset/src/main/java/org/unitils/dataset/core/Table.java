@@ -29,6 +29,9 @@ public class Table {
     /* The name of the table */
     private String name;
 
+    /* The schema this table belongs to */
+    private Schema schema;
+
     private boolean caseSensitive;
 
     /* The data set rows */
@@ -38,16 +41,8 @@ public class Table {
     /**
      * Creates a data set table.
      *
-     * @param name The name of the table, not null
-     */
-    public Table(String name) {
-        this(name, false);
-    }
-
-    /**
-     * Creates a data set table.
-     *
-     * @param name The name of the table, not null
+     * @param name          The name of the table, not null
+     * @param caseSensitive True if the name of the table is case sensitive
      */
     public Table(String name, boolean caseSensitive) {
         this.name = name;
@@ -62,6 +57,23 @@ public class Table {
         return name;
     }
 
+    /**
+     * @param schema The schema this table belongs to, not null
+     */
+    void setSchema(Schema schema) {
+        this.schema = schema;
+    }
+
+    /**
+     * @return The schema this table belongs to, not null
+     */
+    public Schema getSchema() {
+        return schema;
+    }
+
+    /**
+     * @return True if the name of the table is case sensitive
+     */
     public boolean isCaseSensitive() {
         return caseSensitive;
     }
@@ -73,7 +85,6 @@ public class Table {
         return rows;
     }
 
-
     /**
      * @param index the row index
      * @return The data set row, not null
@@ -83,14 +94,12 @@ public class Table {
         return rows.get(index);
     }
 
-
     /**
      * @return The nr of rows in the table >= 0
      */
     public int getNrOfRows() {
         return rows.size();
     }
-
 
     /**
      * @return True if the table does not contain any rows
@@ -105,9 +114,14 @@ public class Table {
      * @param row The row to add, not null
      */
     public void addRow(Row row) {
+        row.setTable(this);
         rows.add(row);
     }
 
+    /**
+     * @param tableName The name to compare with, not null
+     * @return True if this table has the same name respecting case sensitivity
+     */
     public boolean hasName(String tableName) {
         if (caseSensitive) {
             return name.equals(tableName);
@@ -115,4 +129,8 @@ public class Table {
         return name.equalsIgnoreCase(tableName);
     }
 
+    @Override
+    public String toString() {
+        return schema.getName() + "." + name;
+    }
 }

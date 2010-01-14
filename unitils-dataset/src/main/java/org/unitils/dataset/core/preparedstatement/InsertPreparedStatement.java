@@ -15,8 +15,6 @@
  */
 package org.unitils.dataset.core.preparedstatement;
 
-import org.unitils.dataset.core.preparedstatement.BasePreparedStatement;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -26,7 +24,7 @@ import java.util.List;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class InsertPreparedStatement extends BasePreparedStatement {
+public class InsertPreparedStatement extends InsertUpdatePreparedStatement {
 
     protected StringBuilder columnNamesPartBuilder = new StringBuilder();
     protected StringBuilder valuesPartBuilder = new StringBuilder();
@@ -41,13 +39,13 @@ public class InsertPreparedStatement extends BasePreparedStatement {
     @Override
     protected void addColumnName(String columnName, boolean primaryKey) {
         columnNamesPartBuilder.append(columnName);
-        columnNamesPartBuilder.append(',');
+        columnNamesPartBuilder.append(", ");
     }
 
     @Override
     protected void addValue(String value, boolean primaryKey) {
         valuesPartBuilder.append(value);
-        valuesPartBuilder.append(',');
+        valuesPartBuilder.append(", ");
     }
 
     @Override
@@ -78,7 +76,7 @@ public class InsertPreparedStatement extends BasePreparedStatement {
     }
 
     protected void finalizeStatementParts() {
-        columnNamesPartBuilder.setLength(columnNamesPartBuilder.length() - 1);
-        valuesPartBuilder.setLength(valuesPartBuilder.length() - 1);
+        columnNamesPartBuilder.setLength(columnNamesPartBuilder.length() - 2);
+        valuesPartBuilder.setLength(valuesPartBuilder.length() - 2);
     }
 }

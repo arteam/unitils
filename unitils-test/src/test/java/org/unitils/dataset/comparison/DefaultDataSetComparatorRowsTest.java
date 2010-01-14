@@ -55,7 +55,7 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
     @Before
     public void initialize() throws Exception {
         dataSource.returns(connection).getConnection();
-        preparedStatementWrapper.returns(comparisonResultSet).executeQuery();
+        preparedStatementWrapper.returns(comparisonResultSet).executeQuery(null, null);
         defaultDataSetComparator.init(dataSource.getMock());
 
         dataSetWith3Rows = createDataSetWith3Rows();
@@ -179,28 +179,30 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
     }
 
     private DataSet createDataSetWith3Rows() {
-        Table tableA = new Table("table_a");
-        tableA.addRow(createRow());
-        tableA.addRow(createRow());
-        tableA.addRow(createRow());
-        return createDataSet(tableA);
+        Schema schema = new Schema("my_schema", false);
+        Table table = new Table("table_a", false);
+        table.addRow(createRow(table));
+        table.addRow(createRow(table));
+        table.addRow(createRow(table));
+        schema.addTable(table);
+        return createDataSet(schema);
     }
 
     private DataSet createDataSetWithEmptyRow() {
-        Table tableA = new Table("table_a");
-        tableA.addRow(new Row());
-        return createDataSet(tableA);
+        Schema schema = new Schema("my_schema", false);
+        Table table = new Table("table_a", false);
+        table.addRow(new Row());
+        schema.addTable(table);
+        return createDataSet(schema);
     }
 
-    private DataSet createDataSet(Table table) {
-        Schema schema = new Schema("my_schema", false);
-        schema.addTable(table);
+    private DataSet createDataSet(Schema schema) {
         DataSet dataSet = new DataSet();
         dataSet.addSchema(schema);
         return dataSet;
     }
 
-    private Row createRow() {
+    private Row createRow(Table table) {
         Row row = new Row();
         row.addColumn(createColumn("column_1", "1"));
         return row;
@@ -213,7 +215,7 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
 
     private class TestDefaultDataSetComparator extends DefaultDataSetComparator {
         @Override
-        protected ComparisonPreparedStatement createPreparedStatementWrapper(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws Exception {
+        protected ComparisonPreparedStatement createPreparedStatementWrapper(Table table, Connection connection) throws Exception {
             return preparedStatementWrapper.getMock();
         }
     }

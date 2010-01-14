@@ -16,8 +16,9 @@
 package org.unitils.dataset.loader.impl;
 
 import org.unitils.dataset.core.Row;
-import org.unitils.dataset.core.preparedstatement.BasePreparedStatement;
+import org.unitils.dataset.core.Table;
 import org.unitils.dataset.core.preparedstatement.InsertPreparedStatement;
+import org.unitils.dataset.core.preparedstatement.InsertUpdatePreparedStatement;
 import org.unitils.dataset.core.preparedstatement.UpdatePreparedStatement;
 
 import java.sql.Connection;
@@ -31,28 +32,28 @@ import java.util.List;
 public class RefreshDataSetLoader extends BaseDataSetLoader {
 
 
-    protected BasePreparedStatement createPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {
-        return new UpdatePreparedStatement(schemaName, tableName, connection);
+    protected InsertUpdatePreparedStatement createPreparedStatementWrapper(Table table, Connection connection) throws SQLException {
+        return new UpdatePreparedStatement(table.getSchema().getName(), table.getName(), connection);
     }
 
 
     @Override
-    protected int loadRow(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws Exception {
-        int nrUpdates = super.loadRow(schemaName, tableName, row, variables, connection);
+    protected int loadRow(Row row, List<String> variables, Connection connection) throws Exception {
+        int nrUpdates = super.loadRow(row, variables, connection);
         if (nrUpdates > 0) {
             return nrUpdates;
         }
-        return insertRow(schemaName, tableName, row, variables, connection);
+        return insertRow(row, variables, connection);
     }
 
 
-    protected int insertRow(String schemaName, String tableName, Row row, List<String> variables, Connection connection) throws SQLException {
-        BasePreparedStatement preparedStatementWrapper = createInsertPreparedStatementWrapper(schemaName, tableName, connection);
-        return loadRow(row, variables, preparedStatementWrapper);
+    protected int insertRow(Row row, List<String> variables, Connection connection) throws SQLException {
+        InsertUpdatePreparedStatement preparedStatementWrapper = createInsertPreparedStatementWrapper(row.getTable(), connection);
+        return preparedStatementWrapper.executeUpdate(row, variables);
     }
 
-    protected BasePreparedStatement createInsertPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {
-        return new InsertPreparedStatement(schemaName, tableName, connection);
+    protected InsertUpdatePreparedStatement createInsertPreparedStatementWrapper(Table table, Connection connection) throws SQLException {
+        return new InsertPreparedStatement(table.getSchema().getName(), table.getName(), connection);
     }
 
 }

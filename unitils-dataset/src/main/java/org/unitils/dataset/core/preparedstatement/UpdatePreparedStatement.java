@@ -26,7 +26,7 @@ import java.util.List;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class UpdatePreparedStatement extends BasePreparedStatement {
+public class UpdatePreparedStatement extends InsertUpdatePreparedStatement {
 
     protected StringBuilder statementBuilder = new StringBuilder();
     protected StringBuilder whereClauseBuilder = new StringBuilder();
