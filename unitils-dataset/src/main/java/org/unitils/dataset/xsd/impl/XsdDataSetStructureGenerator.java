@@ -100,28 +100,37 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseAccessor implement
 
             String defaultSchemaName = defaultDbSupport.getSchemaName();
             writer.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
-            writer.write("<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" targetNamespace=\"unitils\">\n");
+            writer.write("<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" targetNamespace=\"unitils-dataset\">\n");
 
             for (DbSupport dbSupport : dbSupports) {
                 String schemaName = dbSupport.getSchemaName();
-                writer.write("\t<xsd:import namespace=\"" + schemaName + "\" schemaLocation=\"" + schemaName + ".xsd\" />\n");
+                writer.write("\t<xsd:import namespace=\"" + schemaName + "\" schemaLocation=\"" + schemaName + ".xsd\"/>\n");
             }
 
             writer.write("\t<xsd:element name=\"dataset\">\n");
             writer.write("\t\t<xsd:complexType>\n");
 
             writer.write("\t\t\t<xsd:choice minOccurs=\"0\" maxOccurs=\"unbounded\">\n");
+            writer.write("\t\t\t\t<xsd:element name=\"notExists\" type=\"notExists__type\"/>\n");
             for (DbSupport dbSupport : dbSupports) {
                 String schemaName = dbSupport.getSchemaName();
                 writer.write("\t\t\t\t<xsd:any namespace=\"" + schemaName + "\"/>\n");
             }
             writer.write("\t\t\t</xsd:choice>\n");
 
-            writer.write("\t\t<xsd:attribute name=\"caseSensitive\" use=\"optional\" type=\"xsd:boolean\" />\n");
-            writer.write("\t\t<xsd:attribute name=\"literalToken\" use=\"optional\" type=\"xsd:string\" />\n");
-            writer.write("\t\t<xsd:attribute name=\"variableToken\" use=\"optional\" type=\"xsd:string\" />\n");
+            writer.write("\t\t\t<xsd:attribute name=\"caseSensitive\" use=\"optional\" type=\"xsd:boolean\"/>\n");
+            writer.write("\t\t\t<xsd:attribute name=\"literalToken\" use=\"optional\" type=\"xsd:string\"/>\n");
+            writer.write("\t\t\t<xsd:attribute name=\"variableToken\" use=\"optional\" type=\"xsd:string\"/>\n");
             writer.write("\t\t</xsd:complexType>\n");
             writer.write("\t</xsd:element>\n");
+            writer.write("\t<xsd:complexType name=\"notExists__type\">\n");
+            writer.write("\t\t<xsd:choice minOccurs=\"0\" maxOccurs=\"unbounded\">\n");
+            for (DbSupport dbSupport : dbSupports) {
+                String schemaName = dbSupport.getSchemaName();
+                writer.write("\t\t\t<xsd:any namespace=\"" + schemaName + "\"/>\n");
+            }
+            writer.write("\t\t</xsd:choice>\n");
+            writer.write("\t</xsd:complexType>\n");
             writer.write("</xsd:schema>\n");
 
         } catch (Exception e) {
@@ -154,9 +163,9 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseAccessor implement
 
             for (String tableName : tableNames) {
                 writer.write("\t<xsd:complexType name=\"" + tableName + complexTypeSuffix + "\">\n");
-                writer.write("\t\t\t<xsd:choice minOccurs=\"0\" maxOccurs=\"unbounded\">\n");
-                writer.write("\t\t\t\t<xsd:any namespace=\"" + schemaName + "\"/>\n");
-                writer.write("\t\t\t</xsd:choice>\n");
+                writer.write("\t\t<xsd:choice minOccurs=\"0\" maxOccurs=\"unbounded\">\n");
+                writer.write("\t\t\t<xsd:any namespace=\"" + schemaName + "\"/>\n");
+                writer.write("\t\t</xsd:choice>\n");
 
                 Set<String> columnNames = dbSupport.getColumnNames(tableName);
                 for (String columnName : columnNames) {
@@ -186,20 +195,20 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseAccessor implement
 
             String defaultSchemaName = defaultDbSupport.getSchemaName();
             writer.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
-            writer.write("<unitils:dataset xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
+            writer.write("<uni:dataset xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
             writer.write("\t\t\txmlns=\"" + defaultSchemaName + "\"");
             for (DbSupport dbSupport : dbSupports) {
                 String schemaName = dbSupport.getSchemaName();
                 writer.write(" xmlns:" + schemaName + "=\"" + schemaName + "\"");
             }
-            writer.write(" xmlns:unitils=\"unitils\"\n");
+            writer.write(" xmlns:uni=\"unitils-dataset\"\n");
             writer.write("\t\t\txsi:schemaLocation=\"");
             for (DbSupport dbSupport : dbSupports) {
                 String schemaName = dbSupport.getSchemaName();
                 writer.write(schemaName + " " + schemaName + ".xsd ");
             }
-            writer.write("unitils dataset.xsd\">\n\n\n");
-            writer.write("</unitils:dataset>\n");
+            writer.write("unitils-dataset dataset.xsd\">\n\n\n");
+            writer.write("</uni:dataset>\n");
 
         } catch (Exception e) {
             throw new UnitilsException("Error generating template xml file: " + xsdDirectory, e);
