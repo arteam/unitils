@@ -130,10 +130,10 @@ public class XsdDataSetStructureGeneratorTemplateXmlTest extends UnitilsJUnit4 {
 
         // check content of general dataset xsd
         File dataSetTemplateXml = new File(xsdDirectory, "dataset-template.xml");
-        assertFileContains("<unitils:dataset xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"", dataSetTemplateXml);
-        assertFileContains("xmlns=\"PUBLIC\" xmlns:PUBLIC=\"PUBLIC\" xmlns:SCHEMA_A=\"SCHEMA_A\" xmlns:unitils=\"unitils\"", dataSetTemplateXml);
-        assertFileContains("xsi:schemaLocation=\"PUBLIC PUBLIC.xsd SCHEMA_A SCHEMA_A.xsd unitils dataset.xsd\"", dataSetTemplateXml);
-        assertFileContains("</unitils:dataset>", dataSetTemplateXml);
+        assertFileContains("<uni:dataset xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"", dataSetTemplateXml);
+        assertFileContains("xmlns=\"PUBLIC\" xmlns:PUBLIC=\"PUBLIC\" xmlns:SCHEMA_A=\"SCHEMA_A\" xmlns:uni=\"unitils-dataset\"", dataSetTemplateXml);
+        assertFileContains("xsi:schemaLocation=\"PUBLIC PUBLIC.xsd SCHEMA_A SCHEMA_A.xsd unitils-dataset dataset.xsd\"", dataSetTemplateXml);
+        assertFileContains("</uni:dataset>", dataSetTemplateXml);
     }
 
 

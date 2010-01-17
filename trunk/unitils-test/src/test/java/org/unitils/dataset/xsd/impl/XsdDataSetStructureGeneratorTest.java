@@ -129,29 +129,31 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
 
         // check content of general dataset xsd
         File dataSetXsd = new File(xsdDirectory, "dataset.xsd");
-        assertFileContains("targetNamespace=\"unitils\"", dataSetXsd);
-        assertFileContains("<xsd:import namespace=\"PUBLIC\" schemaLocation=\"PUBLIC.xsd\" />", dataSetXsd);
-        assertFileContains("<xsd:any namespace=\"PUBLIC\" />", dataSetXsd);
-        assertFileContains("<xsd:attribute name=\"caseSensitive\" use=\"optional\" type=\"xsd:boolean\" />", dataSetXsd);
-        assertFileContains("<xsd:attribute name=\"literalToken\" use=\"optional\" type=\"xsd:string\" />", dataSetXsd);
-        assertFileContains("<xsd:attribute name=\"variableToken\" use=\"optional\" type=\"xsd:string\" />", dataSetXsd);
+        assertFileContains("targetNamespace=\"unitils-dataset\"", dataSetXsd);
+        assertFileContains("<xsd:import namespace=\"PUBLIC\" schemaLocation=\"PUBLIC.xsd\"/>", dataSetXsd);
+        assertFileContains("<xsd:element name=\"notExists\" type=\"notExists__type\"/>", dataSetXsd);
+        assertFileContains("<xsd:any namespace=\"PUBLIC\"/>", dataSetXsd);
+        assertFileContains("<xsd:attribute name=\"caseSensitive\" use=\"optional\" type=\"xsd:boolean\"/>", dataSetXsd);
+        assertFileContains("<xsd:attribute name=\"literalToken\" use=\"optional\" type=\"xsd:string\"/>", dataSetXsd);
+        assertFileContains("<xsd:attribute name=\"variableToken\" use=\"optional\" type=\"xsd:string\"/>", dataSetXsd);
+        assertFileContains("<xsd:complexType name=\"notExists__type\">", dataSetXsd);
 
         // check content of PUBLIC schema dataset xsd
         File publicSchemaDataSetXsd = new File(xsdDirectory, "PUBLIC.xsd");
         assertFileContains("xmlns=\"PUBLIC\" targetNamespace=\"PUBLIC\"", publicSchemaDataSetXsd);
 
-        assertFileContains("<xsd:element name=\"TABLE_1\" type=\"TABLE_1__type\" />", publicSchemaDataSetXsd);
+        assertFileContains("<xsd:element name=\"TABLE_1\" type=\"TABLE_1__type\"/>", publicSchemaDataSetXsd);
         assertFileContains("<xsd:complexType name=\"TABLE_1__type\">", publicSchemaDataSetXsd);
         assertFileContains("<xsd:any namespace=\"PUBLIC\"/>", publicSchemaDataSetXsd);
-        assertFileContains("<xsd:attribute name=\"COLUMNC\" use=\"optional\" />", publicSchemaDataSetXsd);
-        assertFileContains("<xsd:attribute name=\"COLUMNA\" use=\"optional\" />", publicSchemaDataSetXsd);
-        assertFileContains("<xsd:attribute name=\"COLUMNB\" use=\"optional\" />", publicSchemaDataSetXsd);
+        assertFileContains("<xsd:attribute name=\"COLUMNC\" use=\"optional\"/>", publicSchemaDataSetXsd);
+        assertFileContains("<xsd:attribute name=\"COLUMNA\" use=\"optional\"/>", publicSchemaDataSetXsd);
+        assertFileContains("<xsd:attribute name=\"COLUMNB\" use=\"optional\"/>", publicSchemaDataSetXsd);
 
-        assertFileContains("<xsd:element name=\"TABLE_2\" type=\"TABLE_2__type\" />", publicSchemaDataSetXsd);
+        assertFileContains("<xsd:element name=\"TABLE_2\" type=\"TABLE_2__type\"/>", publicSchemaDataSetXsd);
         assertFileContains("<xsd:complexType name=\"TABLE_2__type\">", publicSchemaDataSetXsd);
         assertFileContains("<xsd:any namespace=\"PUBLIC\"/>", publicSchemaDataSetXsd);
-        assertFileContains("<xsd:attribute name=\"COLUMN2\" use=\"optional\" />", publicSchemaDataSetXsd);
-        assertFileContains("<xsd:attribute name=\"COLUMN1\" use=\"optional\" />", publicSchemaDataSetXsd);
+        assertFileContains("<xsd:attribute name=\"COLUMN2\" use=\"optional\"/>", publicSchemaDataSetXsd);
+        assertFileContains("<xsd:attribute name=\"COLUMN1\" use=\"optional\"/>", publicSchemaDataSetXsd);
     }
 
 
