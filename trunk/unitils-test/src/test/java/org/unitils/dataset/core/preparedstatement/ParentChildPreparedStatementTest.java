@@ -54,7 +54,7 @@ public class ParentChildPreparedStatementTest extends PreparedStatementTestBase 
         parentRow.addColumn(createColumn("pk1", "1"));
         parentRow.addColumn(createColumn("pk2", "2"));
 
-        Row childRow = new Row(parentRow);
+        Row childRow = new Row(parentRow, false);
         childRow.addColumn(createColumn("column_1", "1"));
 
         insertPreparedStatement = new TestInsertPreparedStatement("my_schema", "table_a", connection.getMock());

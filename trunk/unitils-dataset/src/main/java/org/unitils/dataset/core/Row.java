@@ -37,21 +37,26 @@ public class Row {
     /* The parent row that is referenced (foreign key) by this row, null if not defined */
     private Row parentRow;
 
+    /* True if the row should not exist, false if it should exist */
+    private boolean notExists;
+
 
     /**
      * Creates a data set row.
      */
     public Row() {
-        this(null);
+        this(null, false);
     }
 
     /**
      * Creates a data set row.
      *
      * @param parentRow The parent row that is referenced (foreign key) by this row, null if not defined
+     * @param notExists True if the row should not exist, false if it should exist
      */
-    public Row(Row parentRow) {
+    public Row(Row parentRow, boolean notExists) {
         this.parentRow = parentRow;
+        this.notExists = notExists;
     }
 
 
@@ -74,6 +79,13 @@ public class Row {
      */
     public Row getParentRow() {
         return parentRow;
+    }
+
+    /**
+     * @return True if the row should not exist, false if it should exist
+     */
+    public boolean isNotExists() {
+        return notExists;
     }
 
     /**
