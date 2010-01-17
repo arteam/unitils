@@ -25,6 +25,7 @@ import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import org.unitils.util.PropertyUtils;
 
@@ -37,25 +38,25 @@ import java.util.Properties;
 
 import static org.apache.commons.lang.StringUtils.deleteWhitespace;
 import static org.junit.Assert.assertTrue;
+import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.xsd.impl.XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
 /**
- * Test class for the {@link XsdDataSetStructureGenerator} for a single schema.
+ * Test class for the {@link XsdDataSetStructureGenerator} for the generation of the sample data set template xml.
  * <p/>
  * Currently this is only implemented for HsqlDb.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
+public class XsdDataSetStructureGeneratorTemplateXmlTest extends UnitilsJUnit4 {
 
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(XsdDataSetStructureGeneratorTest.class);
+    private static Log logger = LogFactory.getLog(XsdDataSetStructureGeneratorTemplateXmlTest.class);
 
     /* Tested object */
     private XsdDataSetStructureGenerator xsdDataSetStructureGenerator = new XsdDataSetStructureGenerator();
@@ -84,12 +85,15 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
             return;
         }
 
-        xsdDirectory = new File(System.getProperty("java.io.tmpdir"), "XmlSchemaDatabaseStructureGeneratorTest");
+        xsdDirectory = new File(System.getProperty("java.io.tmpdir"), "XsdDataSetStructureGeneratorTemplateXmlTest");
         if (xsdDirectory.exists()) {
             deleteDirectory(xsdDirectory);
         }
         xsdDirectory.mkdirs();
-        configuration.setProperty(PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
+
+        configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A");
+        configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", XsdDataSetStructureGenerator.class.getName());
+        configuration.setProperty(org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
 
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
         xsdDataSetStructureGenerator.init(configuration, sqlHandler);
@@ -116,11 +120,8 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
     }
 
 
-    /**
-     * Tests the generation of the xsd files for 1 database schema.
-     */
     @Test
-    public void testGenerateDataSetStructure() throws Exception {
+    public void generateDataSetTemplateXml() throws Exception {
         if (disabled) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
@@ -128,30 +129,11 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
         xsdDataSetStructureGenerator.generateDataSetStructure();
 
         // check content of general dataset xsd
-        File dataSetXsd = new File(xsdDirectory, "dataset.xsd");
-        assertFileContains("targetNamespace=\"unitils\"", dataSetXsd);
-        assertFileContains("<xsd:import namespace=\"PUBLIC\" schemaLocation=\"PUBLIC.xsd\" />", dataSetXsd);
-        assertFileContains("<xsd:any namespace=\"PUBLIC\" />", dataSetXsd);
-        assertFileContains("<xsd:attribute name=\"caseSensitive\" use=\"optional\" type=\"xsd:boolean\" />", dataSetXsd);
-        assertFileContains("<xsd:attribute name=\"literalToken\" use=\"optional\" type=\"xsd:string\" />", dataSetXsd);
-        assertFileContains("<xsd:attribute name=\"variableToken\" use=\"optional\" type=\"xsd:string\" />", dataSetXsd);
-
-        // check content of PUBLIC schema dataset xsd
-        File publicSchemaDataSetXsd = new File(xsdDirectory, "PUBLIC.xsd");
-        assertFileContains("xmlns=\"PUBLIC\" targetNamespace=\"PUBLIC\"", publicSchemaDataSetXsd);
-
-        assertFileContains("<xsd:element name=\"TABLE_1\" type=\"TABLE_1__type\" />", publicSchemaDataSetXsd);
-        assertFileContains("<xsd:complexType name=\"TABLE_1__type\">", publicSchemaDataSetXsd);
-        assertFileContains("<xsd:any namespace=\"PUBLIC\"/>", publicSchemaDataSetXsd);
-        assertFileContains("<xsd:attribute name=\"COLUMNC\" use=\"optional\" />", publicSchemaDataSetXsd);
-        assertFileContains("<xsd:attribute name=\"COLUMNA\" use=\"optional\" />", publicSchemaDataSetXsd);
-        assertFileContains("<xsd:attribute name=\"COLUMNB\" use=\"optional\" />", publicSchemaDataSetXsd);
-
-        assertFileContains("<xsd:element name=\"TABLE_2\" type=\"TABLE_2__type\" />", publicSchemaDataSetXsd);
-        assertFileContains("<xsd:complexType name=\"TABLE_2__type\">", publicSchemaDataSetXsd);
-        assertFileContains("<xsd:any namespace=\"PUBLIC\"/>", publicSchemaDataSetXsd);
-        assertFileContains("<xsd:attribute name=\"COLUMN2\" use=\"optional\" />", publicSchemaDataSetXsd);
-        assertFileContains("<xsd:attribute name=\"COLUMN1\" use=\"optional\" />", publicSchemaDataSetXsd);
+        File dataSetTemplateXml = new File(xsdDirectory, "dataset-template.xml");
+        assertFileContains("<unitils:dataset xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"", dataSetTemplateXml);
+        assertFileContains("xmlns=\"PUBLIC\" xmlns:PUBLIC=\"PUBLIC\" xmlns:SCHEMA_A=\"SCHEMA_A\" xmlns:unitils=\"unitils\"", dataSetTemplateXml);
+        assertFileContains("xsi:schemaLocation=\"PUBLIC PUBLIC.xsd SCHEMA_A SCHEMA_A.xsd unitils dataset.xsd\"", dataSetTemplateXml);
+        assertFileContains("</unitils:dataset>", dataSetTemplateXml);
     }
 
 

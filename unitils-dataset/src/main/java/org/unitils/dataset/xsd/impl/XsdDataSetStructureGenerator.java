@@ -84,6 +84,7 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseAccessor implement
         for (DbSupport dbSupport : dbSupports) {
             generateSchemaXsd(dbSupport, xsdDirectory);
         }
+        generateTemplateXml(xsdDirectory);
     }
 
 
@@ -99,7 +100,7 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseAccessor implement
 
             String defaultSchemaName = defaultDbSupport.getSchemaName();
             writer.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
-            writer.write("<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" xmlns:dflt=\"" + defaultSchemaName + "\">\n");
+            writer.write("<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" targetNamespace=\"unitils\">\n");
 
             for (DbSupport dbSupport : dbSupports) {
                 String schemaName = dbSupport.getSchemaName();
@@ -108,18 +109,17 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseAccessor implement
 
             writer.write("\t<xsd:element name=\"dataset\">\n");
             writer.write("\t\t<xsd:complexType>\n");
+
             writer.write("\t\t\t<xsd:choice minOccurs=\"0\" maxOccurs=\"unbounded\">\n");
-
-            Set<String> defaultSchemaTableNames = defaultDbSupport.getTableNames();
-            for (String tableName : defaultSchemaTableNames) {
-                writer.write("\t\t\t\t<xsd:element name=\"" + tableName + "\" type=\"dflt:" + tableName + complexTypeSuffix + "\" />\n");
+            for (DbSupport dbSupport : dbSupports) {
+                String schemaName = dbSupport.getSchemaName();
+                writer.write("\t\t\t\t<xsd:any namespace=\"" + schemaName + "\"/>\n");
             }
-            writer.write("\t\t\t\t<xsd:any namespace=\"" + defaultSchemaName + "\" />\n");
-
             writer.write("\t\t\t</xsd:choice>\n");
-            writer.write("\t\t<xsd:attribute name==\"caseSensitive\" use=\"optional\" type=\"xsd:boolean\" />\n");            
-            writer.write("\t\t<xsd:attribute name==\"literalToken\" use=\"optional\" type=\"xsd:string\" />\n");
-            writer.write("\t\t<xsd:attribute name==\"variableToken\" use=\"optional\" type=\"xsd:string\" />\n");
+
+            writer.write("\t\t<xsd:attribute name=\"caseSensitive\" use=\"optional\" type=\"xsd:boolean\" />\n");
+            writer.write("\t\t<xsd:attribute name=\"literalToken\" use=\"optional\" type=\"xsd:string\" />\n");
+            writer.write("\t\t<xsd:attribute name=\"variableToken\" use=\"optional\" type=\"xsd:string\" />\n");
             writer.write("\t\t</xsd:complexType>\n");
             writer.write("\t</xsd:element>\n");
             writer.write("</xsd:schema>\n");
@@ -143,8 +143,9 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseAccessor implement
         try {
             writer = new BufferedWriter(new FileWriter(new File(xsdDirectory, dbSupport.getSchemaName() + ".xsd")));
 
+            String schemaName = dbSupport.getSchemaName();
             writer.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
-            writer.write("<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" xmlns=\"" + dbSupport.getSchemaName() + "\" targetNamespace=\"" + dbSupport.getSchemaName() + "\">\n");
+            writer.write("<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" xmlns=\"" + schemaName + "\" targetNamespace=\"" + schemaName + "\">\n");
 
             Set<String> tableNames = dbSupport.getTableNames();
             for (String tableName : tableNames) {
@@ -153,6 +154,9 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseAccessor implement
 
             for (String tableName : tableNames) {
                 writer.write("\t<xsd:complexType name=\"" + tableName + complexTypeSuffix + "\">\n");
+                writer.write("\t\t\t<xsd:choice minOccurs=\"0\" maxOccurs=\"unbounded\">\n");
+                writer.write("\t\t\t\t<xsd:any namespace=\"" + schemaName + "\"/>\n");
+                writer.write("\t\t\t</xsd:choice>\n");
 
                 Set<String> columnNames = dbSupport.getColumnNames(tableName);
                 for (String columnName : columnNames) {
@@ -164,6 +168,41 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseAccessor implement
 
         } catch (Exception e) {
             throw new UnitilsException("Error generating xsd file: " + xsdDirectory, e);
+        } finally {
+            closeQuietly(writer);
+        }
+    }
+
+
+    /**
+     * Generates a template xml file that uses the XSDs.
+     *
+     * @param xsdDirectory The target directory, not null
+     */
+    protected void generateTemplateXml(File xsdDirectory) {
+        Writer writer = null;
+        try {
+            writer = new BufferedWriter(new FileWriter(new File(xsdDirectory, "dataset-template.xml")));
+
+            String defaultSchemaName = defaultDbSupport.getSchemaName();
+            writer.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
+            writer.write("<unitils:dataset xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
+            writer.write("\t\t\txmlns=\"" + defaultSchemaName + "\"");
+            for (DbSupport dbSupport : dbSupports) {
+                String schemaName = dbSupport.getSchemaName();
+                writer.write(" xmlns:" + schemaName + "=\"" + schemaName + "\"");
+            }
+            writer.write(" xmlns:unitils=\"unitils\"\n");
+            writer.write("\t\t\txsi:schemaLocation=\"");
+            for (DbSupport dbSupport : dbSupports) {
+                String schemaName = dbSupport.getSchemaName();
+                writer.write(schemaName + " " + schemaName + ".xsd ");
+            }
+            writer.write("unitils dataset.xsd\">\n\n\n");
+            writer.write("</unitils:dataset>\n");
+
+        } catch (Exception e) {
+            throw new UnitilsException("Error generating template xml file: " + xsdDirectory, e);
         } finally {
             closeQuietly(writer);
         }

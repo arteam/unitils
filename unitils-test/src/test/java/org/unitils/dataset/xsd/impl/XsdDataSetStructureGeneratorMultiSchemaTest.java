@@ -15,28 +15,18 @@
  */
 package org.unitils.dataset.xsd.impl;
 
-import static org.apache.commons.lang.StringUtils.deleteWhitespace;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
-import static org.unitils.database.SQLUnitils.executeUpdate;
-import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
-import org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator;
-import static org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
-import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -45,6 +35,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
 import java.util.Properties;
+
+import static org.apache.commons.lang.StringUtils.deleteWhitespace;
+import static org.junit.Assert.assertTrue;
+import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
+import static org.unitils.database.SQLUnitils.executeUpdate;
+import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import static org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
+import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
 /**
  * Test class for the {@link XsdDataSetStructureGenerator} using multiple schemas.
@@ -60,7 +60,7 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
     private static Log logger = LogFactory.getLog(XsdDataSetStructureGeneratorMultiSchemaTest.class);
 
     /* Tested object */
-    private DataSetStructureGenerator dataSetStructureGenerator;
+    private XsdDataSetStructureGenerator xsdDataSetStructureGenerator = new XsdDataSetStructureGenerator();
 
     /* The target directory for the test xsd files */
     private File xsdDirectory;
@@ -93,7 +93,9 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
         configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A");
         configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", XsdDataSetStructureGenerator.class.getName());
         configuration.setProperty(PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
-        dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, new DefaultSQLHandler(dataSource));
+
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
+        xsdDataSetStructureGenerator.init(configuration, sqlHandler);
 
         dropTestTables();
         createTestTables();
@@ -110,7 +112,7 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
         }
         dropTestTables();
         try {
-            deleteDirectory(xsdDirectory);
+            //deleteDirectory(xsdDirectory);
         } catch (Exception e) {
             // ignore
         }
@@ -126,21 +128,19 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        dataSetStructureGenerator.generateDataSetStructure();
+        xsdDataSetStructureGenerator.generateDataSetStructure();
 
         // check content of general dataset xsd
         File dataSetXsd = new File(xsdDirectory, "dataset.xsd");
-        assertFileContains("xmlns:dflt=\"PUBLIC\"", dataSetXsd);
+        assertFileContains("targetNamespace=\"unitils\"", dataSetXsd);
         assertFileContains("<xsd:import namespace=\"PUBLIC\" schemaLocation=\"PUBLIC.xsd\" />", dataSetXsd);
         assertFileContains("<xsd:import namespace=\"SCHEMA_A\" schemaLocation=\"SCHEMA_A.xsd\" />", dataSetXsd);
-        assertFileContains("<xsd:element name=\"TABLE_1\" type=\"dflt:TABLE_1__type\" />", dataSetXsd);
-        assertFileContains("<xsd:element name=\"TABLE_2\" type=\"dflt:TABLE_2__type\" />", dataSetXsd);
         assertFileContains("<xsd:any namespace=\"PUBLIC\" />", dataSetXsd);
+        assertFileContains("<xsd:any namespace=\"SCHEMA_A\" />", dataSetXsd);
 
         // check content of PUBLIC schema dataset xsd
         File publicSchemaDataSetXsd = new File(xsdDirectory, "PUBLIC.xsd");
-        assertFileContains("xmlns=\"PUBLIC\"", publicSchemaDataSetXsd);
-        assertFileContains("targetNamespace=\"PUBLIC\"", publicSchemaDataSetXsd);
+        assertFileContains("xmlns=\"PUBLIC\" targetNamespace=\"PUBLIC\"", publicSchemaDataSetXsd);
         assertFileContains("<xsd:element name=\"TABLE_1\" type=\"TABLE_1__type\" />", publicSchemaDataSetXsd);
         assertFileContains("<xsd:complexType name=\"TABLE_1__type\">", publicSchemaDataSetXsd);
         assertFileContains("<xsd:element name=\"TABLE_2\" type=\"TABLE_2__type\" />", publicSchemaDataSetXsd);
@@ -148,8 +148,7 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
 
         // check content of PUBLIC schema dataset xsd
         File schemaADataSetXsd = new File(xsdDirectory, "SCHEMA_A.xsd");
-        assertFileContains("xmlns=\"SCHEMA_A\"", schemaADataSetXsd);
-        assertFileContains("targetNamespace=\"SCHEMA_A\"", schemaADataSetXsd);
+        assertFileContains("xmlns=\"SCHEMA_A\" targetNamespace=\"SCHEMA_A\"", schemaADataSetXsd);
         assertFileContains("<xsd:element name=\"TABLE_1\" type=\"TABLE_1__type\" />", schemaADataSetXsd);
         assertFileContains("<xsd:complexType name=\"TABLE_1__type\">", schemaADataSetXsd);
         assertFileContains("<xsd:element name=\"TABLE_4\" type=\"TABLE_4__type\" />", schemaADataSetXsd);
