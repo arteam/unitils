@@ -46,6 +46,10 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
     /* The resulting data set */
     protected DataSet dataSet;
 
+    protected boolean unitilsDataSetNamespaceDeclared;
+
+    protected boolean notExists;
+
     protected boolean caseSensitive;
 
     protected char literalToken;
@@ -89,31 +93,55 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
      */
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        // begin element of data set, if default namespace set, it will override the default schema
         if ("dataset".equals(localName)) {
-            if (!isEmpty(uri)) {
-                defaultSchemaName = uri;
-            }
-            dataSet = createDataSet(attributes);
-            caseSensitive = getCaseSensitive(attributes);
-            literalToken = getLiteralToken(attributes);
-            variableToken = getVariableToken(attributes);
+            handleDataSetElement(uri, attributes);
             return;
         }
-        String schemaName = getSchemaName(uri);
-        addSchema(schemaName, localName, attributes, dataSet);
+        if (isUnitilsDataSetNamespace(uri) && "notExists".equals(localName)) {
+            handleNotExistsStartElement();
+            return;
+        }
+        handleRowElement(uri, localName, attributes);
     }
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        if (!"dataset".equals(localName) && !parentRows.isEmpty()) {
+        if (isUnitilsDataSetNamespace(uri) && "notExists".equals(localName)) {
+            handleNotExistsEndElement();
+            return;
+        }
+        if (!parentRows.isEmpty()) {
             parentRows.pop();
         }
     }
 
-    protected DataSet createDataSet(Attributes attributes) {
-        return new DataSet();
+
+    protected void handleDataSetElement(String uri, Attributes attributes) {
+        unitilsDataSetNamespaceDeclared = "unitils-dataset".equals(uri);
+        dataSet = createDataSet(attributes);
+        caseSensitive = getCaseSensitive(attributes);
+        literalToken = getLiteralToken(attributes);
+        variableToken = getVariableToken(attributes);
     }
+
+    protected void handleNotExistsStartElement() {
+        notExists = true;
+    }
+
+    protected void handleNotExistsEndElement() {
+        notExists = false;
+    }
+
+    protected void handleRowElement(String uri, String localName, Attributes attributes) {
+        String schemaName = getSchemaName(uri);
+        addRow(schemaName, localName, attributes);
+    }
+
+
+    protected boolean isUnitilsDataSetNamespace(String uri) {
+        return "unitils-dataset".equals(uri) || !unitilsDataSetNamespaceDeclared;
+    }
+
 
     protected boolean getCaseSensitive(Attributes attributes) {
         String caseSensitiveAttribute = attributes.getValue("caseSensitive");
@@ -152,34 +180,37 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
     }
 
 
-    protected void addSchema(String schemaName, String tableName, Attributes attributes, DataSet schemaCollection) {
-        Schema schema = schemaCollection.getSchema(schemaName);
-        if (schema == null) {
-            schema = new Schema(schemaName, caseSensitive);
-            schemaCollection.addSchema(schema);
+    protected void addRow(String schemaName, String tableName, Attributes attributes) {
+        Row parentRow = getParentRow();
+        Row row = new Row(parentRow, notExists);
+        for (int i = 0; i < attributes.getLength(); i++) {
+            Column column = new Column(attributes.getQName(i), attributes.getValue(i), caseSensitive, literalToken, variableToken);
+            row.addColumn(column);
         }
-        addTable(tableName, schema, attributes);
+        Table table = getTable(schemaName, tableName);
+        table.addRow(row);
+        parentRows.push(row);
     }
 
-    protected void addTable(String tableName, Schema schema, Attributes attributes) {
+    protected Schema getSchema(String schemaName) {
+        Schema schema = dataSet.getSchema(schemaName);
+        if (schema == null) {
+            schema = new Schema(schemaName, caseSensitive);
+            dataSet.addSchema(schema);
+        }
+        return schema;
+    }
+
+    protected Table getTable(String schemaName, String tableName) {
+        Schema schema = getSchema(schemaName);
         Table table = schema.getTable(tableName);
         if (table == null) {
             table = new Table(tableName, caseSensitive);
             schema.addTable(table);
         }
-        addRow(attributes, table);
+        return table;
     }
 
-    protected void addRow(Attributes attributes, Table table) {
-        Row parentRow = getParentRow();
-        Row row = new Row(parentRow);
-        for (int i = 0; i < attributes.getLength(); i++) {
-            Column column = new Column(attributes.getQName(i), attributes.getValue(i), caseSensitive, literalToken, variableToken);
-            row.addColumn(column);
-        }
-        table.addRow(row);
-        parentRows.push(row);
-    }
 
     protected Row getParentRow() {
         if (parentRows.isEmpty()) {
@@ -194,6 +225,12 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
         }
         return uri;
     }
+
+
+    protected DataSet createDataSet(Attributes attributes) {
+        return new DataSet();
+    }
+
 
     /**
      * Overridden to re-throw exceptions.

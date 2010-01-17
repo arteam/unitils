@@ -25,8 +25,7 @@ import java.io.File;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenientEquals;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.toFile;
@@ -113,6 +112,41 @@ public class XmlDataSetReaderTest extends UnitilsJUnit4 {
         Row rowC = tableC.getRow(0);
         assertColumnNames(rowC, "COLUMN_3");
         assertSame(rowB, rowC.getParentRow());
+    }
+
+    @Test
+    public void notExists() throws Exception {
+        DataSet result = xmlDataSetReader.readDataSetXml(getDataSetFile("NotExistsDataSet.xml"));
+
+        assertLenientEquals(new String[]{"SCHEMA_A"}, result.getSchemaNames());
+        Schema schema = result.getSchema("SCHEMA_A");
+
+        assertLenientEquals(new String[]{"TABLE_A"}, schema.getTableNames());
+        Table table = schema.getTable("TABLE_A");
+        assertEquals(3, table.getNrOfRows());
+
+        assertTrue(table.getRow(0).isNotExists());
+        assertTrue(table.getRow(1).isNotExists());
+        assertFalse(table.getRow(2).isNotExists());
+    }
+
+    @Test
+    public void fullyQualifiedWithNamespacesAndXsdDeclarations() throws Exception {
+        DataSet result = xmlDataSetReader.readDataSetXml(getDataSetFile("FullyQualifiedDataSet.xml"));
+
+        assertLenientEquals(new String[]{"SCHEMA_A", "SCHEMA_B"}, result.getSchemaNames());
+
+        Schema schemaA = result.getSchema("SCHEMA_A");
+        Table table1 = schemaA.getTable("TABLE_A");
+        assertEquals(3, table1.getNrOfRows());
+        assertFalse(table1.getRow(0).isNotExists());
+        assertFalse(table1.getRow(1).isNotExists());
+        assertTrue(table1.getRow(2).isNotExists());
+
+        Schema schemaB = result.getSchema("SCHEMA_B");
+        Table table2 = schemaB.getTable("TABLE_A");
+        assertEquals(1, table2.getNrOfRows());
+        assertFalse(table2.getRow(0).isNotExists());
     }
 
 

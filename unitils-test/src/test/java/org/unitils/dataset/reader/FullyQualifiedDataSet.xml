@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<uni:dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns="SCHEMA_A" xmlns:SCHEMA_A="SCHEMA_A" xmlns:SCHEMA_B="SCHEMA_B" xmlns:uni="unitils-dataset"
+             xsi:schemaLocation="SCHEMA_A SCHEMA_A.xsd SCHEMA_B SCHEMA_B.xsd unitils-dataset dataset.xsd">
+
+    <TABLE_A COLUMN_1="1"/>
+    <SCHEMA_A:TABLE_A COLUMN_1="2"/>
+    <SCHEMA_B:TABLE_A COLUMN_1="3"/>
+    
+    <uni:notExists>
+        <TABLE_A COLUMN_1="1"/>
+    </uni:notExists>
+
+</uni:dataset>
