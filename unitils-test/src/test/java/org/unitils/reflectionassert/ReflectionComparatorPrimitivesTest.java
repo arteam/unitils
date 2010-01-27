@@ -73,6 +73,13 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
         reflectionComparator = createRefectionComparator();
     }
 
+    /**
+     * Test for two unequal but similar longs. (fix of UNI-117)
+     */
+    public void testGetDifference_longsNearlyTheSame() {
+        Difference result = reflectionComparator.getDifference(719108101113563415L, 719108101113563395L);
+        assertNotNull(result);
+    }
 
     /**
      * Test for two equal primitives.
