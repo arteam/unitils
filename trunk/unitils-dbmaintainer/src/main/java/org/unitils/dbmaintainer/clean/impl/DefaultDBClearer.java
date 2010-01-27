@@ -128,6 +128,8 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
      */
     protected Map<String, Set<String>> typesToPreserve;
 
+    private MultiPassErrorHandler multiPassErrorHandler;
+
 
     /**
      * Initializes the the DBClearer. The list of database items that should be preserved is retrieved from the given
@@ -160,15 +162,19 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
                 continue;
             }
             logger.info("Clearing (dropping) database schema " + dbSupport.getSchemaName());
-            dropSynonyms(dbSupport);
-            dropViews(dbSupport);
-            dropMaterializedViews(dbSupport);
-            dropSequences(dbSupport);
-            dropTables(dbSupport);
-
-            dropTriggers(dbSupport);
-            dropTypes(dbSupport);
-            // todo drop functions, stored procedures.
+            multiPassErrorHandler = new MultiPassErrorHandler();
+            do{
+                dropSynonyms(dbSupport);
+                dropViews(dbSupport);
+                dropMaterializedViews(dbSupport);
+                dropSequences(dbSupport);
+                dropTables(dbSupport);
+    
+                dropTriggers(dbSupport);
+                dropTypes(dbSupport);
+                // todo drop functions, stored procedures.
+            }
+            while ( multiPassErrorHandler.continueExecutionAfterPass() );
         }
     }
 
@@ -187,7 +193,11 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
                 continue;
             }
             logger.debug("Dropping table " + tableName + " in database schema " + dbSupport.getSchemaName());
-            dbSupport.dropTable(tableName);
+            try {
+                dbSupport.dropTable(tableName);
+            } catch (RuntimeException e) {
+                multiPassErrorHandler.addError(e);
+            }
         }
     }
 
@@ -206,7 +216,11 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
                 continue;
             }
             logger.debug("Dropping view " + viewName + " in database schema " + dbSupport.getSchemaName());
-            dbSupport.dropView(viewName);
+            try {
+                dbSupport.dropView(viewName);
+            } catch (RuntimeException e) {
+                multiPassErrorHandler.addError(e);
+            }
         }
     }
 
@@ -228,7 +242,11 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
                 continue;
             }
             logger.debug("Dropping materialized view " + materializedViewName + " in database schema " + dbSupport.getSchemaName());
-            dbSupport.dropMaterializedView(materializedViewName);
+            try {
+                dbSupport.dropMaterializedView(materializedViewName);
+            } catch (RuntimeException e) {
+                multiPassErrorHandler.addError(e);
+            }
         }
     }
 
@@ -250,7 +268,11 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
                 continue;
             }
             logger.debug("Dropping synonym " + synonymName + " in database schema " + dbSupport.getSchemaName());
-            dbSupport.dropSynonym(synonymName);
+            try {
+                dbSupport.dropSynonym(synonymName);
+            } catch (RuntimeException e) {
+                multiPassErrorHandler.addError(e);
+            }
         }
     }
 
@@ -272,7 +294,11 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
                 continue;
             }
             logger.debug("Dropping sequence " + sequenceName + " in database schema " + dbSupport.getSchemaName());
-            dbSupport.dropSequence(sequenceName);
+            try {
+                dbSupport.dropSequence(sequenceName);
+            } catch (RuntimeException e) {
+                multiPassErrorHandler.addError(e);
+            }
         }
     }
 
@@ -294,7 +320,11 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
                 continue;
             }
             logger.debug("Dropping trigger " + triggerName + " in database schema " + dbSupport.getSchemaName());
-            dbSupport.dropTrigger(triggerName);
+            try {
+                dbSupport.dropTrigger(triggerName);
+            } catch (RuntimeException e) {
+                multiPassErrorHandler.addError(e);
+            }
         }
     }
 
@@ -316,7 +346,11 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
                 continue;
             }
             logger.debug("Dropping type " + typeName + " in database schema " + dbSupport.getSchemaName());
-            dbSupport.dropType(typeName);
+            try {
+                dbSupport.dropType(typeName);
+            } catch (RuntimeException e) {
+                multiPassErrorHandler.addError(e);
+            }
         }
     }
 
