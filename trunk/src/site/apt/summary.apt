@@ -86,6 +86,16 @@ Summary
     []
     
 
+* Articles
+~~~~~~~~~~~~~~~
+    
+    * {{{http://www.sizovpoint.com/2010/01/step-by-step-guide-to-jpa-enabled-unit.html}Step-by-step guide to JPA-enabled unit testing}}  <Vasily Sizov 2010-01>
+
+    * {{{http://martinaharris.com/2009/12/unitils-update-dao-testing/}Unitils update – Its great!}}  <Martin Harris 2009-12>
+     
+    * {{{http://martinaharris.com/2009/11/lessons-on-testing-jpa-dao/}Lessons on testing a JPA Dao}}  <Martin Harris 2009-11>
+
+
 * News
 ~~~~~~
 
