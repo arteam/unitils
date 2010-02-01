@@ -21,6 +21,7 @@ import org.unitils.dataset.comparison.DatabaseContentRetriever;
 import org.unitils.dataset.comparison.ExpectedDataSetAssert;
 import org.unitils.dataset.core.DataSet;
 import org.unitils.dataset.core.Row;
+import org.unitils.dataset.core.Table;
 
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class DefaultExpectedDataSetAssert implements ExpectedDataSetAssert {
     /**
      * Initializes the data set assert.
      *
-     * @param dataSetComparator     The comparator that will create the data set comparison, not null
+     * @param dataSetComparator        The comparator that will create the data set comparison, not null
      * @param databaseContentRetriever The logger for displaying the database content, null if the content should not be logged
      */
     public void init(DataSetComparator dataSetComparator, DatabaseContentRetriever databaseContentRetriever) {
@@ -68,7 +69,7 @@ public class DefaultExpectedDataSetAssert implements ExpectedDataSetAssert {
                 String databaseContent = databaseContentRetriever.getActualDatabaseContentForDataSetComparison(dataSetComparison);
 
                 StringBuilder messageBuilder = new StringBuilder(message);
-                messageBuilder.append("== Actual Database Content ==\n\n");
+                messageBuilder.append("== Actual database content ==\n\n");
                 messageBuilder.append(databaseContent);
                 message = messageBuilder.toString();
             }
@@ -92,31 +93,34 @@ public class DefaultExpectedDataSetAssert implements ExpectedDataSetAssert {
 
 
     protected void appendSchemaComparison(SchemaComparison schemaComparison, StringBuilder result) {
-        String schemaName = schemaComparison.getName();
         for (TableComparison tableComparison : schemaComparison.getTableComparisons()) {
             if (tableComparison.isExpectedNoMoreRecordsButFoundMore()) {
-                appendExpectedToBeEmptyButWasNotTableComparison(schemaName, tableComparison, result);
+                appendExpectedToBeEmptyButWasNotTableComparison(tableComparison, result);
             } else {
-                appendTableComparison(schemaName, tableComparison, result);
+                appendTableComparison(tableComparison, result);
             }
         }
     }
 
-    protected void appendExpectedToBeEmptyButWasNotTableComparison(String schemaName, TableComparison tableComparison, StringBuilder result) {
+    protected void appendExpectedToBeEmptyButWasNotTableComparison(TableComparison tableComparison, StringBuilder result) {
         result.append("Expected no more database records in table ");
-        appendTableName(schemaName, tableComparison.getName(), result);
-        result.append(" but found more records.\n");
+        appendTableName(tableComparison, result);
+        result.append(" but found more records.\n\n");
     }
 
-    protected void appendTableComparison(String schemaName, TableComparison tableComparison, StringBuilder result) {
+    protected void appendTableComparison(TableComparison tableComparison, StringBuilder result) {
         result.append("Found differences for table ");
-        appendTableName(schemaName, tableComparison.getName(), result);
+        appendTableName(tableComparison, result);
         result.append(":\n");
         for (Row missingRow : tableComparison.getMissingRows()) {
             appendMissingRow(missingRow, result);
         }
         for (RowComparison rowComparison : tableComparison.getBestRowComparisons()) {
-            appendBestRowComparison(rowComparison, result);
+            if (rowComparison.shouldNotHaveMatched()) {
+                appendRowThatShouldNotHaveMatch(rowComparison.getDataSetRow(), result);
+            } else {
+                appendBestRowComparison(rowComparison, result);
+            }
         }
         result.append('\n');
     }
@@ -125,6 +129,12 @@ public class DefaultExpectedDataSetAssert implements ExpectedDataSetAssert {
     protected void appendMissingRow(Row missingRow, StringBuilder result) {
         result.append("* No database record found for data set row:  ");
         result.append(missingRow);
+        result.append("\n");
+    }
+
+    protected void appendRowThatShouldNotHaveMatch(Row rowThatShouldNotHaveMatch, StringBuilder result) {
+        result.append("* Expected not to find a match for data set row: ");
+        result.append(rowThatShouldNotHaveMatch);
         result.append("\n");
     }
 
@@ -163,10 +173,11 @@ public class DefaultExpectedDataSetAssert implements ExpectedDataSetAssert {
         actualValues.append(rightPad(actualValue, columnSize));
     }
 
-    protected void appendTableName(String schemaName, String tableName, StringBuilder result) {
-        result.append(schemaName);
+    protected void appendTableName(TableComparison tableComparison, StringBuilder result) {
+        Table table = tableComparison.getDataSetTable();
+        result.append(table.getSchema().getName());
         result.append(".");
-        result.append(tableName);
+        result.append(table.getName());
     }
 
 }

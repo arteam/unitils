@@ -21,6 +21,8 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.dataset.comparison.impl.*;
 import org.unitils.dataset.core.Column;
 import org.unitils.dataset.core.Row;
+import org.unitils.dataset.core.Schema;
+import org.unitils.dataset.core.Table;
 import org.unitils.mock.Mock;
 
 import static org.junit.Assert.assertTrue;
@@ -108,32 +110,32 @@ public class DefaultExpectedDataSetAssertTest extends UnitilsJUnit4 {
     }
 
     private DataSetComparison createMatchingDataSetComparison() {
-        return createDataSetComparison(new TableComparison("table_a"));
+        return createDataSetComparison(new TableComparison(createTable("schema_a", "table_a")));
     }
 
     private DataSetComparison createDataSetComparisonWithDifferences() {
-        TableComparison tableComparison = new TableComparison("table_a");
+        TableComparison tableComparison = new TableComparison(createTable("schema_a", "table_a"));
         tableComparison.replaceIfBetterRowComparison("1", createRowDifference1());
         tableComparison.replaceIfBetterRowComparison("2", createRowDifference2());
         return createDataSetComparison(tableComparison);
     }
 
     private DataSetComparison createDataSetComparisonWithMissingRows() {
-        TableComparison tableComparison = new TableComparison("table_a");
+        TableComparison tableComparison = new TableComparison(createTable("schema_a", "table_a"));
         tableComparison.addMissingRow(createRow(createColumn("column_1", "1"), createColumn("column_2", "2")));
         tableComparison.addMissingRow(createRow(createColumn("column_3", "5"), createColumn("column_4", "6")));
         return createDataSetComparison(tableComparison);
     }
 
     private DataSetComparison createDataSetComparisonWithExpectedButNotEmptyTable() {
-        TableComparison tableComparison = new TableComparison("table_a");
+        TableComparison tableComparison = new TableComparison(createTable("schema_a", "table_a"));
         tableComparison.setExpectedNoMoreRecordsButFoundMore(true);
         return createDataSetComparison(tableComparison);
     }
 
 
     private DataSetComparison createDataSetComparison(TableComparison tableComparison) {
-        SchemaComparison schemaComparison = new SchemaComparison("schema_a");
+        SchemaComparison schemaComparison = new SchemaComparison(tableComparison.getDataSetTable().getSchema());
         schemaComparison.addTableComparison(tableComparison);
 
         DataSetComparison dataSetComparison = new DataSetComparison();
@@ -159,8 +161,16 @@ public class DefaultExpectedDataSetAssertTest extends UnitilsJUnit4 {
         return rowComparison;
     }
 
+
+    private Table createTable(String schemaName, String tableName) {
+        Schema schema = new Schema(schemaName, false);
+        Table table = new Table(tableName, false);
+        schema.addTable(table);
+        return table;
+    }
+
     private Column createColumn(String name, String value) {
-        return new Column(name, value, false, '=', '$');
+        return new Column(name, value, false);
     }
 
     private Row createRow(Column... columns) {

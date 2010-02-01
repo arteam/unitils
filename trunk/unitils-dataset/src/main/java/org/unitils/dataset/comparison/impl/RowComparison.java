@@ -90,6 +90,13 @@ public class RowComparison {
     }
 
     /**
+     * @return True if no match should have been found for the row
+     */
+    public boolean shouldNotHaveMatched() {
+        return dataSetRow.isNotExists();
+    }
+
+    /**
      * @return True if both rows are a match
      */
     public boolean isMatch() {

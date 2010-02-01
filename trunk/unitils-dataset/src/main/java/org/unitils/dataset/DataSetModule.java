@@ -34,6 +34,7 @@ import org.unitils.dataset.core.DataSet;
 import org.unitils.dataset.factory.DataSetFactory;
 import org.unitils.dataset.factory.DataSetResolver;
 import org.unitils.dataset.loader.DataSetLoader;
+import org.unitils.dataset.loader.impl.Database;
 import org.unitils.dataset.util.DataSetAnnotationUtil;
 
 import javax.sql.DataSource;
@@ -72,19 +73,13 @@ public class DataSetModule implements Module {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DataSetModule.class);
 
-    /**
-     * Map holding the default configuration of the dbunit module annotations
-     */
+    /* Map holding the default configuration of the dbunit module annotations */
     protected Map<Class<? extends Annotation>, Map<String, String>> defaultAnnotationPropertyValues;
 
-    /**
-     * The unitils configuration
-     */
+    /* The unitils configuration */
     protected Properties configuration;
 
-    /**
-     * A utilitly class for getting the values from the annotations.
-     */
+    /* A utility class for getting the values from the annotations. */
     protected DataSetAnnotationUtil dataSetAnnotationUtil;
 
 
@@ -97,7 +92,7 @@ public class DataSetModule implements Module {
     public void init(Properties configuration) {
         this.configuration = configuration;
         this.dataSetAnnotationUtil = new DataSetAnnotationUtil(configuration);
-        defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(DataSetModule.class, configuration, org.unitils.dataset.annotation.DataSet.class, ExpectedDataSet.class);
+        this.defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(DataSetModule.class, configuration, org.unitils.dataset.annotation.DataSet.class, ExpectedDataSet.class);
     }
 
 
@@ -158,36 +153,37 @@ public class DataSetModule implements Module {
         }
     }
 
-
     protected void loadDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, DataSetFactory dataSetFactory, Class<? extends DataSetLoader> dataSetLoaderClass) {
+        Database database = createDatabase();
+        DataSetLoader dataSetLoader = createDataSetLoader(dataSetLoaderClass, database);
+
         List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
         for (File dataSetFile : dataSetFiles) {
-            loadDataSet(dataSetFile, variables, testClass, dataSetFactory, dataSetLoaderClass);
+            loadDataSet(dataSetFile, variables, dataSetFactory, dataSetLoader, database);
         }
     }
 
     protected void assertExpectedDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, DataSetFactory dataSetFactory, boolean logDatabaseContentOnAssertionError) {
+        Database database = createDatabase();
         List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
         for (File dataSetFile : dataSetFiles) {
-            assertExpectedDataSet(dataSetFile, variables, testClass, dataSetFactory, logDatabaseContentOnAssertionError);
+            assertExpectedDataSet(dataSetFile, variables, dataSetFactory, logDatabaseContentOnAssertionError, database);
         }
     }
 
 
-    protected void loadDataSet(File dataSetFile, List<String> variables, Class<?> testClass, DataSetFactory dataSetFactory, Class<? extends DataSetLoader> dataSetLoaderClass) {
-        DataSet dataSet = dataSetFactory.createDataSet(dataSetFile);
+    protected void loadDataSet(File dataSetFile, List<String> variables, DataSetFactory dataSetFactory, DataSetLoader dataSetLoader, Database database) {
+        DataSet dataSet = dataSetFactory.createDataSet(dataSetFile, database.getSchemaName());
         if (dataSet == null) {
             // no data set specified
             return;
         }
-
         logger.info("Loading data sets file: " + dataSetFile);
-        DataSetLoader dataSetLoader = createDataSetLoader(dataSetLoaderClass);
         dataSetLoader.load(dataSet, variables);
     }
 
-    protected void assertExpectedDataSet(File dataSetFile, List<String> variables, Class<?> testClass, DataSetFactory dataSetFactory, boolean logDatabaseContentOnAssertionError) {
-        DataSet dataSet = dataSetFactory.createDataSet(dataSetFile);
+    protected void assertExpectedDataSet(File dataSetFile, List<String> variables, DataSetFactory dataSetFactory, boolean logDatabaseContentOnAssertionError, Database database) {
+        DataSet dataSet = dataSetFactory.createDataSet(dataSetFile, database.getSchemaName());
         if (dataSet == null) {
             // no data set specified
             return;
@@ -196,11 +192,10 @@ public class DataSetModule implements Module {
         logger.info("Comparing data sets file: " + dataSetFile);
         DatabaseContentRetriever databaseContentLogger = null;
         if (logDatabaseContentOnAssertionError) {
-            databaseContentLogger = createDatabaseContentLogger();
+            databaseContentLogger = createDatabaseContentLogger(database);
         }
-        DataSetComparator dataSetComparator = createDataSetComparator();
+        DataSetComparator dataSetComparator = createDataSetComparator(dataSet, database);
         ExpectedDataSetAssert expectedDataSetAssert = createExpectedDataSetAssert(dataSetComparator, databaseContentLogger);
-
         expectedDataSetAssert.assertEqual(dataSet, variables);
     }
 
@@ -220,47 +215,50 @@ public class DataSetModule implements Module {
     /* FACTORY METHODS */
 
     /**
-     * @return The data source for the unit test database, not null
-     */
-    protected DataSource getDataSource() {
-        return getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded();
-    }
-
-    /**
      * @param dataSetFactoryClass The type, not null
      * @return An initialized data set factory of the given type, not null
      */
     protected DataSetFactory createDataSetFactory(Class<? extends DataSetFactory> dataSetFactoryClass) {
         DataSetFactory dataSetFactory = createInstanceOfType(dataSetFactoryClass, false);
-        dataSetFactory.init(configuration, getDefaultDbSupport().getSchemaName());
+        dataSetFactory.init(configuration);
         return dataSetFactory;
     }
 
     /**
      * @param dataSetLoaderClass The type, not null
+     * @param database           The access to the database, not null
      * @return An initialized data set loader of the given type, not null
      */
-    protected DataSetLoader createDataSetLoader(Class<? extends DataSetLoader> dataSetLoaderClass) {
+    protected DataSetLoader createDataSetLoader(Class<? extends DataSetLoader> dataSetLoaderClass, Database database) {
         DataSetLoader dataSetLoader = createInstanceOfType(dataSetLoaderClass, false);
-        dataSetLoader.init(getDataSource());
+        dataSetLoader.init(database);
         return dataSetLoader;
     }
 
+
     /**
+     * @param dataSet  The data set that will be compared, not null
+     * @param database The access to the database, not null
      * @return An initialized data set comparator, as configured in the Unitils configuration, not null
      */
-    protected DataSetComparator createDataSetComparator() {
+    protected DataSetComparator createDataSetComparator(DataSet dataSet, Database database) {
         DataSetComparator dataSetComparator = getInstanceOf(DataSetComparator.class, configuration);
-        dataSetComparator.init(getDataSource());
+        dataSetComparator.init(database);
         return dataSetComparator;
     }
 
+    protected Database createDatabase() {
+        DbSupport defaultDbSupport = getDefaultDbSupport();
+        return new Database(defaultDbSupport);
+    }
+
     /**
+     * @param database The access to the database, not null
      * @return An initialized database logger, as configured in the Unitils configuration, not null
      */
-    protected DatabaseContentRetriever createDatabaseContentLogger() {
+    protected DatabaseContentRetriever createDatabaseContentLogger(Database database) {
         DatabaseContentRetriever databaseContentLogger = getInstanceOf(DatabaseContentRetriever.class, configuration);
-        databaseContentLogger.init(getDataSource());
+        databaseContentLogger.init(database);
         return databaseContentLogger;
     }
 

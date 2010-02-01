@@ -52,19 +52,23 @@ public class XmlDataSetReaderDataSetAttributesTest extends UnitilsJUnit4 {
     public void defaultDataSetAttributes() throws Exception {
         DataSet result = xmlDataSetReader.readDataSetXml(getDataSetFile("LessColumnsFirstDataSet.xml"));
 
+        assertEquals('=', result.getLiteralToken());
+        assertEquals('$', result.getVariableToken());
+
         Schema schema = result.getSchema("SCHEMA_A");
         Table table = schema.getTable("TABLE_A");
         Column column = table.getRow(0).getColumns().get(0);
         assertFalse(schema.isCaseSensitive());
         assertFalse(table.isCaseSensitive());
         assertFalse(column.isCaseSensitive());
-        assertEquals('=', column.getLiteralToken());
-        assertEquals('$', column.getVariableToken());
     }
 
     @Test
     public void overridingDataSetAttributes() throws Exception {
         DataSet result = xmlDataSetReader.readDataSetXml(getDataSetFile("OverridingAttributesDataSet.xml"));
+
+        assertEquals('%', result.getLiteralToken());
+        assertEquals(':', result.getVariableToken());
 
         Schema schema = result.getSchema("SCHEMA_A");
         Table table = schema.getTable("TABLE_A");
@@ -72,8 +76,6 @@ public class XmlDataSetReaderDataSetAttributesTest extends UnitilsJUnit4 {
         assertTrue(schema.isCaseSensitive());
         assertTrue(table.isCaseSensitive());
         assertTrue(column.isCaseSensitive());
-        assertEquals('%', column.getLiteralToken());
-        assertEquals(':', column.getVariableToken());
     }
 
     @Test(expected = UnitilsException.class)

@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+
+    <notExists>
+        <TEST col1="value1" col2="1"/>
+    </notExists>
+
+</dataset>

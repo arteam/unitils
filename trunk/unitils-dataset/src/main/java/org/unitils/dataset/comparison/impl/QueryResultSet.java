@@ -13,8 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.core.preparedstatement;
+package org.unitils.dataset.comparison.impl;
 
+import org.unitils.core.util.DbUtils;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -27,6 +31,8 @@ import java.util.Set;
  */
 public class QueryResultSet {
 
+    protected Connection connection;
+    protected PreparedStatement preparedStatement;
     protected ResultSet resultSet;
 
     protected Set<String> primaryKeyColumnNames;
@@ -36,7 +42,9 @@ public class QueryResultSet {
     protected boolean useRowIndexAsIdentifier = false;
 
 
-    public QueryResultSet(ResultSet resultSet, Set<String> primaryKeyColumnNames) {
+    public QueryResultSet(Connection connection, PreparedStatement preparedStatement, ResultSet resultSet, Set<String> primaryKeyColumnNames) {
+        this.connection = connection;
+        this.preparedStatement = preparedStatement;
         this.resultSet = resultSet;
         this.primaryKeyColumnNames = primaryKeyColumnNames;
         this.rowIndex = 0;
@@ -53,7 +61,7 @@ public class QueryResultSet {
     }
 
     public void close() throws SQLException {
-        resultSet.close();
+        DbUtils.close(connection, preparedStatement, resultSet);
     }
 
 

@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.core.preparedstatement;
+package org.unitils.dataset.comparison;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.dataset.comparison.impl.ComparisonResultSet;
 import org.unitils.mock.Mock;
 
 import java.sql.ResultSet;
@@ -41,7 +42,7 @@ public class ComparisonResultSetTest extends UnitilsJUnit4 {
     @Before
     public void initialize() {
         Set<String> primaryKeyColumnNames = new HashSet<String>(asList("pk1", "pk2"));
-        comparisonResultSet = new ComparisonResultSet(resultSet.getMock(), primaryKeyColumnNames);
+        comparisonResultSet = new ComparisonResultSet(null, null, resultSet.getMock(), primaryKeyColumnNames);
     }
 
     @Test

@@ -15,13 +15,6 @@
  */
 package org.unitils.dataset.loader.impl;
 
-import org.unitils.dataset.core.Table;
-import org.unitils.dataset.core.preparedstatement.InsertPreparedStatement;
-import org.unitils.dataset.core.preparedstatement.InsertUpdatePreparedStatement;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-
 /**
  * Loads the data using insert statements.
  *
@@ -31,8 +24,8 @@ import java.sql.SQLException;
 public class InsertDataSetLoader extends BaseDataSetLoader {
 
 
-    protected InsertUpdatePreparedStatement createPreparedStatementWrapper(Table table, Connection connection) throws SQLException {
-        return new InsertPreparedStatement(table.getSchema().getName(), table.getName(), connection);
+    protected BaseRowLoader createRowLoader() {
+        return new InsertRowLoader();
     }
 
 }

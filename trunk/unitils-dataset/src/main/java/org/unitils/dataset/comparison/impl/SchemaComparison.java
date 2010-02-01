@@ -15,6 +15,8 @@
  */
 package org.unitils.dataset.comparison.impl;
 
+import org.unitils.dataset.core.Schema;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +28,8 @@ import java.util.List;
  */
 public class SchemaComparison {
 
-    /* The schema name, not null */
-    private String name;
+    /* The data set schema that was compared */
+    private Schema dataSetSchema;
 
     /* The comparison of the tables of the schema's, empty if none found */
     private List<TableComparison> tableComparisons = new ArrayList<TableComparison>();
@@ -36,18 +38,18 @@ public class SchemaComparison {
     /**
      * Create a schema comparison result.
      *
-     * @param name The schema name, not null
+     * @param dataSetSchema The data set schema that was compared, not null
      */
-    public SchemaComparison(String name) {
-        this.name = name;
+    public SchemaComparison(Schema dataSetSchema) {
+        this.dataSetSchema = dataSetSchema;
     }
 
 
     /**
-     * @return The schema name, not null
+     * @return The data set schema that was compared, not null
      */
-    public String getName() {
-        return name;
+    public Schema getDataSetSchema() {
+        return dataSetSchema;
     }
 
     /**

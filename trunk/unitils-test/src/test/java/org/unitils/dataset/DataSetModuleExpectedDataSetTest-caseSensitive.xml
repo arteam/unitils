@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset caseSensitive="true">
+
+    <TEST COL1="value1" COL2="1"/>
+
+</dataset>

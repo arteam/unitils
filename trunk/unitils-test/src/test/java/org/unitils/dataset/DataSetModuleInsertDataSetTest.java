@@ -16,6 +16,7 @@
 package org.unitils.dataset;
 
 import org.junit.Test;
+import org.unitils.core.UnitilsException;
 import org.unitils.dataset.loader.impl.InsertDataSetLoader;
 
 import java.util.ArrayList;
@@ -44,6 +45,18 @@ public class DataSetModuleInsertDataSetTest extends DataSetModuleDataSetTestBase
         assertValueInTable("test", "col2", "2");
         assertFalse("No value found for col3", getValues("col3", "test").isEmpty());
         assertValueInTable("test", "col4", "=escaped token");
+    }
+
+    @Test
+    public void caseSensitive() throws Exception {
+        dataSetModule.loadDataSet(asList("DataSetModuleDataSetTest-caseSensitive.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
+        assertValueInTable("test", "col1", "xxxx");
+    }
+
+    @Test(expected = UnitilsException.class)
+    public void caseSensitiveWrongCase() throws Exception {
+        dataSetModule.loadDataSet(asList("DataSetModuleDataSetTest-caseSensitiveWrongCase.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
+        assertValueInTable("test", "col1", "xxxx");
     }
 
     @Test

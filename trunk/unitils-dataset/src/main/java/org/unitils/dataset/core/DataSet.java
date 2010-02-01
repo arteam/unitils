@@ -25,11 +25,42 @@ import java.util.*;
  */
 public class DataSet {
 
+    /* The token that identifies a literal, e.g. for '=literal value' */
+    protected char literalToken;
+    /* The token that identifies a variable, e.g. $ for $0 $1 etc */
+    protected char variableToken;
+
     /* Maps schema names on schema's */
     private Map<String, Schema> schemas = new HashMap<String, Schema>();
 
 
     /**
+     * Creates a data set
+     *
+     * @param literalToken  The token that identifies a literal, e.g. for '=literal value'
+     * @param variableToken The token that identifies a variable, e.g. $ for $0 $1 etc
+     */
+    public DataSet(char literalToken, char variableToken) {
+        this.literalToken = literalToken;
+        this.variableToken = variableToken;
+    }
+
+    /**
+     * @return The token that identifies a literal, e.g. for '=literal value'
+     */
+    public char getLiteralToken() {
+        return literalToken;
+    }
+
+    /**
+     * @return The token that identifies a variable, e.g. $ for $0 $1 etc
+     */
+    public char getVariableToken() {
+        return variableToken;
+    }
+
+    /**
+     * /**
      * Returns the schema for the given name, if any
      *
      * @param schemaName The schema name, not null

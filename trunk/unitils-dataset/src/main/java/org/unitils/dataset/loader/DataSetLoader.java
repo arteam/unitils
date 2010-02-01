@@ -16,9 +16,8 @@
 package org.unitils.dataset.loader;
 
 import org.unitils.dataset.core.DataSet;
-import org.unitils.dataset.core.Schema;
+import org.unitils.dataset.loader.impl.Database;
 
-import javax.sql.DataSource;
 import java.util.List;
 
 /**
@@ -27,7 +26,7 @@ import java.util.List;
  */
 public interface DataSetLoader {
 
-    void init(DataSource dataSource);
+    void init(Database database);
 
     void load(DataSet dataSet, List<String> variables);
 }

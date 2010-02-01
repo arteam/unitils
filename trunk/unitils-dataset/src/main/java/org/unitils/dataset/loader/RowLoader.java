@@ -1,5 +1,5 @@
 /*
- * Copyright 2009,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.core.preparedstatement;
+package org.unitils.dataset.loader;
 
+import org.unitils.dataset.core.ColumnProcessor;
 import org.unitils.dataset.core.Row;
+import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.loader.impl.NameProcessor;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public abstract class InsertUpdatePreparedStatement extends BasePreparedStatement {
+public interface RowLoader {
 
+    void init(ColumnProcessor columnProcessor, NameProcessor nameProcessor, Database database);
 
-    public InsertUpdatePreparedStatement(String schemaName, String tableName, Connection connection) throws SQLException {
-        super(schemaName, tableName, connection);
-    }
-
-
-    public int executeUpdate(Row row, List<String> variables) throws SQLException {
-        addRow(row, variables);
-        preparedStatement = buildPreparedStatement();
-        return preparedStatement.executeUpdate();
-    }
-
+    int loadRow(Row row, List<String> variables);
 }

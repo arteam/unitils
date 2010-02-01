@@ -32,6 +32,7 @@ public class Table {
     /* The schema this table belongs to */
     private Schema schema;
 
+    /* True if the table name is case sensitive */
     private boolean caseSensitive;
 
     /* The data set rows */
@@ -55,6 +56,19 @@ public class Table {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Gets the quoted column name if it is a case-sensitive name.
+     *
+     * @param identifierQuoteString The quote string to use, null if quoting is not supported
+     * @return The quoted name or the original name if quoting is not supported or not case sensitive
+     */
+    public String getQuotedNameIfCaseSensitive(String identifierQuoteString) {
+        if (identifierQuoteString == null || !caseSensitive) {
+            return name;
+        }
+        return identifierQuoteString + name + identifierQuoteString;
     }
 
     /**
