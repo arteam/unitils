@@ -20,12 +20,12 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.dataset.comparison.impl.*;
 import org.unitils.dataset.core.*;
-import org.unitils.dataset.core.preparedstatement.ComparisonPreparedStatement;
-import org.unitils.dataset.core.preparedstatement.ComparisonResultSet;
+import org.unitils.dataset.comparison.impl.RowComparator;
+import org.unitils.dataset.comparison.impl.ComparisonResultSet;
+import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.loader.impl.NameProcessor;
 import org.unitils.mock.Mock;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,9 +41,8 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
     /* Tested object */
     private DefaultDataSetComparator defaultDataSetComparator = new TestDefaultDataSetComparator();
 
-    private Mock<DataSource> dataSource;
-    private Mock<Connection> connection;
-    private Mock<ComparisonPreparedStatement> preparedStatementWrapper;
+    private Mock<Database> database;
+    private Mock<RowComparator> comparisonPreparedStatement;
     private Mock<ComparisonResultSet> comparisonResultSet;
 
     protected DataSet dataSetWith3Rows;
@@ -54,9 +53,8 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() throws Exception {
-        dataSource.returns(connection).getConnection();
-        preparedStatementWrapper.returns(comparisonResultSet).executeQuery(null, null);
-        defaultDataSetComparator.init(dataSource.getMock());
+        comparisonPreparedStatement.returns(comparisonResultSet).compareRowWithDatabase(null, null);
+        defaultDataSetComparator.init(database.getMock());
 
         dataSetWith3Rows = createDataSetWith3Rows();
         dataSetWithEmptyRow = createDataSetWithEmptyRow();
@@ -197,7 +195,7 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
     }
 
     private DataSet createDataSet(Schema schema) {
-        DataSet dataSet = new DataSet();
+        DataSet dataSet = new DataSet('=', '$');
         dataSet.addSchema(schema);
         return dataSet;
     }
@@ -209,14 +207,14 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
     }
 
     private Column createColumn(String name, String value) {
-        return new Column(name, value, false, '=', '$');
+        return new Column(name, value, false);
     }
 
 
     private class TestDefaultDataSetComparator extends DefaultDataSetComparator {
         @Override
-        protected ComparisonPreparedStatement createPreparedStatementWrapper(Table table, Connection connection) throws Exception {
-            return preparedStatementWrapper.getMock();
+        protected RowComparator createPreparedStatementWrapper(ColumnProcessor columnProcessor, NameProcessor nameProcessor, Database database) throws Exception {
+            return comparisonPreparedStatement.getMock();
         }
     }
 }

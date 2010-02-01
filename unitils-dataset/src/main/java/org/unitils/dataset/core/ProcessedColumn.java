@@ -16,29 +16,43 @@
 package org.unitils.dataset.core;
 
 /**
- * A value of a data set column
+ * A value of a data set column for which all variables and literal tokens were processed.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class Value {
+public class ProcessedColumn {
 
+    /* The column name */
+    private String name;
     /* The value */
     private String value;
-
     /* True if this value is a literal value */
     private boolean literalValue;
+    /* True if the column is a primary key column */
+    private boolean primaryKey;
 
 
     /**
+     * @param name         The column name, not null
      * @param value        The value, not null
      * @param literalValue True if this value is a literal value
+     * @param primaryKey   True if the column is a primary key column
      */
-    public Value(String value, boolean literalValue) {
+    public ProcessedColumn(String name, String value, boolean literalValue, boolean primaryKey) {
+        this.name = name;
         this.value = value;
         this.literalValue = literalValue;
+        this.primaryKey = primaryKey;
     }
 
+
+    /**
+     * @return The column name, not null
+     */
+    public String getName() {
+        return name;
+    }
 
     /**
      * @return The value, not null
@@ -52,5 +66,12 @@ public class Value {
      */
     public boolean isLiteralValue() {
         return literalValue;
+    }
+
+    /**
+     * @return True if the column is a primary key column
+     */
+    public boolean isPrimaryKey() {
+        return primaryKey;
     }
 }

@@ -18,6 +18,7 @@ package org.unitils.dataset.core;
 import org.unitils.core.UnitilsException;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -97,6 +98,24 @@ public class Row {
     public Column getColumn(String columnName) {
         for (Column column : columns) {
             if (column.hasName(columnName)) {
+                return column;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Removes the column for the given name.
+     *
+     * @param columnName The name of the column, not null
+     * @return The column that was removed, null if not found
+     */
+    public Column removeColumn(String columnName) {
+        Iterator<Column> iterator = columns.iterator();
+        while (iterator.hasNext()) {
+            Column column = iterator.next();
+            if (column.hasName(columnName)) {
+                iterator.remove();
                 return column;
             }
         }

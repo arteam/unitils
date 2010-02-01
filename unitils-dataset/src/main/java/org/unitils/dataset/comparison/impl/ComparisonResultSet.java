@@ -13,8 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.core.preparedstatement;
+package org.unitils.dataset.comparison.impl;
 
+import org.unitils.dataset.comparison.impl.QueryResultSet;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
@@ -25,8 +29,8 @@ import java.util.Set;
  */
 public class ComparisonResultSet extends QueryResultSet {
 
-    public ComparisonResultSet(ResultSet resultSet, Set<String> primaryKeyColumnNames) {
-        super(resultSet, primaryKeyColumnNames);
+    public ComparisonResultSet(Connection connection, PreparedStatement preparedStatement, ResultSet resultSet, Set<String> primaryKeyColumnNames) {
+        super(connection, preparedStatement, resultSet, primaryKeyColumnNames);
     }
 
     public String getExpectedValue(int columnIndex) throws SQLException {
@@ -35,5 +39,9 @@ public class ComparisonResultSet extends QueryResultSet {
 
     public String getActualValue(int columnIndex) throws SQLException {
         return getValue(columnIndex * 2);
+    }
+
+    public int getNrOfColumns() throws SQLException {
+        return super.getNrOfColumns() - primaryKeyColumnNames.size();
     }
 }

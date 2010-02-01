@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.core.preparedstatement;
+package org.unitils.dataset.comparison;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.dataset.comparison.impl.QueryResultSet;
 import org.unitils.mock.Mock;
 
 import java.sql.ResultSet;
@@ -41,8 +42,8 @@ public class QueryResultSetGetRowIdentifierTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        queryResultSetWithPrimaryKeys = new QueryResultSet(resultSet.getMock(), new LinkedHashSet<String>(asList("pk1", "pk2")));
-        queryResultSetWithoutPrimaryKeys = new QueryResultSet(resultSet.getMock(), new HashSet<String>());
+        queryResultSetWithPrimaryKeys = new QueryResultSet(null, null, resultSet.getMock(), new LinkedHashSet<String>(asList("pk1", "pk2")));
+        queryResultSetWithoutPrimaryKeys = new QueryResultSet(null, null, resultSet.getMock(), new HashSet<String>());
     }
 
     @Test

@@ -64,11 +64,13 @@ public class DataSetModuleParentChildTest extends DataSetModuleDataSetTestBase {
     }
 
 
+    @Override
     protected void createTestTables() {
         executeUpdate("create table parent (pk1 varchar(100) not null, pk2 integer not null, a_column varchar(100), primary key (pk1, pk2))", dataSource);
         executeUpdate("create table child (pk1 varchar(100) not null primary key, fk1 varchar(100), fk2 integer, foreign key (fk1, fk2) references parent(pk1, pk2))", dataSource);
     }
 
+    @Override
     protected void dropTestTable() {
         executeUpdateQuietly("drop table child", dataSource);
         executeUpdateQuietly("drop table parent", dataSource);

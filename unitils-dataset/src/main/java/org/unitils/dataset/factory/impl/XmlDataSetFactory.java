@@ -48,11 +48,9 @@ public class XmlDataSetFactory implements DataSetFactory {
     /**
      * Initializes this DataSetFactory
      *
-     * @param configuration     The configuration, not null
-     * @param defaultSchemaName The name of the default schema of the test database, not null
+     * @param configuration The configuration, not null
      */
-    public void init(Properties configuration, String defaultSchemaName) {
-        this.defaultSchemaName = defaultSchemaName;
+    public void init(Properties configuration) {
         this.defaultCaseSensitive = PropertyUtils.getBoolean(DEFAULT_CASE_SENSITIVE_PROPERTY, configuration);
         this.defaultLiteralToken = PropertyUtils.getString(DEFAULT_LITERAL_TOKEN_PROPERTY, configuration).charAt(0);
         this.defaultVariableToken = PropertyUtils.getString(DEFAULT_VARIABLE_TOKEN_PROPERTY, configuration).charAt(0);
@@ -62,10 +60,11 @@ public class XmlDataSetFactory implements DataSetFactory {
     /**
      * Creates a {@link org.unitils.dataset.core.DataSet} using the given file.
      *
-     * @param dataSetFile The data set file, not null
+     * @param dataSetFile       The data set file, not null
+     * @param defaultSchemaName The name of the default schema of the test database, not null
      * @return A {@link org.unitils.dataset.core.DataSet} containing the data sets per schema, not null
      */
-    public DataSet createDataSet(File dataSetFile) {
+    public DataSet createDataSet(File dataSetFile, String defaultSchemaName) {
         try {
             XmlDataSetReader xmlDataSetReader = new XmlDataSetReader(defaultSchemaName, defaultCaseSensitive, defaultLiteralToken, defaultVariableToken);
             return xmlDataSetReader.readDataSetXml(dataSetFile);

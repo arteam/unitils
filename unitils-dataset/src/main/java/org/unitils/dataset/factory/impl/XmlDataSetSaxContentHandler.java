@@ -118,10 +118,8 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
 
     protected void handleDataSetElement(String uri, Attributes attributes) {
         unitilsDataSetNamespaceDeclared = "unitils-dataset".equals(uri);
-        dataSet = createDataSet(attributes);
         caseSensitive = getCaseSensitive(attributes);
-        literalToken = getLiteralToken(attributes);
-        variableToken = getVariableToken(attributes);
+        dataSet = createDataSet(attributes);
     }
 
     protected void handleNotExistsStartElement() {
@@ -184,7 +182,7 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
         Row parentRow = getParentRow();
         Row row = new Row(parentRow, notExists);
         for (int i = 0; i < attributes.getLength(); i++) {
-            Column column = new Column(attributes.getQName(i), attributes.getValue(i), caseSensitive, literalToken, variableToken);
+            Column column = new Column(attributes.getQName(i), attributes.getValue(i), caseSensitive);
             row.addColumn(column);
         }
         Table table = getTable(schemaName, tableName);
@@ -228,7 +226,9 @@ public class XmlDataSetSaxContentHandler extends DefaultHandler {
 
 
     protected DataSet createDataSet(Attributes attributes) {
-        return new DataSet();
+        char literalToken = getLiteralToken(attributes);
+        char variableToken = getVariableToken(attributes);
+        return new DataSet(literalToken, variableToken);
     }
 
 

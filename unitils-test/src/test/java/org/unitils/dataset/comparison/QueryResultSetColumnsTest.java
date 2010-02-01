@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.core.preparedstatement;
+package org.unitils.dataset.comparison;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.dataset.comparison.impl.QueryResultSet;
 import org.unitils.mock.Mock;
 
 import java.sql.ResultSet;
@@ -43,7 +44,7 @@ public class QueryResultSetColumnsTest extends UnitilsJUnit4 {
     @Before
     public void initialize() throws Exception {
         resultSet.returns(resultSetMetaData).getMetaData();
-        queryResultSet = new QueryResultSet(resultSet.getMock(), new HashSet<String>());
+        queryResultSet = new QueryResultSet(null, null, resultSet.getMock(), new HashSet<String>());
     }
 
     @Test

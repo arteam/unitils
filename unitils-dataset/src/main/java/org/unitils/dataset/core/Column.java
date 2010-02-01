@@ -15,9 +15,6 @@
  */
 package org.unitils.dataset.core;
 
-import java.util.List;
-
-
 /**
  * A column in a data set row
  *
@@ -32,31 +29,21 @@ public class Column {
     /* The original value */
     private String value;
 
-    /* True if the table name is case sensitive */
+    /* True if the column name is case sensitive */
     private boolean caseSensitive;
-
-    /* The token that identifies a literal, e.g. for '=literal value' */
-    private char literalToken;
-
-    /* The token that identifies a variable, e.g. $ for $0 $1 etc */
-    private char variableToken;
 
 
     /**
-     * Creates a value
+     * Creates a data set column
      *
      * @param name          The name of the data set column, not null
      * @param value         The value, not null
      * @param caseSensitive True if the table name is case sensitive
-     * @param literalToken  The token that identifies a literal, e.g. for '=literal value'
-     * @param variableToken The token that identifies a variable, e.g. $ for $0 $1 etc
      */
-    public Column(String name, String value, boolean caseSensitive, char literalToken, char variableToken) {
+    public Column(String name, String value, boolean caseSensitive) {
         this.name = name;
         this.value = value;
         this.caseSensitive = caseSensitive;
-        this.literalToken = literalToken;
-        this.variableToken = variableToken;
     }
 
 
@@ -72,20 +59,6 @@ public class Column {
      */
     public boolean isCaseSensitive() {
         return caseSensitive;
-    }
-
-    /**
-     * @return The token that identifies a literal, e.g. for '=literal value'
-     */
-    public char getLiteralToken() {
-        return literalToken;
-    }
-
-    /**
-     * @return The token that identifies a variable, e.g. $ for $0 $1 etc
-     */
-    public char getVariableToken() {
-        return variableToken;
     }
 
     /**
@@ -106,41 +79,6 @@ public class Column {
         return value;
     }
 
-    /**
-     * @param value The value, not null
-     * @return True if the given value is a literal value
-     */
-    public boolean isLiteralValue(String value) {
-        return value.startsWith("" + literalToken) && !isEscapedLiteralValue(value);
-    }
-
-    /**
-     * @param value The value, not null
-     * @return True if the given value is an escaped literal value
-     */
-    public boolean isEscapedLiteralValue(String value) {
-        return value.startsWith("" + literalToken + literalToken);
-    }
-
-    /**
-     * Gets the value, filling in the variable declarations using the given variables.
-     * The first variable replaces $0, the second $1 etc.
-     * If there are not enough variable values, the remaining declaration will not be replaced.
-     * If the value is an escaped literal, the escaped token is replaced.
-     *
-     * @param variables The variable values, not null
-     * @return the processed value, not null
-     */
-    public Value getValue(List<String> variables) {
-        String valueWithVariablesFilledIn = getValueWithVariablesFilledIn(variables);
-        if (isLiteralValue(valueWithVariablesFilledIn)) {
-            return getLiteralValue(valueWithVariablesFilledIn);
-        }
-        if (isEscapedLiteralValue(valueWithVariablesFilledIn)) {
-            return getEscapedLiteralValue(valueWithVariablesFilledIn);
-        }
-        return new Value(valueWithVariablesFilledIn, false);
-    }
 
     /**
      * @return The string representation of this column, not null
@@ -153,54 +91,6 @@ public class Column {
         stringBuilder.append(value);
         stringBuilder.append("\"");
         return stringBuilder.toString();
-    }
-
-
-    /**
-     * @param variables The variable values, not null
-     * @return The value with the variable declarations replaced by the given variables, not null
-     */
-    protected String getValueWithVariablesFilledIn(List<String> variables) {
-        StringBuilder valueStringBuilder = new StringBuilder(value);
-        for (int variableIndex = 0; variableIndex < variables.size(); variableIndex++) {
-            replaceVariableDeclaration(valueStringBuilder, variableIndex, variables.get(variableIndex));
-        }
-        return valueStringBuilder.toString();
-    }
-
-    /**
-     * @param valueStringBuilder The value in which to replace the variable declaration
-     * @param variableIndex      The variable index, >=0
-     * @param variable           The variable value to use, not null
-     */
-    protected void replaceVariableDeclaration(StringBuilder valueStringBuilder, int variableIndex, String variable) {
-        String variableDeclaration = "" + variableToken + variableIndex;
-        int index = 0;
-        while ((index = valueStringBuilder.indexOf(variableDeclaration, index)) != -1) {
-            if (index > 0 && valueStringBuilder.charAt(index - 1) == variableToken) {
-                valueStringBuilder.deleteCharAt(index - 1);
-            } else {
-                valueStringBuilder.replace(index, index + 2, variable);
-            }
-        }
-    }
-
-    /**
-     * @param value The value, not null
-     * @return The literal value for the given value, not null
-     */
-    protected Value getLiteralValue(String value) {
-        String result = value.substring(1);
-        return new Value(result, true);
-    }
-
-    /**
-     * @param value The value, not null
-     * @return The escaped literal value for the given value, not null
-     */
-    protected Value getEscapedLiteralValue(String value) {
-        String result = value.substring(1);
-        return new Value(result, false);
     }
 
 }

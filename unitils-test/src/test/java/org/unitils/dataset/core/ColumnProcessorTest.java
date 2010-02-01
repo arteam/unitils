@@ -15,7 +15,9 @@
  */
 package org.unitils.dataset.core;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.unitils.dataset.loader.impl.NameProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,61 +31,64 @@ import static org.junit.Assert.*;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ColumnGetValueTest {
+public class ColumnProcessorTest {
+
+    /* Tested object */
+    private ColumnProcessor columnProcessor;
 
     private List<String> emptyVariables = new ArrayList<String>();
 
+    @Before
+    public void initialize() {
+        NameProcessor nameProcessor = new NameProcessor("'");
+        columnProcessor = new ColumnProcessor('=', '$', nameProcessor);
+    }
 
+    
     @Test
     public void regularValue() {
-        Column column = new Column("column", "value", false, '=', '$');
+        ProcessedColumn result = columnProcessor.processColumn(new Column("column", "value", false), emptyVariables, false);
 
-        Value result = column.getValue(emptyVariables);
         assertEquals("value", result.getValue());
         assertFalse(result.isLiteralValue());
     }
 
     @Test
     public void literalValue() {
-        Column column = new Column("column", "=value", false, '=', '$');
+        ProcessedColumn result = columnProcessor.processColumn(new Column("column", "=value", false), emptyVariables, false);
 
-        Value result = column.getValue(emptyVariables);
         assertEquals("value", result.getValue());
         assertTrue(result.isLiteralValue());
     }
 
     @Test
     public void escapedLiteralValue() {
-        Column column = new Column("column", "==value", false, '=', '$');
+        ProcessedColumn result = columnProcessor.processColumn(new Column("column", "==value", false), emptyVariables, false);
 
-        Value result = column.getValue(emptyVariables);
         assertEquals("=value", result.getValue());
         assertFalse(result.isLiteralValue());
     }
 
     @Test
     public void variables() {
-        Column column = new Column("column", "$0value $0 $1", false, '=', '$');
+        ProcessedColumn result = columnProcessor.processColumn(new Column("column", "$0value $0 $1", false), asList("1", "2"), false);
 
-        Value result = column.getValue(asList("1", "2"));
         assertEquals("1value 1 2", result.getValue());
         assertFalse(result.isLiteralValue());
     }
 
     @Test
     public void literalValueThroughVariable() {
-        Column column = new Column("column", "$0", false, '=', '$');
+        ProcessedColumn result = columnProcessor.processColumn(new Column("column", "$0", false), asList("=value"), false);
 
-        Value result = column.getValue(asList("=value"));
         assertEquals("value", result.getValue());
         assertTrue(result.isLiteralValue());
     }
 
     @Test
     public void escapedLiteralValueThroughVariable() {
-        Column column = new Column("column", "$0", false, '=', '$');
+        ProcessedColumn result = columnProcessor.processColumn(new Column("column", "$0", false), asList("==value"), false);
 
-        Value result = column.getValue(asList("==value"));
         assertEquals("=value", result.getValue());
         assertFalse(result.isLiteralValue());
     }

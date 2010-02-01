@@ -68,6 +68,16 @@ public abstract class DataSetModuleDataSetTestBase extends UnitilsJUnit4 {
         assertFalse("Value " + notExpectedValue + " not expected in table " + tableName + ", but found ", values.contains(notExpectedValue));
     }
 
+    protected void assertMessageContains(String text, AssertionError e) {
+        String message = e.getMessage();
+        assertTrue("Message of assertion error did not contain " + text + ". Message: " + message, message.contains(text));
+    }
+
+    protected void assertMessageNotContains(String text, AssertionError e) {
+        String message = e.getMessage();
+        assertFalse("Message of assertion error contained " + text + ". Message: " + message, message.contains(text));
+    }
+
     protected Set<String> getValues(String columnName, String table) {
         return getItemsAsStringSet("select " + columnName + " from " + table, dataSource);
     }

@@ -16,8 +16,7 @@
 package org.unitils.dataset.comparison;
 
 import org.unitils.dataset.comparison.impl.DataSetComparison;
-
-import javax.sql.DataSource;
+import org.unitils.dataset.loader.impl.Database;
 
 /**
  * @author Tim Ducheyne
@@ -25,7 +24,7 @@ import javax.sql.DataSource;
  */
 public interface DatabaseContentRetriever {
 
-    void init(DataSource dataSource);
+    void init(Database database);
 
     String getActualDatabaseContentForDataSetComparison(DataSetComparison dataSetComparison);
 

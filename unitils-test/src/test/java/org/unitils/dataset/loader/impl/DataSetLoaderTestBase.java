@@ -21,9 +21,10 @@ import org.unitils.dataset.core.*;
 import org.unitils.dataset.loader.DataSetLoader;
 import org.unitils.mock.Mock;
 
-import javax.sql.DataSource;
 import java.sql.*;
+import java.util.LinkedHashSet;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -32,7 +33,7 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class DataSetLoaderTestBase extends UnitilsJUnit4 {
 
-    protected Mock<DataSource> dataSource;
+    protected Mock<Database> database;
     protected Mock<Connection> connection;
     protected Mock<PreparedStatement> preparedStatement;
     protected Mock<ResultSet> primaryKeyResultSet;
@@ -56,18 +57,15 @@ public abstract class DataSetLoaderTestBase extends UnitilsJUnit4 {
 
 
     protected void initializeDataSetLoader(DataSetLoader dataSetLoader) throws Exception {
-        dataSource.returns(connection).getConnection();
-        connection.returns(primaryKeyResultSet).getMetaData().getPrimaryKeys(null, null, null);
+        database.returns(connection).createConnection();
         connection.returns(preparedStatement).prepareStatement(null);
         preparedStatement.returns(parameterMetaData).getParameterMetaData();
-        dataSetLoader.init(dataSource.getMock());
+        dataSetLoader.init(database.getMock());
     }
 
     protected void initializePrimaryKeys(String... pkColumnNames) throws SQLException {
         for (String pkColumnName : pkColumnNames) {
-            primaryKeyResultSet.onceReturns(true).next();
-            primaryKeyResultSet.onceReturns(pkColumnName).getString(null);
-            primaryKeyResultSet.onceReturns(false).next();
+            database.onceReturns(new LinkedHashSet<String>(asList(pkColumnName))).getPrimaryKeyColumnNames(null);
         }
     }
 
@@ -147,12 +145,12 @@ public abstract class DataSetLoaderTestBase extends UnitilsJUnit4 {
     }
 
     protected DataSet createDataSet(Schema schema) {
-        DataSet dataSet = new DataSet();
+        DataSet dataSet = new DataSet('=', '$');
         dataSet.addSchema(schema);
         return dataSet;
     }
 
     protected Column createColumn(String name, String value) {
-        return new Column(name, value, false, '=', '$');
+        return new Column(name, value, false);
     }
 }

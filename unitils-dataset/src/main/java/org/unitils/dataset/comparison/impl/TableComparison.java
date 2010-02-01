@@ -16,6 +16,7 @@
 package org.unitils.dataset.comparison.impl;
 
 import org.unitils.dataset.core.Row;
+import org.unitils.dataset.core.Table;
 
 import java.util.*;
 
@@ -27,8 +28,8 @@ import java.util.*;
  */
 public class TableComparison {
 
-    /* The name of the table */
-    private String name;
+    /* The data set table that was compared */
+    private Table dataSetTable;
 
     /* True if expected no more records but found more records in the database */
     private boolean expectedNoMoreRecordsButFoundMore = false;
@@ -41,21 +42,22 @@ public class TableComparison {
 
     private Set<String> actualRowIdentifiersWithMatch = new HashSet<String>();
 
+
     /**
      * Creates a table difference.
      *
-     * @param name The table name, not null
+     * @param dataSetTable The data set table that was compared, not null
      */
-    public TableComparison(String name) {
-        this.name = name;
+    public TableComparison(Table dataSetTable) {
+        this.dataSetTable = dataSetTable;
     }
 
 
     /**
-     * @return The name of the table, not null
+     * @return The data set table that was compared, not null
      */
-    public String getName() {
-        return name;
+    public Table getDataSetTable() {
+        return dataSetTable;
     }
 
     /**
@@ -141,7 +143,7 @@ public class TableComparison {
             return false;
         }
         for (RowComparison rowComparison : bestRowComparisons.values()) {
-            if (!rowComparison.isMatch()) {
+            if (!rowComparison.isMatch() || rowComparison.shouldNotHaveMatched()) {
                 return false;
             }
         }

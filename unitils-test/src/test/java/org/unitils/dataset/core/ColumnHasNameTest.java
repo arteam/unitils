@@ -36,21 +36,21 @@ public class ColumnHasNameTest {
 
     @Test
     public void caseInsensitive() {
-        Column column = new Column("column", "value", false, '=', '$');
+        Column column = new Column("column", "value", false);
         boolean result = column.hasName("COLUMN");
         assertTrue(result);
     }
 
     @Test
     public void different() {
-        Column column = new Column("column", "value", false, '=', '$');
+        Column column = new Column("column", "value", false);
         boolean result = column.hasName("xxxx");
         assertFalse(result);
     }
 
     @Test
     public void caseSensitive() {
-        Column column = new Column("column", "value", true, '=', '$');
+        Column column = new Column("column", "value", true);
 
         boolean result = column.hasName("column");
         assertTrue(result);
@@ -58,7 +58,7 @@ public class ColumnHasNameTest {
 
     @Test
     public void differentCaseSensitive() {
-        Column column = new Column("column", "value", true, '=', '$');
+        Column column = new Column("column", "value", true);
 
         boolean result = column.hasName("COLUMN");
         assertFalse(result);

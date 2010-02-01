@@ -17,11 +17,12 @@ package org.unitils.dataset.comparison.impl;
 
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.comparison.DatabaseContentRetriever;
-import org.unitils.dataset.core.preparedstatement.QueryResultSet;
-import org.unitils.dataset.core.preparedstatement.TableContentPreparedStatement;
+import org.unitils.dataset.core.Table;
+import org.unitils.dataset.comparison.impl.QueryResultSet;
+import org.unitils.dataset.comparison.impl.TableContentRetriever;
+import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.loader.impl.NameProcessor;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,11 +35,11 @@ import static org.apache.commons.lang.StringUtils.rightPad;
  */
 public class DefaultDatabaseContentRetriever implements DatabaseContentRetriever {
 
-    protected DataSource dataSource;
+    protected Database database;
 
 
-    public void init(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public void init(Database database) {
+        this.database = database;
     }
 
 
@@ -55,56 +56,54 @@ public class DefaultDatabaseContentRetriever implements DatabaseContentRetriever
     }
 
     protected void getActualDatabaseContent(DataSetComparison dataSetComparison, StringBuilder contentBuilder) throws SQLException {
-        Connection connection = dataSource.getConnection();
-        try {
-            for (SchemaComparison schemaComparison : dataSetComparison.getSchemaComparisons()) {
-                String schemaName = schemaComparison.getName();
-                for (TableComparison tableComparison : schemaComparison.getTableComparisons()) {
-                    getActualTableContent(schemaName, tableComparison, connection, contentBuilder);
-                }
+        for (SchemaComparison schemaComparison : dataSetComparison.getSchemaComparisons()) {
+            for (TableComparison tableComparison : schemaComparison.getTableComparisons()) {
+                getActualTableContent(tableComparison, contentBuilder);
             }
-        } finally {
-            connection.close();
         }
     }
 
     @SuppressWarnings({"unchecked"})
-    protected void getActualTableContent(String schemaName, TableComparison tableComparison, Connection connection, StringBuilder contentBuilder) throws SQLException {
-        String tableName = tableComparison.getName();
-        TableContentPreparedStatement preparedStatementWrapper = createPreparedStatementWrapper(schemaName, tableName, connection);
-        QueryResultSet resultSet = preparedStatementWrapper.executeQuery();
+    protected void getActualTableContent(TableComparison tableComparison, StringBuilder contentBuilder) throws SQLException {
+        Table table = tableComparison.getDataSetTable();
+        TableContentRetriever preparedStatementWrapper = createPreparedStatementWrapper();
+        QueryResultSet resultSet = preparedStatementWrapper.getTableContent(tableComparison.getDataSetTable());
+        try {
 
-        int nrOfColumns = resultSet.getNrOfColumns();
-        if (nrOfColumns == 0) {
-            return;
-        }
-        List<String> columnNames = resultSet.getColumnNames();
-        List<List<String>> values = new ArrayList(nrOfColumns);
-        List<Integer> columnSizes = new ArrayList<Integer>(nrOfColumns);
-        List<Boolean> rowWithExactMatch = new ArrayList<Boolean>();
-
-        contentBuilder.append(schemaName);
-        contentBuilder.append('.');
-        contentBuilder.append(tableName);
-        contentBuilder.append('\n');
-        for (String columnName : columnNames) {
-            columnSizes.add(columnName.length());
-            values.add(new ArrayList<String>());
-        }
-        while (resultSet.next()) {
-            String rowIdentifier = resultSet.getRowIdentifier();
-            rowWithExactMatch.add(tableComparison.isActualRowWithExactMatch(rowIdentifier));
-
-            for (int i = 0; i < nrOfColumns; i++) {
-                String value = resultSet.getValue(i);
-                if (value == null) {
-                    value = "";
-                }
-                values.get(i).add(value);
-                columnSizes.set(i, Math.max(columnSizes.get(i), value.length()));
+            int nrOfColumns = resultSet.getNrOfColumns();
+            if (nrOfColumns == 0) {
+                return;
             }
+            List<String> columnNames = resultSet.getColumnNames();
+            List<List<String>> values = new ArrayList(nrOfColumns);
+            List<Integer> columnSizes = new ArrayList<Integer>(nrOfColumns);
+            List<Boolean> rowWithExactMatch = new ArrayList<Boolean>();
+
+            contentBuilder.append(table.getSchema().getName());
+            contentBuilder.append('.');
+            contentBuilder.append(table.getName());
+            contentBuilder.append('\n');
+            for (String columnName : columnNames) {
+                columnSizes.add(columnName.length());
+                values.add(new ArrayList<String>());
+            }
+            while (resultSet.next()) {
+                String rowIdentifier = resultSet.getRowIdentifier();
+                rowWithExactMatch.add(tableComparison.isActualRowWithExactMatch(rowIdentifier));
+
+                for (int i = 0; i < nrOfColumns; i++) {
+                    String value = resultSet.getValue(i);
+                    if (value == null) {
+                        value = "";
+                    }
+                    values.get(i).add(value);
+                    columnSizes.set(i, Math.max(columnSizes.get(i), value.length()));
+                }
+            }
+            getContent(columnNames, values, rowWithExactMatch, columnSizes, contentBuilder);
+        } finally {
+            resultSet.close();
         }
-        getContent(columnNames, values, rowWithExactMatch, columnSizes, contentBuilder);
     }
 
     protected void getContent(List<String> columnNames, List<List<String>> values, List<Boolean> rowWithExactMatch, List<Integer> columnSizes, StringBuilder contentBuilder) {
@@ -133,8 +132,9 @@ public class DefaultDatabaseContentRetriever implements DatabaseContentRetriever
         }
     }
 
-    protected TableContentPreparedStatement createPreparedStatementWrapper(String schemaName, String tableName, Connection connection) throws SQLException {
-        return new TableContentPreparedStatement(schemaName, tableName, connection);
+    protected TableContentRetriever createPreparedStatementWrapper() throws SQLException {
+        NameProcessor nameProcessor = new NameProcessor(database.getIdentifierQuoteString());
+        return new TableContentRetriever(nameProcessor, database);
     }
 
 }

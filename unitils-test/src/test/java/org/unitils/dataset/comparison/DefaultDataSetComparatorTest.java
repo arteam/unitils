@@ -20,12 +20,12 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.dataset.comparison.impl.*;
 import org.unitils.dataset.core.*;
-import org.unitils.dataset.core.preparedstatement.ComparisonPreparedStatement;
-import org.unitils.dataset.core.preparedstatement.ComparisonResultSet;
+import org.unitils.dataset.comparison.impl.RowComparator;
+import org.unitils.dataset.comparison.impl.ComparisonResultSet;
+import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.loader.impl.NameProcessor;
 import org.unitils.mock.Mock;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,9 +40,8 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
     /* Tested object */
     private DefaultDataSetComparator defaultDataSetComparator = new TestDefaultDataSetComparator();
 
-    private Mock<DataSource> dataSource;
-    private Mock<Connection> connection;
-    private Mock<ComparisonPreparedStatement> preparedStatementWrapper;
+    private Mock<Database> database;
+    private Mock<RowComparator> comparisonPreparedStatement;
     private Mock<ComparisonResultSet> comparisonResultSet;
 
     protected DataSet dataSet;
@@ -53,9 +52,8 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() throws Exception {
-        dataSource.returns(connection).getConnection();
-        preparedStatementWrapper.returns(comparisonResultSet).executeQuery(null, null);
-        defaultDataSetComparator.init(dataSource.getMock());
+        comparisonPreparedStatement.returns(comparisonResultSet).compareRowWithDatabase(null, null);
+        defaultDataSetComparator.init(database.getMock());
 
         dataSet = createDataSet();
         emptyDataSet = createEmptyDataSet();
@@ -104,8 +102,8 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
         List<Row> missingRows = tableComparison.getMissingRows();
 
         assertFalse(dataSetComparison.isMatch());
-        assertEquals("my_schema", schemaComparison.getName());
-        assertEquals("table_a", tableComparison.getName());
+        assertEquals("my_schema", schemaComparison.getDataSetSchema().getName());
+        assertEquals("table_a", tableComparison.getDataSetTable().getName());
         assertEquals(1, missingRows.size());
     }
 
@@ -168,20 +166,20 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
     }
 
     private DataSet createDataSet(Schema schema) {
-        DataSet dataSet = new DataSet();
+        DataSet dataSet = new DataSet('=', '$');
         dataSet.addSchema(schema);
         return dataSet;
     }
 
     private Column createColumn(String name, String value) {
-        return new Column(name, value, false, '=', '$');
+        return new Column(name, value, false);
     }
-
 
     private class TestDefaultDataSetComparator extends DefaultDataSetComparator {
         @Override
-        protected ComparisonPreparedStatement createPreparedStatementWrapper(Table table, Connection connection) throws Exception {
-            return preparedStatementWrapper.getMock();
+        protected RowComparator createPreparedStatementWrapper(ColumnProcessor columnProcessor, NameProcessor nameProcessor, Database database) throws Exception {
+            return comparisonPreparedStatement.getMock();
         }
     }
+
 }

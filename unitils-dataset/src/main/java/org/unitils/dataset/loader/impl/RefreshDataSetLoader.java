@@ -15,15 +15,9 @@
  */
 package org.unitils.dataset.loader.impl;
 
-import org.unitils.dataset.core.Row;
-import org.unitils.dataset.core.Table;
-import org.unitils.dataset.core.preparedstatement.InsertPreparedStatement;
-import org.unitils.dataset.core.preparedstatement.InsertUpdatePreparedStatement;
-import org.unitils.dataset.core.preparedstatement.UpdatePreparedStatement;
+import org.unitils.dataset.loader.RowLoader;
 
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
 
 /**
  * @author Tim Ducheyne
@@ -32,28 +26,8 @@ import java.util.List;
 public class RefreshDataSetLoader extends BaseDataSetLoader {
 
 
-    protected InsertUpdatePreparedStatement createPreparedStatementWrapper(Table table, Connection connection) throws SQLException {
-        return new UpdatePreparedStatement(table.getSchema().getName(), table.getName(), connection);
-    }
-
-
-    @Override
-    protected int loadRow(Row row, List<String> variables, Connection connection) throws Exception {
-        int nrUpdates = super.loadRow(row, variables, connection);
-        if (nrUpdates > 0) {
-            return nrUpdates;
-        }
-        return insertRow(row, variables, connection);
-    }
-
-
-    protected int insertRow(Row row, List<String> variables, Connection connection) throws SQLException {
-        InsertUpdatePreparedStatement preparedStatementWrapper = createInsertPreparedStatementWrapper(row.getTable(), connection);
-        return preparedStatementWrapper.executeUpdate(row, variables);
-    }
-
-    protected InsertUpdatePreparedStatement createInsertPreparedStatementWrapper(Table table, Connection connection) throws SQLException {
-        return new InsertPreparedStatement(table.getSchema().getName(), table.getName(), connection);
+    protected RowLoader createRowLoader() {
+        return new RefreshRowLoader();
     }
 
 }

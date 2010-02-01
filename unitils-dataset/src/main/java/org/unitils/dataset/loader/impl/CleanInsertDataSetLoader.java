@@ -15,12 +15,11 @@
  */
 package org.unitils.dataset.loader.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.unitils.dataset.core.Schema;
+import org.unitils.dataset.core.Table;
+import org.unitils.dataset.loader.impl.TableContentDeleter;
+import org.unitils.dataset.loader.RowLoader;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,42 +34,26 @@ import java.util.List;
  */
 public class CleanInsertDataSetLoader extends InsertDataSetLoader {
 
-    /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(CleanInsertDataSetLoader.class);
-
 
     @Override
-    public void loadSchema(Schema schema, List<String> variables, Connection connection) throws SQLException {
-        deleteDataFromTablesInReverseOrder(schema, connection);
-        super.loadSchema(schema, variables, connection);
+    public void loadSchema(Schema schema, List<String> variables, RowLoader rowLoader) throws SQLException {
+        TableContentDeleter deleteTableContentPreparedStatement = createTableContentDeleter();
+        deleteDataFromTablesInReverseOrder(schema, deleteTableContentPreparedStatement);
+        super.loadSchema(schema, variables, rowLoader);
     }
 
 
-    // delete tables in reverse order    
-
-    protected void deleteDataFromTablesInReverseOrder(Schema schema, Connection connection) throws SQLException {
+    protected void deleteDataFromTablesInReverseOrder(Schema schema, TableContentDeleter deleteTableContentPreparedStatement) throws SQLException {
         String schemaName = schema.getName();
 
-        List<String> tableNames = new ArrayList<String>(schema.getTableNames());
-        Collections.reverse(tableNames);
-        for (String tableName : tableNames) {
-            deleteDataFromTable(schemaName, tableName, connection);
+        List<Table> tables = new ArrayList<Table>(schema.getTables());
+        Collections.reverse(tables);
+        for (Table table : tables) {
+            deleteTableContentPreparedStatement.deleteTableContent(table);
         }
     }
 
-    protected void deleteDataFromTable(String schemaName, String tableName, Connection connection) throws SQLException {
-        String deleteStatement = createDeleteStatement(schemaName, tableName);
-        PreparedStatement preparedStatement = connection.prepareStatement(deleteStatement);
-        preparedStatement.execute();
-        preparedStatement.close();
-    }
-
-    protected String createDeleteStatement(String schemaName, String tableName) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("delete from ");
-        stringBuilder.append(schemaName);
-        stringBuilder.append(".");
-        stringBuilder.append(tableName);
-        return stringBuilder.toString();
+    protected TableContentDeleter createTableContentDeleter() throws SQLException {
+        return new TableContentDeleter(nameProcessor, database);
     }
 }

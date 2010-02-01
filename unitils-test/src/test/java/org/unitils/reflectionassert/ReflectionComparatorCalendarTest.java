@@ -54,7 +54,7 @@ public class ReflectionComparatorCalendarTest extends TestCase {
         calendarA = Calendar.getInstance();
         calendarA.set(2000, 11, 5);
         calendarB = Calendar.getInstance();
-        calendarB.set(2000, 11, 5);
+        calendarB.setTime(calendarA.getTime());
         differentCalendar = Calendar.getInstance();
 
         reflectionComparator = createRefectionComparator();

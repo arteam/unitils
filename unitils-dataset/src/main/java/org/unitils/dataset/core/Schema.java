@@ -58,6 +58,19 @@ public class Schema {
     }
 
     /**
+     * Gets the quoted column name if it is a case-sensitive name.
+     *
+     * @param identifierQuoteString The quote string to use, null if quoting is not supported
+     * @return The quoted name or the original name if quoting is not supported or not case sensitive
+     */
+    public String getQuotedNameIfCaseSensitive(String identifierQuoteString) {
+        if (identifierQuoteString == null || !caseSensitive) {
+            return name;
+        }
+        return identifierQuoteString + name + identifierQuoteString;
+    }
+
+    /**
      * @return True if the name of the schema is case sensitive
      */
     public boolean isCaseSensitive() {

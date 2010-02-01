@@ -32,17 +32,17 @@ public interface DataSetFactory {
     /**
      * Initializes this DataSetFactory
      *
-     * @param configuration     The configuration, not null
-     * @param defaultSchemaName The name of the default schema of the test database, not null
+     * @param configuration The configuration, not null
      */
-    void init(Properties configuration, String defaultSchemaName);
+    void init(Properties configuration);
 
 
     /**
-     * @param dataSetFile The data set file, not null
+     * @param dataSetFile       The data set file, not null
+     * @param defaultSchemaName The name of the default schema of the test database, not null
      * @return A {@link org.unitils.dataset.core.DataSet} containing the schema's in the given data set file, not null
      */
-    DataSet createDataSet(File dataSetFile);
+    DataSet createDataSet(File dataSetFile, String defaultSchemaName);
 
 
     /**
