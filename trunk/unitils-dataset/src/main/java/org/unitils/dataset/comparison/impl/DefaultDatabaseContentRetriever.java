@@ -16,7 +16,10 @@
 package org.unitils.dataset.comparison.impl;
 
 import org.unitils.core.UnitilsException;
+import org.unitils.dataset.comparison.DataSetComparison;
 import org.unitils.dataset.comparison.DatabaseContentRetriever;
+import org.unitils.dataset.comparison.SchemaComparison;
+import org.unitils.dataset.comparison.TableComparison;
 import org.unitils.dataset.core.Table;
 import org.unitils.dataset.comparison.impl.QueryResultSet;
 import org.unitils.dataset.comparison.impl.TableContentRetriever;

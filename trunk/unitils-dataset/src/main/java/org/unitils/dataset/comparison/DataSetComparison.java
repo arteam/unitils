@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.comparison.impl;
+package org.unitils.dataset.comparison;
 
-import org.unitils.dataset.comparison.impl.SchemaComparison;
+import org.unitils.dataset.comparison.SchemaComparison;
 
 import java.util.ArrayList;
 import java.util.List;

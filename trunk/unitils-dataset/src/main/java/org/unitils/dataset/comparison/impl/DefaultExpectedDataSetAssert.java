@@ -16,9 +16,7 @@
 package org.unitils.dataset.comparison.impl;
 
 import org.unitils.core.util.ObjectFormatter;
-import org.unitils.dataset.comparison.DataSetComparator;
-import org.unitils.dataset.comparison.DatabaseContentRetriever;
-import org.unitils.dataset.comparison.ExpectedDataSetAssert;
+import org.unitils.dataset.comparison.*;
 import org.unitils.dataset.core.DataSet;
 import org.unitils.dataset.core.Row;
 import org.unitils.dataset.core.Table;

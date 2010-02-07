@@ -65,7 +65,8 @@ public class RowComparatorTest extends UnitilsJUnit4 {
 
         NameProcessor nameProcessor = new NameProcessor("'");
         ColumnProcessor columnProcessor = new ColumnProcessor('=', '$', nameProcessor);
-        rowComparator = new RowComparator(columnProcessor, nameProcessor, database.getMock());
+        rowComparator = new RowComparator();
+        rowComparator.init(columnProcessor, nameProcessor, database.getMock());
     }
 
     @Before

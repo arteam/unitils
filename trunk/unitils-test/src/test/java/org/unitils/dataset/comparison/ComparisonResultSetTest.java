@@ -19,14 +19,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.dataset.comparison.impl.ComparisonResultSet;
+import org.unitils.dataset.core.ProcessedColumn;
 import org.unitils.mock.Mock;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * @author Tim Ducheyne
@@ -39,22 +42,46 @@ public class ComparisonResultSetTest extends UnitilsJUnit4 {
 
     private Mock<ResultSet> resultSet;
 
+    private ProcessedColumn processedColumn;
+    private ProcessedColumn processedPkColumn;
+    private Set<String> emptyPrimaryKeyColumnNames = new HashSet<String>();
+
+
     @Before
     public void initialize() {
-        Set<String> primaryKeyColumnNames = new HashSet<String>(asList("pk1", "pk2"));
-        comparisonResultSet = new ComparisonResultSet(null, null, resultSet.getMock(), primaryKeyColumnNames);
+        processedColumn = new ProcessedColumn("column1", "value", false, false, null);
+        processedPkColumn = new ProcessedColumn("column2", "value", false, true, null);
     }
 
+
     @Test
-    public void getExpectedAndActualValues() throws Exception {
+    public void getRowComparisonWith2Columns() throws Exception {
+        List<ProcessedColumn> processedColumns = asList(processedColumn, processedPkColumn);
         resultSet.returns("1").getString(1);
         resultSet.returns("2").getString(2);
         resultSet.returns("3").getString(3);
         resultSet.returns("4").getString(4);
 
-        assertEquals("1", comparisonResultSet.getActualValue(0));
-        assertEquals("2", comparisonResultSet.getExpectedValue(0));
-        assertEquals("3", comparisonResultSet.getActualValue(1));
-        assertEquals("4", comparisonResultSet.getExpectedValue(1));
+        comparisonResultSet = new ComparisonResultSet(processedColumns, null, null, resultSet.getMock(), emptyPrimaryKeyColumnNames);
+        RowComparison rowComparison = comparisonResultSet.getRowComparison(null);
+
+        ColumnComparison columnComparison1 = rowComparison.getColumnComparisons().get(0);
+        assertEquals("1", columnComparison1.getActualValue());
+        assertEquals("2", columnComparison1.getExpectedValue());
+        assertFalse(columnComparison1.isPrimaryKey());
+
+        ColumnComparison columnComparison2 = rowComparison.getColumnComparisons().get(1);
+        assertEquals("3", columnComparison2.getActualValue());
+        assertEquals("4", columnComparison2.getExpectedValue());
+        assertTrue(columnComparison2.isPrimaryKey());
+    }
+
+    @Test
+    public void noColumns() throws Exception {
+        List<ProcessedColumn> emptyProcessedColumns = new ArrayList<ProcessedColumn>();
+        comparisonResultSet = new ComparisonResultSet(emptyProcessedColumns, null, null, resultSet.getMock(), emptyPrimaryKeyColumnNames);
+
+        RowComparison rowComparison = comparisonResultSet.getRowComparison(null);
+        assertTrue(rowComparison.getColumnComparisons().isEmpty());
     }
 }

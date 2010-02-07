@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.comparison.impl;
+package org.unitils.dataset.comparison;
 
 import org.unitils.dataset.core.Row;
 
@@ -69,6 +69,19 @@ public class RowComparison {
     }
 
     /**
+     * @return The nr of different primary key values, 0 if there is a match or no primary key
+     */
+    public int getNrOfPrimaryKeyDifferences() {
+        int nrOfPrimaryKeyDifferences = 0;
+        for (ColumnComparison columnComparison : columnComparisons) {
+            if (columnComparison.isPrimaryKey() && !columnComparison.isMatch()) {
+                nrOfPrimaryKeyDifferences++;
+            }
+        }
+        return nrOfPrimaryKeyDifferences;
+    }
+
+    /**
      * @return The nr of differences, 0 if there is a match
      */
     public int getNrOfDifferences() {
@@ -82,11 +95,19 @@ public class RowComparison {
     }
 
     /**
+     * Returns true if this row comparison is a better match than the given one.
+     * First we look at the nr of matching primary keys columns. If there are more matching PKs, the row
+     * is considered to be a better match. If both rows have the same amount of matching PKs,
+     * all the other columns are taken into account.
+     *
      * @param rowComparison The result to compare with, not null
-     * @return True if the given result has less differences
+     * @return True if this comparison has less differences
      */
     public boolean isBetterMatch(RowComparison rowComparison) {
-        return getNrOfDifferences() < rowComparison.getNrOfDifferences();
+        if (getNrOfPrimaryKeyDifferences() == rowComparison.getNrOfPrimaryKeyDifferences()) {
+            return getNrOfDifferences() < rowComparison.getNrOfDifferences();
+        }
+        return getNrOfPrimaryKeyDifferences() < rowComparison.getNrOfPrimaryKeyDifferences();
     }
 
     /**

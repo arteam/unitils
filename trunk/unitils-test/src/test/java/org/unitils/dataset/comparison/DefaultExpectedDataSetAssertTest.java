@@ -18,7 +18,7 @@ package org.unitils.dataset.comparison;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.comparison.impl.*;
+import org.unitils.dataset.comparison.impl.DefaultExpectedDataSetAssert;
 import org.unitils.dataset.core.Column;
 import org.unitils.dataset.core.Row;
 import org.unitils.dataset.core.Schema;
@@ -147,8 +147,8 @@ public class DefaultExpectedDataSetAssertTest extends UnitilsJUnit4 {
         Column column1 = createColumn("column_1", "1");
         Column column2 = createColumn("column_2", "2");
         RowComparison rowComparison = new RowComparison(createRow(column1, column2));
-        rowComparison.addColumnComparison(new ColumnComparison(column1, "1", "x"));
-        rowComparison.addColumnComparison(new ColumnComparison(column2, "2", "2"));
+        rowComparison.addColumnComparison(new ColumnComparison(column1, "1", "x", false));
+        rowComparison.addColumnComparison(new ColumnComparison(column2, "2", "2", false));
         return rowComparison;
     }
 
@@ -156,8 +156,8 @@ public class DefaultExpectedDataSetAssertTest extends UnitilsJUnit4 {
         Column column3 = createColumn("column_3", "3");
         Column column4 = createColumn("column_4", "4");
         RowComparison rowComparison = new RowComparison(createRow(column3, column4));
-        rowComparison.addColumnComparison(new ColumnComparison(column3, "3", "3"));
-        rowComparison.addColumnComparison(new ColumnComparison(column4, "4", "y"));
+        rowComparison.addColumnComparison(new ColumnComparison(column3, "3", "3", false));
+        rowComparison.addColumnComparison(new ColumnComparison(column4, "4", "y", false));
         return rowComparison;
     }
 

@@ -31,6 +31,8 @@ public class ProcessedColumn {
     private boolean literalValue;
     /* True if the column is a primary key column */
     private boolean primaryKey;
+    /* The original column that was processed */
+    private Column column;
 
 
     /**
@@ -38,12 +40,14 @@ public class ProcessedColumn {
      * @param value        The value, not null
      * @param literalValue True if this value is a literal value
      * @param primaryKey   True if the column is a primary key column
+     * @param column       The original column that was processed, not null
      */
-    public ProcessedColumn(String name, String value, boolean literalValue, boolean primaryKey) {
+    public ProcessedColumn(String name, String value, boolean literalValue, boolean primaryKey, Column column) {
         this.name = name;
         this.value = value;
         this.literalValue = literalValue;
         this.primaryKey = primaryKey;
+        this.column = column;
     }
 
 
@@ -73,5 +77,12 @@ public class ProcessedColumn {
      */
     public boolean isPrimaryKey() {
         return primaryKey;
+    }
+
+    /**
+     * @return The original column that was processed
+     */
+    public Column getColumn() {
+        return column;
     }
 }

@@ -20,7 +20,6 @@ import org.unitils.dataset.core.Column;
 import org.unitils.dataset.core.ColumnProcessor;
 import org.unitils.dataset.core.ProcessedColumn;
 import org.unitils.dataset.core.Row;
-import org.unitils.dataset.comparison.impl.ComparisonResultSet;
 import org.unitils.dataset.loader.impl.Database;
 import org.unitils.dataset.loader.impl.NameProcessor;
 
@@ -45,11 +44,8 @@ public class RowComparator {
     protected NameProcessor nameProcessor;
     protected Database database;
 
-    protected StringBuilder columnsBuilder = new StringBuilder();
-    protected List<String> statementParameters = new ArrayList<String>();
 
-
-    public RowComparator(ColumnProcessor columnProcessor, NameProcessor nameProcessor, Database database) throws SQLException {
+    public void init(ColumnProcessor columnProcessor, NameProcessor nameProcessor, Database database) {
         this.columnProcessor = columnProcessor;
         this.nameProcessor = nameProcessor;
         this.database = database;
@@ -59,77 +55,84 @@ public class RowComparator {
     public ComparisonResultSet compareRowWithDatabase(Row row, List<String> variables) throws SQLException {
         Set<String> primaryKeyColumnNames = database.getPrimaryKeyColumnNames(row.getTable());
 
-        addRow(row, variables);
+        StringBuilder columnsPart = new StringBuilder();
+        StringBuilder valuesPart = new StringBuilder();
+        List<String> statementValues = new ArrayList<String>();
+
+        List<ProcessedColumn> processedColumns = processColumns(row, variables, primaryKeyColumnNames);
+        for (ProcessedColumn processedColumn : processedColumns) {
+            addColumnToStatementParts(processedColumn, columnsPart, statementValues);
+        }
+
+        addIdentifiersToStatementParts(primaryKeyColumnNames, columnsPart);
+
         String tableName = nameProcessor.getTableName(row.getTable());
-        String sql = buildStatement(tableName, primaryKeyColumnNames);
-
-        Connection connection = database.createConnection();
-        PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
-        try {
-            preparedStatement = createPreparedStatement(sql, statementParameters, connection);
-            resultSet = preparedStatement.executeQuery();
-            return new ComparisonResultSet(connection, preparedStatement, resultSet, primaryKeyColumnNames);
-        } catch (Throwable t) {
-            closeQuietly(connection, preparedStatement, resultSet);
-            throw new UnitilsException("Unable to compare row with database content. Row: " + row + ", variables: " + variables, t);
-        }
+        String sql = createStatement(tableName, columnsPart);
+        return executeQuery(processedColumns, primaryKeyColumnNames, sql, statementValues);
     }
 
 
-    protected void addRow(Row row, List<String> variables) throws SQLException {
-        database.addExtraParentColumnsForChild(row);
+    protected List<ProcessedColumn> processColumns(Row row, List<String> variables, Set<String> primaryKeyColumnNames) {
+        List<ProcessedColumn> processedColumns = new ArrayList<ProcessedColumn>();
         for (Column column : row.getColumns()) {
-            // todo check primary key columns
-            ProcessedColumn processedColumn = columnProcessor.processColumn(column, variables, false);
-            addColumn(processedColumn);
+            boolean primaryKey = column.hasName(primaryKeyColumnNames);
+            ProcessedColumn processedColumn = columnProcessor.processColumn(column, variables, primaryKey);
+            processedColumns.add(processedColumn);
         }
+        return processedColumns;
     }
 
-    protected void addColumn(ProcessedColumn column) {
-        columnsBuilder.append(column.getName());
-        columnsBuilder.append(", ");
+    protected void addColumnToStatementParts(ProcessedColumn column, StringBuilder columnsPart, List<String> statementValues) {
+        columnsPart.append(column.getName());
+        columnsPart.append(", ");
         if (column.isLiteralValue()) {
-            columnsBuilder.append(column.getValue());
+            columnsPart.append(column.getValue());
         } else {
-            columnsBuilder.append('?');
-            statementParameters.add(column.getValue());
+            columnsPart.append('?');
+            statementValues.add(column.getValue());
         }
-        columnsBuilder.append(", ");
+        columnsPart.append(", ");
     }
 
-
-    protected String buildStatement(String tableName, Set<String> primaryKeyColumnNames) {
-        appendIdentifiers(primaryKeyColumnNames);
-        finalizeStatementParts();
+    protected String createStatement(String tableName, StringBuilder columnsPart) {
+        if (columnsPart.length() == 0) {
+            // row without columns
+            columnsPart.append("1");
+        } else {
+            columnsPart.setLength(columnsPart.length() - 2);
+        }
 
         StringBuilder sql = new StringBuilder();
         sql.append("select ");
-        sql.append(columnsBuilder);
+        sql.append(columnsPart);
         sql.append(" from ");
         sql.append(tableName);
         return sql.toString();
     }
 
-    protected void appendIdentifiers(Set<String> primaryKeyColumnNames) {
+    protected void addIdentifiersToStatementParts(Set<String> primaryKeyColumnNames, StringBuilder columnsPart) {
         if (primaryKeyColumnNames.isEmpty()) {
             return;
         }
         for (String primaryKeyColumnName : primaryKeyColumnNames) {
-            columnsBuilder.append(nameProcessor.getQuotedName(primaryKeyColumnName));
-            columnsBuilder.append(", ");
+            columnsPart.append(nameProcessor.getQuotedName(primaryKeyColumnName));
+            columnsPart.append(", ");
         }
     }
 
-    protected void finalizeStatementParts() {
-        if (hasColumns()) {
-            columnsBuilder.setLength(columnsBuilder.length() - 2);
-        } else {
-            columnsBuilder.append("1");
+
+    protected ComparisonResultSet executeQuery(List<ProcessedColumn> processedColumns, Set<String> primaryKeyColumnNames, String sql, List<String> statementValues) throws SQLException {
+        Connection connection = database.createConnection();
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        try {
+            preparedStatement = createPreparedStatement(sql, statementValues, connection);
+            resultSet = preparedStatement.executeQuery();
+            return new ComparisonResultSet(processedColumns, connection, preparedStatement, resultSet, primaryKeyColumnNames);
+        } catch (Throwable t) {
+            closeQuietly(connection, preparedStatement, resultSet);
+            throw new UnitilsException("Unable to compare row with database content.", t);
         }
     }
 
-    protected boolean hasColumns() {
-        return columnsBuilder.length() != 0;
-    }
 }
