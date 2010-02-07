@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.comparison;
 
-import org.unitils.dataset.comparison.impl.DataSetComparison;
+import org.unitils.dataset.comparison.DataSetComparison;
 import org.unitils.dataset.loader.impl.Database;
 
 /**

@@ -61,7 +61,7 @@ public class ColumnProcessor {
      */
     public ProcessedColumn processColumn(Column column, List<String> variables, boolean primaryKey) {
         String columnName = nameProcessor.getColumnName(column);
-        String processedValue = getValueWithVariablesFilledIn(column.getOriginalValue(), variables);
+        String processedValue = getValueWithVariablesFilledIn(column.getValue(), variables);
 
         boolean isLiteralValue = false;
         if (isLiteralValue(processedValue)) {
@@ -70,7 +70,7 @@ public class ColumnProcessor {
         } else if (isEscapedLiteralValue(processedValue)) {
             processedValue = extractLiteralValue(processedValue);
         }
-        return new ProcessedColumn(columnName, processedValue, isLiteralValue, primaryKey);
+        return new ProcessedColumn(columnName, processedValue, isLiteralValue, primaryKey, column);
     }
 
 

@@ -97,7 +97,7 @@ public class Database {
 
             Column parentColumn = parentRow.getColumn(parentColumnName);
             if (parentColumn == null) {
-                continue;
+                throw new UnitilsException("Unable to add parent columns to child row. No value found in parent for column " + parentColumnName + ". This value is needed for child column " + childColumnName);
             }
 
             Column existingChildColumn = childRow.removeColumn(childColumnName);
@@ -105,7 +105,7 @@ public class Database {
                 logger.warn("Child row contained a value for a parent foreign key column: " + existingChildColumn + ". This value will be ignored and overridden by the actual value of the parent row: " + parentColumn);
             }
 
-            String parentValue = parentColumn.getOriginalValue();
+            String parentValue = parentColumn.getValue();
             Column parentChildColumn = new Column(childColumnName, parentValue, true);
             childRow.addColumn(parentChildColumn);
         }
@@ -117,7 +117,9 @@ public class Database {
         Connection connection = createConnection();
         ResultSet resultSet = null;
         try {
-            resultSet = connection.getMetaData().getImportedKeys(null, childTable.getSchema().getName(), childTable.getName());
+            String childSchemaName = dbSupport.toCorrectCaseIdentifier(childTable.getSchema().getName());
+            String childTableName = dbSupport.toCorrectCaseIdentifier(childTable.getName());
+            resultSet = connection.getMetaData().getImportedKeys(null, childSchemaName, childTableName);
             while (resultSet.next()) {
                 String parentForeignKeySchemaName = resultSet.getString("PKTABLE_SCHEM");
                 String parentForeignKeyTableName = resultSet.getString("PKTABLE_NAME");

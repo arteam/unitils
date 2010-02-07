@@ -22,8 +22,8 @@ import org.unitils.dataset.core.Column;
 import org.unitils.dataset.core.ColumnProcessor;
 import org.unitils.dataset.core.ProcessedColumn;
 import org.unitils.dataset.core.Row;
-import org.unitils.dataset.util.PreparedStatementUtils;
 import org.unitils.dataset.loader.RowLoader;
+import org.unitils.dataset.util.PreparedStatementUtils;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -91,11 +91,10 @@ public abstract class BaseRowLoader implements RowLoader {
     }
 
     protected boolean isPrimaryKeyColumn(Column column, Set<String> primaryKeyColumnNames, Set<String> remainingPrimaryKeyColumnNames) {
-        for (String primaryKeyColumnName : primaryKeyColumnNames) {
-            if (column.hasName(primaryKeyColumnName)) {
-                remainingPrimaryKeyColumnNames.remove(primaryKeyColumnName);
-                return true;
-            }
+        if (column.hasName(primaryKeyColumnNames)) {
+            String primaryKeyColumnName = column.getWithSameName(primaryKeyColumnNames);
+            remainingPrimaryKeyColumnNames.remove(primaryKeyColumnName);
+            return true;
         }
         return false;
     }

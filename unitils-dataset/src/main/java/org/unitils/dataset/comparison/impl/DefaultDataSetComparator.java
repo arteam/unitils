@@ -18,14 +18,11 @@ package org.unitils.dataset.comparison.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.comparison.DataSetComparator;
+import org.unitils.dataset.comparison.*;
 import org.unitils.dataset.core.*;
-import org.unitils.dataset.comparison.impl.RowComparator;
-import org.unitils.dataset.comparison.impl.ComparisonResultSet;
 import org.unitils.dataset.loader.impl.Database;
 import org.unitils.dataset.loader.impl.NameProcessor;
 
-import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -46,48 +43,46 @@ public class DefaultDataSetComparator implements DataSetComparator {
     }
 
     public DataSetComparison compare(DataSet expectedDataSet, List<String> variables) {
-        try {
-            NameProcessor nameProcessor = new NameProcessor(database.getIdentifierQuoteString());
-            ColumnProcessor columnProcessor = new ColumnProcessor(expectedDataSet.getLiteralToken(), expectedDataSet.getVariableToken(), nameProcessor);
-            return compareDataSet(expectedDataSet, variables, columnProcessor, nameProcessor);
-        } catch (UnitilsException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new UnitilsException("Unable to load data set.", e);
-        }
+        NameProcessor nameProcessor = new NameProcessor(database.getIdentifierQuoteString());
+        ColumnProcessor columnProcessor = new ColumnProcessor(expectedDataSet.getLiteralToken(), expectedDataSet.getVariableToken(), nameProcessor);
+        RowComparator rowComparator = createRowComparator();
+        rowComparator.init(columnProcessor, nameProcessor, database);
+
+        return compareDataSet(expectedDataSet, variables, rowComparator);
     }
 
 
-    protected DataSetComparison compareDataSet(DataSet dataSet, List<String> variables, ColumnProcessor columnProcessor, NameProcessor nameProcessor) throws SQLException {
+    protected DataSetComparison compareDataSet(DataSet dataSet, List<String> variables, RowComparator rowComparator) {
         DataSetComparison dataSetComparison = new DataSetComparison();
         for (Schema schema : dataSet.getSchemas()) {
-            SchemaComparison schemaComparison = compareSchema(schema, variables, columnProcessor, nameProcessor);
+            SchemaComparison schemaComparison = compareSchema(schema, variables, rowComparator);
             dataSetComparison.addSchemaComparison(schemaComparison);
         }
         return dataSetComparison;
     }
 
-    protected SchemaComparison compareSchema(Schema schema, List<String> variables, ColumnProcessor columnProcessor, NameProcessor nameProcessor) throws SQLException {
+    protected SchemaComparison compareSchema(Schema schema, List<String> variables, RowComparator rowComparator) {
         SchemaComparison schemaComparison = new SchemaComparison(schema);
         for (Table table : schema.getTables()) {
-            TableComparison tableComparison = compareTable(table, variables, columnProcessor, nameProcessor);
+            TableComparison tableComparison = compareTable(table, variables, rowComparator);
             schemaComparison.addTableComparison(tableComparison);
         }
         return schemaComparison;
     }
 
-    protected TableComparison compareTable(Table table, List<String> variables, ColumnProcessor columnProcessor, NameProcessor nameProcessor) {
+    protected TableComparison compareTable(Table table, List<String> variables, RowComparator rowComparator) {
         TableComparison tableDifference = new TableComparison(table);
-        findMatches(table, variables, tableDifference, columnProcessor, nameProcessor);
-        findBestComparisons(table, variables, tableDifference, columnProcessor, nameProcessor);
+        findMatches(table, variables, tableDifference, rowComparator);
+        findBestComparisons(table, variables, tableDifference, rowComparator);
         return tableDifference;
     }
 
-    protected void findMatches(Table table, List<String> variables, TableComparison tableComparison, ColumnProcessor columnProcessor, NameProcessor nameProcessor) {
+
+    protected void findMatches(Table table, List<String> variables, TableComparison tableComparison, RowComparator rowComparator) {
         for (Row row : table.getRows()) {
             try {
-                RowComparator comparisonPreparedStatement = createPreparedStatementWrapper(columnProcessor, nameProcessor, database);
-                ComparisonResultSet comparisonResultSet = comparisonPreparedStatement.compareRowWithDatabase(row, variables);
+                database.addExtraParentColumnsForChild(row);
+                ComparisonResultSet comparisonResultSet = rowComparator.compareRowWithDatabase(row, variables);
                 try {
                     findMatchesAndTablesThatShouldHaveNoMoreRecords(row, variables, comparisonResultSet, tableComparison);
                 } finally {
@@ -99,14 +94,13 @@ public class DefaultDataSetComparator implements DataSetComparator {
         }
     }
 
-    protected void findBestComparisons(Table table, List<String> variables, TableComparison tableComparison, ColumnProcessor columnProcessor, NameProcessor nameProcessor) {
+    protected void findBestComparisons(Table table, List<String> variables, TableComparison tableComparison, RowComparator rowComparator) {
         for (Row row : table.getRows()) {
             if (row.isEmpty() || row.isNotExists() || tableComparison.hasMatch(row)) {
                 continue;
             }
             try {
-                RowComparator comparisonPreparedStatement = createPreparedStatementWrapper(columnProcessor, nameProcessor, database);
-                ComparisonResultSet comparisonResultSet = comparisonPreparedStatement.compareRowWithDatabase(row, variables);
+                ComparisonResultSet comparisonResultSet = rowComparator.compareRowWithDatabase(row, variables);
                 try {
                     findBestComparisons(row, variables, comparisonResultSet, tableComparison);
                 } finally {
@@ -131,7 +125,7 @@ public class DefaultDataSetComparator implements DataSetComparator {
                 }
                 break;
             }
-            RowComparison rowComparison = compareRow(row, comparisonResultSet);
+            RowComparison rowComparison = comparisonResultSet.getRowComparison(row);
             if (rowComparison.isMatch()) {
                 tableComparison.replaceIfBetterRowComparison(rowIdentifier, rowComparison);
                 break;
@@ -147,7 +141,7 @@ public class DefaultDataSetComparator implements DataSetComparator {
             if (tableComparison.isActualRowWithExactMatch(rowIdentifier)) {
                 continue;
             }
-            RowComparison rowComparison = compareRow(row, comparisonResultSet);
+            RowComparison rowComparison = comparisonResultSet.getRowComparison(row);
             tableComparison.replaceIfBetterRowComparison(rowIdentifier, rowComparison);
             foundActualRow = true;
         }
@@ -157,24 +151,8 @@ public class DefaultDataSetComparator implements DataSetComparator {
     }
 
 
-    protected RowComparison compareRow(Row row, ComparisonResultSet comparisonResultSet) throws SQLException {
-        RowComparison rowComparison = new RowComparison(row);
-
-        List<Column> columns = row.getColumns();
-        for (int index = 0; index < columns.size(); index++) {
-            Column column = columns.get(index);
-            String expectedValue = comparisonResultSet.getExpectedValue(index);
-            String actualValue = comparisonResultSet.getActualValue(index);
-
-            ColumnComparison columnComparison = new ColumnComparison(column, expectedValue, actualValue);
-            rowComparison.addColumnComparison(columnComparison);
-        }
-        return rowComparison;
+    protected RowComparator createRowComparator() {
+        return new RowComparator();
     }
-
-    protected RowComparator createPreparedStatementWrapper(ColumnProcessor columnProcessor, NameProcessor nameProcessor, Database database) throws Exception {
-        return new RowComparator(columnProcessor, nameProcessor, database);
-    }
-
 
 }

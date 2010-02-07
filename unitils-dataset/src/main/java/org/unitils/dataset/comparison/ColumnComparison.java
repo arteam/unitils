@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.comparison.impl;
+package org.unitils.dataset.comparison;
 
 import org.unitils.dataset.core.Column;
 
@@ -27,18 +27,19 @@ public class ColumnComparison {
 
     /* The name of the data set column */
     private Column column;
-
     /* The expected value */
     private String expectedValue;
-
     /* The expected value */
     private String actualValue;
+    /* True if this column is part of a primary key */
+    private boolean primaryKey;
 
 
-    public ColumnComparison(Column column, String expectedValue, String actualValue) {
+    public ColumnComparison(Column column, String expectedValue, String actualValue, boolean primaryKey) {
         this.column = column;
         this.expectedValue = expectedValue;
         this.actualValue = actualValue;
+        this.primaryKey = primaryKey;
     }
 
 
@@ -56,6 +57,10 @@ public class ColumnComparison {
 
     public String getActualValue() {
         return actualValue;
+    }
+
+    public boolean isPrimaryKey() {
+        return primaryKey;
     }
 
     /**

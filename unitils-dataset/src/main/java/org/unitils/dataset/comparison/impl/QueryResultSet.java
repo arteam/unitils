@@ -98,8 +98,12 @@ public class QueryResultSet {
         int nrOfColumns = getNrOfColumns();
         List<String> columnNames = new ArrayList<String>(nrOfColumns);
         for (int i = 0; i < nrOfColumns; i++) {
-            columnNames.add(resultSet.getMetaData().getColumnName(i + 1));
+            columnNames.add(getColumnName(i));
         }
         return columnNames;
+    }
+
+    public String getColumnName(int columnIndex) throws SQLException {
+        return resultSet.getMetaData().getColumnName(columnIndex + 1);
     }
 }

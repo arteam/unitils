@@ -18,12 +18,11 @@ package org.unitils.dataset.comparison;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.comparison.impl.*;
-import org.unitils.dataset.core.*;
-import org.unitils.dataset.comparison.impl.RowComparator;
 import org.unitils.dataset.comparison.impl.ComparisonResultSet;
+import org.unitils.dataset.comparison.impl.DefaultDataSetComparator;
+import org.unitils.dataset.comparison.impl.RowComparator;
+import org.unitils.dataset.core.*;
 import org.unitils.dataset.loader.impl.Database;
-import org.unitils.dataset.loader.impl.NameProcessor;
 import org.unitils.mock.Mock;
 
 import java.util.ArrayList;
@@ -41,9 +40,10 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
     private DefaultDataSetComparator defaultDataSetComparator = new TestDefaultDataSetComparator();
 
     private Mock<Database> database;
-    private Mock<RowComparator> comparisonPreparedStatement;
+    private Mock<RowComparator> rowComparator;
     private Mock<ComparisonResultSet> comparisonResultSet;
 
+    protected Row row;
     protected DataSet dataSet;
     protected DataSet emptyDataSet;
 
@@ -52,21 +52,31 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() throws Exception {
-        comparisonPreparedStatement.returns(comparisonResultSet).compareRowWithDatabase(null, null);
+        rowComparator.returns(comparisonResultSet).compareRowWithDatabase(null, null);
         defaultDataSetComparator.init(database.getMock());
 
-        dataSet = createDataSet();
+        row = createRow();
+        dataSet = createDataSet(row);
         emptyDataSet = createEmptyDataSet();
     }
 
 
     @Test
-    public void equal() throws Exception {
+    public void firstRowIsAMatch() throws Exception {
         setResultSetRows("row1col1", "row1col1", "row1col2", "row1col2",
                 "row2col1", "xxxx", "row2col2", "yyyy");
         DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSet, emptyVariables);
         assertTrue(dataSetComparison.isMatch());
     }
+
+    @Test
+    public void lastRowIsAMatch() throws Exception {
+        setResultSetRows("row1col1", "xxxx", "row1col2", "yyyy",
+                "row2col1", "row2col1", "row2col2", "row2col2");
+        DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSet, emptyVariables);
+        assertTrue(dataSetComparison.isMatch());
+    }
+
 
     @Test
     public void difference() throws Exception {
@@ -77,6 +87,7 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
         assertColumnComparison(1, "row1col2", "yyyy", dataSetComparison);
     }
 
+
     @Test
     public void firstRowIsBetterMatch() throws Exception {
         setResultSetRows("row1col1", "row1col1", "row1col2", "yyyy",
@@ -86,12 +97,13 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
     }
 
     @Test
-    public void secondRowIsBetterMatch() throws Exception {
+    public void lastRowIsBetterMatch() throws Exception {
         setResultSetRows("row1col1", "xxxx", "row1col2", "yyyy",
                 "row2col1", "row2col1", "row2col2", "yyyy");
         DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSet, emptyVariables);
         assertColumnComparison(1, "row2col2", "yyyy", dataSetComparison);
     }
+
 
     @Test
     public void emptyTable() throws Exception {
@@ -119,24 +131,33 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
                                   String expectedRow2Col1, String actualRow2Col1, String expectedRow2Col2, String actualRow2Col2) throws Exception {
         // first run finds the matches
         comparisonResultSet.onceReturns(true).next();
+        comparisonResultSet.onceReturns("row1").getRowIdentifier();
         setResultSetRowValues(expectedRow1Col1, actualRow1Col1, expectedRow1Col2, actualRow1Col2);
         comparisonResultSet.onceReturns(true).next();
+        comparisonResultSet.onceReturns("row2").getRowIdentifier();
         setResultSetRowValues(expectedRow2Col1, actualRow2Col1, expectedRow2Col2, actualRow2Col2);
         comparisonResultSet.onceReturns(false).next();
         // second run finds the best comparisons
         comparisonResultSet.onceReturns(true).next();
+        comparisonResultSet.onceReturns("row1").getRowIdentifier();
         setResultSetRowValues(expectedRow1Col1, actualRow1Col1, expectedRow1Col2, actualRow1Col2);
         comparisonResultSet.onceReturns(true).next();
+        comparisonResultSet.onceReturns("row2").getRowIdentifier();
         setResultSetRowValues(expectedRow2Col1, actualRow2Col1, expectedRow2Col2, actualRow2Col2);
         comparisonResultSet.onceReturns(false).next();
     }
 
     private void setResultSetRowValues(String expectedCol1, String actualCol1, String expectedCol2, String actualCol2) throws Exception {
-        comparisonResultSet.onceReturns(actualCol1).getActualValue(0);
-        comparisonResultSet.onceReturns(expectedCol1).getExpectedValue(0);
-        comparisonResultSet.onceReturns(actualCol2).getActualValue(1);
-        comparisonResultSet.onceReturns(expectedCol2).getExpectedValue(1);
+        RowComparison rowComparison = new RowComparison(row);
+        rowComparison.addColumnComparison(createColumnComparison(expectedCol1, actualCol1));
+        rowComparison.addColumnComparison(createColumnComparison(expectedCol2, actualCol2));
+        comparisonResultSet.onceReturns(rowComparison).getRowComparison(null);
     }
+
+    private ColumnComparison createColumnComparison(String expectedValue, String actualValue) {
+        return new ColumnComparison(null, expectedValue, actualValue, false);
+    }
+
 
     private void assertColumnComparison(int index, String expectedValue, String actualValue, DataSetComparison dataSetComparison) {
         SchemaComparison schemaComparison = dataSetComparison.getSchemaComparisons().get(0);
@@ -148,15 +169,19 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
         assertEquals(actualValue, columnComparison.getActualValue());
     }
 
-    private DataSet createDataSet() {
+    private DataSet createDataSet(Row row) {
         Schema schema = new Schema("my_schema", false);
         Table table = new Table("table_a", false);
-        Row row1 = new Row();
-        row1.addColumn(createColumn("column_1", "1"));
-        row1.addColumn(createColumn("column_2", "2"));
-        table.addRow(row1);
+        table.addRow(row);
         schema.addTable(table);
         return createDataSet(schema);
+    }
+
+    private Row createRow() {
+        Row row = new Row();
+        row.addColumn(createColumn("column_1", "1"));
+        row.addColumn(createColumn("column_2", "2"));
+        return row;
     }
 
     private DataSet createEmptyDataSet() {
@@ -177,8 +202,8 @@ public class DefaultDataSetComparatorTest extends UnitilsJUnit4 {
 
     private class TestDefaultDataSetComparator extends DefaultDataSetComparator {
         @Override
-        protected RowComparator createPreparedStatementWrapper(ColumnProcessor columnProcessor, NameProcessor nameProcessor, Database database) throws Exception {
-            return comparisonPreparedStatement.getMock();
+        protected RowComparator createRowComparator() {
+            return rowComparator.getMock();
         }
     }
 

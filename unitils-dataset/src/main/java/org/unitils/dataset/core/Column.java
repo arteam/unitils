@@ -15,6 +15,8 @@
  */
 package org.unitils.dataset.core;
 
+import java.util.Set;
+
 /**
  * A column in a data set row
  *
@@ -26,7 +28,7 @@ public class Column {
     /* The name of the data set column */
     private String name;
 
-    /* The original value */
+    /* The data set value */
     private String value;
 
     /* True if the column name is case sensitive */
@@ -73,9 +75,30 @@ public class Column {
     }
 
     /**
-     * @return The original value from the data set, not null
+     * @param columnNames The names to compare with, not null
+     * @return The column from the set with the same name as this column respecting case sensitivity
      */
-    public String getOriginalValue() {
+    public String getWithSameName(Set<String> columnNames) {
+        for (String columnName : columnNames) {
+            if (hasName(columnName)) {
+                return columnName;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param columnNames The names to compare with, not null
+     * @return True if a column from the set has the same name as this column respecting case sensitivity
+     */
+    public boolean hasName(Set<String> columnNames) {
+        return getWithSameName(columnNames) != null;
+    }
+
+    /**
+     * @return The value from the data set, not null
+     */
+    public String getValue() {
         return value;
     }
 
