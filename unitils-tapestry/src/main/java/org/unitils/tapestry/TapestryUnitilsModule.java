@@ -2,6 +2,7 @@ package org.unitils.tapestry;
 
 import org.apache.commons.lang.ClassUtils;
 import org.apache.tapestry5.ioc.AnnotationProvider;
+import org.apache.tapestry5.ioc.ObjectLocator;
 import org.apache.tapestry5.ioc.Registry;
 import org.apache.tapestry5.ioc.RegistryBuilder;
 import org.apache.tapestry5.ioc.annotations.Inject;
@@ -29,7 +30,7 @@ import java.util.*;
  *
  * <pre>
  * &#064;TapestryRegistry(MyModule.class)
- * &#064;RunWith(UnitilsJUnit4TestClassRunner.class)
+ * &#064;RunWith(UnitilsJUnit4BlockTestClassRunner.class)
  * public class MyTest {
  * 	&#064;Inject
  * 	private MyService service;
@@ -101,7 +102,7 @@ public class TapestryUnitilsModule implements Module {
     }
 
     private Object getValueToInjectFor(Registry registry, final Field field) {
-        if (field.getType() == Registry.class) {
+        if (field.getType() == Registry.class || field.getType() == ObjectLocator.class) {
             return registry;
         }
 

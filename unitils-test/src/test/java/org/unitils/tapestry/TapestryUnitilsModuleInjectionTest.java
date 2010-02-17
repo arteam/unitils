@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import junit.framework.Assert;
 
+import org.apache.tapestry5.ioc.ObjectLocator;
 import org.apache.tapestry5.ioc.Registry;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.InjectService;
@@ -39,6 +40,11 @@ public class TapestryUnitilsModuleInjectionTest {
 	private Registry registry;
 	@Inject
 	private static Registry staticRegistry;
+	@Inject
+	private ObjectLocator objectLocator;
+	@Inject
+	private static ObjectLocator staticObjectLocator;
+	
 
 	private Registry registryThatIsNotInjected;
 	private Person serviceThatIsNotInjected;
@@ -83,6 +89,16 @@ public class TapestryUnitilsModuleInjectionTest {
 	@Test
 	public void injectStaticTapestryRegistry() {
 		assertNotNull(staticRegistry);
+	}
+	
+	@Test
+	public void injectTapestryRegistryAsObjectLocator() {
+		assertNotNull(objectLocator);
+	}
+	
+	@Test
+	public void injectStaticTapestryRegistryAsObjectLocator() {
+		assertNotNull(staticObjectLocator);
 	}
 
 	@Test
