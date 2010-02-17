@@ -41,6 +41,8 @@ public @interface TapestryRegistry {
 	 * <li>Class<?>[] modules
 	 * <li>
 	 * </ul>
+	 * 
+	 * For more information see {@link RegistryFactory}.
 	 */
 	String registryFactoryMethodName() default "";
 
@@ -56,6 +58,8 @@ public @interface TapestryRegistry {
 	 * The method must be non static.
 	 * 
 	 * The method takes a single argument of type {@link Registry}.
+	 * 
+	 * For more information see {@link RegistryShutdown}.
 	 */
 	String registryShutdownMethodName() default "";
 
