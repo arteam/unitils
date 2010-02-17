@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
+import org.unitils.tapestry.annotation.RegistryFactory;
+import org.unitils.tapestry.annotation.RegistryShutdown;
 import org.unitils.tapestry.annotation.RunBeforeTapestryRegistryIsCreated;
 import org.unitils.tapestry.annotation.TapestryRegistry;
 
@@ -136,23 +138,41 @@ public class TapestryUnitilsModule implements Module {
         }
     }
 
+    private Method getRegistryShutdownMethodFor(TapestryRegistry annotation, Class<?> testClass, Object testObject) {
+        Method shutdownMethod = null;
+        if (annotation != null && annotation.registryShutdownMethodName().length() != 0) {
+            try {
+                shutdownMethod = testClass.getMethod(annotation.registryShutdownMethodName(), new Class<?>[]{Registry.class});
+            } catch (SecurityException e) {
+                throw new TapestryUnitilsModuleException(String.format("Registry shutdown method '%s' must be public", annotation.registryShutdownMethodName()),
+                        e);
+            } catch (NoSuchMethodException e) {
+                throw new TapestryUnitilsModuleException(String.format("Could not find registry shutdown method '%s'", annotation.registryShutdownMethodName()),
+                        e);
+            }
+        } else if(annotation != null) {
+        	shutdownMethod = findMostSpecificAnnotatedMethod(testClass, RegistryShutdown.class, void.class, Registry.class);
+        }
+        
+        if(shutdownMethod == null)
+        	return null;
+        
+    	if(!Modifier.isPublic(shutdownMethod.getModifiers())) {
+	        throw new TapestryUnitilsModuleException(String.format("Registry shutdown method '%s' must be public", shutdownMethod.getName()));
+    	}
+        if (Modifier.isStatic(shutdownMethod.getModifiers())) {
+            throw new TapestryUnitilsModuleException(String.format("Registry factory method '%s' may not be static", shutdownMethod.getName()));
+        }
+        
+        return shutdownMethod;
+    }
+    
     private void shutdownRegistryFor(TapestryRegistry annotation, Class<?> testClass, Object testObject, Registry registry) {
         if (registry != null) {
             if (logger.isDebugEnabled()) {
                 logger.debug("shutting down tapestry registry ...");
             }
-            Method shutdownMethod = null;
-            if (annotation != null && annotation.registryShutdownMethodName().length() != 0) {
-                try {
-                    shutdownMethod = testClass.getMethod(annotation.registryShutdownMethodName(), new Class<?>[]{Registry.class});
-                } catch (SecurityException e) {
-                    throw new TapestryUnitilsModuleException(String.format("Registry shutdown method '%s' must be public", annotation.registryShutdownMethodName()),
-                            e);
-                } catch (NoSuchMethodException e) {
-                    throw new TapestryUnitilsModuleException(String.format("Could not find registry shutdown method '%s'", annotation.registryShutdownMethodName()),
-                            e);
-                }
-            }
+            Method shutdownMethod = getRegistryShutdownMethodFor(annotation, testClass, testObject);
             try {
                 if (shutdownMethod != null) {
                     shutdownMethod.invoke(testObject, registry);
@@ -188,35 +208,52 @@ public class TapestryUnitilsModule implements Module {
         }
     }
 
+    private Method findMostSpecificAnnotatedMethod(Class<?> type, Class<? extends Annotation> annotationType, Class<?> returnType, Class<?>... parameterTypes) {
+    	if(type == null) 
+    		return null;
+    	
+    	for(Method method : type.getDeclaredMethods()) {
+    		if(method.getAnnotation(annotationType) != null && method.getReturnType().equals(returnType) && 
+    				Arrays.equals(method.getParameterTypes(), parameterTypes)) {
+    			return method;
+    		}
+    	}
+    	return findMostSpecificAnnotatedMethod(type.getSuperclass(), annotationType, returnType, parameterTypes);
+    }
+    
     private Method getRegistryFactoryMethodFor(TapestryRegistry annotation, Class<?> testClass, Object testObject) {
-
-        if (annotation.registryFactoryMethodName().length() == 0)
-            return null;
-
         Method method = null;
-        try {
-            method = testClass.getMethod(annotation.registryFactoryMethodName(), String.class, Class[].class);
-        } catch (SecurityException e) {
-            throw new TapestryUnitilsModuleException(String.format("Registry factory method '%s' must be public", annotation.registryFactoryMethodName()), e);
-        } catch (NoSuchMethodException e) {
-        }
-        if (method == null) {
+    	if (annotation.registryFactoryMethodName().length() == 0) {
+            method = findMostSpecificAnnotatedMethod(testClass, RegistryFactory.class, Registry.class, Class[].class);
+    	} else {
             try {
-                method = testClass.getMethod(annotation.registryFactoryMethodName(), Class[].class);
+                method = testClass.getMethod(annotation.registryFactoryMethodName(), String.class, Class[].class);
             } catch (SecurityException e) {
-                throw new TapestryUnitilsModuleException(String.format("Registry factory method '%s' must be public", annotation.registryFactoryMethodName()),
-                        e);
-            } catch (NoSuchMethodException e) {
-                throw new TapestryUnitilsModuleException(String.format("Could not find registry factory method '%s'", annotation.registryFactoryMethodName()),
-                        e);
+                throw new TapestryUnitilsModuleException(String.format("Registry factory method '%s' must be public", annotation.registryFactoryMethodName()), e);
+            } catch (NoSuchMethodException nsme) {
+                try {
+                    method = testClass.getMethod(annotation.registryFactoryMethodName(), Class[].class);
+                } catch (SecurityException e) {
+                    throw new TapestryUnitilsModuleException(String.format("Registry factory method '%s' must be public", annotation.registryFactoryMethodName()),
+                            e);
+                } catch (NoSuchMethodException e) {
+                    throw new TapestryUnitilsModuleException(String.format("Could not find registry factory method '%s'", annotation.registryFactoryMethodName()),
+                            e);
+                }
             }
-        }
+    	}
+    	
+    	if(method == null) 
+    		return null;
+    	
+    	if(!Modifier.isPublic(method.getModifiers())) {
+	        throw new TapestryUnitilsModuleException(String.format("Registry factory method '%s' must be public", method.getName()));
+    	}
         if (!Registry.class.isAssignableFrom(method.getReturnType())) {
-            throw new TapestryUnitilsModuleException(String.format("Registry factory method '%s' must return an instance of Registry", annotation
-                    .registryFactoryMethodName()));
+            throw new TapestryUnitilsModuleException(String.format("Registry factory method '%s' must return an instance of Registry", method.getName()));
         }
         if (testObject == null && !Modifier.isStatic(method.getModifiers())) {
-            throw new TapestryUnitilsModuleException(String.format("Registry factory method '%s' must be static", annotation.registryFactoryMethodName()));
+            throw new TapestryUnitilsModuleException(String.format("Registry factory method '%s' must be static", method.getName()));
         }
         return method;
     }
