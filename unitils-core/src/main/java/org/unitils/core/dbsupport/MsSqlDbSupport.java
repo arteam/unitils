@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2010,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 package org.unitils.core.dbsupport;
 
 import org.unitils.core.UnitilsException;
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Set;
+
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 /**
  * Implementation of {@link DbSupport} for a MsSQL database.
@@ -134,6 +135,7 @@ public class MsSqlDbSupport extends DbSupport {
 
 
     // todo refactor (see oracle)
+
     protected void disableReferentialConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
         Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select f.name from sys.foreign_keys f, sys.tables t, sys.schemas s where f.parent_object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
@@ -141,7 +143,6 @@ public class MsSqlDbSupport extends DbSupport {
             sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
         }
     }
-
 
     /**
      * Disables all value constraints (e.g. not null) on all tables in the schema
@@ -154,8 +155,8 @@ public class MsSqlDbSupport extends DbSupport {
         }
     }
 
-
     // todo refactor (see oracle)
+
     protected void disableValueConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
 
@@ -190,6 +191,19 @@ public class MsSqlDbSupport extends DbSupport {
         getSQLHandler().executeUpdate("DBCC CHECKIDENT ('" + qualified(tableName) + "', reseed, " + identityValue + ")");
     }
 
+    /**
+     * Enables or disables the setting of identity value in insert and update statements.
+     * By default some databases do not allow to set values of identity columns directly from insert/update
+     * statements. If supported, this method will enable/disable this behavior.
+     *
+     * @param tableName The table with the identity column, not null
+     * @param enabled   True to enable, false to disable
+     */
+    @Override
+    public void setSettingIdentityColumnValueEnabled(String tableName, boolean enabled) {
+        getSQLHandler().executeUpdate("SET IDENTITY_INSERT " + qualified(tableName) + " " + (enabled ? "ON" : "OFF"));
+    }
+
 
     /**
      * Synonyms are supported.
@@ -201,7 +215,6 @@ public class MsSqlDbSupport extends DbSupport {
         return true;
     }
 
-
     /**
      * Triggers are supported.
      *
@@ -212,7 +225,6 @@ public class MsSqlDbSupport extends DbSupport {
         return true;
     }
 
-
     /**
      * Types are supported
      *
@@ -222,7 +234,6 @@ public class MsSqlDbSupport extends DbSupport {
     public boolean supportsTypes() {
         return true;
     }
-
 
     /**
      * Identity columns are supported.

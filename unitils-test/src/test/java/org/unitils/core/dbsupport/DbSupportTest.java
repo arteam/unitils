@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2010,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,22 +19,23 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hsqldb.Trigger;
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.database.annotations.TestDataSource;
+
+import javax.sql.DataSource;
+import java.util.Properties;
+import java.util.Set;
+
+import static java.util.Arrays.asList;
+import static org.junit.Assert.*;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import static org.unitils.core.util.SQLTestUtils.*;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.getItemAsLong;
-import org.unitils.database.annotations.TestDataSource;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
-
-import javax.sql.DataSource;
-import static java.util.Arrays.asList;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * Tests for the db support class. Each type of database has to provide a subclass in which it sets-up the database
@@ -298,7 +299,6 @@ public class DbSupportTest extends UnitilsJUnit4 {
         assertEquals(30, result);
     }
 
-
     /**
      * Tests incrementing the current value of the primary key.
      */
@@ -314,6 +314,23 @@ public class DbSupportTest extends UnitilsJUnit4 {
 
         long result = getItemAsLong("select col1 from test_table", dataSource);
         assertEquals(30, result);
+    }
+
+    /**
+     * Tests setting a value of an indentity column in an insert statement
+     */
+    @Test
+    public void enableSetSettingIdentityColumnValueEnabled() throws Exception {
+        if (!dbSupport.supportsIdentityColumns()) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
+
+        dbSupport.setSettingIdentityColumnValueEnabled(dbSupport.toCorrectCaseIdentifier("TEST_TABLE"), true);
+        executeUpdate("insert into test_table (col1, col2) values (99, 'value')", dataSource);
+
+        long result = getItemAsLong("select col1 from test_table", dataSource);
+        assertEquals(99, result);
     }
 
 

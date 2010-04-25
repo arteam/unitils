@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2010,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
 package org.unitils.core.dbsupport;
 
 import org.unitils.core.util.StoredIdentifierCase;
-import static org.unitils.core.util.StoredIdentifierCase.LOWER_CASE;
-import static org.unitils.core.util.StoredIdentifierCase.UPPER_CASE;
 
 import java.util.Set;
+
+import static org.unitils.core.util.StoredIdentifierCase.LOWER_CASE;
+import static org.unitils.core.util.StoredIdentifierCase.UPPER_CASE;
 
 /**
  * Implementation of {@link DbSupport} for a MySql database.
@@ -104,6 +105,7 @@ public class MySqlDbSupport extends DbSupport {
 
 
     // todo refactor (see oracle)
+
     protected void disableReferentialConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
         Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select constraint_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' AND table_name = '" + tableName + "' and constraint_schema = '" + getSchemaName() + "'");
@@ -126,6 +128,7 @@ public class MySqlDbSupport extends DbSupport {
 
 
     // todo refactor (see oracle)
+
     protected void disableValueConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
 
@@ -168,6 +171,19 @@ public class MySqlDbSupport extends DbSupport {
     @Override
     public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
         getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " AUTO_INCREMENT = " + identityValue);
+    }
+
+    /**
+     * Enables or disables the setting of identity value in insert and update statements.
+     * By default some databases do not allow to set values of identity columns directly from insert/update
+     * statements. If supported, this method will enable/disable this behavior.
+     *
+     * @param tableName The table with the identity column, not null
+     * @param enabled   True to enable, false to disable
+     */
+    @Override
+    public void setSettingIdentityColumnValueEnabled(String tableName, boolean enabled) {
+        // nothing to do, my-sql allows setting values for identity columns
     }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2010,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,16 @@ package org.unitils.core.dbsupport;
 
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.StoredIdentifierCase;
-import static org.unitils.core.util.StoredIdentifierCase.*;
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
-import static org.unitils.util.PropertyUtils.getString;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.Set;
+
+import static org.unitils.core.util.StoredIdentifierCase.*;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
+import static org.unitils.util.PropertyUtils.getString;
 
 /**
  * Helper class that implements a number of common operations on a database schema. Operations that can be implemented
@@ -335,7 +336,6 @@ abstract public class DbSupport {
         throw new UnsupportedOperationException("Sequences not supported for " + getDatabaseDialect());
     }
 
-
     /**
      * Gets the names of all identity columns of the given table.
      *
@@ -345,7 +345,6 @@ abstract public class DbSupport {
     public Set<String> getIdentityColumnNames(String tableName) {
         throw new UnsupportedOperationException("Identity columns not supported for " + getDatabaseDialect());
     }
-
 
     /**
      * Increments the identity value for the specified identity column on the specified table to the given value. If there
@@ -359,6 +358,17 @@ abstract public class DbSupport {
         throw new UnsupportedOperationException("Identity columns not supported for " + getDatabaseDialect());
     }
 
+    /**
+     * Enables or disables the setting of identity value in insert and update statements.
+     * By default some databases do not allow to set values of identity columns directly from insert/update
+     * statements. If supported, this method will enable/disable this behavior.
+     *
+     * @param tableName The table with the identity column, not null
+     * @param enabled   True to enable, false to disable
+     */
+    public void setSettingIdentityColumnValueEnabled(String tableName, boolean enabled) {
+        throw new UnsupportedOperationException("Enabling/disabling setting values for identity columns not supported for " + getDatabaseDialect());
+    }
 
     /**
      * Gets the column type suitable to store values of the Java <code>java.lang.Long</code> type.
@@ -368,7 +378,6 @@ abstract public class DbSupport {
     public String getLongDataType() {
         return "BIGINT";
     }
-
 
     /**
      * Gets the column type suitable to store text values.
@@ -393,7 +402,6 @@ abstract public class DbSupport {
     public String qualified(String databaseObjectName) {
         return quoted(schemaName) + "." + quoted(databaseObjectName);
     }
-
 
     /**
      * Put quotes around the given databaseObjectName, if the underlying DBMS supports quoted database object names.
@@ -448,7 +456,6 @@ abstract public class DbSupport {
         }
     }
 
-
     /**
      * Determines the case the database uses to store non-quoted identifiers. This will use the connections
      * database metadata to determine the correct case.
@@ -485,7 +492,6 @@ abstract public class DbSupport {
             closeQuietly(connection, null, null);
         }
     }
-
 
     /**
      * Determines the string used to quote identifiers to make them case-sensitive. This will use the connections
@@ -529,7 +535,6 @@ abstract public class DbSupport {
         return false;
     }
 
-
     /**
      * Indicates whether the underlying DBMS supports sequences
      *
@@ -538,7 +543,6 @@ abstract public class DbSupport {
     public boolean supportsSequences() {
         return false;
     }
-
 
     /**
      * Indicates whether the underlying DBMS supports triggers
@@ -549,7 +553,6 @@ abstract public class DbSupport {
         return false;
     }
 
-
     /**
      * Indicates whether the underlying DBMS supports database types
      *
@@ -558,7 +561,6 @@ abstract public class DbSupport {
     public boolean supportsTypes() {
         return false;
     }
-
 
     /**
      * Indicates whether the underlying DBMS supports identity columns
@@ -569,7 +571,6 @@ abstract public class DbSupport {
         return false;
     }
 
-
     /**
      * Indicates whether the underlying DBMS supports materialized views
      *
@@ -578,7 +579,6 @@ abstract public class DbSupport {
     public boolean supportsMaterializedViews() {
         return false;
     }
-
 
     /**
      * Indicates whether the underlying DBMS supports the cascade option for dropping tables and views.

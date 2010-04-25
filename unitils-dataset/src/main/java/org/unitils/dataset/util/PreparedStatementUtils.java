@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright 2010,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,14 +65,28 @@ public class PreparedStatementUtils {
         if (statementValues.isEmpty()) {
             return;
         }
-        ParameterMetaData parameterMetaData = preparedStatement.getParameterMetaData();
+        ParameterMetaData parameterMetaData = getParameterMetaData(preparedStatement);
 
         int index = 1;
         for (String value : statementValues) {
-            int columnTypeInDatabase = parameterMetaData.getParameterType(index);
-            preparedStatement.setObject(index++, value, columnTypeInDatabase);
+            if (parameterMetaData == null) {
+                preparedStatement.setObject(index++, value);
+            } else {
+                int columnTypeInDatabase = parameterMetaData.getParameterType(index);
+                preparedStatement.setObject(index++, value, columnTypeInDatabase);
+            }
         }
     }
+
+    protected static ParameterMetaData getParameterMetaData(PreparedStatement preparedStatement) {
+        try {
+            return preparedStatement.getParameterMetaData();
+        } catch (SQLException e) {
+            logger.warn("JDBC driver does not support PreparedStatement.getParameterMetaData(). Falling back to setObject without specifiying a type.");
+            return null;
+        }
+    }
+
 
     protected static void logStatement(String sql, List<String> statementValues) {
         if (statementValues.isEmpty()) {

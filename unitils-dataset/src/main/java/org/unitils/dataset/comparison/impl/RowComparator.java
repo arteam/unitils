@@ -1,5 +1,5 @@
 /*
- * Copyright 2009,  Unitils.org
+ * Copyright 2010,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,8 +88,7 @@ public class RowComparator {
         if (column.isLiteralValue()) {
             columnsPart.append(column.getValue());
         } else {
-            columnsPart.append('?');
-            statementValues.add(column.getValue());
+            columnsPart.append(column.getValue());
         }
         columnsPart.append(", ");
     }
@@ -131,7 +130,7 @@ public class RowComparator {
             return new ComparisonResultSet(processedColumns, connection, preparedStatement, resultSet, primaryKeyColumnNames);
         } catch (Throwable t) {
             closeQuietly(connection, preparedStatement, resultSet);
-            throw new UnitilsException("Unable to compare row with database content.", t);
+            throw new UnitilsException("Unable to compare row with database content. Sql: " + sql + ", statementValues: " + statementValues, t);
         }
     }
 
