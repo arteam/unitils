@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2010,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,6 +119,7 @@ public class Db2DbSupport extends DbSupport {
 
 
     // todo refactor (see oracle)
+
     protected void disableReferentialConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
         Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTNAME from SYSCAT.TABCONST where TYPE = 'F' and TABNAME = '" + tableName + "' and TABSCHEMA = '" + getSchemaName() + "'");
@@ -141,6 +142,7 @@ public class Db2DbSupport extends DbSupport {
 
 
     // todo refactor (see oracle)
+
     protected void disableValueConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
 
@@ -190,7 +192,6 @@ public class Db2DbSupport extends DbSupport {
         getSQLHandler().executeUpdate("alter sequence " + qualified(sequenceName) + " restart with " + newSequenceValue);
     }
 
-
     /**
      * Gets the names of all identity columns of the given table.
      * <p/>
@@ -203,7 +204,6 @@ public class Db2DbSupport extends DbSupport {
     public Set<String> getIdentityColumnNames(String tableName) {
         return getSQLHandler().getItemsAsStringSet("select COLNAME from SYSCAT.COLUMNS where KEYSEQ is not null and TABNAME = '" + tableName + "' and TABSCHEMA = '" + getSchemaName() + "'");
     }
-
 
     /**
      * Increments the identity value for the specified identity column on the specified table to the given value. If
@@ -218,6 +218,19 @@ public class Db2DbSupport extends DbSupport {
         getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " alter column " + quoted(identityColumnName) + " restart with " + identityValue);
     }
 
+    /**
+     * Enables or disables the setting of identity value in insert and update statements.
+     * By default some databases do not allow to set values of identity columns directly from insert/update
+     * statements. If supported, this method will enable/disable this behavior.
+     *
+     * @param tableName The table with the identity column, not null
+     * @param enabled   True to enable, false to disable
+     */
+    @Override
+    public void setSettingIdentityColumnValueEnabled(String tableName, boolean enabled) {
+        // nothing to do, db2 allows setting values for identity columns
+    }
+
 
     /**
      * Sequences are supported.
@@ -229,7 +242,6 @@ public class Db2DbSupport extends DbSupport {
         return true;
     }
 
-
     /**
      * Triggers are supported.
      *
@@ -240,7 +252,6 @@ public class Db2DbSupport extends DbSupport {
         return true;
     }
 
-
     /**
      * Identity columns are supported.
      *
@@ -250,7 +261,6 @@ public class Db2DbSupport extends DbSupport {
     public boolean supportsIdentityColumns() {
         return true;
     }
-
 
     /**
      * Types are supported

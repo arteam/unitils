@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2010,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 package org.unitils.core.dbsupport;
 
 import org.unitils.core.UnitilsException;
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Set;
+
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 /**
  * Implementation of {@link DbSupport} for a hsqldb database
@@ -133,7 +134,6 @@ public class HsqldbDbSupport extends DbSupport {
         disableNotNullConstraints();
     }
 
-
     /**
      * Disables all check and unique constraints on all tables in the schema
      */
@@ -160,7 +160,6 @@ public class HsqldbDbSupport extends DbSupport {
             closeQuietly(connection, alterStatement, resultSet);
         }
     }
-
 
     /**
      * Disables all not null constraints on all tables in the schema
@@ -205,7 +204,6 @@ public class HsqldbDbSupport extends DbSupport {
         return getSQLHandler().getItemAsLong("select START_WITH from INFORMATION_SCHEMA.SYSTEM_SEQUENCES where SEQUENCE_SCHEMA = '" + getSchemaName() + "' and SEQUENCE_NAME = '" + sequenceName + "'");
     }
 
-
     /**
      * Sets the next value of the sequence with the given sequence name to the given sequence value.
      *
@@ -220,8 +218,7 @@ public class HsqldbDbSupport extends DbSupport {
 
     /**
      * Gets the names of all identity columns of the given table.
-     * <p/>
-     * todo check, at this moment the PK columns are returned
+     * todo: in upcomming version 2.0 following query can be used select COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where IS_IDENTITY = 'YES'
      *
      * @param tableName The table, not null
      * @return The names of the identity columns of the table with the given name
@@ -230,7 +227,6 @@ public class HsqldbDbSupport extends DbSupport {
     public Set<String> getIdentityColumnNames(String tableName) {
         return getSQLHandler().getItemsAsStringSet("select COLUMN_NAME from INFORMATION_SCHEMA.SYSTEM_PRIMARYKEYS where TABLE_NAME = '" + tableName + "' AND TABLE_SCHEM = '" + getSchemaName() + "'");
     }
-
 
     /**
      * Increments the identity value for the specified identity column on the specified table to the given value.
@@ -244,6 +240,19 @@ public class HsqldbDbSupport extends DbSupport {
         getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " alter column " + quoted(identityColumnName) + " RESTART WITH " + identityValue);
     }
 
+    /**
+     * Enables or disables the setting of identity value in insert and update statements.
+     * By default some databases do not allow to set values of identity columns directly from insert/update
+     * statements. If supported, this method will enable/disable this behavior.
+     *
+     * @param tableName The table with the identity column, not null
+     * @param enabled   True to enable, false to disable
+     */
+    @Override
+    public void setSettingIdentityColumnValueEnabled(String tableName, boolean enabled) {
+        // nothing to do, hsqldb allows setting values for identity columns
+    }
+
 
     /**
      * Sequences are supported.
@@ -255,7 +264,6 @@ public class HsqldbDbSupport extends DbSupport {
         return true;
     }
 
-
     /**
      * Triggers are supported.
      *
@@ -266,7 +274,6 @@ public class HsqldbDbSupport extends DbSupport {
         return true;
     }
 
-
     /**
      * Identity columns are supported.
      *
@@ -276,7 +283,6 @@ public class HsqldbDbSupport extends DbSupport {
     public boolean supportsIdentityColumns() {
         return true;
     }
-
 
     /**
      * Cascade are supported.
