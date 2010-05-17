@@ -26,6 +26,8 @@
     <orderEntry type="library" exported="" name="Maven: org.springframework:spring-context:2.5.2" level="project" />
     <orderEntry type="library" exported="" name="Maven: aopalliance:aopalliance:1.0" level="project" />
     <orderEntry type="library" exported="" name="Maven: org.springframework:spring-tx:2.5.2" level="project" />
+    <orderEntry type="library" exported="" name="Maven: com.sun.xml.stream:sjsxp:1.0.1" level="project" />
+    <orderEntry type="library" exported="" name="Maven: javax.xml.stream:stax-api:1.0" level="project" />
   </component>
 </module>
 
