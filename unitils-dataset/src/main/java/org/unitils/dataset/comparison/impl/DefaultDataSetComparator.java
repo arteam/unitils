@@ -18,141 +18,176 @@ package org.unitils.dataset.comparison.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.comparison.*;
-import org.unitils.dataset.core.*;
+import org.unitils.dataset.comparison.DataSetComparison;
+import org.unitils.dataset.comparison.RowComparison;
+import org.unitils.dataset.comparison.TableComparison;
+import org.unitils.dataset.core.DataSetRow;
+import org.unitils.dataset.core.DataSetRowProcessor;
+import org.unitils.dataset.core.DatabaseColumn;
+import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.factory.DataSetRowSource;
 import org.unitils.dataset.loader.impl.Database;
-import org.unitils.dataset.loader.impl.NameProcessor;
 
-import java.util.List;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DefaultDataSetComparator implements DataSetComparator {
+public class DefaultDataSetComparator {//implements DataSetComparator {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DefaultDataSetComparator.class);
 
+    protected DataSetRowProcessor dataSetRowProcessor;
+    protected TableContentRetriever tableContentRetriever;
+
     protected Database database;
-    protected String identifierQuoteString;
 
 
-    public void init(Database database) {
+    public void init(DataSetRowProcessor dataSetRowProcessor, TableContentRetriever tableContentRetriever, Database database) {
+        this.dataSetRowProcessor = dataSetRowProcessor;
+        this.tableContentRetriever = tableContentRetriever;
         this.database = database;
     }
 
-    public DataSetComparison compare(DataSet expectedDataSet, List<String> variables) {
-        NameProcessor nameProcessor = new NameProcessor(database.getIdentifierQuoteString());
-        ColumnProcessor columnProcessor = new ColumnProcessor(expectedDataSet.getLiteralToken(), expectedDataSet.getVariableToken(), nameProcessor);
-        RowComparator rowComparator = createRowComparator();
-        rowComparator.init(columnProcessor, nameProcessor, database);
-
-        return compareDataSet(expectedDataSet, variables, rowComparator);
-    }
-
-
-    protected DataSetComparison compareDataSet(DataSet dataSet, List<String> variables, RowComparator rowComparator) {
+    public DataSetComparison compare(DataSetRowSource expectedDataSetRowSource, List<String> variables) {
         DataSetComparison dataSetComparison = new DataSetComparison();
-        for (Schema schema : dataSet.getSchemas()) {
-            SchemaComparison schemaComparison = compareSchema(schema, variables, rowComparator);
-            dataSetComparison.addSchemaComparison(schemaComparison);
-        }
-        return dataSetComparison;
-    }
+        try {
+            Map<String, Map<DataSetRow, DatabaseRow>> rowsPerTable = getRowsPerTable(expectedDataSetRowSource, variables);
+            for (Map.Entry<String, Map<DataSetRow, DatabaseRow>> entry : rowsPerTable.entrySet()) {
+                String qualifiedTableName = entry.getKey();
+                Map<DataSetRow, DatabaseRow> dataSetRows = entry.getValue();
 
-    protected SchemaComparison compareSchema(Schema schema, List<String> variables, RowComparator rowComparator) {
-        SchemaComparison schemaComparison = new SchemaComparison(schema);
-        for (Table table : schema.getTables()) {
-            TableComparison tableComparison = compareTable(table, variables, rowComparator);
-            schemaComparison.addTableComparison(tableComparison);
-        }
-        return schemaComparison;
-    }
+                List<DatabaseColumn> databaseColumns = getAllUsedDatabaseColumns(dataSetRows);
+                Set<String> primaryKeyColumnNames = getPrimaryKeyColumnNames(dataSetRows);
 
-    protected TableComparison compareTable(Table table, List<String> variables, RowComparator rowComparator) {
-        TableComparison tableDifference = new TableComparison(table);
-        findMatches(table, variables, tableDifference, rowComparator);
-        findBestComparisons(table, variables, tableDifference, rowComparator);
-        return tableDifference;
-    }
-
-
-    protected void findMatches(Table table, List<String> variables, TableComparison tableComparison, RowComparator rowComparator) {
-        for (Row row : table.getRows()) {
-            try {
-                database.addExtraParentColumnsForChild(row);
-                ComparisonResultSet comparisonResultSet = rowComparator.compareRowWithDatabase(row, variables);
-                try {
-                    findMatchesAndTablesThatShouldHaveNoMoreRecords(row, variables, comparisonResultSet, tableComparison);
-                } finally {
-                    comparisonResultSet.close();
-                }
-            } catch (Exception e) {
-                throw new UnitilsException("Unable to compare data set row for table: " + table + ", row: [" + row + "], variables: " + variables, e);
+                TableComparison tableComparison = compareDataSetRowsForTable(qualifiedTableName, databaseColumns, dataSetRows, primaryKeyColumnNames);
+                dataSetComparison.addTableComparison(tableComparison);
             }
+            return dataSetComparison;
+
+        } catch (Exception e) {
+            //todo implement
+            e.printStackTrace();
+            throw new UnitilsException("todo", e);
         }
     }
 
-    protected void findBestComparisons(Table table, List<String> variables, TableComparison tableComparison, RowComparator rowComparator) {
-        for (Row row : table.getRows()) {
-            if (row.isEmpty() || row.isNotExists() || tableComparison.hasMatch(row)) {
-                continue;
+    protected List<DatabaseColumn> getAllUsedDatabaseColumns(Map<DataSetRow, DatabaseRow> dataSetRows) {
+        Map<String, DatabaseColumn> databaseColumnsPerName = new LinkedHashMap<String, DatabaseColumn>();
+        for (DatabaseRow databaseRow : dataSetRows.values()) {
+            for (DatabaseColumn databaseColumn : databaseRow.getDatabaseColumnsWithValue()) {
+                databaseColumnsPerName.put(databaseColumn.getColumnName(), databaseColumn);
             }
-            try {
-                ComparisonResultSet comparisonResultSet = rowComparator.compareRowWithDatabase(row, variables);
-                try {
-                    findBestComparisons(row, variables, comparisonResultSet, tableComparison);
-                } finally {
-                    comparisonResultSet.close();
-                }
-            } catch (Exception e) {
-                throw new UnitilsException("Unable to compare data set row for table: " + table + ", row: [" + row + "], variables: " + variables, e);
-            }
+        }
+        return new ArrayList<DatabaseColumn>(databaseColumnsPerName.values());
+    }
+
+
+    protected TableComparison compareDataSetRowsForTable(String qualifiedTableName, List<DatabaseColumn> databaseColumns, Map<DataSetRow, DatabaseRow> dataSetRows, Set<String> primaryKeyColumnNames) throws Exception {
+        TableContents tableContents = tableContentRetriever.getTableContents(qualifiedTableName, databaseColumns, primaryKeyColumnNames);
+        try {
+            return compareTable(qualifiedTableName, tableContents, dataSetRows);
+        } finally {
+            tableContents.close();
         }
     }
 
 
-    protected void findMatchesAndTablesThatShouldHaveNoMoreRecords(Row row, List<String> variables, ComparisonResultSet comparisonResultSet, TableComparison tableComparison) throws Exception {
-        while (comparisonResultSet.next()) {
-            String rowIdentifier = comparisonResultSet.getRowIdentifier();
-            if (tableComparison.isActualRowWithExactMatch(rowIdentifier)) {
-                continue;
+    protected Set<String> getPrimaryKeyColumnNames(Map<DataSetRow, DatabaseRow> dataSetRows) throws SQLException {
+        DataSetRow dataSetRow = dataSetRows.keySet().iterator().next();
+        boolean caseSensitive = dataSetRow.getDataSetSettings().isCaseSensitive();
+        return database.getPrimaryKeyColumnNames(dataSetRow.getSchemaName(), dataSetRow.getTableName(), caseSensitive);
+    }
+
+
+    protected Map<String, Map<DataSetRow, DatabaseRow>> getRowsPerTable(DataSetRowSource dataSetRowSource, List<String> variables) throws Exception {
+        Map<String, Map<DataSetRow, DatabaseRow>> dataSetRowsPerTable = new LinkedHashMap<String, Map<DataSetRow, DatabaseRow>>();
+        DataSetRow dataSetRow;
+        while ((dataSetRow = dataSetRowSource.getNextDataSetRow()) != null) {
+            DatabaseRow databaseRow = dataSetRowProcessor.process(dataSetRow, variables, new HashSet<String>());
+            String qualifiedTableName = databaseRow.getQualifiedTableName();
+
+            Map<DataSetRow, DatabaseRow> dataSetRows = dataSetRowsPerTable.get(qualifiedTableName);
+            if (dataSetRows == null) {
+                dataSetRows = new LinkedHashMap<DataSetRow, DatabaseRow>();
+                dataSetRowsPerTable.put(qualifiedTableName, dataSetRows);
             }
-            if (row.isEmpty()) {
-                if (!row.isNotExists()) {
-                    tableComparison.setExpectedNoMoreRecordsButFoundMore(true);
-                }
+            dataSetRows.put(dataSetRow, databaseRow);
+        }
+        return dataSetRowsPerTable;
+    }
+
+
+    protected TableComparison compareTable(String qualifiedTableName, TableContents tableContents, Map<DataSetRow, DatabaseRow> dataSetRows) throws Exception {
+        TableComparison tableComparison = new TableComparison(qualifiedTableName);
+
+        List<RowComparison> currentRowComparisons = new ArrayList<RowComparison>();
+
+        DatabaseRow actualDatabaseRow;
+        while ((actualDatabaseRow = tableContents.getDatabaseRow()) != null) {
+            if (dataSetRows.isEmpty()) {
                 break;
             }
-            RowComparison rowComparison = comparisonResultSet.getRowComparison(row);
-            if (rowComparison.isMatch()) {
-                tableComparison.replaceIfBetterRowComparison(rowIdentifier, rowComparison);
-                break;
+
+            Iterator<Map.Entry<DataSetRow, DatabaseRow>> iterator1 = dataSetRows.entrySet().iterator();
+            if (iterator1.hasNext()) {
+                Map.Entry<DataSetRow, DatabaseRow> entry = iterator1.next();
+
+                DataSetRow expectedDataSetRow = entry.getKey();
+                DatabaseRow expectedDatabaseRow = entry.getValue();
+
+                if (expectedDataSetRow.isEmpty()) {
+                    iterator1.remove();
+                    if (!expectedDataSetRow.isNotExists()) {
+                        tableComparison.setExpectedNoMoreRecordsButFoundMore(true);
+                    }
+                }
             }
+
+            Iterator<Map.Entry<DataSetRow, DatabaseRow>> iterator = dataSetRows.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<DataSetRow, DatabaseRow> entry = iterator.next();
+
+                DataSetRow dataSetRow = entry.getKey();
+                DatabaseRow expectedDatabaseRow = entry.getValue();
+
+                if (dataSetRow.isEmpty()) {
+                    continue;
+                }
+
+                RowComparison rowComparison = new RowComparison(expectedDatabaseRow, actualDatabaseRow);
+                currentRowComparisons.add(rowComparison);
+
+                if (rowComparison.isMatch()) {
+                    if (dataSetRow.isNotExists()) {
+                        tableComparison.setMatchingRowThatShouldNotHaveMatched(actualDatabaseRow);
+                    }
+                    tableComparison.setMatchingRow(rowComparison);
+                    iterator.remove();
+                    currentRowComparisons.clear();
+                    break;
+                }
+            }
+
+            for (RowComparison rowComparison : currentRowComparisons) {
+                tableComparison.replaceIfBetterRowComparison(rowComparison);
+            }
+            currentRowComparisons.clear();
         }
-    }
 
-    protected void findBestComparisons(Row row, List<String> variables, ComparisonResultSet comparisonResultSet, TableComparison tableComparison) throws Exception {
-        boolean foundActualRow = false;
-
-        while (comparisonResultSet.next()) {
-            String rowIdentifier = comparisonResultSet.getRowIdentifier();
-            if (tableComparison.isActualRowWithExactMatch(rowIdentifier)) {
+        for (DatabaseRow expectedDatabaseRow : dataSetRows.values()) {
+            if (expectedDatabaseRow.isEmpty()) {
                 continue;
             }
-            RowComparison rowComparison = comparisonResultSet.getRowComparison(row);
-            tableComparison.replaceIfBetterRowComparison(rowIdentifier, rowComparison);
-            foundActualRow = true;
+            if (tableComparison.getBestRowComparison(expectedDatabaseRow) == null) {
+                tableComparison.addMissingRow(expectedDatabaseRow);
+            }
         }
-        if (!foundActualRow) {
-            tableComparison.addMissingRow(row);
-        }
-    }
 
-
-    protected RowComparator createRowComparator() {
-        return new RowComparator();
+        return tableComparison;
     }
 
 }

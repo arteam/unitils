@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package org.unitils.dataset.comparison;
 
-import org.unitils.dataset.comparison.DataSetComparison;
 import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.util.DatabaseAccessor;
 
 /**
  * @author Tim Ducheyne
@@ -24,7 +24,7 @@ import org.unitils.dataset.loader.impl.Database;
  */
 public interface DatabaseContentRetriever {
 
-    void init(Database database);
+    void init(Database database, DatabaseAccessor databaseAccessor);
 
     String getActualDatabaseContentForDataSetComparison(DataSetComparison dataSetComparison);
 

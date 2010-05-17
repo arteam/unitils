@@ -1,5 +1,5 @@
 /*
- * Copyright 2010,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.sqltypehandler;
+package org.unitils.dataset.core;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import org.unitils.dataset.loader.DataSetLoader;
+import org.unitils.dataset.loader.impl.UpdateDataSetLoader;
+import org.unitils.dataset.util.DatabaseAccessor;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public interface SqlTypeHandler {
+public class UpdateDataSetStrategy extends BaseDataSetStrategy {
 
-    void setValue(String value, PreparedStatement preparedStatement, int parameterIndex, int sqlType) throws SQLException;
+    @Override
+    protected DataSetLoader createDataSetLoader(DataSetRowProcessor dataSetRowProcessor, DatabaseAccessor databaseAccessor) {
+        UpdateDataSetLoader updateDataSetLoader = new UpdateDataSetLoader();
+        updateDataSetLoader.init(dataSetRowProcessor, databaseAccessor);
+        return updateDataSetLoader;
+    }
 
-    Object getValue(ResultSet resultSet, int columnIndex, int sqlType) throws SQLException;
 }

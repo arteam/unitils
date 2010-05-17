@@ -1,5 +1,5 @@
 /*
- * Copyright 2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.loader.impl;
+package org.unitils.dataset.core;
 
-import org.unitils.dataset.loader.RowLoader;
-
-import java.sql.SQLException;
+import org.unitils.dataset.loader.DataSetLoader;
+import org.unitils.dataset.loader.impl.InsertDataSetLoader;
+import org.unitils.dataset.util.DatabaseAccessor;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class RefreshDataSetLoader extends BaseDataSetLoader {
+public class InsertDataSetStrategy extends BaseDataSetStrategy {
 
-
-    protected RowLoader createRowLoader() {
-        return new RefreshRowLoader();
+    @Override
+    protected DataSetLoader createDataSetLoader(DataSetRowProcessor dataSetRowProcessor, DatabaseAccessor databaseAccessor) {
+        InsertDataSetLoader insertDataSetLoader = new InsertDataSetLoader();
+        insertDataSetLoader.init(dataSetRowProcessor, databaseAccessor);
+        return insertDataSetLoader;
     }
 
 }

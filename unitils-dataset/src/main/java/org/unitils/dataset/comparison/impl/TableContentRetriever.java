@@ -16,15 +16,15 @@
 package org.unitils.dataset.comparison.impl;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.comparison.impl.QueryResultSet;
-import org.unitils.dataset.core.Table;
+import org.unitils.dataset.core.DatabaseColumn;
 import org.unitils.dataset.loader.impl.Database;
-import org.unitils.dataset.loader.impl.NameProcessor;
+import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Set;
 
 import static org.unitils.core.util.DbUtils.closeQuietly;
@@ -35,36 +35,49 @@ import static org.unitils.core.util.DbUtils.closeQuietly;
  */
 public class TableContentRetriever {
 
-    private Database database;
-    private NameProcessor nameProcessor;
+    protected Database database;
+    protected SqlTypeHandlerRepository sqlTypeHandlerRepository;
 
 
-    public TableContentRetriever(NameProcessor nameProcessor, Database database) throws SQLException {
+    public void init(Database database, SqlTypeHandlerRepository sqlTypeHandlerRepository) throws SQLException {
         this.database = database;
-        this.nameProcessor = nameProcessor;
+        this.sqlTypeHandlerRepository = sqlTypeHandlerRepository;
     }
 
-    public QueryResultSet getTableContent(Table table) throws SQLException {
-        Set<String> primaryKeyColumnNames = database.getPrimaryKeyColumnNames(table);
-        String sql = createStatement(table);
 
-        Connection connection = database.createConnection();
-        PreparedStatement preparedStatement = null;
+    public TableContents getTableContents(String qualifiedTableName, List<DatabaseColumn> databaseColumns, Set<String> primaryKeyColumnNames) throws SQLException {
+        String sql = createStatement(qualifiedTableName, databaseColumns, primaryKeyColumnNames);
+
         ResultSet resultSet = null;
+        PreparedStatement preparedStatement = null;
+        Connection connection = database.getConnection();
         try {
             preparedStatement = connection.prepareStatement(sql);
             resultSet = preparedStatement.executeQuery();
-            return new QueryResultSet(connection, preparedStatement, resultSet, primaryKeyColumnNames);
-        } catch (Throwable t) {
+            return new TableContents(qualifiedTableName, databaseColumns, sqlTypeHandlerRepository, primaryKeyColumnNames, connection, preparedStatement, resultSet);
+
+        } catch (Exception e) {
             closeQuietly(connection, preparedStatement, resultSet);
-            throw new UnitilsException("Unable to get content for table " + table, t);
+            throw new UnitilsException("Unable to execute query " + sql, e);
         }
     }
 
-    protected String createStatement(Table table) {
+
+    protected String createStatement(String qualifiedTableName, List<DatabaseColumn> databaseColumns, Set<String> primaryKeyColumnNames) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("select * from ");
-        stringBuilder.append(nameProcessor.getTableName(table));
+        for (DatabaseColumn databaseColumn : databaseColumns) {
+            stringBuilder.append(databaseColumn.getColumnName());
+            stringBuilder.append(", ");
+        }
+        stringBuilder.setLength(stringBuilder.length() - 2);
+        for (String primaryKeyColumnName : primaryKeyColumnNames) {
+            stringBuilder.append(primaryKeyColumnName);
+            stringBuilder.append(", ");
+        }
+        stringBuilder.setLength(stringBuilder.length() - 2);
+        stringBuilder.append(" from ");
+        stringBuilder.append(qualifiedTableName);
         return stringBuilder.toString();
     }
 

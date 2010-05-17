@@ -20,7 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.dataset.DataSetModule;
 import org.unitils.dataset.annotation.DataSet;
 import org.unitils.dataset.annotation.ExpectedDataSet;
-import org.unitils.dataset.factory.DataSetFactory;
+import org.unitils.dataset.factory.DataSetRowSource;
 import org.unitils.dataset.loader.DataSetLoader;
 
 import java.lang.annotation.Annotation;
@@ -99,21 +99,21 @@ public class DataSetAnnotationUtil {
     }
 
     /**
-     * Gets the data set factory class that was specified using the factory parameter on the DataSet annotation.
-     * If no factory was specified, the default class found in the Unitils configuration will be returned.
+     * Gets the data set row source class that was specified using the source parameter on the DataSet annotation.
+     * If no source was specified, the default class found in the Unitils configuration will be returned.
      *
      * @param testClass  The test class, not null
      * @param testMethod The test method, not null
      * @return The DataSetFactory class, not null
      */
     @SuppressWarnings("unchecked")
-    public Class<? extends DataSetFactory> getDataSetFactoryClass(Class<?> testClass, Method testMethod) {
-        Class<? extends DataSetFactory> dataSetFactoryClass = getMethodOrClassLevelAnnotationProperty(DataSet.class, "factory", DataSetFactory.class, testMethod, testClass);
-        return (Class<? extends DataSetFactory>) getClassValueReplaceDefault(DataSet.class, "factory", dataSetFactoryClass, defaultAnnotationPropertyValues, DataSetFactory.class);
+    public Class<? extends DataSetRowSource> getDataSetFactoryClass(Class<?> testClass, Method testMethod) {
+        Class<? extends DataSetRowSource> dataSetFactoryClass = getMethodOrClassLevelAnnotationProperty(DataSet.class, "source", DataSetRowSource.class, testMethod, testClass);
+        return (Class<? extends DataSetRowSource>) getClassValueReplaceDefault(DataSet.class, "source", dataSetFactoryClass, defaultAnnotationPropertyValues, DataSetRowSource.class);
     }
 
-    public Class<? extends DataSetFactory> getDefaultDataSetFactoryClass() {
-        String className = defaultAnnotationPropertyValues.get(DataSet.class).get("factory");
+    public Class<? extends DataSetRowSource> getDefaultDataSetRowSourceClass() {
+        String className = defaultAnnotationPropertyValues.get(DataSet.class).get("source");
         return getClassWithName(className);
     }
 

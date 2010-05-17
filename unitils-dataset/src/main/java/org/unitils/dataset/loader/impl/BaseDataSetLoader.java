@@ -1,5 +1,5 @@
 /*
- * Copyright 2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,17 @@
  */
 package org.unitils.dataset.loader.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.core.*;
+import org.unitils.dataset.core.DataSetRow;
+import org.unitils.dataset.core.DataSetRowProcessor;
+import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.factory.DataSetRowSource;
 import org.unitils.dataset.loader.DataSetLoader;
-import org.unitils.dataset.loader.RowLoader;
+import org.unitils.dataset.util.DatabaseAccessor;
 
-import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Tim Ducheyne
@@ -31,61 +33,50 @@ import java.util.List;
  */
 public abstract class BaseDataSetLoader implements DataSetLoader {
 
-    /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(BaseDataSetLoader.class);
-
-    protected Database database;
-    protected Database databaseMetaDataHelper;
-    protected NameProcessor nameProcessor;
+    protected DataSetRowProcessor dataSetRowProcessor;
+    protected DatabaseAccessor databaseAccessor;
 
 
-    public void init(Database database) {
-        this.database = database;
-        this.nameProcessor = new NameProcessor(database.getIdentifierQuoteString());
+    public void init(DataSetRowProcessor dataSetRowProcessor, DatabaseAccessor databaseAccessor) {
+        this.dataSetRowProcessor = dataSetRowProcessor;
+        this.databaseAccessor = databaseAccessor;
     }
 
-    public void load(DataSet dataSet, List<String> variables) {
+
+    public void load(DataSetRowSource dataSetRowSource, List<String> variables) {
+        DataSetRow dataSetRow;
+        while ((dataSetRow = dataSetRowSource.getNextDataSetRow()) != null) {
+            loadDataSetRow(dataSetRow, variables);
+        }
+    }
+
+
+    protected int loadDataSetRow(DataSetRow dataSetRow, List<String> variables) {
         try {
-            RowLoader rowLoader = createRowLoader(dataSet);
-            loadDataSet(dataSet, variables, rowLoader);
-
-        } catch (UnitilsException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new UnitilsException("Unable to load data set.", e);
-        }
-    }
-
-    protected RowLoader createRowLoader(DataSet dataSet) throws Exception {
-        ColumnProcessor columnProcessor = new ColumnProcessor(dataSet.getLiteralToken(), dataSet.getVariableToken(), nameProcessor);
-
-        RowLoader rowLoader = createRowLoader();
-        rowLoader.init(columnProcessor, nameProcessor, database);
-        return rowLoader;
-    }
-
-    protected abstract RowLoader createRowLoader();
-
-
-    protected void loadDataSet(DataSet dataSet, List<String> variables, RowLoader rowLoader) throws SQLException {
-        for (Schema schema : dataSet.getSchemas()) {
-            loadSchema(schema, variables, rowLoader);
-        }
-    }
-
-    protected void loadSchema(Schema schema, List<String> variables, RowLoader rowLoader) throws SQLException {
-        for (Table table : schema.getTables()) {
-            loadTable(table, variables, rowLoader);
-        }
-    }
-
-    protected void loadTable(Table table, List<String> variables, RowLoader rowLoader) {
-        for (Row row : table.getRows()) {
-            if (row.getNrOfColumns() == 0) {
-                continue;
+            DatabaseRow databaseRow = processDataSetRow(dataSetRow, variables);
+            if (databaseRow.isEmpty()) {
+                return 0;
             }
-            rowLoader.loadRow(row, variables);
+            return loadDatabaseRow(databaseRow);
+
+        } catch (Exception e) {
+            throw new UnitilsException("Unable to load data set row: " + dataSetRow + ", variables: " + variables, e);
         }
     }
 
+    protected DatabaseRow processDataSetRow(DataSetRow dataSetRow, List<String> variables) throws Exception {
+        Set<String> unusedPrimaryKeyColumnNames = new HashSet<String>();
+        DatabaseRow databaseRow = dataSetRowProcessor.process(dataSetRow, variables, unusedPrimaryKeyColumnNames);
+        if (!unusedPrimaryKeyColumnNames.isEmpty()) {
+            handleUnusedPrimaryKeyColumns(unusedPrimaryKeyColumnNames);
+        }
+        return databaseRow;
+    }
+
+
+    protected void handleUnusedPrimaryKeyColumns(Set<String> unusedPrimaryKeyColumnNames) {
+        // nothing to do
+    }
+
+    protected abstract int loadDatabaseRow(DatabaseRow databaseRow) throws Exception;
 }

@@ -15,8 +15,9 @@
  */
 package org.unitils.dataset.loader;
 
-import org.unitils.dataset.core.DataSet;
-import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.core.DataSetRowProcessor;
+import org.unitils.dataset.factory.DataSetRowSource;
+import org.unitils.dataset.util.DatabaseAccessor;
 
 import java.util.List;
 
@@ -26,7 +27,8 @@ import java.util.List;
  */
 public interface DataSetLoader {
 
-    void init(Database database);
+    void init(DataSetRowProcessor dataSetRowProcessor, DatabaseAccessor databaseAccessor);
 
-    void load(DataSet dataSet, List<String> variables);
+    void load(DataSetRowSource dataSetRowSource, List<String> variables);
+
 }

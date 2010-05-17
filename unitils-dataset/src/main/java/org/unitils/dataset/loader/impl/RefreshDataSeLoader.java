@@ -15,9 +15,9 @@
  */
 package org.unitils.dataset.loader.impl;
 
-import org.unitils.dataset.core.ColumnProcessor;
-import org.unitils.dataset.core.Row;
-import org.unitils.dataset.loader.RowLoader;
+import org.unitils.dataset.core.DataSetRow;
+import org.unitils.dataset.core.DataSetRowProcessor;
+import org.unitils.dataset.util.DatabaseAccessor;
 
 import java.util.List;
 
@@ -25,27 +25,28 @@ import java.util.List;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class RefreshRowLoader extends UpdateRowLoader {
+public class RefreshDataSeLoader extends UpdateDataSetLoader {
 
-    protected RowLoader insertRowLoader;
+    protected InsertDataSetLoader insertDataSetLoader;
 
-
-    public void init(ColumnProcessor columnProcessor, NameProcessor nameProcessor, Database database) {
-        super.init(columnProcessor, nameProcessor, database);
-        insertRowLoader = new InsertRowLoader();
-        insertRowLoader.init(columnProcessor, nameProcessor, database);
+    @Override
+    public void init(DataSetRowProcessor dataSetRowProcessor, DatabaseAccessor databaseAccessor) {
+        super.init(dataSetRowProcessor, databaseAccessor);
+        insertDataSetLoader = new InsertDataSetLoader();
+        insertDataSetLoader.init(dataSetRowProcessor, databaseAccessor);
     }
 
     @Override
     protected void handleNoUpdatesPerformed() {
     }
 
-    public int loadRow(Row row, List<String> variables) {
-        int nrUpdates = super.loadRow(row, variables);
+    @Override
+    public int loadDataSetRow(DataSetRow dataSetRow, List<String> variables) {
+        int nrUpdates = super.loadDataSetRow(dataSetRow, variables);
         if (nrUpdates > 0) {
             return nrUpdates;
         }
-        return insertRowLoader.loadRow(row, variables);
+        return insertDataSetLoader.loadDataSetRow(dataSetRow, variables);
     }
 
 }
