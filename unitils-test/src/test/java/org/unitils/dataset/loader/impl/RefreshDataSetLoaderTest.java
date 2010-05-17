@@ -18,19 +18,13 @@ package org.unitils.dataset.loader.impl;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.core.ColumnProcessor;
+import org.unitils.dataset.core.*;
+import org.unitils.dataset.factory.DataSetRowSource;
+import org.unitils.dataset.util.DatabaseAccessor;
 import org.unitils.mock.Mock;
-import org.unitils.mock.PartialMock;
 
-import java.sql.Connection;
-import java.sql.ParameterMetaData;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.unitils.dataset.loader.impl.TestDataFactory.createRow;
-import static org.unitils.util.CollectionUtils.asSet;
 
 /**
  * @author Tim Ducheyne
@@ -39,49 +33,60 @@ import static org.unitils.util.CollectionUtils.asSet;
 public class RefreshDataSetLoaderTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private RefreshRowLoader refreshRowLoader = new RefreshRowLoader();
+    private RefreshDataSeLoader refreshRowLoader = new RefreshDataSeLoader();
 
-    private PartialMock<Database> database;
-    private Mock<Connection> connection;
-    private Mock<PreparedStatement> preparedStatement;
-    private Mock<ParameterMetaData> parameterMetaData;
+    private Mock<DataSetRowSource> dataSetRowSource;
+    private Mock<DataSetRowProcessor> dataSetRowProcessor;
+    private Mock<DatabaseAccessor> databaseAccessor;
 
     private List<String> emptyVariables = new ArrayList<String>();
+
+    private DataSetRow dataSetRow;
+    private DatabaseRow databaseRowPrimaryKey;
 
 
     @Before
     public void initialize() throws Exception {
-        database.returns(connection).createConnection();
-        connection.returns(preparedStatement).prepareStatement(null);
-        preparedStatement.returns(1).executeUpdate();
-        preparedStatement.returns(parameterMetaData).getParameterMetaData();
+        refreshRowLoader.init(dataSetRowProcessor.getMock(), databaseAccessor.getMock());
 
-        NameProcessor nameProcessor = new NameProcessor("'");
-        ColumnProcessor columnProcessor = new ColumnProcessor('=', '$', nameProcessor);
-        refreshRowLoader.init(columnProcessor, nameProcessor, database.getMock());
+        dataSetRow = createDataSetRow();
+        databaseRowPrimaryKey = createDatabaseRow(true);
+
+        dataSetRowSource.onceReturns(dataSetRow).getNextDataSetRow();
+        dataSetRowProcessor.returns(databaseRowPrimaryKey).process(null, null, null);
     }
 
-    @Before
-    public void initializePrimaryKeys() throws SQLException {
-        database.returns(asSet("PK1", "Pk2")).getPrimaryKeyColumnNames(null);
-    }
-
-
-    @Test
-    public void rowAlreadyInDatabase() throws Exception {
-        refreshRowLoader.loadRow(createRow(), emptyVariables);
-
-        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_1=?, column_2=?, pk1=?, pk2=? where pk1=?, pk2=?");
-        connection.assertNotInvoked().prepareStatement("insert into my_schema.table_a (column_1, column_2, pk1, pk2) values (?, ?, ?, ?)");
-    }
 
     @Test
     public void rowNotYetInDatabase() throws Exception {
-        preparedStatement.onceReturns(0).executeUpdate();
-        refreshRowLoader.loadRow(createRow(), emptyVariables);
+        databaseAccessor.returns(0).executeUpdate(null, null);
 
-        connection.assertInvoked().prepareStatement("update my_schema.table_a set column_1=?, column_2=?, pk1=?, pk2=? where pk1=?, pk2=?");
-        connection.assertInvoked().prepareStatement("insert into my_schema.table_a (column_1, column_2, pk1, pk2) values (?, ?, ?, ?)");
+        refreshRowLoader.load(dataSetRowSource.getMock(), emptyVariables);
+
+        databaseAccessor.assertInvoked().executeUpdate("update schema.table set column=? where column=?", null);
+        databaseAccessor.assertInvoked().executeUpdate("insert into schema.table (column) values (?)", null);
     }
 
+    @Test
+    public void rowAlreadyInDatabase() throws Exception {
+        databaseAccessor.returns(1).executeUpdate(null, null);
+
+        refreshRowLoader.load(dataSetRowSource.getMock(), emptyVariables);
+
+        databaseAccessor.assertInvoked().executeUpdate("update schema.table set column=? where column=?", null);
+        databaseAccessor.assertNotInvoked().executeUpdate("insert into schema.table (column) values (?)", null);
+    }
+
+
+    private DataSetRow createDataSetRow() {
+        DataSetRow dataSetRow = new DataSetRow("schema", "table", null, false, null);
+        dataSetRow.addDataSetColumn(new DataSetColumn("column", "value"));
+        return dataSetRow;
+    }
+
+    private DatabaseRow createDatabaseRow(boolean primaryKey) {
+        DatabaseRow databaseRow = new DatabaseRow("schema.table");
+        databaseRow.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column", "value", 0, null, false, primaryKey));
+        return databaseRow;
+    }
 }

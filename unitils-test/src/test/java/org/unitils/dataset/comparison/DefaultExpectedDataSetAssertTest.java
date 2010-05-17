@@ -19,12 +19,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.dataset.comparison.impl.DefaultExpectedDataSetAssert;
-import org.unitils.dataset.core.Column;
-import org.unitils.dataset.core.Row;
-import org.unitils.dataset.core.Schema;
-import org.unitils.dataset.core.Table;
+import org.unitils.dataset.core.DatabaseColumnWithValue;
+import org.unitils.dataset.core.DatabaseRow;
 import org.unitils.mock.Mock;
 
+import static java.sql.Types.VARCHAR;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -68,11 +67,12 @@ public class DefaultExpectedDataSetAssertTest extends UnitilsJUnit4 {
             dataSetComparator.returns(dataSetComparisonWithDifferences).compare(null, null);
             defaultExpectedDataSetAssert.assertEqual(null, null);
         } catch (AssertionError e) {
-            assertErrorMessageContains("Found differences for table schema_a.table_a", e);
-            assertErrorMessageContains("Different database record found for data set row:  column_1=\"1\", column_2=\"2\"", e);
-            assertErrorMessageContains("Different database record found for data set row:  column_3=\"3\", column_4=\"4\"", e);
-            assertErrorMessageContains("Expected", e);
-            assertErrorMessageContains("Actual", e);
+            assertErrorMessageContains("No match found for data set row:  schema.table   column_1=1, column_2=2", e);
+            assertErrorMessageContains("Expected:  1         2", e);
+            assertErrorMessageContains("Actual:    666       777", e);
+            assertErrorMessageContains("No match found for data set row:  schema.table   column_1=3, column_2=4", e);
+            assertErrorMessageContains("Expected:  3         4", e);
+            assertErrorMessageContains("Actual:    888       999", e);
             return;
         }
         fail("Expected an AssertionError"); //fail also raises assertion errors
@@ -84,8 +84,8 @@ public class DefaultExpectedDataSetAssertTest extends UnitilsJUnit4 {
             dataSetComparator.returns(dataSetComparisonWithMissingRows).compare(null, null);
             defaultExpectedDataSetAssert.assertEqual(null, null);
         } catch (AssertionError e) {
-            assertErrorMessageContains("Found differences for table schema_a.table_a", e);
-            assertErrorMessageContains("No database record found for data set row:  column_1=\"1\", column_2=\"2\"", e);
+            assertErrorMessageContains("No database record found for data set row:  schema.table   column_1=1, column_2=2", e);
+            assertErrorMessageContains("No database record found for data set row:  schema.table   column_3=3, column_4=4", e);
             return;
         }
         fail("Expected an AssertionError"); //fail also raises assertion errors
@@ -97,7 +97,7 @@ public class DefaultExpectedDataSetAssertTest extends UnitilsJUnit4 {
             dataSetComparator.returns(dataSetComparisonWithExpectedButNotEmptyTables).compare(null, null);
             defaultExpectedDataSetAssert.assertEqual(null, null);
         } catch (AssertionError e) {
-            assertErrorMessageContains("Expected no more database records in table schema_a.table_a but found more records.", e);
+            assertErrorMessageContains("Expected no more database records in table schema.table but found more records.", e);
             return;
         }
         fail("Expected an AssertionError"); //fail also raises assertion errors
@@ -110,73 +110,59 @@ public class DefaultExpectedDataSetAssertTest extends UnitilsJUnit4 {
     }
 
     private DataSetComparison createMatchingDataSetComparison() {
-        return createDataSetComparison(new TableComparison(createTable("schema_a", "table_a")));
+        return createDataSetComparison(new TableComparison("schema.tsble"));
     }
 
     private DataSetComparison createDataSetComparisonWithDifferences() {
-        TableComparison tableComparison = new TableComparison(createTable("schema_a", "table_a"));
-        tableComparison.replaceIfBetterRowComparison("1", createRowDifference1());
-        tableComparison.replaceIfBetterRowComparison("2", createRowDifference2());
+        TableComparison tableComparison = new TableComparison("schema.table");
+        tableComparison.replaceIfBetterRowComparison(createRowComparisonWithDifferences(1, 666, 2, 777));
+        tableComparison.replaceIfBetterRowComparison(createRowComparisonWithDifferences(3, 888, 4, 999));
         return createDataSetComparison(tableComparison);
     }
 
     private DataSetComparison createDataSetComparisonWithMissingRows() {
-        TableComparison tableComparison = new TableComparison(createTable("schema_a", "table_a"));
-        tableComparison.addMissingRow(createRow(createColumn("column_1", "1"), createColumn("column_2", "2")));
-        tableComparison.addMissingRow(createRow(createColumn("column_3", "5"), createColumn("column_4", "6")));
+        TableComparison tableComparison = new TableComparison("schema.table");
+        tableComparison.addMissingRow(createExpectedDatabaseRow(createDatabaseColumnWithValue("column_1", 1), createDatabaseColumnWithValue("column_2", 2)));
+        tableComparison.addMissingRow(createExpectedDatabaseRow(createDatabaseColumnWithValue("column_3", 3), createDatabaseColumnWithValue("column_4", 4)));
         return createDataSetComparison(tableComparison);
     }
 
     private DataSetComparison createDataSetComparisonWithExpectedButNotEmptyTable() {
-        TableComparison tableComparison = new TableComparison(createTable("schema_a", "table_a"));
+        TableComparison tableComparison = new TableComparison("schema.table");
         tableComparison.setExpectedNoMoreRecordsButFoundMore(true);
         return createDataSetComparison(tableComparison);
     }
 
 
     private DataSetComparison createDataSetComparison(TableComparison tableComparison) {
-        SchemaComparison schemaComparison = new SchemaComparison(tableComparison.getDataSetTable().getSchema());
-        schemaComparison.addTableComparison(tableComparison);
-
         DataSetComparison dataSetComparison = new DataSetComparison();
-        dataSetComparison.addSchemaComparison(schemaComparison);
+        dataSetComparison.addTableComparison(tableComparison);
         return dataSetComparison;
     }
 
-    private RowComparison createRowDifference1() {
-        Column column1 = createColumn("column_1", "1");
-        Column column2 = createColumn("column_2", "2");
-        RowComparison rowComparison = new RowComparison(createRow(column1, column2));
-        rowComparison.addColumnComparison(new ColumnComparison(column1, "1", "x", false));
-        rowComparison.addColumnComparison(new ColumnComparison(column2, "2", "2", false));
-        return rowComparison;
-    }
-
-    private RowComparison createRowDifference2() {
-        Column column3 = createColumn("column_3", "3");
-        Column column4 = createColumn("column_4", "4");
-        RowComparison rowComparison = new RowComparison(createRow(column3, column4));
-        rowComparison.addColumnComparison(new ColumnComparison(column3, "3", "3", false));
-        rowComparison.addColumnComparison(new ColumnComparison(column4, "4", "y", false));
-        return rowComparison;
+    private RowComparison createRowComparisonWithDifferences(Object expectedValue1, Object actualValue1, Object expectedValue2, Object actualValue2) {
+        DatabaseRow expectedDatabaseRow = createExpectedDatabaseRow(createDatabaseColumnWithValue("column_1", expectedValue1), createDatabaseColumnWithValue("column_2", expectedValue2));
+        DatabaseRow actualDatabaseRow = createActualDatabaseRow("1", createDatabaseColumnWithValue("column_1", actualValue1), createDatabaseColumnWithValue("column_2", actualValue2));
+        return new RowComparison(expectedDatabaseRow, actualDatabaseRow);
     }
 
 
-    private Table createTable(String schemaName, String tableName) {
-        Schema schema = new Schema(schemaName, false);
-        Table table = new Table(tableName, false);
-        schema.addTable(table);
-        return table;
+    private DatabaseColumnWithValue createDatabaseColumnWithValue(String name, Object value) {
+        return new DatabaseColumnWithValue(name, value, VARCHAR, null, false, false);
     }
 
-    private Column createColumn(String name, String value) {
-        return new Column(name, value, false);
+    private DatabaseRow createExpectedDatabaseRow(DatabaseColumnWithValue... columns) {
+        DatabaseRow row = new DatabaseRow("schema.table");
+        for (DatabaseColumnWithValue column : columns) {
+            row.addDatabaseColumnWithValue(column);
+        }
+        return row;
     }
 
-    private Row createRow(Column... columns) {
-        Row row = new Row();
-        for (Column column : columns) {
-            row.addColumn(column);
+    private DatabaseRow createActualDatabaseRow(String rowIdentifier, DatabaseColumnWithValue... columns) {
+        DatabaseRow row = new DatabaseRow(rowIdentifier, "schema.table");
+        for (DatabaseColumnWithValue column : columns) {
+            row.addDatabaseColumnWithValue(column);
         }
         return row;
     }

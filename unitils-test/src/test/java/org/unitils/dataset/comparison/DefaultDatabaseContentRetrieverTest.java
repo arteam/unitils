@@ -18,12 +18,13 @@ package org.unitils.dataset.comparison;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.comparison.impl.*;
+import org.unitils.dataset.comparison.impl.DefaultDatabaseContentRetriever;
 import org.unitils.dataset.core.Column;
 import org.unitils.dataset.core.Row;
 import org.unitils.dataset.core.Schema;
 import org.unitils.dataset.core.Table;
 import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.util.DatabaseAccessor;
 import org.unitils.mock.Mock;
 
 import java.sql.Connection;
@@ -43,6 +44,7 @@ public class DefaultDatabaseContentRetrieverTest extends UnitilsJUnit4 {
     private DefaultDatabaseContentRetriever defaultDatabaseContentRetriever = new DefaultDatabaseContentRetriever();
 
     private Mock<Database> database;
+    private Mock<DatabaseAccessor> databaseAccessor;
     private Mock<Connection> connection;
     private Mock<PreparedStatement> preparedStatement;
     private Mock<ResultSet> resultSet;
@@ -50,17 +52,17 @@ public class DefaultDatabaseContentRetrieverTest extends UnitilsJUnit4 {
     protected Mock<ResultSet> primaryKeyResultSet;
 
     protected DataSetComparison dataSetComparison;
-    protected TableComparison tableComparison;
+    protected TableComparison3 tableComparison;
 
 
     @Before
     public void initialize() throws Exception {
-        database.returns(connection).createConnection();
+        database.returns(connection).getConnection();
         connection.returns(preparedStatement).prepareStatement(null);
         preparedStatement.returns(resultSet).executeQuery();
         resultSet.returns(resultSetMetaData).getMetaData();
         connection.returns(primaryKeyResultSet).getMetaData().getPrimaryKeys(null, null, null);
-        defaultDatabaseContentRetriever.init(database.getMock());
+        defaultDatabaseContentRetriever.init(database.getMock(), databaseAccessor.getMock());
 
         tableComparison = createTableComparison();
         dataSetComparison = createDataSetComparison(tableComparison);
@@ -120,18 +122,16 @@ public class DefaultDatabaseContentRetrieverTest extends UnitilsJUnit4 {
     }
 
 
-    private TableComparison createTableComparison() {
+    private TableComparison3 createTableComparison() {
         Schema schema = new Schema("my_schema", false);
         Table table = new Table("table_a", false);
         schema.addTable(table);
-        return new TableComparison(table);
+        return new TableComparison3(table);
     }
 
-    private DataSetComparison createDataSetComparison(TableComparison tableComparison) {
-        SchemaComparison schemaComparison = new SchemaComparison(tableComparison.getDataSetTable().getSchema());
-        schemaComparison.addTableComparison(tableComparison);
+    private DataSetComparison createDataSetComparison(TableComparison3 tableComparison) {
         DataSetComparison dataSetComparison = new DataSetComparison();
-        dataSetComparison.addSchemaComparison(schemaComparison);
+//        dataSetComparison.addSchemaComparison(schemaComparison);
         return dataSetComparison;
     }
 
@@ -146,7 +146,7 @@ public class DefaultDatabaseContentRetrieverTest extends UnitilsJUnit4 {
     }
 
     private void setActualRowIdentifiersWithMatch(String identifier) {
-        tableComparison.replaceIfBetterRowComparison(identifier, new RowComparison(new Row()));
+        tableComparison.replaceIfBetterRowComparison(identifier, new RowComparison2(new Row()));
     }
 
 

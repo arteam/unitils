@@ -15,12 +15,12 @@
  */
 package org.unitils.dataset.comparison;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.core.Column;
-import org.unitils.dataset.core.Row;
+import org.unitils.dataset.core.DatabaseColumnWithValue;
+import org.unitils.dataset.core.DatabaseRow;
 
+import static java.sql.Types.VARCHAR;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -29,19 +29,12 @@ import static org.junit.Assert.assertEquals;
  */
 public class RowComparisonGetNrOfPrimaryKeyDifferencesTest extends UnitilsJUnit4 {
 
-    private RowComparison rowComparison = new RowComparison(new Row());
-
-    private Column column;
-
-    @Before
-    public void initialize() {
-        column = new Column("pk1", "value1", false);
-    }
 
     @Test
     public void equal() throws Exception {
-        rowComparison.addColumnComparison(new ColumnComparison(column, "value1", "value1", true));
-        rowComparison.addColumnComparison(new ColumnComparison(column, "value2", "value2", true));
+        DatabaseRow expectedDatabaseRow = createRow(1, 2, 3, 4);
+        DatabaseRow actualDatabaseRow = createRow(1, 2, 3, 4);
+        RowComparison rowComparison = new RowComparison(expectedDatabaseRow, actualDatabaseRow);
 
         int result = rowComparison.getNrOfPrimaryKeyDifferences();
         assertEquals(0, result);
@@ -49,118 +42,30 @@ public class RowComparisonGetNrOfPrimaryKeyDifferencesTest extends UnitilsJUnit4
 
     @Test
     public void noPrimaryKeys() throws Exception {
-        rowComparison.addColumnComparison(new ColumnComparison(column, "value1", "xxxx", false));
-        rowComparison.addColumnComparison(new ColumnComparison(column, "value2", "yyyy", false));
-
+        RowComparison rowComparison = new RowComparison(new DatabaseRow("schema.table"), new DatabaseRow("schema.table"));
         int result = rowComparison.getNrOfPrimaryKeyDifferences();
         assertEquals(0, result);
     }
 
     @Test
     public void differences() throws Exception {
-        rowComparison.addColumnComparison(new ColumnComparison(column, "value1", "xxxx", true));
-        rowComparison.addColumnComparison(new ColumnComparison(column, "value2", "yyyy", true));
+        DatabaseRow expectedDatabaseRow = createRow(1, 2, 3, 4);
+        DatabaseRow actualDatabaseRow = createRow(888, 999, 3, 4);
+        RowComparison rowComparison = new RowComparison(expectedDatabaseRow, actualDatabaseRow);
 
         int result = rowComparison.getNrOfPrimaryKeyDifferences();
         assertEquals(2, result);
     }
 
 
-//    @Test
-//    public void testEqualPrimaryKeyButOnlyPartInExpected() throws Exception {
-//        addColumn(expectedRow, "pk1", "value1");
-//        addPrimaryKeyColumn(actualRow, "pk1", "value1");
-//        addPrimaryKeyColumn(actualRow, "pk2", "value2");
-//
-//        boolean result = expectedRow.hasDifferentPrimaryKeyColumns(actualRow);
-//
-//        assertFalse(result);
-//    }
-//
-//
-//    @Test
-//    public void testDifferentPrimaryKey() throws Exception {
-//        addColumn(expectedRow, "pk1", "value1");
-//        addColumn(expectedRow, "pk2", "value1");
-//        addPrimaryKeyColumn(actualRow, "pk1", "value1");
-//        addPrimaryKeyColumn(actualRow, "pk2", "yyyy");
-//
-//        boolean result = expectedRow.hasDifferentPrimaryKeyColumns(actualRow);
-//
-//        assertTrue(result);
-//    }
-//
-//
-//    @Test
-//    public void testEqualRows() throws Exception {
-//        addColumn(expectedRow, "pk", "value1");
-//        addColumn(expectedRow, "column", "value2");
-//        addPrimaryKeyColumn(actualRow, "pk", "value1");
-//        addColumn(actualRow, "column", "value2");
-//
-//        RowDifference result = expectedRow.compare(actualRow);
-//
-//        assertNull(result);
-//    }
-//
-//
-//    @Test
-//    public void testDifferentValues() throws Exception {
-//        addColumn(expectedRow, "pk", "value1");
-//        addColumn(expectedRow, "column", "value2");
-//        addPrimaryKeyColumn(actualRow, "pk", "xxxx");
-//        addColumn(actualRow, "column", "yyyy");
-//
-//        RowDifference result = expectedRow.compare(actualRow);
-//
-//        assertColumnDifference(result, "pk", "value1", "xxxx");
-//        assertColumnDifference(result, "column", "value2", "yyyy");
-//    }
-//
-//
-//    @Test
-//    public void testMissingColumns() throws Exception {
-//        addPrimaryKeyColumn(expectedRow, "pk", "value1");
-//        addColumn(expectedRow, "column", "value2");
-//
-//        RowDifference result = expectedRow.compare(actualRow);
-//
-//        assertMissingColumn(result, "pk");
-//        assertMissingColumn(result, "column");
-//    }
-//
-//
-//    @Test(expected = UnitilsException.class)
-//    public void testAddingTwoPrimaryKeyColumnsForSameName() throws Exception {
-//        addPrimaryKeyColumn(expectedRow, "column", "value");
-//        addPrimaryKeyColumn(expectedRow, "column", "value");
-//    }
-//
-//
-//    private void assertColumnDifference(RowDifference result, String columnName, String expectedValue, String actualValue) {
-//        ColumnDifference columnDifference = result.getColumnDifference(columnName);
-//        assertEquals(expectedValue, columnDifference.getColumn().getValue());
-//        assertEquals(actualValue, columnDifference.getActualColumn().getValue());
-//    }
-//
-//
-//    private void assertMissingColumn(RowDifference rowDifference, String columnName) {
-//        for (Column missingColumn : rowDifference.getMissingColumns()) {
-//            if (columnName.equals(missingColumn.getName())) {
-//                return;
-//            }
-//        }
-//        fail("No missing column found for name " + columnName);
-//    }
-//
-//
-//    private void addPrimaryKeyColumn(Row row, String columnName, String value) {
-//        row.addPrimaryKeyColumn(new Column(columnName, VARCHAR, value));
-//    }
-//
-//
-//    private void addColumn(Row row, String columnName, String value) {
-//        row.addColumn(new Column(columnName, VARCHAR, value));
-//    }
+    private DatabaseRow createRow(Object pk1, Object pk2, Object value1, Object value2) {
+        DatabaseRow row = new DatabaseRow("schema.table");
+        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("pk1", pk1, VARCHAR, null, false, true));
+        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("pk2", pk2, VARCHAR, null, false, true));
+        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column1", value1, VARCHAR, null, false, false));
+        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column2", value2, VARCHAR, null, false, false));
+        return row;
+    }
+
 
 }
