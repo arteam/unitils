@@ -20,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
-import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
@@ -31,14 +30,19 @@ import org.unitils.dataset.comparison.DataSetComparator;
 import org.unitils.dataset.comparison.DatabaseContentRetriever;
 import org.unitils.dataset.comparison.ExpectedDataSetAssert;
 import org.unitils.dataset.core.DataSet;
-import org.unitils.dataset.factory.DataSetFactory;
+import org.unitils.dataset.core.DataSetSettings;
 import org.unitils.dataset.factory.DataSetResolver;
+import org.unitils.dataset.factory.DataSetRowSource;
 import org.unitils.dataset.loader.DataSetLoader;
 import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 import org.unitils.dataset.util.DataSetAnnotationUtil;
+import org.unitils.dataset.util.DatabaseAccessor;
+import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
 import java.io.File;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -69,6 +73,10 @@ import static org.unitils.util.ReflectionUtils.createInstanceOfType;
  * @author Filip Neven
  */
 public class DataSetModule implements Module {
+
+    public static String DEFAULT_CASE_SENSITIVE_PROPERTY = "dataset.casesensitive.default";
+    public static String DEFAULT_LITERAL_TOKEN_PROPERTY = "dataset.literaltoken.default";
+    public static String DEFAULT_VARIABLE_TOKEN_PROPERTY = "dataset.variabletoken.default";
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DataSetModule.class);
@@ -103,31 +111,29 @@ public class DataSetModule implements Module {
     }
 
     public void loadDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, Class<? extends DataSetLoader> dataSetLoaderClass) {
-        Class<? extends DataSetFactory> dataSetFactoryClass = dataSetAnnotationUtil.getDefaultDataSetFactoryClass();
-        DataSetFactory dataSetFactory = createDataSetFactory(dataSetFactoryClass);
-        loadDataSet(dataSetFileNames, variables, testClass, dataSetFactory, dataSetLoaderClass);
+        Class<? extends DataSetRowSource> dataSetRowSourceClass = dataSetAnnotationUtil.getDefaultDataSetRowSourceClass();
+        loadDataSet(dataSetFileNames, variables, testClass, dataSetRowSourceClass, dataSetLoaderClass);
     }
 
     public void assertExpectedDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, boolean logDatabaseContentOnAssertionError) {
-        Class<? extends DataSetFactory> dataSetFactoryClass = dataSetAnnotationUtil.getDefaultDataSetFactoryClass();
-        DataSetFactory dataSetFactory = createDataSetFactory(dataSetFactoryClass);
-        assertExpectedDataSet(dataSetFileNames, variables, testClass, dataSetFactory, logDatabaseContentOnAssertionError);
+//        Class<? extends DataSetRowSource> dataSetRowSourceClass = dataSetAnnotationUtil.getDefaultDataSetRowSourceClass();
+//        assertExpectedDataSet(dataSetFileNames, variables, testClass, dataSetRowSourceClass, logDatabaseContentOnAssertionError);
     }
 
     protected void loadDataSet(Method testMethod, Object testObject) {
-        try {
-            Class<?> testClass = testObject.getClass();
-            Class<? extends DataSetFactory> dataSetFactoryClass = dataSetAnnotationUtil.getDataSetFactoryClass(testClass, testMethod);
-            DataSetFactory dataSetFactory = createDataSetFactory(dataSetFactoryClass);
-            List<String> dataSetFileNames = dataSetAnnotationUtil.getDataSetFileNames(testClass, testMethod, dataSetFactory.getDataSetFileExtension());
-            List<String> variables = dataSetAnnotationUtil.getDataSetVariables(testClass, testMethod);
-            Class<? extends DataSetLoader> dataSetLoaderClass = dataSetAnnotationUtil.getDataSetLoaderClass(testClass, testMethod);
-
-            loadDataSet(dataSetFileNames, variables, testClass, dataSetFactory, dataSetLoaderClass);
-
-        } catch (Exception e) {
-            throw new UnitilsException("Error inserting data set for method " + testMethod, e);
-        }
+//        try {
+//            Class<?> testClass = testObject.getClass();
+//            Class<? extends DataSetFactory> dataSetFactoryClass = dataSetAnnotationUtil.getDataSetFactoryClass(testClass, testMethod);
+//            DataSetFactory dataSetFactory = createDataSetRowSource(dataSetFactoryClass);
+//            List<String> dataSetFileNames = dataSetAnnotationUtil.getDataSetFileNames(testClass, testMethod, dataSetFactory.getDataSetFileExtension());
+//            List<String> variables = dataSetAnnotationUtil.getDataSetVariables(testClass, testMethod);
+//            Class<? extends DataSetLoader> dataSetLoaderClass = dataSetAnnotationUtil.getDataSetLoaderClass(testClass, testMethod);
+//
+//            loadDataSet(dataSetFileNames, variables, testClass, dataSetFactory, dataSetLoaderClass);
+//
+//        } catch (Exception e) {
+//            throw new UnitilsException("Error inserting data set for method " + testMethod, e);
+//        }
     }
 
     /**
@@ -138,65 +144,83 @@ public class DataSetModule implements Module {
      * @param testObject The test object, not null
      */
     protected void assertExpectedDataSet(Method testMethod, Object testObject) {
-        try {
-            Class<?> testClass = testObject.getClass();
-            Class<? extends DataSetFactory> dataSetFactoryClass = dataSetAnnotationUtil.getDataSetFactoryClass(testClass, testMethod);
-            DataSetFactory dataSetFactory = createDataSetFactory(dataSetFactoryClass);
-            List<String> dataSetFileNames = dataSetAnnotationUtil.getExpectedDataSetFileNames(testClass, testMethod, dataSetFactory.getDataSetFileExtension());
-            List<String> variables = dataSetAnnotationUtil.getExpectedDataSetVariables(testClass, testMethod);
-            boolean logDatabaseContentOnAssertionError = dataSetAnnotationUtil.getLogDatabaseContentOnAssertionError(testClass, testMethod);
-
-            assertExpectedDataSet(dataSetFileNames, variables, testClass, dataSetFactory, logDatabaseContentOnAssertionError);
-
-        } catch (Exception e) {
-            throw new UnitilsException("Error comparing data set for method " + testMethod, e);
-        }
+//        try {
+//            Class<?> testClass = testObject.getClass();
+//            Class<? extends DataSetFactory> dataSetFactoryClass = dataSetAnnotationUtil.getDataSetFactoryClass(testClass, testMethod);
+//            DataSetFactory dataSetFactory = createDataSetRowSource(dataSetFactoryClass);
+//            List<String> dataSetFileNames = dataSetAnnotationUtil.getExpectedDataSetFileNames(testClass, testMethod, dataSetFactory.getDataSetFileExtension());
+//            List<String> variables = dataSetAnnotationUtil.getExpectedDataSetVariables(testClass, testMethod);
+//            boolean logDatabaseContentOnAssertionError = dataSetAnnotationUtil.getLogDatabaseContentOnAssertionError(testClass, testMethod);
+//
+//            assertExpectedDataSet(dataSetFileNames, variables, testClass, dataSetFactory, logDatabaseContentOnAssertionError);
+//
+//        } catch (Exception e) {
+//            throw new UnitilsException("Error comparing data set for method " + testMethod, e);
+//        }
     }
 
-    protected void loadDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, DataSetFactory dataSetFactory, Class<? extends DataSetLoader> dataSetLoaderClass) {
+    protected void loadDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, Class<? extends DataSetRowSource> dataSetRowSourceClass, Class<? extends DataSetLoader> dataSetLoaderClass) {
         Database database = createDatabase();
-        DataSetLoader dataSetLoader = createDataSetLoader(dataSetLoaderClass, database);
+        DatabaseAccessor databaseAccessor = createDatabaseAccessor(database);
+
+        DataSetLoader dataSetLoader = createDataSetLoader(dataSetLoaderClass, database, databaseAccessor);
 
         List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
         for (File dataSetFile : dataSetFiles) {
-            loadDataSet(dataSetFile, variables, dataSetFactory, dataSetLoader, database);
+            loadDataSet(dataSetFile, variables, dataSetRowSourceClass, dataSetLoader, database);
         }
+
     }
 
-    protected void assertExpectedDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, DataSetFactory dataSetFactory, boolean logDatabaseContentOnAssertionError) {
-        Database database = createDatabase();
-        List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
-        for (File dataSetFile : dataSetFiles) {
-            assertExpectedDataSet(dataSetFile, variables, dataSetFactory, logDatabaseContentOnAssertionError, database);
-        }
+    private DatabaseAccessor createDatabaseAccessor(Database database) {
+        // todo refactor initialization
+        SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
+        return null;//new DatabaseAccessor(database, sqlTypeHandlerRepository);
+    }
+
+    protected void assertExpectedDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, DataSetRowSource dataSetRowSource, boolean logDatabaseContentOnAssertionError) {
+//        Database database = createDatabase();
+//        DatabaseAccessor databaseAccessor = createDatabaseAccessor(database);
+//
+//        List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
+//        for (File dataSetFile : dataSetFiles) {
+//            assertExpectedDataSet(dataSetFile, variables, dataSetRowSource, logDatabaseContentOnAssertionError, database, databaseAccessor);
+//        }
     }
 
 
-    protected void loadDataSet(File dataSetFile, List<String> variables, DataSetFactory dataSetFactory, DataSetLoader dataSetLoader, Database database) {
-        DataSet dataSet = dataSetFactory.createDataSet(dataSetFile, database.getSchemaName());
-        if (dataSet == null) {
-            // no data set specified
-            return;
-        }
-        logger.info("Loading data sets file: " + dataSetFile);
-        dataSetLoader.load(dataSet, variables);
+    protected void loadDataSet(File dataSetFile, List<String> variables, Class<? extends DataSetRowSource> dataSetRowSourceClass, DataSetLoader dataSetLoader, Database database) {
+//        logger.info("Loading data sets file: " + dataSetFile);
+//        InputStream dataSetInputStream = null;
+//        try {
+//            dataSetInputStream = new FileInputStream(dataSetFile);
+//            String defaultSchemaName = database.getSchemaName();
+//            DataSetRowSource dataSetRowSource = createDataSetRowSource(dataSetInputStream, defaultSchemaName, dataSetRowSourceClass);
+//            dataSetLoader.load(dataSetRowSource, variables);
+//
+//        } catch (Exception e) {
+//            throw new UnitilsException("Unable to load data set file: " + dataSetFile, e);
+//        } finally {
+//            closeQuietly(dataSetInputStream);
+//        }
     }
 
-    protected void assertExpectedDataSet(File dataSetFile, List<String> variables, DataSetFactory dataSetFactory, boolean logDatabaseContentOnAssertionError, Database database) {
-        DataSet dataSet = dataSetFactory.createDataSet(dataSetFile, database.getSchemaName());
-        if (dataSet == null) {
-            // no data set specified
-            return;
-        }
-
-        logger.info("Comparing data sets file: " + dataSetFile);
-        DatabaseContentRetriever databaseContentLogger = null;
-        if (logDatabaseContentOnAssertionError) {
-            databaseContentLogger = createDatabaseContentLogger(database);
-        }
-        DataSetComparator dataSetComparator = createDataSetComparator(dataSet, database);
-        ExpectedDataSetAssert expectedDataSetAssert = createExpectedDataSetAssert(dataSetComparator, databaseContentLogger);
-        expectedDataSetAssert.assertEqual(dataSet, variables);
+    protected void assertExpectedDataSet(File dataSetFile, List<String> variables, Class<? extends DataSetRowSource> dataSetRowSourceClass, boolean logDatabaseContentOnAssertionError, Database database, DatabaseAccessor databaseAccessor) {
+//        DataSetRowSource dataSetRowSource = createDataSetRowSource(dataSetRowSourceClass);
+//        DataSet dataSet = dataSetRowSource.createDataSet(dataSetFile, database.getSchemaName());
+//        if (dataSet == null) {
+//            // no data set specified
+//            return;
+//        }
+//
+//        logger.info("Comparing data sets file: " + dataSetFile);
+//        DatabaseContentRetriever databaseContentLogger = null;
+//        if (logDatabaseContentOnAssertionError) {
+//            databaseContentLogger = createDatabaseContentLogger(database, databaseAccessor);
+//        }
+//        DataSetComparator dataSetComparator = createDataSetComparator(dataSet, database, databaseAccessor);
+//        ExpectedDataSetAssert expectedDataSetAssert = createExpectedDataSetAssert(dataSetComparator, databaseContentLogger);
+//        expectedDataSetAssert.assertEqual(dataSet, variables);
     }
 
 
@@ -215,13 +239,20 @@ public class DataSetModule implements Module {
     /* FACTORY METHODS */
 
     /**
-     * @param dataSetFactoryClass The type, not null
+     * @param dataSetInputStream    The input stream that contains the data set, not null
+     * @param defaultSchemaName     The schema name to use when none is specified, not null
+     * @param dataSetRowSourceClass The type, not null
      * @return An initialized data set factory of the given type, not null
      */
-    protected DataSetFactory createDataSetFactory(Class<? extends DataSetFactory> dataSetFactoryClass) {
-        DataSetFactory dataSetFactory = createInstanceOfType(dataSetFactoryClass, false);
-        dataSetFactory.init(configuration);
-        return dataSetFactory;
+    protected DataSetRowSource createDataSetRowSource(InputStream dataSetInputStream, String defaultSchemaName, Class<? extends DataSetRowSource> dataSetRowSourceClass) {
+        char defaultLiteralToken = PropertyUtils.getString(DEFAULT_LITERAL_TOKEN_PROPERTY, configuration).charAt(0);
+        char defaultVariableToken = PropertyUtils.getString(DEFAULT_VARIABLE_TOKEN_PROPERTY, configuration).charAt(0);
+        boolean defaultCaseSensitive = PropertyUtils.getBoolean(DEFAULT_CASE_SENSITIVE_PROPERTY, configuration);
+        DataSetSettings dataSetSettings = new DataSetSettings(defaultLiteralToken, defaultVariableToken, defaultCaseSensitive);
+
+        DataSetRowSource dataSetRowSource = createInstanceOfType(dataSetRowSourceClass, false);
+        //dataSetRowSource.init(dataSetInputStream, defaultSchemaName, dataSetSettings);
+        return dataSetRowSource;
     }
 
     /**
@@ -229,9 +260,10 @@ public class DataSetModule implements Module {
      * @param database           The access to the database, not null
      * @return An initialized data set loader of the given type, not null
      */
-    protected DataSetLoader createDataSetLoader(Class<? extends DataSetLoader> dataSetLoaderClass, Database database) {
+    protected DataSetLoader createDataSetLoader(Class<? extends DataSetLoader> dataSetLoaderClass, Database database, DatabaseAccessor databaseAccessor) {
         DataSetLoader dataSetLoader = createInstanceOfType(dataSetLoaderClass, false);
-        dataSetLoader.init(database);
+        //todo
+        // dataSetLoader.init(database, databaseAccessor);
         return dataSetLoader;
     }
 
@@ -241,25 +273,29 @@ public class DataSetModule implements Module {
      * @param database The access to the database, not null
      * @return An initialized data set comparator, as configured in the Unitils configuration, not null
      */
-    protected DataSetComparator createDataSetComparator(DataSet dataSet, Database database) {
-        DataSetComparator dataSetComparator = getInstanceOf(DataSetComparator.class, configuration);
-        dataSetComparator.init(database);
-        return dataSetComparator;
+    protected DataSetComparator createDataSetComparator(DataSet dataSet, Database database, DatabaseAccessor databaseAccessor) {
+        //DataSetComparator dataSetComparator = getInstanceOf(DataSetComparator.class, configuration);
+        //dataSetComparator.init(database, databaseAccessor);
+        // todo implement
+        return null;//dataSetComparator;
     }
 
     protected Database createDatabase() {
         DbSupport defaultDbSupport = getDefaultDbSupport();
-        return new Database(defaultDbSupport);
+        Database database = new Database();
+        database.init(defaultDbSupport);
+        return database;
     }
 
     /**
      * @param database The access to the database, not null
      * @return An initialized database logger, as configured in the Unitils configuration, not null
      */
-    protected DatabaseContentRetriever createDatabaseContentLogger(Database database) {
-        DatabaseContentRetriever databaseContentLogger = getInstanceOf(DatabaseContentRetriever.class, configuration);
-        databaseContentLogger.init(database);
-        return databaseContentLogger;
+    protected Object createDatabaseContentLogger(Database database, DatabaseAccessor databaseAccessor) {
+//        DatabaseContentRetriever databaseContentLogger = getInstanceOf(DatabaseContentRetriever.class, configuration);
+//        databaseContentLogger.init(database, databaseAccessor);
+//        return databaseContentLogger;
+        return null;
     }
 
     protected ExpectedDataSetAssert createExpectedDataSetAssert(DataSetComparator dataSetComparator, DatabaseContentRetriever databaseContentLogger) {

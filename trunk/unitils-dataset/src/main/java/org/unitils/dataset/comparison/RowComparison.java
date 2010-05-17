@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,57 +15,46 @@
  */
 package org.unitils.dataset.comparison;
 
-import org.unitils.dataset.core.Row;
+import org.unitils.dataset.core.DatabaseColumnWithValue;
+import org.unitils.dataset.core.DatabaseRow;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The comparison result of 2 data set rows.
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public class RowComparison {
 
-    /* The data set row that was compared */
-    private Row dataSetRow;
+    private DatabaseRow expectedDatabaseRow;
+
+    private DatabaseRow actualDatabaseRow;
 
     /* The column comparison results */
-    private List<ColumnComparison> columnComparisons = new ArrayList<ColumnComparison>();
+    private List<ColumnDifference> columnDifferences = new ArrayList<ColumnDifference>();
 
 
-    /**
-     * Creates a row comparison result.
-     *
-     * @param dataSetRow The data set row that was compared, not null
-     */
-    public RowComparison(Row dataSetRow) {
-        this.dataSetRow = dataSetRow;
+    public RowComparison(DatabaseRow expectedDatabaseRow, DatabaseRow actualDatabaseRow) {
+        this.expectedDatabaseRow = expectedDatabaseRow;
+        this.actualDatabaseRow = actualDatabaseRow;
+        this.columnDifferences = createColumnDifferences();
     }
 
 
-    /**
-     * @return The data set row that was compared, not null
-     */
-    public Row getDataSetRow() {
-        return dataSetRow;
+    public DatabaseRow getExpectedDatabaseRow() {
+        return expectedDatabaseRow;
+    }
+
+    public DatabaseRow getActualDatabaseRow() {
+        return actualDatabaseRow;
     }
 
     /**
      * @return The differences between the rows, empty if there is a match
      */
-    public List<ColumnComparison> getColumnComparisons() {
-        return columnComparisons;
-    }
-
-    /**
-     * Adds a column comparison result
-     *
-     * @param columnComparison The comparison, not null
-     */
-    public void addColumnComparison(ColumnComparison columnComparison) {
-        columnComparisons.add(columnComparison);
+    public List<ColumnDifference> getColumnDifferences() {
+        return columnDifferences;
     }
 
     /**
@@ -73,8 +62,8 @@ public class RowComparison {
      */
     public int getNrOfPrimaryKeyDifferences() {
         int nrOfPrimaryKeyDifferences = 0;
-        for (ColumnComparison columnComparison : columnComparisons) {
-            if (columnComparison.isPrimaryKey() && !columnComparison.isMatch()) {
+        for (ColumnDifference columnDifference : columnDifferences) {
+            if (columnDifference.isPrimaryKey()) {
                 nrOfPrimaryKeyDifferences++;
             }
         }
@@ -85,13 +74,7 @@ public class RowComparison {
      * @return The nr of differences, 0 if there is a match
      */
     public int getNrOfDifferences() {
-        int nrOfDifferences = 0;
-        for (ColumnComparison columnComparison : columnComparisons) {
-            if (!columnComparison.isMatch()) {
-                nrOfDifferences++;
-            }
-        }
-        return nrOfDifferences;
+        return columnDifferences.size();
     }
 
     /**
@@ -111,21 +94,26 @@ public class RowComparison {
     }
 
     /**
-     * @return True if no match should have been found for the row
-     */
-    public boolean shouldNotHaveMatched() {
-        return dataSetRow.isNotExists();
-    }
-
-    /**
      * @return True if both rows are a match
      */
     public boolean isMatch() {
-        for (ColumnComparison columnComparison : columnComparisons) {
-            if (!columnComparison.isMatch()) {
-                return false;
+        return columnDifferences.isEmpty();
+    }
+
+
+    protected List<ColumnDifference> createColumnDifferences(){
+        List<ColumnDifference> columnDifferences = new ArrayList<ColumnDifference>();
+
+        for (DatabaseColumnWithValue expectedDatabaseColumnWithValue : expectedDatabaseRow.getDatabaseColumnsWithValue()) {
+            DatabaseColumnWithValue actualDatabaseColumnsWithValue = actualDatabaseRow.getDatabaseColumnsWithValue(expectedDatabaseColumnWithValue);
+            if (!expectedDatabaseColumnWithValue.isEqualValue(actualDatabaseColumnsWithValue)) {
+                boolean primaryKey = expectedDatabaseColumnWithValue.isPrimaryKey();
+                String columnName = expectedDatabaseColumnWithValue.getColumnName();
+                Object expectedValue = expectedDatabaseColumnWithValue.getValue();
+                Object actualValue = actualDatabaseColumnsWithValue.getValue();
+                columnDifferences.add(new ColumnDifference(columnName, expectedValue, actualValue, primaryKey));
             }
         }
-        return true;
+        return columnDifferences;
     }
 }

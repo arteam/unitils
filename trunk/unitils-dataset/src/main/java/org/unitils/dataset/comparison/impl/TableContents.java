@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,11 @@
 package org.unitils.dataset.comparison.impl;
 
 import org.unitils.core.util.DbUtils;
+import org.unitils.dataset.core.DatabaseColumn;
+import org.unitils.dataset.core.DatabaseColumnWithValue;
+import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.sqltypehandler.SqlTypeHandler;
+import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -29,12 +34,16 @@ import java.util.Set;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class QueryResultSet {
+public class TableContents {
+
+    protected String qualifiedTableName;
+    protected List<DatabaseColumn> databaseColumns;
 
     protected Connection connection;
     protected PreparedStatement preparedStatement;
     protected ResultSet resultSet;
 
+    protected SqlTypeHandlerRepository sqlTypeHandlerRepository;
     protected Set<String> primaryKeyColumnNames;
 
     protected int rowIndex;
@@ -42,22 +51,20 @@ public class QueryResultSet {
     protected boolean useRowIndexAsIdentifier = false;
 
 
-    public QueryResultSet(Connection connection, PreparedStatement preparedStatement, ResultSet resultSet, Set<String> primaryKeyColumnNames) {
+    public TableContents(String qualifiedTableName, List<DatabaseColumn> databaseColumns, SqlTypeHandlerRepository sqlTypeHandlerRepository, Set<String> primaryKeyColumnNames, Connection connection, PreparedStatement preparedStatement, ResultSet resultSet) {
+        this.qualifiedTableName = qualifiedTableName;
+        this.databaseColumns = databaseColumns;
+        this.sqlTypeHandlerRepository = sqlTypeHandlerRepository;
+        this.primaryKeyColumnNames = primaryKeyColumnNames;
+
         this.connection = connection;
         this.preparedStatement = preparedStatement;
         this.resultSet = resultSet;
-        this.primaryKeyColumnNames = primaryKeyColumnNames;
-        this.rowIndex = 0;
 
+        this.rowIndex = 0;
         if (primaryKeyColumnNames.isEmpty()) {
             useRowIndexAsIdentifier = true;
         }
-    }
-
-
-    public boolean next() throws SQLException {
-        rowIndex++;
-        return resultSet.next();
     }
 
     public void close() throws SQLException {
@@ -85,10 +92,39 @@ public class QueryResultSet {
         return identifier.toString();
     }
 
-    public String getValue(int columnIndex) throws SQLException {
-        return resultSet.getString(columnIndex + 1);
+
+    public DatabaseRow getDatabaseRow() throws Exception {
+        if (!resultSet.next()) {
+            return null;
+        }
+        rowIndex++;
+        DatabaseRow databaseRow = new DatabaseRow(getRowIdentifier(), qualifiedTableName);
+
+        List<DatabaseColumnWithValue> values = new ArrayList<DatabaseColumnWithValue>();
+
+        for (int i = 0; i < databaseColumns.size(); i++) {
+            DatabaseColumn databaseColumn = databaseColumns.get(i);
+
+            String columnName = databaseColumn.getColumnName();
+            boolean primaryKey = databaseColumn.isPrimaryKey();
+            int sqlType = databaseColumn.getSqlType();
+            SqlTypeHandler<?> sqlTypeHandler = databaseColumn.getSqlTypeHandler();
+
+            Object value = sqlTypeHandler.getResultSetValue(resultSet, i + 1, sqlType);
+
+            DatabaseColumnWithValue databaseColumnWithValue = new DatabaseColumnWithValue(columnName, value, sqlType, sqlTypeHandler, false, primaryKey);
+            databaseRow.addDatabaseColumnWithValue(databaseColumnWithValue);
+        }
+        return databaseRow;
     }
 
+    protected Object getValue(DatabaseColumn databaseColumn, SqlTypeHandler sqlTypeHandler) throws Exception {
+        // todo not correct
+        int index = databaseColumns.indexOf(databaseColumn) + 1;
+
+        int sqlType = databaseColumn.getSqlType();
+        return sqlTypeHandler.getResultSetValue(resultSet, index, sqlType);
+    }
 
     public int getNrOfColumns() throws SQLException {
         return resultSet.getMetaData().getColumnCount();

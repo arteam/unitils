@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.annotation;
 
-import org.unitils.dataset.factory.DataSetFactory;
+import org.unitils.dataset.factory.DataSetRowSource;
 import org.unitils.dataset.loader.DataSetLoader;
 
 import java.lang.annotation.Inherited;
@@ -98,10 +98,10 @@ public @interface DataSet {
     /**
      * The factory that needs to be used to read the data set files.
      *
-     * @return An implementation class of {@link DataSetFactory}. Use the default value {@link DataSetFactory}
+     * @return An implementation class of {@link DataSetRowSource}. Use the default value {@link DataSetRowSource}
      *         to make use of the default DataSetLoadStrategy configured in the unitils configuration.
      */
-    Class<? extends DataSetFactory> factory() default DataSetFactory.class;
+    Class<? extends DataSetRowSource> source() default DataSetRowSource.class;
 
     /**
      * Variables that will be used to fill in possible variable declarations in a data set.

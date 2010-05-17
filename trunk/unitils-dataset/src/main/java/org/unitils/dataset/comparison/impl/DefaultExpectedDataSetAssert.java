@@ -17,9 +17,8 @@ package org.unitils.dataset.comparison.impl;
 
 import org.unitils.core.util.ObjectFormatter;
 import org.unitils.dataset.comparison.*;
-import org.unitils.dataset.core.DataSet;
-import org.unitils.dataset.core.Row;
-import org.unitils.dataset.core.Table;
+import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.factory.DataSetRowSource;
 
 import java.util.List;
 
@@ -55,22 +54,14 @@ public class DefaultExpectedDataSetAssert implements ExpectedDataSetAssert {
      * Tables, rows or columns that are not specified in the expected schema will be ignored.
      * If an empty table is specified in the expected schema, it will check that the actual table is also be empty.
      *
-     * @param expectedDataSet The expected data set, not null
-     * @param variables       Variables that will be replaced in the data set if needed, not null
+     * @param expectedDataSetRowSource The expected data set, not null
+     * @param variables                Variables that will be replaced in the data set if needed, not null
      * @throws AssertionError When the assertion fails.
      */
-    public void assertEqual(DataSet expectedDataSet, List<String> variables) throws AssertionError {
-        DataSetComparison dataSetComparison = dataSetComparator.compare(expectedDataSet, variables);
+    public void assertEqual(DataSetRowSource expectedDataSetRowSource, List<String> variables) throws AssertionError {
+        DataSetComparison dataSetComparison = dataSetComparator.compare(expectedDataSetRowSource, variables);
         if (!dataSetComparison.isMatch()) {
             String message = generateErrorMessage(dataSetComparison, dataSetComparator);
-            if (databaseContentRetriever != null) {
-                String databaseContent = databaseContentRetriever.getActualDatabaseContentForDataSetComparison(dataSetComparison);
-
-                StringBuilder messageBuilder = new StringBuilder(message);
-                messageBuilder.append("== Actual database content ==\n\n");
-                messageBuilder.append(databaseContent);
-                message = messageBuilder.toString();
-            }
             throw new AssertionError(message);
         }
     }
@@ -83,68 +74,63 @@ public class DefaultExpectedDataSetAssert implements ExpectedDataSetAssert {
      */
     protected String generateErrorMessage(DataSetComparison dataSetComparison, DataSetComparator dataSetComparator) {
         StringBuilder result = new StringBuilder("Assertion failed. Differences found between the expected data set and actual database content.\n\n");
-        for (SchemaComparison schemaComparison : dataSetComparison.getSchemaComparisons()) {
-            appendSchemaComparison(schemaComparison, result);
-        }
-        return result.toString();
-    }
-
-
-    protected void appendSchemaComparison(SchemaComparison schemaComparison, StringBuilder result) {
-        for (TableComparison tableComparison : schemaComparison.getTableComparisons()) {
+        for (TableComparison tableComparison : dataSetComparison.getTableComparisons()) {
             if (tableComparison.isExpectedNoMoreRecordsButFoundMore()) {
                 appendExpectedToBeEmptyButWasNotTableComparison(tableComparison, result);
             } else {
                 appendTableComparison(tableComparison, result);
             }
         }
+
+        if (databaseContentRetriever != null) {
+            String databaseContent = databaseContentRetriever.getActualDatabaseContentForDataSetComparison(dataSetComparison);
+            result.append("== Actual database content ==\n\n");
+            result.append(databaseContent);
+        }
+        return result.toString();
     }
 
     protected void appendExpectedToBeEmptyButWasNotTableComparison(TableComparison tableComparison, StringBuilder result) {
         result.append("Expected no more database records in table ");
-        appendTableName(tableComparison, result);
+        result.append(tableComparison.getQualifiedTableName());
         result.append(" but found more records.\n\n");
     }
 
-    protected void appendTableComparison(TableComparison tableComparison, StringBuilder result) {
-        result.append("Found differences for table ");
-        appendTableName(tableComparison, result);
-        result.append(":\n");
-        for (Row missingRow : tableComparison.getMissingRows()) {
-            appendMissingRow(missingRow, result);
+    protected void appendTableComparison(TableComparison tableComparison, StringBuilder result) {       
+        for (DatabaseRow databaseRow : tableComparison.getMissingRows()) {
+            appendMissingRow(databaseRow, result);
+        }
+        for (DatabaseRow databaseRow : tableComparison.getRowsThatShouldNotHaveMatched()) {
+            appendRowThatShouldNotHaveMatch(databaseRow, result);
         }
         for (RowComparison rowComparison : tableComparison.getBestRowComparisons()) {
-            if (rowComparison.shouldNotHaveMatched()) {
-                appendRowThatShouldNotHaveMatch(rowComparison.getDataSetRow(), result);
-            } else {
-                appendBestRowComparison(rowComparison, result);
-            }
+            appendBestRowComparison(rowComparison, result);
         }
         result.append('\n');
     }
 
 
-    protected void appendMissingRow(Row missingRow, StringBuilder result) {
+    protected void appendMissingRow(DatabaseRow missingRow, StringBuilder result) {
         result.append("* No database record found for data set row:  ");
         result.append(missingRow);
         result.append("\n");
     }
 
-    protected void appendRowThatShouldNotHaveMatch(Row rowThatShouldNotHaveMatch, StringBuilder result) {
+    protected void appendRowThatShouldNotHaveMatch(DatabaseRow rowThatShouldNotHaveMatch, StringBuilder result) {
         result.append("* Expected not to find a match for data set row: ");
         result.append(rowThatShouldNotHaveMatch);
         result.append("\n");
     }
 
     protected void appendBestRowComparison(RowComparison rowComparison, StringBuilder result) {
-        result.append("* Different database record found for data set row:  ");
-        result.append(rowComparison.getDataSetRow());
+        result.append("* No match found for data set row:  ");
+        result.append(rowComparison.getExpectedDatabaseRow());
         result.append("\n");
 
         StringBuilder columnNames = new StringBuilder();
         StringBuilder expectedValues = new StringBuilder();
         StringBuilder actualValues = new StringBuilder();
-        for (ColumnComparison columnComparison : rowComparison.getColumnComparisons()) {
+        for (ColumnDifference columnComparison : rowComparison.getColumnDifferences()) {
             appendColumnComparison(columnComparison, columnNames, expectedValues, actualValues);
         }
         result.append("\n                ");
@@ -157,13 +143,10 @@ public class DefaultExpectedDataSetAssert implements ExpectedDataSetAssert {
     }
 
 
-    protected void appendColumnComparison(ColumnComparison columnComparison, StringBuilder columnNames, StringBuilder expectedValues, StringBuilder actualValues) {
-        String columnName = columnComparison.getColumnName();
-        String expectedValue = columnComparison.getExpectedValue();
-        String actualValue = columnComparison.getActualValue();
-        if (actualValue == null) {
-            actualValue = "<null>";
-        }
+    protected void appendColumnComparison(ColumnDifference columnDifference, StringBuilder columnNames, StringBuilder expectedValues, StringBuilder actualValues) {
+        String columnName = columnDifference.getColumnName();
+        String expectedValue = columnDifference.getExpectedValueAsString();
+        String actualValue = columnDifference.getActualValueAsString();
 
         int columnSize = max(max(columnName.length(), expectedValue.length()), actualValue.length()) + 2;
         columnNames.append(rightPad(columnName, columnSize));
@@ -171,11 +154,5 @@ public class DefaultExpectedDataSetAssert implements ExpectedDataSetAssert {
         actualValues.append(rightPad(actualValue, columnSize));
     }
 
-    protected void appendTableName(TableComparison tableComparison, StringBuilder result) {
-        Table table = tableComparison.getDataSetTable();
-        result.append(table.getSchema().getName());
-        result.append(".");
-        result.append(table.getName());
-    }
 
 }

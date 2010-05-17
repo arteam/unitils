@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.loader;
+package org.unitils.dataset.core;
 
-import org.unitils.dataset.core.ColumnProcessor;
-import org.unitils.dataset.core.Row;
 import org.unitils.dataset.loader.impl.Database;
-import org.unitils.dataset.loader.impl.NameProcessor;
 
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public interface RowLoader {
+public interface DataSetStrategy {
 
-    void init(ColumnProcessor columnProcessor, NameProcessor nameProcessor, Database database);
 
-    int loadRow(Row row, List<String> variables);
+    public void init(Properties configuration, Database database);
+
+
+    public void perform(List<String> dataSetFileNames, List<String> variables, Class<?> testClass);
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
  */
 package org.unitils.dataset.comparison;
 
-import org.unitils.dataset.core.Row;
-import org.unitils.dataset.core.Table;
+import org.unitils.dataset.core.DatabaseRow;
 
 import java.util.*;
 
@@ -28,17 +27,19 @@ import java.util.*;
  */
 public class TableComparison {
 
-    /* The data set table that was compared */
-    private Table dataSetTable;
+    /* The table name prefixed with the schema name and quoted if it is a case-sensitive name. */
+    private String qualifiedTableName;
 
     /* True if expected no more records but found more records in the database */
     private boolean expectedNoMoreRecordsButFoundMore = false;
 
-    /* The rows for which no other row was found in the actual table, empty if none found */
-    private List<Row> missingRows = new ArrayList<Row>();
+    /* The data set rows for which no database row was found, empty if none found */
+    private List<DatabaseRow> missingRows = new ArrayList<DatabaseRow>();
 
-    /* The best differences of the comparisons between the rows of the tables with the data set row as key */
-    private Map<Row, RowComparison> bestRowComparisons = new LinkedHashMap<Row, RowComparison>();
+    private List<DatabaseRow> rowsThatShouldNotHaveMatched = new ArrayList<DatabaseRow>();
+
+    /* The best differences of the comparisons between the rows of the tables with the epxected database row as key */
+    private Map<DatabaseRow, RowComparison> bestRowComparisons = new LinkedHashMap<DatabaseRow, RowComparison>();
 
     private Set<String> actualRowIdentifiersWithMatch = new HashSet<String>();
 
@@ -46,18 +47,18 @@ public class TableComparison {
     /**
      * Creates a table difference.
      *
-     * @param dataSetTable The data set table that was compared, not null
+     * @param qualifiedTableName The table name prefixed with the schema name and quoted if it is a case-sensitive name, not null
      */
-    public TableComparison(Table dataSetTable) {
-        this.dataSetTable = dataSetTable;
+    public TableComparison(String qualifiedTableName) {
+        this.qualifiedTableName = qualifiedTableName;
     }
 
 
     /**
-     * @return The data set table that was compared, not null
+     * @return The table name prefixed with the schema name and quoted if it is a case-sensitive name, not null
      */
-    public Table getDataSetTable() {
-        return dataSetTable;
+    public String getQualifiedTableName() {
+        return qualifiedTableName;
     }
 
     /**
@@ -67,12 +68,6 @@ public class TableComparison {
         return expectedNoMoreRecordsButFoundMore;
     }
 
-    /**
-     * @return The rows for which no other row was found in the actual table, empty if none found
-     */
-    public List<Row> getMissingRows() {
-        return missingRows;
-    }
 
     /**
      * @param expectedNoMoreRecordsButFoundMore
@@ -83,29 +78,42 @@ public class TableComparison {
     }
 
     /**
-     * Adds a rows for which no other row was found in the actual table.
-     *
-     * @param missingRow The missing row, not null
+     * @return The data set rows for which no database row was found, empty if none found
      */
-    public void addMissingRow(Row missingRow) {
-        missingRows.add(missingRow);
+    public List<DatabaseRow> getMissingRows() {
+        return missingRows;
     }
 
     /**
-     * @param row The row to check, not null
-     * @return True if a match was found for the given row
+     * Adds a data set row for which no database row was found.
+     *
+     * @param missingRow The missing row, not null
      */
-    public boolean hasMatch(Row row) {
-        RowComparison rowComparison = bestRowComparisons.get(row);
-        return rowComparison != null && rowComparison.isMatch();
+    public void addMissingRow(DatabaseRow missingRow) {
+        missingRows.add(missingRow);
+    }
+
+
+    public List<DatabaseRow> getRowsThatShouldNotHaveMatched() {
+        return rowsThatShouldNotHaveMatched;
+    }
+
+    public void setMatchingRowThatShouldNotHaveMatched(DatabaseRow databaseRow) {
+        actualRowIdentifiersWithMatch.contains(databaseRow.getIdentifier());
+        rowsThatShouldNotHaveMatched.add(databaseRow);
     }
 
     /**
      * @param rowIdentifier The identifier of the actual row in the database, not null
      * @return True if the actual row index was already used for a match
      */
-    public boolean isActualRowWithExactMatch(String rowIdentifier) {
+    public boolean isMatchingRow(String rowIdentifier) {
         return actualRowIdentifiersWithMatch.contains(rowIdentifier);
+    }
+
+    public void setMatchingRow(RowComparison rowComparison) {
+        bestRowComparisons.remove(rowComparison.getExpectedDatabaseRow());
+        actualRowIdentifiersWithMatch.add(rowComparison.getActualDatabaseRow().getIdentifier());
     }
 
     /**
@@ -116,19 +124,24 @@ public class TableComparison {
     }
 
     /**
+     * @param expectedDatabaseRow The expected database row, not null
+     * @return The best comparison for the given rows, not null
+     */
+    public RowComparison getBestRowComparison(DatabaseRow expectedDatabaseRow) {
+        return bestRowComparisons.get(expectedDatabaseRow);
+    }
+
+
+    /**
      * Sets the given difference as best row difference if it is better than the current best row difference.
      *
-     * @param rowIdentifier The identifier of the actual row in the database, not null
      * @param rowComparison The comparison result, not null
      */
-    public void replaceIfBetterRowComparison(String rowIdentifier, RowComparison rowComparison) {
-        Row dataSetRow = rowComparison.getDataSetRow();
-        RowComparison currentRowComparison = bestRowComparisons.get(dataSetRow);
+    public void replaceIfBetterRowComparison(RowComparison rowComparison) {
+        DatabaseRow expectedDatabaseRow = rowComparison.getExpectedDatabaseRow();
+        RowComparison currentRowComparison = bestRowComparisons.get(expectedDatabaseRow);
         if (currentRowComparison == null || rowComparison.isBetterMatch(currentRowComparison)) {
-            bestRowComparisons.put(dataSetRow, rowComparison);
-            if (rowComparison.isMatch()) {
-                actualRowIdentifiersWithMatch.add(rowIdentifier);
-            }
+            bestRowComparisons.put(expectedDatabaseRow, rowComparison);
         }
     }
 
@@ -142,8 +155,11 @@ public class TableComparison {
         if (!missingRows.isEmpty()) {
             return false;
         }
+        if (!rowsThatShouldNotHaveMatched.isEmpty()) {
+            return false;
+        }
         for (RowComparison rowComparison : bestRowComparisons.values()) {
-            if (!rowComparison.isMatch() || rowComparison.shouldNotHaveMatched()) {
+            if (!rowComparison.isMatch()) {
                 return false;
             }
         }

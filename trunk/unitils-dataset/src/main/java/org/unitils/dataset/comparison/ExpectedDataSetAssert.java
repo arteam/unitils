@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.comparison;
 
-import org.unitils.dataset.core.DataSet;
+import org.unitils.dataset.factory.DataSetRowSource;
 
 import java.util.List;
 
@@ -38,10 +38,10 @@ public interface ExpectedDataSetAssert {
      * Tables, rows or columns that are not specified in the expected schema will be ignored.
      * If an empty table is specified in the expected schema, it will check that the actual table is also be empty.
      *
-     * @param expectedDataSet The expected data set, not null
-     * @param variables       Variables that will be replaced in the data set if needed, not null
+     * @param expectedDataSetRowSource The expected data set, not null
+     * @param variables                Variables that will be replaced in the data set if needed, not null
      * @throws AssertionError When the assertion fails.
      */
-    public void assertEqual(DataSet expectedDataSet, List<String> variables) throws AssertionError;
+    public void assertEqual(DataSetRowSource expectedDataSetRowSource, List<String> variables) throws AssertionError;
 
 }

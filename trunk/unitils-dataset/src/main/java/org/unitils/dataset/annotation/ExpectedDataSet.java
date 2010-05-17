@@ -15,8 +15,6 @@
  */
 package org.unitils.dataset.annotation;
 
-import org.unitils.dataset.factory.DataSetFactory;
-
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -120,6 +118,6 @@ public @interface ExpectedDataSet {
      * @return An implementation class of {@link DataSetFactory}. Use the default value {@link DataSetFactory}
      *         to make use of the default factory configured in the unitils configuration.
      */
-    Class<? extends DataSetFactory> factory() default DataSetFactory.class;
+    //Class<? extends DataSetFactory> factory() default DataSetFactory.class;
 
 }

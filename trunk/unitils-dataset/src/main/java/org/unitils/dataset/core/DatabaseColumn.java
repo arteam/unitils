@@ -1,5 +1,5 @@
 /*
- * Copyright 2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,43 +15,36 @@
  */
 package org.unitils.dataset.core;
 
+import org.unitils.dataset.sqltypehandler.SqlTypeHandler;
+
 /**
  * A value of a data set column for which all variables and literal tokens were processed.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ProcessedColumn {
+public class DatabaseColumn {
 
     /* The column name */
     private String columnName;
-    /* The value */
-    private String value;
     /* The sql type of the column in the database */
     private int sqlType;
-    /* True if this value is a literal value */
-    private boolean literalValue;
+
+    private SqlTypeHandler sqlTypeHandler;
     /* True if the column is a primary key column */
     private boolean primaryKey;
-    /* The original column that was processed */
-    private Column column;
 
 
     /**
-     * @param columnName         The column name, not null
-     * @param value        The value, not null
-     * @param sqlType      The sql type of the column in the database
-     * @param literalValue True if this value is a literal value
-     * @param primaryKey   True if the column is a primary key column
-     * @param column       The original column that was processed, not null
+     * @param columnName The column name, not null
+     * @param sqlType    The sql type of the column in the database
+     * @param primaryKey True if the column is a primary key column
      */
-    public ProcessedColumn(String columnName, String value, int sqlType, boolean literalValue, boolean primaryKey, Column column) {
+    public DatabaseColumn(String columnName, int sqlType, SqlTypeHandler sqlTypeHandler, boolean primaryKey) {
         this.columnName = columnName;
-        this.value = value;
         this.sqlType = sqlType;
-        this.literalValue = literalValue;
+        this.sqlTypeHandler = sqlTypeHandler;
         this.primaryKey = primaryKey;
-        this.column = column;
     }
 
 
@@ -63,24 +56,14 @@ public class ProcessedColumn {
     }
 
     /**
-     * @return The value, not null
-     */
-    public String getValue() {
-        return value;
-    }
-
-    /**
      * @return The sql type of the column in the database
      */
     public int getSqlType() {
         return sqlType;
     }
 
-    /**
-     * @return True if this value is a literal value
-     */
-    public boolean isLiteralValue() {
-        return literalValue;
+    public SqlTypeHandler getSqlTypeHandler() {
+        return sqlTypeHandler;
     }
 
     /**
@@ -90,10 +73,4 @@ public class ProcessedColumn {
         return primaryKey;
     }
 
-    /**
-     * @return The original column that was processed
-     */
-    public Column getColumn() {
-        return column;
-    }
 }

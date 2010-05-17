@@ -15,8 +15,6 @@
  */
 package org.unitils.dataset.comparison;
 
-import org.unitils.dataset.comparison.SchemaComparison;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,29 +26,29 @@ import java.util.List;
  */
 public class DataSetComparison {
 
-    /* The differences between the schema's of the data set, empty if none found */
-    private List<SchemaComparison> schemaComparisons = new ArrayList<SchemaComparison>();
+    /* The comparisons between the tables of the data set */
+    private List<TableComparison> tableComparisons = new ArrayList<TableComparison>();
 
 
-    public List<SchemaComparison> getSchemaComparisons() {
-        return schemaComparisons;
+    public List<TableComparison> getTableComparisons() {
+        return tableComparisons;
     }
 
     /**
-     * Adds a result of a schema comparison
+     * Adds a result of a table comparison
      *
-     * @param schemaComparison The schema comparison, not null
+     * @param tableComparison The table comparison, not null
      */
-    public void addSchemaComparison(SchemaComparison schemaComparison) {
-        schemaComparisons.add(schemaComparison);
+    public void addTableComparison(TableComparison tableComparison) {
+        tableComparisons.add(tableComparison);
     }
 
     /**
      * @return True if both data sets are a match
      */
     public boolean isMatch() {
-        for (SchemaComparison schemaComparison : schemaComparisons) {
-            if (!schemaComparison.isMatch()) {
+        for (TableComparison tableComparison : tableComparisons) {
+            if (!tableComparison.isMatch()) {
                 return false;
             }
         }

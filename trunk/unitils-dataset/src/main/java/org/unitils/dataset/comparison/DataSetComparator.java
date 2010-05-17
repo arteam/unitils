@@ -15,9 +15,10 @@
  */
 package org.unitils.dataset.comparison;
 
-import org.unitils.dataset.comparison.DataSetComparison;
-import org.unitils.dataset.core.DataSet;
+import org.unitils.dataset.core.DataSetRowProcessor;
+import org.unitils.dataset.factory.DataSetRowSource;
 import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.util.DatabaseAccessor;
 
 import java.util.List;
 
@@ -27,8 +28,8 @@ import java.util.List;
  */
 public interface DataSetComparator {
 
-    void init(Database database);
+    void init(DataSetRowProcessor dataSetRowProcessor, DatabaseAccessor databaseAccessor, Database database);
 
-    DataSetComparison compare(DataSet expectedDataSet, List<String> variables);
+    DataSetComparison compare(DataSetRowSource expectedDataSetRowSource, List<String> variables);
 
 }

@@ -23,7 +23,7 @@ import org.unitils.dataset.core.Column;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ColumnComparison {
+public class ColumnComparison2 {
 
     /* The name of the data set column */
     private Column column;
@@ -31,14 +31,17 @@ public class ColumnComparison {
     private String expectedValue;
     /* The expected value */
     private String actualValue;
+    /* True if the both values are equal */
+    private boolean equal;
     /* True if this column is part of a primary key */
     private boolean primaryKey;
 
 
-    public ColumnComparison(Column column, String expectedValue, String actualValue, boolean primaryKey) {
+    public ColumnComparison2(Column column, String expectedValue, String actualValue, boolean equal, boolean primaryKey) {
         this.column = column;
         this.expectedValue = expectedValue;
         this.actualValue = actualValue;
+        this.equal = equal;
         this.primaryKey = primaryKey;
     }
 
@@ -67,6 +70,6 @@ public class ColumnComparison {
      * @return True if both columns are a match
      */
     public boolean isMatch() {
-        return (expectedValue == null && actualValue == null) || (expectedValue != null && expectedValue.equals(actualValue));
+        return equal;
     }
 }

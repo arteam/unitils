@@ -15,16 +15,13 @@
  */
 package org.unitils.dataset.loader.impl;
 
-import org.unitils.dataset.core.Table;
-import org.unitils.dataset.loader.impl.Database;
-import org.unitils.dataset.loader.impl.NameProcessor;
+import org.unitils.core.UnitilsException;
+import org.unitils.dataset.core.DataSetRow;
+import org.unitils.dataset.core.DatabaseColumnWithValue;
+import org.unitils.dataset.factory.DataSetRowSource;
+import org.unitils.dataset.util.DatabaseAccessor;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import static org.unitils.core.util.DbUtils.close;
+import java.util.*;
 
 
 /**
@@ -33,33 +30,54 @@ import static org.unitils.core.util.DbUtils.close;
  */
 public class TableContentDeleter {
 
-    private Database database;
-    private NameProcessor nameProcessor;
+    protected DatabaseAccessor databaseAccessor;
+    protected IdentifierNameProcessor identifierNameProcessor;
 
 
-    public TableContentDeleter(NameProcessor nameProcessor, Database database) throws SQLException {
-        this.database = database;
-        this.nameProcessor = nameProcessor;
+    public void init(IdentifierNameProcessor identifierNameProcessor, DatabaseAccessor databaseAccessor) {
+        this.databaseAccessor = databaseAccessor;
+        this.identifierNameProcessor = identifierNameProcessor;
     }
 
-    public int deleteTableContent(Table table) throws SQLException {
-        String sql = createStatement(table);
 
-        Connection connection = database.createConnection();
-        PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
-        try {
-            preparedStatement = connection.prepareStatement(sql);
-            return preparedStatement.executeUpdate();
-        } finally {
-            close(connection, preparedStatement, resultSet);
+    public void deleteDataFromTablesInReverseOrder(DataSetRowSource dataSetRowSource) {
+        List<String> qualifiedTableNames = getQualifiedTableNames(dataSetRowSource);
+        Collections.reverse(qualifiedTableNames);
+        for (String qualifiedTableName : qualifiedTableNames) {
+            try {
+                deleteTableContent(qualifiedTableName);
+            } catch (Exception e) {
+                throw new UnitilsException("Unable to delete data from table " + qualifiedTableName, e);
+            }
         }
     }
 
-    protected String createStatement(Table table) {
+
+    protected List<String> getQualifiedTableNames(DataSetRowSource dataSetRowSource) {
+        List<String> qualifiedTableNames = new ArrayList<String>();
+        Map<String, String> qualifiedTableNameMap = new LinkedHashMap<String, String>();
+
+        DataSetRow dataSetRow;
+        while ((dataSetRow = dataSetRowSource.getNextDataSetRow()) != null) {
+            String qualifiedTableName = identifierNameProcessor.getQualifiedTableName(dataSetRow);
+            if (!qualifiedTableNameMap.containsKey(qualifiedTableName)) {
+                qualifiedTableNameMap.put(qualifiedTableName, qualifiedTableName);
+                qualifiedTableNames.add(qualifiedTableName);
+            }
+        }
+        return qualifiedTableNames;
+    }
+
+
+    protected void deleteTableContent(String qualifiedTableName) throws Exception {
+        String sql = createStatement(qualifiedTableName);
+        databaseAccessor.executeUpdate(sql, new ArrayList<DatabaseColumnWithValue>());
+    }
+
+    protected String createStatement(String qualifiedTableName) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("delete from ");
-        stringBuilder.append(nameProcessor.getTableName(table));
+        stringBuilder.append(qualifiedTableName);
         return stringBuilder.toString();
     }
 
