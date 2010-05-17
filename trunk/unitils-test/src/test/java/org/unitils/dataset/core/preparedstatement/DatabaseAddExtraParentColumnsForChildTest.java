@@ -25,22 +25,19 @@ import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dataset.core.Row;
-import org.unitils.dataset.core.Schema;
-import org.unitils.dataset.core.Table;
+import org.unitils.dataset.core.DataSetColumn;
+import org.unitils.dataset.core.DataSetRow;
+import org.unitils.dataset.core.DataSetSettings;
 import org.unitils.dataset.loader.impl.Database;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import static junit.framework.Assert.fail;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.loader.impl.TestDataFactory.createColumn;
 
 /**
  * @author Tim Ducheyne
@@ -49,14 +46,16 @@ import static org.unitils.dataset.loader.impl.TestDataFactory.createColumn;
 public class DatabaseAddExtraParentColumnsForChildTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private Database database;
+    private Database database = new Database();
 
     @TestDataSource
     private DataSource dataSource;
 
-    private Row parentRow;
-    private Row childRow;
-    private Row parentToParentRow;
+    private DataSetRow parentDataSetRow;
+    private DataSetRow childDataSetRow;
+    private DataSetRow parentToParentDataSetRow;
+    private DataSetRow caseSensitiveParentDataSetRow;
+    private DataSetRow caseSensitiveChildDataSetRow;
 
 
     @Before
@@ -64,7 +63,7 @@ public class DatabaseAddExtraParentColumnsForChildTest extends UnitilsJUnit4 {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
         DbSupport dbSupport = getDefaultDbSupport(configuration, sqlHandler);
-        database = new Database(dbSupport);
+        database.init(dbSupport);
 
         dropTestTables();
         createTestTables();
@@ -72,20 +71,14 @@ public class DatabaseAddExtraParentColumnsForChildTest extends UnitilsJUnit4 {
 
     @Before
     public void initializeTestData() {
-        parentRow = new Row();
-        childRow = new Row(parentRow, false);
-        parentToParentRow = new Row(parentRow, false);
+        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
+        parentDataSetRow = new DataSetRow("public", "parent", null, false, dataSetSettings);
+        childDataSetRow = new DataSetRow("public", "child", parentDataSetRow, false, dataSetSettings);
+        parentToParentDataSetRow = new DataSetRow("public", "parent", parentDataSetRow, false, dataSetSettings);
 
-        Table parentTable = new Table("parent", false);
-        parentTable.addRow(parentRow);
-        parentTable.addRow(parentToParentRow);
-
-        Table childTable = new Table("child", false);
-        childTable.addRow(childRow);
-
-        Schema schema = new Schema("public", false);
-        schema.addTable(parentTable);
-        schema.addTable(childTable);
+        DataSetSettings caseSensitiveDataSetSettings = new DataSetSettings('=', '$', true);
+        caseSensitiveParentDataSetRow = new DataSetRow("PUBLIC", "ParentCase", null, false, caseSensitiveDataSetSettings);
+        caseSensitiveChildDataSetRow = new DataSetRow("PUBLIC", "ChildCase", caseSensitiveParentDataSetRow, false, caseSensitiveDataSetSettings);
     }
 
     @After
@@ -96,19 +89,30 @@ public class DatabaseAddExtraParentColumnsForChildTest extends UnitilsJUnit4 {
 
     @Test
     public void addExtraParentColumnsForChild() throws Exception {
-        parentRow.addColumn(createColumn("pk1", "1"));
-        parentRow.addColumn(createColumn("pk2", "2"));
+        parentDataSetRow.addDataSetColumn(new DataSetColumn("pk1", "1"));
+        parentDataSetRow.addDataSetColumn(new DataSetColumn("pk2", "2"));
 
-        database.addExtraParentColumnsForChild(childRow);
-        assertEquals("1", childRow.getColumn("FK1").getValue());
-        assertEquals("2", childRow.getColumn("FK2").getValue());
+        database.addExtraParentColumnsForChild(childDataSetRow);
+        assertEquals("1", childDataSetRow.getDataSetColumn("FK1").getValue());
+        assertEquals("2", childDataSetRow.getDataSetColumn("FK2").getValue());
+    }
+
+    @Test
+    public void caseSensitive() throws Exception {
+        caseSensitiveParentDataSetRow.addDataSetColumn(new DataSetColumn("pk1", "1"));
+        caseSensitiveParentDataSetRow.addDataSetColumn(new DataSetColumn("Pk2", "2"));
+
+        database.addExtraParentColumnsForChild(caseSensitiveChildDataSetRow);
+        assertEquals("1", caseSensitiveChildDataSetRow.getDataSetColumn("fk1").getValue());
+        assertEquals("2", caseSensitiveChildDataSetRow.getDataSetColumn("FK2").getValue());
     }
 
     @Test
     public void fkColumnNotFoundInParent() throws Exception {
         try {
-            parentRow.addColumn(createColumn("pk2", "2"));
-            database.addExtraParentColumnsForChild(childRow);
+            parentDataSetRow.addDataSetColumn(new DataSetColumn("pk2", "2"));
+
+            database.addExtraParentColumnsForChild(childDataSetRow);
             fail("Expected UnitilsException");
 
         } catch (UnitilsException e) {
@@ -118,19 +122,19 @@ public class DatabaseAddExtraParentColumnsForChildTest extends UnitilsJUnit4 {
 
     @Test
     public void overridingValueOfChild() throws Exception {
-        parentRow.addColumn(createColumn("pk1", "1"));
-        parentRow.addColumn(createColumn("pk2", "2"));
-        childRow.addColumn(createColumn("fk1", "9999"));
+        parentDataSetRow.addDataSetColumn(new DataSetColumn("pk1", "1"));
+        parentDataSetRow.addDataSetColumn(new DataSetColumn("pk2", "2"));
+        childDataSetRow.addDataSetColumn(new DataSetColumn("fk1", "9999"));
 
-        database.addExtraParentColumnsForChild(childRow);
-        assertEquals("1", childRow.getColumn("FK1").getValue());
-        assertEquals("2", childRow.getColumn("FK2").getValue());
+        database.addExtraParentColumnsForChild(childDataSetRow);
+        assertEquals("1", childDataSetRow.getDataSetColumn("FK1").getValue());
+        assertEquals("2", childDataSetRow.getDataSetColumn("FK2").getValue());
     }
 
     @Test
     public void noForeignKeysFound() throws Exception {
         try {
-            database.addExtraParentColumnsForChild(parentToParentRow);
+            database.addExtraParentColumnsForChild(parentToParentDataSetRow);
             fail("Expected UnitilsException");
 
         } catch (UnitilsException e) {
@@ -138,14 +142,19 @@ public class DatabaseAddExtraParentColumnsForChildTest extends UnitilsJUnit4 {
         }
     }
 
+
     private void createTestTables() {
         executeUpdate("create table parent (pk1 integer not null, pk2 integer not null, parentColumn varchar(100), primary key (pk1, pk2))", dataSource);
         executeUpdate("create table child (pk integer not null primary key, childColumn varchar(100), fk1 integer, fk2 integer, foreign key (fk1, fk2) references parent(pk1, pk2))", dataSource);
+        executeUpdate("create table \"ParentCase\" (\"pk1\" integer not null, \"Pk2\" integer not null, \"parentColumn\" varchar(100), primary key (\"pk1\", \"Pk2\"))", dataSource);
+        executeUpdate("create table \"ChildCase\" (\"pk\" integer not null primary key, childColumn varchar(100), \"fk1\" integer, fk2 integer, foreign key (\"fk1\", fk2) references \"ParentCase\"(\"pk1\", \"Pk2\"))", dataSource);
     }
 
     private void dropTestTables() {
         executeUpdateQuietly("drop table child", dataSource);
         executeUpdateQuietly("drop table parent", dataSource);
+        executeUpdateQuietly("drop table \"ChildCase\"", dataSource);
+        executeUpdateQuietly("drop table \"ParentCase\"", dataSource);
     }
 
     private void assertExceptionContainsColumnNames(UnitilsException e, String... columnNames) {

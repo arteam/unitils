@@ -18,18 +18,19 @@ package org.unitils.dataset.comparison;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.comparison.impl.ComparisonResultSet;
 import org.unitils.dataset.comparison.impl.DefaultDataSetComparator;
-import org.unitils.dataset.comparison.impl.RowComparator;
+import org.unitils.dataset.comparison.impl.TableContentRetriever;
+import org.unitils.dataset.comparison.impl.TableContents;
 import org.unitils.dataset.core.*;
+import org.unitils.dataset.factory.DataSetRowSource;
 import org.unitils.dataset.loader.impl.Database;
 import org.unitils.mock.Mock;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static java.sql.Types.INTEGER;
+import static org.junit.Assert.*;
 
 /**
  * @author Tim Ducheyne
@@ -38,191 +39,272 @@ import static org.junit.Assert.assertTrue;
 public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private DefaultDataSetComparator defaultDataSetComparator = new TestDefaultDataSetComparator();
+    private DefaultDataSetComparator defaultDataSetComparator = new DefaultDataSetComparator();
 
     private Mock<Database> database;
-    private Mock<RowComparator> rowComparator;
-    private Mock<ComparisonResultSet> comparisonResultSet;
-
-    private Row row1;
-    private Row row2;
-    private Row row3;
-    private Row emptyRow;
-
-    protected DataSet dataSetWith3Rows;
-    protected DataSet dataSetWithEmptyRow;
+    private Mock<DataSetRowProcessor> dataSetRowProcessor;
+    private Mock<TableContentRetriever> tableContentRetriever;
+    private Mock<TableContents> tableContents;
+    private Mock<DataSetRowSource> dataSetRowSource;
 
     protected List<String> emptyVariables = new ArrayList<String>();
 
+    protected DataSetRow dataSetRow1;
+    protected DataSetRow dataSetRow2;
+
+    protected DatabaseRow expectedDatabaseRow1;
+    protected DatabaseRow expectedDatabaseRow2;
+
+    protected DatabaseRow actualDatabaseRow1;
+    protected DatabaseRow actualDatabaseRow2;
+    protected DatabaseRow actualDatabaseRow3;
 
     @Before
     public void initialize() throws Exception {
-        rowComparator.returns(comparisonResultSet).compareRowWithDatabase(null, null);
-        defaultDataSetComparator.init(database.getMock());
+        defaultDataSetComparator.init(dataSetRowProcessor.getMock(), tableContentRetriever.getMock(), database.getMock());
 
-        Schema schema = new Schema("my_schema", false);
-        Table table = new Table("table_a", false);
-        row1 = createRow(table);
-        row2 = createRow(table);
-        row3 = createRow(table);
-        table.addRow(row1);
-        table.addRow(row2);
-        table.addRow(row3);
-        schema.addTable(table);
-        dataSetWith3Rows = createDataSet(schema);
+        RowComparison rowComparison = new RowComparison(null, null);
+        tableContentRetriever.onceReturns(tableContents).getTableContents(null, null, null);
 
-        Schema schemaWithEmptyRow = new Schema("my_schema", false);
-        Table tableWithEmptyRow = new Table("table_a", false);
-        emptyRow = new Row();
-        tableWithEmptyRow.addRow(emptyRow);
-        schemaWithEmptyRow.addTable(tableWithEmptyRow);
-        dataSetWithEmptyRow = createDataSet(schemaWithEmptyRow);
+        actualDatabaseRow1 = new DatabaseRow("1", "schema.table");
+        actualDatabaseRow1.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column1", 11, INTEGER, null, false, true));
+        actualDatabaseRow1.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column2", 12, INTEGER, null, false, true));
+        actualDatabaseRow1.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column3", 13, INTEGER, null, false, true));
+
+        actualDatabaseRow2 = new DatabaseRow("2", "schema.table");
+        actualDatabaseRow2.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column1", 21, INTEGER, null, false, true));
+        actualDatabaseRow2.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column2", 22, INTEGER, null, false, true));
+        actualDatabaseRow2.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column3", 23, INTEGER, null, false, true));
+
+        actualDatabaseRow3 = new DatabaseRow("3", "schema.table");
+        actualDatabaseRow3.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column1", 31, INTEGER, null, false, true));
+        actualDatabaseRow3.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column2", 32, INTEGER, null, false, true));
+        actualDatabaseRow3.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column3", 33, INTEGER, null, false, true));
+    }
+
+    private DatabaseColumnWithValue createColumn(String name, Object value) {
+        return new DatabaseColumnWithValue(name, value, INTEGER, null, false, true);
+    }
+
+    private DatabaseRow createExpectedDatabaseRow(DatabaseColumnWithValue... databaseColumnWithValues) {
+        DatabaseRow expectedDatabaseRow = new DatabaseRow("schema.table");
+        for (DatabaseColumnWithValue databaseColumnWithValue : databaseColumnWithValues) {
+            expectedDatabaseRow.addDatabaseColumnWithValue(databaseColumnWithValue);
+        }
+        return expectedDatabaseRow;
+    }
+
+    private void setExpectedRow(DatabaseRow databaseRow) throws Exception {
+        dataSetRowSource.onceReturns(createDataSetRow()).getNextDataSetRow();
+        dataSetRowProcessor.onceReturns(databaseRow).process(null, emptyVariables, null);
+    }
+
+    private void setEmptyExpectedRow() throws Exception {
+        dataSetRowSource.onceReturns(createEmptyDataSetRow()).getNextDataSetRow();
+        dataSetRowProcessor.onceReturns(createExpectedDatabaseRow()).process(null, emptyVariables, null);
+    }
+
+    private void setActualRow(DatabaseRow databaseRow) throws Exception {
+        tableContents.onceReturns(databaseRow).getDatabaseRow();
     }
 
 
     @Test
     public void allRowsAreMatches() throws Exception {
-        // find matches: row 1
-        setResultSetRow(0, row1, "1", "1");
-        // find matches: row 2
-        setResultSetRow(1, row2, "2", "2");
-        // find matches: row 3
-        setResultSetRow(2, row3, "3", "3");
+        setExpectedRow(createExpectedDatabaseRow(createColumn("column1", 11), createColumn("column2", 12)));
+        setExpectedRow(createExpectedDatabaseRow(createColumn("column1", 21), createColumn("column2", 22), createColumn("column3", 23)));
+        setActualRow(actualDatabaseRow1);
+        setActualRow(actualDatabaseRow2);
+        setActualRow(actualDatabaseRow3);
 
-        DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetWith3Rows, emptyVariables);
+        DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetRowSource.getMock(), emptyVariables);
         assertTrue(dataSetComparison.isMatch());
+        assertRowMatch(true, "1", dataSetComparison);
+        assertRowMatch(true, "2", dataSetComparison);
+        assertRowMatch(false, "3", dataSetComparison);
+    }
+
+    @Test
+    public void firstRowIsAMatch() throws Exception {
+        setExpectedRow(createExpectedDatabaseRow(createColumn("column1", 11)));
+        setActualRow(actualDatabaseRow1);
+        setActualRow(actualDatabaseRow2);
+
+        DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetRowSource.getMock(), emptyVariables);
+        assertTrue(dataSetComparison.isMatch());
+        assertRowMatch(true, "1", dataSetComparison);
+    }
+
+    @Test
+    public void lastRowIsAMatch() throws Exception {
+        setExpectedRow(createExpectedDatabaseRow(createColumn("column1", 21)));
+        setActualRow(actualDatabaseRow1);
+        setActualRow(actualDatabaseRow2);
+
+        DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetRowSource.getMock(), emptyVariables);
+        assertTrue(dataSetComparison.isMatch());
+        assertRowMatch(true, "2", dataSetComparison);
     }
 
     @Test
     public void missingRow() throws Exception {
-        // find matches: row 1
-        setResultSetRow(0, row1, "1", "1");
-        // find matches: row 2
-        setResultSetRow(1, row2, "2", "2");
-        // find matches: row 3
-        comparisonResultSet.onceReturns(false).next();
-        // find best comparisons: row 1
-        // find best comparisons: row 2
-        // find best comparisons: row 3
-        setResultSetRow(2, row3, "3");
-        comparisonResultSet.onceReturns(false).next();
+        setExpectedRow(createExpectedDatabaseRow(createColumn("column1", 11)));
+        setExpectedRow(createExpectedDatabaseRow(createColumn("column1", 21)));
+        setActualRow(actualDatabaseRow1);
 
-        DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetWith3Rows, emptyVariables);
+        DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetRowSource.getMock(), emptyVariables);
         assertNrOfMissingRows(1, dataSetComparison);
     }
 
     @Test
-    public void differences() throws Exception {
-        // find matches: row 1
-        setResultSetRow(0, row1, "1", "1");
-        // find matches: row 2
-        setResultSetRow(1, row2, "2", "x", "3");
-        comparisonResultSet.onceReturns(false).next();
-        // find matches: row 3
-        setResultSetRow(1, row3, "y", "x", "3");
-        comparisonResultSet.onceReturns(false).next();
-        // find best comparisons: row 1
-        // find best comparisons: row 2
-        setResultSetRow(1, row2, "2", "x", "3");
-        comparisonResultSet.onceReturns(false).next();
-        // find best comparisons: row 3
-        setResultSetRow(1, row3, "y", "x", "3");
-        comparisonResultSet.onceReturns(false).next();
+    public void difference() throws Exception {
+        setExpectedRow(createExpectedDatabaseRow(createColumn("column1", 777), createColumn("column2", 888), createColumn("column3", 999)));
+        setActualRow(actualDatabaseRow1);
 
-        DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetWith3Rows, emptyVariables);
-        assertRowMatch(0, dataSetComparison);
-        assertRowDifference(1, "2", "x", dataSetComparison);
-        assertRowDifference(2, "y", "x", dataSetComparison);
+        DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetRowSource.getMock(), emptyVariables);
+        assertColumnDifference(0, "column1", 777, 11, dataSetComparison);
+        assertColumnDifference(1, "column2", 888, 12, dataSetComparison);
+        assertColumnDifference(2, "column3", 999, 13, dataSetComparison);
+    }
+
+
+    @Test
+    public void allRowsHaveDifferences() throws Exception {
+        DatabaseRow expectedDatabaseRow1 = createExpectedDatabaseRow(createColumn("column1", 999), createColumn("column2", 999));
+        DatabaseRow expectedDatabaseRow2 = createExpectedDatabaseRow(createColumn("column1", 999), createColumn("column2", 999), createColumn("column3", 999));
+        setExpectedRow(expectedDatabaseRow1);
+        setExpectedRow(expectedDatabaseRow2);
+        setActualRow(actualDatabaseRow1);
+        setActualRow(actualDatabaseRow2);
+        setActualRow(actualDatabaseRow3);
+
+        DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetRowSource.getMock(), emptyVariables);
+        assertFalse(dataSetComparison.isMatch());
+        assertBestRowComparison(expectedDatabaseRow1, actualDatabaseRow1, dataSetComparison);
+        assertBestRowComparison(expectedDatabaseRow2, actualDatabaseRow1, dataSetComparison);
+    }
+
+    @Test
+    public void firstRowIsBetterMatch() throws Exception {
+        DatabaseRow expectedDatabaseRow1 = createExpectedDatabaseRow(createColumn("column1", 11), createColumn("column2", 999));
+        setExpectedRow(expectedDatabaseRow1);
+        setActualRow(actualDatabaseRow1);
+        setActualRow(actualDatabaseRow2);
+
+        DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetRowSource.getMock(), emptyVariables);
+        assertFalse(dataSetComparison.isMatch());
+        assertBestRowComparison(expectedDatabaseRow1, actualDatabaseRow1, dataSetComparison);
+    }
+
+    @Test
+    public void lastRowIsBetterMatch() throws Exception {
+        DatabaseRow expectedDatabaseRow1 = createExpectedDatabaseRow(createColumn("column1", 999), createColumn("column2", 22));
+        setExpectedRow(expectedDatabaseRow1);
+        setActualRow(actualDatabaseRow1);
+        setActualRow(actualDatabaseRow2);
+
+        DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetRowSource.getMock(), emptyVariables);
+        assertFalse(dataSetComparison.isMatch());
+        assertBestRowComparison(expectedDatabaseRow1, actualDatabaseRow2, dataSetComparison);
+    }
+
+    @Test
+    public void expectedNoMoreRecordsInDatabase() throws Exception {
+        setExpectedRow(createExpectedDatabaseRow(createColumn("column1", 11)));
+        setExpectedRow(createExpectedDatabaseRow(createColumn("column1", 21)));
+        setEmptyExpectedRow();
+        setActualRow(actualDatabaseRow1);
+        setActualRow(actualDatabaseRow2);
+
+        DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetRowSource.getMock(), emptyVariables);
+        assertTrue(dataSetComparison.isMatch());
+        assertIsExpectedNoMoreRecordsButFoundMore(false, dataSetComparison);
     }
 
     @Test
     public void expectedNoMoreRecordsInDatabaseButFoundMore() throws Exception {
-        setResultSetRow(0, emptyRow, "1", "1");
-        DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetWithEmptyRow, emptyVariables);
+        setExpectedRow(createExpectedDatabaseRow(createColumn("column1", 11)));
+        setExpectedRow(createExpectedDatabaseRow(createColumn("column1", 21)));
+        setEmptyExpectedRow();
+        setActualRow(actualDatabaseRow1);
+        setActualRow(actualDatabaseRow2);
+        setActualRow(actualDatabaseRow3);
+
+        DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetRowSource.getMock(), emptyVariables);
+        assertFalse(dataSetComparison.isMatch());
         assertIsExpectedNoMoreRecordsButFoundMore(true, dataSetComparison);
     }
 
     @Test
-    public void notExpectedNoMoreRecordsInDatabaseButFoundMore() throws Exception {
-        setResultSetRow(0, row1, "1", "1");
-        DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetWith3Rows, emptyVariables);
-        assertIsExpectedNoMoreRecordsButFoundMore(false, dataSetComparison);
+    public void noRowsInDataSet() throws Exception {
+        setActualRow(actualDatabaseRow1);
+        setActualRow(actualDatabaseRow2);
+
+        DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetRowSource.getMock(), emptyVariables);
+        assertTrue(dataSetComparison.isMatch());
     }
 
-    private void setResultSetRow(int nrOfSkippedRows, Row row, String expectedValue, String... actualValues) throws Exception {
-        int rowIndex = 1;
-        for (int i = 0; i < nrOfSkippedRows; i++) {
-            comparisonResultSet.onceReturns(true).next();
-            comparisonResultSet.onceReturns("" + rowIndex++).getRowIdentifier();
-        }
-        for (String actualValue : actualValues) {
-            comparisonResultSet.onceReturns(true).next();
-            comparisonResultSet.onceReturns("" + rowIndex++).getRowIdentifier();
-            comparisonResultSet.onceReturns(createRowComparison(row, expectedValue, actualValue)).getRowComparison(null);
-        }
+    @Test
+    public void noRowsInTable() throws Exception {
+        setExpectedRow(createExpectedDatabaseRow(createColumn("column1", 11)));
+
+        DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetRowSource.getMock(), emptyVariables);
+        assertFalse(dataSetComparison.isMatch());
     }
 
-    private RowComparison createRowComparison(Row row, String expectedValue, String actualValue) throws Exception {
-        RowComparison rowComparison = new RowComparison(row);
-        ColumnComparison columnComparison = new ColumnComparison(null, expectedValue, actualValue, false);
-        rowComparison.addColumnComparison(columnComparison);
-        return rowComparison;
+    @Test
+    public void noRowsInTableAndOnlyEmptyElementInDataSet() throws Exception {
+        setEmptyExpectedRow();
 
+        DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetRowSource.getMock(), emptyVariables);
+        assertTrue(dataSetComparison.isMatch());
     }
+
 
     private void assertNrOfMissingRows(int expectedNrOfMissingRows, DataSetComparison dataSetComparison) {
-        SchemaComparison schemaComparison = dataSetComparison.getSchemaComparisons().get(0);
-        TableComparison tableComparison = schemaComparison.getTableComparisons().get(0);
+        TableComparison tableComparison = dataSetComparison.getTableComparisons().get(0);
         int nrOfMissingRows = tableComparison.getMissingRows().size();
-
         assertEquals("Found different nr of missing rows", expectedNrOfMissingRows, nrOfMissingRows);
     }
 
-    private void assertRowMatch(int index, DataSetComparison dataSetComparison) {
-        SchemaComparison schemaComparison = dataSetComparison.getSchemaComparisons().get(0);
-        TableComparison tableComparison = schemaComparison.getTableComparisons().get(0);
-        RowComparison rowComparison = tableComparison.getBestRowComparisons().get(index);
-
-        assertTrue("Row comparison with index " + index + " was not a match", rowComparison.isMatch());
+    private void assertRowMatch(boolean match, String rowIdentifier, DataSetComparison dataSetComparison) {
+        TableComparison tableComparison = dataSetComparison.getTableComparisons().get(0);
+        boolean result = tableComparison.isMatchingRow(rowIdentifier);
+        assertEquals(match, result);
     }
 
-    private void assertRowDifference(int index, String expectedValue, String actualValue, DataSetComparison dataSetComparison) {
-        SchemaComparison schemaComparison = dataSetComparison.getSchemaComparisons().get(0);
-        TableComparison tableComparison = schemaComparison.getTableComparisons().get(0);
-        RowComparison rowComparison = tableComparison.getBestRowComparisons().get(index);
-        ColumnComparison columnComparison = rowComparison.getColumnComparisons().get(0);
+    private void assertColumnDifference(int index, String columnName, Object expectedValue, Object actualValue, DataSetComparison dataSetComparison) {
+        TableComparison tableComparison = dataSetComparison.getTableComparisons().get(0);
+        RowComparison bestRowComparison = tableComparison.getBestRowComparisons().get(0);
+        ColumnDifference columnDifference1 = bestRowComparison.getColumnDifferences().get(index);
+        assertEquals(columnName, columnDifference1.getColumnName());
+        assertEquals(expectedValue, columnDifference1.getExpectedValue());
+        assertEquals(actualValue, columnDifference1.getActualValue());
+    }
 
-        assertEquals(expectedValue, columnComparison.getExpectedValue());
-        assertEquals(actualValue, columnComparison.getActualValue());
+    private void assertBestRowComparison(DatabaseRow expectedDatabaseRow, DatabaseRow actualDatabaseRow, DataSetComparison dataSetComparison) {
+        TableComparison tableComparison = dataSetComparison.getTableComparisons().get(0);
+        RowComparison bestRowComparison = tableComparison.getBestRowComparison(expectedDatabaseRow);
+        assertSame(expectedDatabaseRow, bestRowComparison.getExpectedDatabaseRow());
+        assertSame(actualDatabaseRow, bestRowComparison.getActualDatabaseRow());
     }
 
     private void assertIsExpectedNoMoreRecordsButFoundMore(boolean expectedValue, DataSetComparison dataSetComparison) {
-        SchemaComparison schemaComparison = dataSetComparison.getSchemaComparisons().get(0);
-        TableComparison tableComparison = schemaComparison.getTableComparisons().get(0);
+        TableComparison tableComparison = dataSetComparison.getTableComparisons().get(0);
         assertEquals(expectedValue, tableComparison.isExpectedNoMoreRecordsButFoundMore());
     }
 
-    private DataSet createDataSet(Schema schema) {
-        DataSet dataSet = new DataSet('=', '$');
-        dataSet.addSchema(schema);
-        return dataSet;
+
+    private DataSetRow createDataSetRow() {
+        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
+        DataSetRow dataSetRow = new DataSetRow("schema", "table", null, false, dataSetSettings);
+        dataSetRow.addDataSetColumn(new DataSetColumn("column", "value"));
+        return dataSetRow;
     }
 
-    private Row createRow(Table table) {
-        Row row = new Row();
-        row.addColumn(createColumn("column_1", "1"));
-        return row;
+    private DataSetRow createEmptyDataSetRow() {
+        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
+        return new DataSetRow("schema", "table", null, false, dataSetSettings);
     }
 
-    private Column createColumn(String name, String value) {
-        return new Column(name, value, false);
-    }
-
-
-    private class TestDefaultDataSetComparator extends DefaultDataSetComparator {
-        @Override
-        protected RowComparator createRowComparator() {
-            return rowComparator.getMock();
-        }
-    }
 }

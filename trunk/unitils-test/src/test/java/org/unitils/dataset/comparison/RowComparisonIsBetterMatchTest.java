@@ -15,12 +15,12 @@
  */
 package org.unitils.dataset.comparison;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.core.Column;
-import org.unitils.dataset.core.Row;
+import org.unitils.dataset.core.DatabaseColumnWithValue;
+import org.unitils.dataset.core.DatabaseRow;
 
+import static java.sql.Types.VARCHAR;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -30,29 +30,16 @@ import static org.junit.Assert.assertTrue;
  */
 public class RowComparisonIsBetterMatchTest extends UnitilsJUnit4 {
 
-    private RowComparison rowComparison1 = new RowComparison(new Row());
-    private RowComparison rowComparison2 = new RowComparison(new Row());
-
-    private ColumnComparison equal;
-    private ColumnComparison equalPk;
-    private ColumnComparison different;
-    private ColumnComparison differentPk;
-
-    @Before
-    public void initialize() {
-        Column column = new Column("name", "value1", false);
-        equal = new ColumnComparison(column, "value1", "value1", false);
-        equalPk = new ColumnComparison(column, "value1", "value1", true);
-        different = new ColumnComparison(column, "value1", "xxxx", false);
-        differentPk = new ColumnComparison(column, "value1", "xxxx", true);
-    }
 
     @Test
     public void lessDifferences() throws Exception {
-        rowComparison1.addColumnComparison(equal);
-        rowComparison1.addColumnComparison(different);
-        rowComparison2.addColumnComparison(different);
-        rowComparison2.addColumnComparison(different);
+        DatabaseRow expectedDatabaseRow1 = createRow(1, 2, 3, 4);
+        DatabaseRow actualDatabaseRow1 = createRow(1, 2, 3, 999);
+        DatabaseRow expectedDatabaseRow2 = createRow(1, 2, 3, 4);
+        DatabaseRow actualDatabaseRow2 = createRow(1, 2, 888, 999);
+
+        RowComparison rowComparison1 = new RowComparison(expectedDatabaseRow1, actualDatabaseRow1);
+        RowComparison rowComparison2 = new RowComparison(expectedDatabaseRow2, actualDatabaseRow2);
 
         boolean result = rowComparison1.isBetterMatch(rowComparison2);
         assertTrue(result);
@@ -60,21 +47,13 @@ public class RowComparisonIsBetterMatchTest extends UnitilsJUnit4 {
 
     @Test
     public void moreDifferences() throws Exception {
-        rowComparison1.addColumnComparison(different);
-        rowComparison1.addColumnComparison(different);
-        rowComparison2.addColumnComparison(different);
-        rowComparison2.addColumnComparison(equal);
+        DatabaseRow expectedDatabaseRow1 = createRow(1, 2, 3, 4);
+        DatabaseRow actualDatabaseRow1 = createRow(1, 2, 888, 999);
+        DatabaseRow expectedDatabaseRow2 = createRow(1, 2, 3, 4);
+        DatabaseRow actualDatabaseRow2 = createRow(1, 2, 3, 999);
 
-        boolean result = rowComparison1.isBetterMatch(rowComparison2);
-        assertFalse(result);
-    }
-
-    @Test
-    public void noDifferences() throws Exception {
-        rowComparison1.addColumnComparison(equal);
-        rowComparison1.addColumnComparison(equal);
-        rowComparison2.addColumnComparison(equal);
-        rowComparison2.addColumnComparison(equal);
+        RowComparison rowComparison1 = new RowComparison(expectedDatabaseRow1, actualDatabaseRow1);
+        RowComparison rowComparison2 = new RowComparison(expectedDatabaseRow2, actualDatabaseRow2);
 
         boolean result = rowComparison1.isBetterMatch(rowComparison2);
         assertFalse(result);
@@ -82,10 +61,13 @@ public class RowComparisonIsBetterMatchTest extends UnitilsJUnit4 {
 
     @Test
     public void lessPkDifferences() throws Exception {
-        rowComparison1.addColumnComparison(equalPk);
-        rowComparison1.addColumnComparison(differentPk);
-        rowComparison2.addColumnComparison(differentPk);
-        rowComparison2.addColumnComparison(differentPk);
+        DatabaseRow expectedDatabaseRow1 = createRow(1, 2, 3, 4);
+        DatabaseRow actualDatabaseRow1 = createRow(1, 999, 3, 4);
+        DatabaseRow expectedDatabaseRow2 = createRow(1, 2, 3, 4);
+        DatabaseRow actualDatabaseRow2 = createRow(888, 999, 3, 4);
+
+        RowComparison rowComparison1 = new RowComparison(expectedDatabaseRow1, actualDatabaseRow1);
+        RowComparison rowComparison2 = new RowComparison(expectedDatabaseRow2, actualDatabaseRow2);
 
         boolean result = rowComparison1.isBetterMatch(rowComparison2);
         assertTrue(result);
@@ -93,21 +75,27 @@ public class RowComparisonIsBetterMatchTest extends UnitilsJUnit4 {
 
     @Test
     public void morePkDifferences() throws Exception {
-        rowComparison1.addColumnComparison(differentPk);
-        rowComparison1.addColumnComparison(differentPk);
-        rowComparison2.addColumnComparison(differentPk);
-        rowComparison2.addColumnComparison(equalPk);
+        DatabaseRow expectedDatabaseRow1 = createRow(1, 2, 3, 4);
+        DatabaseRow actualDatabaseRow1 = createRow(888, 999, 3, 4);
+        DatabaseRow expectedDatabaseRow2 = createRow(1, 2, 3, 4);
+        DatabaseRow actualDatabaseRow2 = createRow(888, 2, 3, 4);
+
+        RowComparison rowComparison1 = new RowComparison(expectedDatabaseRow1, actualDatabaseRow1);
+        RowComparison rowComparison2 = new RowComparison(expectedDatabaseRow2, actualDatabaseRow2);
 
         boolean result = rowComparison1.isBetterMatch(rowComparison2);
         assertFalse(result);
     }
 
     @Test
-    public void noPkDifferences() throws Exception {
-        rowComparison1.addColumnComparison(equalPk);
-        rowComparison1.addColumnComparison(equalPk);
-        rowComparison2.addColumnComparison(equalPk);
-        rowComparison2.addColumnComparison(equalPk);
+    public void noDifferences() throws Exception {
+        DatabaseRow expectedDatabaseRow1 = createRow(1, 2, 3, 4);
+        DatabaseRow actualDatabaseRow1 = createRow(1, 2, 3, 4);
+        DatabaseRow expectedDatabaseRow2 = createRow(1, 2, 3, 4);
+        DatabaseRow actualDatabaseRow2 = createRow(1, 2, 3, 4);
+
+        RowComparison rowComparison1 = new RowComparison(expectedDatabaseRow1, actualDatabaseRow1);
+        RowComparison rowComparison2 = new RowComparison(expectedDatabaseRow2, actualDatabaseRow2);
 
         boolean result = rowComparison1.isBetterMatch(rowComparison2);
         assertFalse(result);
@@ -115,17 +103,26 @@ public class RowComparisonIsBetterMatchTest extends UnitilsJUnit4 {
 
     @Test
     public void betterMatchBecauseOfBetterMatchingPk() throws Exception {
-        rowComparison1.addColumnComparison(equalPk);
-        rowComparison1.addColumnComparison(equalPk);
-        rowComparison1.addColumnComparison(different);
-        rowComparison1.addColumnComparison(different);
+        DatabaseRow expectedDatabaseRow1 = createRow(1, 2, 3, 4);
+        DatabaseRow actualDatabaseRow1 = createRow(1, 2, 888, 999);
+        DatabaseRow expectedDatabaseRow2 = createRow(1, 2, 3, 4);
+        DatabaseRow actualDatabaseRow2 = createRow(1, 777, 3, 4);
 
-        rowComparison2.addColumnComparison(equalPk);
-        rowComparison2.addColumnComparison(differentPk);
-        rowComparison2.addColumnComparison(equal);
-        rowComparison2.addColumnComparison(equal);
+        RowComparison rowComparison1 = new RowComparison(expectedDatabaseRow1, actualDatabaseRow1);
+        RowComparison rowComparison2 = new RowComparison(expectedDatabaseRow2, actualDatabaseRow2);
 
         boolean result = rowComparison1.isBetterMatch(rowComparison2);
         assertTrue(result);
     }
+
+
+    private DatabaseRow createRow(Object pk1, Object pk2, Object value1, Object value2) {
+        DatabaseRow row = new DatabaseRow("schema.table");
+        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("pk1", pk1, VARCHAR, null, false, true));
+        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("pk2", pk2, VARCHAR, null, false, true));
+        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column1", value1, VARCHAR, null, false, false));
+        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column2", value2, VARCHAR, null, false, false));
+        return row;
+    }
+
 }

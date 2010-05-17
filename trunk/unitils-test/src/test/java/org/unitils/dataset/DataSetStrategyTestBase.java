@@ -18,8 +18,11 @@ package org.unitils.dataset;
 import org.junit.After;
 import org.junit.Before;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.DbSupportFactory;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dataset.loader.impl.Database;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -30,35 +33,35 @@ import static org.junit.Assert.assertTrue;
 import static org.unitils.database.SQLUnitils.*;
 
 /**
- * todo remove
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public abstract class DataSetModuleDataSetTestBase extends UnitilsJUnit4 {
-
-    /* Tested object */
-    protected DataSetModule dataSetModule;
+public abstract class DataSetStrategyTestBase extends UnitilsJUnit4 {
 
     @TestDataSource
     protected DataSource dataSource;
 
 
     @Before
-    public void setUp() throws Exception {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        dataSetModule = new DataSetModule();
-        dataSetModule.init(configuration);
-
-        dropTestTable();
-        createTestTables();
+    public void createTestTables() {
+        dropTestTables();
+        executeUpdate("create table test (col1 varchar(100) not null primary key, col2 integer, col3 timestamp, col4 varchar(100))", dataSource);
+        executeUpdate("create table dependent (col1 varchar(100), foreign key (col1) references test(col1))", dataSource);
     }
 
     @After
-    public void tearDown() throws Exception {
-        dropTestTable();
+    public void dropTestTables() {
+        executeUpdateQuietly("drop table dependent", dataSource);
+        executeUpdateQuietly("drop table test", dataSource);
     }
 
+
+    protected Database createDatabase(Properties configuration) {
+        DbSupport defaultDbSupport = DbSupportFactory.getDefaultDbSupport(configuration, new DefaultSQLHandler(dataSource));
+        Database database = new Database();
+        database.init(defaultDbSupport);
+        return database;
+    }
 
     protected void assertValueInTable(String tableName, String columnName, String expectedValue) {
         Set<String> values = getValues(columnName, tableName);
@@ -92,15 +95,5 @@ public abstract class DataSetModuleDataSetTestBase extends UnitilsJUnit4 {
         executeUpdate("insert into dependent (col1) values ('" + value + "')", dataSource);
     }
 
-
-    protected void createTestTables() {
-        executeUpdate("create table test (col1 varchar(100) not null primary key, col2 integer, col3 timestamp, col4 varchar(100))", dataSource);
-        executeUpdate("create table dependent (col1 varchar(100), foreign key (col1) references test(col1))", dataSource);
-    }
-
-    protected void dropTestTable() {
-        executeUpdateQuietly("drop table dependent", dataSource);
-        executeUpdateQuietly("drop table test", dataSource);
-    }
 
 }
