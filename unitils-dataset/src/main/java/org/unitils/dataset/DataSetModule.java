@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
+import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
@@ -30,18 +31,22 @@ import org.unitils.dataset.comparison.DataSetComparator;
 import org.unitils.dataset.comparison.DatabaseContentLogger;
 import org.unitils.dataset.comparison.ExpectedDataSetAssert;
 import org.unitils.dataset.core.DataSet;
+import org.unitils.dataset.core.DataSetRowProcessor;
 import org.unitils.dataset.core.DataSetSettings;
 import org.unitils.dataset.factory.DataSetResolver;
 import org.unitils.dataset.factory.DataSetRowSource;
 import org.unitils.dataset.loader.DataSetLoader;
 import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.loader.impl.IdentifierNameProcessor;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 import org.unitils.dataset.util.DataSetAnnotationUtil;
 import org.unitils.dataset.util.DatabaseAccessor;
+import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -52,6 +57,7 @@ import java.util.Properties;
 
 import static org.unitils.core.util.ConfigUtils.getConfiguredInstanceOf;
 import static org.unitils.core.util.ConfigUtils.getInstanceOf;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
@@ -161,9 +167,12 @@ public class DataSetModule implements Module {
 
     protected void loadDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, Class<? extends DataSetRowSource> dataSetRowSourceClass, Class<? extends DataSetLoader> dataSetLoaderClass) {
         Database database = createDatabase();
+        IdentifierNameProcessor identifierNameProcessor = createIdentifierNameProcessor(database);
+        SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
+        DataSetRowProcessor dataSetRowProcessor = createDataSetRowProcessor(identifierNameProcessor, sqlTypeHandlerRepository, database);
         DatabaseAccessor databaseAccessor = createDatabaseAccessor(database);
 
-        DataSetLoader dataSetLoader = createDataSetLoader(dataSetLoaderClass, database, databaseAccessor);
+        DataSetLoader dataSetLoader = createDataSetLoader(dataSetLoaderClass, dataSetRowProcessor, databaseAccessor);
 
         List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
         for (File dataSetFile : dataSetFiles) {
@@ -172,10 +181,20 @@ public class DataSetModule implements Module {
 
     }
 
-    private DatabaseAccessor createDatabaseAccessor(Database database) {
-        // todo refactor initialization
-        SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
-        return null;//new DatabaseAccessor(database, sqlTypeHandlerRepository);
+    protected IdentifierNameProcessor createIdentifierNameProcessor(Database database) {
+        IdentifierNameProcessor identifierNameProcessor = new IdentifierNameProcessor();
+        identifierNameProcessor.init(database);
+        return identifierNameProcessor;
+    }
+
+    protected DatabaseAccessor createDatabaseAccessor(Database database) {
+        return new DatabaseAccessor(database);
+    }
+
+    protected DataSetRowProcessor createDataSetRowProcessor(IdentifierNameProcessor identifierNameProcessor, SqlTypeHandlerRepository sqlTypeHandlerRepository, Database database){
+        DataSetRowProcessor dataSetRowProcessor = new DataSetRowProcessor();
+        dataSetRowProcessor.init(identifierNameProcessor, sqlTypeHandlerRepository, database);
+        return dataSetRowProcessor;
     }
 
     protected void assertExpectedDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, DataSetRowSource dataSetRowSource, boolean logDatabaseContentOnAssertionError) {
@@ -190,19 +209,19 @@ public class DataSetModule implements Module {
 
 
     protected void loadDataSet(File dataSetFile, List<String> variables, Class<? extends DataSetRowSource> dataSetRowSourceClass, DataSetLoader dataSetLoader, Database database) {
-//        logger.info("Loading data sets file: " + dataSetFile);
-//        InputStream dataSetInputStream = null;
-//        try {
-//            dataSetInputStream = new FileInputStream(dataSetFile);
-//            String defaultSchemaName = database.getSchemaName();
-//            DataSetRowSource dataSetRowSource = createDataSetRowSource(dataSetInputStream, defaultSchemaName, dataSetRowSourceClass);
-//            dataSetLoader.load(dataSetRowSource, variables);
-//
-//        } catch (Exception e) {
-//            throw new UnitilsException("Unable to load data set file: " + dataSetFile, e);
-//        } finally {
-//            closeQuietly(dataSetInputStream);
-//        }
+        logger.info("Loading data sets file: " + dataSetFile);
+        InputStream dataSetInputStream = null;
+        try {
+            dataSetInputStream = new FileInputStream(dataSetFile);
+            String defaultSchemaName = database.getSchemaName();
+            DataSetRowSource dataSetRowSource = createDataSetRowSource(dataSetInputStream, defaultSchemaName, dataSetRowSourceClass);
+            dataSetLoader.load(dataSetRowSource, variables);
+
+        } catch (Exception e) {
+            throw new UnitilsException("Unable to load data set file: " + dataSetFile, e);
+        } finally {
+            closeQuietly(dataSetInputStream);
+        }
     }
 
     protected void assertExpectedDataSet(File dataSetFile, List<String> variables, Class<? extends DataSetRowSource> dataSetRowSourceClass, boolean logDatabaseContentOnAssertionError, Database database, DatabaseAccessor databaseAccessor) {
@@ -251,19 +270,19 @@ public class DataSetModule implements Module {
         DataSetSettings dataSetSettings = new DataSetSettings(defaultLiteralToken, defaultVariableToken, defaultCaseSensitive);
 
         DataSetRowSource dataSetRowSource = createInstanceOfType(dataSetRowSourceClass, false);
-        //dataSetRowSource.init(dataSetInputStream, defaultSchemaName, dataSetSettings);
+        dataSetRowSource.init(defaultSchemaName, dataSetSettings);
         return dataSetRowSource;
     }
 
     /**
      * @param dataSetLoaderClass The type, not null
-     * @param database           The access to the database, not null
+     * @param dataSetRowProcessor
+     * @param databaseAccessor
      * @return An initialized data set loader of the given type, not null
      */
-    protected DataSetLoader createDataSetLoader(Class<? extends DataSetLoader> dataSetLoaderClass, Database database, DatabaseAccessor databaseAccessor) {
+    protected DataSetLoader createDataSetLoader(Class<? extends DataSetLoader> dataSetLoaderClass, DataSetRowProcessor dataSetRowProcessor, DatabaseAccessor databaseAccessor) {
         DataSetLoader dataSetLoader = createInstanceOfType(dataSetLoaderClass, false);
-        //todo
-        // dataSetLoader.init(database, databaseAccessor);
+        dataSetLoader.init(dataSetRowProcessor, databaseAccessor);
         return dataSetLoader;
     }
 

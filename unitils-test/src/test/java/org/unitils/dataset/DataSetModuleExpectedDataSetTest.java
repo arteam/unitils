@@ -17,6 +17,7 @@ package org.unitils.dataset;
 
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
+import org.unitils.dataset.loader.impl.InsertDataSetLoader;
 
 import java.util.ArrayList;
 
@@ -32,15 +33,13 @@ public class DataSetModuleExpectedDataSetTest extends DataSetModuleDataSetTestBa
 
     @Test
     public void matchingDataSet() throws Exception {
-        // todo implement
-//        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader2.class);
+        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
         dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), true);
     }
 
     @Test
     public void differentDataSet() throws Exception {
-        // todo implement
-//        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader2.class);
+        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
         try {
             dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetTest-different.xml"), new ArrayList<String>(), getClass(), true);
         } catch (AssertionError e) {
@@ -58,36 +57,31 @@ public class DataSetModuleExpectedDataSetTest extends DataSetModuleDataSetTestBa
 
     @Test
     public void literalValues() throws Exception {
-        // todo implement
-//        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-literalValues.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader2.class);
+        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-literalValues.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
         dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetTest-literalValues.xml"), new ArrayList<String>(), getClass(), true);
     }
 
     @Test
     public void caseSensitive() throws Exception {
-        // todo implement
-//        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader2.class);
+        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
         dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetTest-caseSensitive.xml"), new ArrayList<String>(), getClass(), true);
     }
 
     @Test(expected = UnitilsException.class)
     public void caseSensitiveWrongCase() throws Exception {
-        // todo implement
-//        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader2.class);
+        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
         dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetTest-caseSensitiveWrongCase.xml"), new ArrayList<String>(), getClass(), true);
     }
 
     @Test
     public void equalVariables() throws Exception {
-        // todo implement
-//        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-variables.xml"), asList("test", "1"), getClass(), InsertDataSetLoader2.class);
+        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-variables.xml"), asList("test", "1"), getClass(), InsertDataSetLoader.class);
         dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetTest-variables.xml"), asList("test", "1"), getClass(), true);
     }
 
     @Test
     public void differentVariables() throws Exception {
-        // todo implement
-//        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-variables.xml"), asList("test", "1"), getClass(), InsertDataSetLoader2.class);
+        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-variables.xml"), asList("test", "1"), getClass(), InsertDataSetLoader.class);
         try {
             dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetTest-variables.xml"), asList("xxxx", "9999"), getClass(), true);
         } catch (AssertionError e) {
@@ -102,8 +96,7 @@ public class DataSetModuleExpectedDataSetTest extends DataSetModuleDataSetTestBa
 
     @Test
     public void noDatabaseContentLogging() throws Exception {
-        // todo implement
-//        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader2.class);
+        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
         try {
             dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetTest-different.xml"), new ArrayList<String>(), getClass(), false);
         } catch (AssertionError e) {
@@ -115,8 +108,7 @@ public class DataSetModuleExpectedDataSetTest extends DataSetModuleDataSetTestBa
 
     @Test
     public void emptyDataSet() throws Exception {
-        // todo implement
-//        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader2.class);
+        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
         dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetTest-emptyDataSet.xml"), new ArrayList<String>(), getClass(), true);
     }
 

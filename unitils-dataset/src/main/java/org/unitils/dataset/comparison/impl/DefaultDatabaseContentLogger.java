@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,9 +69,6 @@ public class DefaultDatabaseContentLogger implements DatabaseContentLogger {
         TableContents tableContents = tableContentRetriever.getTableContents(qualifiedTableName, databaseColumns, primaryKeyColumnNames);
         try {
             int nrOfColumns = tableContents.getNrOfColumns();
-            if (nrOfColumns == 0) {
-                return;
-            }
             List<String> columnNames = tableContents.getColumnNames();
             List<List<String>> values = new ArrayList<List<String>>(nrOfColumns);
             List<Integer> columnSizes = new ArrayList<Integer>(nrOfColumns);
@@ -96,7 +93,8 @@ public class DefaultDatabaseContentLogger implements DatabaseContentLogger {
                     if (value != null) {
                         valueAsString = value.toString();
                     }
-
+                    
+                    values.get(i).add(valueAsString);
                     columnSizes.set(i, Math.max(columnSizes.get(i), valueAsString.length()));
                 }
             }
@@ -110,7 +108,7 @@ public class DefaultDatabaseContentLogger implements DatabaseContentLogger {
     protected void getContent(List<String> columnNames, List<List<String>> values, List<Boolean> rowWithExactMatch, List<Integer> columnSizes, StringBuilder contentBuilder) {
         int nrOfRows = values.get(0).size();
         if (nrOfRows == 0) {
-            contentBuilder.append("<empty table>");
+            contentBuilder.append("   <empty table>");
             return;
         }
 
