@@ -16,7 +16,12 @@
 package org.unitils.dataset;
 
 import org.junit.Test;
+import org.unitils.dataset.loader.impl.InsertDataSetLoader;
 
+import java.util.ArrayList;
+
+import static java.util.Arrays.asList;
+import static org.junit.Assert.fail;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 
@@ -29,26 +34,24 @@ public class DataSetModuleExpectedDataSetParentChildTest extends DataSetModuleDa
 
     @Test
     public void matchingDataSet() throws Exception {
-        // todo implement
-//        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetParentChildTest.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader2.class);
-//        dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetParentChildTest.xml"), new ArrayList<String>(), getClass(), true);
+        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetParentChildTest.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
+        dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetParentChildTest.xml"), new ArrayList<String>(), getClass(), true);
     }
 
     @Test
     public void differentDataSet() throws Exception {
-        // todo implement
-//        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetParentChildTest.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader2.class);
-//        try {
-//            dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetParentChildTest-different.xml"), new ArrayList<String>(), getClass(), true);
-//        } catch (AssertionError e) {
-//            assertMessageContains("Found differences for table PUBLIC.PARENT", e);
-//            assertMessageContains("Different database record found for data set row:  pk1=\"777\", pk2=\"888\", parentColumn=\"xxxx\"", e);
-//            assertMessageContains("Found differences for table PUBLIC.CHILD", e);
-//            assertMessageContains("Different database record found for data set row:  pk=\"3\", childColumn=\"child\", FK1=\"777\", FK2=\"888\"", e);
-//            assertMessageContains("Actual database content", e);
-//            return;
-//        }
-//        fail("Expected an AssertionError"); //fail also raises assertion errors
+        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetParentChildTest.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
+        try {
+            dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetParentChildTest-different.xml"), new ArrayList<String>(), getClass(), true);
+        } catch (AssertionError e) {
+            assertMessageContains("Found differences for table PUBLIC.PARENT", e);
+            assertMessageContains("Different database record found for data set row:  pk1=\"777\", pk2=\"888\", parentColumn=\"xxxx\"", e);
+            assertMessageContains("Found differences for table PUBLIC.CHILD", e);
+            assertMessageContains("Different database record found for data set row:  pk=\"3\", childColumn=\"child\", FK1=\"777\", FK2=\"888\"", e);
+            assertMessageContains("Actual database content", e);
+            return;
+        }
+        fail("Expected an AssertionError"); //fail also raises assertion errors
     }
 
 
