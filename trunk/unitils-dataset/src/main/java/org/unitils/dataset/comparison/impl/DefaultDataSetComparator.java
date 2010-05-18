@@ -28,7 +28,6 @@ import org.unitils.dataset.core.DatabaseRow;
 import org.unitils.dataset.factory.DataSetRowSource;
 import org.unitils.dataset.loader.impl.Database;
 
-import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -61,7 +60,7 @@ public class DefaultDataSetComparator {//implements DataSetComparator {
                 Map<DataSetRow, DatabaseRow> dataSetRows = entry.getValue();
 
                 List<DatabaseColumn> databaseColumns = getAllUsedDatabaseColumns(dataSetRows);
-                Set<String> primaryKeyColumnNames = getPrimaryKeyColumnNames(dataSetRows);
+                Set<String> primaryKeyColumnNames = database.getPrimaryKeyColumnNames(qualifiedTableName);
 
                 TableComparison tableComparison = compareDataSetRowsForTable(qualifiedTableName, databaseColumns, dataSetRows, primaryKeyColumnNames);
                 dataSetComparison.addTableComparison(tableComparison);
@@ -94,14 +93,7 @@ public class DefaultDataSetComparator {//implements DataSetComparator {
             tableContents.close();
         }
     }
-
-
-    protected Set<String> getPrimaryKeyColumnNames(Map<DataSetRow, DatabaseRow> dataSetRows) throws SQLException {
-        DataSetRow dataSetRow = dataSetRows.keySet().iterator().next();
-        boolean caseSensitive = dataSetRow.getDataSetSettings().isCaseSensitive();
-        return database.getPrimaryKeyColumnNames(dataSetRow.getSchemaName(), dataSetRow.getTableName(), caseSensitive);
-    }
-
+    
 
     protected Map<String, Map<DataSetRow, DatabaseRow>> getRowsPerTable(DataSetRowSource dataSetRowSource, List<String> variables) throws Exception {
         Map<String, Map<DataSetRow, DatabaseRow>> dataSetRowsPerTable = new LinkedHashMap<String, Map<DataSetRow, DatabaseRow>>();

@@ -23,6 +23,7 @@ import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -59,7 +60,7 @@ public abstract class DataSetStrategyTestBase extends UnitilsJUnit4 {
     protected Database createDatabase(Properties configuration) {
         DbSupport defaultDbSupport = DbSupportFactory.getDefaultDbSupport(configuration, new DefaultSQLHandler(dataSource));
         Database database = new Database();
-        database.init(defaultDbSupport);
+        database.init(defaultDbSupport, new SqlTypeHandlerRepository());
         return database;
     }
 
@@ -71,16 +72,6 @@ public abstract class DataSetStrategyTestBase extends UnitilsJUnit4 {
     protected void assertValueNotInTable(String tableName, String columnName, String notExpectedValue) throws Exception {
         Set<String> values = getValues(columnName, tableName);
         assertFalse("Value " + notExpectedValue + " not expected in table " + tableName + ", but found ", values.contains(notExpectedValue));
-    }
-
-    protected void assertMessageContains(String text, AssertionError e) {
-        String message = e.getMessage();
-        assertTrue("Message of assertion error did not contain " + text + ". Message: " + message, message.contains(text));
-    }
-
-    protected void assertMessageNotContains(String text, AssertionError e) {
-        String message = e.getMessage();
-        assertFalse("Message of assertion error contained " + text + ". Message: " + message, message.contains(text));
     }
 
     protected Set<String> getValues(String columnName, String table) {

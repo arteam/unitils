@@ -27,7 +27,7 @@ import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.DatabaseModule;
 import org.unitils.dataset.annotation.ExpectedDataSet;
 import org.unitils.dataset.comparison.DataSetComparator;
-import org.unitils.dataset.comparison.DatabaseContentRetriever;
+import org.unitils.dataset.comparison.DatabaseContentLogger;
 import org.unitils.dataset.comparison.ExpectedDataSetAssert;
 import org.unitils.dataset.core.DataSet;
 import org.unitils.dataset.core.DataSetSettings;
@@ -283,7 +283,8 @@ public class DataSetModule implements Module {
     protected Database createDatabase() {
         DbSupport defaultDbSupport = getDefaultDbSupport();
         Database database = new Database();
-        database.init(defaultDbSupport);
+        SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
+        database.init(defaultDbSupport, sqlTypeHandlerRepository);
         return database;
     }
 
@@ -298,7 +299,7 @@ public class DataSetModule implements Module {
         return null;
     }
 
-    protected ExpectedDataSetAssert createExpectedDataSetAssert(DataSetComparator dataSetComparator, DatabaseContentRetriever databaseContentLogger) {
+    protected ExpectedDataSetAssert createExpectedDataSetAssert(DataSetComparator dataSetComparator, DatabaseContentLogger databaseContentLogger) {
         ExpectedDataSetAssert expectedDataSetAssert = getInstanceOf(ExpectedDataSetAssert.class, configuration);
         expectedDataSetAssert.init(dataSetComparator, databaseContentLogger);
         return expectedDataSetAssert;

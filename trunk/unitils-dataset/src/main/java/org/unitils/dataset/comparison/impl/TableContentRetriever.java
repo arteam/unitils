@@ -45,6 +45,7 @@ public class TableContentRetriever {
     }
 
 
+    // todo remove primary key column names  (implicit in database columns)
     public TableContents getTableContents(String qualifiedTableName, List<DatabaseColumn> databaseColumns, Set<String> primaryKeyColumnNames) throws SQLException {
         String sql = createStatement(qualifiedTableName, databaseColumns, primaryKeyColumnNames);
 

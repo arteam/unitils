@@ -15,17 +15,17 @@
  */
 package org.unitils.dataset.comparison;
 
+import org.unitils.dataset.comparison.impl.TableContentRetriever;
 import org.unitils.dataset.loader.impl.Database;
-import org.unitils.dataset.util.DatabaseAccessor;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public interface DatabaseContentRetriever {
+public interface DatabaseContentLogger {
 
-    void init(Database database, DatabaseAccessor databaseAccessor);
+    void init(Database database, TableContentRetriever tableContentRetriever);
 
-    String getActualDatabaseContentForDataSetComparison(DataSetComparison dataSetComparison);
+    String getDatabaseContentForComparison(DataSetComparison dataSetComparison);
 
 }

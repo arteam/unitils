@@ -24,6 +24,7 @@ import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -47,14 +48,14 @@ public class DatabaseGetPrimaryKeyColumnNamesTest extends UnitilsJUnit4 {
     private Database database = new Database();
 
     @TestDataSource
-    private DataSource dataSource;
+    protected DataSource dataSource;
 
 
     @Before
     public void initialize() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         DbSupport defaultDbSupport = DbSupportFactory.getDefaultDbSupport(configuration, new DefaultSQLHandler(dataSource));
-        database.init(defaultDbSupport);
+        database.init(defaultDbSupport, new SqlTypeHandlerRepository());
     }
 
 
@@ -76,39 +77,39 @@ public class DatabaseGetPrimaryKeyColumnNamesTest extends UnitilsJUnit4 {
 
     @Test
     public void getPrimaryKeyColumnNames() throws Exception {
-        Set<String> result = database.getPrimaryKeyColumnNames("public", "test", false);
+        Set<String> result = database.getPrimaryKeyColumnNames("public.test");
         assertReflectionEquals(asList("COL1", "COL2"), result);
     }
 
     @Test
     public void noPrimaryKeys() throws Exception {
-        Set<String> result = database.getPrimaryKeyColumnNames("public", "noPrimaryKeys", false);
+        Set<String> result = database.getPrimaryKeyColumnNames("public.noPrimaryKeys");
         assertTrue(result.isEmpty());
     }
 
     @Test
     public void caseSensitive() throws Exception {
-        Set<String> result = database.getPrimaryKeyColumnNames("PUBLIC", "TestCase", true);
+        Set<String> result = database.getPrimaryKeyColumnNames("\"PUBLIC\".\"TestCase\"");
         assertReflectionEquals(asList("Col1", "col2"), result);
     }
 
     @Test
     public void primaryKeySetCached() throws Exception {
-        Set<String> result1 = database.getPrimaryKeyColumnNames("public", "test", false);
-        Set<String> result2 = database.getPrimaryKeyColumnNames("public", "test", false);
+        Set<String> result1 = database.getPrimaryKeyColumnNames("public.test");
+        Set<String> result2 = database.getPrimaryKeyColumnNames("public.test");
         assertSame(result1, result2);
     }
 
     @Test
     public void onlyCachedForIdenticalSchemaAndTableName() throws Exception {
-        Set<String> result1 = database.getPrimaryKeyColumnNames("public", "test", false);
-        Set<String> result2 = database.getPrimaryKeyColumnNames("PUBLIC", "TEST", false);
+        Set<String> result1 = database.getPrimaryKeyColumnNames("public.test");
+        Set<String> result2 = database.getPrimaryKeyColumnNames("\"PUBLIC\".\"TEST\"");
         assertNotSame(result1, result2);
     }
 
     @Test
     public void tableNotFound() throws Exception {
-        Set<String> result = database.getPrimaryKeyColumnNames("xxxx", "xxxx", false);
+        Set<String> result = database.getPrimaryKeyColumnNames("xxxx.xxxx");
         assertTrue(result.isEmpty());
     }
 }

@@ -21,6 +21,9 @@ import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.dataset.core.DataSetColumn;
 import org.unitils.dataset.core.DataSetRow;
+import org.unitils.dataset.core.DatabaseColumn;
+import org.unitils.dataset.sqltypehandler.SqlTypeHandler;
+import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -41,14 +44,16 @@ public class Database {
 
     public static final int SQL_TYPE_UNKNOWN = -1;
 
-    private DbSupport dbSupport;
+    protected DbSupport dbSupport;
+    protected SqlTypeHandlerRepository sqlTypeHandlerRepository;
 
-    private Map<String, Set<String>> tablePrimaryKeysCache = new HashMap<String, Set<String>>();
-    private Map<String, Map<String, Integer>> tableColumnSqlTypesCache = new HashMap<String, Map<String, Integer>>();
+    protected Map<String, Set<String>> tablePrimaryKeysCache = new HashMap<String, Set<String>>();
+    protected Map<String, Map<String, Integer>> tableColumnSqlTypesCache = new HashMap<String, Map<String, Integer>>();
 
 
-    public void init(DbSupport dbSupport) {
+    public void init(DbSupport dbSupport, SqlTypeHandlerRepository sqlTypeHandlerRepository) {
         this.dbSupport = dbSupport;
+        this.sqlTypeHandlerRepository = sqlTypeHandlerRepository;
     }
 
 
@@ -77,9 +82,8 @@ public class Database {
     }
 
 
-    public Set<String> getPrimaryKeyColumnNames(String schemaName, String tableName, boolean caseSensitive) throws SQLException {
-        String key = schemaName + "." + tableName;
-        Set<String> primaryKeyColumnNames = tablePrimaryKeysCache.get(key);
+    public Set<String> getPrimaryKeyColumnNames(String qualifiedTableName) throws SQLException {
+        Set<String> primaryKeyColumnNames = tablePrimaryKeysCache.get(qualifiedTableName);
         if (primaryKeyColumnNames != null) {
             return primaryKeyColumnNames;
         }
@@ -88,18 +92,14 @@ public class Database {
         Connection connection = getConnection();
         ResultSet resultSet = null;
         try {
-            String correctCaseSchemaName = schemaName;
-            String correctCaseTableName = tableName;
-            if (!caseSensitive) {
-                correctCaseSchemaName = toCorrectCaseIdentifier(schemaName);
-                correctCaseTableName = toCorrectCaseIdentifier(tableName);
-            }
+            String schemaName = getSchemaName(qualifiedTableName);
+            String tableName = getTableName(qualifiedTableName);
 
-            resultSet = connection.getMetaData().getPrimaryKeys(null, correctCaseSchemaName, correctCaseTableName);
+            resultSet = connection.getMetaData().getPrimaryKeys(null, schemaName, tableName);
             while (resultSet.next()) {
                 primaryKeyColumnNames.add(resultSet.getString("COLUMN_NAME"));
             }
-            tablePrimaryKeysCache.put(key, primaryKeyColumnNames);
+            tablePrimaryKeysCache.put(qualifiedTableName, primaryKeyColumnNames);
             return primaryKeyColumnNames;
 
         } finally {
@@ -108,14 +108,36 @@ public class Database {
     }
 
 
-    public int getColumnSqlType(String schemaName, String tableName, String columnName, boolean caseSensitive) throws SQLException {
-        Map<String, Integer> columnSqlTypes = getColumnSqlTypes(schemaName, tableName, caseSensitive);
+    public List<DatabaseColumn> getDatabaseColumns(String qualifiedTableName) throws SQLException {
+        List<DatabaseColumn> databaseColumns = new ArrayList<DatabaseColumn>();
+        Set<String> primaryKeyColumnNames = getPrimaryKeyColumnNames(qualifiedTableName);
 
-        String correctCaseColumnName = columnName;
-        if (!caseSensitive) {
-            correctCaseColumnName = toCorrectCaseIdentifier(columnName);
+        Connection connection = getConnection();
+        ResultSet resultSet = null;
+        try {
+            String schemaName = getSchemaName(qualifiedTableName);
+            String tableName = getTableName(qualifiedTableName);
+
+            resultSet = connection.getMetaData().getColumns(null, schemaName, tableName, null);
+            while (resultSet.next()) {
+                String columnName = resultSet.getString("COLUMN_NAME");
+                int sqlType = resultSet.getInt("DATA_TYPE");
+                SqlTypeHandler<?> sqlTypeHandler = sqlTypeHandlerRepository.getSqlTypeHandler(sqlType);
+                boolean primaryKey = primaryKeyColumnNames.contains(columnName);
+
+                DatabaseColumn databaseColumn = new DatabaseColumn(columnName, sqlType, sqlTypeHandler, primaryKey);
+                databaseColumns.add(databaseColumn);
+            }
+            return databaseColumns;
+        } finally {
+            close(connection, null, resultSet);
         }
-        Integer columnSqlType = columnSqlTypes.get(correctCaseColumnName);
+    }
+
+    public int getColumnSqlType(String qualifiedTableName, String columnName) throws SQLException {
+        Map<String, Integer> columnSqlTypes = getColumnSqlTypes(qualifiedTableName);
+
+        Integer columnSqlType = columnSqlTypes.get(columnName);
         if (columnSqlType == null) {
             // todo handle -1 in set object 
             return SQL_TYPE_UNKNOWN;
@@ -123,9 +145,8 @@ public class Database {
         return columnSqlType;
     }
 
-    protected Map<String, Integer> getColumnSqlTypes(String schemaName, String tableName, boolean caseSensitive) throws SQLException {
-        String key = schemaName + "." + tableName;
-        Map<String, Integer> columnSqlTypes = tableColumnSqlTypesCache.get(key);
+    protected Map<String, Integer> getColumnSqlTypes(String qualifiedTableName) throws SQLException {
+        Map<String, Integer> columnSqlTypes = tableColumnSqlTypesCache.get(qualifiedTableName);
         if (columnSqlTypes != null) {
             return columnSqlTypes;
         }
@@ -134,21 +155,17 @@ public class Database {
         Connection connection = getConnection();
         ResultSet resultSet = null;
         try {
-            String correctCaseSchemaName = schemaName;
-            String correctCaseTableName = tableName;
-            if (!caseSensitive) {
-                correctCaseSchemaName = toCorrectCaseIdentifier(schemaName);
-                correctCaseTableName = toCorrectCaseIdentifier(tableName);
-            }
+            String schemaName = getSchemaName(qualifiedTableName);
+            String tableName = getTableName(qualifiedTableName);
 
-            resultSet = connection.getMetaData().getColumns(null, correctCaseSchemaName, correctCaseTableName, null);
+            resultSet = connection.getMetaData().getColumns(null, schemaName, tableName, null);
             while (resultSet.next()) {
                 String columnName = resultSet.getString("COLUMN_NAME");
                 int sqlType = resultSet.getInt("DATA_TYPE");
                 columnSqlTypes.put(columnName, sqlType);
             }
 
-            tableColumnSqlTypesCache.put(key, columnSqlTypes);
+            tableColumnSqlTypesCache.put(qualifiedTableName, columnSqlTypes);
             return columnSqlTypes;
         } finally {
             close(connection, null, resultSet);
@@ -221,5 +238,25 @@ public class Database {
             close(connection, null, resultSet);
         }
     }
+
+
+    protected String getSchemaName(String qualifiedTableName) {
+        int index = qualifiedTableName.indexOf('.');
+        if (index == -1) {
+            throw new UnitilsException("Unable to determine schema name for qualified table name " + qualifiedTableName);
+        }
+        String schemaName = qualifiedTableName.substring(0, index);
+        return dbSupport.removeIdentifierQuotes(schemaName);
+    }
+
+    protected String getTableName(String qualifiedTableName) {
+        int index = qualifiedTableName.indexOf('.');
+        if (index == -1) {
+            throw new UnitilsException("Unable to determine table name for qualified table name " + qualifiedTableName);
+        }
+        String tableName = qualifiedTableName.substring(index + 1);
+        return dbSupport.removeIdentifierQuotes(tableName);
+    }
+
 
 }
