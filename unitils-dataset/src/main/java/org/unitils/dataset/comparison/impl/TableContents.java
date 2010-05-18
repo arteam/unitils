@@ -78,7 +78,6 @@ public class TableContents {
             identifier.append(rowIndex);
             return identifier.toString();
         }
-        int index = 1;
         identifier.append('#');
         for (String primaryKeyColumnName : primaryKeyColumnNames) {
             String primaryKeyValue = resultSet.getString(primaryKeyColumnName);
@@ -99,8 +98,6 @@ public class TableContents {
         }
         rowIndex++;
         DatabaseRow databaseRow = new DatabaseRow(getRowIdentifier(), qualifiedTableName);
-
-        List<DatabaseColumnWithValue> values = new ArrayList<DatabaseColumnWithValue>();
 
         for (int i = 0; i < databaseColumns.size(); i++) {
             DatabaseColumn databaseColumn = databaseColumns.get(i);

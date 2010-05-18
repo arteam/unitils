@@ -35,7 +35,7 @@ public class DefaultExpectedDataSetAssert implements ExpectedDataSetAssert {
     protected ObjectFormatter objectFormatter = new ObjectFormatter();
 
     protected DataSetComparator dataSetComparator;
-    protected DatabaseContentRetriever databaseContentRetriever;
+    protected DatabaseContentLogger databaseContentRetriever;
 
 
     /**
@@ -44,7 +44,7 @@ public class DefaultExpectedDataSetAssert implements ExpectedDataSetAssert {
      * @param dataSetComparator        The comparator that will create the data set comparison, not null
      * @param databaseContentRetriever The logger for displaying the database content, null if the content should not be logged
      */
-    public void init(DataSetComparator dataSetComparator, DatabaseContentRetriever databaseContentRetriever) {
+    public void init(DataSetComparator dataSetComparator, DatabaseContentLogger databaseContentRetriever) {
         this.dataSetComparator = dataSetComparator;
         this.databaseContentRetriever = databaseContentRetriever;
     }
@@ -83,7 +83,7 @@ public class DefaultExpectedDataSetAssert implements ExpectedDataSetAssert {
         }
 
         if (databaseContentRetriever != null) {
-            String databaseContent = databaseContentRetriever.getActualDatabaseContentForDataSetComparison(dataSetComparison);
+            String databaseContent = databaseContentRetriever.getDatabaseContentForComparison(dataSetComparison);
             result.append("== Actual database content ==\n\n");
             result.append(databaseContent);
         }

@@ -445,7 +445,7 @@ abstract public class DbSupport {
         }
 
         if (identifier.startsWith(identifierQuoteString) && identifier.endsWith(identifierQuoteString)) {
-            return identifier.substring(1, identifier.length() - 1);
+            return removeIdentifierQuotes(identifier);
         }
         if (storedIdentifierCase == UPPER_CASE) {
             return identifier.toUpperCase();
@@ -454,6 +454,17 @@ abstract public class DbSupport {
         } else {
             return identifier;
         }
+    }
+
+    /**
+     * @param identifier The identifier, not null
+     * @return The identifier, removing identifier quotes if necessary, not null
+     */
+    public String removeIdentifierQuotes(String identifier) {
+        if (identifier.startsWith(identifierQuoteString) && identifier.endsWith(identifierQuoteString)) {
+            return identifier.substring(1, identifier.length() - 1);
+        }
+        return identifier;
     }
 
     /**

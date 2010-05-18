@@ -29,6 +29,7 @@ import org.unitils.dataset.core.DataSetColumn;
 import org.unitils.dataset.core.DataSetRow;
 import org.unitils.dataset.core.DataSetSettings;
 import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -49,7 +50,7 @@ public class DatabaseAddExtraParentColumnsForChildTest extends UnitilsJUnit4 {
     private Database database = new Database();
 
     @TestDataSource
-    private DataSource dataSource;
+    protected DataSource dataSource;
 
     private DataSetRow parentDataSetRow;
     private DataSetRow childDataSetRow;
@@ -63,7 +64,7 @@ public class DatabaseAddExtraParentColumnsForChildTest extends UnitilsJUnit4 {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
         DbSupport dbSupport = getDefaultDbSupport(configuration, sqlHandler);
-        database.init(dbSupport);
+        database.init(dbSupport, new SqlTypeHandlerRepository());
 
         dropTestTables();
         createTestTables();

@@ -31,7 +31,7 @@ public interface ExpectedDataSetAssert {
      * @param dataSetComparator     The comparator that will create the data set comparison, not null
      * @param databaseContentLogger The logger for displaying the database content, null if the content should not be logged
      */
-    public void init(DataSetComparator dataSetComparator, DatabaseContentRetriever databaseContentLogger);
+    public void init(DataSetComparator dataSetComparator, DatabaseContentLogger databaseContentLogger);
 
     /**
      * Asserts that the given expected schema is equal to the actual schema.

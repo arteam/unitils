@@ -24,6 +24,7 @@ import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import javax.sql.DataSource;
 import java.util.Map;
@@ -47,14 +48,14 @@ public class DatabaseGetColumnSqlTypeTest extends UnitilsJUnit4 {
     private Database database = new Database();
 
     @TestDataSource
-    private DataSource dataSource;
+    protected DataSource dataSource;
 
 
     @Before
     public void initialize() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         DbSupport defaultDbSupport = DbSupportFactory.getDefaultDbSupport(configuration, new DefaultSQLHandler(dataSource));
-        database.init(defaultDbSupport);
+        database.init(defaultDbSupport, new SqlTypeHandlerRepository());
     }
 
 
@@ -74,9 +75,9 @@ public class DatabaseGetColumnSqlTypeTest extends UnitilsJUnit4 {
 
     @Test
     public void getPrimaryKeyColumnNames() throws Exception {
-        int col1Type = database.getColumnSqlType("public", "test", "col1", false);
-        int col2Type = database.getColumnSqlType("public", "test", "col2", false);
-        int col3Type = database.getColumnSqlType("public", "test", "col3", false);
+        int col1Type = database.getColumnSqlType("public.test", "col1");
+        int col2Type = database.getColumnSqlType("public.test", "col2");
+        int col3Type = database.getColumnSqlType("public.test", "col3");
 
         assertEquals(VARCHAR, col1Type);
         assertEquals(INTEGER, col2Type);
@@ -85,9 +86,9 @@ public class DatabaseGetColumnSqlTypeTest extends UnitilsJUnit4 {
 
     @Test
     public void caseSensitive() throws Exception {
-        int col1Type = database.getColumnSqlType("PUBLIC", "TestCase", "Col1", true);
-        int col2Type = database.getColumnSqlType("PUBLIC", "TestCase", "col2", true);
-        int col3Type = database.getColumnSqlType("PUBLIC", "TestCase", "COL3", true);
+        int col1Type = database.getColumnSqlType("\"PUBLIC\".\"TestCase\"", "Col1");
+        int col2Type = database.getColumnSqlType("\"PUBLIC\".\"TestCase\"", "col2");
+        int col3Type = database.getColumnSqlType("\"PUBLIC\".\"TestCase\"", "COL3");
 
         assertEquals(VARCHAR, col1Type);
         assertEquals(INTEGER, col2Type);
@@ -96,21 +97,21 @@ public class DatabaseGetColumnSqlTypeTest extends UnitilsJUnit4 {
 
     @Test
     public void primaryKeySetCached() throws Exception {
-        Map<String, Integer> columnSqlTypes1 = database.getColumnSqlTypes("public", "test", false);
-        Map<String, Integer> columnSqlTypes2 = database.getColumnSqlTypes("public", "test", false);
+        Map<String, Integer> columnSqlTypes1 = database.getColumnSqlTypes("public.test");
+        Map<String, Integer> columnSqlTypes2 = database.getColumnSqlTypes("public.test");
         assertSame(columnSqlTypes1, columnSqlTypes2);
     }
 
     @Test
     public void onlyCachedForIdenticalSchemaAndTableName() throws Exception {
-        Map<String, Integer> columnSqlTypes1 = database.getColumnSqlTypes("public", "test", false);
-        Map<String, Integer> columnSqlTypes2 = database.getColumnSqlTypes("public", "TEST", false);
+        Map<String, Integer> columnSqlTypes1 = database.getColumnSqlTypes("public.test");
+        Map<String, Integer> columnSqlTypes2 = database.getColumnSqlTypes("public.\"TEST\"");
         assertNotSame(columnSqlTypes1, columnSqlTypes2);
     }
 
     @Test
     public void tableNotFound() throws Exception {
-        int result = database.getColumnSqlType("xxxx", "xxxx", "xxxx", false);
+        int result = database.getColumnSqlType("xxxx.xxxx", "xxxx");
         assertEquals(SQL_TYPE_UNKNOWN, result);
     }
 }

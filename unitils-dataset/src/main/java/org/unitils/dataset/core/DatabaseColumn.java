@@ -62,6 +62,8 @@ public class DatabaseColumn {
         return sqlType;
     }
 
+
+    // todo remove??
     public SqlTypeHandler getSqlTypeHandler() {
         return sqlTypeHandler;
     }
