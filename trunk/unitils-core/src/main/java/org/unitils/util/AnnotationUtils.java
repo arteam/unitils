@@ -148,7 +148,6 @@ public class AnnotationUtils {
         return getClassLevelAnnotationProperty(annotationClass, annotationPropertyName, defaultValue, clazz);
     }
 
-
     @SuppressWarnings({"unchecked"})
     public static <S extends Annotation, T> T getClassLevelAnnotationProperty(Class<S> annotationClass, String annotationPropertyName, T defaultValue, Class<?> clazz) {
         if (Object.class.equals(clazz)) {
@@ -164,6 +163,35 @@ public class AnnotationUtils {
             }
         }
         return getClassLevelAnnotationProperty(annotationClass, annotationPropertyName, defaultValue, clazz.getSuperclass());
+    }
+
+
+    @SuppressWarnings({"unchecked"})
+    public static <S extends Annotation, T> T getMethodOrClassLevelAnnotationAnnotatedWith(Class<S> annotationClass, Method method, Class<?> clazz) {
+        Annotation[] annotations = method.getDeclaredAnnotations();
+        for (Annotation annotation : annotations) {
+            Annotation annotationAnnotation = annotation.annotationType().getAnnotation(annotationClass);
+            if (annotationAnnotation != null) {
+                return (T) annotation;
+            }
+        }
+        return (T) getClassLevelAnnotationAnnotatedWith(annotationClass, clazz);
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public static <S extends Annotation, T> T getClassLevelAnnotationAnnotatedWith(Class<S> annotationClass, Class<?> clazz) {
+        if (Object.class.equals(clazz)) {
+            return null;
+        }
+
+        Annotation[] annotations = clazz.getDeclaredAnnotations();
+        for (Annotation annotation : annotations) {
+            Annotation annotationAnnotation = annotation.annotationType().getAnnotation(annotationClass);
+            if (annotationAnnotation != null) {
+                return (T) annotation;
+            }
+        }
+        return (T) getClassLevelAnnotationAnnotatedWith(annotationClass, clazz.getSuperclass());
     }
 
 

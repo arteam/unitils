@@ -18,6 +18,7 @@ package org.unitils.dataset.comparison.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
+import org.unitils.dataset.comparison.DataSetComparator;
 import org.unitils.dataset.comparison.DataSetComparison;
 import org.unitils.dataset.comparison.RowComparison;
 import org.unitils.dataset.comparison.TableComparison;
@@ -34,7 +35,7 @@ import java.util.*;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DefaultDataSetComparator {//implements DataSetComparator {
+public class DefaultDataSetComparator implements DataSetComparator {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DefaultDataSetComparator.class);

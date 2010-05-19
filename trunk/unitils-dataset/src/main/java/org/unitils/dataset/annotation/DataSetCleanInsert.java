@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,35 +24,34 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Annotation indicating that after having executed a test method, the contents of the unit test database should be
- * equal to the contents of a data set.
+ * Annotation indicating that a data set should be loaded before the test run.
  * <p/>
- * If a class is annotated, the content of the unit test database will be compared with a data set after the execution
- * of each of the test methods in the class. A data set file name can explicitly be specified. If no such file name is
- * specified, the default 'classname'.'testmethod'-result.xml will be tried, if no such file, an exception will be
- * thrown. File names that start with '/' are treated absolute. File names that do not start with '/', are relative to
- * the current class.
+ * If a class is annotated, a test data set will be loaded before the execution of each of the test methods in
+ * the class. A data set file name can explicitly be specified. If no such file name is specified, first a data set
+ * named 'classname'.'testmethod'.xml will be tried, if no such file exists, 'classname'.xml will be tried. If that
+ * file also doesn't exist, an exception will be thrown. File names that start with '/' are treated absolute. File names
+ * that do not start with '/', are relative to the current class.
  * <p/>
- * A test method can also be annotated with ExpectedDataSet in which case you specify the dataset that needs to be used
- * for this test method. Again, a file name can explicitly be specified or if not specified, the default will
- * be used: 'classname'.'methodname'-result.xml. Example:
+ * A test method can also be annotated with DataSet in which case you specify the data set that needs to be loaded
+ * before this test method is run. Again, a file name can explicitly be specified or if not specified, the default will
+ * be used: first 'classname'.'methodname'.xml and if that file does not exist 'classname'.xml.
  * <p/>
  * Examples:
- * <p/>
  * <pre><code>
- * '    @ExpectedDataSet
+ * '    @DataSet
  *      public class MyTestClass extends UnitilsJUnit3 {
  * '
  *          public void testMethod1(){
  *          }
  * '
- * '        @ExpectedDataSet("aCustomFileName.xml")
+ * '        @DataSet("aCustomFileName.xml")
  *          public void testMethod2(){
  *          }
  *      }
  * </code></pre>
- * Will check the resulting contents of the unit test database using a data set file named MyTestClass.testMethod1-result.xml
- * in the same directory as the class for testMethod1 and aCustomFileName.xml for testMethod2.
+ * Will load a data set file named MyTestClass.xml or MyTestClass-testMethod1.xml for testMethod1 in the same directory
+ * as the class. And for testMethod2 a data set file named aCustomFileName.xml in the same directory as the class is
+ * loaded.
  * <p/>
  * <pre><code>
  *      public class MyTestClass extends UnitilsJUnit3 {
@@ -60,13 +59,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *          public void testMethod1(){
  *          }
  * '
- * '        @ExpectedDataSet
+ * '        @DataSet
  *          public void testMethod2(){
  *          }
  *      }
  * </code></pre>
- * Will not perform any data set check for testMethod1 (there is no class level expected data set). And will use a data set
- * file named MyTestClass.testMethod2-result.xml for testMethod2.
+ * Will not load any data set for testMethod1 (there is no class level data set). Will load a data set file named
+ * MyTestClass.xml or MyTestClass.testMethod2.xml for testMethod2.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -74,12 +73,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({TYPE, METHOD})
 @Retention(RUNTIME)
 @Inherited
-@DataSetAnnotation(ExpectedDataSetAnnotationHandler.class)
-public @interface ExpectedDataSet {
+@DataSetAnnotation(DataSetCleanInsertAnnotationHandler.class)
+public @interface DataSetCleanInsert {
 
     /**
-     * The file name of the data set. If left empty, the default filename will be
-     * used: 'classname'.'methodname'-result.xml. If that file also does not exist, an exception is thrown.
+     * The file name of the data set. If left empty, the default filename will
+     * be used: first 'classname'.'testMethodname'.xml will be tried, if that file does not exist,
+     * 'classname'.xml is tried. If that file also does not exist, an exception is thrown.
      *
      * @return the fileName, empty for default
      */
@@ -103,14 +103,5 @@ public @interface ExpectedDataSet {
      * @return The values to use when replacing the variable declarations (e.g. $0) in the data set, empty by default
      */
     String[] variables() default {};
-
-    /**
-     * By default, the database content of the tables that were in the expected data set will be outputted to the log.
-     * For performance reasons or when large tables are involved, it is possible to skip this logging by
-     * setting this property to false.
-     *
-     * @return True for logging the database content, false otherwise
-     */
-    boolean logDatabaseContentOnAssertionError() default true;
 
 }
