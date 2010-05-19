@@ -18,35 +18,35 @@ package org.unitils.dataset.comparison.impl;
 import org.unitils.core.util.ObjectFormatter;
 import org.unitils.dataset.comparison.*;
 import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.factory.DataSetResolver;
 import org.unitils.dataset.factory.DataSetRowSource;
+import org.unitils.dataset.loader.impl.Database;
 
 import java.util.List;
+import java.util.Properties;
 
 import static java.lang.Math.max;
 import static org.apache.commons.lang.StringUtils.rightPad;
+import static org.unitils.core.util.ConfigUtils.getConfiguredInstanceOf;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DefaultExpectedDataSetAssert implements ExpectedDataSetAssert {
+public class DefaultExpectedDataSetStrategy implements ExpectedDataSetStrategy {
 
     /* Utility for creating string representations */
     protected ObjectFormatter objectFormatter = new ObjectFormatter();
 
+    protected DataSetResolver dataSetResolver;
     protected DataSetComparator dataSetComparator;
-    protected DatabaseContentLogger databaseContentRetriever;
+    protected DatabaseContentLogger databaseContentLogger;
 
 
-    /**
-     * Initializes the data set assert.
-     *
-     * @param dataSetComparator        The comparator that will create the data set comparison, not null
-     * @param databaseContentRetriever The logger for displaying the database content, null if the content should not be logged
-     */
-    public void init(DataSetComparator dataSetComparator, DatabaseContentLogger databaseContentRetriever) {
-        this.dataSetComparator = dataSetComparator;
-        this.databaseContentRetriever = databaseContentRetriever;
+    public void init(Properties configuration, Database database) {
+        this.dataSetResolver = createDataSetResolver(configuration);
+        this.dataSetComparator = createDataSetComparator();
+        this.databaseContentLogger = createDatabaseContentLogger();
     }
 
     /**
@@ -82,8 +82,8 @@ public class DefaultExpectedDataSetAssert implements ExpectedDataSetAssert {
             }
         }
 
-        if (databaseContentRetriever != null) {
-            String databaseContent = databaseContentRetriever.getDatabaseContentForComparison(dataSetComparison);
+        if (databaseContentLogger != null) {
+            String databaseContent = databaseContentLogger.getDatabaseContentForComparison(dataSetComparison);
             result.append("== Actual database content ==\n\n");
             result.append(databaseContent);
         }
@@ -154,5 +154,18 @@ public class DefaultExpectedDataSetAssert implements ExpectedDataSetAssert {
         actualValues.append(rightPad(actualValue, columnSize));
     }
 
+
+    protected DataSetResolver createDataSetResolver(Properties configuration) {
+        return getConfiguredInstanceOf(DataSetResolver.class, configuration);
+    }
+
+
+    protected DataSetComparator createDataSetComparator() {
+        return new DefaultDataSetComparator();
+    }
+
+    protected DatabaseContentLogger createDatabaseContentLogger() {
+        return new DefaultDatabaseContentLogger();
+    }
 
 }

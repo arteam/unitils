@@ -25,7 +25,7 @@ import java.util.List;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class RefreshDataSeLoader extends UpdateDataSetLoader {
+public class RefreshDataSetLoader extends UpdateDataSetLoader {
 
     protected InsertDataSetLoader insertDataSetLoader;
 

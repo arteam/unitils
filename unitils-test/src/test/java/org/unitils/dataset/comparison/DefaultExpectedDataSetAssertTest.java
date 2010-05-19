@@ -18,7 +18,7 @@ package org.unitils.dataset.comparison;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.comparison.impl.DefaultExpectedDataSetAssert;
+import org.unitils.dataset.comparison.impl.DefaultExpectedDataSetStrategy;
 import org.unitils.dataset.core.DatabaseColumnWithValue;
 import org.unitils.dataset.core.DatabaseRow;
 import org.unitils.mock.Mock;
@@ -34,7 +34,7 @@ import static org.junit.Assert.fail;
 public class DefaultExpectedDataSetAssertTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private DefaultExpectedDataSetAssert defaultExpectedDataSetAssert = new DefaultExpectedDataSetAssert();
+    private DefaultExpectedDataSetStrategy defaultExpectedDataSetAssert = new DefaultExpectedDataSetStrategy();
 
     private Mock<DataSetComparator> dataSetComparator;
 

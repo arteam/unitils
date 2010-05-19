@@ -33,7 +33,7 @@ import java.util.List;
 public class RefreshDataSetLoaderTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private RefreshDataSeLoader refreshRowLoader = new RefreshDataSeLoader();
+    private RefreshDataSetLoader refreshRowLoader = new RefreshDataSetLoader();
 
     private Mock<DataSetRowSource> dataSetRowSource;
     private Mock<DataSetRowProcessor> dataSetRowProcessor;

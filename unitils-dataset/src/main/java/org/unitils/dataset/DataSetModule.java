@@ -26,13 +26,14 @@ import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.DatabaseModule;
+import org.unitils.dataset.annotation.DataSetAnnotation;
+import org.unitils.dataset.annotation.DataSetAnnotationHandler;
 import org.unitils.dataset.annotation.ExpectedDataSet;
 import org.unitils.dataset.comparison.DataSetComparator;
 import org.unitils.dataset.comparison.DatabaseContentLogger;
-import org.unitils.dataset.comparison.ExpectedDataSetAssert;
+import org.unitils.dataset.comparison.ExpectedDataSetStrategy;
 import org.unitils.dataset.core.DataSet;
 import org.unitils.dataset.core.DataSetRowProcessor;
-import org.unitils.dataset.core.DataSetSettings;
 import org.unitils.dataset.factory.DataSetResolver;
 import org.unitils.dataset.factory.DataSetRowSource;
 import org.unitils.dataset.loader.DataSetLoader;
@@ -41,16 +42,11 @@ import org.unitils.dataset.loader.impl.IdentifierNameProcessor;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 import org.unitils.dataset.util.DataSetAnnotationUtil;
 import org.unitils.dataset.util.DatabaseAccessor;
-import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
-import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -58,6 +54,7 @@ import java.util.Properties;
 import static org.unitils.core.util.ConfigUtils.getConfiguredInstanceOf;
 import static org.unitils.core.util.ConfigUtils.getInstanceOf;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationAnnotatedWith;
 import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
@@ -127,19 +124,28 @@ public class DataSetModule implements Module {
     }
 
     protected void loadDataSet(Method testMethod, Object testObject) {
-//        try {
-//            Class<?> testClass = testObject.getClass();
-//            Class<? extends DataSetFactory> dataSetFactoryClass = dataSetAnnotationUtil.getDataSetFactoryClass(testClass, testMethod);
-//            DataSetFactory dataSetFactory = createDataSetRowSource(dataSetFactoryClass);
-//            List<String> dataSetFileNames = dataSetAnnotationUtil.getDataSetFileNames(testClass, testMethod, dataSetFactory.getDataSetFileExtension());
-//            List<String> variables = dataSetAnnotationUtil.getDataSetVariables(testClass, testMethod);
-//            Class<? extends DataSetLoader> dataSetLoaderClass = dataSetAnnotationUtil.getDataSetLoaderClass(testClass, testMethod);
-//
-//            loadDataSet(dataSetFileNames, variables, testClass, dataSetFactory, dataSetLoaderClass);
-//
-//        } catch (Exception e) {
-//            throw new UnitilsException("Error inserting data set for method " + testMethod, e);
-//        }
+        try {
+            Class<?> testClass = testObject.getClass();
+            Annotation dataSetAnnotation = getMethodOrClassLevelAnnotationAnnotatedWith(DataSetAnnotation.class, testMethod, testClass);
+            if (dataSetAnnotation == null){
+                return;
+            }
+
+            Database database = createDatabase();
+
+            DataSetAnnotationHandler dataSetAnnotationHandler = getDataSetAnnotationHandler(dataSetAnnotation);
+            dataSetAnnotationHandler.init(configuration, database);
+            dataSetAnnotationHandler.handle(dataSetAnnotation, testClass);
+
+        } catch (Exception e) {
+            throw new UnitilsException("Error inserting data set for method " + testMethod, e);
+        }
+    }
+
+    protected DataSetAnnotationHandler getDataSetAnnotationHandler(Annotation dataSetAnnotation){
+        DataSetAnnotation annotation = dataSetAnnotation.annotationType().getAnnotation(DataSetAnnotation.class);
+        Class<? extends DataSetAnnotationHandler> dataSetAnnotationHandlerClass = annotation.value();
+        return createInstanceOfType(dataSetAnnotationHandlerClass, false);
     }
 
     /**
@@ -167,7 +173,6 @@ public class DataSetModule implements Module {
 
     protected void loadDataSet(List<String> dataSetFileNames, List<String> variables, Class<?> testClass, Class<? extends DataSetRowSource> dataSetRowSourceClass, Class<? extends DataSetLoader> dataSetLoaderClass) {
         Database database = createDatabase();
-        IdentifierNameProcessor identifierNameProcessor = createIdentifierNameProcessor(database);
         SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
         DataSetRowProcessor dataSetRowProcessor = createDataSetRowProcessor(identifierNameProcessor, sqlTypeHandlerRepository, database);
         DatabaseAccessor databaseAccessor = createDatabaseAccessor(database);
@@ -181,11 +186,6 @@ public class DataSetModule implements Module {
 
     }
 
-    protected IdentifierNameProcessor createIdentifierNameProcessor(Database database) {
-        IdentifierNameProcessor identifierNameProcessor = new IdentifierNameProcessor();
-        identifierNameProcessor.init(database);
-        return identifierNameProcessor;
-    }
 
     protected DatabaseAccessor createDatabaseAccessor(Database database) {
         return new DatabaseAccessor(database);
@@ -207,23 +207,6 @@ public class DataSetModule implements Module {
 //        }
     }
 
-
-    protected void loadDataSet(File dataSetFile, List<String> variables, Class<? extends DataSetRowSource> dataSetRowSourceClass, DataSetLoader dataSetLoader, Database database) {
-        logger.info("Loading data sets file: " + dataSetFile);
-        InputStream dataSetInputStream = null;
-        try {
-            dataSetInputStream = new FileInputStream(dataSetFile);
-            String defaultSchemaName = database.getSchemaName();
-            DataSetRowSource dataSetRowSource = createDataSetRowSource(dataSetInputStream, defaultSchemaName, dataSetRowSourceClass);
-            dataSetLoader.load(dataSetRowSource, variables);
-
-        } catch (Exception e) {
-            throw new UnitilsException("Unable to load data set file: " + dataSetFile, e);
-        } finally {
-            closeQuietly(dataSetInputStream);
-        }
-    }
-
     protected void assertExpectedDataSet(File dataSetFile, List<String> variables, Class<? extends DataSetRowSource> dataSetRowSourceClass, boolean logDatabaseContentOnAssertionError, Database database, DatabaseAccessor databaseAccessor) {
 //        DataSetRowSource dataSetRowSource = createDataSetRowSource(dataSetRowSourceClass);
 //        DataSet dataSet = dataSetRowSource.createDataSet(dataSetFile, database.getSchemaName());
@@ -238,41 +221,12 @@ public class DataSetModule implements Module {
 //            databaseContentLogger = createDatabaseContentLogger(database, databaseAccessor);
 //        }
 //        DataSetComparator dataSetComparator = createDataSetComparator(dataSet, database, databaseAccessor);
-//        ExpectedDataSetAssert expectedDataSetAssert = createExpectedDataSetAssert(dataSetComparator, databaseContentLogger);
-//        expectedDataSetAssert.assertEqual(dataSet, variables);
-    }
-
-
-    protected List<File> resolveDataSets(Class<?> testClass, List<String> dataSetFileNames) {
-        List<File> dataSetFiles = new ArrayList<File>();
-
-        DataSetResolver dataSetResolver = createDataSetResolver();
-        for (String dataSetFileName : dataSetFileNames) {
-            File dataSetFile = dataSetResolver.resolve(testClass, dataSetFileName);
-            dataSetFiles.add(dataSetFile);
-        }
-        return dataSetFiles;
+//        ExpectedDataSetStrategy expectedDataSetStrategy = createExpectedDataSetAssert(dataSetComparator, databaseContentLogger);
+//        expectedDataSetStrategy.assertEqual(dataSet, variables);
     }
 
 
     /* FACTORY METHODS */
-
-    /**
-     * @param dataSetInputStream    The input stream that contains the data set, not null
-     * @param defaultSchemaName     The schema name to use when none is specified, not null
-     * @param dataSetRowSourceClass The type, not null
-     * @return An initialized data set factory of the given type, not null
-     */
-    protected DataSetRowSource createDataSetRowSource(InputStream dataSetInputStream, String defaultSchemaName, Class<? extends DataSetRowSource> dataSetRowSourceClass) {
-        char defaultLiteralToken = PropertyUtils.getString(DEFAULT_LITERAL_TOKEN_PROPERTY, configuration).charAt(0);
-        char defaultVariableToken = PropertyUtils.getString(DEFAULT_VARIABLE_TOKEN_PROPERTY, configuration).charAt(0);
-        boolean defaultCaseSensitive = PropertyUtils.getBoolean(DEFAULT_CASE_SENSITIVE_PROPERTY, configuration);
-        DataSetSettings dataSetSettings = new DataSetSettings(defaultLiteralToken, defaultVariableToken, defaultCaseSensitive);
-
-        DataSetRowSource dataSetRowSource = createInstanceOfType(dataSetRowSourceClass, false);
-        dataSetRowSource.init(defaultSchemaName, dataSetSettings);
-        return dataSetRowSource;
-    }
 
     /**
      * @param dataSetLoaderClass The type, not null
@@ -318,10 +272,10 @@ public class DataSetModule implements Module {
         return null;
     }
 
-    protected ExpectedDataSetAssert createExpectedDataSetAssert(DataSetComparator dataSetComparator, DatabaseContentLogger databaseContentLogger) {
-        ExpectedDataSetAssert expectedDataSetAssert = getInstanceOf(ExpectedDataSetAssert.class, configuration);
-        expectedDataSetAssert.init(dataSetComparator, databaseContentLogger);
-        return expectedDataSetAssert;
+    protected ExpectedDataSetStrategy createExpectedDataSetAssert(DataSetComparator dataSetComparator, DatabaseContentLogger databaseContentLogger) {
+        ExpectedDataSetStrategy expectedDataSetStrategy = getInstanceOf(ExpectedDataSetStrategy.class, configuration);
+        expectedDataSetStrategy.init(dataSetComparator, databaseContentLogger);
+        return expectedDataSetStrategy;
     }
 
     /**

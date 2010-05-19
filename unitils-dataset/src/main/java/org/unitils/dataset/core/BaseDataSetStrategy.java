@@ -124,10 +124,6 @@ public abstract class BaseDataSetStrategy {
         return dataSetRowSource;
     }
 
-    /**
-     * @param configuration The unitils configuration, not null
-     * @return The data set resolver, as configured in the Unitils configuration, not null
-     */
     protected DataSetResolver createDataSetResolver(Properties configuration) {
         return getConfiguredInstanceOf(DataSetResolver.class, configuration);
     }

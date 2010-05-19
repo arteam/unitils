@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.comparison;
+package org.unitils.dataset.annotation;
 
-import org.unitils.dataset.comparison.impl.TableContentRetriever;
-import org.unitils.dataset.core.DataSetRowProcessor;
-import org.unitils.dataset.factory.DataSetRowSource;
 import org.unitils.dataset.loader.impl.Database;
 
-import java.util.List;
+import java.util.Properties;
 
-/**
- * @author Tim Ducheyne
- * @author Filip Neven
- */
-public interface DataSetComparator {
+public interface DataSetAnnotationHandler {
 
-    void init(DataSetRowProcessor dataSetRowProcessor, TableContentRetriever tableContentRetriever, Database database);
+    public void init(Properties configuration, Database database);
 
-    DataSetComparison compare(DataSetRowSource expectedDataSetRowSource, List<String> variables);
-
+    public void handle(Object annotation, Class<?> testClass);
 }

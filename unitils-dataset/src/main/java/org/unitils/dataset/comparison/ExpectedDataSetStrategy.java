@@ -16,14 +16,16 @@
 package org.unitils.dataset.comparison;
 
 import org.unitils.dataset.factory.DataSetRowSource;
+import org.unitils.dataset.loader.impl.Database;
 
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public interface ExpectedDataSetAssert {
+public interface ExpectedDataSetStrategy {
 
     /**
      * Initializes the data set assert.
@@ -31,7 +33,7 @@ public interface ExpectedDataSetAssert {
      * @param dataSetComparator     The comparator that will create the data set comparison, not null
      * @param databaseContentLogger The logger for displaying the database content, null if the content should not be logged
      */
-    public void init(DataSetComparator dataSetComparator, DatabaseContentLogger databaseContentLogger);
+    public void init(Properties configuration, Database database);
 
     /**
      * Asserts that the given expected schema is equal to the actual schema.

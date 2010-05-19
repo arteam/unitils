@@ -30,7 +30,6 @@ import static org.junit.Assert.assertTrue;
 import static org.unitils.database.SQLUnitils.*;
 
 /**
- * todo remove
  *
  * @author Tim Ducheyne
  * @author Filip Neven

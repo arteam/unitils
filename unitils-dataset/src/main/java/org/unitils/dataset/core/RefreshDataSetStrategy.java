@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.comparison;
+package org.unitils.dataset.core;
 
-import org.unitils.dataset.comparison.impl.TableContentRetriever;
-import org.unitils.dataset.core.DataSetRowProcessor;
-import org.unitils.dataset.factory.DataSetRowSource;
-import org.unitils.dataset.loader.impl.Database;
-
-import java.util.List;
+import org.unitils.dataset.loader.DataSetLoader;
+import org.unitils.dataset.loader.impl.RefreshDataSetLoader;
+import org.unitils.dataset.util.DatabaseAccessor;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public interface DataSetComparator {
+public class RefreshDataSetStrategy extends BaseDataSetStrategy {
 
-    void init(DataSetRowProcessor dataSetRowProcessor, TableContentRetriever tableContentRetriever, Database database);
-
-    DataSetComparison compare(DataSetRowSource expectedDataSetRowSource, List<String> variables);
+    @Override
+    protected DataSetLoader createDataSetLoader(DataSetRowProcessor dataSetRowProcessor, DatabaseAccessor databaseAccessor) {
+        RefreshDataSetLoader refreshDataSetLoader = new RefreshDataSetLoader();
+        refreshDataSetLoader.init(dataSetRowProcessor, databaseAccessor);
+        return refreshDataSetLoader;
+    }
 
 }
