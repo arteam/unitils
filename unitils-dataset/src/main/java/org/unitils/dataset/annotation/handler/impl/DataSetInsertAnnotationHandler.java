@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.annotation;
+package org.unitils.dataset.annotation.handler.impl;
 
 import org.unitils.dataset.DataSetModule;
-import org.unitils.dataset.comparison.ExpectedDataSetStrategy;
-import org.unitils.dataset.comparison.impl.DefaultExpectedDataSetStrategy;
+import org.unitils.dataset.annotation.DataSetInsert;
+import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
+import org.unitils.dataset.core.InsertDataSetStrategy;
 import org.unitils.dataset.loader.impl.Database;
 
 import java.util.List;
@@ -25,24 +26,22 @@ import java.util.Properties;
 
 import static java.util.Arrays.asList;
 
-public class ExpectedDataSetAnnotationHandler implements DataSetAnnotationHandler<ExpectedDataSet> {
+public class DataSetInsertAnnotationHandler implements DataSetAnnotationHandler<DataSetInsert> {
 
-    protected ExpectedDataSetStrategy expectedDataSetStrategy = new DefaultExpectedDataSetStrategy();
+    protected InsertDataSetStrategy insertDataSetStrategy = new InsertDataSetStrategy();
     protected DataSetModule dataSetModule;
 
 
     public void init(Properties configuration, Database database, DataSetModule dataSetModule) {
-        expectedDataSetStrategy.init(configuration, database);
+        insertDataSetStrategy.init(configuration, database);
         this.dataSetModule = dataSetModule;
     }
 
 
-    public void handle(ExpectedDataSet annotation, Class<?> testClass) {
+    public void handle(DataSetInsert annotation, Class<?> testClass) {
         List<String> fileNames = asList(annotation.value());
         List<String> variables = asList(annotation.variables());
-        boolean logDatabaseContentOnAssertionError = annotation.logDatabaseContentOnAssertionError();
 
-        dataSetModule.performExpectedDataSetStrategy(expectedDataSetStrategy, fileNames, variables, logDatabaseContentOnAssertionError, testClass);
+        dataSetModule.performLoadDataSetStrategy(insertDataSetStrategy, fileNames, variables, testClass);
     }
-
 }

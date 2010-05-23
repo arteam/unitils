@@ -15,8 +15,6 @@
  */
 package org.unitils.dataset.core;
 
-import org.unitils.dataset.sqltypehandler.SqlTypeHandler;
-
 /**
  * A value of a data set column for which all variables and literal tokens were processed.
  *
@@ -29,8 +27,6 @@ public class DatabaseColumn {
     private String columnName;
     /* The sql type of the column in the database */
     private int sqlType;
-
-    private SqlTypeHandler sqlTypeHandler;
     /* True if the column is a primary key column */
     private boolean primaryKey;
 
@@ -40,10 +36,9 @@ public class DatabaseColumn {
      * @param sqlType    The sql type of the column in the database
      * @param primaryKey True if the column is a primary key column
      */
-    public DatabaseColumn(String columnName, int sqlType, SqlTypeHandler sqlTypeHandler, boolean primaryKey) {
+    public DatabaseColumn(String columnName, int sqlType, boolean primaryKey) {
         this.columnName = columnName;
         this.sqlType = sqlType;
-        this.sqlTypeHandler = sqlTypeHandler;
         this.primaryKey = primaryKey;
     }
 
@@ -60,12 +55,6 @@ public class DatabaseColumn {
      */
     public int getSqlType() {
         return sqlType;
-    }
-
-
-    // todo remove??
-    public SqlTypeHandler getSqlTypeHandler() {
-        return sqlTypeHandler;
     }
 
     /**

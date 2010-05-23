@@ -53,8 +53,8 @@ public class DefaultDatabaseContentLoggerTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() throws Exception {
-        DatabaseColumn databaseColumn1 = new DatabaseColumn("pk1", VARCHAR, null, true);
-        DatabaseColumn databaseColumn2 = new DatabaseColumn("column", VARCHAR, null, false);
+        DatabaseColumn databaseColumn1 = new DatabaseColumn("pk1", VARCHAR, true);
+        DatabaseColumn databaseColumn2 = new DatabaseColumn("column", VARCHAR, false);
         database.returns(asSet("pk1")).getPrimaryKeyColumnNames("schema.table");
         database.returns(asList(databaseColumn1, databaseColumn2)).getDatabaseColumns("schema.table");
 
@@ -68,11 +68,11 @@ public class DefaultDatabaseContentLoggerTest extends UnitilsJUnit4 {
         dataSetComparison = createDataSetComparison(tableComparison);
 
         databaseRow1 = new DatabaseRow("1", "schema.table");
-        databaseRow1.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column1", "row1col1", VARCHAR, null, false, true));
-        databaseRow1.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column2", "row1col2", VARCHAR, null, false, true));
+        databaseRow1.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column1", "row1col1", VARCHAR, false, true));
+        databaseRow1.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column2", "row1col2", VARCHAR, false, true));
         databaseRow2 = new DatabaseRow("2", "schema.table");
-        databaseRow2.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column1", "row2col1", VARCHAR, null, false, true));
-        databaseRow2.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column2", "row2col2", VARCHAR, null, false, true));
+        databaseRow2.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column1", "row2col1", VARCHAR, false, true));
+        databaseRow2.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column2", "row2col2", VARCHAR, false, true));
     }
 
 
