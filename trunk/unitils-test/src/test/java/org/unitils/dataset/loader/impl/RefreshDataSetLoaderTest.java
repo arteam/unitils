@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,9 +35,9 @@ public class RefreshDataSetLoaderTest extends UnitilsJUnit4 {
     /* Tested object */
     private RefreshDataSetLoader refreshRowLoader = new RefreshDataSetLoader();
 
-    private Mock<DataSetRowSource> dataSetRowSource;
-    private Mock<DataSetRowProcessor> dataSetRowProcessor;
-    private Mock<DatabaseAccessor> databaseAccessor;
+    protected Mock<DataSetRowSource> dataSetRowSource;
+    protected Mock<DataSetRowProcessor> dataSetRowProcessor;
+    protected Mock<DatabaseAccessor> databaseAccessor;
 
     private List<String> emptyVariables = new ArrayList<String>();
 
@@ -79,7 +79,8 @@ public class RefreshDataSetLoaderTest extends UnitilsJUnit4 {
 
 
     private DataSetRow createDataSetRow() {
-        DataSetRow dataSetRow = new DataSetRow("schema", "table", null, false, null);
+        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
+        DataSetRow dataSetRow = new DataSetRow("schema", "table", null, false, dataSetSettings);
         dataSetRow.addDataSetColumn(new DataSetColumn("column", "value"));
         return dataSetRow;
     }

@@ -70,14 +70,16 @@ import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
  */
 public class XmlDataSetRowSource implements DataSetRowSource {
 
-    /* The input stream that contains the data set */
-    protected InputStream dataSetInputStream;
-    /* The stream reader that reads out the input stream */
-    protected XMLStreamReader xmlStreamReader;
+    protected File dataSetFile;
     /* The schema name to use when none is specified */
     protected String defaultSchemaName;
     /* The default settings of the data set */
     protected DataSetSettings defaultDataSetSettings;
+
+    /* The input stream that contains the data set */
+    protected InputStream dataSetInputStream;
+    /* The stream reader that reads out the input stream */
+    protected XMLStreamReader xmlStreamReader;
 
     /* The actual settings of the data set, possibly overridden in the xml */
     protected DataSetSettings dataSetSettings;
@@ -91,25 +93,21 @@ public class XmlDataSetRowSource implements DataSetRowSource {
     protected Stack<DataSetRow> parentDataSetRows = new Stack<DataSetRow>();
 
 
-    /**
-     * Initializes this DataSetFactory
-     *
-     * @param defaultSchemaName      The schema name to use when none is specified, not null
-     * @param defaultDataSetSettings The default settings, not null
-     */
-    public void init(String defaultSchemaName, DataSetSettings defaultDataSetSettings) {
+    public XmlDataSetRowSource(File dataSetFile, String defaultSchemaName, DataSetSettings defaultDataSetSettings) {
+        this.dataSetFile = dataSetFile;
         this.defaultSchemaName = defaultSchemaName;
         this.defaultDataSetSettings = defaultDataSetSettings;
     }
 
+    public String getDataSetName() {
+        return dataSetFile.toString();
+    }
 
     /**
-     * Opens the given data set file.
+     * Opens the data set file.
      * Don't forget to call close afterwards.
-     *
-     * @param dataSetFile The data set file, not null
      */
-    public void open(File dataSetFile) {
+    public void open() {
         InputStream dataSetInputStream = null;
         try {
             dataSetInputStream = new BufferedInputStream(new FileInputStream(dataSetFile));

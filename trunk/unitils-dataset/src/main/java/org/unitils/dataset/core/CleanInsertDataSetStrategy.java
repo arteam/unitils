@@ -16,12 +16,12 @@
 package org.unitils.dataset.core;
 
 import org.unitils.core.UnitilsException;
+import org.unitils.dataset.factory.DataSetRowSource;
 import org.unitils.dataset.loader.impl.Database;
 import org.unitils.dataset.loader.impl.IdentifierNameProcessor;
 import org.unitils.dataset.loader.impl.TableContentDeleter;
 import org.unitils.dataset.util.DatabaseAccessor;
 
-import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
@@ -45,25 +45,19 @@ public class CleanInsertDataSetStrategy extends InsertDataSetStrategy {
 
 
     @Override
-    protected void loadDataSets(List<File> dataSetFiles, List<String> variables) {
-        deleteDataFromTablesInReverseOrder(dataSetFiles);
-        super.loadDataSets(dataSetFiles, variables);
+    public void perform(DataSetRowSource dataSetRowSource, List<String> variables) {
+        deleteDataFromTablesInReverseOrder(dataSetRowSource);
+        super.perform(dataSetRowSource, variables);
     }
 
 
-    protected void deleteDataFromTablesInReverseOrder(List<File> dataSetFiles) {
-        for (File dataSetFile : dataSetFiles) {
-            deleteDataFromTablesInReverseOrder(dataSetFile);
-        }
-    }
-
-    protected void deleteDataFromTablesInReverseOrder(File dataSetFile) {
+    protected void deleteDataFromTablesInReverseOrder(DataSetRowSource dataSetRowSource) {
         try {
-            dataSetRowSource.open(dataSetFile);
+            dataSetRowSource.open();
             tableContentDeleter.deleteDataFromTablesInReverseOrder(dataSetRowSource);
 
         } catch (Exception e) {
-            throw new UnitilsException("Unable to delete table data for data set file: " + dataSetFile, e);
+            throw new UnitilsException("Unable to delete table data for data set file: " + dataSetRowSource.getDataSetName(), e);
         } finally {
             dataSetRowSource.close();
         }

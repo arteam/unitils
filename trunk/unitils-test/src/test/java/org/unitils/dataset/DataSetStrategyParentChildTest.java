@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,40 +18,18 @@ package org.unitils.dataset;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
-import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dataset.core.InsertDataSetStrategy;
 
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import static java.util.Arrays.asList;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import static org.unitils.dataset.DataSetUnitils.dataSetInsert;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DataSetStrategyParentChildTest extends DataSetStrategyTestBase {
+public class DataSetStrategyParentChildTest extends DataSetTestBase {
 
-    /* Tested object */
-    protected InsertDataSetStrategy insertDataSetStrategy = new InsertDataSetStrategy();
-
-    @TestDataSource
-    private DataSource dataSource;
-
-    private List<String> emptyVariables = new ArrayList<String>();
-
-
-    @Before
-    public void initialize() throws Exception {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        insertDataSetStrategy.init(configuration, createDatabase(configuration));
-    }
 
     @Before
     public void createTestTables() {
@@ -69,7 +47,7 @@ public class DataSetStrategyParentChildTest extends DataSetStrategyTestBase {
 
     @Test
     public void insertDataSet() throws Exception {
-        insertDataSetStrategy.perform(asList("DataSetModuleParentChildTest.xml"), emptyVariables, getClass());
+        dataSetInsert(this, "DataSetModuleParentChildTest.xml");
 
         assertValueInTable("parent", "pk1", "1");
         assertValueInTable("parent", "pk2", "2");
@@ -81,7 +59,7 @@ public class DataSetStrategyParentChildTest extends DataSetStrategyTestBase {
 
     @Test
     public void childForeignKeyValuesAreOverriddenByActualParentValues() throws Exception {
-        insertDataSetStrategy.perform(asList("DataSetModuleParentChildTest-tryingToOverride.xml"), emptyVariables, getClass());
+        dataSetInsert(this, "DataSetModuleParentChildTest-tryingToOverride.xml");
 
         assertValueInTable("parent", "pk1", "1");
         assertValueInTable("parent", "pk2", "2");
@@ -93,11 +71,11 @@ public class DataSetStrategyParentChildTest extends DataSetStrategyTestBase {
 
     @Test(expected = UnitilsException.class)
     public void notAParent() throws Exception {
-        insertDataSetStrategy.perform(asList("DataSetModuleParentChildTest-notAParent.xml"), emptyVariables, getClass());
+        dataSetInsert(this, "DataSetModuleParentChildTest-notAParent.xml");
     }
 
     @Test(expected = UnitilsException.class)
     public void missingParentValueForForeignKey() throws Exception {
-        insertDataSetStrategy.perform(asList("DataSetModuleParentChildTest-missingParentValueForForeignKey.xml"), emptyVariables, getClass());
+        dataSetInsert(this, "DataSetModuleParentChildTest-missingParentValueForForeignKey.xml");
     }
 }

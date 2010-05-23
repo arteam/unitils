@@ -112,7 +112,7 @@ public class DatabaseRow {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(qualifiedTableName);
-        stringBuilder.append("   ");
+        stringBuilder.append(" [");
         for (DatabaseColumnWithValue databaseColumn : databaseColumnsWithValuePerName.values()) {
             stringBuilder.append(databaseColumn);
             stringBuilder.append(", ");
@@ -122,6 +122,8 @@ public class DatabaseRow {
         } else {
             stringBuilder.setLength(stringBuilder.length() - 2);
         }
+        stringBuilder.append("]");
         return stringBuilder.toString();
     }
+
 }

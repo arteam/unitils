@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,10 @@
  */
 package org.unitils.dataset;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.core.CleanInsertDataSetStrategy;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import static java.util.Arrays.asList;
+import static org.unitils.dataset.DataSetUnitils.dataSetCleanInsert;
 
 /**
  * Test class for loading of data sets using the clean insert data set strategy.
@@ -33,27 +26,14 @@ import static java.util.Arrays.asList;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class CleanInsertDataSetStrategyTest extends DataSetStrategyTestBase {
-
-    /* Tested object */
-    protected CleanInsertDataSetStrategy cleanInsertDataSetStrategy;
-
-    private List<String> emptyVariables = new ArrayList<String>();
-
-
-    @Before
-    public void initialize() throws Exception {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        cleanInsertDataSetStrategy = new CleanInsertDataSetStrategy();
-        cleanInsertDataSetStrategy.init(configuration, createDatabase(configuration));
-    }
+public class CleanInsertDataSetStrategyTest extends DataSetTestBase {
 
 
     @Test
     public void cleanInsertDataSet() throws Exception {
         insertValueInTableTest("yyyy");
 
-        cleanInsertDataSetStrategy.perform(asList("DataSetModuleDataSetTest-simple.xml"), emptyVariables, getClass());
+        dataSetCleanInsert(this, "DataSetModuleDataSetTest-simple.xml");
         assertValueInTable("test", "col1", "xxxx");
         assertValueNotInTable("test", "col1", "yyyy");
     }
@@ -63,7 +43,7 @@ public class CleanInsertDataSetStrategyTest extends DataSetStrategyTestBase {
         insertValueInTableTest("yyyy");
         insertValueInTableDependent("yyyy");
 
-        cleanInsertDataSetStrategy.perform(asList("DataSetModuleDataSetTest-dependency.xml"), emptyVariables, getClass());
+        dataSetCleanInsert(this, "DataSetModuleDataSetTest-dependency.xml");
         assertValueInTable("test", "col1", "xxxx");
         assertValueInTable("dependent", "col1", "xxxx");
         assertValueNotInTable("test", "col1", "yyyy");
@@ -75,7 +55,7 @@ public class CleanInsertDataSetStrategyTest extends DataSetStrategyTestBase {
         insertValueInTableTest("yyyy");
         insertValueInTableDependent("yyyy");
 
-        cleanInsertDataSetStrategy.perform(asList("DataSetModuleDataSetTest-dependencyWrongOrder.xml"), emptyVariables, getClass());
+        dataSetCleanInsert(this, "DataSetModuleDataSetTest-dependencyWrongOrder.xml");
     }
 
 }

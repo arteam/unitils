@@ -77,13 +77,13 @@ public class DatabaseGetPrimaryKeyColumnNamesTest extends UnitilsJUnit4 {
 
     @Test
     public void getPrimaryKeyColumnNames() throws Exception {
-        Set<String> result = database.getPrimaryKeyColumnNames("public.test");
+        Set<String> result = database.getPrimaryKeyColumnNames("PUBLIC.TEST");
         assertReflectionEquals(asList("COL1", "COL2"), result);
     }
 
     @Test
     public void noPrimaryKeys() throws Exception {
-        Set<String> result = database.getPrimaryKeyColumnNames("public.noPrimaryKeys");
+        Set<String> result = database.getPrimaryKeyColumnNames("PUBLIC.NOPRIMARYKEYS");
         assertTrue(result.isEmpty());
     }
 
@@ -95,14 +95,14 @@ public class DatabaseGetPrimaryKeyColumnNamesTest extends UnitilsJUnit4 {
 
     @Test
     public void primaryKeySetCached() throws Exception {
-        Set<String> result1 = database.getPrimaryKeyColumnNames("public.test");
-        Set<String> result2 = database.getPrimaryKeyColumnNames("public.test");
+        Set<String> result1 = database.getPrimaryKeyColumnNames("PUBLIC.TEST");
+        Set<String> result2 = database.getPrimaryKeyColumnNames("PUBLIC.TEST");
         assertSame(result1, result2);
     }
 
     @Test
     public void onlyCachedForIdenticalSchemaAndTableName() throws Exception {
-        Set<String> result1 = database.getPrimaryKeyColumnNames("public.test");
+        Set<String> result1 = database.getPrimaryKeyColumnNames("PUBLIC.TEST");
         Set<String> result2 = database.getPrimaryKeyColumnNames("\"PUBLIC\".\"TEST\"");
         assertNotSame(result1, result2);
     }

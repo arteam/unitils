@@ -15,6 +15,8 @@
  */
 package org.unitils.dataset.annotation;
 
+import org.unitils.dataset.DataSetModule;
+import org.unitils.dataset.core.LoadDataSetStrategy;
 import org.unitils.dataset.core.RefreshDataSetStrategy;
 import org.unitils.dataset.loader.impl.Database;
 
@@ -23,21 +25,23 @@ import java.util.Properties;
 
 import static java.util.Arrays.asList;
 
-public class DataSetRefreshAnnotationHandler implements DataSetAnnotationHandler {
+public class DataSetRefreshAnnotationHandler implements DataSetAnnotationHandler<DataSetRefresh> {
 
-    protected RefreshDataSetStrategy refreshDataSetStrategy;
+    protected LoadDataSetStrategy refreshDataSetStrategy = new RefreshDataSetStrategy();
+    protected DataSetModule dataSetModule;
 
-    public void init(Properties configuration, Database database) {
-        refreshDataSetStrategy = new RefreshDataSetStrategy();
+
+    public void init(Properties configuration, Database database, DataSetModule dataSetModule) {
         refreshDataSetStrategy.init(configuration, database);
+        this.dataSetModule = dataSetModule;
     }
 
-    public void handle(Object annotation, Class<?> testClass) {
-        DataSetRefresh dataSetRefresh = (DataSetRefresh) annotation;
-        List<String> fileNames = asList(dataSetRefresh.value());
-        List<String> variables = asList(dataSetRefresh.variables());
 
-        refreshDataSetStrategy.perform(fileNames, variables, testClass);
+    public void handle(DataSetRefresh annotation, Class<?> testClass) {
+        List<String> fileNames = asList(annotation.value());
+        List<String> variables = asList(annotation.variables());
+
+        dataSetModule.performLoadDataSetStrategy(refreshDataSetStrategy, fileNames, variables, testClass);
     }
 
 }

@@ -36,6 +36,9 @@ public class DateSqlTypeHandler implements SqlTypeHandler<Date> {
 
     public Date getResultSetValue(ResultSet resultSet, int columnIndex, int sqlType) throws Exception {
         Date date = resultSet.getTimestamp(columnIndex);
+        if (date == null) {
+            return null;
+        }
         return new Date(date.getTime());
     }
 }

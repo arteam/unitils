@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,12 +43,11 @@ public class XmlDataSetStaxReaderTest extends UnitilsJUnit4 {
     /* Tested object */
     private XmlDataSetRowSource xmlDataSetStaxReader;
 
+    private DataSetSettings defaultDataSetSettings;
 
     @Before
     public void setUp() throws Exception {
-        DataSetSettings defauDataSetSettings = new DataSetSettings('=', '$', false);
-        xmlDataSetStaxReader = new XmlDataSetRowSource();
-        xmlDataSetStaxReader.init("SCHEMA_A", defauDataSetSettings);
+        defaultDataSetSettings = new DataSetSettings('=', '$', false);
     }
 
     @After
@@ -59,7 +58,8 @@ public class XmlDataSetStaxReaderTest extends UnitilsJUnit4 {
 
     @Test
     public void readTwoRows() throws Exception {
-        xmlDataSetStaxReader.open(getDataSetFile("LessColumnsLastDataSet.xml"));
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("LessColumnsLastDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader.open();
 
         DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
         assertEquals("SCHEMA_A", row1.getSchemaName());
@@ -79,7 +79,8 @@ public class XmlDataSetStaxReaderTest extends UnitilsJUnit4 {
 
     @Test
     public void lessColumnsForLastRow() throws Exception {
-        xmlDataSetStaxReader.open(getDataSetFile("LessColumnsLastDataSet.xml"));
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("LessColumnsLastDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader.open();
 
         DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
         assertColumnNames(row1, "COLUMN_1", "COLUMN_2", "COLUMN_3");
@@ -92,7 +93,8 @@ public class XmlDataSetStaxReaderTest extends UnitilsJUnit4 {
 
     @Test
     public void lessColumnsForFirstRow() throws Exception {
-        xmlDataSetStaxReader.open(getDataSetFile("LessColumnsFirstDataSet.xml"));
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("LessColumnsFirstDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader.open();
 
         DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
         assertColumnNames(row1, "COLUMN_2");
@@ -105,7 +107,8 @@ public class XmlDataSetStaxReaderTest extends UnitilsJUnit4 {
 
     @Test
     public void parentChild() throws Exception {
-        xmlDataSetStaxReader.open(getDataSetFile("ParentChildDataSet.xml"));
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("ParentChildDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader.open();
 
         DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
         assertEquals("TABLE_A", row1.getTableName());
@@ -124,7 +127,8 @@ public class XmlDataSetStaxReaderTest extends UnitilsJUnit4 {
 
     @Test
     public void notExists() throws Exception {
-        xmlDataSetStaxReader.open(getDataSetFile("NotExistsDataSet.xml"));
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("NotExistsDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader.open();
 
         DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
         assertTrue(row1.isNotExists());
@@ -136,7 +140,8 @@ public class XmlDataSetStaxReaderTest extends UnitilsJUnit4 {
 
     @Test
     public void fullyQualifiedWithNamespacesAndXsdDeclarations() throws Exception {
-        xmlDataSetStaxReader.open(getDataSetFile("FullyQualifiedDataSet.xml"));
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("FullyQualifiedDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader.open();
 
         DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
         assertEquals("SCHEMA_A", row1.getSchemaName());

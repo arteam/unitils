@@ -40,12 +40,12 @@ public class XmlDataSetStaxReaderDataSetSettingsTest extends UnitilsJUnit4 {
     /* Tested object */
     private XmlDataSetRowSource xmlDataSetStaxReader;
 
+    private DataSetSettings defaultDataSetSettings;
+
 
     @Before
     public void initialize() throws Exception {
-        DataSetSettings defauDataSetSettings = new DataSetSettings('=', '$', false);
-        xmlDataSetStaxReader = new XmlDataSetRowSource();
-        xmlDataSetStaxReader.init("SCHEMA_A", defauDataSetSettings);
+        defaultDataSetSettings = new DataSetSettings('=', '$', false);
     }
 
     @After
@@ -56,7 +56,8 @@ public class XmlDataSetStaxReaderDataSetSettingsTest extends UnitilsJUnit4 {
 
     @Test
     public void defaultDataSetAttributes() throws Exception {
-        xmlDataSetStaxReader.open(getDataSetFile("LessColumnsLastDataSet.xml"));
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("LessColumnsLastDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader.open();
 
         DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
         DataSetSettings dataSetSettings1 = row1.getDataSetSettings();
@@ -71,7 +72,8 @@ public class XmlDataSetStaxReaderDataSetSettingsTest extends UnitilsJUnit4 {
 
     @Test
     public void dataSetSettingsReusedForEveryRow() throws Exception {
-        xmlDataSetStaxReader.open(getDataSetFile("LessColumnsLastDataSet.xml"));
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("LessColumnsLastDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader.open();
 
         DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
         DataSetSettings dataSetSettings1 = row1.getDataSetSettings();
@@ -83,7 +85,8 @@ public class XmlDataSetStaxReaderDataSetSettingsTest extends UnitilsJUnit4 {
 
     @Test
     public void overridingDataSetAttributes() throws Exception {
-        xmlDataSetStaxReader.open(getDataSetFile("OverridingAttributesDataSet.xml"));
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("OverridingAttributesDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader.open();
 
         DataSetRow row = xmlDataSetStaxReader.getNextDataSetRow();
         DataSetSettings dataSetSettings = row.getDataSetSettings();
@@ -94,19 +97,22 @@ public class XmlDataSetStaxReaderDataSetSettingsTest extends UnitilsJUnit4 {
 
     @Test(expected = UnitilsException.class)
     public void invalidCaseSensitiveValue() throws Exception {
-        xmlDataSetStaxReader.open(getDataSetFile("InvalidCaseSensitiveValueDataSet.xml"));
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("InvalidCaseSensitiveValueDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader.open();
         xmlDataSetStaxReader.getNextDataSetRow();
     }
 
     @Test(expected = UnitilsException.class)
     public void invalidLiteralTokenValue() throws Exception {
-        xmlDataSetStaxReader.open(getDataSetFile("InvalidLiteralTokenValueDataSet.xml"));
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("InvalidLiteralTokenValueDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader.open();
         xmlDataSetStaxReader.getNextDataSetRow();
     }
 
     @Test(expected = UnitilsException.class)
     public void invalidVariableTokenValue() throws Exception {
-        xmlDataSetStaxReader.open(getDataSetFile("InvalidVariableTokenValueDataSet.xml"));
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("InvalidVariableTokenValueDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader.open();
         xmlDataSetStaxReader.getNextDataSetRow();
     }
 

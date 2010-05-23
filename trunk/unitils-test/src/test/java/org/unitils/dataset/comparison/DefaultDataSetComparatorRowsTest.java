@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,19 +41,13 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
     /* Tested object */
     private DefaultDataSetComparator defaultDataSetComparator = new DefaultDataSetComparator();
 
-    private Mock<Database> database;
-    private Mock<DataSetRowProcessor> dataSetRowProcessor;
-    private Mock<TableContentRetriever> tableContentRetriever;
-    private Mock<TableContents> tableContents;
-    private Mock<DataSetRowSource> dataSetRowSource;
+    protected Mock<Database> database;
+    protected Mock<DataSetRowProcessor> dataSetRowProcessor;
+    protected Mock<TableContentRetriever> tableContentRetriever;
+    protected Mock<TableContents> tableContents;
+    protected Mock<DataSetRowSource> dataSetRowSource;
 
     protected List<String> emptyVariables = new ArrayList<String>();
-
-    protected DataSetRow dataSetRow1;
-    protected DataSetRow dataSetRow2;
-
-    protected DatabaseRow expectedDatabaseRow1;
-    protected DatabaseRow expectedDatabaseRow2;
 
     protected DatabaseRow actualDatabaseRow1;
     protected DatabaseRow actualDatabaseRow2;
@@ -63,7 +57,6 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
     public void initialize() throws Exception {
         defaultDataSetComparator.init(dataSetRowProcessor.getMock(), tableContentRetriever.getMock(), database.getMock());
 
-        RowComparison rowComparison = new RowComparison(null, null);
         tableContentRetriever.onceReturns(tableContents).getTableContents(null, null, null);
 
         actualDatabaseRow1 = new DatabaseRow("1", "schema.table");
@@ -80,32 +73,6 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
         actualDatabaseRow3.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column1", 31, INTEGER, null, false, true));
         actualDatabaseRow3.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column2", 32, INTEGER, null, false, true));
         actualDatabaseRow3.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column3", 33, INTEGER, null, false, true));
-    }
-
-    private DatabaseColumnWithValue createColumn(String name, Object value) {
-        return new DatabaseColumnWithValue(name, value, INTEGER, null, false, true);
-    }
-
-    private DatabaseRow createExpectedDatabaseRow(DatabaseColumnWithValue... databaseColumnWithValues) {
-        DatabaseRow expectedDatabaseRow = new DatabaseRow("schema.table");
-        for (DatabaseColumnWithValue databaseColumnWithValue : databaseColumnWithValues) {
-            expectedDatabaseRow.addDatabaseColumnWithValue(databaseColumnWithValue);
-        }
-        return expectedDatabaseRow;
-    }
-
-    private void setExpectedRow(DatabaseRow databaseRow) throws Exception {
-        dataSetRowSource.onceReturns(createDataSetRow()).getNextDataSetRow();
-        dataSetRowProcessor.onceReturns(databaseRow).process(null, emptyVariables, null);
-    }
-
-    private void setEmptyExpectedRow() throws Exception {
-        dataSetRowSource.onceReturns(createEmptyDataSetRow()).getNextDataSetRow();
-        dataSetRowProcessor.onceReturns(createExpectedDatabaseRow()).process(null, emptyVariables, null);
-    }
-
-    private void setActualRow(DatabaseRow databaseRow) throws Exception {
-        tableContents.onceReturns(databaseRow).getDatabaseRow();
     }
 
 
@@ -258,6 +225,33 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
 
         DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetRowSource.getMock(), emptyVariables);
         assertTrue(dataSetComparison.isMatch());
+    }
+
+
+    private DatabaseColumnWithValue createColumn(String name, Object value) {
+        return new DatabaseColumnWithValue(name, value, INTEGER, null, false, true);
+    }
+
+    private DatabaseRow createExpectedDatabaseRow(DatabaseColumnWithValue... databaseColumnWithValues) {
+        DatabaseRow expectedDatabaseRow = new DatabaseRow("schema.table");
+        for (DatabaseColumnWithValue databaseColumnWithValue : databaseColumnWithValues) {
+            expectedDatabaseRow.addDatabaseColumnWithValue(databaseColumnWithValue);
+        }
+        return expectedDatabaseRow;
+    }
+
+    private void setExpectedRow(DatabaseRow databaseRow) throws Exception {
+        dataSetRowSource.onceReturns(createDataSetRow()).getNextDataSetRow();
+        dataSetRowProcessor.onceReturns(databaseRow).process(null, emptyVariables, null);
+    }
+
+    private void setEmptyExpectedRow() throws Exception {
+        dataSetRowSource.onceReturns(createEmptyDataSetRow()).getNextDataSetRow();
+        dataSetRowProcessor.onceReturns(createExpectedDatabaseRow()).process(null, emptyVariables, null);
+    }
+
+    private void setActualRow(DatabaseRow databaseRow) throws Exception {
+        tableContents.onceReturns(databaseRow).getDatabaseRow();
     }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,11 @@
  */
 package org.unitils.dataset;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.core.InsertDataSetStrategy;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import static java.util.Arrays.asList;
 import static org.junit.Assert.assertFalse;
+import static org.unitils.dataset.DataSetUnitils.dataSetInsert;
 
 /**
  * Test class for loading of data sets using the insert data set strategy.
@@ -34,30 +27,18 @@ import static org.junit.Assert.assertFalse;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class InsertDataSetStrategyTest extends DataSetStrategyTestBase {
-
-    /* Tested object */
-    protected InsertDataSetStrategy insertDataSetStrategy = new InsertDataSetStrategy();
-
-    private List<String> emptyVariables = new ArrayList<String>();
-
-
-    @Before
-    public void initialize() throws Exception {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        insertDataSetStrategy.init(configuration, createDatabase(configuration));
-    }
+public class InsertDataSetStrategyTest extends DataSetTestBase {
 
 
     @Test
     public void insertDataSet() throws Exception {
-        insertDataSetStrategy.perform(asList("DataSetModuleDataSetTest-simple.xml"), emptyVariables, getClass());
+        dataSetInsert(this, "DataSetModuleDataSetTest-simple.xml");
         assertValueInTable("test", "col1", "xxxx");
     }
 
     @Test
     public void literalValues() throws Exception {
-        insertDataSetStrategy.perform(asList("DataSetModuleDataSetTest-literalValues.xml"), emptyVariables, getClass());
+        dataSetInsert(this, "DataSetModuleDataSetTest-literalValues.xml");
 
         assertValueInTable("test", "col1", "text");
         assertValueInTable("test", "col2", "2");
@@ -67,19 +48,19 @@ public class InsertDataSetStrategyTest extends DataSetStrategyTestBase {
 
     @Test
     public void caseSensitive() throws Exception {
-        insertDataSetStrategy.perform(asList("DataSetModuleDataSetTest-caseSensitive.xml"), emptyVariables, getClass());
+        dataSetInsert(this, "DataSetModuleDataSetTest-caseSensitive.xml");
         assertValueInTable("test", "col1", "xxxx");
     }
 
     @Test(expected = UnitilsException.class)
     public void caseSensitiveWrongCase() throws Exception {
-        insertDataSetStrategy.perform(asList("DataSetModuleDataSetTest-caseSensitiveWrongCase.xml"), emptyVariables, getClass());
+        dataSetInsert(this, "DataSetModuleDataSetTest-caseSensitiveWrongCase.xml");
         assertValueInTable("test", "col1", "xxxx");
     }
 
     @Test
     public void literalValuesOverriddenLiteralToken() throws Exception {
-        insertDataSetStrategy.perform(asList("DataSetModuleDataSetTest-literalValues-overriddenLiteralToken.xml"), emptyVariables, getClass());
+        dataSetInsert(this, "DataSetModuleDataSetTest-literalValues-overriddenLiteralToken.xml");
 
         assertValueInTable("test", "col1", "text");
         assertValueInTable("test", "col2", "2");
@@ -89,7 +70,7 @@ public class InsertDataSetStrategyTest extends DataSetStrategyTestBase {
 
     @Test
     public void variables() throws Exception {
-        insertDataSetStrategy.perform(asList("DataSetModuleDataSetTest-variables.xml"), asList("value1", "2", "now"), getClass());
+        dataSetInsert(this, "DataSetModuleDataSetTest-variables.xml", "value1", "2", "now");
 
         assertValueInTable("test", "col1", "test value1 2");
         assertValueInTable("test", "col2", "2");
@@ -98,7 +79,7 @@ public class InsertDataSetStrategyTest extends DataSetStrategyTestBase {
 
     @Test
     public void variablesOverriddenVariableToken() throws Exception {
-        insertDataSetStrategy.perform(asList("DataSetModuleDataSetTest-variables-overriddenVariableToken.xml"), asList("value1", "2", "now"), getClass());
+        dataSetInsert(this, "DataSetModuleDataSetTest-variables-overriddenVariableToken.xml", "value1", "2", "now");
 
         assertValueInTable("test", "col1", "test value1 2");
         assertValueInTable("test", "col2", "2");

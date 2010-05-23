@@ -15,13 +15,14 @@
  */
 package org.unitils.dataset.annotation;
 
+import org.unitils.dataset.DataSetModule;
 import org.unitils.dataset.loader.impl.Database;
 
 import java.util.Properties;
 
-public interface DataSetAnnotationHandler {
+public interface DataSetAnnotationHandler<T> {
 
-    public void init(Properties configuration, Database database);
+    void init(Properties configuration, Database database, DataSetModule dataSetModule);
 
-    public void handle(Object annotation, Class<?> testClass);
+    void handle(T annotation, Class<?> testClass);
 }

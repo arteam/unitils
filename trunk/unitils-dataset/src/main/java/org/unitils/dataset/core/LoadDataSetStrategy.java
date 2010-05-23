@@ -15,6 +15,7 @@
  */
 package org.unitils.dataset.core;
 
+import org.unitils.dataset.factory.DataSetRowSource;
 import org.unitils.dataset.loader.impl.Database;
 
 import java.util.List;
@@ -24,12 +25,10 @@ import java.util.Properties;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public interface DataSetStrategy {
+public interface LoadDataSetStrategy {
 
+    void init(Properties configuration, Database database);
 
-    public void init(Properties configuration, Database database);
-
-
-    public void perform(List<String> dataSetFileNames, List<String> variables, Class<?> testClass);
+    void perform(DataSetRowSource dataSetRowSource, List<String> variables);
 
 }

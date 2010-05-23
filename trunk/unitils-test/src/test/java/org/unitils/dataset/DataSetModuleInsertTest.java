@@ -15,16 +15,30 @@
  */
 package org.unitils.dataset;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.unitils.core.ConfigurationLoader;
 import org.unitils.dataset.annotation.DataSetInsert;
 
 import java.lang.reflect.Method;
+import java.util.Properties;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DataSetModuleInsertTest extends DataSetModuleDataSetTestBase {
+public class DataSetModuleInsertTest extends DataSetTestBase {
+
+    /* Tested object */
+    protected DataSetModule dataSetModule;
+
+    @Before
+    public void initialize() throws Exception {
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        dataSetModule = new DataSetModule();
+        dataSetModule.init(configuration);
+        dataSetModule.afterInit();
+    }
 
 
     @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,24 @@
  */
 package org.unitils.dataset.comparison.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.unitils.core.UnitilsException;
 import org.unitils.core.util.ObjectFormatter;
 import org.unitils.dataset.comparison.*;
+import org.unitils.dataset.core.BaseDataSetStrategy;
+import org.unitils.dataset.core.DataSetRowProcessor;
 import org.unitils.dataset.core.DatabaseRow;
-import org.unitils.dataset.factory.DataSetResolver;
 import org.unitils.dataset.factory.DataSetRowSource;
 import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.loader.impl.IdentifierNameProcessor;
+import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import java.util.List;
 import java.util.Properties;
 
 import static java.lang.Math.max;
 import static org.apache.commons.lang.StringUtils.rightPad;
-import static org.unitils.core.util.ConfigUtils.getConfiguredInstanceOf;
 
 /**
  * @author Tim Ducheyne
@@ -35,44 +40,55 @@ import static org.unitils.core.util.ConfigUtils.getConfiguredInstanceOf;
  */
 public class DefaultExpectedDataSetStrategy implements ExpectedDataSetStrategy {
 
-    /* Utility for creating string representations */
-    protected ObjectFormatter objectFormatter = new ObjectFormatter();
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(BaseDataSetStrategy.class);
 
-    protected DataSetResolver dataSetResolver;
     protected DataSetComparator dataSetComparator;
+    protected IdentifierNameProcessor identifierNameProcessor;
+    protected DataSetRowProcessor dataSetRowProcessor;
+
     protected DatabaseContentLogger databaseContentLogger;
+    protected TableContentRetriever tableContentRetriever;
+
+    protected ObjectFormatter objectFormatter = new ObjectFormatter();
 
 
     public void init(Properties configuration, Database database) {
-        this.dataSetResolver = createDataSetResolver(configuration);
-        this.dataSetComparator = createDataSetComparator();
-        this.databaseContentLogger = createDatabaseContentLogger();
+        this.identifierNameProcessor = createIdentifierNameProcessor(database);
+        this.dataSetRowProcessor = createDataSetRowProcessor(identifierNameProcessor, database);
+        this.tableContentRetriever = createTableContentRetriever(database);
+        this.dataSetComparator = createDataSetComparator(dataSetRowProcessor, tableContentRetriever, database);
+        this.databaseContentLogger = createDatabaseContentLogger(database, tableContentRetriever);
     }
 
     /**
      * Asserts that the given expected schema is equal to the actual schema.
      * Tables, rows or columns that are not specified in the expected schema will be ignored.
      * If an empty table is specified in the expected schema, it will check that the actual table is also be empty.
-     *
-     * @param expectedDataSetRowSource The expected data set, not null
-     * @param variables                Variables that will be replaced in the data set if needed, not null
-     * @throws AssertionError When the assertion fails.
      */
-    public void assertEqual(DataSetRowSource expectedDataSetRowSource, List<String> variables) throws AssertionError {
-        DataSetComparison dataSetComparison = dataSetComparator.compare(expectedDataSetRowSource, variables);
-        if (!dataSetComparison.isMatch()) {
-            String message = generateErrorMessage(dataSetComparison, dataSetComparator);
-            throw new AssertionError(message);
+    public void assertExpectedDataSet(DataSetRowSource dataSetRowSource, List<String> variables, boolean logDatabaseContentOnAssertionError) {
+        logger.info("Comparing data sets file: " + dataSetRowSource.getDataSetName());
+        try {
+            dataSetRowSource.open();
+            DataSetComparison dataSetComparison = dataSetComparator.compare(dataSetRowSource, variables);
+            if (!dataSetComparison.isMatch()) {
+                String message = generateErrorMessage(dataSetComparison, logDatabaseContentOnAssertionError);
+                throw new AssertionError(message);
+            }
+
+        } catch (Exception e) {
+            throw new UnitilsException("Unable to load data set file: " + dataSetRowSource.getDataSetName(), e);
+        } finally {
+            dataSetRowSource.close();
         }
     }
 
 
     /**
      * @param dataSetComparison The comparison result, not null
-     * @param dataSetComparator The comparator that can output the actual database content, not null
      * @return the assertion failed message for the given comparison result, not null
      */
-    protected String generateErrorMessage(DataSetComparison dataSetComparison, DataSetComparator dataSetComparator) {
+    protected String generateErrorMessage(DataSetComparison dataSetComparison, boolean logDatabaseContent) {
         StringBuilder result = new StringBuilder("Assertion failed. Differences found between the expected data set and actual database content.\n\n");
         for (TableComparison tableComparison : dataSetComparison.getTableComparisons()) {
             if (tableComparison.isExpectedNoMoreRecordsButFoundMore()) {
@@ -82,10 +98,11 @@ public class DefaultExpectedDataSetStrategy implements ExpectedDataSetStrategy {
             }
         }
 
-        if (databaseContentLogger != null) {
+        if (logDatabaseContent) {
             String databaseContent = databaseContentLogger.getDatabaseContentForComparison(dataSetComparison);
-            result.append("== Actual database content ==\n\n");
+            result.append("== Actual database content (matched rows indicated with ->) ==\n");
             result.append(databaseContent);
+            result.append('\n');
         }
         return result.toString();
     }
@@ -96,7 +113,7 @@ public class DefaultExpectedDataSetStrategy implements ExpectedDataSetStrategy {
         result.append(" but found more records.\n\n");
     }
 
-    protected void appendTableComparison(TableComparison tableComparison, StringBuilder result) {       
+    protected void appendTableComparison(TableComparison tableComparison, StringBuilder result) {
         for (DatabaseRow databaseRow : tableComparison.getMissingRows()) {
             appendMissingRow(databaseRow, result);
         }
@@ -155,17 +172,39 @@ public class DefaultExpectedDataSetStrategy implements ExpectedDataSetStrategy {
     }
 
 
-    protected DataSetResolver createDataSetResolver(Properties configuration) {
-        return getConfiguredInstanceOf(DataSetResolver.class, configuration);
+    protected DataSetComparator createDataSetComparator(DataSetRowProcessor dataSetRowProcessor, TableContentRetriever tableContentRetriever, Database database) {
+        DataSetComparator dataSetComparator = new DefaultDataSetComparator();
+        dataSetComparator.init(dataSetRowProcessor, tableContentRetriever, database);
+        return dataSetComparator;
     }
 
-
-    protected DataSetComparator createDataSetComparator() {
-        return new DefaultDataSetComparator();
+    protected DatabaseContentLogger createDatabaseContentLogger(Database database, TableContentRetriever tableContentRetriever) {
+        DatabaseContentLogger databaseContentLogger = new DefaultDatabaseContentLogger();
+        databaseContentLogger.init(database, tableContentRetriever);
+        return databaseContentLogger;
     }
 
-    protected DatabaseContentLogger createDatabaseContentLogger() {
-        return new DefaultDatabaseContentLogger();
+    protected TableContentRetriever createTableContentRetriever(Database database) {
+        SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
+        TableContentRetriever tableContentRetriever = new TableContentRetriever();
+        tableContentRetriever.init(database, sqlTypeHandlerRepository);
+        return tableContentRetriever;
+    }
+
+    protected IdentifierNameProcessor createIdentifierNameProcessor(Database database) {
+        // todo refactor initialization
+        IdentifierNameProcessor identifierNameProcessor = new IdentifierNameProcessor();
+        identifierNameProcessor.init(database);
+        return identifierNameProcessor;
+    }
+
+    protected DataSetRowProcessor createDataSetRowProcessor(IdentifierNameProcessor identifierNameProcessor, Database database) {
+        // todo refactor initialization
+        SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
+        // todo refactor initialization
+        DataSetRowProcessor dataSetRowProcessor = new DataSetRowProcessor();
+        dataSetRowProcessor.init(identifierNameProcessor, sqlTypeHandlerRepository, database);
+        return dataSetRowProcessor;
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,12 +39,11 @@ public class XmlDataSetStaxReaderMultiSchemaTest extends UnitilsJUnit4 {
     /* Tested object */
     private XmlDataSetRowSource xmlDataSetStaxReader;
 
+    private DataSetSettings defaultDataSetSettings;
 
     @Before
     public void setUp() throws Exception {
-        DataSetSettings defauDataSetSettings = new DataSetSettings('=', '$', false);
-        xmlDataSetStaxReader = new XmlDataSetRowSource();
-        xmlDataSetStaxReader.init("SCHEMA_A", defauDataSetSettings);
+        defaultDataSetSettings = new DataSetSettings('=', '$', false);
     }
 
     @After
@@ -55,7 +54,8 @@ public class XmlDataSetStaxReaderMultiSchemaTest extends UnitilsJUnit4 {
 
     @Test
     public void schemaDisDefaultDataSetInXml_overridesDefaultSchemaA() throws Exception {
-        xmlDataSetStaxReader.open(getDataSetFile("MultiSchemaDataSet.xml"));
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("MultiSchemaDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader.open();
 
         DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
         assertEquals("SCHEMA_D", row1.getSchemaName());
@@ -72,7 +72,8 @@ public class XmlDataSetStaxReaderMultiSchemaTest extends UnitilsJUnit4 {
 
     @Test
     public void noDefaultSchemaInDataSetXml_schemaAisDefault() throws Exception {
-        xmlDataSetStaxReader.open(getDataSetFile("MultiSchemaNoDefaultDataSet.xml"));
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("MultiSchemaNoDefaultDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader.open();
 
         DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
         assertEquals("SCHEMA_A", row1.getSchemaName());

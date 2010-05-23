@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.dataset.loader.impl.Database;
 import org.unitils.dataset.loader.impl.IdentifierNameProcessor;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
+import org.unitils.dataset.sqltypehandler.impl.TextSqlTypeHandler;
 import org.unitils.mock.Mock;
 
 import java.util.ArrayList;
@@ -42,9 +43,9 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
     /* Tested object */
     private DataSetRowProcessor dataSetRowProcessor = new DataSetRowProcessor();
 
-    private Mock<IdentifierNameProcessor> identifierNameProcessor;
-    private Mock<SqlTypeHandlerRepository> sqlTypeHandlerRepository;
-    private Mock<Database> database;
+    protected Mock<IdentifierNameProcessor> identifierNameProcessor;
+    protected Mock<SqlTypeHandlerRepository> sqlTypeHandlerRepository;
+    protected Mock<Database> database;
 
     private DataSetRow dataSetRow;
 
@@ -54,6 +55,8 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
+        sqlTypeHandlerRepository.returns(new TextSqlTypeHandler()).getSqlTypeHandler(0);
+
         dataSetRowProcessor.init(identifierNameProcessor.getMock(), sqlTypeHandlerRepository.getMock(), database.getMock());
 
         DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);

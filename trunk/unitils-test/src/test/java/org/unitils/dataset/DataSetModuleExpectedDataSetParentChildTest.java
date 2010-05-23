@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,39 +15,41 @@
  */
 package org.unitils.dataset;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.unitils.dataset.loader.impl.InsertDataSetLoader;
 
-import java.util.ArrayList;
-
-import static java.util.Arrays.asList;
 import static org.junit.Assert.fail;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import static org.unitils.dataset.DataSetUnitils.assertExpectedDataSet;
+import static org.unitils.dataset.DataSetUnitils.dataSetCleanInsert;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DataSetModuleExpectedDataSetParentChildTest extends DataSetModuleDataSetTestBase {
-
+public class DataSetModuleExpectedDataSetParentChildTest extends DataSetTestBase {
 
     @Test
     public void matchingDataSet() throws Exception {
-        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetParentChildTest.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
-        dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetParentChildTest.xml"), new ArrayList<String>(), getClass(), true);
+        dataSetCleanInsert(this, "DataSetModuleExpectedDataSetParentChildTest.xml");
+        assertExpectedDataSet(this, "DataSetModuleExpectedDataSetParentChildTest.xml");
     }
 
     @Test
     public void differentDataSet() throws Exception {
-        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetParentChildTest.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
         try {
-            dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetParentChildTest-different.xml"), new ArrayList<String>(), getClass(), true);
+            dataSetCleanInsert(this, "DataSetModuleExpectedDataSetParentChildTest.xml");
+            assertExpectedDataSet(this, "DataSetModuleExpectedDataSetParentChildTest-different.xml");
+
         } catch (AssertionError e) {
-            assertMessageContains("Found differences for table PUBLIC.PARENT", e);
-            assertMessageContains("Different database record found for data set row:  pk1=\"777\", pk2=\"888\", parentColumn=\"xxxx\"", e);
-            assertMessageContains("Found differences for table PUBLIC.CHILD", e);
-            assertMessageContains("Different database record found for data set row:  pk=\"3\", childColumn=\"child\", FK1=\"777\", FK2=\"888\"", e);
+            assertMessageContains("No match found for data set row:  PUBLIC.PARENT [PK1=777, PK2=888, PARENTCOLUMN=xxxx]", e);
+            assertMessageContains("Expected:  777  888  xxxx", e);
+            assertMessageContains("Actual:    1    2    parent", e);
+            assertMessageContains("No match found for data set row:  PUBLIC.CHILD [PK=3, CHILDCOLUMN=child, FK1=777, FK2=888]", e);
+            assertMessageContains("Expected:  777  888", e);
+            assertMessageContains("Actual:    1    2", e);
             assertMessageContains("Actual database content", e);
             return;
         }
@@ -56,13 +58,14 @@ public class DataSetModuleExpectedDataSetParentChildTest extends DataSetModuleDa
 
 
     @Override
-    protected void createTestTables() {
+    @Before
+    public void createTestTables() {
         executeUpdate("create table parent (pk1 integer not null, pk2 integer not null, parentColumn varchar(100), primary key (pk1, pk2))", dataSource);
         executeUpdate("create table child (pk integer not null primary key, childColumn varchar(100), fk1 integer, fk2 integer, foreign key (fk1, fk2) references parent(pk1, pk2))", dataSource);
     }
 
-    @Override
-    protected void dropTestTable() {
+    @After
+    public void dropTestTables() {
         executeUpdateQuietly("drop table child", dataSource);
         executeUpdateQuietly("drop table parent", dataSource);
     }

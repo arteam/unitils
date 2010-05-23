@@ -102,7 +102,12 @@ public class DataSetRowProcessor {
         int sqlType = database.getColumnSqlType(qualifiedTableName, columnName);
         SqlTypeHandler sqlTypeHandler = sqlTypeHandlerRepository.getSqlTypeHandler(sqlType);
 
-        Object correctTypeValue = sqlTypeHandler.getValue(valueWithVariablesFilledIn, sqlType);
+        Object correctTypeValue;
+        if (isLiteralValue) {
+            correctTypeValue = valueWithVariablesFilledIn;
+        } else {
+            correctTypeValue = sqlTypeHandler.getValue(valueWithVariablesFilledIn, sqlType);
+        }
 
         return new DatabaseColumnWithValue(columnName, correctTypeValue, sqlType, sqlTypeHandler, isLiteralValue, primaryKey);
     }
