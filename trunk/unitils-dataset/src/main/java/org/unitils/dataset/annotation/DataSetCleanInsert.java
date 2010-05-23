@@ -15,6 +15,8 @@
  */
 package org.unitils.dataset.annotation;
 
+import org.unitils.dataset.annotation.handler.impl.DataSetCleanInsertAnnotationHandler;
+
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

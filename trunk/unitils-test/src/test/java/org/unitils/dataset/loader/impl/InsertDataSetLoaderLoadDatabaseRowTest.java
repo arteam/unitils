@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,9 +53,9 @@ public class InsertDataSetLoaderLoadDatabaseRowTest extends UnitilsJUnit4 {
         insertDataSetLoader.init(dataSetRowProcessor.getMock(), databaseAccessor.getMock());
 
         databaseRow = new DatabaseRow("my_schema.table_a");
-        databaseColumnPk = new DatabaseColumnWithValue("column_1", "1", VARCHAR, null, false, true);
-        databaseColumn = new DatabaseColumnWithValue("column_2", "2", VARCHAR, null, false, false);
-        databaseColumnLiteral = new DatabaseColumnWithValue("column_3", "literal", VARCHAR, null, true, false);
+        databaseColumnPk = new DatabaseColumnWithValue("column_1", "1", VARCHAR, false, true);
+        databaseColumn = new DatabaseColumnWithValue("column_2", "2", VARCHAR, false, false);
+        databaseColumnLiteral = new DatabaseColumnWithValue("column_3", "literal", VARCHAR, true, false);
     }
 
 

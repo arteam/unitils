@@ -20,13 +20,12 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.dataset.core.*;
 import org.unitils.dataset.factory.DataSetRowSource;
-import org.unitils.dataset.sqltypehandler.impl.TextSqlTypeHandler;
 import org.unitils.mock.Mock;
 
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.sql.Types.VARCHAR;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -125,7 +124,7 @@ public class BaseDataSetLoaderTest extends UnitilsJUnit4 {
 
     private DatabaseRow createDatabaseRow() {
         DatabaseRow databaseRow = new DatabaseRow("schema.table");
-        databaseRow.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column", "value", Types.VARCHAR, new TextSqlTypeHandler(), false, false));
+        databaseRow.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column", "value", VARCHAR, false, false));
         return databaseRow;
     }
 

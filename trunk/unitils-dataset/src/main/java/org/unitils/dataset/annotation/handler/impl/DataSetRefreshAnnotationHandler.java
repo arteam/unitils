@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.annotation;
+package org.unitils.dataset.annotation.handler.impl;
 
 import org.unitils.dataset.DataSetModule;
-import org.unitils.dataset.core.CleanInsertDataSetStrategy;
+import org.unitils.dataset.annotation.DataSetRefresh;
+import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
+import org.unitils.dataset.core.LoadDataSetStrategy;
+import org.unitils.dataset.core.RefreshDataSetStrategy;
 import org.unitils.dataset.loader.impl.Database;
 
 import java.util.List;
@@ -24,23 +27,23 @@ import java.util.Properties;
 
 import static java.util.Arrays.asList;
 
-public class DataSetCleanInsertAnnotationHandler implements DataSetAnnotationHandler<DataSetCleanInsert> {
+public class DataSetRefreshAnnotationHandler implements DataSetAnnotationHandler<DataSetRefresh> {
 
-    protected CleanInsertDataSetStrategy cleanInsertDataSetStrategy = new CleanInsertDataSetStrategy();
+    protected LoadDataSetStrategy refreshDataSetStrategy = new RefreshDataSetStrategy();
     protected DataSetModule dataSetModule;
 
 
     public void init(Properties configuration, Database database, DataSetModule dataSetModule) {
-        cleanInsertDataSetStrategy.init(configuration, database);
+        refreshDataSetStrategy.init(configuration, database);
         this.dataSetModule = dataSetModule;
     }
 
 
-    public void handle(DataSetCleanInsert annotation, Class<?> testClass) {
+    public void handle(DataSetRefresh annotation, Class<?> testClass) {
         List<String> fileNames = asList(annotation.value());
         List<String> variables = asList(annotation.variables());
 
-        dataSetModule.performLoadDataSetStrategy(cleanInsertDataSetStrategy, fileNames, variables, testClass);
+        dataSetModule.performLoadDataSetStrategy(refreshDataSetStrategy, fileNames, variables, testClass);
     }
 
 }

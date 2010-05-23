@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,11 +52,11 @@ public class UpdateRowLoaderLoadDatabaseRowTest extends UnitilsJUnit4 {
         updateDataSetLoader.init(null, databaseAccessor.getMock());
 
         databaseRow = new DatabaseRow("my_schema.table_a");
-        databaseColumnPk1 = new DatabaseColumnWithValue("pk1", "1", VARCHAR, null, false, true);
-        databaseColumnPk2 = new DatabaseColumnWithValue("pk2", "2", VARCHAR, null, false, true);
-        databaseColumnPkLiteral = new DatabaseColumnWithValue("pk3", "pk-literal", VARCHAR, null, true, true);
-        databaseColumn = new DatabaseColumnWithValue("column_1", "3", VARCHAR, null, false, false);
-        databaseColumnLiteral = new DatabaseColumnWithValue("column_2", "literal", VARCHAR, null, true, false);
+        databaseColumnPk1 = new DatabaseColumnWithValue("pk1", "1", VARCHAR, false, true);
+        databaseColumnPk2 = new DatabaseColumnWithValue("pk2", "2", VARCHAR, false, true);
+        databaseColumnPkLiteral = new DatabaseColumnWithValue("pk3", "pk-literal", VARCHAR, true, true);
+        databaseColumn = new DatabaseColumnWithValue("column_1", "3", VARCHAR, false, false);
+        databaseColumnLiteral = new DatabaseColumnWithValue("column_2", "literal", VARCHAR, true, false);
     }
 
 

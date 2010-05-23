@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,10 +118,10 @@ public class RowComparisonIsBetterMatchTest extends UnitilsJUnit4 {
 
     private DatabaseRow createRow(Object pk1, Object pk2, Object value1, Object value2) {
         DatabaseRow row = new DatabaseRow("schema.table");
-        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("pk1", pk1, VARCHAR, null, false, true));
-        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("pk2", pk2, VARCHAR, null, false, true));
-        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column1", value1, VARCHAR, null, false, false));
-        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column2", value2, VARCHAR, null, false, false));
+        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("pk1", pk1, VARCHAR, false, true));
+        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("pk2", pk2, VARCHAR, false, true));
+        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column1", value1, VARCHAR, false, false));
+        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column2", value2, VARCHAR, false, false));
         return row;
     }
 

@@ -109,7 +109,7 @@ public class DataSetRowProcessor {
             correctTypeValue = sqlTypeHandler.getValue(valueWithVariablesFilledIn, sqlType);
         }
 
-        return new DatabaseColumnWithValue(columnName, correctTypeValue, sqlType, sqlTypeHandler, isLiteralValue, primaryKey);
+        return new DatabaseColumnWithValue(columnName, correctTypeValue, sqlType, isLiteralValue, primaryKey);
     }
 
 

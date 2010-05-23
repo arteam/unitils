@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.annotation;
+package org.unitils.dataset.annotation.handler.impl;
 
 import org.unitils.dataset.DataSetModule;
-import org.unitils.dataset.core.InsertDataSetStrategy;
+import org.unitils.dataset.annotation.DataSetCleanInsert;
+import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
+import org.unitils.dataset.core.CleanInsertDataSetStrategy;
 import org.unitils.dataset.loader.impl.Database;
 
 import java.util.List;
@@ -24,22 +26,23 @@ import java.util.Properties;
 
 import static java.util.Arrays.asList;
 
-public class DataSetInsertAnnotationHandler implements DataSetAnnotationHandler<DataSetInsert> {
+public class DataSetCleanInsertAnnotationHandler implements DataSetAnnotationHandler<DataSetCleanInsert> {
 
-    protected InsertDataSetStrategy insertDataSetStrategy = new InsertDataSetStrategy();
+    protected CleanInsertDataSetStrategy cleanInsertDataSetStrategy = new CleanInsertDataSetStrategy();
     protected DataSetModule dataSetModule;
 
 
     public void init(Properties configuration, Database database, DataSetModule dataSetModule) {
-        insertDataSetStrategy.init(configuration, database);
+        cleanInsertDataSetStrategy.init(configuration, database);
         this.dataSetModule = dataSetModule;
     }
 
 
-    public void handle(DataSetInsert annotation, Class<?> testClass) {
+    public void handle(DataSetCleanInsert annotation, Class<?> testClass) {
         List<String> fileNames = asList(annotation.value());
         List<String> variables = asList(annotation.variables());
 
-        dataSetModule.performLoadDataSetStrategy(insertDataSetStrategy, fileNames, variables, testClass);
+        dataSetModule.performLoadDataSetStrategy(cleanInsertDataSetStrategy, fileNames, variables, testClass);
     }
+
 }

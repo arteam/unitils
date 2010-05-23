@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package org.unitils.dataset.annotation;
+
+import org.unitils.dataset.annotation.handler.impl.ExpectedDataSetAnnotationHandler;
 
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;

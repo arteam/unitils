@@ -105,11 +105,11 @@ public class TableContents {
             String columnName = databaseColumn.getColumnName();
             boolean primaryKey = databaseColumn.isPrimaryKey();
             int sqlType = databaseColumn.getSqlType();
-            SqlTypeHandler<?> sqlTypeHandler = databaseColumn.getSqlTypeHandler();
+            SqlTypeHandler<?> sqlTypeHandler = sqlTypeHandlerRepository.getSqlTypeHandler(sqlType);
 
             Object value = sqlTypeHandler.getResultSetValue(resultSet, i + 1, sqlType);
 
-            DatabaseColumnWithValue databaseColumnWithValue = new DatabaseColumnWithValue(columnName, value, sqlType, sqlTypeHandler, false, primaryKey);
+            DatabaseColumnWithValue databaseColumnWithValue = new DatabaseColumnWithValue(columnName, value, sqlType, false, primaryKey);
             databaseRow.addDatabaseColumnWithValue(databaseColumnWithValue);
         }
         return databaseRow;

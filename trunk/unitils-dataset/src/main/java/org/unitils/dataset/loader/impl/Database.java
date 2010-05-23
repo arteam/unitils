@@ -1,5 +1,5 @@
 /*
- * Copyright 2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.dataset.core.DataSetColumn;
 import org.unitils.dataset.core.DataSetRow;
 import org.unitils.dataset.core.DatabaseColumn;
-import org.unitils.dataset.sqltypehandler.SqlTypeHandler;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import java.sql.Connection;
@@ -122,10 +121,9 @@ public class Database {
             while (resultSet.next()) {
                 String columnName = resultSet.getString("COLUMN_NAME");
                 int sqlType = resultSet.getInt("DATA_TYPE");
-                SqlTypeHandler<?> sqlTypeHandler = sqlTypeHandlerRepository.getSqlTypeHandler(sqlType);
                 boolean primaryKey = primaryKeyColumnNames.contains(columnName);
 
-                DatabaseColumn databaseColumn = new DatabaseColumn(columnName, sqlType, sqlTypeHandler, primaryKey);
+                DatabaseColumn databaseColumn = new DatabaseColumn(columnName, sqlType, primaryKey);
                 databaseColumns.add(databaseColumn);
             }
             return databaseColumns;

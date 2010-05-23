@@ -15,8 +15,6 @@
  */
 package org.unitils.dataset.core;
 
-import org.unitils.dataset.sqltypehandler.SqlTypeHandler;
-
 /**
  * A value of a data set column for which all variables and literal tokens were processed.
  *
@@ -38,8 +36,8 @@ public class DatabaseColumnWithValue extends DatabaseColumn {
      * @param literalValue True if this value is a literal value
      * @param primaryKey   True if the column is a primary key column
      */
-    public DatabaseColumnWithValue(String columnName, Object value, int sqlType, SqlTypeHandler sqlTypeHandler, boolean literalValue, boolean primaryKey) {
-        super(columnName, sqlType, sqlTypeHandler, primaryKey);
+    public DatabaseColumnWithValue(String columnName, Object value, int sqlType, boolean literalValue, boolean primaryKey) {
+        super(columnName, sqlType, primaryKey);
         this.value = value;
         this.literalValue = literalValue;
     }
