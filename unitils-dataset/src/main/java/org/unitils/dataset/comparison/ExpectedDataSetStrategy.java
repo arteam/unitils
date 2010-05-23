@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,23 +27,18 @@ import java.util.Properties;
  */
 public interface ExpectedDataSetStrategy {
 
-    /**
-     * Initializes the data set assert.
-     *
-     * @param dataSetComparator     The comparator that will create the data set comparison, not null
-     * @param databaseContentLogger The logger for displaying the database content, null if the content should not be logged
-     */
-    public void init(Properties configuration, Database database);
+
+    void init(Properties configuration, Database database);
 
     /**
      * Asserts that the given expected schema is equal to the actual schema.
      * Tables, rows or columns that are not specified in the expected schema will be ignored.
      * If an empty table is specified in the expected schema, it will check that the actual table is also be empty.
      *
-     * @param expectedDataSetRowSource The expected data set, not null
-     * @param variables                Variables that will be replaced in the data set if needed, not null
+     * @param dataSetRowSource The expected data set, not null
+     * @param variables        Variables that will be replaced in the data set if needed, not null
      * @throws AssertionError When the assertion fails.
      */
-    public void assertEqual(DataSetRowSource expectedDataSetRowSource, List<String> variables) throws AssertionError;
+    void assertExpectedDataSet(DataSetRowSource dataSetRowSource, List<String> variables, boolean logDatabaseContentOnAssertionError) throws AssertionError;
 
 }

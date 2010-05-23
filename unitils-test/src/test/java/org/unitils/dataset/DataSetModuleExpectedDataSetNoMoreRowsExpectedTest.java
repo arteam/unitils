@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,35 +15,52 @@
  */
 package org.unitils.dataset;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.unitils.dataset.loader.impl.InsertDataSetLoader;
+import org.unitils.core.ConfigurationLoader;
+import org.unitils.dataset.comparison.ExpectedDataSetStrategy;
+import org.unitils.dataset.comparison.impl.DefaultExpectedDataSetStrategy;
 
-import java.util.ArrayList;
+import java.util.Properties;
 
-import static java.util.Arrays.asList;
 import static org.junit.Assert.fail;
+import static org.unitils.dataset.DataSetUnitils.assertExpectedDataSet;
+import static org.unitils.dataset.DataSetUnitils.dataSetCleanInsert;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DataSetModuleExpectedDataSetNoMoreRowsExpectedTest extends DataSetModuleDataSetTestBase {
+public class DataSetModuleExpectedDataSetNoMoreRowsExpectedTest extends DataSetTestBase {
+
+    /* Tested object */
+    protected ExpectedDataSetStrategy expectedDataSetStrategy;
+
+    @Before
+    public void initialize() throws Exception {
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        expectedDataSetStrategy = new DefaultExpectedDataSetStrategy();
+        expectedDataSetStrategy.init(configuration, createDatabase(configuration));
+    }
 
 
     @Test
     public void noMoreRowsFound() throws Exception {
-        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
-        dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-noMoreRows.xml"), new ArrayList<String>(), getClass(), true);
+        dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-simple.xml");
+        assertExpectedDataSet(this, "DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-noMoreRows.xml");
     }
 
     @Test
     public void moreRowsFound() throws Exception {
         try {
-            dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
-            dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-moreRowsFound.xml"), new ArrayList<String>(), getClass(), true);
+            dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-3rows.xml");
+            assertExpectedDataSet(this, "DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-moreRowsFound.xml");
+
         } catch (AssertionError e) {
             assertMessageContains("Expected no more database records in table PUBLIC.TEST but found more records.", e);
             assertMessageContains("Actual database content", e);
+            assertMessageContains("   value1  1", e);
+            assertMessageContains("-> value2  2", e);
             return;
         }
         fail("Expected an AssertionError"); //fail also raises assertion errors
@@ -52,11 +69,14 @@ public class DataSetModuleExpectedDataSetNoMoreRowsExpectedTest extends DataSetM
     @Test
     public void rowWithColumnsAfterEmptyRow() throws Exception {
         try {
-            dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
-            dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-rowWithColumnsAfterEmptyRow.xml"), new ArrayList<String>(), getClass(), true);
+            dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-3rows.xml");
+            assertExpectedDataSet(this, "DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-rowWithColumnsAfterEmptyRow.xml");
+
         } catch (AssertionError e) {
-            assertMessageContains("Found differences for table PUBLIC.TEST", e);
+            assertMessageContains("Expected no more database records in table PUBLIC.TEST but found more records.", e);
             assertMessageContains("Actual database content", e);
+            assertMessageContains("-> value1  1", e);
+            assertMessageContains("-> value2  2", e);
             return;
         }
         fail("Expected an AssertionError"); //fail also raises assertion errors
@@ -64,8 +84,8 @@ public class DataSetModuleExpectedDataSetNoMoreRowsExpectedTest extends DataSetM
 
     @Test
     public void twoEmptyRows() throws Exception {
-        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
-        dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-twoEmptyRows.xml"), new ArrayList<String>(), getClass(), true);
+        dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-simple.xml");
+        assertExpectedDataSet(this, "DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-twoEmptyRows.xml");
     }
 
 }

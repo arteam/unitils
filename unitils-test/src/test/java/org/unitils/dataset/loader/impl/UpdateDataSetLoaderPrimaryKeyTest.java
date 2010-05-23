@@ -113,7 +113,8 @@ public class UpdateDataSetLoaderPrimaryKeyTest extends UnitilsJUnit4 {
 
 
     private DataSetRow createDataSetRow() {
-        DataSetRow dataSetRow = new DataSetRow("schema", "table", null, false, null);
+        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
+        DataSetRow dataSetRow = new DataSetRow("schema", "table", null, false, dataSetSettings);
         dataSetRow.addDataSetColumn(new DataSetColumn("column", "value"));
         return dataSetRow;
     }

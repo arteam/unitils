@@ -1,5 +1,5 @@
 /*
- * Copyright 2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,13 +39,14 @@ public class TableContentRetriever {
     protected SqlTypeHandlerRepository sqlTypeHandlerRepository;
 
 
-    public void init(Database database, SqlTypeHandlerRepository sqlTypeHandlerRepository) throws SQLException {
+    public void init(Database database, SqlTypeHandlerRepository sqlTypeHandlerRepository) {
         this.database = database;
         this.sqlTypeHandlerRepository = sqlTypeHandlerRepository;
     }
 
 
     // todo remove primary key column names  (implicit in database columns)
+
     public TableContents getTableContents(String qualifiedTableName, List<DatabaseColumn> databaseColumns, Set<String> primaryKeyColumnNames) throws SQLException {
         String sql = createStatement(qualifiedTableName, databaseColumns, primaryKeyColumnNames);
 
@@ -66,12 +67,11 @@ public class TableContentRetriever {
 
     protected String createStatement(String qualifiedTableName, List<DatabaseColumn> databaseColumns, Set<String> primaryKeyColumnNames) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("select * from ");
+        stringBuilder.append("select ");
         for (DatabaseColumn databaseColumn : databaseColumns) {
             stringBuilder.append(databaseColumn.getColumnName());
             stringBuilder.append(", ");
         }
-        stringBuilder.setLength(stringBuilder.length() - 2);
         for (String primaryKeyColumnName : primaryKeyColumnNames) {
             stringBuilder.append(primaryKeyColumnName);
             stringBuilder.append(", ");

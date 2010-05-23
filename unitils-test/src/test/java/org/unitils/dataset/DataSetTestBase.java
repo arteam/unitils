@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,12 @@ package org.unitils.dataset;
 import org.junit.After;
 import org.junit.Before;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.DbSupportFactory;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -30,34 +34,35 @@ import static org.junit.Assert.assertTrue;
 import static org.unitils.database.SQLUnitils.*;
 
 /**
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public abstract class DataSetModuleDataSetTestBase extends UnitilsJUnit4 {
-
-    /* Tested object */
-    protected DataSetModule dataSetModule;
+public abstract class DataSetTestBase extends UnitilsJUnit4 {
 
     @TestDataSource
     protected DataSource dataSource;
 
 
     @Before
-    public void setUp() throws Exception {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        dataSetModule = new DataSetModule();
-        dataSetModule.init(configuration);
-
-        dropTestTable();
-        createTestTables();
+    public void createTestTables() {
+        dropTestTables();
+        executeUpdate("create table test (col1 varchar(100) not null primary key, col2 integer, col3 timestamp, col4 varchar(100))", dataSource);
+        executeUpdate("create table dependent (col1 varchar(100), foreign key (col1) references test(col1))", dataSource);
     }
 
     @After
-    public void tearDown() throws Exception {
-        dropTestTable();
+    public void dropTestTables() {
+        executeUpdateQuietly("drop table dependent", dataSource);
+        executeUpdateQuietly("drop table test", dataSource);
     }
 
+
+    protected Database createDatabase(Properties configuration) {
+        DbSupport defaultDbSupport = DbSupportFactory.getDefaultDbSupport(configuration, new DefaultSQLHandler(dataSource));
+        Database database = new Database();
+        database.init(defaultDbSupport, new SqlTypeHandlerRepository());
+        return database;
+    }
 
     protected void assertValueInTable(String tableName, String columnName, String expectedValue) {
         Set<String> values = getValues(columnName, tableName);
@@ -67,16 +72,6 @@ public abstract class DataSetModuleDataSetTestBase extends UnitilsJUnit4 {
     protected void assertValueNotInTable(String tableName, String columnName, String notExpectedValue) throws Exception {
         Set<String> values = getValues(columnName, tableName);
         assertFalse("Value " + notExpectedValue + " not expected in table " + tableName + ", but found ", values.contains(notExpectedValue));
-    }
-
-    protected void assertMessageContains(String text, AssertionError e) {
-        String message = e.getMessage();
-        assertTrue("Message of assertion error did not contain " + text + ". Message: " + message, message.contains(text));
-    }
-
-    protected void assertMessageNotContains(String text, AssertionError e) {
-        String message = e.getMessage();
-        assertFalse("Message of assertion error contained " + text + ". Message: " + message, message.contains(text));
     }
 
     protected Set<String> getValues(String columnName, String table) {
@@ -91,15 +86,15 @@ public abstract class DataSetModuleDataSetTestBase extends UnitilsJUnit4 {
         executeUpdate("insert into dependent (col1) values ('" + value + "')", dataSource);
     }
 
-
-    protected void createTestTables() {
-        executeUpdate("create table test (col1 varchar(100) not null primary key, col2 integer, col3 timestamp, col4 varchar(100))", dataSource);
-        executeUpdate("create table dependent (col1 varchar(100), foreign key (col1) references test(col1))", dataSource);
+    protected void assertMessageContains(String part, Throwable e) {
+        String message = e.getMessage();
+        assertTrue("Exception message did not contain " + part + ".\nMessage: " + message, message.contains(part));
     }
 
-    protected void dropTestTable() {
-        executeUpdateQuietly("drop table dependent", dataSource);
-        executeUpdateQuietly("drop table test", dataSource);
+    protected void assertMessageNotContains(String part, Throwable e) {
+        String message = e.getMessage();
+        assertFalse("Exception message should not have contained " + part + ".\nMessage: " + message, message.contains(part));
     }
+
 
 }

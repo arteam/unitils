@@ -75,9 +75,9 @@ public class DatabaseGetColumnSqlTypeTest extends UnitilsJUnit4 {
 
     @Test
     public void getPrimaryKeyColumnNames() throws Exception {
-        int col1Type = database.getColumnSqlType("public.test", "col1");
-        int col2Type = database.getColumnSqlType("public.test", "col2");
-        int col3Type = database.getColumnSqlType("public.test", "col3");
+        int col1Type = database.getColumnSqlType("PUBLIC.TEST", "COL1");
+        int col2Type = database.getColumnSqlType("PUBLIC.TEST", "COL2");
+        int col3Type = database.getColumnSqlType("PUBLIC.TEST", "COL3");
 
         assertEquals(VARCHAR, col1Type);
         assertEquals(INTEGER, col2Type);
@@ -97,14 +97,14 @@ public class DatabaseGetColumnSqlTypeTest extends UnitilsJUnit4 {
 
     @Test
     public void primaryKeySetCached() throws Exception {
-        Map<String, Integer> columnSqlTypes1 = database.getColumnSqlTypes("public.test");
-        Map<String, Integer> columnSqlTypes2 = database.getColumnSqlTypes("public.test");
+        Map<String, Integer> columnSqlTypes1 = database.getColumnSqlTypes("PUBLIC.TEST");
+        Map<String, Integer> columnSqlTypes2 = database.getColumnSqlTypes("PUBLIC.TEST");
         assertSame(columnSqlTypes1, columnSqlTypes2);
     }
 
     @Test
     public void onlyCachedForIdenticalSchemaAndTableName() throws Exception {
-        Map<String, Integer> columnSqlTypes1 = database.getColumnSqlTypes("public.test");
+        Map<String, Integer> columnSqlTypes1 = database.getColumnSqlTypes("PUBLIC.TEST");
         Map<String, Integer> columnSqlTypes2 = database.getColumnSqlTypes("public.\"TEST\"");
         assertNotSame(columnSqlTypes1, columnSqlTypes2);
     }

@@ -15,6 +15,7 @@
  */
 package org.unitils.dataset.annotation;
 
+import org.unitils.dataset.DataSetModule;
 import org.unitils.dataset.core.InsertDataSetStrategy;
 import org.unitils.dataset.loader.impl.Database;
 
@@ -23,21 +24,22 @@ import java.util.Properties;
 
 import static java.util.Arrays.asList;
 
-public class DataSetInsertAnnotationHandler implements DataSetAnnotationHandler {
+public class DataSetInsertAnnotationHandler implements DataSetAnnotationHandler<DataSetInsert> {
 
-    protected InsertDataSetStrategy insertDataSetStrategy;
+    protected InsertDataSetStrategy insertDataSetStrategy = new InsertDataSetStrategy();
+    protected DataSetModule dataSetModule;
 
-    public void init(Properties configuration, Database database) {
-        insertDataSetStrategy = new InsertDataSetStrategy();
+
+    public void init(Properties configuration, Database database, DataSetModule dataSetModule) {
         insertDataSetStrategy.init(configuration, database);
+        this.dataSetModule = dataSetModule;
     }
 
-    public void handle(Object annotation, Class<?> testClass) {
-        DataSetInsert dataSetInsert = (DataSetInsert) annotation;
-        List<String> fileNames = asList(dataSetInsert.value());
-        List<String> variables = asList(dataSetInsert.variables());
 
-        insertDataSetStrategy.perform(fileNames, variables, testClass);
+    public void handle(DataSetInsert annotation, Class<?> testClass) {
+        List<String> fileNames = asList(annotation.value());
+        List<String> variables = asList(annotation.variables());
+
+        dataSetModule.performLoadDataSetStrategy(insertDataSetStrategy, fileNames, variables, testClass);
     }
-
 }

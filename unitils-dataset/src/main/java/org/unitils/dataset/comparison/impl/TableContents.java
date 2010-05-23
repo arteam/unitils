@@ -124,7 +124,7 @@ public class TableContents {
     }
 
     public int getNrOfColumns() throws SQLException {
-        return resultSet.getMetaData().getColumnCount();
+        return databaseColumns.size();
     }
 
     public List<String> getColumnNames() throws SQLException {

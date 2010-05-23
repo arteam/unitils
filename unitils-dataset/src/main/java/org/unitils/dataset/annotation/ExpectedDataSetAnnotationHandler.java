@@ -15,6 +15,7 @@
  */
 package org.unitils.dataset.annotation;
 
+import org.unitils.dataset.DataSetModule;
 import org.unitils.dataset.comparison.ExpectedDataSetStrategy;
 import org.unitils.dataset.comparison.impl.DefaultExpectedDataSetStrategy;
 import org.unitils.dataset.loader.impl.Database;
@@ -24,22 +25,24 @@ import java.util.Properties;
 
 import static java.util.Arrays.asList;
 
-public class ExpectedDataSetAnnotationHandler implements DataSetAnnotationHandler {
+public class ExpectedDataSetAnnotationHandler implements DataSetAnnotationHandler<ExpectedDataSet> {
 
-    protected ExpectedDataSetStrategy expectedDataSetStrategy;
+    protected ExpectedDataSetStrategy expectedDataSetStrategy = new DefaultExpectedDataSetStrategy();
+    protected DataSetModule dataSetModule;
 
-    public void init(Properties configuration, Database database) {
-        expectedDataSetStrategy = new DefaultExpectedDataSetStrategy();
+
+    public void init(Properties configuration, Database database, DataSetModule dataSetModule) {
         expectedDataSetStrategy.init(configuration, database);
+        this.dataSetModule = dataSetModule;
     }
 
-    public void handle(Object annotation, Class<?> testClass) {
-        ExpectedDataSet expectedDataSet = (ExpectedDataSet) annotation;
-        List<String> fileNames = asList(expectedDataSet.value());
-        List<String> variables = asList(expectedDataSet.variables());
-        boolean logDatabaseContentOnAssertionError = expectedDataSet.logDatabaseContentOnAssertionError();
 
-        insertDataSetStrategy.perform(fileNames, variables, testClass);
+    public void handle(ExpectedDataSet annotation, Class<?> testClass) {
+        List<String> fileNames = asList(annotation.value());
+        List<String> variables = asList(annotation.variables());
+        boolean logDatabaseContentOnAssertionError = annotation.logDatabaseContentOnAssertionError();
+
+        dataSetModule.performExpectedDataSetStrategy(expectedDataSetStrategy, fileNames, variables, logDatabaseContentOnAssertionError, testClass);
     }
 
 }

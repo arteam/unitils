@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,12 @@
  */
 package org.unitils.dataset.comparison.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.comparison.DataSetComparator;
 import org.unitils.dataset.comparison.DataSetComparison;
 import org.unitils.dataset.comparison.RowComparison;
 import org.unitils.dataset.comparison.TableComparison;
-import org.unitils.dataset.core.DataSetRow;
-import org.unitils.dataset.core.DataSetRowProcessor;
-import org.unitils.dataset.core.DatabaseColumn;
-import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.*;
 import org.unitils.dataset.factory.DataSetRowSource;
 import org.unitils.dataset.loader.impl.Database;
 
@@ -36,9 +31,6 @@ import java.util.*;
  * @author Filip Neven
  */
 public class DefaultDataSetComparator implements DataSetComparator {
-
-    /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(DefaultDataSetComparator.class);
 
     protected DataSetRowProcessor dataSetRowProcessor;
     protected TableContentRetriever tableContentRetriever;
@@ -94,13 +86,19 @@ public class DefaultDataSetComparator implements DataSetComparator {
             tableContents.close();
         }
     }
-    
+
 
     protected Map<String, Map<DataSetRow, DatabaseRow>> getRowsPerTable(DataSetRowSource dataSetRowSource, List<String> variables) throws Exception {
         Map<String, Map<DataSetRow, DatabaseRow>> dataSetRowsPerTable = new LinkedHashMap<String, Map<DataSetRow, DatabaseRow>>();
         DataSetRow dataSetRow;
         while ((dataSetRow = dataSetRowSource.getNextDataSetRow()) != null) {
             DatabaseRow databaseRow = dataSetRowProcessor.process(dataSetRow, variables, new HashSet<String>());
+            for (DatabaseColumnWithValue databaseColumn : databaseRow.getDatabaseColumnsWithValue()) {
+                if (databaseColumn.isLiteralValue()) {
+                    throw new UnitilsException("Literal values in an expected data set are not supported. Found literal values in data set row: " + dataSetRow);
+                }
+            }
+
             String qualifiedTableName = databaseRow.getQualifiedTableName();
 
             Map<DataSetRow, DatabaseRow> dataSetRows = dataSetRowsPerTable.get(qualifiedTableName);
@@ -125,20 +123,8 @@ public class DefaultDataSetComparator implements DataSetComparator {
                 break;
             }
 
-            Iterator<Map.Entry<DataSetRow, DatabaseRow>> iterator1 = dataSetRows.entrySet().iterator();
-            if (iterator1.hasNext()) {
-                Map.Entry<DataSetRow, DatabaseRow> entry = iterator1.next();
-
-                DataSetRow expectedDataSetRow = entry.getKey();
-                DatabaseRow expectedDatabaseRow = entry.getValue();
-
-                if (expectedDataSetRow.isEmpty()) {
-                    iterator1.remove();
-                    if (!expectedDataSetRow.isNotExists()) {
-                        tableComparison.setExpectedNoMoreRecordsButFoundMore(true);
-                    }
-                }
-            }
+            boolean matchFound = false;
+            boolean emptyRowFound = false;
 
             Iterator<Map.Entry<DataSetRow, DatabaseRow>> iterator = dataSetRows.entrySet().iterator();
             while (iterator.hasNext()) {
@@ -148,6 +134,9 @@ public class DefaultDataSetComparator implements DataSetComparator {
                 DatabaseRow expectedDatabaseRow = entry.getValue();
 
                 if (dataSetRow.isEmpty()) {
+                    if (!dataSetRow.isNotExists()) {
+                        emptyRowFound = true;
+                    }
                     continue;
                 }
 
@@ -157,12 +146,24 @@ public class DefaultDataSetComparator implements DataSetComparator {
                 if (rowComparison.isMatch()) {
                     if (dataSetRow.isNotExists()) {
                         tableComparison.setMatchingRowThatShouldNotHaveMatched(actualDatabaseRow);
+                    } else {
+                        matchFound = true;
+                        tableComparison.setMatchingRow(rowComparison);
                     }
-                    tableComparison.setMatchingRow(rowComparison);
                     iterator.remove();
                     currentRowComparisons.clear();
                     break;
+                } else {
+                    if (dataSetRow.isNotExists()) {
+                        iterator.remove();
+                        currentRowComparisons.clear();
+                        break;
+                    }
                 }
+            }
+
+            if (emptyRowFound && !matchFound) {
+                tableComparison.setExpectedNoMoreRecordsButFoundMore(true);
             }
 
             for (RowComparison rowComparison : currentRowComparisons) {

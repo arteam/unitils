@@ -15,23 +15,37 @@
  */
 package org.unitils.dataset;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.unitils.core.ConfigurationLoader;
 import org.unitils.dataset.annotation.DataSetCleanInsert;
 
 import java.lang.reflect.Method;
+import java.util.Properties;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DataSetModuleCleanInsertTest extends DataSetModuleDataSetTestBase {
+public class DataSetModuleCleanInsertTest extends DataSetTestBase {
+
+    /* Tested object */
+    protected DataSetModule dataSetModule;
+
+    @Before
+    public void initialize() throws Exception {
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        dataSetModule = new DataSetModule();
+        dataSetModule.init(configuration);
+        dataSetModule.afterInit();
+    }
 
 
     @Test
     public void loadDataSet() throws Exception {
         Method method = TestClass.class.getDeclaredMethod("annotatedMethod");
         dataSetModule.loadDataSet(method, new TestClass());
-        
+
         assertValueInTable("TEST", "col1", "xxxx");
     }
 

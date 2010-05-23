@@ -18,13 +18,12 @@ package org.unitils.dataset.loader.impl;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.core.DataSetColumn;
-import org.unitils.dataset.core.DataSetRow;
-import org.unitils.dataset.core.DataSetRowProcessor;
-import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.*;
 import org.unitils.dataset.factory.DataSetRowSource;
+import org.unitils.dataset.sqltypehandler.impl.TextSqlTypeHandler;
 import org.unitils.mock.Mock;
 
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,8 +44,8 @@ public class BaseDataSetLoaderTest extends UnitilsJUnit4 {
     /* Tested object */
     private TestBaseDataSetLoader baseDataSetLoader = new TestBaseDataSetLoader();
 
-    private Mock<DataSetRowSource> dataSetRowSource;
-    private Mock<DataSetRowProcessor> dataSetRowProcessor;
+    protected Mock<DataSetRowSource> dataSetRowSource;
+    protected Mock<DataSetRowProcessor> dataSetRowProcessor;
 
     private List<String> emptyVariables = new ArrayList<String>();
 
@@ -55,14 +54,20 @@ public class BaseDataSetLoaderTest extends UnitilsJUnit4 {
     private DatabaseRow databaseRow1;
     private DatabaseRow databaseRow2;
 
+    private DataSetRow emptyDataSetRow;
+    private DatabaseRow emptyDatabaseRow;
+
     @Before
     public void initialize() throws Exception {
         baseDataSetLoader.init(dataSetRowProcessor.getMock(), null);
 
         dataSetRow1 = createDataSetRow();
         dataSetRow2 = createDataSetRow();
-        databaseRow1 = new DatabaseRow("schema.table");
-        databaseRow2 = new DatabaseRow("schema.table");
+        databaseRow1 = createDatabaseRow();
+        databaseRow2 = createDatabaseRow();
+
+        emptyDataSetRow = createDataSetRowWithoutColumns();
+        emptyDatabaseRow = createDatabaseRowWithoutColumns();
     }
 
 
@@ -79,7 +84,8 @@ public class BaseDataSetLoaderTest extends UnitilsJUnit4 {
 
     @Test
     public void emptyDatabaseRow() throws Exception {
-        dataSetRowSource.onceReturns(createDataSetRowWithoutColumns()).getNextDataSetRow();
+        dataSetRowProcessor.returns(emptyDatabaseRow).process(emptyDataSetRow, null, null);
+        dataSetRowSource.onceReturns(emptyDataSetRow).getNextDataSetRow();
 
         baseDataSetLoader.load(dataSetRowSource.getMock(), emptyVariables);
         assertTrue(baseDataSetLoader.getLoadedDatabaseRows().isEmpty());
@@ -111,13 +117,24 @@ public class BaseDataSetLoaderTest extends UnitilsJUnit4 {
 
 
     private DataSetRow createDataSetRow() {
-        DataSetRow dataSetRow = new DataSetRow("schema", "table", null, false, null);
+        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
+        DataSetRow dataSetRow = new DataSetRow("schema", "table", null, false, dataSetSettings);
         dataSetRow.addDataSetColumn(new DataSetColumn("column", "value"));
         return dataSetRow;
     }
 
+    private DatabaseRow createDatabaseRow() {
+        DatabaseRow databaseRow = new DatabaseRow("schema.table");
+        databaseRow.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column", "value", Types.VARCHAR, new TextSqlTypeHandler(), false, false));
+        return databaseRow;
+    }
+
     private DataSetRow createDataSetRowWithoutColumns() {
         return new DataSetRow("schema", "table", null, false, null);
+    }
+
+    private DatabaseRow createDatabaseRowWithoutColumns() {
+        return new DatabaseRow("schema.table");
     }
 
 

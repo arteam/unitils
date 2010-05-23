@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,73 +17,70 @@ package org.unitils.dataset;
 
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.loader.impl.InsertDataSetLoader;
 
-import java.util.ArrayList;
-
-import static java.util.Arrays.asList;
 import static org.junit.Assert.fail;
+import static org.unitils.dataset.DataSetUnitils.assertExpectedDataSet;
+import static org.unitils.dataset.DataSetUnitils.dataSetCleanInsert;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DataSetModuleExpectedDataSetTest extends DataSetModuleDataSetTestBase {
+public class DataSetModuleExpectedDataSetTest extends DataSetTestBase {
 
 
     @Test
     public void matchingDataSet() throws Exception {
-        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
-        dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), true);
+        dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-simple.xml");
+        assertExpectedDataSet(this, "DataSetModuleExpectedDataSetTest-simple.xml");
     }
 
     @Test
     public void differentDataSet() throws Exception {
-        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
         try {
-            dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetTest-different.xml"), new ArrayList<String>(), getClass(), true);
+            dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-simple.xml");
+            assertExpectedDataSet(this, "DataSetModuleExpectedDataSetTest-different.xml");
+
         } catch (AssertionError e) {
-            assertMessageContains("Found differences for table PUBLIC.TEST", e);
-            assertMessageContains("Different database record found for data set row:  col1=\"xxxx\", col2=\"9999\"", e);
-            assertMessageContains("value1", e);
-            assertMessageContains("xxxx", e);
-            assertMessageContains("1", e);
-            assertMessageContains("9999", e);
+            assertMessageContains("No match found for data set row:  PUBLIC.TEST [COL1=xxxx, COL2=9999]", e);
+            assertMessageContains("Expected:  xxxx    9999", e);
+            assertMessageContains("Actual:    value1  1", e);
             assertMessageContains("Actual database content", e);
             return;
         }
         fail("Expected an AssertionError"); //fail also raises assertion errors
     }
 
-    @Test
-    public void literalValues() throws Exception {
-        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-literalValues.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
-        dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetTest-literalValues.xml"), new ArrayList<String>(), getClass(), true);
+    @Test(expected = UnitilsException.class)
+    public void literalValuesNotSupportedInExpectedDataSet() throws Exception {
+        dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-literalValues.xml");
+        assertExpectedDataSet(this, "DataSetModuleExpectedDataSetTest-literalValues.xml");
     }
 
     @Test
     public void caseSensitive() throws Exception {
-        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
-        dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetTest-caseSensitive.xml"), new ArrayList<String>(), getClass(), true);
+        dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-simple.xml");
+        assertExpectedDataSet(this, "DataSetModuleExpectedDataSetTest-caseSensitive.xml");
     }
 
     @Test(expected = UnitilsException.class)
     public void caseSensitiveWrongCase() throws Exception {
-        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
-        dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetTest-caseSensitiveWrongCase.xml"), new ArrayList<String>(), getClass(), true);
+        dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-simple.xml");
+        assertExpectedDataSet(this, "DataSetModuleExpectedDataSetTest-caseSensitiveWrongCase.xml");
     }
 
     @Test
     public void equalVariables() throws Exception {
-        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-variables.xml"), asList("test", "1"), getClass(), InsertDataSetLoader.class);
-        dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetTest-variables.xml"), asList("test", "1"), getClass(), true);
+        dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-variables.xml", "test", "1");
+        assertExpectedDataSet(this, "DataSetModuleExpectedDataSetTest-variables.xml", "test", "1");
     }
 
     @Test
     public void differentVariables() throws Exception {
-        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-variables.xml"), asList("test", "1"), getClass(), InsertDataSetLoader.class);
         try {
-            dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetTest-variables.xml"), asList("xxxx", "9999"), getClass(), true);
+            dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-variables.xml", "test", "1");
+            assertExpectedDataSet(this, "DataSetModuleExpectedDataSetTest-variables.xml", "xxxx", "9999");
+
         } catch (AssertionError e) {
             assertMessageContains("test", e);
             assertMessageContains("xxxx", e);
@@ -96,9 +93,10 @@ public class DataSetModuleExpectedDataSetTest extends DataSetModuleDataSetTestBa
 
     @Test
     public void noDatabaseContentLogging() throws Exception {
-        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
         try {
-            dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetTest-different.xml"), new ArrayList<String>(), getClass(), false);
+            dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-simple.xml");
+            assertExpectedDataSet(this, "DataSetModuleExpectedDataSetTest-different.xml");
+
         } catch (AssertionError e) {
             assertMessageNotContains("Actual Database Content", e);
             return;
@@ -108,8 +106,8 @@ public class DataSetModuleExpectedDataSetTest extends DataSetModuleDataSetTestBa
 
     @Test
     public void emptyDataSet() throws Exception {
-        dataSetModule.loadDataSet(asList("DataSetModuleExpectedDataSetTest-simple.xml"), new ArrayList<String>(), getClass(), InsertDataSetLoader.class);
-        dataSetModule.assertExpectedDataSet(asList("DataSetModuleExpectedDataSetTest-emptyDataSet.xml"), new ArrayList<String>(), getClass(), true);
+        dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-simple.xml");
+        assertExpectedDataSet(this, "DataSetModuleExpectedDataSetTest-emptyDataSet.xml");
     }
 
 }
