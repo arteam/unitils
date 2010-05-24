@@ -1,5 +1,5 @@
 /*
- * Copyright 2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package org.unitils.dataset.loader.impl;
 
-import org.unitils.dataset.core.DatabaseColumnWithValue;
 import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.Value;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +32,9 @@ public class InsertDataSetLoader extends BaseDataSetLoader {
     protected int loadDatabaseRow(DatabaseRow databaseRow) throws Exception {
         StringBuilder columnsPart = new StringBuilder();
         StringBuilder valuesPart = new StringBuilder();
-        List<DatabaseColumnWithValue> statementValues = new ArrayList<DatabaseColumnWithValue>();
+        List<Value> statementValues = new ArrayList<Value>();
 
-        for (DatabaseColumnWithValue databaseColumn : databaseRow.getDatabaseColumnsWithValue()) {
+        for (Value databaseColumn : databaseRow.getDatabaseColumnsWithValue()) {
             addColumnToStatementParts(databaseColumn, columnsPart, valuesPart, statementValues);
         }
         String sql = createStatement(databaseRow.getQualifiedTableName(), columnsPart, valuesPart);
@@ -42,15 +42,15 @@ public class InsertDataSetLoader extends BaseDataSetLoader {
     }
 
 
-    protected void addColumnToStatementParts(DatabaseColumnWithValue databaseColumn, StringBuilder columnsPart, StringBuilder valuesPart, List<DatabaseColumnWithValue> statementValues) {
-        columnsPart.append(databaseColumn.getColumnName());
+    protected void addColumnToStatementParts(Value value, StringBuilder columnsPart, StringBuilder valuesPart, List<Value> statementValues) {
+        columnsPart.append(value.getDatabaseColumn().getColumnName());
         columnsPart.append(", ");
 
-        if (databaseColumn.isLiteralValue()) {
-            valuesPart.append(databaseColumn.getValue());
+        if (value.isLiteralValue()) {
+            valuesPart.append(value.getValue());
         } else {
             valuesPart.append('?');
-            statementValues.add(databaseColumn);
+            statementValues.add(value);
         }
         valuesPart.append(", ");
     }

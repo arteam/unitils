@@ -81,12 +81,12 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
         DatabaseRow result = dataSetRowProcessor.process(dataSetRow, emptyVariables, unusedPrimaryKeys);
 
         assertTrue(unusedPrimaryKeys.isEmpty());
-        DatabaseColumnWithValue databaseColumn1 = result.getDatabaseColumnsWithValue().get(0);
-        DatabaseColumnWithValue databaseColumn2 = result.getDatabaseColumnsWithValue().get(1);
-        DatabaseColumnWithValue databaseColumn3 = result.getDatabaseColumnsWithValue().get(2);
-        assertTrue(databaseColumn1.isPrimaryKey());
-        assertTrue(databaseColumn2.isPrimaryKey());
-        assertFalse(databaseColumn3.isPrimaryKey());
+        Value databaseColumn1 = result.getDatabaseColumnsWithValue().get(0);
+        Value databaseColumn2 = result.getDatabaseColumnsWithValue().get(1);
+        Value databaseColumn3 = result.getDatabaseColumnsWithValue().get(2);
+        assertTrue(databaseColumn1.getDatabaseColumn().isPrimaryKey());
+        assertTrue(databaseColumn2.getDatabaseColumn().isPrimaryKey());
+        assertFalse(databaseColumn3.getDatabaseColumn().isPrimaryKey());
     }
 
     @Test
@@ -99,8 +99,8 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
         DatabaseRow result = dataSetRowProcessor.process(dataSetRow, emptyVariables, unusedPrimaryKeys);
 
         assertReflectionEquals(asSet("pk2", "pk3"), unusedPrimaryKeys);
-        DatabaseColumnWithValue databaseColumn1 = result.getDatabaseColumnsWithValue().get(0);
-        assertTrue(databaseColumn1.isPrimaryKey());
+        Value databaseColumn1 = result.getDatabaseColumnsWithValue().get(0);
+        assertTrue(databaseColumn1.getDatabaseColumn().isPrimaryKey());
     }
 
     @Test
@@ -113,10 +113,10 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
         Set<String> unusedPrimaryKeys = new HashSet<String>();
         DatabaseRow result = dataSetRowProcessor.process(dataSetRowCaseSensitive, emptyVariables, unusedPrimaryKeys);
 
-        DatabaseColumnWithValue databaseColumn1 = result.getDatabaseColumnsWithValue().get(0);
-        DatabaseColumnWithValue databaseColumn2 = result.getDatabaseColumnsWithValue().get(1);
-        assertFalse(databaseColumn1.isPrimaryKey());
-        assertTrue(databaseColumn2.isPrimaryKey());
+        Value databaseColumn1 = result.getDatabaseColumnsWithValue().get(0);
+        Value databaseColumn2 = result.getDatabaseColumnsWithValue().get(1);
+        assertFalse(databaseColumn1.getDatabaseColumn().isPrimaryKey());
+        assertTrue(databaseColumn2.getDatabaseColumn().isPrimaryKey());
     }
 
 }

@@ -22,8 +22,8 @@ import org.unitils.dataset.comparison.impl.DefaultDatabaseContentLogger;
 import org.unitils.dataset.comparison.impl.TableContentRetriever;
 import org.unitils.dataset.comparison.impl.TableContents;
 import org.unitils.dataset.core.DatabaseColumn;
-import org.unitils.dataset.core.DatabaseColumnWithValue;
 import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.Value;
 import org.unitils.dataset.loader.impl.Database;
 import org.unitils.mock.Mock;
 
@@ -68,11 +68,11 @@ public class DefaultDatabaseContentLoggerTest extends UnitilsJUnit4 {
         dataSetComparison = createDataSetComparison(tableComparison);
 
         databaseRow1 = new DatabaseRow("1", "schema.table");
-        databaseRow1.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column1", "row1col1", VARCHAR, false, true));
-        databaseRow1.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column2", "row1col2", VARCHAR, false, true));
+        databaseRow1.addDatabaseColumnWithValue(new Value("row1col1", false, new DatabaseColumn("column1", VARCHAR, true)));
+        databaseRow1.addDatabaseColumnWithValue(new Value("row1col2", false, new DatabaseColumn("column2", VARCHAR, true)));
         databaseRow2 = new DatabaseRow("2", "schema.table");
-        databaseRow2.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column1", "row2col1", VARCHAR, false, true));
-        databaseRow2.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column2", "row2col2", VARCHAR, false, true));
+        databaseRow2.addDatabaseColumnWithValue(new Value("row2col1", false, new DatabaseColumn("column1", VARCHAR, true)));
+        databaseRow2.addDatabaseColumnWithValue(new Value("row2col2", false, new DatabaseColumn("column2", VARCHAR, true)));
     }
 
 

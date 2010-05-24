@@ -21,29 +21,28 @@ package org.unitils.dataset.core;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DatabaseColumnWithValue extends DatabaseColumn {
+public class Value {
 
     /* The value */
     private Object value;
     /* True if this value is a literal value */
     private boolean literalValue;
+    private DatabaseColumn databaseColumn;
 
 
     /**
-     * @param columnName   The column name, not null
-     * @param value        The value, not null
-     * @param sqlType      The sql type of the column in the database
-     * @param literalValue True if this value is a literal value
-     * @param primaryKey   True if the column is a primary key column
+     * @param value          The value, not null
+     * @param literalValue   True if this value is a literal value
+     * @param databaseColumn The column that this value is for, not null
      */
-    public DatabaseColumnWithValue(String columnName, Object value, int sqlType, boolean literalValue, boolean primaryKey) {
-        super(columnName, sqlType, primaryKey);
+    public Value(Object value, boolean literalValue, DatabaseColumn databaseColumn) {
         this.value = value;
         this.literalValue = literalValue;
+        this.databaseColumn = databaseColumn;
     }
 
 
-    public boolean isEqualValue(DatabaseColumnWithValue otherDatabaseColumnWithValue) {
+    public boolean isEqualValue(Value otherDatabaseColumnWithValue) {
         Object otherValue = otherDatabaseColumnWithValue.getValue();
         if (value == otherValue) {
             return true;
@@ -65,10 +64,14 @@ public class DatabaseColumnWithValue extends DatabaseColumn {
         return literalValue;
     }
 
+    public DatabaseColumn getDatabaseColumn() {
+        return databaseColumn;
+    }
+
 
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(getColumnName());
+        stringBuilder.append(databaseColumn.getColumnName());
         stringBuilder.append('=');
         stringBuilder.append(value);
         return stringBuilder.toString();

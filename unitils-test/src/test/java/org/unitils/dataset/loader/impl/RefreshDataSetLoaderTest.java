@@ -87,7 +87,7 @@ public class RefreshDataSetLoaderTest extends UnitilsJUnit4 {
 
     private DatabaseRow createDatabaseRow(boolean primaryKey) {
         DatabaseRow databaseRow = new DatabaseRow("schema.table");
-        databaseRow.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column", "value", 0, false, primaryKey));
+        databaseRow.addDatabaseColumnWithValue(new Value("value", false, new DatabaseColumn("column", 0, primaryKey)));
         return databaseRow;
     }
 }

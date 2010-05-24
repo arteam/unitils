@@ -1,5 +1,5 @@
 /*
- * Copyright 2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.unitils.dataset.loader.impl;
 
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.core.DataSetRow;
-import org.unitils.dataset.core.DatabaseColumnWithValue;
+import org.unitils.dataset.core.Value;
 import org.unitils.dataset.factory.DataSetRowSource;
 import org.unitils.dataset.util.DatabaseAccessor;
 
@@ -71,7 +71,7 @@ public class TableContentDeleter {
 
     protected void deleteTableContent(String qualifiedTableName) throws Exception {
         String sql = createStatement(qualifiedTableName);
-        databaseAccessor.executeUpdate(sql, new ArrayList<DatabaseColumnWithValue>());
+        databaseAccessor.executeUpdate(sql, new ArrayList<Value>());
     }
 
     protected String createStatement(String qualifiedTableName) {

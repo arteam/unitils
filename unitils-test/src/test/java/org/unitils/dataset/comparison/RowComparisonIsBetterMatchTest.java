@@ -17,8 +17,9 @@ package org.unitils.dataset.comparison;
 
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.core.DatabaseColumnWithValue;
+import org.unitils.dataset.core.DatabaseColumn;
 import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.Value;
 
 import static java.sql.Types.VARCHAR;
 import static org.junit.Assert.assertFalse;
@@ -118,10 +119,10 @@ public class RowComparisonIsBetterMatchTest extends UnitilsJUnit4 {
 
     private DatabaseRow createRow(Object pk1, Object pk2, Object value1, Object value2) {
         DatabaseRow row = new DatabaseRow("schema.table");
-        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("pk1", pk1, VARCHAR, false, true));
-        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("pk2", pk2, VARCHAR, false, true));
-        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column1", value1, VARCHAR, false, false));
-        row.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column2", value2, VARCHAR, false, false));
+        row.addDatabaseColumnWithValue(new Value(pk1, false, new DatabaseColumn("pk1", VARCHAR, true)));
+        row.addDatabaseColumnWithValue(new Value(pk2, false, new DatabaseColumn("pk2", VARCHAR, true)));
+        row.addDatabaseColumnWithValue(new Value(value1, false, new DatabaseColumn("column1", VARCHAR, false)));
+        row.addDatabaseColumnWithValue(new Value(value2, false, new DatabaseColumn("column2", VARCHAR, false)));
         return row;
     }
 

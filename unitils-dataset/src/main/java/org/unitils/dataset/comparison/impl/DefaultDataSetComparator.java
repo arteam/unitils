@@ -70,7 +70,8 @@ public class DefaultDataSetComparator implements DataSetComparator {
     protected List<DatabaseColumn> getAllUsedDatabaseColumns(Map<DataSetRow, DatabaseRow> dataSetRows) {
         Map<String, DatabaseColumn> databaseColumnsPerName = new LinkedHashMap<String, DatabaseColumn>();
         for (DatabaseRow databaseRow : dataSetRows.values()) {
-            for (DatabaseColumn databaseColumn : databaseRow.getDatabaseColumnsWithValue()) {
+            for (Value value : databaseRow.getDatabaseColumnsWithValue()) {
+                DatabaseColumn databaseColumn = value.getDatabaseColumn();
                 databaseColumnsPerName.put(databaseColumn.getColumnName(), databaseColumn);
             }
         }
@@ -93,7 +94,7 @@ public class DefaultDataSetComparator implements DataSetComparator {
         DataSetRow dataSetRow;
         while ((dataSetRow = dataSetRowSource.getNextDataSetRow()) != null) {
             DatabaseRow databaseRow = dataSetRowProcessor.process(dataSetRow, variables, new HashSet<String>());
-            for (DatabaseColumnWithValue databaseColumn : databaseRow.getDatabaseColumnsWithValue()) {
+            for (Value databaseColumn : databaseRow.getDatabaseColumnsWithValue()) {
                 if (databaseColumn.isLiteralValue()) {
                     throw new UnitilsException("Literal values in an expected data set are not supported. Found literal values in data set row: " + dataSetRow);
                 }

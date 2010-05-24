@@ -69,7 +69,7 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
         dataSetRow.addDataSetColumn(new DataSetColumn("column", "value"));
         DatabaseRow result = dataSetRowProcessor.process(dataSetRow, emptyVariables, emptyPrimaryKeys);
 
-        DatabaseColumnWithValue databaseColumn = result.getDatabaseColumnsWithValue().get(0);
+        Value databaseColumn = result.getDatabaseColumnsWithValue().get(0);
         assertEquals("value", databaseColumn.getValue());
         assertFalse(databaseColumn.isLiteralValue());
     }
@@ -79,7 +79,7 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
         dataSetRow.addDataSetColumn(new DataSetColumn("column", "=value"));
         DatabaseRow result = dataSetRowProcessor.process(dataSetRow, emptyVariables, emptyPrimaryKeys);
 
-        DatabaseColumnWithValue databaseColumn = result.getDatabaseColumnsWithValue().get(0);
+        Value databaseColumn = result.getDatabaseColumnsWithValue().get(0);
         assertEquals("value", databaseColumn.getValue());
         assertTrue(databaseColumn.isLiteralValue());
     }
@@ -89,7 +89,7 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
         dataSetRow.addDataSetColumn(new DataSetColumn("column", "==value"));
         DatabaseRow result = dataSetRowProcessor.process(dataSetRow, emptyVariables, emptyPrimaryKeys);
 
-        DatabaseColumnWithValue databaseColumn = result.getDatabaseColumnsWithValue().get(0);
+        Value databaseColumn = result.getDatabaseColumnsWithValue().get(0);
         assertEquals("=value", databaseColumn.getValue());
         assertFalse(databaseColumn.isLiteralValue());
     }
@@ -99,7 +99,7 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
         dataSetRow.addDataSetColumn(new DataSetColumn("column", "$0value $0 $1"));
         DatabaseRow result = dataSetRowProcessor.process(dataSetRow, asList("1", "2"), emptyPrimaryKeys);
 
-        DatabaseColumnWithValue databaseColumn = result.getDatabaseColumnsWithValue().get(0);
+        Value databaseColumn = result.getDatabaseColumnsWithValue().get(0);
         assertEquals("1value 1 2", databaseColumn.getValue());
         assertFalse(databaseColumn.isLiteralValue());
     }
@@ -109,7 +109,7 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
         dataSetRow.addDataSetColumn(new DataSetColumn("column", "$0"));
         DatabaseRow result = dataSetRowProcessor.process(dataSetRow, asList("=value"), emptyPrimaryKeys);
 
-        DatabaseColumnWithValue databaseColumn = result.getDatabaseColumnsWithValue().get(0);
+        Value databaseColumn = result.getDatabaseColumnsWithValue().get(0);
         assertEquals("value", databaseColumn.getValue());
         assertTrue(databaseColumn.isLiteralValue());
     }
@@ -119,7 +119,7 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
         dataSetRow.addDataSetColumn(new DataSetColumn("column", "$0"));
         DatabaseRow result = dataSetRowProcessor.process(dataSetRow, asList("==value"), emptyPrimaryKeys);
 
-        DatabaseColumnWithValue databaseColumn = result.getDatabaseColumnsWithValue().get(0);
+        Value databaseColumn = result.getDatabaseColumnsWithValue().get(0);
         assertEquals("=value", databaseColumn.getValue());
         assertFalse(databaseColumn.isLiteralValue());
     }
