@@ -17,7 +17,7 @@ package org.unitils.dataset.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitils.dataset.core.DatabaseColumnWithValue;
+import org.unitils.dataset.core.Value;
 import org.unitils.dataset.loader.impl.Database;
 
 import java.sql.Connection;
@@ -42,7 +42,7 @@ public class DatabaseAccessor {
         this.database = database;
     }
 
-    public int executeUpdate(String sql, List<DatabaseColumnWithValue> statementValues) throws Exception {
+    public int executeUpdate(String sql, List<Value> statementValues) throws Exception {
         PreparedStatement preparedStatement = null;
         Connection connection = database.getConnection();
         try {
@@ -54,13 +54,13 @@ public class DatabaseAccessor {
         }
     }
 
-    protected void setStatementValues(PreparedStatement preparedStatement, List<DatabaseColumnWithValue> statementValues) throws Exception {
+    protected void setStatementValues(PreparedStatement preparedStatement, List<Value> statementValues) throws Exception {
         if (statementValues == null || statementValues.isEmpty()) {
             return;
         }
         int index = 1;
-        for (DatabaseColumnWithValue databaseColumnWithValue : statementValues) {
-            int sqlType = databaseColumnWithValue.getSqlType();
+        for (Value databaseColumnWithValue : statementValues) {
+            int sqlType = databaseColumnWithValue.getDatabaseColumn().getSqlType();
             preparedStatement.setObject(index++, databaseColumnWithValue.getValue(), sqlType);
         }
     }

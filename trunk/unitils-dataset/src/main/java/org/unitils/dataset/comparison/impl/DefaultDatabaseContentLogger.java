@@ -20,8 +20,8 @@ import org.unitils.dataset.comparison.DataSetComparison;
 import org.unitils.dataset.comparison.DatabaseContentLogger;
 import org.unitils.dataset.comparison.TableComparison;
 import org.unitils.dataset.core.DatabaseColumn;
-import org.unitils.dataset.core.DatabaseColumnWithValue;
 import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.Value;
 import org.unitils.dataset.loader.impl.Database;
 
 import java.util.ArrayList;
@@ -85,15 +85,15 @@ public class DefaultDatabaseContentLogger implements DatabaseContentLogger {
                 String rowIdentifier = databaseRow.getIdentifier();
                 rowWithExactMatch.add(tableComparison.isMatchingRow(rowIdentifier));
 
-                List<DatabaseColumnWithValue> databaseColumnWithValues = databaseRow.getDatabaseColumnsWithValue();
+                List<Value> databaseColumnWithValues = databaseRow.getDatabaseColumnsWithValue();
                 for (int i = 0; i < nrOfColumns; i++) {
-                    DatabaseColumnWithValue databaseColumnWithValue = databaseColumnWithValues.get(i);
+                    Value databaseColumnWithValue = databaseColumnWithValues.get(i);
                     Object value = databaseColumnWithValue.getValue();
                     String valueAsString = "";
                     if (value != null) {
                         valueAsString = value.toString();
                     }
-                    
+
                     values.get(i).add(valueAsString);
                     columnSizes.set(i, Math.max(columnSizes.get(i), valueAsString.length()));
                 }

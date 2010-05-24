@@ -19,8 +19,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.dataset.core.DataSetRowProcessor;
-import org.unitils.dataset.core.DatabaseColumnWithValue;
+import org.unitils.dataset.core.DatabaseColumn;
 import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.Value;
 import org.unitils.dataset.util.DatabaseAccessor;
 import org.unitils.mock.Mock;
 
@@ -43,9 +44,9 @@ public class InsertDataSetLoaderLoadDatabaseRowTest extends UnitilsJUnit4 {
 
     private DatabaseRow databaseRow;
 
-    private DatabaseColumnWithValue databaseColumnPk;
-    private DatabaseColumnWithValue databaseColumn;
-    private DatabaseColumnWithValue databaseColumnLiteral;
+    private Value databaseColumnPk;
+    private Value databaseColumn;
+    private Value databaseColumnLiteral;
 
 
     @Before
@@ -53,9 +54,9 @@ public class InsertDataSetLoaderLoadDatabaseRowTest extends UnitilsJUnit4 {
         insertDataSetLoader.init(dataSetRowProcessor.getMock(), databaseAccessor.getMock());
 
         databaseRow = new DatabaseRow("my_schema.table_a");
-        databaseColumnPk = new DatabaseColumnWithValue("column_1", "1", VARCHAR, false, true);
-        databaseColumn = new DatabaseColumnWithValue("column_2", "2", VARCHAR, false, false);
-        databaseColumnLiteral = new DatabaseColumnWithValue("column_3", "literal", VARCHAR, true, false);
+        databaseColumnPk = new Value("1", false, new DatabaseColumn("column_1", VARCHAR, true));
+        databaseColumn = new Value("2", false, new DatabaseColumn("column_2", VARCHAR, false));
+        databaseColumnLiteral = new Value("literal", true, new DatabaseColumn("column_3", VARCHAR, false));
     }
 
 

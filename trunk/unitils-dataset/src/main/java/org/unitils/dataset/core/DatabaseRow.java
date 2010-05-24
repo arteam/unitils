@@ -34,7 +34,7 @@ public class DatabaseRow {
     private String qualifiedTableName;
 
     /* The columns of the row */
-    private Map<String, DatabaseColumnWithValue> databaseColumnsWithValuePerName = new LinkedHashMap<String, DatabaseColumnWithValue>();
+    private Map<String, Value> databaseColumnsWithValuePerName = new LinkedHashMap<String, Value>();
 
     /**
      * Creates a database row.
@@ -69,25 +69,25 @@ public class DatabaseRow {
     /**
      * @return The columns of the row, not null
      */
-    public List<DatabaseColumnWithValue> getDatabaseColumnsWithValue() {
-        return new ArrayList<DatabaseColumnWithValue>(databaseColumnsWithValuePerName.values());
+    public List<Value> getDatabaseColumnsWithValue() {
+        return new ArrayList<Value>(databaseColumnsWithValuePerName.values());
     }
 
     /**
      * @param databaseColumn The column to get, not null
      * @return The column with value, null if not found
      */
-    public DatabaseColumnWithValue getDatabaseColumnsWithValue(DatabaseColumn databaseColumn) {
+    public Value getDatabaseColumnsWithValue(DatabaseColumn databaseColumn) {
         return databaseColumnsWithValuePerName.get(databaseColumn.getColumnName());
     }
 
     /**
      * Adds a column to the row.
      *
-     * @param databaseColumnWithValue The column to add, not null
+     * @param value The column to add, not null
      */
-    public void addDatabaseColumnWithValue(DatabaseColumnWithValue databaseColumnWithValue) {
-        databaseColumnsWithValuePerName.put(databaseColumnWithValue.getColumnName(), databaseColumnWithValue);
+    public void addDatabaseColumnWithValue(Value value) {
+        databaseColumnsWithValuePerName.put(value.getDatabaseColumn().getColumnName(), value);
     }
 
 
@@ -113,7 +113,7 @@ public class DatabaseRow {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(qualifiedTableName);
         stringBuilder.append(" [");
-        for (DatabaseColumnWithValue databaseColumn : databaseColumnsWithValuePerName.values()) {
+        for (Value databaseColumn : databaseColumnsWithValuePerName.values()) {
             stringBuilder.append(databaseColumn);
             stringBuilder.append(", ");
         }

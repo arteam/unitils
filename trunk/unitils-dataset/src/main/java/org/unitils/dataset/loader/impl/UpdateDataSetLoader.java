@@ -1,5 +1,5 @@
 /*
- * Copyright 2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 package org.unitils.dataset.loader.impl;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.core.DatabaseColumnWithValue;
 import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.Value;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ public class UpdateDataSetLoader extends BaseDataSetLoader {
 
     @Override
     protected int loadDatabaseRow(DatabaseRow databaseRow) throws Exception {
-        List<DatabaseColumnWithValue> statementValues = new ArrayList<DatabaseColumnWithValue>();
+        List<Value> statementValues = new ArrayList<Value>();
         String sql = buildUpdateStatement(databaseRow, statementValues);
 
         int nrUpdates = databaseAccessor.executeUpdate(sql, statementValues);
@@ -58,15 +58,15 @@ public class UpdateDataSetLoader extends BaseDataSetLoader {
     }
 
 
-    protected String buildUpdateStatement(DatabaseRow databaseRow, List<DatabaseColumnWithValue> statementValues) {
-        List<DatabaseColumnWithValue> columnsValues = new ArrayList<DatabaseColumnWithValue>();
-        List<DatabaseColumnWithValue> whereValues = new ArrayList<DatabaseColumnWithValue>();
+    protected String buildUpdateStatement(DatabaseRow databaseRow, List<Value> statementValues) {
+        List<Value> columnsValues = new ArrayList<Value>();
+        List<Value> whereValues = new ArrayList<Value>();
         StringBuilder columnsPart = new StringBuilder();
         StringBuilder wherePart = new StringBuilder();
 
         boolean primaryKeyColumnFound = false;
-        for (DatabaseColumnWithValue databaseColumn : databaseRow.getDatabaseColumnsWithValue()) {
-            if (databaseColumn.isPrimaryKey()) {
+        for (Value databaseColumn : databaseRow.getDatabaseColumnsWithValue()) {
+            if (databaseColumn.getDatabaseColumn().isPrimaryKey()) {
                 primaryKeyColumnFound = true;
                 addColumnToStatementPart(databaseColumn, wherePart, whereValues);
             }
@@ -82,8 +82,8 @@ public class UpdateDataSetLoader extends BaseDataSetLoader {
         return createStatement(databaseRow.getQualifiedTableName(), columnsPart, wherePart);
     }
 
-    protected void addColumnToStatementPart(DatabaseColumnWithValue databaseColumn, StringBuilder statementPart, List<DatabaseColumnWithValue> parameters) {
-        statementPart.append(databaseColumn.getColumnName());
+    protected void addColumnToStatementPart(Value databaseColumn, StringBuilder statementPart, List<Value> parameters) {
+        statementPart.append(databaseColumn.getDatabaseColumn().getColumnName());
         statementPart.append('=');
 
         if (databaseColumn.isLiteralValue()) {

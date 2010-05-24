@@ -124,7 +124,7 @@ public class BaseDataSetLoaderTest extends UnitilsJUnit4 {
 
     private DatabaseRow createDatabaseRow() {
         DatabaseRow databaseRow = new DatabaseRow("schema.table");
-        databaseRow.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column", "value", VARCHAR, false, false));
+        databaseRow.addDatabaseColumnWithValue(new Value("value", false, new DatabaseColumn("column", VARCHAR, false)));
         return databaseRow;
     }
 

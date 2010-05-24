@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.core.*;
-import org.unitils.dataset.factory.DataSetRowSource;
 import org.unitils.dataset.util.DatabaseAccessor;
 import org.unitils.mock.Mock;
 import org.unitils.mock.core.proxy.ProxyInvocation;
@@ -46,9 +45,8 @@ public class UpdateDataSetLoaderPrimaryKeyTest extends UnitilsJUnit4 {
     /* Tested object */
     private UpdateDataSetLoader updateDataSetLoader = new UpdateDataSetLoader();
 
-    private Mock<DataSetRowSource> dataSetRowSource;
-    private Mock<DataSetRowProcessor> dataSetRowProcessor;
-    private Mock<DatabaseAccessor> databaseAccessor;
+    protected Mock<DataSetRowProcessor> dataSetRowProcessor;
+    protected Mock<DatabaseAccessor> databaseAccessor;
 
     private List<String> emptyVariables = new ArrayList<String>();
 
@@ -121,7 +119,7 @@ public class UpdateDataSetLoaderPrimaryKeyTest extends UnitilsJUnit4 {
 
     private DatabaseRow createDatabaseRow(boolean primaryKey) {
         DatabaseRow databaseRow = new DatabaseRow("schema.table");
-        databaseRow.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column", "value", 0, false, primaryKey));
+        databaseRow.addDatabaseColumnWithValue(new Value("value", false, new DatabaseColumn("column", 0, primaryKey)));
         return databaseRow;
     }
 

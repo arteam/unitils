@@ -60,19 +60,19 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
         tableContentRetriever.onceReturns(tableContents).getTableContents(null, null, null);
 
         actualDatabaseRow1 = new DatabaseRow("1", "schema.table");
-        actualDatabaseRow1.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column1", 11, INTEGER, false, true));
-        actualDatabaseRow1.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column2", 12, INTEGER, false, true));
-        actualDatabaseRow1.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column3", 13, INTEGER, false, true));
+        actualDatabaseRow1.addDatabaseColumnWithValue(new Value(11, false, new DatabaseColumn("column1", INTEGER, true)));
+        actualDatabaseRow1.addDatabaseColumnWithValue(new Value(12, false, new DatabaseColumn("column2", INTEGER, true)));
+        actualDatabaseRow1.addDatabaseColumnWithValue(new Value(13, false, new DatabaseColumn("column3", INTEGER, true)));
 
         actualDatabaseRow2 = new DatabaseRow("2", "schema.table");
-        actualDatabaseRow2.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column1", 21, INTEGER, false, true));
-        actualDatabaseRow2.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column2", 22, INTEGER, false, true));
-        actualDatabaseRow2.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column3", 23, INTEGER, false, true));
+        actualDatabaseRow2.addDatabaseColumnWithValue(new Value(21, false, new DatabaseColumn("column1", INTEGER, true)));
+        actualDatabaseRow2.addDatabaseColumnWithValue(new Value(22, false, new DatabaseColumn("column2", INTEGER, true)));
+        actualDatabaseRow2.addDatabaseColumnWithValue(new Value(23, false, new DatabaseColumn("column3", INTEGER, true)));
 
         actualDatabaseRow3 = new DatabaseRow("3", "schema.table");
-        actualDatabaseRow3.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column1", 31, INTEGER, false, true));
-        actualDatabaseRow3.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column2", 32, INTEGER, false, true));
-        actualDatabaseRow3.addDatabaseColumnWithValue(new DatabaseColumnWithValue("column3", 33, INTEGER, false, true));
+        actualDatabaseRow3.addDatabaseColumnWithValue(new Value(31, false, new DatabaseColumn("column1", INTEGER, true)));
+        actualDatabaseRow3.addDatabaseColumnWithValue(new Value(32, false, new DatabaseColumn("column2", INTEGER, true)));
+        actualDatabaseRow3.addDatabaseColumnWithValue(new Value(33, false, new DatabaseColumn("column3", INTEGER, true)));
     }
 
 
@@ -228,13 +228,13 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
     }
 
 
-    private DatabaseColumnWithValue createColumn(String name, Object value) {
-        return new DatabaseColumnWithValue(name, value, INTEGER, false, true);
+    private Value createColumn(String name, Object value) {
+        return new Value(value, false, new DatabaseColumn(name, INTEGER, true));
     }
 
-    private DatabaseRow createExpectedDatabaseRow(DatabaseColumnWithValue... databaseColumnWithValues) {
+    private DatabaseRow createExpectedDatabaseRow(Value... databaseColumnWithValues) {
         DatabaseRow expectedDatabaseRow = new DatabaseRow("schema.table");
-        for (DatabaseColumnWithValue databaseColumnWithValue : databaseColumnWithValues) {
+        for (Value databaseColumnWithValue : databaseColumnWithValues) {
             expectedDatabaseRow.addDatabaseColumnWithValue(databaseColumnWithValue);
         }
         return expectedDatabaseRow;

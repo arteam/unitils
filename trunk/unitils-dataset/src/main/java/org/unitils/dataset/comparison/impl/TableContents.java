@@ -17,8 +17,8 @@ package org.unitils.dataset.comparison.impl;
 
 import org.unitils.core.util.DbUtils;
 import org.unitils.dataset.core.DatabaseColumn;
-import org.unitils.dataset.core.DatabaseColumnWithValue;
 import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.Value;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandler;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
@@ -102,14 +102,12 @@ public class TableContents {
         for (int i = 0; i < databaseColumns.size(); i++) {
             DatabaseColumn databaseColumn = databaseColumns.get(i);
 
-            String columnName = databaseColumn.getColumnName();
-            boolean primaryKey = databaseColumn.isPrimaryKey();
             int sqlType = databaseColumn.getSqlType();
             SqlTypeHandler<?> sqlTypeHandler = sqlTypeHandlerRepository.getSqlTypeHandler(sqlType);
 
             Object value = sqlTypeHandler.getResultSetValue(resultSet, i + 1, sqlType);
 
-            DatabaseColumnWithValue databaseColumnWithValue = new DatabaseColumnWithValue(columnName, value, sqlType, false, primaryKey);
+            Value databaseColumnWithValue = new Value(value, false, databaseColumn);
             databaseRow.addDatabaseColumnWithValue(databaseColumnWithValue);
         }
         return databaseRow;

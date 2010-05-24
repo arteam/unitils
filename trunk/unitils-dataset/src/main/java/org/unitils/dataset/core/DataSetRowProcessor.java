@@ -57,7 +57,7 @@ public class DataSetRowProcessor {
 
         for (DataSetColumn column : dataSetRow.getColumns()) {
             boolean primaryKey = isPrimaryKeyColumn(column, caseSensitive, allPrimaryKeyColumnNames, remainingPrimaryKeyColumnNames);
-            DatabaseColumnWithValue databaseColumn = processColumn(qualifiedTableName, column, variables, primaryKey, dataSetSettings);
+            Value databaseColumn = processColumn(qualifiedTableName, column, variables, primaryKey, dataSetSettings);
             databaseRow.addDatabaseColumnWithValue(databaseColumn);
         }
 
@@ -77,7 +77,7 @@ public class DataSetRowProcessor {
      * @param primaryKey    True if the column is a primary key column
      * @return the processed value, not null
      */
-    protected DatabaseColumnWithValue processColumn(String qualifiedTableName, DataSetColumn dataSetColumn, List<String> variables, boolean primaryKey, DataSetSettings dataSetSettings) throws Exception {
+    protected Value processColumn(String qualifiedTableName, DataSetColumn dataSetColumn, List<String> variables, boolean primaryKey, DataSetSettings dataSetSettings) throws Exception {
         char literalToken = dataSetSettings.getLiteralToken();
         char variableToken = dataSetSettings.getVariableToken();
         boolean caseSensitive = dataSetSettings.isCaseSensitive();
@@ -109,7 +109,8 @@ public class DataSetRowProcessor {
             correctTypeValue = sqlTypeHandler.getValue(valueWithVariablesFilledIn, sqlType);
         }
 
-        return new DatabaseColumnWithValue(columnName, correctTypeValue, sqlType, isLiteralValue, primaryKey);
+        DatabaseColumn databaseColumn = new DatabaseColumn(columnName, sqlType, primaryKey);
+        return new Value(correctTypeValue, isLiteralValue, databaseColumn);
     }
 
 

@@ -19,8 +19,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.core.DatabaseColumnWithValue;
+import org.unitils.dataset.core.DatabaseColumn;
 import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.Value;
 import org.unitils.dataset.util.DatabaseAccessor;
 import org.unitils.mock.Mock;
 
@@ -39,11 +40,11 @@ public class UpdateRowLoaderLoadDatabaseRowTest extends UnitilsJUnit4 {
     private Mock<DatabaseAccessor> databaseAccessor;
 
     private DatabaseRow databaseRow;
-    private DatabaseColumnWithValue databaseColumnPk1;
-    private DatabaseColumnWithValue databaseColumnPk2;
-    private DatabaseColumnWithValue databaseColumnPkLiteral;
-    private DatabaseColumnWithValue databaseColumn;
-    private DatabaseColumnWithValue databaseColumnLiteral;
+    private Value databaseColumnPk1;
+    private Value databaseColumnPk2;
+    private Value databaseColumnPkLiteral;
+    private Value databaseColumn;
+    private Value databaseColumnLiteral;
 
 
     @Before
@@ -52,11 +53,11 @@ public class UpdateRowLoaderLoadDatabaseRowTest extends UnitilsJUnit4 {
         updateDataSetLoader.init(null, databaseAccessor.getMock());
 
         databaseRow = new DatabaseRow("my_schema.table_a");
-        databaseColumnPk1 = new DatabaseColumnWithValue("pk1", "1", VARCHAR, false, true);
-        databaseColumnPk2 = new DatabaseColumnWithValue("pk2", "2", VARCHAR, false, true);
-        databaseColumnPkLiteral = new DatabaseColumnWithValue("pk3", "pk-literal", VARCHAR, true, true);
-        databaseColumn = new DatabaseColumnWithValue("column_1", "3", VARCHAR, false, false);
-        databaseColumnLiteral = new DatabaseColumnWithValue("column_2", "literal", VARCHAR, true, false);
+        databaseColumnPk1 = new Value("1", false, new DatabaseColumn("pk1", VARCHAR, true));
+        databaseColumnPk2 = new Value("2", false, new DatabaseColumn("pk2", VARCHAR, true));
+        databaseColumnPkLiteral = new Value("pk-literal", true, new DatabaseColumn("pk3", VARCHAR, true));
+        databaseColumn = new Value("3", false, new DatabaseColumn("column_1", VARCHAR, false));
+        databaseColumnLiteral = new Value("literal", true, new DatabaseColumn("column_2", VARCHAR, false));
     }
 
 
