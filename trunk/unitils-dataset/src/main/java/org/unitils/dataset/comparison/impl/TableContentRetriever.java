@@ -16,7 +16,7 @@
 package org.unitils.dataset.comparison.impl;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.core.DatabaseColumn;
+import org.unitils.dataset.core.Column;
 import org.unitils.dataset.loader.impl.Database;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
@@ -47,8 +47,8 @@ public class TableContentRetriever {
 
     // todo remove primary key column names  (implicit in database columns)
 
-    public TableContents getTableContents(String qualifiedTableName, List<DatabaseColumn> databaseColumns, Set<String> primaryKeyColumnNames) throws SQLException {
-        String sql = createStatement(qualifiedTableName, databaseColumns, primaryKeyColumnNames);
+    public TableContents getTableContents(String qualifiedTableName, List<Column> columns, Set<String> primaryKeyColumnNames) throws SQLException {
+        String sql = createStatement(qualifiedTableName, columns, primaryKeyColumnNames);
 
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
@@ -56,7 +56,7 @@ public class TableContentRetriever {
         try {
             preparedStatement = connection.prepareStatement(sql);
             resultSet = preparedStatement.executeQuery();
-            return new TableContents(qualifiedTableName, databaseColumns, sqlTypeHandlerRepository, primaryKeyColumnNames, connection, preparedStatement, resultSet);
+            return new TableContents(qualifiedTableName, columns, sqlTypeHandlerRepository, primaryKeyColumnNames, connection, preparedStatement, resultSet);
 
         } catch (Exception e) {
             closeQuietly(connection, preparedStatement, resultSet);
@@ -65,11 +65,11 @@ public class TableContentRetriever {
     }
 
 
-    protected String createStatement(String qualifiedTableName, List<DatabaseColumn> databaseColumns, Set<String> primaryKeyColumnNames) {
+    protected String createStatement(String qualifiedTableName, List<Column> columns, Set<String> primaryKeyColumnNames) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("select ");
-        for (DatabaseColumn databaseColumn : databaseColumns) {
-            stringBuilder.append(databaseColumn.getColumnName());
+        for (Column column : columns) {
+            stringBuilder.append(column.getName());
             stringBuilder.append(", ");
         }
         for (String primaryKeyColumnName : primaryKeyColumnNames) {

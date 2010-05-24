@@ -27,27 +27,27 @@ public class Value {
     private Object value;
     /* True if this value is a literal value */
     private boolean literalValue;
-    private DatabaseColumn databaseColumn;
+    /* The column that this value is for */
+    private Column column;
 
 
     /**
-     * @param value          The value, not null
-     * @param literalValue   True if this value is a literal value
-     * @param databaseColumn The column that this value is for, not null
+     * @param value        The value, not null
+     * @param literalValue True if this value is a literal value
+     * @param column       The column that this value is for, not null
      */
-    public Value(Object value, boolean literalValue, DatabaseColumn databaseColumn) {
+    public Value(Object value, boolean literalValue, Column column) {
         this.value = value;
         this.literalValue = literalValue;
-        this.databaseColumn = databaseColumn;
+        this.column = column;
     }
 
 
-    public boolean isEqualValue(Value otherDatabaseColumnWithValue) {
-        Object otherValue = otherDatabaseColumnWithValue.getValue();
-        if (value == otherValue) {
+    public boolean isEqualValue(Value otherValue) {
+        if (value == otherValue.getValue()) {
             return true;
         }
-        return value != null && value.equals(otherValue);
+        return value != null && value.equals(otherValue.getValue());
     }
 
     /**
@@ -64,14 +64,14 @@ public class Value {
         return literalValue;
     }
 
-    public DatabaseColumn getDatabaseColumn() {
-        return databaseColumn;
+    public Column getColumn() {
+        return column;
     }
 
 
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(databaseColumn.getColumnName());
+        stringBuilder.append(column.getName());
         stringBuilder.append('=');
         stringBuilder.append(value);
         return stringBuilder.toString();

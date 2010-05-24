@@ -78,15 +78,15 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
         dataSetRow.addDataSetColumn(new DataSetColumn("column", "value"));
 
         Set<String> unusedPrimaryKeys = new HashSet<String>();
-        DatabaseRow result = dataSetRowProcessor.process(dataSetRow, emptyVariables, unusedPrimaryKeys);
+        Row result = dataSetRowProcessor.process(dataSetRow, emptyVariables, unusedPrimaryKeys);
 
         assertTrue(unusedPrimaryKeys.isEmpty());
-        Value databaseColumn1 = result.getDatabaseColumnsWithValue().get(0);
-        Value databaseColumn2 = result.getDatabaseColumnsWithValue().get(1);
-        Value databaseColumn3 = result.getDatabaseColumnsWithValue().get(2);
-        assertTrue(databaseColumn1.getDatabaseColumn().isPrimaryKey());
-        assertTrue(databaseColumn2.getDatabaseColumn().isPrimaryKey());
-        assertFalse(databaseColumn3.getDatabaseColumn().isPrimaryKey());
+        Value value1 = result.getValues().get(0);
+        Value value2 = result.getValues().get(1);
+        Value value3 = result.getValues().get(2);
+        assertTrue(value1.getColumn().isPrimaryKey());
+        assertTrue(value2.getColumn().isPrimaryKey());
+        assertFalse(value3.getColumn().isPrimaryKey());
     }
 
     @Test
@@ -96,11 +96,11 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
         dataSetRow.addDataSetColumn(new DataSetColumn("Pk1", "value"));
 
         Set<String> unusedPrimaryKeys = new HashSet<String>();
-        DatabaseRow result = dataSetRowProcessor.process(dataSetRow, emptyVariables, unusedPrimaryKeys);
+        Row result = dataSetRowProcessor.process(dataSetRow, emptyVariables, unusedPrimaryKeys);
 
         assertReflectionEquals(asSet("pk2", "pk3"), unusedPrimaryKeys);
-        Value databaseColumn1 = result.getDatabaseColumnsWithValue().get(0);
-        assertTrue(databaseColumn1.getDatabaseColumn().isPrimaryKey());
+        Value value = result.getValues().get(0);
+        assertTrue(value.getColumn().isPrimaryKey());
     }
 
     @Test
@@ -111,12 +111,12 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
         dataSetRowCaseSensitive.addDataSetColumn(new DataSetColumn("pk", "value"));
 
         Set<String> unusedPrimaryKeys = new HashSet<String>();
-        DatabaseRow result = dataSetRowProcessor.process(dataSetRowCaseSensitive, emptyVariables, unusedPrimaryKeys);
+        Row result = dataSetRowProcessor.process(dataSetRowCaseSensitive, emptyVariables, unusedPrimaryKeys);
 
-        Value databaseColumn1 = result.getDatabaseColumnsWithValue().get(0);
-        Value databaseColumn2 = result.getDatabaseColumnsWithValue().get(1);
-        assertFalse(databaseColumn1.getDatabaseColumn().isPrimaryKey());
-        assertTrue(databaseColumn2.getDatabaseColumn().isPrimaryKey());
+        Value value1 = result.getValues().get(0);
+        Value value2 = result.getValues().get(1);
+        assertFalse(value1.getColumn().isPrimaryKey());
+        assertTrue(value2.getColumn().isPrimaryKey());
     }
 
 }

@@ -17,8 +17,8 @@ package org.unitils.dataset.comparison;
 
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.core.DatabaseColumn;
-import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.Column;
+import org.unitils.dataset.core.Row;
 import org.unitils.dataset.core.Value;
 
 import static java.sql.Types.VARCHAR;
@@ -33,9 +33,9 @@ public class RowComparisonGetNrOfPrimaryKeyDifferencesTest extends UnitilsJUnit4
 
     @Test
     public void equal() throws Exception {
-        DatabaseRow expectedDatabaseRow = createRow(1, 2, 3, 4);
-        DatabaseRow actualDatabaseRow = createRow(1, 2, 3, 4);
-        RowComparison rowComparison = new RowComparison(expectedDatabaseRow, actualDatabaseRow);
+        Row expectedRow = createRow(1, 2, 3, 4);
+        Row actualRow = createRow(1, 2, 3, 4);
+        RowComparison rowComparison = new RowComparison(expectedRow, actualRow);
 
         int result = rowComparison.getNrOfPrimaryKeyDifferences();
         assertEquals(0, result);
@@ -43,28 +43,28 @@ public class RowComparisonGetNrOfPrimaryKeyDifferencesTest extends UnitilsJUnit4
 
     @Test
     public void noPrimaryKeys() throws Exception {
-        RowComparison rowComparison = new RowComparison(new DatabaseRow("schema.table"), new DatabaseRow("schema.table"));
+        RowComparison rowComparison = new RowComparison(new Row("schema.table"), new Row("schema.table"));
         int result = rowComparison.getNrOfPrimaryKeyDifferences();
         assertEquals(0, result);
     }
 
     @Test
     public void differences() throws Exception {
-        DatabaseRow expectedDatabaseRow = createRow(1, 2, 3, 4);
-        DatabaseRow actualDatabaseRow = createRow(888, 999, 3, 4);
-        RowComparison rowComparison = new RowComparison(expectedDatabaseRow, actualDatabaseRow);
+        Row expectedRow = createRow(1, 2, 3, 4);
+        Row actualRow = createRow(888, 999, 3, 4);
+        RowComparison rowComparison = new RowComparison(expectedRow, actualRow);
 
         int result = rowComparison.getNrOfPrimaryKeyDifferences();
         assertEquals(2, result);
     }
 
 
-    private DatabaseRow createRow(Object pk1, Object pk2, Object value1, Object value2) {
-        DatabaseRow row = new DatabaseRow("schema.table");
-        row.addDatabaseColumnWithValue(new Value(pk1, false, new DatabaseColumn("pk1", VARCHAR, true)));
-        row.addDatabaseColumnWithValue(new Value(pk2, false, new DatabaseColumn("pk2", VARCHAR, true)));
-        row.addDatabaseColumnWithValue(new Value(value1, false, new DatabaseColumn("column1", VARCHAR, false)));
-        row.addDatabaseColumnWithValue(new Value(value2, false, new DatabaseColumn("column2", VARCHAR, false)));
+    private Row createRow(Object pk1, Object pk2, Object value1, Object value2) {
+        Row row = new Row("schema.table");
+        row.addValue(new Value(pk1, false, new Column("pk1", VARCHAR, true)));
+        row.addValue(new Value(pk2, false, new Column("pk2", VARCHAR, true)));
+        row.addValue(new Value(value1, false, new Column("column1", VARCHAR, false)));
+        row.addValue(new Value(value2, false, new Column("column2", VARCHAR, false)));
         return row;
     }
 

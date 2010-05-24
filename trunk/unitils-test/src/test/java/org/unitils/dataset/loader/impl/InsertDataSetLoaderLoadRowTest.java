@@ -18,9 +18,9 @@ package org.unitils.dataset.loader.impl;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.dataset.core.Column;
 import org.unitils.dataset.core.DataSetRowProcessor;
-import org.unitils.dataset.core.DatabaseColumn;
-import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.Row;
 import org.unitils.dataset.core.Value;
 import org.unitils.dataset.util.DatabaseAccessor;
 import org.unitils.mock.Mock;
@@ -29,12 +29,12 @@ import static java.sql.Types.VARCHAR;
 import static java.util.Arrays.asList;
 
 /**
- * Tests for creating using insert statements for loading data rows
+ * Tests for creating using insert statements for loading rows
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class InsertDataSetLoaderLoadDatabaseRowTest extends UnitilsJUnit4 {
+public class InsertDataSetLoaderLoadRowTest extends UnitilsJUnit4 {
 
     /* Tested object */
     private InsertDataSetLoader insertDataSetLoader = new InsertDataSetLoader();
@@ -42,40 +42,40 @@ public class InsertDataSetLoaderLoadDatabaseRowTest extends UnitilsJUnit4 {
     private Mock<DataSetRowProcessor> dataSetRowProcessor;
     private Mock<DatabaseAccessor> databaseAccessor;
 
-    private DatabaseRow databaseRow;
+    private Row row;
 
-    private Value databaseColumnPk;
-    private Value databaseColumn;
-    private Value databaseColumnLiteral;
+    private Value valuePk;
+    private Value value;
+    private Value valueLiteral;
 
 
     @Before
     public void initialize() throws Exception {
         insertDataSetLoader.init(dataSetRowProcessor.getMock(), databaseAccessor.getMock());
 
-        databaseRow = new DatabaseRow("my_schema.table_a");
-        databaseColumnPk = new Value("1", false, new DatabaseColumn("column_1", VARCHAR, true));
-        databaseColumn = new Value("2", false, new DatabaseColumn("column_2", VARCHAR, false));
-        databaseColumnLiteral = new Value("literal", true, new DatabaseColumn("column_3", VARCHAR, false));
+        row = new Row("my_schema.table_a");
+        valuePk = new Value("1", false, new Column("column_1", VARCHAR, true));
+        value = new Value("2", false, new Column("column_2", VARCHAR, false));
+        valueLiteral = new Value("literal", true, new Column("column_3", VARCHAR, false));
     }
 
 
     @Test
-    public void loadDatabaseRow() throws Exception {
-        databaseRow.addDatabaseColumnWithValue(databaseColumnPk);
-        databaseRow.addDatabaseColumnWithValue(databaseColumn);
+    public void loadRow() throws Exception {
+        row.addValue(valuePk);
+        row.addValue(value);
 
-        insertDataSetLoader.loadDatabaseRow(databaseRow);
-        databaseAccessor.assertInvoked().executeUpdate("insert into my_schema.table_a (column_1, column_2) values (?, ?)", asList(databaseColumnPk, databaseColumn));
+        insertDataSetLoader.loadRow(row);
+        databaseAccessor.assertInvoked().executeUpdate("insert into my_schema.table_a (column_1, column_2) values (?, ?)", asList(valuePk, value));
     }
 
     @Test
-    public void databaseRowWithLiteralValue() throws Exception {
-        databaseRow.addDatabaseColumnWithValue(databaseColumnPk);
-        databaseRow.addDatabaseColumnWithValue(databaseColumnLiteral);
+    public void rowWithLiteralValue() throws Exception {
+        row.addValue(valuePk);
+        row.addValue(valueLiteral);
 
-        insertDataSetLoader.loadDatabaseRow(databaseRow);
-        databaseAccessor.assertInvoked().executeUpdate("insert into my_schema.table_a (column_1, column_3) values (?, literal)", asList(databaseColumnPk));
+        insertDataSetLoader.loadRow(row);
+        databaseAccessor.assertInvoked().executeUpdate("insert into my_schema.table_a (column_1, column_3) values (?, literal)", asList(valuePk));
     }
 
 
@@ -93,7 +93,7 @@ public class InsertDataSetLoaderLoadDatabaseRowTest extends UnitilsJUnit4 {
 //    public void exceptionDuringLoadingOfRow() throws Exception {
 //        databaseAccessor.raises(SQLException.class).executeUpdate(null, null);
 //        try {
-//            insertDataSetRowLoader.load(databaseRow);
+//            insertDataSetRowLoader.load(row);
 //            fail("Exception expected");
 //        } catch (Exception e) {
 //            assertExceptionMessageContains(e, "my_schema");

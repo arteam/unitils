@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.loader.impl;
 
-import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.Row;
 import org.unitils.dataset.core.Value;
 
 import java.util.ArrayList;
@@ -29,21 +29,21 @@ import java.util.List;
 public class InsertDataSetLoader extends BaseDataSetLoader {
 
 
-    protected int loadDatabaseRow(DatabaseRow databaseRow) throws Exception {
+    protected int loadRow(Row row) throws Exception {
         StringBuilder columnsPart = new StringBuilder();
         StringBuilder valuesPart = new StringBuilder();
         List<Value> statementValues = new ArrayList<Value>();
 
-        for (Value databaseColumn : databaseRow.getDatabaseColumnsWithValue()) {
-            addColumnToStatementParts(databaseColumn, columnsPart, valuesPart, statementValues);
+        for (Value value : row.getValues()) {
+            addValueToStatementParts(value, columnsPart, valuesPart, statementValues);
         }
-        String sql = createStatement(databaseRow.getQualifiedTableName(), columnsPart, valuesPart);
+        String sql = createStatement(row.getQualifiedTableName(), columnsPart, valuesPart);
         return databaseAccessor.executeUpdate(sql, statementValues);
     }
 
 
-    protected void addColumnToStatementParts(Value value, StringBuilder columnsPart, StringBuilder valuesPart, List<Value> statementValues) {
-        columnsPart.append(value.getDatabaseColumn().getColumnName());
+    protected void addValueToStatementParts(Value value, StringBuilder columnsPart, StringBuilder valuesPart, List<Value> statementValues) {
+        columnsPart.append(value.getColumn().getName());
         columnsPart.append(", ");
 
         if (value.isLiteralValue()) {

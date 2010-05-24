@@ -26,35 +26,40 @@ import java.util.Map;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DatabaseRow {
+public class Row {
 
+    /* The identifier of the row (e.g. primary keys or row number), null if undefined */
     private String identifier;
-
     /* The table name prefixed with the schema name and quoted if it is a case-sensitive name. */
     private String qualifiedTableName;
-
     /* The columns of the row */
-    private Map<String, Value> databaseColumnsWithValuePerName = new LinkedHashMap<String, Value>();
+    private Map<String, Value> valuesPerColumnName = new LinkedHashMap<String, Value>();
+
 
     /**
      * Creates a database row.
      *
      * @param qualifiedTableName The table name prefixed with the schema name and quoted if it is a case-sensitive name, not null
      */
-    public DatabaseRow(String qualifiedTableName) {
+    public Row(String qualifiedTableName) {
         this(null, qualifiedTableName);
     }
 
     /**
      * Creates a database row.
      *
+     * @param identifier         The identifier of the row (e.g. primary keys or row number), null if undefined
      * @param qualifiedTableName The table name prefixed with the schema name and quoted if it is a case-sensitive name, not null
      */
-    public DatabaseRow(String identifier, String qualifiedTableName) {
+    public Row(String identifier, String qualifiedTableName) {
         this.identifier = identifier;
         this.qualifiedTableName = qualifiedTableName;
     }
 
+
+    /**
+     * @return The identifier of the row (e.g. primary keys or row number), null if undefined
+     */
     public String getIdentifier() {
         return identifier;
     }
@@ -67,18 +72,18 @@ public class DatabaseRow {
     }
 
     /**
-     * @return The columns of the row, not null
+     * @return The values of the row, not null
      */
-    public List<Value> getDatabaseColumnsWithValue() {
-        return new ArrayList<Value>(databaseColumnsWithValuePerName.values());
+    public List<Value> getValues() {
+        return new ArrayList<Value>(valuesPerColumnName.values());
     }
 
     /**
-     * @param databaseColumn The column to get, not null
-     * @return The column with value, null if not found
+     * @param column The column for which to get the value, not null
+     * @return The value, null if not found
      */
-    public Value getDatabaseColumnsWithValue(DatabaseColumn databaseColumn) {
-        return databaseColumnsWithValuePerName.get(databaseColumn.getColumnName());
+    public Value getValue(Column column) {
+        return valuesPerColumnName.get(column.getName());
     }
 
     /**
@@ -86,24 +91,17 @@ public class DatabaseRow {
      *
      * @param value The column to add, not null
      */
-    public void addDatabaseColumnWithValue(Value value) {
-        databaseColumnsWithValuePerName.put(value.getDatabaseColumn().getColumnName(), value);
-    }
-
-
-    /**
-     * @return The nr of columns in the row >= 0
-     */
-    public int getNrOfColumns() {
-        return databaseColumnsWithValuePerName.size();
+    public void addValue(Value value) {
+        valuesPerColumnName.put(value.getColumn().getName(), value);
     }
 
     /**
      * @return True if this row has no columns
      */
     public boolean isEmpty() {
-        return databaseColumnsWithValuePerName.isEmpty();
+        return valuesPerColumnName.isEmpty();
     }
+
 
     /**
      * @return The string representation of this row, not null
@@ -113,8 +111,8 @@ public class DatabaseRow {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(qualifiedTableName);
         stringBuilder.append(" [");
-        for (Value databaseColumn : databaseColumnsWithValuePerName.values()) {
-            stringBuilder.append(databaseColumn);
+        for (Value value : valuesPerColumnName.values()) {
+            stringBuilder.append(value);
             stringBuilder.append(", ");
         }
         if (stringBuilder.length() == 0) {

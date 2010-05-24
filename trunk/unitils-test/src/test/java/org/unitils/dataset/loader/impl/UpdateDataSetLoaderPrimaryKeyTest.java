@@ -51,8 +51,8 @@ public class UpdateDataSetLoaderPrimaryKeyTest extends UnitilsJUnit4 {
     private List<String> emptyVariables = new ArrayList<String>();
 
     private DataSetRow dataSetRow;
-    private DatabaseRow databaseRowPrimaryKey;
-    private DatabaseRow databaseRowNoPrimaryKey;
+    private Row rowPrimaryKey;
+    private Row rowNoPrimaryKey;
 
 
     @Before
@@ -60,11 +60,11 @@ public class UpdateDataSetLoaderPrimaryKeyTest extends UnitilsJUnit4 {
         updateDataSetLoader.init(dataSetRowProcessor.getMock(), databaseAccessor.getMock());
 
         dataSetRow = createDataSetRow();
-        databaseRowPrimaryKey = createDatabaseRow(true);
-        databaseRowNoPrimaryKey = createDatabaseRow(false);
+        rowPrimaryKey = createRow(true);
+        rowNoPrimaryKey = createRow(false);
 
         databaseAccessor.returns(1).executeUpdate(null, null);
-        dataSetRowProcessor.returns(databaseRowPrimaryKey).process(null, null, null);
+        dataSetRowProcessor.returns(rowPrimaryKey).process(null, null, null);
     }
 
 
@@ -88,7 +88,7 @@ public class UpdateDataSetLoaderPrimaryKeyTest extends UnitilsJUnit4 {
 
     @Test
     public void noPkFound() throws Exception {
-        dataSetRowProcessor.onceReturns(databaseRowNoPrimaryKey).process(null, null, null);
+        dataSetRowProcessor.onceReturns(rowNoPrimaryKey).process(null, null, null);
         try {
             updateDataSetLoader.loadDataSetRow(dataSetRow, emptyVariables);
             fail("UnitilsException expected");
@@ -104,7 +104,7 @@ public class UpdateDataSetLoaderPrimaryKeyTest extends UnitilsJUnit4 {
             public Object execute(ProxyInvocation proxyInvocation) throws Throwable {
                 Set<String> unusedPrimaryKeyColumnNames = (Set<String>) proxyInvocation.getArguments().get(2);
                 unusedPrimaryKeyColumnNames.addAll(primaryKeyNames);
-                return databaseRowPrimaryKey;
+                return rowPrimaryKey;
             }
         }).process(null, null, null);
     }
@@ -117,10 +117,10 @@ public class UpdateDataSetLoaderPrimaryKeyTest extends UnitilsJUnit4 {
         return dataSetRow;
     }
 
-    private DatabaseRow createDatabaseRow(boolean primaryKey) {
-        DatabaseRow databaseRow = new DatabaseRow("schema.table");
-        databaseRow.addDatabaseColumnWithValue(new Value("value", false, new DatabaseColumn("column", 0, primaryKey)));
-        return databaseRow;
+    private Row createRow(boolean primaryKey) {
+        Row row = new Row("schema.table");
+        row.addValue(new Value("value", false, new Column("column", 0, primaryKey)));
+        return row;
     }
 
 

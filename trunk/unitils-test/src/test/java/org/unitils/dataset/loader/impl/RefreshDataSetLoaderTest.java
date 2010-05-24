@@ -42,7 +42,7 @@ public class RefreshDataSetLoaderTest extends UnitilsJUnit4 {
     private List<String> emptyVariables = new ArrayList<String>();
 
     private DataSetRow dataSetRow;
-    private DatabaseRow databaseRowPrimaryKey;
+    private Row rowPrimaryKey;
 
 
     @Before
@@ -50,10 +50,10 @@ public class RefreshDataSetLoaderTest extends UnitilsJUnit4 {
         refreshRowLoader.init(dataSetRowProcessor.getMock(), databaseAccessor.getMock());
 
         dataSetRow = createDataSetRow();
-        databaseRowPrimaryKey = createDatabaseRow(true);
+        rowPrimaryKey = createRow(true);
 
         dataSetRowSource.onceReturns(dataSetRow).getNextDataSetRow();
-        dataSetRowProcessor.returns(databaseRowPrimaryKey).process(null, null, null);
+        dataSetRowProcessor.returns(rowPrimaryKey).process(null, null, null);
     }
 
 
@@ -85,9 +85,9 @@ public class RefreshDataSetLoaderTest extends UnitilsJUnit4 {
         return dataSetRow;
     }
 
-    private DatabaseRow createDatabaseRow(boolean primaryKey) {
-        DatabaseRow databaseRow = new DatabaseRow("schema.table");
-        databaseRow.addDatabaseColumnWithValue(new Value("value", false, new DatabaseColumn("column", 0, primaryKey)));
-        return databaseRow;
+    private Row createRow(boolean primaryKey) {
+        Row row = new Row("schema.table");
+        row.addValue(new Value("value", false, new Column("column", 0, primaryKey)));
+        return row;
     }
 }

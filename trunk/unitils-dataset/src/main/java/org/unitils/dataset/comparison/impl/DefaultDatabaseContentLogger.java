@@ -19,8 +19,8 @@ import org.unitils.core.UnitilsException;
 import org.unitils.dataset.comparison.DataSetComparison;
 import org.unitils.dataset.comparison.DatabaseContentLogger;
 import org.unitils.dataset.comparison.TableComparison;
-import org.unitils.dataset.core.DatabaseColumn;
-import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.Column;
+import org.unitils.dataset.core.Row;
 import org.unitils.dataset.core.Value;
 import org.unitils.dataset.loader.impl.Database;
 
@@ -64,9 +64,9 @@ public class DefaultDatabaseContentLogger implements DatabaseContentLogger {
     protected void getActualTableContent(TableComparison tableComparison, StringBuilder contentBuilder) throws Exception {
         String qualifiedTableName = tableComparison.getQualifiedTableName();
         Set<String> primaryKeyColumnNames = database.getPrimaryKeyColumnNames(qualifiedTableName);
-        List<DatabaseColumn> databaseColumns = database.getDatabaseColumns(qualifiedTableName);
+        List<Column> columns = database.getColumns(qualifiedTableName);
 
-        TableContents tableContents = tableContentRetriever.getTableContents(qualifiedTableName, databaseColumns, primaryKeyColumnNames);
+        TableContents tableContents = tableContentRetriever.getTableContents(qualifiedTableName, columns, primaryKeyColumnNames);
         try {
             int nrOfColumns = tableContents.getNrOfColumns();
             List<String> columnNames = tableContents.getColumnNames();
@@ -80,18 +80,17 @@ public class DefaultDatabaseContentLogger implements DatabaseContentLogger {
                 columnSizes.add(columnName.length());
                 values.add(new ArrayList<String>());
             }
-            DatabaseRow databaseRow;
-            while ((databaseRow = tableContents.getDatabaseRow()) != null) {
-                String rowIdentifier = databaseRow.getIdentifier();
+            Row row;
+            while ((row = tableContents.getRow()) != null) {
+                String rowIdentifier = row.getIdentifier();
                 rowWithExactMatch.add(tableComparison.isMatchingRow(rowIdentifier));
 
-                List<Value> databaseColumnWithValues = databaseRow.getDatabaseColumnsWithValue();
+                List<Value> rowValues = row.getValues();
                 for (int i = 0; i < nrOfColumns; i++) {
-                    Value databaseColumnWithValue = databaseColumnWithValues.get(i);
-                    Object value = databaseColumnWithValue.getValue();
+                    Value value = rowValues.get(i);
                     String valueAsString = "";
-                    if (value != null) {
-                        valueAsString = value.toString();
+                    if (value.getValue() != null) {
+                        valueAsString = value.getValue().toString();
                     }
 
                     values.get(i).add(valueAsString);

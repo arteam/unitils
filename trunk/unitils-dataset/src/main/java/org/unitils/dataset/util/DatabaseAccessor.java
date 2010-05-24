@@ -46,6 +46,7 @@ public class DatabaseAccessor {
         PreparedStatement preparedStatement = null;
         Connection connection = database.getConnection();
         try {
+            logStatement(sql, statementValues);
             preparedStatement = connection.prepareStatement(sql);
             setStatementValues(preparedStatement, statementValues);
             return preparedStatement.executeUpdate();
@@ -59,20 +60,27 @@ public class DatabaseAccessor {
             return;
         }
         int index = 1;
-        for (Value databaseColumnWithValue : statementValues) {
-            int sqlType = databaseColumnWithValue.getDatabaseColumn().getSqlType();
-            preparedStatement.setObject(index++, databaseColumnWithValue.getValue(), sqlType);
+        for (Value value : statementValues) {
+            int sqlType = value.getColumn().getSqlType();
+            preparedStatement.setObject(index++, value.getValue(), sqlType);
         }
     }
 
 
-    // todo implement
-
-    protected void logStatement(String sql, List<String> statementValues) {
+    protected void logStatement(String sql, List<Value> statementValues) {
         if (statementValues.isEmpty()) {
             logger.debug(sql);
         } else {
-            logger.debug(sql + " <- " + statementValues);
+            StringBuilder message = new StringBuilder(sql);
+            if (!statementValues.isEmpty()) {
+                message.append(" <- ");
+                for (Value statementValue : statementValues) {
+                    message.append(statementValue.getValue());
+                    message.append(", ");
+                }
+                message.setLength(message.length() - 2);
+            }
+            logger.debug(message);
         }
     }
 }

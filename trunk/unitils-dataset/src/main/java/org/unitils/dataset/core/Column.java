@@ -21,7 +21,7 @@ package org.unitils.dataset.core;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DatabaseColumn {
+public class Column {
 
     /* The column name */
     private String columnName;
@@ -36,7 +36,7 @@ public class DatabaseColumn {
      * @param sqlType    The sql type of the column in the database
      * @param primaryKey True if the column is a primary key column
      */
-    public DatabaseColumn(String columnName, int sqlType, boolean primaryKey) {
+    public Column(String columnName, int sqlType, boolean primaryKey) {
         this.columnName = columnName;
         this.sqlType = sqlType;
         this.primaryKey = primaryKey;
@@ -46,7 +46,7 @@ public class DatabaseColumn {
     /**
      * @return The column name, not null
      */
-    public String getColumnName() {
+    public String getName() {
         return columnName;
     }
 
