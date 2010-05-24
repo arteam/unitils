@@ -19,9 +19,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.dataset.core.Column;
 import org.unitils.dataset.core.DataSetColumn;
 import org.unitils.dataset.core.DataSetRow;
-import org.unitils.dataset.core.DatabaseColumn;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import java.sql.Connection;
@@ -107,8 +107,8 @@ public class Database {
     }
 
 
-    public List<DatabaseColumn> getDatabaseColumns(String qualifiedTableName) throws SQLException {
-        List<DatabaseColumn> databaseColumns = new ArrayList<DatabaseColumn>();
+    public List<Column> getColumns(String qualifiedTableName) throws SQLException {
+        List<Column> columns = new ArrayList<Column>();
         Set<String> primaryKeyColumnNames = getPrimaryKeyColumnNames(qualifiedTableName);
 
         Connection connection = getConnection();
@@ -123,10 +123,10 @@ public class Database {
                 int sqlType = resultSet.getInt("DATA_TYPE");
                 boolean primaryKey = primaryKeyColumnNames.contains(columnName);
 
-                DatabaseColumn databaseColumn = new DatabaseColumn(columnName, sqlType, primaryKey);
-                databaseColumns.add(databaseColumn);
+                Column column = new Column(columnName, sqlType, primaryKey);
+                columns.add(column);
             }
-            return databaseColumns;
+            return columns;
         } finally {
             close(connection, null, resultSet);
         }

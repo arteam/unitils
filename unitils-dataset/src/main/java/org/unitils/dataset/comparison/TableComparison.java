@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.comparison;
 
-import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.Row;
 
 import java.util.*;
 
@@ -34,14 +34,14 @@ public class TableComparison {
     private boolean expectedNoMoreRecordsButFoundMore = false;
 
     /* The data set rows for which no database row was found, empty if none found */
-    private List<DatabaseRow> missingRows = new ArrayList<DatabaseRow>();
+    private List<Row> missingRows = new ArrayList<Row>();
 
-    private List<DatabaseRow> rowsThatShouldNotHaveMatched = new ArrayList<DatabaseRow>();
+    private List<Row> rowsThatShouldNotHaveMatched = new ArrayList<Row>();
 
     /* The best differences of the comparisons between the rows of the tables with the epxected database row as key */
-    private Map<DatabaseRow, RowComparison> bestRowComparisons = new LinkedHashMap<DatabaseRow, RowComparison>();
+    private Map<Row, RowComparison> bestRowComparisons = new LinkedHashMap<Row, RowComparison>();
 
-    private Set<String> actualRowIdentifiersWithMatch = new HashSet<String>();
+    private Set<String> rowIdentifiersWithMatch = new HashSet<String>();
 
 
     /**
@@ -80,7 +80,7 @@ public class TableComparison {
     /**
      * @return The data set rows for which no database row was found, empty if none found
      */
-    public List<DatabaseRow> getMissingRows() {
+    public List<Row> getMissingRows() {
         return missingRows;
     }
 
@@ -89,18 +89,18 @@ public class TableComparison {
      *
      * @param missingRow The missing row, not null
      */
-    public void addMissingRow(DatabaseRow missingRow) {
+    public void addMissingRow(Row missingRow) {
         missingRows.add(missingRow);
     }
 
 
-    public List<DatabaseRow> getRowsThatShouldNotHaveMatched() {
+    public List<Row> getRowsThatShouldNotHaveMatched() {
         return rowsThatShouldNotHaveMatched;
     }
 
-    public void setMatchingRowThatShouldNotHaveMatched(DatabaseRow databaseRow) {
-        actualRowIdentifiersWithMatch.contains(databaseRow.getIdentifier());
-        rowsThatShouldNotHaveMatched.add(databaseRow);
+    public void setMatchingRowThatShouldNotHaveMatched(Row row) {
+        rowIdentifiersWithMatch.contains(row.getIdentifier());
+        rowsThatShouldNotHaveMatched.add(row);
     }
 
     /**
@@ -108,12 +108,12 @@ public class TableComparison {
      * @return True if the actual row index was already used for a match
      */
     public boolean isMatchingRow(String rowIdentifier) {
-        return actualRowIdentifiersWithMatch.contains(rowIdentifier);
+        return rowIdentifiersWithMatch.contains(rowIdentifier);
     }
 
     public void setMatchingRow(RowComparison rowComparison) {
-        bestRowComparisons.remove(rowComparison.getExpectedDatabaseRow());
-        actualRowIdentifiersWithMatch.add(rowComparison.getActualDatabaseRow().getIdentifier());
+        bestRowComparisons.remove(rowComparison.getExpectedRow());
+        rowIdentifiersWithMatch.add(rowComparison.getActualRow().getIdentifier());
     }
 
     /**
@@ -124,11 +124,11 @@ public class TableComparison {
     }
 
     /**
-     * @param expectedDatabaseRow The expected database row, not null
+     * @param expectedRow The expected row, not null
      * @return The best comparison for the given rows, not null
      */
-    public RowComparison getBestRowComparison(DatabaseRow expectedDatabaseRow) {
-        return bestRowComparisons.get(expectedDatabaseRow);
+    public RowComparison getBestRowComparison(Row expectedRow) {
+        return bestRowComparisons.get(expectedRow);
     }
 
 
@@ -138,10 +138,10 @@ public class TableComparison {
      * @param rowComparison The comparison result, not null
      */
     public void replaceIfBetterRowComparison(RowComparison rowComparison) {
-        DatabaseRow expectedDatabaseRow = rowComparison.getExpectedDatabaseRow();
-        RowComparison currentRowComparison = bestRowComparisons.get(expectedDatabaseRow);
+        Row expectedRow = rowComparison.getExpectedRow();
+        RowComparison currentRowComparison = bestRowComparisons.get(expectedRow);
         if (currentRowComparison == null || rowComparison.isBetterMatch(currentRowComparison)) {
-            bestRowComparisons.put(expectedDatabaseRow, rowComparison);
+            bestRowComparisons.put(expectedRow, rowComparison);
         }
     }
 

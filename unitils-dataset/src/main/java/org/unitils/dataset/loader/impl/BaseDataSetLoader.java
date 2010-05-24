@@ -18,7 +18,7 @@ package org.unitils.dataset.loader.impl;
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.core.DataSetRow;
 import org.unitils.dataset.core.DataSetRowProcessor;
-import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.Row;
 import org.unitils.dataset.factory.DataSetRowSource;
 import org.unitils.dataset.loader.DataSetLoader;
 import org.unitils.dataset.util.DatabaseAccessor;
@@ -53,24 +53,24 @@ public abstract class BaseDataSetLoader implements DataSetLoader {
 
     protected int loadDataSetRow(DataSetRow dataSetRow, List<String> variables) {
         try {
-            DatabaseRow databaseRow = processDataSetRow(dataSetRow, variables);
-            if (databaseRow.isEmpty()) {
+            Row row = processDataSetRow(dataSetRow, variables);
+            if (row.isEmpty()) {
                 return 0;
             }
-            return loadDatabaseRow(databaseRow);
+            return loadRow(row);
 
         } catch (Exception e) {
             throw new UnitilsException("Unable to load data set row: " + dataSetRow + ", variables: " + variables, e);
         }
     }
 
-    protected DatabaseRow processDataSetRow(DataSetRow dataSetRow, List<String> variables) throws Exception {
+    protected Row processDataSetRow(DataSetRow dataSetRow, List<String> variables) throws Exception {
         Set<String> unusedPrimaryKeyColumnNames = new HashSet<String>();
-        DatabaseRow databaseRow = dataSetRowProcessor.process(dataSetRow, variables, unusedPrimaryKeyColumnNames);
+        Row row = dataSetRowProcessor.process(dataSetRow, variables, unusedPrimaryKeyColumnNames);
         if (!unusedPrimaryKeyColumnNames.isEmpty()) {
             handleUnusedPrimaryKeyColumns(unusedPrimaryKeyColumnNames);
         }
-        return databaseRow;
+        return row;
     }
 
 
@@ -78,5 +78,5 @@ public abstract class BaseDataSetLoader implements DataSetLoader {
         // nothing to do
     }
 
-    protected abstract int loadDatabaseRow(DatabaseRow databaseRow) throws Exception;
+    protected abstract int loadRow(Row row) throws Exception;
 }

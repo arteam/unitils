@@ -21,8 +21,8 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.dataset.comparison.impl.DefaultDatabaseContentLogger;
 import org.unitils.dataset.comparison.impl.TableContentRetriever;
 import org.unitils.dataset.comparison.impl.TableContents;
-import org.unitils.dataset.core.DatabaseColumn;
-import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.Column;
+import org.unitils.dataset.core.Row;
 import org.unitils.dataset.core.Value;
 import org.unitils.dataset.loader.impl.Database;
 import org.unitils.mock.Mock;
@@ -48,17 +48,17 @@ public class DefaultDatabaseContentLoggerTest extends UnitilsJUnit4 {
     protected DataSetComparison dataSetComparison;
     protected TableComparison tableComparison;
 
-    private DatabaseRow databaseRow1;
-    private DatabaseRow databaseRow2;
+    private Row row1;
+    private Row row2;
 
     @Before
     public void initialize() throws Exception {
-        DatabaseColumn databaseColumn1 = new DatabaseColumn("pk1", VARCHAR, true);
-        DatabaseColumn databaseColumn2 = new DatabaseColumn("column", VARCHAR, false);
+        Column column1 = new Column("pk1", VARCHAR, true);
+        Column column2 = new Column("column", VARCHAR, false);
         database.returns(asSet("pk1")).getPrimaryKeyColumnNames("schema.table");
-        database.returns(asList(databaseColumn1, databaseColumn2)).getDatabaseColumns("schema.table");
+        database.returns(asList(column1, column2)).getColumns("schema.table");
 
-        tableContentRetriever.returns(tableContent).getTableContents("schema.table", asList(databaseColumn1, databaseColumn2), asSet("pk1"));
+        tableContentRetriever.returns(tableContent).getTableContents("schema.table", asList(column1, column2), asSet("pk1"));
         tableContent.returns(2).getNrOfColumns();
         tableContent.returns(asList("column1", "column2")).getColumnNames();
 
@@ -67,19 +67,19 @@ public class DefaultDatabaseContentLoggerTest extends UnitilsJUnit4 {
         tableComparison = new TableComparison("schema.table");
         dataSetComparison = createDataSetComparison(tableComparison);
 
-        databaseRow1 = new DatabaseRow("1", "schema.table");
-        databaseRow1.addDatabaseColumnWithValue(new Value("row1col1", false, new DatabaseColumn("column1", VARCHAR, true)));
-        databaseRow1.addDatabaseColumnWithValue(new Value("row1col2", false, new DatabaseColumn("column2", VARCHAR, true)));
-        databaseRow2 = new DatabaseRow("2", "schema.table");
-        databaseRow2.addDatabaseColumnWithValue(new Value("row2col1", false, new DatabaseColumn("column1", VARCHAR, true)));
-        databaseRow2.addDatabaseColumnWithValue(new Value("row2col2", false, new DatabaseColumn("column2", VARCHAR, true)));
+        row1 = new Row("1", "schema.table");
+        row1.addValue(new Value("row1col1", false, new Column("column1", VARCHAR, true)));
+        row1.addValue(new Value("row1col2", false, new Column("column2", VARCHAR, true)));
+        row2 = new Row("2", "schema.table");
+        row2.addValue(new Value("row2col1", false, new Column("column1", VARCHAR, true)));
+        row2.addValue(new Value("row2col2", false, new Column("column2", VARCHAR, true)));
     }
 
 
     @Test
     public void getContent() throws Exception {
-        tableContent.onceReturns(databaseRow1).getDatabaseRow();
-        tableContent.onceReturns(databaseRow2).getDatabaseRow();
+        tableContent.onceReturns(row1).getRow();
+        tableContent.onceReturns(row2).getRow();
 
         String result = defaultDatabaseContentRetriever.getDatabaseContentForComparison(dataSetComparison);
         assertEquals("schema.table\n" +
@@ -99,8 +99,8 @@ public class DefaultDatabaseContentLoggerTest extends UnitilsJUnit4 {
     @Test
     public void rowsWithExactMatch() throws Exception {
         setActualRowIdentifiersWithMatch("1");
-        tableContent.onceReturns(databaseRow1).getDatabaseRow();
-        tableContent.onceReturns(databaseRow2).getDatabaseRow();
+        tableContent.onceReturns(row1).getRow();
+        tableContent.onceReturns(row2).getRow();
 
         String result = defaultDatabaseContentRetriever.getDatabaseContentForComparison(dataSetComparison);
         assertEquals("schema.table\n" +
@@ -117,7 +117,7 @@ public class DefaultDatabaseContentLoggerTest extends UnitilsJUnit4 {
     }
 
     private void setActualRowIdentifiersWithMatch(String identifier) {
-        tableComparison.setMatchingRow(new RowComparison(new DatabaseRow(null), new DatabaseRow(identifier, null)));
+        tableComparison.setMatchingRow(new RowComparison(new Row(null), new Row(identifier, null)));
     }
 
 

@@ -67,61 +67,61 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
     @Test
     public void regularValue() throws Exception {
         dataSetRow.addDataSetColumn(new DataSetColumn("column", "value"));
-        DatabaseRow result = dataSetRowProcessor.process(dataSetRow, emptyVariables, emptyPrimaryKeys);
+        Row result = dataSetRowProcessor.process(dataSetRow, emptyVariables, emptyPrimaryKeys);
 
-        Value databaseColumn = result.getDatabaseColumnsWithValue().get(0);
-        assertEquals("value", databaseColumn.getValue());
-        assertFalse(databaseColumn.isLiteralValue());
+        Value value = result.getValues().get(0);
+        assertEquals("value", value.getValue());
+        assertFalse(value.isLiteralValue());
     }
 
     @Test
     public void literalValue() throws Exception {
         dataSetRow.addDataSetColumn(new DataSetColumn("column", "=value"));
-        DatabaseRow result = dataSetRowProcessor.process(dataSetRow, emptyVariables, emptyPrimaryKeys);
+        Row result = dataSetRowProcessor.process(dataSetRow, emptyVariables, emptyPrimaryKeys);
 
-        Value databaseColumn = result.getDatabaseColumnsWithValue().get(0);
-        assertEquals("value", databaseColumn.getValue());
-        assertTrue(databaseColumn.isLiteralValue());
+        Value value = result.getValues().get(0);
+        assertEquals("value", value.getValue());
+        assertTrue(value.isLiteralValue());
     }
 
     @Test
     public void escapedLiteralValue() throws Exception {
         dataSetRow.addDataSetColumn(new DataSetColumn("column", "==value"));
-        DatabaseRow result = dataSetRowProcessor.process(dataSetRow, emptyVariables, emptyPrimaryKeys);
+        Row result = dataSetRowProcessor.process(dataSetRow, emptyVariables, emptyPrimaryKeys);
 
-        Value databaseColumn = result.getDatabaseColumnsWithValue().get(0);
-        assertEquals("=value", databaseColumn.getValue());
-        assertFalse(databaseColumn.isLiteralValue());
+        Value value = result.getValues().get(0);
+        assertEquals("=value", value.getValue());
+        assertFalse(value.isLiteralValue());
     }
 
     @Test
     public void variables() throws Exception {
         dataSetRow.addDataSetColumn(new DataSetColumn("column", "$0value $0 $1"));
-        DatabaseRow result = dataSetRowProcessor.process(dataSetRow, asList("1", "2"), emptyPrimaryKeys);
+        Row result = dataSetRowProcessor.process(dataSetRow, asList("1", "2"), emptyPrimaryKeys);
 
-        Value databaseColumn = result.getDatabaseColumnsWithValue().get(0);
-        assertEquals("1value 1 2", databaseColumn.getValue());
-        assertFalse(databaseColumn.isLiteralValue());
+        Value value = result.getValues().get(0);
+        assertEquals("1value 1 2", value.getValue());
+        assertFalse(value.isLiteralValue());
     }
 
     @Test
     public void literalValueThroughVariable() throws Exception {
         dataSetRow.addDataSetColumn(new DataSetColumn("column", "$0"));
-        DatabaseRow result = dataSetRowProcessor.process(dataSetRow, asList("=value"), emptyPrimaryKeys);
+        Row result = dataSetRowProcessor.process(dataSetRow, asList("=value"), emptyPrimaryKeys);
 
-        Value databaseColumn = result.getDatabaseColumnsWithValue().get(0);
-        assertEquals("value", databaseColumn.getValue());
-        assertTrue(databaseColumn.isLiteralValue());
+        Value value = result.getValues().get(0);
+        assertEquals("value", value.getValue());
+        assertTrue(value.isLiteralValue());
     }
 
     @Test
     public void escapedLiteralValueThroughVariable() throws Exception {
         dataSetRow.addDataSetColumn(new DataSetColumn("column", "$0"));
-        DatabaseRow result = dataSetRowProcessor.process(dataSetRow, asList("==value"), emptyPrimaryKeys);
+        Row result = dataSetRowProcessor.process(dataSetRow, asList("==value"), emptyPrimaryKeys);
 
-        Value databaseColumn = result.getDatabaseColumnsWithValue().get(0);
-        assertEquals("=value", databaseColumn.getValue());
-        assertFalse(databaseColumn.isLiteralValue());
+        Value value = result.getValues().get(0);
+        assertEquals("=value", value.getValue());
+        assertFalse(value.isLiteralValue());
     }
 
 }

@@ -22,7 +22,7 @@ import org.unitils.core.util.ObjectFormatter;
 import org.unitils.dataset.comparison.*;
 import org.unitils.dataset.core.BaseDataSetStrategy;
 import org.unitils.dataset.core.DataSetRowProcessor;
-import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.Row;
 import org.unitils.dataset.factory.DataSetRowSource;
 import org.unitils.dataset.loader.impl.Database;
 import org.unitils.dataset.loader.impl.IdentifierNameProcessor;
@@ -114,11 +114,11 @@ public class DefaultExpectedDataSetStrategy implements ExpectedDataSetStrategy {
     }
 
     protected void appendTableComparison(TableComparison tableComparison, StringBuilder result) {
-        for (DatabaseRow databaseRow : tableComparison.getMissingRows()) {
-            appendMissingRow(databaseRow, result);
+        for (Row row : tableComparison.getMissingRows()) {
+            appendMissingRow(row, result);
         }
-        for (DatabaseRow databaseRow : tableComparison.getRowsThatShouldNotHaveMatched()) {
-            appendRowThatShouldNotHaveMatch(databaseRow, result);
+        for (Row row : tableComparison.getRowsThatShouldNotHaveMatched()) {
+            appendRowThatShouldNotHaveMatch(row, result);
         }
         for (RowComparison rowComparison : tableComparison.getBestRowComparisons()) {
             appendBestRowComparison(rowComparison, result);
@@ -127,13 +127,13 @@ public class DefaultExpectedDataSetStrategy implements ExpectedDataSetStrategy {
     }
 
 
-    protected void appendMissingRow(DatabaseRow missingRow, StringBuilder result) {
+    protected void appendMissingRow(Row missingRow, StringBuilder result) {
         result.append("* No database record found for data set row:  ");
         result.append(missingRow);
         result.append("\n");
     }
 
-    protected void appendRowThatShouldNotHaveMatch(DatabaseRow rowThatShouldNotHaveMatch, StringBuilder result) {
+    protected void appendRowThatShouldNotHaveMatch(Row rowThatShouldNotHaveMatch, StringBuilder result) {
         result.append("* Expected not to find a match for data set row: ");
         result.append(rowThatShouldNotHaveMatch);
         result.append("\n");
@@ -141,7 +141,7 @@ public class DefaultExpectedDataSetStrategy implements ExpectedDataSetStrategy {
 
     protected void appendBestRowComparison(RowComparison rowComparison, StringBuilder result) {
         result.append("* No match found for data set row:  ");
-        result.append(rowComparison.getExpectedDatabaseRow());
+        result.append(rowComparison.getExpectedRow());
         result.append("\n");
 
         StringBuilder columnNames = new StringBuilder();

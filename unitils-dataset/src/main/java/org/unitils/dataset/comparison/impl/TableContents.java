@@ -16,8 +16,8 @@
 package org.unitils.dataset.comparison.impl;
 
 import org.unitils.core.util.DbUtils;
-import org.unitils.dataset.core.DatabaseColumn;
-import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.Column;
+import org.unitils.dataset.core.Row;
 import org.unitils.dataset.core.Value;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandler;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
@@ -37,7 +37,7 @@ import java.util.Set;
 public class TableContents {
 
     protected String qualifiedTableName;
-    protected List<DatabaseColumn> databaseColumns;
+    protected List<Column> columns;
 
     protected Connection connection;
     protected PreparedStatement preparedStatement;
@@ -51,9 +51,9 @@ public class TableContents {
     protected boolean useRowIndexAsIdentifier = false;
 
 
-    public TableContents(String qualifiedTableName, List<DatabaseColumn> databaseColumns, SqlTypeHandlerRepository sqlTypeHandlerRepository, Set<String> primaryKeyColumnNames, Connection connection, PreparedStatement preparedStatement, ResultSet resultSet) {
+    public TableContents(String qualifiedTableName, List<Column> columns, SqlTypeHandlerRepository sqlTypeHandlerRepository, Set<String> primaryKeyColumnNames, Connection connection, PreparedStatement preparedStatement, ResultSet resultSet) {
         this.qualifiedTableName = qualifiedTableName;
-        this.databaseColumns = databaseColumns;
+        this.columns = columns;
         this.sqlTypeHandlerRepository = sqlTypeHandlerRepository;
         this.primaryKeyColumnNames = primaryKeyColumnNames;
 
@@ -92,37 +92,35 @@ public class TableContents {
     }
 
 
-    public DatabaseRow getDatabaseRow() throws Exception {
+    public Row getRow() throws Exception {
         if (!resultSet.next()) {
             return null;
         }
         rowIndex++;
-        DatabaseRow databaseRow = new DatabaseRow(getRowIdentifier(), qualifiedTableName);
+        Row row = new Row(getRowIdentifier(), qualifiedTableName);
 
-        for (int i = 0; i < databaseColumns.size(); i++) {
-            DatabaseColumn databaseColumn = databaseColumns.get(i);
+        for (int i = 0; i < columns.size(); i++) {
+            Column column = columns.get(i);
 
-            int sqlType = databaseColumn.getSqlType();
+            int sqlType = column.getSqlType();
             SqlTypeHandler<?> sqlTypeHandler = sqlTypeHandlerRepository.getSqlTypeHandler(sqlType);
 
             Object value = sqlTypeHandler.getResultSetValue(resultSet, i + 1, sqlType);
-
-            Value databaseColumnWithValue = new Value(value, false, databaseColumn);
-            databaseRow.addDatabaseColumnWithValue(databaseColumnWithValue);
+            row.addValue(new Value(value, false, column));
         }
-        return databaseRow;
+        return row;
     }
 
-    protected Object getValue(DatabaseColumn databaseColumn, SqlTypeHandler sqlTypeHandler) throws Exception {
+    protected Object getValue(Column column, SqlTypeHandler sqlTypeHandler) throws Exception {
         // todo not correct
-        int index = databaseColumns.indexOf(databaseColumn) + 1;
+        int index = columns.indexOf(column) + 1;
 
-        int sqlType = databaseColumn.getSqlType();
+        int sqlType = column.getSqlType();
         return sqlTypeHandler.getResultSetValue(resultSet, index, sqlType);
     }
 
     public int getNrOfColumns() throws SQLException {
-        return databaseColumns.size();
+        return columns.size();
     }
 
     public List<String> getColumnNames() throws SQLException {

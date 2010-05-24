@@ -43,26 +43,26 @@ public class DataSetRowProcessor {
     }
 
 
-    public DatabaseRow process(DataSetRow dataSetRow, List<String> variables, Set<String> unusedPrimaryKeyColumnNames) throws Exception {
+    public Row process(DataSetRow dataSetRow, List<String> variables, Set<String> unusedPrimaryKeyColumnNames) throws Exception {
         DataSetSettings dataSetSettings = dataSetRow.getDataSetSettings();
         boolean caseSensitive = dataSetSettings.isCaseSensitive();
 
         database.addExtraParentColumnsForChild(dataSetRow);
 
         String qualifiedTableName = identifierNameProcessor.getQualifiedTableName(dataSetRow);
-        DatabaseRow databaseRow = new DatabaseRow(qualifiedTableName);
+        Row row = new Row(qualifiedTableName);
 
         Set<String> allPrimaryKeyColumnNames = database.getPrimaryKeyColumnNames(qualifiedTableName);
         Set<String> remainingPrimaryKeyColumnNames = new HashSet<String>(allPrimaryKeyColumnNames);
 
         for (DataSetColumn column : dataSetRow.getColumns()) {
             boolean primaryKey = isPrimaryKeyColumn(column, caseSensitive, allPrimaryKeyColumnNames, remainingPrimaryKeyColumnNames);
-            Value databaseColumn = processColumn(qualifiedTableName, column, variables, primaryKey, dataSetSettings);
-            databaseRow.addDatabaseColumnWithValue(databaseColumn);
+            Value value = processDataSetColumn(qualifiedTableName, column, variables, primaryKey, dataSetSettings);
+            row.addValue(value);
         }
 
         unusedPrimaryKeyColumnNames.addAll(remainingPrimaryKeyColumnNames);
-        return databaseRow;
+        return row;
     }
 
 
@@ -77,7 +77,7 @@ public class DataSetRowProcessor {
      * @param primaryKey    True if the column is a primary key column
      * @return the processed value, not null
      */
-    protected Value processColumn(String qualifiedTableName, DataSetColumn dataSetColumn, List<String> variables, boolean primaryKey, DataSetSettings dataSetSettings) throws Exception {
+    protected Value processDataSetColumn(String qualifiedTableName, DataSetColumn dataSetColumn, List<String> variables, boolean primaryKey, DataSetSettings dataSetSettings) throws Exception {
         char literalToken = dataSetSettings.getLiteralToken();
         char variableToken = dataSetSettings.getVariableToken();
         boolean caseSensitive = dataSetSettings.isCaseSensitive();
@@ -109,8 +109,8 @@ public class DataSetRowProcessor {
             correctTypeValue = sqlTypeHandler.getValue(valueWithVariablesFilledIn, sqlType);
         }
 
-        DatabaseColumn databaseColumn = new DatabaseColumn(columnName, sqlType, primaryKey);
-        return new Value(correctTypeValue, isLiteralValue, databaseColumn);
+        Column column = new Column(columnName, sqlType, primaryKey);
+        return new Value(correctTypeValue, isLiteralValue, column);
     }
 
 

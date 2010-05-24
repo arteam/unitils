@@ -50,11 +50,11 @@ public class BaseDataSetLoaderTest extends UnitilsJUnit4 {
 
     private DataSetRow dataSetRow1;
     private DataSetRow dataSetRow2;
-    private DatabaseRow databaseRow1;
-    private DatabaseRow databaseRow2;
+    private Row row1;
+    private Row row2;
 
     private DataSetRow emptyDataSetRow;
-    private DatabaseRow emptyDatabaseRow;
+    private Row emptyRow;
 
     @Before
     public void initialize() throws Exception {
@@ -62,38 +62,38 @@ public class BaseDataSetLoaderTest extends UnitilsJUnit4 {
 
         dataSetRow1 = createDataSetRow();
         dataSetRow2 = createDataSetRow();
-        databaseRow1 = createDatabaseRow();
-        databaseRow2 = createDatabaseRow();
+        row1 = createRow();
+        row2 = createRow();
 
         emptyDataSetRow = createDataSetRowWithoutColumns();
-        emptyDatabaseRow = createDatabaseRowWithoutColumns();
+        emptyRow = createRowWithoutColumns();
     }
 
 
     @Test
-    public void loadDatabaseRow() throws Exception {
+    public void loadRow() throws Exception {
         dataSetRowSource.onceReturns(dataSetRow1).getNextDataSetRow();
         dataSetRowSource.onceReturns(dataSetRow2).getNextDataSetRow();
-        dataSetRowProcessor.returns(databaseRow1).process(dataSetRow1, null, null);
-        dataSetRowProcessor.returns(databaseRow2).process(dataSetRow2, null, null);
+        dataSetRowProcessor.returns(row1).process(dataSetRow1, null, null);
+        dataSetRowProcessor.returns(row2).process(dataSetRow2, null, null);
 
         baseDataSetLoader.load(dataSetRowSource.getMock(), emptyVariables);
-        assertReflectionEquals(asList(databaseRow1, databaseRow2), baseDataSetLoader.getLoadedDatabaseRows());
+        assertReflectionEquals(asList(row1, row2), baseDataSetLoader.getLoadedRows());
     }
 
     @Test
-    public void emptyDatabaseRow() throws Exception {
-        dataSetRowProcessor.returns(emptyDatabaseRow).process(emptyDataSetRow, null, null);
+    public void emptyRow() throws Exception {
+        dataSetRowProcessor.returns(emptyRow).process(emptyDataSetRow, null, null);
         dataSetRowSource.onceReturns(emptyDataSetRow).getNextDataSetRow();
 
         baseDataSetLoader.load(dataSetRowSource.getMock(), emptyVariables);
-        assertTrue(baseDataSetLoader.getLoadedDatabaseRows().isEmpty());
+        assertTrue(baseDataSetLoader.getLoadedRows().isEmpty());
     }
 
     @Test
     public void variables() throws Exception {
         dataSetRowSource.onceReturns(dataSetRow1).getNextDataSetRow();
-        dataSetRowProcessor.returns(databaseRow1).process(null, null, null);
+        dataSetRowProcessor.returns(row1).process(null, null, null);
 
         baseDataSetLoader.load(dataSetRowSource.getMock(), asList("1", "2"));
         dataSetRowProcessor.assertInvoked().process(dataSetRow1, asList("1", "2"), null);
@@ -122,33 +122,33 @@ public class BaseDataSetLoaderTest extends UnitilsJUnit4 {
         return dataSetRow;
     }
 
-    private DatabaseRow createDatabaseRow() {
-        DatabaseRow databaseRow = new DatabaseRow("schema.table");
-        databaseRow.addDatabaseColumnWithValue(new Value("value", false, new DatabaseColumn("column", VARCHAR, false)));
-        return databaseRow;
+    private Row createRow() {
+        Row row = new Row("schema.table");
+        row.addValue(new Value("value", false, new Column("column", VARCHAR, false)));
+        return row;
     }
 
     private DataSetRow createDataSetRowWithoutColumns() {
         return new DataSetRow("schema", "table", null, false, null);
     }
 
-    private DatabaseRow createDatabaseRowWithoutColumns() {
-        return new DatabaseRow("schema.table");
+    private Row createRowWithoutColumns() {
+        return new Row("schema.table");
     }
 
 
     private static class TestBaseDataSetLoader extends BaseDataSetLoader {
 
-        private List<DatabaseRow> loadedDatabaseRows = new ArrayList<DatabaseRow>();
+        private List<Row> loadedRows = new ArrayList<Row>();
 
         @Override
-        protected int loadDatabaseRow(DatabaseRow databaseRow) throws Exception {
-            loadedDatabaseRows.add(databaseRow);
+        protected int loadRow(Row row) throws Exception {
+            loadedRows.add(row);
             return 1;
         }
 
-        public List<DatabaseRow> getLoadedDatabaseRows() {
-            return loadedDatabaseRows;
+        public List<Row> getLoadedRows() {
+            return loadedRows;
         }
     }
 }

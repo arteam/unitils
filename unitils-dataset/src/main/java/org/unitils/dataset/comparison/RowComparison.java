@@ -15,8 +15,8 @@
  */
 package org.unitils.dataset.comparison;
 
-import org.unitils.dataset.core.DatabaseColumn;
-import org.unitils.dataset.core.DatabaseRow;
+import org.unitils.dataset.core.Column;
+import org.unitils.dataset.core.Row;
 import org.unitils.dataset.core.Value;
 
 import java.util.ArrayList;
@@ -28,27 +28,27 @@ import java.util.List;
  */
 public class RowComparison {
 
-    private DatabaseRow expectedDatabaseRow;
+    private Row expectedRow;
 
-    private DatabaseRow actualDatabaseRow;
+    private Row actualRow;
 
     /* The column comparison results */
     private List<ColumnDifference> columnDifferences = new ArrayList<ColumnDifference>();
 
 
-    public RowComparison(DatabaseRow expectedDatabaseRow, DatabaseRow actualDatabaseRow) {
-        this.expectedDatabaseRow = expectedDatabaseRow;
-        this.actualDatabaseRow = actualDatabaseRow;
+    public RowComparison(Row expectedRow, Row actualRow) {
+        this.expectedRow = expectedRow;
+        this.actualRow = actualRow;
         this.columnDifferences = createColumnDifferences();
     }
 
 
-    public DatabaseRow getExpectedDatabaseRow() {
-        return expectedDatabaseRow;
+    public Row getExpectedRow() {
+        return expectedRow;
     }
 
-    public DatabaseRow getActualDatabaseRow() {
-        return actualDatabaseRow;
+    public Row getActualRow() {
+        return actualRow;
     }
 
     /**
@@ -105,15 +105,13 @@ public class RowComparison {
     protected List<ColumnDifference> createColumnDifferences() {
         List<ColumnDifference> columnDifferences = new ArrayList<ColumnDifference>();
 
-        for (Value expectedDatabaseColumnWithValue : expectedDatabaseRow.getDatabaseColumnsWithValue()) {
-            DatabaseColumn databaseColumn = expectedDatabaseColumnWithValue.getDatabaseColumn();
-            Value actualDatabaseColumnsWithValue = actualDatabaseRow.getDatabaseColumnsWithValue(databaseColumn);
-            if (!expectedDatabaseColumnWithValue.isEqualValue(actualDatabaseColumnsWithValue)) {
-                boolean primaryKey = databaseColumn.isPrimaryKey();
-                String columnName = databaseColumn.getColumnName();
-                Object expectedValue = expectedDatabaseColumnWithValue.getValue();
-                Object actualValue = actualDatabaseColumnsWithValue.getValue();
-                columnDifferences.add(new ColumnDifference(columnName, expectedValue, actualValue, primaryKey));
+        for (Value expectedValue : expectedRow.getValues()) {
+            Column column = expectedValue.getColumn();
+            Value actualValue = actualRow.getValue(column);
+            if (!expectedValue.isEqualValue(actualValue)) {
+                boolean primaryKey = column.isPrimaryKey();
+                String columnName = column.getName();
+                columnDifferences.add(new ColumnDifference(columnName, expectedValue.getValue(), actualValue.getValue(), primaryKey));
             }
         }
         return columnDifferences;
