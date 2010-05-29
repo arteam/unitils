@@ -16,8 +16,8 @@
 package org.unitils.dataset.comparison.impl;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.core.Column;
-import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.core.database.Column;
+import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import java.sql.Connection;
@@ -35,11 +35,11 @@ import static org.unitils.core.util.DbUtils.closeQuietly;
  */
 public class TableContentRetriever {
 
-    protected Database database;
+    protected DatabaseMetaData database;
     protected SqlTypeHandlerRepository sqlTypeHandlerRepository;
 
 
-    public void init(Database database, SqlTypeHandlerRepository sqlTypeHandlerRepository) {
+    public void init(DatabaseMetaData database, SqlTypeHandlerRepository sqlTypeHandlerRepository) {
         this.database = database;
         this.sqlTypeHandlerRepository = sqlTypeHandlerRepository;
     }

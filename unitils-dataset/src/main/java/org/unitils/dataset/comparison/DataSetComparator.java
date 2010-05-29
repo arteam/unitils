@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 package org.unitils.dataset.comparison;
 
 import org.unitils.dataset.comparison.impl.TableContentRetriever;
-import org.unitils.dataset.core.DataSetRowProcessor;
-import org.unitils.dataset.factory.DataSetRowSource;
-import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.comparison.model.DataSetComparison;
+import org.unitils.dataset.core.impl.DataSetRowProcessor;
+import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.rowsource.DataSetRowSource;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ import java.util.List;
  */
 public interface DataSetComparator {
 
-    void init(DataSetRowProcessor dataSetRowProcessor, TableContentRetriever tableContentRetriever, Database database);
+    void init(DataSetRowProcessor dataSetRowProcessor, TableContentRetriever tableContentRetriever, DatabaseMetaData database);
 
     DataSetComparison compare(DataSetRowSource expectedDataSetRowSource, List<String> variables);
 

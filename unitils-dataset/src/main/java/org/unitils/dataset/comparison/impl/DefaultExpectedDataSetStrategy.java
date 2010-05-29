@@ -18,14 +18,19 @@ package org.unitils.dataset.comparison.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
-import org.unitils.core.util.ObjectFormatter;
-import org.unitils.dataset.comparison.*;
-import org.unitils.dataset.core.BaseDataSetStrategy;
-import org.unitils.dataset.core.DataSetRowProcessor;
-import org.unitils.dataset.core.Row;
-import org.unitils.dataset.factory.DataSetRowSource;
-import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.comparison.DataSetComparator;
+import org.unitils.dataset.comparison.DatabaseContentLogger;
+import org.unitils.dataset.comparison.ExpectedDataSetStrategy;
+import org.unitils.dataset.comparison.model.ColumnDifference;
+import org.unitils.dataset.comparison.model.DataSetComparison;
+import org.unitils.dataset.comparison.model.RowComparison;
+import org.unitils.dataset.comparison.model.TableComparison;
+import org.unitils.dataset.core.database.Row;
+import org.unitils.dataset.core.impl.BaseLoadDataSetStrategy;
+import org.unitils.dataset.core.impl.DataSetRowProcessor;
+import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.loader.impl.IdentifierNameProcessor;
+import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import java.util.List;
@@ -41,7 +46,7 @@ import static org.apache.commons.lang.StringUtils.rightPad;
 public class DefaultExpectedDataSetStrategy implements ExpectedDataSetStrategy {
 
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(BaseDataSetStrategy.class);
+    private static Log logger = LogFactory.getLog(BaseLoadDataSetStrategy.class);
 
     protected DataSetComparator dataSetComparator;
     protected IdentifierNameProcessor identifierNameProcessor;
@@ -50,10 +55,8 @@ public class DefaultExpectedDataSetStrategy implements ExpectedDataSetStrategy {
     protected DatabaseContentLogger databaseContentLogger;
     protected TableContentRetriever tableContentRetriever;
 
-    protected ObjectFormatter objectFormatter = new ObjectFormatter();
 
-
-    public void init(Properties configuration, Database database) {
+    public void init(Properties configuration, DatabaseMetaData database) {
         this.identifierNameProcessor = createIdentifierNameProcessor(database);
         this.dataSetRowProcessor = createDataSetRowProcessor(identifierNameProcessor, database);
         this.tableContentRetriever = createTableContentRetriever(database);
@@ -172,39 +175,36 @@ public class DefaultExpectedDataSetStrategy implements ExpectedDataSetStrategy {
     }
 
 
-    protected DataSetComparator createDataSetComparator(DataSetRowProcessor dataSetRowProcessor, TableContentRetriever tableContentRetriever, Database database) {
+    protected DataSetComparator createDataSetComparator(DataSetRowProcessor dataSetRowProcessor, TableContentRetriever tableContentRetriever, DatabaseMetaData database) {
         DataSetComparator dataSetComparator = new DefaultDataSetComparator();
         dataSetComparator.init(dataSetRowProcessor, tableContentRetriever, database);
         return dataSetComparator;
     }
 
-    protected DatabaseContentLogger createDatabaseContentLogger(Database database, TableContentRetriever tableContentRetriever) {
+    protected DatabaseContentLogger createDatabaseContentLogger(DatabaseMetaData database, TableContentRetriever tableContentRetriever) {
         DatabaseContentLogger databaseContentLogger = new DefaultDatabaseContentLogger();
         databaseContentLogger.init(database, tableContentRetriever);
         return databaseContentLogger;
     }
 
-    protected TableContentRetriever createTableContentRetriever(Database database) {
+    protected TableContentRetriever createTableContentRetriever(DatabaseMetaData database) {
         SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
         TableContentRetriever tableContentRetriever = new TableContentRetriever();
         tableContentRetriever.init(database, sqlTypeHandlerRepository);
         return tableContentRetriever;
     }
 
-    protected IdentifierNameProcessor createIdentifierNameProcessor(Database database) {
+    protected IdentifierNameProcessor createIdentifierNameProcessor(DatabaseMetaData database) {
         // todo refactor initialization
         IdentifierNameProcessor identifierNameProcessor = new IdentifierNameProcessor();
         identifierNameProcessor.init(database);
         return identifierNameProcessor;
     }
 
-    protected DataSetRowProcessor createDataSetRowProcessor(IdentifierNameProcessor identifierNameProcessor, Database database) {
+    protected DataSetRowProcessor createDataSetRowProcessor(IdentifierNameProcessor identifierNameProcessor, DatabaseMetaData database) {
         // todo refactor initialization
         SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
-        // todo refactor initialization
-        DataSetRowProcessor dataSetRowProcessor = new DataSetRowProcessor();
-        dataSetRowProcessor.init(identifierNameProcessor, sqlTypeHandlerRepository, database);
-        return dataSetRowProcessor;
+        return new DataSetRowProcessor(identifierNameProcessor, sqlTypeHandlerRepository, database);
     }
 
 }

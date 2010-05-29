@@ -16,13 +16,8 @@
 package org.unitils.dataset.annotation.handler;
 
 import org.unitils.dataset.DataSetModule;
-import org.unitils.dataset.loader.impl.Database;
-
-import java.util.Properties;
 
 public interface DataSetAnnotationHandler<T> {
 
-    void init(Properties configuration, Database database, DataSetModule dataSetModule);
-
-    void handle(T annotation, Class<?> testClass);
+    void handle(T annotation, Object testInstance, DataSetModule dataSetModule);
 }

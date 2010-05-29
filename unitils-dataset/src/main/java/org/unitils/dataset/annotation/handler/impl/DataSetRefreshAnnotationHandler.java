@@ -18,32 +18,19 @@ package org.unitils.dataset.annotation.handler.impl;
 import org.unitils.dataset.DataSetModule;
 import org.unitils.dataset.annotation.DataSetRefresh;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
-import org.unitils.dataset.core.LoadDataSetStrategy;
-import org.unitils.dataset.core.RefreshDataSetStrategy;
-import org.unitils.dataset.loader.impl.Database;
 
 import java.util.List;
-import java.util.Properties;
 
 import static java.util.Arrays.asList;
 
 public class DataSetRefreshAnnotationHandler implements DataSetAnnotationHandler<DataSetRefresh> {
 
-    protected LoadDataSetStrategy refreshDataSetStrategy = new RefreshDataSetStrategy();
-    protected DataSetModule dataSetModule;
 
-
-    public void init(Properties configuration, Database database, DataSetModule dataSetModule) {
-        refreshDataSetStrategy.init(configuration, database);
-        this.dataSetModule = dataSetModule;
-    }
-
-
-    public void handle(DataSetRefresh annotation, Class<?> testClass) {
+    public void handle(DataSetRefresh annotation, Object testInstance, DataSetModule dataSetModule) {
         List<String> fileNames = asList(annotation.value());
-        List<String> variables = asList(annotation.variables());
+        String[] variables = annotation.variables();
 
-        dataSetModule.performLoadDataSetStrategy(refreshDataSetStrategy, fileNames, variables, testClass);
+        dataSetModule.refreshDataSetFiles(testInstance, fileNames, variables);
     }
 
 }

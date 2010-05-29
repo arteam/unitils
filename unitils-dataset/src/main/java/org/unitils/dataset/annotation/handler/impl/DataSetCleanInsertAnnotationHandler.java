@@ -18,31 +18,18 @@ package org.unitils.dataset.annotation.handler.impl;
 import org.unitils.dataset.DataSetModule;
 import org.unitils.dataset.annotation.DataSetCleanInsert;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
-import org.unitils.dataset.core.CleanInsertDataSetStrategy;
-import org.unitils.dataset.loader.impl.Database;
 
 import java.util.List;
-import java.util.Properties;
 
 import static java.util.Arrays.asList;
 
 public class DataSetCleanInsertAnnotationHandler implements DataSetAnnotationHandler<DataSetCleanInsert> {
 
-    protected CleanInsertDataSetStrategy cleanInsertDataSetStrategy = new CleanInsertDataSetStrategy();
-    protected DataSetModule dataSetModule;
-
-
-    public void init(Properties configuration, Database database, DataSetModule dataSetModule) {
-        cleanInsertDataSetStrategy.init(configuration, database);
-        this.dataSetModule = dataSetModule;
-    }
-
-
-    public void handle(DataSetCleanInsert annotation, Class<?> testClass) {
+    public void handle(DataSetCleanInsert annotation, Object testInstance, DataSetModule dataSetModule) {
         List<String> fileNames = asList(annotation.value());
-        List<String> variables = asList(annotation.variables());
+        String[] variables = annotation.variables();
 
-        dataSetModule.performLoadDataSetStrategy(cleanInsertDataSetStrategy, fileNames, variables, testClass);
+        dataSetModule.cleanInsertDataSetFiles(testInstance, fileNames, variables);
     }
 
 }
