@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.unitils.core.UnitilsException;
 
 import static org.junit.Assert.assertFalse;
-import static org.unitils.dataset.DataSetUnitils.dataSetInsert;
+import static org.unitils.dataset.DataSetLoader.insertDataSetFile;
 
 /**
  * Test class for loading of data sets using the insert data set strategy.
@@ -27,18 +27,18 @@ import static org.unitils.dataset.DataSetUnitils.dataSetInsert;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class InsertDataSetStrategyTest extends DataSetTestBase {
+public class InsertDataSetTest extends DataSetTestBase {
 
 
     @Test
     public void insertDataSet() throws Exception {
-        dataSetInsert(this, "DataSetModuleDataSetTest-simple.xml");
+        insertDataSetFile(this, "DataSetModuleDataSetTest-simple.xml");
         assertValueInTable("test", "col1", "xxxx");
     }
 
     @Test
     public void literalValues() throws Exception {
-        dataSetInsert(this, "DataSetModuleDataSetTest-literalValues.xml");
+        insertDataSetFile(this, "DataSetModuleDataSetTest-literalValues.xml");
 
         assertValueInTable("test", "col1", "text");
         assertValueInTable("test", "col2", "2");
@@ -48,19 +48,19 @@ public class InsertDataSetStrategyTest extends DataSetTestBase {
 
     @Test
     public void caseSensitive() throws Exception {
-        dataSetInsert(this, "DataSetModuleDataSetTest-caseSensitive.xml");
+        insertDataSetFile(this, "DataSetModuleDataSetTest-caseSensitive.xml");
         assertValueInTable("test", "col1", "xxxx");
     }
 
     @Test(expected = UnitilsException.class)
     public void caseSensitiveWrongCase() throws Exception {
-        dataSetInsert(this, "DataSetModuleDataSetTest-caseSensitiveWrongCase.xml");
+        insertDataSetFile(this, "DataSetModuleDataSetTest-caseSensitiveWrongCase.xml");
         assertValueInTable("test", "col1", "xxxx");
     }
 
     @Test
     public void literalValuesOverriddenLiteralToken() throws Exception {
-        dataSetInsert(this, "DataSetModuleDataSetTest-literalValues-overriddenLiteralToken.xml");
+        insertDataSetFile(this, "DataSetModuleDataSetTest-literalValues-overriddenLiteralToken.xml");
 
         assertValueInTable("test", "col1", "text");
         assertValueInTable("test", "col2", "2");
@@ -70,7 +70,7 @@ public class InsertDataSetStrategyTest extends DataSetTestBase {
 
     @Test
     public void variables() throws Exception {
-        dataSetInsert(this, "DataSetModuleDataSetTest-variables.xml", "value1", "2", "now");
+        insertDataSetFile(this, "DataSetModuleDataSetTest-variables.xml", "value1", "2", "now");
 
         assertValueInTable("test", "col1", "test value1 2");
         assertValueInTable("test", "col2", "2");
@@ -79,7 +79,7 @@ public class InsertDataSetStrategyTest extends DataSetTestBase {
 
     @Test
     public void variablesOverriddenVariableToken() throws Exception {
-        dataSetInsert(this, "DataSetModuleDataSetTest-variables-overriddenVariableToken.xml", "value1", "2", "now");
+        insertDataSetFile(this, "DataSetModuleDataSetTest-variables-overriddenVariableToken.xml", "value1", "2", "now");
 
         assertValueInTable("test", "col1", "test value1 2");
         assertValueInTable("test", "col2", "2");

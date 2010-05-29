@@ -22,25 +22,25 @@ import org.junit.Test;
 import static org.junit.Assert.fail;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.DataSetUnitils.assertExpectedDataSet;
-import static org.unitils.dataset.DataSetUnitils.dataSetCleanInsert;
+import static org.unitils.dataset.DataSetAssert.assertExpectedDataSet;
+import static org.unitils.dataset.DataSetLoader.cleanInsertDataSetFile;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DataSetModuleExpectedDataSetParentChildTest extends DataSetTestBase {
+public class AssertExpectedDataSetParentChildTest extends DataSetTestBase {
 
     @Test
     public void matchingDataSet() throws Exception {
-        dataSetCleanInsert(this, "DataSetModuleExpectedDataSetParentChildTest.xml");
+        cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetParentChildTest.xml");
         assertExpectedDataSet(this, "DataSetModuleExpectedDataSetParentChildTest.xml");
     }
 
     @Test
     public void differentDataSet() throws Exception {
         try {
-            dataSetCleanInsert(this, "DataSetModuleExpectedDataSetParentChildTest.xml");
+            cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetParentChildTest.xml");
             assertExpectedDataSet(this, "DataSetModuleExpectedDataSetParentChildTest-different.xml");
 
         } catch (AssertionError e) {

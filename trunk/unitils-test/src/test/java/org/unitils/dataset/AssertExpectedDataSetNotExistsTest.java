@@ -18,26 +18,26 @@ package org.unitils.dataset;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
-import static org.unitils.dataset.DataSetUnitils.assertExpectedDataSet;
-import static org.unitils.dataset.DataSetUnitils.dataSetCleanInsert;
+import static org.unitils.dataset.DataSetAssert.assertExpectedDataSet;
+import static org.unitils.dataset.DataSetLoader.cleanInsertDataSetFile;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DataSetModuleExpectedDataNotExistsTest extends DataSetTestBase {
+public class AssertExpectedDataSetNotExistsTest extends DataSetTestBase {
 
 
     @Test
     public void rowNotFound() throws Exception {
-        dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-simple.xml");
+        cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-simple.xml");
         assertExpectedDataSet(this, "DataSetModuleExpectedDataNotExistsTest-rowNotFound.xml");
     }
 
     @Test
     public void rowFound() throws Exception {
         try {
-            dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-simple.xml");
+            cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-simple.xml");
             assertExpectedDataSet(this, "DataSetModuleExpectedDataNotExistsTest-rowFound.xml");
         } catch (AssertionError e) {
             e.printStackTrace();
@@ -50,7 +50,7 @@ public class DataSetModuleExpectedDataNotExistsTest extends DataSetTestBase {
 
     @Test
     public void emptyRowInNotExists() throws Exception {
-        dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-simple.xml");
+        cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-simple.xml");
         assertExpectedDataSet(this, "DataSetModuleExpectedDataNotExistsTest-emptyRowInNotExists.xml");
     }
 

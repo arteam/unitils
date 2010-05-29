@@ -21,9 +21,19 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.dataset.comparison.impl.DefaultDataSetComparator;
 import org.unitils.dataset.comparison.impl.TableContentRetriever;
 import org.unitils.dataset.comparison.impl.TableContents;
-import org.unitils.dataset.core.*;
-import org.unitils.dataset.factory.DataSetRowSource;
-import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.comparison.model.ColumnDifference;
+import org.unitils.dataset.comparison.model.DataSetComparison;
+import org.unitils.dataset.comparison.model.RowComparison;
+import org.unitils.dataset.comparison.model.TableComparison;
+import org.unitils.dataset.core.database.Column;
+import org.unitils.dataset.core.database.Row;
+import org.unitils.dataset.core.database.Value;
+import org.unitils.dataset.core.dataset.DataSetRow;
+import org.unitils.dataset.core.dataset.DataSetSettings;
+import org.unitils.dataset.core.dataset.DataSetValue;
+import org.unitils.dataset.core.impl.DataSetRowProcessor;
+import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.mock.Mock;
 
 import java.util.ArrayList;
@@ -41,7 +51,7 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
     /* Tested object */
     private DefaultDataSetComparator defaultDataSetComparator = new DefaultDataSetComparator();
 
-    protected Mock<Database> database;
+    protected Mock<DatabaseMetaData> database;
     protected Mock<DataSetRowProcessor> dataSetRowProcessor;
     protected Mock<TableContentRetriever> tableContentRetriever;
     protected Mock<TableContents> tableContents;
@@ -292,7 +302,7 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
     private DataSetRow createDataSetRow() {
         DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
         DataSetRow dataSetRow = new DataSetRow("schema", "table", null, false, dataSetSettings);
-        dataSetRow.addDataSetColumn(new DataSetColumn("column", "value"));
+        dataSetRow.addDataSetValue(new DataSetValue("column", "value"));
         return dataSetRow;
     }
 

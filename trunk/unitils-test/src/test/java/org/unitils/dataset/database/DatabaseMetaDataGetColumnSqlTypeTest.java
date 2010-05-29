@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.loader.impl;
+package org.unitils.dataset.database;
 
 import org.junit.After;
 import org.junit.Before;
@@ -27,25 +27,25 @@ import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import javax.sql.DataSource;
+import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
-import static java.util.Arrays.asList;
+import static java.sql.Types.*;
 import static org.junit.Assert.*;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
+import static org.unitils.dataset.database.DatabaseMetaData.SQL_TYPE_UNKNOWN;
 
 /**
- * Tests for getting the primary key column names of a table.
+ * Tests for getting the sql type for a column.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DatabaseGetPrimaryKeyColumnNamesTest extends UnitilsJUnit4 {
+public class DatabaseMetaDataGetColumnSqlTypeTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private Database database = new Database();
+    private DatabaseMetaData databaseMetaData;
 
     @TestDataSource
     protected DataSource dataSource;
@@ -55,61 +55,63 @@ public class DatabaseGetPrimaryKeyColumnNamesTest extends UnitilsJUnit4 {
     public void initialize() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         DbSupport defaultDbSupport = DbSupportFactory.getDefaultDbSupport(configuration, new DefaultSQLHandler(dataSource));
-        database.init(defaultDbSupport, new SqlTypeHandlerRepository());
+        databaseMetaData = new DatabaseMetaData(defaultDbSupport, new SqlTypeHandlerRepository());
     }
 
 
     @Before
     public void createTestTables() {
         dropTestTables();
-        executeUpdate("create table test (col1 varchar(100) not null, col2 integer not null, col3 timestamp, primary key (col1, col2))", dataSource);
-        executeUpdate("create table \"TestCase\" (\"Col1\" varchar(100) not null, \"col2\" integer not null, col3 timestamp, primary key (\"Col1\", \"col2\"))", dataSource);
-        executeUpdate("create table noPrimaryKeys (col1 integer)", dataSource);
+        executeUpdate("create table test (col1 varchar(100), col2 integer, col3 timestamp)", dataSource);
+        executeUpdate("create table \"TestCase\" (\"Col1\" varchar(100), \"col2\" integer, col3 timestamp)", dataSource);
     }
 
     @After
     public void dropTestTables() {
         executeUpdateQuietly("drop table test", dataSource);
         executeUpdateQuietly("drop table \"TestCase\"", dataSource);
-        executeUpdateQuietly("drop table noPrimaryKeys", dataSource);
     }
 
 
     @Test
     public void getPrimaryKeyColumnNames() throws Exception {
-        Set<String> result = database.getPrimaryKeyColumnNames("PUBLIC.TEST");
-        assertReflectionEquals(asList("COL1", "COL2"), result);
-    }
+        int col1Type = databaseMetaData.getColumnSqlType("PUBLIC.TEST", "COL1");
+        int col2Type = databaseMetaData.getColumnSqlType("PUBLIC.TEST", "COL2");
+        int col3Type = databaseMetaData.getColumnSqlType("PUBLIC.TEST", "COL3");
 
-    @Test
-    public void noPrimaryKeys() throws Exception {
-        Set<String> result = database.getPrimaryKeyColumnNames("PUBLIC.NOPRIMARYKEYS");
-        assertTrue(result.isEmpty());
+        assertEquals(VARCHAR, col1Type);
+        assertEquals(INTEGER, col2Type);
+        assertEquals(TIMESTAMP, col3Type);
     }
 
     @Test
     public void caseSensitive() throws Exception {
-        Set<String> result = database.getPrimaryKeyColumnNames("\"PUBLIC\".\"TestCase\"");
-        assertReflectionEquals(asList("Col1", "col2"), result);
+        int col1Type = databaseMetaData.getColumnSqlType("\"PUBLIC\".\"TestCase\"", "Col1");
+        int col2Type = databaseMetaData.getColumnSqlType("\"PUBLIC\".\"TestCase\"", "col2");
+        int col3Type = databaseMetaData.getColumnSqlType("\"PUBLIC\".\"TestCase\"", "COL3");
+
+        assertEquals(VARCHAR, col1Type);
+        assertEquals(INTEGER, col2Type);
+        assertEquals(TIMESTAMP, col3Type);
     }
 
     @Test
     public void primaryKeySetCached() throws Exception {
-        Set<String> result1 = database.getPrimaryKeyColumnNames("PUBLIC.TEST");
-        Set<String> result2 = database.getPrimaryKeyColumnNames("PUBLIC.TEST");
-        assertSame(result1, result2);
+        Map<String, Integer> columnSqlTypes1 = databaseMetaData.getColumnSqlTypes("PUBLIC.TEST");
+        Map<String, Integer> columnSqlTypes2 = databaseMetaData.getColumnSqlTypes("PUBLIC.TEST");
+        assertSame(columnSqlTypes1, columnSqlTypes2);
     }
 
     @Test
     public void onlyCachedForIdenticalSchemaAndTableName() throws Exception {
-        Set<String> result1 = database.getPrimaryKeyColumnNames("PUBLIC.TEST");
-        Set<String> result2 = database.getPrimaryKeyColumnNames("\"PUBLIC\".\"TEST\"");
-        assertNotSame(result1, result2);
+        Map<String, Integer> columnSqlTypes1 = databaseMetaData.getColumnSqlTypes("PUBLIC.TEST");
+        Map<String, Integer> columnSqlTypes2 = databaseMetaData.getColumnSqlTypes("public.\"TEST\"");
+        assertNotSame(columnSqlTypes1, columnSqlTypes2);
     }
 
     @Test
     public void tableNotFound() throws Exception {
-        Set<String> result = database.getPrimaryKeyColumnNames("xxxx.xxxx");
-        assertTrue(result.isEmpty());
+        int result = databaseMetaData.getColumnSqlType("xxxx.xxxx", "xxxx");
+        assertEquals(SQL_TYPE_UNKNOWN, result);
     }
 }

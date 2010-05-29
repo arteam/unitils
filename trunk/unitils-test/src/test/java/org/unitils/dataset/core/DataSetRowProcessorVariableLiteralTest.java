@@ -18,7 +18,13 @@ package org.unitils.dataset.core;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.core.database.Row;
+import org.unitils.dataset.core.database.Value;
+import org.unitils.dataset.core.dataset.DataSetRow;
+import org.unitils.dataset.core.dataset.DataSetSettings;
+import org.unitils.dataset.core.dataset.DataSetValue;
+import org.unitils.dataset.core.impl.DataSetRowProcessor;
+import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.loader.impl.IdentifierNameProcessor;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 import org.unitils.dataset.sqltypehandler.impl.TextSqlTypeHandler;
@@ -41,11 +47,11 @@ import static org.junit.Assert.*;
 public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private DataSetRowProcessor dataSetRowProcessor = new DataSetRowProcessor();
+    private DataSetRowProcessor dataSetRowProcessor;
 
     protected Mock<IdentifierNameProcessor> identifierNameProcessor;
     protected Mock<SqlTypeHandlerRepository> sqlTypeHandlerRepository;
-    protected Mock<Database> database;
+    protected Mock<DatabaseMetaData> database;
 
     private DataSetRow dataSetRow;
 
@@ -57,7 +63,7 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
     public void initialize() {
         sqlTypeHandlerRepository.returns(new TextSqlTypeHandler()).getSqlTypeHandler(0);
 
-        dataSetRowProcessor.init(identifierNameProcessor.getMock(), sqlTypeHandlerRepository.getMock(), database.getMock());
+        dataSetRowProcessor = new DataSetRowProcessor(identifierNameProcessor.getMock(), sqlTypeHandlerRepository.getMock(), database.getMock());
 
         DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
         dataSetRow = new DataSetRow("schema", "table", null, false, dataSetSettings);
@@ -66,7 +72,7 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
 
     @Test
     public void regularValue() throws Exception {
-        dataSetRow.addDataSetColumn(new DataSetColumn("column", "value"));
+        dataSetRow.addDataSetValue(new DataSetValue("column", "value"));
         Row result = dataSetRowProcessor.process(dataSetRow, emptyVariables, emptyPrimaryKeys);
 
         Value value = result.getValues().get(0);
@@ -76,7 +82,7 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
 
     @Test
     public void literalValue() throws Exception {
-        dataSetRow.addDataSetColumn(new DataSetColumn("column", "=value"));
+        dataSetRow.addDataSetValue(new DataSetValue("column", "=value"));
         Row result = dataSetRowProcessor.process(dataSetRow, emptyVariables, emptyPrimaryKeys);
 
         Value value = result.getValues().get(0);
@@ -86,7 +92,7 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
 
     @Test
     public void escapedLiteralValue() throws Exception {
-        dataSetRow.addDataSetColumn(new DataSetColumn("column", "==value"));
+        dataSetRow.addDataSetValue(new DataSetValue("column", "==value"));
         Row result = dataSetRowProcessor.process(dataSetRow, emptyVariables, emptyPrimaryKeys);
 
         Value value = result.getValues().get(0);
@@ -96,7 +102,7 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
 
     @Test
     public void variables() throws Exception {
-        dataSetRow.addDataSetColumn(new DataSetColumn("column", "$0value $0 $1"));
+        dataSetRow.addDataSetValue(new DataSetValue("column", "$0value $0 $1"));
         Row result = dataSetRowProcessor.process(dataSetRow, asList("1", "2"), emptyPrimaryKeys);
 
         Value value = result.getValues().get(0);
@@ -106,7 +112,7 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
 
     @Test
     public void literalValueThroughVariable() throws Exception {
-        dataSetRow.addDataSetColumn(new DataSetColumn("column", "$0"));
+        dataSetRow.addDataSetValue(new DataSetValue("column", "$0"));
         Row result = dataSetRowProcessor.process(dataSetRow, asList("=value"), emptyPrimaryKeys);
 
         Value value = result.getValues().get(0);
@@ -116,7 +122,7 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
 
     @Test
     public void escapedLiteralValueThroughVariable() throws Exception {
-        dataSetRow.addDataSetColumn(new DataSetColumn("column", "$0"));
+        dataSetRow.addDataSetValue(new DataSetValue("column", "$0"));
         Row result = dataSetRowProcessor.process(dataSetRow, asList("==value"), emptyPrimaryKeys);
 
         Value value = result.getValues().get(0);

@@ -19,8 +19,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.core.*;
-import org.unitils.dataset.util.DatabaseAccessor;
+import org.unitils.dataset.core.database.Column;
+import org.unitils.dataset.core.database.Row;
+import org.unitils.dataset.core.database.Value;
+import org.unitils.dataset.core.dataset.DataSetRow;
+import org.unitils.dataset.core.dataset.DataSetSettings;
+import org.unitils.dataset.core.dataset.DataSetValue;
+import org.unitils.dataset.core.impl.DataSetRowProcessor;
+import org.unitils.dataset.database.DatabaseAccessor;
 import org.unitils.mock.Mock;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
@@ -113,7 +119,7 @@ public class UpdateDataSetLoaderPrimaryKeyTest extends UnitilsJUnit4 {
     private DataSetRow createDataSetRow() {
         DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
         DataSetRow dataSetRow = new DataSetRow("schema", "table", null, false, dataSetSettings);
-        dataSetRow.addDataSetColumn(new DataSetColumn("column", "value"));
+        dataSetRow.addDataSetValue(new DataSetValue("column", "value"));
         return dataSetRow;
     }
 

@@ -19,10 +19,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.core.DataSetColumn;
-import org.unitils.dataset.core.DataSetRow;
-import org.unitils.dataset.core.DataSetSettings;
-import org.unitils.dataset.factory.impl.XmlDataSetRowSource;
+import org.unitils.dataset.core.dataset.DataSetRow;
+import org.unitils.dataset.core.dataset.DataSetSettings;
+import org.unitils.dataset.core.dataset.DataSetValue;
+import org.unitils.dataset.rowsource.impl.XmlDataSetRowSource;
 
 import java.io.File;
 import java.util.List;
@@ -38,10 +38,10 @@ import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.toFile;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class XmlDataSetStaxReaderTest extends UnitilsJUnit4 {
+public class XmlDataSetRowSourceTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private XmlDataSetRowSource xmlDataSetStaxReader;
+    private XmlDataSetRowSource xmlDataSetRowSource;
 
     private DataSetSettings defaultDataSetSettings;
 
@@ -52,74 +52,74 @@ public class XmlDataSetStaxReaderTest extends UnitilsJUnit4 {
 
     @After
     public void cleanUp() throws Exception {
-        xmlDataSetStaxReader.close();
+        xmlDataSetRowSource.close();
     }
 
 
     @Test
     public void readTwoRows() throws Exception {
-        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("LessColumnsLastDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
-        xmlDataSetStaxReader.open();
+        xmlDataSetRowSource = new XmlDataSetRowSource(getDataSetFile("LessColumnsLastDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetRowSource.open();
 
-        DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
+        DataSetRow row1 = xmlDataSetRowSource.getNextDataSetRow();
         assertEquals("SCHEMA_A", row1.getSchemaName());
         assertEquals("TABLE_A", row1.getTableName());
         assertColumnNames(row1, "COLUMN_1", "COLUMN_2", "COLUMN_3");
         assertColumnValues(row1, "1", "2", "3");
 
-        DataSetRow row2 = xmlDataSetStaxReader.getNextDataSetRow();
+        DataSetRow row2 = xmlDataSetRowSource.getNextDataSetRow();
         assertEquals("SCHEMA_A", row2.getSchemaName());
         assertEquals("TABLE_A", row2.getTableName());
         assertColumnNames(row2, "COLUMN_2");
         assertColumnValues(row2, "4");
 
-        DataSetRow row3 = xmlDataSetStaxReader.getNextDataSetRow();
+        DataSetRow row3 = xmlDataSetRowSource.getNextDataSetRow();
         assertNull(row3);
     }
 
     @Test
     public void lessColumnsForLastRow() throws Exception {
-        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("LessColumnsLastDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
-        xmlDataSetStaxReader.open();
+        xmlDataSetRowSource = new XmlDataSetRowSource(getDataSetFile("LessColumnsLastDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetRowSource.open();
 
-        DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
+        DataSetRow row1 = xmlDataSetRowSource.getNextDataSetRow();
         assertColumnNames(row1, "COLUMN_1", "COLUMN_2", "COLUMN_3");
         assertColumnValues(row1, "1", "2", "3");
 
-        DataSetRow row2 = xmlDataSetStaxReader.getNextDataSetRow();
+        DataSetRow row2 = xmlDataSetRowSource.getNextDataSetRow();
         assertColumnNames(row2, "COLUMN_2");
         assertColumnValues(row2, "4");
     }
 
     @Test
     public void lessColumnsForFirstRow() throws Exception {
-        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("LessColumnsFirstDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
-        xmlDataSetStaxReader.open();
+        xmlDataSetRowSource = new XmlDataSetRowSource(getDataSetFile("LessColumnsFirstDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetRowSource.open();
 
-        DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
+        DataSetRow row1 = xmlDataSetRowSource.getNextDataSetRow();
         assertColumnNames(row1, "COLUMN_2");
         assertColumnValues(row1, "4");
 
-        DataSetRow row2 = xmlDataSetStaxReader.getNextDataSetRow();
+        DataSetRow row2 = xmlDataSetRowSource.getNextDataSetRow();
         assertColumnNames(row2, "COLUMN_1", "COLUMN_2", "COLUMN_3");
         assertColumnValues(row2, "1", "2", "3");
     }
 
     @Test
     public void parentChild() throws Exception {
-        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("ParentChildDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
-        xmlDataSetStaxReader.open();
+        xmlDataSetRowSource = new XmlDataSetRowSource(getDataSetFile("ParentChildDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetRowSource.open();
 
-        DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
+        DataSetRow row1 = xmlDataSetRowSource.getNextDataSetRow();
         assertEquals("TABLE_A", row1.getTableName());
         assertColumnNames(row1, "COLUMN_1");
 
-        DataSetRow row2 = xmlDataSetStaxReader.getNextDataSetRow();
+        DataSetRow row2 = xmlDataSetRowSource.getNextDataSetRow();
         assertEquals("TABLE_B", row2.getTableName());
         assertColumnNames(row2, "COLUMN_2");
         assertSame(row1, row2.getParentRow());
 
-        DataSetRow row3 = xmlDataSetStaxReader.getNextDataSetRow();
+        DataSetRow row3 = xmlDataSetRowSource.getNextDataSetRow();
         assertEquals("TABLE_C", row3.getTableName());
         assertColumnNames(row3, "COLUMN_3");
         assertSame(row2, row3.getParentRow());
@@ -127,47 +127,47 @@ public class XmlDataSetStaxReaderTest extends UnitilsJUnit4 {
 
     @Test
     public void notExists() throws Exception {
-        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("NotExistsDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
-        xmlDataSetStaxReader.open();
+        xmlDataSetRowSource = new XmlDataSetRowSource(getDataSetFile("NotExistsDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetRowSource.open();
 
-        DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
+        DataSetRow row1 = xmlDataSetRowSource.getNextDataSetRow();
         assertTrue(row1.isNotExists());
-        DataSetRow row2 = xmlDataSetStaxReader.getNextDataSetRow();
+        DataSetRow row2 = xmlDataSetRowSource.getNextDataSetRow();
         assertTrue(row2.isNotExists());
-        DataSetRow row3 = xmlDataSetStaxReader.getNextDataSetRow();
+        DataSetRow row3 = xmlDataSetRowSource.getNextDataSetRow();
         assertFalse(row3.isNotExists());
     }
 
     @Test
     public void fullyQualifiedWithNamespacesAndXsdDeclarations() throws Exception {
-        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("FullyQualifiedDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
-        xmlDataSetStaxReader.open();
+        xmlDataSetRowSource = new XmlDataSetRowSource(getDataSetFile("FullyQualifiedDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetRowSource.open();
 
-        DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
+        DataSetRow row1 = xmlDataSetRowSource.getNextDataSetRow();
         assertEquals("SCHEMA_A", row1.getSchemaName());
         assertFalse(row1.isNotExists());
 
-        DataSetRow row2 = xmlDataSetStaxReader.getNextDataSetRow();
+        DataSetRow row2 = xmlDataSetRowSource.getNextDataSetRow();
         assertEquals("SCHEMA_A", row2.getSchemaName());
         assertFalse(row2.isNotExists());
 
-        DataSetRow row3 = xmlDataSetStaxReader.getNextDataSetRow();
+        DataSetRow row3 = xmlDataSetRowSource.getNextDataSetRow();
         assertEquals("SCHEMA_B", row3.getSchemaName());
         assertFalse(row3.isNotExists());
 
-        DataSetRow row4 = xmlDataSetStaxReader.getNextDataSetRow();
+        DataSetRow row4 = xmlDataSetRowSource.getNextDataSetRow();
         assertEquals("SCHEMA_A", row4.getSchemaName());
         assertTrue(row4.isNotExists());
     }
 
 
     private void assertColumnNames(DataSetRow dataSetRow, String... values) {
-        List<DataSetColumn> columns = dataSetRow.getColumns();
-        assertPropertyLenientEquals("name", asList(values), columns);
+        List<DataSetValue> columns = dataSetRow.getColumns();
+        assertPropertyLenientEquals("columnName", asList(values), columns);
     }
 
     private void assertColumnValues(DataSetRow dataSetRow, String... values) {
-        List<DataSetColumn> columns = dataSetRow.getColumns();
+        List<DataSetValue> columns = dataSetRow.getColumns();
         assertPropertyLenientEquals("value", asList(values), columns);
     }
 
