@@ -16,7 +16,8 @@
 package org.unitils.dataset.comparison;
 
 import org.unitils.dataset.comparison.impl.TableContentRetriever;
-import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.comparison.model.DataSetComparison;
+import org.unitils.dataset.database.DatabaseMetaData;
 
 /**
  * @author Tim Ducheyne
@@ -24,7 +25,7 @@ import org.unitils.dataset.loader.impl.Database;
  */
 public interface DatabaseContentLogger {
 
-    void init(Database database, TableContentRetriever tableContentRetriever);
+    void init(DatabaseMetaData database, TableContentRetriever tableContentRetriever);
 
     String getDatabaseContentForComparison(DataSetComparison dataSetComparison);
 

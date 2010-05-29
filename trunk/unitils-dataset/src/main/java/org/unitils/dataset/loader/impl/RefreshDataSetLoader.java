@@ -1,5 +1,5 @@
 /*
- * Copyright 2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package org.unitils.dataset.loader.impl;
 
-import org.unitils.dataset.core.DataSetRow;
-import org.unitils.dataset.core.DataSetRowProcessor;
-import org.unitils.dataset.util.DatabaseAccessor;
+import org.unitils.dataset.core.dataset.DataSetRow;
+import org.unitils.dataset.core.impl.DataSetRowProcessor;
+import org.unitils.dataset.database.DatabaseAccessor;
 
 import java.util.List;
 

@@ -15,8 +15,8 @@
  */
 package org.unitils.dataset.comparison;
 
-import org.unitils.dataset.factory.DataSetRowSource;
-import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.rowsource.DataSetRowSource;
 
 import java.util.List;
 import java.util.Properties;
@@ -28,7 +28,7 @@ import java.util.Properties;
 public interface ExpectedDataSetStrategy {
 
 
-    void init(Properties configuration, Database database);
+    void init(Properties configuration, DatabaseMetaData database);
 
     /**
      * Asserts that the given expected schema is equal to the actual schema.

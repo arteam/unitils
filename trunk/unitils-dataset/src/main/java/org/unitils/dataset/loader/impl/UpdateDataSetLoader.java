@@ -16,8 +16,8 @@
 package org.unitils.dataset.loader.impl;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.core.Row;
-import org.unitils.dataset.core.Value;
+import org.unitils.dataset.core.database.Row;
+import org.unitils.dataset.core.database.Value;
 
 import java.util.ArrayList;
 import java.util.List;

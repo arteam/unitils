@@ -24,21 +24,22 @@ import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.DatabaseModule;
-import org.unitils.dataset.annotation.DataSetAnnotation;
 import org.unitils.dataset.annotation.ExpectedDataSet;
-import org.unitils.dataset.annotation.ExpectedDataSetAnnotation;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
+import org.unitils.dataset.annotation.handler.MarkerForExpectedDataSetAnnotation;
+import org.unitils.dataset.annotation.handler.MarkerForLoadDataSetAnnotation;
 import org.unitils.dataset.comparison.ExpectedDataSetStrategy;
 import org.unitils.dataset.comparison.impl.DefaultExpectedDataSetStrategy;
-import org.unitils.dataset.core.CleanInsertDataSetStrategy;
-import org.unitils.dataset.core.InsertDataSetStrategy;
 import org.unitils.dataset.core.LoadDataSetStrategy;
-import org.unitils.dataset.core.RefreshDataSetStrategy;
-import org.unitils.dataset.factory.DataSetResolver;
-import org.unitils.dataset.factory.DataSetRowSource;
-import org.unitils.dataset.factory.impl.DefaultDataSetResolver;
-import org.unitils.dataset.factory.impl.XmlDataSetRowSourceFactory;
-import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.core.impl.CleanInsertDataSetStrategy;
+import org.unitils.dataset.core.impl.InsertDataSetStrategy;
+import org.unitils.dataset.core.impl.RefreshDataSetStrategy;
+import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.resolver.DataSetResolver;
+import org.unitils.dataset.resolver.impl.DefaultDataSetResolver;
+import org.unitils.dataset.rowsource.DataSetRowSource;
+import org.unitils.dataset.rowsource.impl.InlineDataSetRowSourceFactory;
+import org.unitils.dataset.rowsource.impl.XmlDataSetRowSourceFactory;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import javax.sql.DataSource;
@@ -60,7 +61,7 @@ import static org.unitils.util.ReflectionUtils.createInstanceOfType;
  * of the data set files can be specified explicitly as an argument of the annotation. If no file name is specified, it looks
  * for a file in the same directory as the test class named: 'classname without packagename'.xml.
  * <p/>
- * By annotating a method with the {@link ExpectedDataSet} annotation or by calling the {@link #assertExpectedDataSet}
+ * By annotating a method with the {@link ExpectedDataSet} annotation or by calling the {@link #assertExpectedDataSetFiles}
  * method, the contents of the database can be compared with the contents of a data set. The expected data set can be
  * passed as an argument of the annotation. If no file name is specified it looks for a file in the same directory
  * as the test class that has following name: 'class name without packagename'.'test method name'-result.xml.
@@ -75,9 +76,10 @@ public class DataSetModule implements Module {
     /* The unitils configuration */
     protected Properties configuration;
 
-    protected Database database;
-    protected XmlDataSetRowSourceFactory xmlDataSetRowSourceFactory = new XmlDataSetRowSourceFactory();
+    protected DatabaseMetaData database;
     protected DataSetResolver dataSetResolver = new DefaultDataSetResolver();
+    protected XmlDataSetRowSourceFactory xmlDataSetRowSourceFactory = new XmlDataSetRowSourceFactory();
+    protected InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = new InlineDataSetRowSourceFactory();
 
 
     /**
@@ -92,50 +94,77 @@ public class DataSetModule implements Module {
 
     public void afterInit() {
         database = createDatabase();
-        xmlDataSetRowSourceFactory.init(configuration, database.getSchemaName());
         dataSetResolver.init(configuration);
+        xmlDataSetRowSourceFactory.init(configuration, database.getSchemaName());
+        inlineDataSetRowSourceFactory.init(configuration, database.getSchemaName());
     }
 
 
-    public void dataSetInsert(Object testInstance, List<String> dataSetFileNames, String... variables) {
+    public void insertDataSetFiles(Object testInstance, List<String> dataSetFileNames, String... variables) {
         LoadDataSetStrategy insertDataSetStrategy = new InsertDataSetStrategy();
         insertDataSetStrategy.init(configuration, createDatabase());
         performLoadDataSetStrategy(insertDataSetStrategy, dataSetFileNames, asList(variables), testInstance.getClass());
     }
 
-    public void dataSetCleanInsert(Object testInstance, List<String> dataSetFileNames, String... variables) {
+    public void insertDataSet(String... dataSetRows) {
+        LoadDataSetStrategy insertDataSetStrategy = new InsertDataSetStrategy();
+        insertDataSetStrategy.init(configuration, createDatabase());
+        performInlineLoadDataSetStrategy(insertDataSetStrategy, asList(dataSetRows));
+    }
+
+
+    public void cleanInsertDataSetFiles(Object testInstance, List<String> dataSetFileNames, String... variables) {
         LoadDataSetStrategy cleanInsertDataSetStrategy = new CleanInsertDataSetStrategy();
         cleanInsertDataSetStrategy.init(configuration, createDatabase());
         performLoadDataSetStrategy(cleanInsertDataSetStrategy, dataSetFileNames, asList(variables), testInstance.getClass());
     }
 
-    public void dataSetRefresh(Object testInstance, List<String> dataSetFileNames, String... variables) {
+    public void cleanInsertDataSet(String... dataSetRows) {
+        LoadDataSetStrategy cleanInsertDataSetStrategy = new CleanInsertDataSetStrategy();
+        cleanInsertDataSetStrategy.init(configuration, createDatabase());
+        performInlineLoadDataSetStrategy(cleanInsertDataSetStrategy, asList(dataSetRows));
+    }
+
+
+    public void refreshDataSetFiles(Object testInstance, List<String> dataSetFileNames, String... variables) {
         LoadDataSetStrategy refreshDataSetStrategy = new RefreshDataSetStrategy();
         refreshDataSetStrategy.init(configuration, createDatabase());
         performLoadDataSetStrategy(refreshDataSetStrategy, dataSetFileNames, asList(variables), testInstance.getClass());
     }
 
-    public void assertExpectedDataSet(Object testInstance, List<String> dataSetFileNames, boolean logDatabaseContentOnAssertionError, String... variables) {
+    public void refreshDataSet(String... dataSetRows) {
+        LoadDataSetStrategy refreshDataSetStrategy = new RefreshDataSetStrategy();
+        refreshDataSetStrategy.init(configuration, createDatabase());
+        performInlineLoadDataSetStrategy(refreshDataSetStrategy, asList(dataSetRows));
+    }
+
+
+    public void assertExpectedDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean logDatabaseContentOnAssertionError, String... variables) {
         ExpectedDataSetStrategy defaultExpectedDataSetStrategy = new DefaultExpectedDataSetStrategy();
         defaultExpectedDataSetStrategy.init(configuration, database);
         performExpectedDataSetStrategy(defaultExpectedDataSetStrategy, dataSetFileNames, asList(variables), logDatabaseContentOnAssertionError, testInstance.getClass());
+    }
+
+    public void assertExpectedDataSet(boolean logDatabaseContentOnAssertionError, String... dataSetRows) {
+        ExpectedDataSetStrategy defaultExpectedDataSetStrategy = new DefaultExpectedDataSetStrategy();
+        defaultExpectedDataSetStrategy.init(configuration, database);
+        performInlineExpectedDataSetStrategy(defaultExpectedDataSetStrategy, asList(dataSetRows), logDatabaseContentOnAssertionError);
     }
 
 
     @SuppressWarnings({"unchecked"})
     protected void loadDataSet(Method testMethod, Object testObject) {
         try {
-            Class<?> testClass = testObject.getClass();
-            Annotation dataSetAnnotation = getMethodOrClassLevelAnnotationAnnotatedWith(DataSetAnnotation.class, testMethod, testClass);
+            Annotation dataSetAnnotation = getMethodOrClassLevelAnnotationAnnotatedWith(MarkerForLoadDataSetAnnotation.class, testMethod, testObject.getClass());
             if (dataSetAnnotation == null) {
                 return;
             }
 
-            Database database = createDatabase();
+            MarkerForLoadDataSetAnnotation annotation = dataSetAnnotation.annotationType().getAnnotation(MarkerForLoadDataSetAnnotation.class);
+            Class<? extends DataSetAnnotationHandler> dataSetAnnotationHandlerClass = annotation.value();
+            DataSetAnnotationHandler dataSetAnnotationHandler = createInstanceOfType(dataSetAnnotationHandlerClass, false);
 
-            DataSetAnnotationHandler dataSetAnnotationHandler = getDataSetAnnotationHandler(dataSetAnnotation);
-            dataSetAnnotationHandler.init(configuration, database, this);
-            dataSetAnnotationHandler.handle(dataSetAnnotation, testClass);
+            dataSetAnnotationHandler.handle(dataSetAnnotation, testObject, this);
 
         } catch (Exception e) {
             throw new UnitilsException("Error inserting data set for method " + testMethod, e);
@@ -152,31 +181,24 @@ public class DataSetModule implements Module {
     @SuppressWarnings({"unchecked"})
     protected void assertExpectedDataSet(Method testMethod, Object testObject) {
         try {
-            Class<?> testClass = testObject.getClass();
-            Annotation dataSetAnnotation = getMethodOrClassLevelAnnotationAnnotatedWith(ExpectedDataSetAnnotation.class, testMethod, testClass);
+            Annotation dataSetAnnotation = getMethodOrClassLevelAnnotationAnnotatedWith(MarkerForExpectedDataSetAnnotation.class, testMethod, testObject.getClass());
             if (dataSetAnnotation == null) {
                 return;
             }
 
-            Database database = createDatabase();
+            MarkerForExpectedDataSetAnnotation annotation = dataSetAnnotation.annotationType().getAnnotation(MarkerForExpectedDataSetAnnotation.class);
+            Class<? extends DataSetAnnotationHandler> dataSetAnnotationHandlerClass = annotation.value();
+            DataSetAnnotationHandler dataSetAnnotationHandler = createInstanceOfType(dataSetAnnotationHandlerClass, false);
 
-            DataSetAnnotationHandler dataSetAnnotationHandler = getDataSetAnnotationHandler(dataSetAnnotation);
-            dataSetAnnotationHandler.init(configuration, database, this);
-            dataSetAnnotationHandler.handle(dataSetAnnotation, testClass);
+            dataSetAnnotationHandler.handle(dataSetAnnotation, testObject, this);
 
         } catch (Exception e) {
             throw new UnitilsException("Error comparing data set for method " + testMethod, e);
         }
     }
 
-    protected DataSetAnnotationHandler getDataSetAnnotationHandler(Annotation dataSetAnnotation) {
-        DataSetAnnotation annotation = dataSetAnnotation.annotationType().getAnnotation(DataSetAnnotation.class);
-        Class<? extends DataSetAnnotationHandler> dataSetAnnotationHandlerClass = annotation.value();
-        return createInstanceOfType(dataSetAnnotationHandlerClass, false);
-    }
 
-
-    public void performLoadDataSetStrategy(LoadDataSetStrategy loadDataSetStrategy, List<String> dataSetFileNames, List<String> variables, Class<?> testClass) {
+    protected void performLoadDataSetStrategy(LoadDataSetStrategy loadDataSetStrategy, List<String> dataSetFileNames, List<String> variables, Class<?> testClass) {
         List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
         for (File dataSetFile : dataSetFiles) {
             DataSetRowSource dataSetRowSource = xmlDataSetRowSourceFactory.createDataSetRowSource(dataSetFile);
@@ -184,13 +206,25 @@ public class DataSetModule implements Module {
         }
     }
 
-    public void performExpectedDataSetStrategy(ExpectedDataSetStrategy expectedDataSetStrategy, List<String> dataSetFileNames, List<String> variables, boolean logDatabaseContentOnAssertionError, Class<?> testClass) {
+    protected void performInlineLoadDataSetStrategy(LoadDataSetStrategy loadDataSetStrategy, List<String> dataSetRows) {
+        DataSetRowSource dataSetRowSource = inlineDataSetRowSourceFactory.createDataSetRowSource(dataSetRows);
+        loadDataSetStrategy.perform(dataSetRowSource, new ArrayList<String>());
+    }
+
+
+    protected void performExpectedDataSetStrategy(ExpectedDataSetStrategy expectedDataSetStrategy, List<String> dataSetFileNames, List<String> variables, boolean logDatabaseContentOnAssertionError, Class<?> testClass) {
         List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
         for (File dataSetFile : dataSetFiles) {
             DataSetRowSource dataSetRowSource = xmlDataSetRowSourceFactory.createDataSetRowSource(dataSetFile);
             expectedDataSetStrategy.assertExpectedDataSet(dataSetRowSource, variables, logDatabaseContentOnAssertionError);
         }
     }
+
+    protected void performInlineExpectedDataSetStrategy(ExpectedDataSetStrategy expectedDataSetStrategy, List<String> dataSetRows, boolean logDatabaseContentOnAssertionError) {
+        DataSetRowSource dataSetRowSource = inlineDataSetRowSourceFactory.createDataSetRowSource(dataSetRows);
+        expectedDataSetStrategy.assertExpectedDataSet(dataSetRowSource, new ArrayList<String>(), logDatabaseContentOnAssertionError);
+    }
+
 
     protected List<File> resolveDataSets(Class<?> testClass, List<String> dataSetFileNames) {
         List<File> dataSetFiles = new ArrayList<File>();
@@ -205,12 +239,10 @@ public class DataSetModule implements Module {
 
     /* FACTORY METHODS */
 
-    protected Database createDatabase() {
+    protected DatabaseMetaData createDatabase() {
         DbSupport defaultDbSupport = getDefaultDbSupport();
-        Database database = new Database();
         SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
-        database.init(defaultDbSupport, sqlTypeHandlerRepository);
-        return database;
+        return new DatabaseMetaData(defaultDbSupport, sqlTypeHandlerRepository);
     }
 
     /**

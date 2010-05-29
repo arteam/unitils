@@ -18,33 +18,20 @@ package org.unitils.dataset.annotation.handler.impl;
 import org.unitils.dataset.DataSetModule;
 import org.unitils.dataset.annotation.ExpectedDataSet;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
-import org.unitils.dataset.comparison.ExpectedDataSetStrategy;
-import org.unitils.dataset.comparison.impl.DefaultExpectedDataSetStrategy;
-import org.unitils.dataset.loader.impl.Database;
 
 import java.util.List;
-import java.util.Properties;
 
 import static java.util.Arrays.asList;
 
 public class ExpectedDataSetAnnotationHandler implements DataSetAnnotationHandler<ExpectedDataSet> {
 
-    protected ExpectedDataSetStrategy expectedDataSetStrategy = new DefaultExpectedDataSetStrategy();
-    protected DataSetModule dataSetModule;
 
-
-    public void init(Properties configuration, Database database, DataSetModule dataSetModule) {
-        expectedDataSetStrategy.init(configuration, database);
-        this.dataSetModule = dataSetModule;
-    }
-
-
-    public void handle(ExpectedDataSet annotation, Class<?> testClass) {
+    public void handle(ExpectedDataSet annotation, Object testInstance, DataSetModule dataSetModule) {
         List<String> fileNames = asList(annotation.value());
-        List<String> variables = asList(annotation.variables());
+        String[] variables = annotation.variables();
         boolean logDatabaseContentOnAssertionError = annotation.logDatabaseContentOnAssertionError();
 
-        dataSetModule.performExpectedDataSetStrategy(expectedDataSetStrategy, fileNames, variables, logDatabaseContentOnAssertionError, testClass);
+        dataSetModule.assertExpectedDataSetFiles(testInstance, fileNames, logDatabaseContentOnAssertionError, variables);
     }
 
 }

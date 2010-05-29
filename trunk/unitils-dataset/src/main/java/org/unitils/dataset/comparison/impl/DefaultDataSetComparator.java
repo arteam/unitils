@@ -17,12 +17,16 @@ package org.unitils.dataset.comparison.impl;
 
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.comparison.DataSetComparator;
-import org.unitils.dataset.comparison.DataSetComparison;
-import org.unitils.dataset.comparison.RowComparison;
-import org.unitils.dataset.comparison.TableComparison;
-import org.unitils.dataset.core.*;
-import org.unitils.dataset.factory.DataSetRowSource;
-import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.comparison.model.DataSetComparison;
+import org.unitils.dataset.comparison.model.RowComparison;
+import org.unitils.dataset.comparison.model.TableComparison;
+import org.unitils.dataset.core.database.Column;
+import org.unitils.dataset.core.database.Row;
+import org.unitils.dataset.core.database.Value;
+import org.unitils.dataset.core.dataset.DataSetRow;
+import org.unitils.dataset.core.impl.DataSetRowProcessor;
+import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.rowsource.DataSetRowSource;
 
 import java.util.*;
 
@@ -35,10 +39,10 @@ public class DefaultDataSetComparator implements DataSetComparator {
     protected DataSetRowProcessor dataSetRowProcessor;
     protected TableContentRetriever tableContentRetriever;
 
-    protected Database database;
+    protected DatabaseMetaData database;
 
 
-    public void init(DataSetRowProcessor dataSetRowProcessor, TableContentRetriever tableContentRetriever, Database database) {
+    public void init(DataSetRowProcessor dataSetRowProcessor, TableContentRetriever tableContentRetriever, DatabaseMetaData database) {
         this.dataSetRowProcessor = dataSetRowProcessor;
         this.tableContentRetriever = tableContentRetriever;
         this.database = database;

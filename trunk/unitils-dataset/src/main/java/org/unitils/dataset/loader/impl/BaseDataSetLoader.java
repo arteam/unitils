@@ -16,12 +16,12 @@
 package org.unitils.dataset.loader.impl;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.core.DataSetRow;
-import org.unitils.dataset.core.DataSetRowProcessor;
-import org.unitils.dataset.core.Row;
-import org.unitils.dataset.factory.DataSetRowSource;
+import org.unitils.dataset.core.database.Row;
+import org.unitils.dataset.core.dataset.DataSetRow;
+import org.unitils.dataset.core.impl.DataSetRowProcessor;
+import org.unitils.dataset.database.DatabaseAccessor;
 import org.unitils.dataset.loader.DataSetLoader;
-import org.unitils.dataset.util.DatabaseAccessor;
+import org.unitils.dataset.rowsource.DataSetRowSource;
 
 import java.util.HashSet;
 import java.util.List;

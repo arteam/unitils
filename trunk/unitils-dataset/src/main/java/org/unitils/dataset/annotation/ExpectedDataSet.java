@@ -15,6 +15,7 @@
  */
 package org.unitils.dataset.annotation;
 
+import org.unitils.dataset.annotation.handler.MarkerForExpectedDataSetAnnotation;
 import org.unitils.dataset.annotation.handler.impl.ExpectedDataSetAnnotationHandler;
 
 import java.lang.annotation.Inherited;
@@ -76,7 +77,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({TYPE, METHOD})
 @Retention(RUNTIME)
 @Inherited
-@DataSetAnnotation(ExpectedDataSetAnnotationHandler.class)
+@MarkerForExpectedDataSetAnnotation(ExpectedDataSetAnnotationHandler.class)
 public @interface ExpectedDataSet {
 
     /**

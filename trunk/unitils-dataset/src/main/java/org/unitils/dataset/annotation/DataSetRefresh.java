@@ -15,6 +15,7 @@
  */
 package org.unitils.dataset.annotation;
 
+import org.unitils.dataset.annotation.handler.MarkerForLoadDataSetAnnotation;
 import org.unitils.dataset.annotation.handler.impl.DataSetRefreshAnnotationHandler;
 
 import java.lang.annotation.Inherited;
@@ -75,7 +76,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({TYPE, METHOD})
 @Retention(RUNTIME)
 @Inherited
-@DataSetAnnotation(DataSetRefreshAnnotationHandler.class)
+@MarkerForLoadDataSetAnnotation(DataSetRefreshAnnotationHandler.class)
 public @interface DataSetRefresh {
 
     /**

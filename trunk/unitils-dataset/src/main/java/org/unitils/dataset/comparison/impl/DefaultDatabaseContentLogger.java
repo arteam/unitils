@@ -16,13 +16,13 @@
 package org.unitils.dataset.comparison.impl;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.comparison.DataSetComparison;
 import org.unitils.dataset.comparison.DatabaseContentLogger;
-import org.unitils.dataset.comparison.TableComparison;
-import org.unitils.dataset.core.Column;
-import org.unitils.dataset.core.Row;
-import org.unitils.dataset.core.Value;
-import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.comparison.model.DataSetComparison;
+import org.unitils.dataset.comparison.model.TableComparison;
+import org.unitils.dataset.core.database.Column;
+import org.unitils.dataset.core.database.Row;
+import org.unitils.dataset.core.database.Value;
+import org.unitils.dataset.database.DatabaseMetaData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,11 +36,11 @@ import static org.apache.commons.lang.StringUtils.rightPad;
  */
 public class DefaultDatabaseContentLogger implements DatabaseContentLogger {
 
-    protected Database database;
+    protected DatabaseMetaData database;
     protected TableContentRetriever tableContentRetriever;
 
 
-    public void init(Database database, TableContentRetriever tableContentRetriever) {
+    public void init(DatabaseMetaData database, TableContentRetriever tableContentRetriever) {
         this.database = database;
         this.tableContentRetriever = tableContentRetriever;
     }
