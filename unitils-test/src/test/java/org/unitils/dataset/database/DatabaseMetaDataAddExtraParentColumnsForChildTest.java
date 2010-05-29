@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.core.preparedstatement;
+package org.unitils.dataset.database;
 
 import org.junit.After;
 import org.junit.Before;
@@ -25,10 +25,9 @@ import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dataset.core.DataSetColumn;
-import org.unitils.dataset.core.DataSetRow;
-import org.unitils.dataset.core.DataSetSettings;
-import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.core.dataset.DataSetRow;
+import org.unitils.dataset.core.dataset.DataSetSettings;
+import org.unitils.dataset.core.dataset.DataSetValue;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import javax.sql.DataSource;
@@ -44,10 +43,10 @@ import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DatabaseAddExtraParentColumnsForChildTest extends UnitilsJUnit4 {
+public class DatabaseMetaDataAddExtraParentColumnsForChildTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private Database database = new Database();
+    private DatabaseMetaData databaseMetaData;
 
     @TestDataSource
     protected DataSource dataSource;
@@ -64,7 +63,7 @@ public class DatabaseAddExtraParentColumnsForChildTest extends UnitilsJUnit4 {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
         DbSupport dbSupport = getDefaultDbSupport(configuration, sqlHandler);
-        database.init(dbSupport, new SqlTypeHandlerRepository());
+        databaseMetaData = new DatabaseMetaData(dbSupport, new SqlTypeHandlerRepository());
 
         dropTestTables();
         createTestTables();
@@ -90,20 +89,20 @@ public class DatabaseAddExtraParentColumnsForChildTest extends UnitilsJUnit4 {
 
     @Test
     public void addExtraParentColumnsForChild() throws Exception {
-        parentDataSetRow.addDataSetColumn(new DataSetColumn("pk1", "1"));
-        parentDataSetRow.addDataSetColumn(new DataSetColumn("pk2", "2"));
+        parentDataSetRow.addDataSetValue(new DataSetValue("pk1", "1"));
+        parentDataSetRow.addDataSetValue(new DataSetValue("pk2", "2"));
 
-        database.addExtraParentColumnsForChild(childDataSetRow);
+        databaseMetaData.addExtraParentColumnsForChild(childDataSetRow);
         assertEquals("1", childDataSetRow.getDataSetColumn("FK1").getValue());
         assertEquals("2", childDataSetRow.getDataSetColumn("FK2").getValue());
     }
 
     @Test
     public void caseSensitive() throws Exception {
-        caseSensitiveParentDataSetRow.addDataSetColumn(new DataSetColumn("pk1", "1"));
-        caseSensitiveParentDataSetRow.addDataSetColumn(new DataSetColumn("Pk2", "2"));
+        caseSensitiveParentDataSetRow.addDataSetValue(new DataSetValue("pk1", "1"));
+        caseSensitiveParentDataSetRow.addDataSetValue(new DataSetValue("Pk2", "2"));
 
-        database.addExtraParentColumnsForChild(caseSensitiveChildDataSetRow);
+        databaseMetaData.addExtraParentColumnsForChild(caseSensitiveChildDataSetRow);
         assertEquals("1", caseSensitiveChildDataSetRow.getDataSetColumn("fk1").getValue());
         assertEquals("2", caseSensitiveChildDataSetRow.getDataSetColumn("FK2").getValue());
     }
@@ -111,9 +110,9 @@ public class DatabaseAddExtraParentColumnsForChildTest extends UnitilsJUnit4 {
     @Test
     public void fkColumnNotFoundInParent() throws Exception {
         try {
-            parentDataSetRow.addDataSetColumn(new DataSetColumn("pk2", "2"));
+            parentDataSetRow.addDataSetValue(new DataSetValue("pk2", "2"));
 
-            database.addExtraParentColumnsForChild(childDataSetRow);
+            databaseMetaData.addExtraParentColumnsForChild(childDataSetRow);
             fail("Expected UnitilsException");
 
         } catch (UnitilsException e) {
@@ -123,11 +122,11 @@ public class DatabaseAddExtraParentColumnsForChildTest extends UnitilsJUnit4 {
 
     @Test
     public void overridingValueOfChild() throws Exception {
-        parentDataSetRow.addDataSetColumn(new DataSetColumn("pk1", "1"));
-        parentDataSetRow.addDataSetColumn(new DataSetColumn("pk2", "2"));
-        childDataSetRow.addDataSetColumn(new DataSetColumn("fk1", "9999"));
+        parentDataSetRow.addDataSetValue(new DataSetValue("pk1", "1"));
+        parentDataSetRow.addDataSetValue(new DataSetValue("pk2", "2"));
+        childDataSetRow.addDataSetValue(new DataSetValue("fk1", "9999"));
 
-        database.addExtraParentColumnsForChild(childDataSetRow);
+        databaseMetaData.addExtraParentColumnsForChild(childDataSetRow);
         assertEquals("1", childDataSetRow.getDataSetColumn("FK1").getValue());
         assertEquals("2", childDataSetRow.getDataSetColumn("FK2").getValue());
     }
@@ -135,7 +134,7 @@ public class DatabaseAddExtraParentColumnsForChildTest extends UnitilsJUnit4 {
     @Test
     public void noForeignKeysFound() throws Exception {
         try {
-            database.addExtraParentColumnsForChild(parentToParentDataSetRow);
+            databaseMetaData.addExtraParentColumnsForChild(parentToParentDataSetRow);
             fail("Expected UnitilsException");
 
         } catch (UnitilsException e) {

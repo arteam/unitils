@@ -19,10 +19,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.core.Column;
-import org.unitils.dataset.core.Row;
-import org.unitils.dataset.core.Value;
-import org.unitils.dataset.util.DatabaseAccessor;
+import org.unitils.dataset.core.database.Column;
+import org.unitils.dataset.core.database.Row;
+import org.unitils.dataset.core.database.Value;
+import org.unitils.dataset.database.DatabaseAccessor;
 import org.unitils.mock.Mock;
 
 import static java.sql.Types.VARCHAR;

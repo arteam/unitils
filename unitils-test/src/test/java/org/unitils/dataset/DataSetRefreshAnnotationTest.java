@@ -27,7 +27,7 @@ import java.util.Properties;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DataSetModuleRefreshTest extends DataSetTestBase {
+public class DataSetRefreshAnnotationTest extends DataSetTestBase {
 
     /* Tested object */
     protected DataSetModule dataSetModule;

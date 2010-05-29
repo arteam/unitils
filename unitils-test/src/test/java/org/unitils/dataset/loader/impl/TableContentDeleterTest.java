@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package org.unitils.dataset.loader.impl;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.core.DataSetRow;
-import org.unitils.dataset.factory.DataSetRowSource;
-import org.unitils.dataset.util.DatabaseAccessor;
+import org.unitils.dataset.core.dataset.DataSetRow;
+import org.unitils.dataset.database.DatabaseAccessor;
+import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.mock.Mock;
 
 /**
@@ -34,9 +34,9 @@ public class TableContentDeleterTest extends UnitilsJUnit4 {
     /* Tested object */
     private TableContentDeleter tableContentDeleter = new TableContentDeleter();
 
-    private Mock<DataSetRowSource> dataSetRowSource;
-    private Mock<DatabaseAccessor> databaseAccessor;
-    private Mock<IdentifierNameProcessor> identifierNameProcessor;
+    protected Mock<DataSetRowSource> dataSetRowSource;
+    protected Mock<DatabaseAccessor> databaseAccessor;
+    protected Mock<IdentifierNameProcessor> identifierNameProcessor;
 
     private DataSetRow dataSetRowTableA;
     private DataSetRow dataSetRowTableB;

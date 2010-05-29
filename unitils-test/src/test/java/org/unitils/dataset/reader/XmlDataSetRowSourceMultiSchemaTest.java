@@ -19,9 +19,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.core.DataSetRow;
-import org.unitils.dataset.core.DataSetSettings;
-import org.unitils.dataset.factory.impl.XmlDataSetRowSource;
+import org.unitils.dataset.core.dataset.DataSetRow;
+import org.unitils.dataset.core.dataset.DataSetSettings;
+import org.unitils.dataset.rowsource.impl.XmlDataSetRowSource;
 
 import java.io.File;
 
@@ -34,7 +34,7 @@ import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.toFile;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class XmlDataSetStaxReaderMultiSchemaTest extends UnitilsJUnit4 {
+public class XmlDataSetRowSourceMultiSchemaTest extends UnitilsJUnit4 {
 
     /* Tested object */
     private XmlDataSetRowSource xmlDataSetStaxReader;

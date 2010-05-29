@@ -22,7 +22,7 @@ import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import javax.sql.DataSource;
@@ -57,11 +57,9 @@ public abstract class DataSetTestBase extends UnitilsJUnit4 {
     }
 
 
-    protected Database createDatabase(Properties configuration) {
+    protected DatabaseMetaData createDatabaseMetaData(Properties configuration) {
         DbSupport defaultDbSupport = DbSupportFactory.getDefaultDbSupport(configuration, new DefaultSQLHandler(dataSource));
-        Database database = new Database();
-        database.init(defaultDbSupport, new SqlTypeHandlerRepository());
-        return database;
+        return new DatabaseMetaData(defaultDbSupport, new SqlTypeHandlerRepository());
     }
 
     protected void assertValueInTable(String tableName, String columnName, String expectedValue) {

@@ -15,45 +15,29 @@
  */
 package org.unitils.dataset;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.dataset.comparison.ExpectedDataSetStrategy;
-import org.unitils.dataset.comparison.impl.DefaultExpectedDataSetStrategy;
-
-import java.util.Properties;
 
 import static org.junit.Assert.fail;
-import static org.unitils.dataset.DataSetUnitils.assertExpectedDataSet;
-import static org.unitils.dataset.DataSetUnitils.dataSetCleanInsert;
+import static org.unitils.dataset.DataSetAssert.assertExpectedDataSet;
+import static org.unitils.dataset.DataSetLoader.cleanInsertDataSetFile;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DataSetModuleExpectedDataSetNoMoreRowsExpectedTest extends DataSetTestBase {
-
-    /* Tested object */
-    protected ExpectedDataSetStrategy expectedDataSetStrategy;
-
-    @Before
-    public void initialize() throws Exception {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        expectedDataSetStrategy = new DefaultExpectedDataSetStrategy();
-        expectedDataSetStrategy.init(configuration, createDatabase(configuration));
-    }
+public class AssertExpectedDataSetNoMoreRowsExpectedTest extends DataSetTestBase {
 
 
     @Test
     public void noMoreRowsFound() throws Exception {
-        dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-simple.xml");
+        cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-simple.xml");
         assertExpectedDataSet(this, "DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-noMoreRows.xml");
     }
 
     @Test
     public void moreRowsFound() throws Exception {
         try {
-            dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-3rows.xml");
+            cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-3rows.xml");
             assertExpectedDataSet(this, "DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-moreRowsFound.xml");
 
         } catch (AssertionError e) {
@@ -69,7 +53,7 @@ public class DataSetModuleExpectedDataSetNoMoreRowsExpectedTest extends DataSetT
     @Test
     public void rowWithColumnsAfterEmptyRow() throws Exception {
         try {
-            dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-3rows.xml");
+            cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-3rows.xml");
             assertExpectedDataSet(this, "DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-rowWithColumnsAfterEmptyRow.xml");
 
         } catch (AssertionError e) {
@@ -84,7 +68,7 @@ public class DataSetModuleExpectedDataSetNoMoreRowsExpectedTest extends DataSetT
 
     @Test
     public void twoEmptyRows() throws Exception {
-        dataSetCleanInsert(this, "DataSetModuleExpectedDataSetTest-simple.xml");
+        cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-simple.xml");
         assertExpectedDataSet(this, "DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-twoEmptyRows.xml");
     }
 

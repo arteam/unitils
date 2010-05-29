@@ -18,7 +18,7 @@ package org.unitils.dataset;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.dataset.annotation.DataSetInsert;
+import org.unitils.dataset.annotation.InlineDataSetRefresh;
 
 import java.lang.reflect.Method;
 import java.util.Properties;
@@ -27,7 +27,7 @@ import java.util.Properties;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DataSetModuleInsertTest extends DataSetTestBase {
+public class InlineDataSetRefreshAnnotationTest extends DataSetTestBase {
 
     /* Tested object */
     protected DataSetModule dataSetModule;
@@ -46,7 +46,7 @@ public class DataSetModuleInsertTest extends DataSetTestBase {
         Method method = TestClass.class.getDeclaredMethod("annotatedMethod");
         dataSetModule.loadDataSet(method, new TestClass());
 
-        assertValueInTable("TEST", "col1", "xxxx");
+        assertValueInTable("TEST", "col1", "method");
     }
 
     @Test
@@ -54,7 +54,7 @@ public class DataSetModuleInsertTest extends DataSetTestBase {
         Method method = TestClass.class.getDeclaredMethod("notAnnotatedMethod");
         dataSetModule.loadDataSet(method, new TestClass());
 
-        assertValueInTable("TEST", "col1", "xxxx");
+        assertValueInTable("TEST", "col1", "class");
     }
 
     @Test
@@ -62,14 +62,14 @@ public class DataSetModuleInsertTest extends DataSetTestBase {
         Method method = NotAnnotatedTestClass.class.getDeclaredMethod("notAnnotatedMethod");
         dataSetModule.loadDataSet(method, new NotAnnotatedTestClass());
 
-        assertValueNotInTable("TEST", "col1", "xxxx");
+        assertValueNotInTable("TEST", "col1", "class");
     }
 
 
-    @DataSetInsert("DataSetModuleDataSetTest-simple.xml")
+    @InlineDataSetRefresh("TEST col1=class")
     public class TestClass {
 
-        @DataSetInsert("DataSetModuleDataSetTest-simple.xml")
+        @InlineDataSetRefresh("TEST col1=method")
         public void annotatedMethod() {
         }
 

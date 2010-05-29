@@ -21,10 +21,13 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.dataset.comparison.impl.DefaultDatabaseContentLogger;
 import org.unitils.dataset.comparison.impl.TableContentRetriever;
 import org.unitils.dataset.comparison.impl.TableContents;
-import org.unitils.dataset.core.Column;
-import org.unitils.dataset.core.Row;
-import org.unitils.dataset.core.Value;
-import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.comparison.model.DataSetComparison;
+import org.unitils.dataset.comparison.model.RowComparison;
+import org.unitils.dataset.comparison.model.TableComparison;
+import org.unitils.dataset.core.database.Column;
+import org.unitils.dataset.core.database.Row;
+import org.unitils.dataset.core.database.Value;
+import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.mock.Mock;
 
 import static java.sql.Types.VARCHAR;
@@ -41,7 +44,7 @@ public class DefaultDatabaseContentLoggerTest extends UnitilsJUnit4 {
     /* Tested object */
     private DefaultDatabaseContentLogger defaultDatabaseContentRetriever = new DefaultDatabaseContentLogger();
 
-    protected Mock<Database> database;
+    protected Mock<DatabaseMetaData> database;
     protected Mock<TableContentRetriever> tableContentRetriever;
     protected Mock<TableContents> tableContent;
 

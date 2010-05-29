@@ -18,7 +18,13 @@ package org.unitils.dataset.core;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.loader.impl.Database;
+import org.unitils.dataset.core.database.Row;
+import org.unitils.dataset.core.database.Value;
+import org.unitils.dataset.core.dataset.DataSetRow;
+import org.unitils.dataset.core.dataset.DataSetSettings;
+import org.unitils.dataset.core.dataset.DataSetValue;
+import org.unitils.dataset.core.impl.DataSetRowProcessor;
+import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.loader.impl.IdentifierNameProcessor;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 import org.unitils.mock.Mock;
@@ -42,10 +48,10 @@ import static org.unitils.util.CollectionUtils.asSet;
 public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private DataSetRowProcessor dataSetRowProcessor = new DataSetRowProcessor();
+    private DataSetRowProcessor dataSetRowProcessor;
 
     protected Mock<IdentifierNameProcessor> identifierNameProcessor;
-    protected Mock<Database> database;
+    protected Mock<DatabaseMetaData> databaseMetaData;
 
     private DataSetRow dataSetRow;
     private DataSetRow dataSetRowCaseSensitive;
@@ -56,13 +62,18 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
     @Before
     public void initialize() {
         SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
-        dataSetRowProcessor.init(identifierNameProcessor.getMock(), sqlTypeHandlerRepository, database.getMock());
+        dataSetRowProcessor = new DataSetRowProcessor(identifierNameProcessor.getMock(), sqlTypeHandlerRepository, databaseMetaData.getMock());
 
-        database.returns("\"PK\"").quoteIdentifier("PK");
-        database.returns("\"pk\"").quoteIdentifier("pk");
-        database.returns("PK1").toCorrectCaseIdentifier("pk1");
-        database.returns("PK2").toCorrectCaseIdentifier("pk2");
-        database.returns("COLUMN").toCorrectCaseIdentifier("column");
+        databaseMetaData.returns("\"PK\"").quoteIdentifier("PK");
+        databaseMetaData.returns("\"pk\"").quoteIdentifier("pk");
+        databaseMetaData.returns("PK1").toCorrectCaseIdentifier("pk1");
+        databaseMetaData.returns("PK2").toCorrectCaseIdentifier("pk2");
+        databaseMetaData.returns("COLUMN").toCorrectCaseIdentifier("column");
+        databaseMetaData.returns("PK").removeIdentifierQuotes("\"PK\"");
+        databaseMetaData.returns("pk").removeIdentifierQuotes("\"pk\"");
+        databaseMetaData.returns("PK1").removeIdentifierQuotes("PK1");
+        databaseMetaData.returns("PK2").removeIdentifierQuotes("PK2");
+        databaseMetaData.returns("COLUMN").removeIdentifierQuotes("COLUMN");
 
         dataSetRow = new DataSetRow("schema", "table", null, false, new DataSetSettings('=', '$', false));
         dataSetRowCaseSensitive = new DataSetRow("schema", "table", null, false, new DataSetSettings('=', '$', true));
@@ -72,10 +83,10 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
     @Test
     public void primaryKeyColumns() throws Exception {
         identifierNameProcessor.returns("schema.table").getQualifiedTableName(null);
-        database.returns(asSet("pk1", "pk2")).getPrimaryKeyColumnNames("schema.table");
-        dataSetRow.addDataSetColumn(new DataSetColumn("pk1", "value"));
-        dataSetRow.addDataSetColumn(new DataSetColumn("pk2", "value"));
-        dataSetRow.addDataSetColumn(new DataSetColumn("column", "value"));
+        databaseMetaData.returns(asSet("PK1", "PK2")).getPrimaryKeyColumnNames("schema.table");
+        dataSetRow.addDataSetValue(new DataSetValue("pk1", "value"));
+        dataSetRow.addDataSetValue(new DataSetValue("pk2", "value"));
+        dataSetRow.addDataSetValue(new DataSetValue("column", "value"));
 
         Set<String> unusedPrimaryKeys = new HashSet<String>();
         Row result = dataSetRowProcessor.process(dataSetRow, emptyVariables, unusedPrimaryKeys);
@@ -92,13 +103,13 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
     @Test
     public void unusedPrimaryKeyColumns() throws Exception {
         identifierNameProcessor.returns("schema.table").getQualifiedTableName(null);
-        database.returns(asSet("pk1", "pk2", "pk3")).getPrimaryKeyColumnNames("schema.table");
-        dataSetRow.addDataSetColumn(new DataSetColumn("Pk1", "value"));
+        databaseMetaData.returns(asSet("PK1", "PK2", "PK3")).getPrimaryKeyColumnNames("schema.table");
+        dataSetRow.addDataSetValue(new DataSetValue("pk1", "value"));
 
         Set<String> unusedPrimaryKeys = new HashSet<String>();
         Row result = dataSetRowProcessor.process(dataSetRow, emptyVariables, unusedPrimaryKeys);
 
-        assertReflectionEquals(asSet("pk2", "pk3"), unusedPrimaryKeys);
+        assertReflectionEquals(asSet("PK2", "PK3"), unusedPrimaryKeys);
         Value value = result.getValues().get(0);
         assertTrue(value.getColumn().isPrimaryKey());
     }
@@ -106,9 +117,9 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
     @Test
     public void caseSensitive() throws Exception {
         identifierNameProcessor.returns("\"schema\".\"table\"").getQualifiedTableName(null);
-        database.returns(asSet("pk")).getPrimaryKeyColumnNames("\"schema\".\"table\"");
-        dataSetRowCaseSensitive.addDataSetColumn(new DataSetColumn("PK", "value"));
-        dataSetRowCaseSensitive.addDataSetColumn(new DataSetColumn("pk", "value"));
+        databaseMetaData.returns(asSet("pk")).getPrimaryKeyColumnNames("\"schema\".\"table\"");
+        dataSetRowCaseSensitive.addDataSetValue(new DataSetValue("PK", "value"));
+        dataSetRowCaseSensitive.addDataSetValue(new DataSetValue("pk", "value"));
 
         Set<String> unusedPrimaryKeys = new HashSet<String>();
         Row result = dataSetRowProcessor.process(dataSetRowCaseSensitive, emptyVariables, unusedPrimaryKeys);

@@ -18,7 +18,7 @@ package org.unitils.dataset;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
 
-import static org.unitils.dataset.DataSetUnitils.dataSetCleanInsert;
+import static org.unitils.dataset.DataSetLoader.cleanInsertDataSet;
 
 /**
  * Test class for loading of data sets using the clean insert data set strategy.
@@ -26,14 +26,14 @@ import static org.unitils.dataset.DataSetUnitils.dataSetCleanInsert;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class CleanInsertDataSetStrategyTest extends DataSetTestBase {
+public class InlineCleanInsertDataSetTest extends DataSetTestBase {
 
 
     @Test
-    public void cleanInsertDataSet() throws Exception {
+    public void inlineCleanInsertDataSet() throws Exception {
         insertValueInTableTest("yyyy");
 
-        dataSetCleanInsert(this, "DataSetModuleDataSetTest-simple.xml");
+        cleanInsertDataSet("TEST col1=xxxx");
         assertValueInTable("test", "col1", "xxxx");
         assertValueNotInTable("test", "col1", "yyyy");
     }
@@ -43,7 +43,7 @@ public class CleanInsertDataSetStrategyTest extends DataSetTestBase {
         insertValueInTableTest("yyyy");
         insertValueInTableDependent("yyyy");
 
-        dataSetCleanInsert(this, "DataSetModuleDataSetTest-dependency.xml");
+        cleanInsertDataSet("TEST col1=xxxx", "DEPENDENT col1=xxxx");
         assertValueInTable("test", "col1", "xxxx");
         assertValueInTable("dependent", "col1", "xxxx");
         assertValueNotInTable("test", "col1", "yyyy");
@@ -55,7 +55,15 @@ public class CleanInsertDataSetStrategyTest extends DataSetTestBase {
         insertValueInTableTest("yyyy");
         insertValueInTableDependent("yyyy");
 
-        dataSetCleanInsert(this, "DataSetModuleDataSetTest-dependencyWrongOrder.xml");
+        cleanInsertDataSet("DEPENDENT col1=xxxx", "TEST col1=xxxx");
+    }
+
+    @Test
+    public void literalValues() throws Exception {
+        cleanInsertDataSet("TEST col1==1, col2='=2', col3==sysdate");
+
+        assertValueInTable("test", "col1", "1");
+        assertValueInTable("test", "col2", "2");
     }
 
 }

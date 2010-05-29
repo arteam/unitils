@@ -22,13 +22,13 @@ import org.unitils.core.UnitilsException;
 
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.DataSetUnitils.dataSetInsert;
+import static org.unitils.dataset.DataSetLoader.insertDataSetFile;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DataSetStrategyParentChildTest extends DataSetTestBase {
+public class InsertDataSetParentChildTest extends DataSetTestBase {
 
 
     @Before
@@ -47,7 +47,7 @@ public class DataSetStrategyParentChildTest extends DataSetTestBase {
 
     @Test
     public void insertDataSet() throws Exception {
-        dataSetInsert(this, "DataSetModuleParentChildTest.xml");
+        insertDataSetFile(this, "DataSetModuleParentChildTest.xml");
 
         assertValueInTable("parent", "pk1", "1");
         assertValueInTable("parent", "pk2", "2");
@@ -59,7 +59,7 @@ public class DataSetStrategyParentChildTest extends DataSetTestBase {
 
     @Test
     public void childForeignKeyValuesAreOverriddenByActualParentValues() throws Exception {
-        dataSetInsert(this, "DataSetModuleParentChildTest-tryingToOverride.xml");
+        insertDataSetFile(this, "DataSetModuleParentChildTest-tryingToOverride.xml");
 
         assertValueInTable("parent", "pk1", "1");
         assertValueInTable("parent", "pk2", "2");
@@ -71,11 +71,11 @@ public class DataSetStrategyParentChildTest extends DataSetTestBase {
 
     @Test(expected = UnitilsException.class)
     public void notAParent() throws Exception {
-        dataSetInsert(this, "DataSetModuleParentChildTest-notAParent.xml");
+        insertDataSetFile(this, "DataSetModuleParentChildTest-notAParent.xml");
     }
 
     @Test(expected = UnitilsException.class)
     public void missingParentValueForForeignKey() throws Exception {
-        dataSetInsert(this, "DataSetModuleParentChildTest-missingParentValueForForeignKey.xml");
+        insertDataSetFile(this, "DataSetModuleParentChildTest-missingParentValueForForeignKey.xml");
     }
 }

@@ -18,8 +18,14 @@ package org.unitils.dataset.loader.impl;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.core.*;
-import org.unitils.dataset.factory.DataSetRowSource;
+import org.unitils.dataset.core.database.Column;
+import org.unitils.dataset.core.database.Row;
+import org.unitils.dataset.core.database.Value;
+import org.unitils.dataset.core.dataset.DataSetRow;
+import org.unitils.dataset.core.dataset.DataSetSettings;
+import org.unitils.dataset.core.dataset.DataSetValue;
+import org.unitils.dataset.core.impl.DataSetRowProcessor;
+import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.mock.Mock;
 
 import java.util.ArrayList;
@@ -118,7 +124,7 @@ public class BaseDataSetLoaderTest extends UnitilsJUnit4 {
     private DataSetRow createDataSetRow() {
         DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
         DataSetRow dataSetRow = new DataSetRow("schema", "table", null, false, dataSetSettings);
-        dataSetRow.addDataSetColumn(new DataSetColumn("column", "value"));
+        dataSetRow.addDataSetValue(new DataSetValue("column", "value"));
         return dataSetRow;
     }
 

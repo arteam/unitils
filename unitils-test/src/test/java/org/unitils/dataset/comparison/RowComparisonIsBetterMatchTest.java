@@ -17,9 +17,10 @@ package org.unitils.dataset.comparison;
 
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.core.Column;
-import org.unitils.dataset.core.Row;
-import org.unitils.dataset.core.Value;
+import org.unitils.dataset.comparison.model.RowComparison;
+import org.unitils.dataset.core.database.Column;
+import org.unitils.dataset.core.database.Row;
+import org.unitils.dataset.core.database.Value;
 
 import static java.sql.Types.VARCHAR;
 import static org.junit.Assert.assertFalse;
