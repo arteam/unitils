@@ -19,6 +19,13 @@ import org.unitils.dataset.DataSetModule;
 
 import java.lang.reflect.Method;
 
+/**
+ * todo javadoc
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
+ * @param <T>
+ */
 public interface DataSetAnnotationHandler<T> {
 
     void handle(T annotation, Method testMethod, Object testInstance, DataSetModule dataSetModule);

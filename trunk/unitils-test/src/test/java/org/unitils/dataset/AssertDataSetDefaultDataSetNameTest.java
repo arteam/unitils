@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.annotation.AssertDataSet;
-import org.unitils.dataset.annotation.DataSetCleanInsert;
+import org.unitils.dataset.annotation.CleanInsertDataSet;
 import org.unitils.inject.annotation.TestedObject;
 
 import java.util.Properties;
@@ -98,7 +98,7 @@ public class AssertDataSetDefaultDataSetNameTest extends DataSetTestBase {
     @AssertDataSet
     private static class TestClass {
 
-        @DataSetCleanInsert
+        @CleanInsertDataSet
         @AssertDataSet
         public void annotatedMethod() {
         }

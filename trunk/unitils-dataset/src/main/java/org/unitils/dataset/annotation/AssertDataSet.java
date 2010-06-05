@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.annotation;
 
-import org.unitils.dataset.annotation.handler.MarkerForExpectedDataSetAnnotation;
+import org.unitils.dataset.annotation.handler.MarkerForAssertDataSetAnnotation;
 import org.unitils.dataset.annotation.handler.impl.AssertDataSetAnnotationHandler;
 
 import java.lang.annotation.Inherited;
@@ -27,6 +27,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
+ * todo javadoc
  * Annotation indicating that after having executed a test method, the contents of the unit test database should be
  * equal to the contents of a data set.
  * <p/>
@@ -77,7 +78,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({TYPE, METHOD})
 @Retention(RUNTIME)
 @Inherited
-@MarkerForExpectedDataSetAnnotation(AssertDataSetAnnotationHandler.class)
+@MarkerForAssertDataSetAnnotation(AssertDataSetAnnotationHandler.class)
 public @interface AssertDataSet {
 
     /**

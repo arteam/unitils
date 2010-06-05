@@ -18,7 +18,7 @@ package org.unitils.dataset;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.dataset.annotation.DataSetInsert;
+import org.unitils.dataset.annotation.InsertDataSet;
 
 import java.lang.reflect.Method;
 import java.util.Properties;
@@ -66,10 +66,10 @@ public class DataSetInsertAnnotationTest extends DataSetTestBase {
     }
 
 
-    @DataSetInsert("DataSetModuleDataSetTest-simple.xml")
+    @InsertDataSet("DataSetModuleDataSetTest-simple.xml")
     public class TestClass {
 
-        @DataSetInsert("DataSetModuleDataSetTest-simple.xml")
+        @InsertDataSet("DataSetModuleDataSetTest-simple.xml")
         public void annotatedMethod() {
         }
 
