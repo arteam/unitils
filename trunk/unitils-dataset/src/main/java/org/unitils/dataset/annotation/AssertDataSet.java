@@ -43,13 +43,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Examples:
  * <p/>
  * <pre><code>
- * '    @ExpectedDataSet
+ * '    @AssertDataSet
  *      public class MyTestClass extends UnitilsJUnit3 {
  * '
  *          public void testMethod1(){
  *          }
  * '
- * '        @ExpectedDataSet("aCustomFileName.xml")
+ * '        @AssertDataSet("aCustomFileName.xml")
  *          public void testMethod2(){
  *          }
  *      }
@@ -63,7 +63,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *          public void testMethod1(){
  *          }
  * '
- * '        @ExpectedDataSet
+ * '        @AssertDataSet
  *          public void testMethod2(){
  *          }
  *      }
@@ -90,16 +90,16 @@ public @interface AssertDataSet {
 
     /**
      * Variables that will be used to fill in possible variable declarations in a data set.
-     *
+     * <p/>
      * A data set can contain variable declarations: $0, $1 ...
      * When the data set is loaded, these declarations are replaced with the given variable values.
      * The first variable will replace $0, the second $1 ...
      * When no value is found, the $0 variable declaration will not be replaced and will remain in the data set.
-     *
+     * <p/>
      * The character that defines a variable token, e.g. $0, can be defined using the variableToken parameter on the
      * dataset root xml element. By default $ is used, but you can override this default by setting
      * the dataset.variabletoken.default unitils property.
-     *
+     * <p/>
      * Variable declarations can be escaped by using a double variable token, e.g. $$0 will be replaced by $0
      * instead of the variable value
      *
