@@ -18,7 +18,7 @@ package org.unitils.dataset;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.dataset.annotation.InlineDataSetRefresh;
+import org.unitils.dataset.annotation.InlineRefreshDataSet;
 
 import java.lang.reflect.Method;
 import java.util.Properties;
@@ -66,10 +66,10 @@ public class InlineDataSetRefreshAnnotationTest extends DataSetTestBase {
     }
 
 
-    @InlineDataSetRefresh("TEST col1=class")
+    @InlineRefreshDataSet("TEST col1=class")
     public class TestClass {
 
-        @InlineDataSetRefresh("TEST col1=method")
+        @InlineRefreshDataSet("TEST col1=method")
         public void annotatedMethod() {
         }
 

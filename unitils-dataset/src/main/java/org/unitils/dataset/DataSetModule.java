@@ -22,19 +22,19 @@ import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.core.util.ConfigUtils;
 import org.unitils.database.DatabaseModule;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
-import org.unitils.dataset.annotation.handler.MarkerForExpectedDataSetAnnotation;
+import org.unitils.dataset.annotation.handler.MarkerForAssertDataSetAnnotation;
 import org.unitils.dataset.annotation.handler.MarkerForLoadDataSetAnnotation;
-import org.unitils.dataset.comparison.AssertDataSetStrategy;
-import org.unitils.dataset.comparison.impl.DefaultAssertDataSetStrategy;
-import org.unitils.dataset.core.LoadDataSetStrategy;
-import org.unitils.dataset.core.impl.CleanInsertDataSetStrategy;
-import org.unitils.dataset.core.impl.InsertDataSetStrategy;
-import org.unitils.dataset.core.impl.RefreshDataSetStrategy;
+import org.unitils.dataset.assertstrategy.AssertDataSetStrategy;
+import org.unitils.dataset.assertstrategy.impl.DefaultAssertDataSetStrategy;
 import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.loadstrategy.LoadDataSetStrategy;
+import org.unitils.dataset.loadstrategy.impl.CleanInsertDataSetStrategy;
+import org.unitils.dataset.loadstrategy.impl.InsertDataSetStrategy;
+import org.unitils.dataset.loadstrategy.impl.RefreshDataSetStrategy;
 import org.unitils.dataset.resolver.DataSetResolver;
-import org.unitils.dataset.resolver.impl.DefaultDataSetResolver;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.dataset.rowsource.impl.InlineDataSetRowSourceFactory;
 import org.unitils.dataset.rowsource.impl.XmlDataSetRowSourceFactory;
@@ -74,10 +74,10 @@ public class DataSetModule implements Module {
     /* The unitils configuration */
     protected Properties configuration;
 
-    protected DatabaseMetaData database;
-    protected DataSetResolver dataSetResolver = new DefaultDataSetResolver();
-    protected XmlDataSetRowSourceFactory xmlDataSetRowSourceFactory = new XmlDataSetRowSourceFactory();
-    protected InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = new InlineDataSetRowSourceFactory();
+    protected DatabaseMetaData databaseMetaData;
+    protected DataSetResolver dataSetResolver;
+    protected XmlDataSetRowSourceFactory xmlDataSetRowSourceFactory;
+    protected InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory;
 
     protected List<File> lastLoadedReadOnlyFiles = new ArrayList<File>();
 
@@ -91,64 +91,96 @@ public class DataSetModule implements Module {
         this.configuration = configuration;
     }
 
-
     public void afterInit() {
-        database = createDatabase();
-        dataSetResolver.init(configuration);
-        xmlDataSetRowSourceFactory.init(configuration, database.getSchemaName());
-        inlineDataSetRowSourceFactory.init(configuration, database.getSchemaName());
+        databaseMetaData = createDatabaseMetaData(configuration);
+        dataSetResolver = createDataSetResolver(configuration);
+        xmlDataSetRowSourceFactory = createXmlDataSetRowSourceFactory(configuration, databaseMetaData);
+        inlineDataSetRowSourceFactory = createInlineDataSetRowSourceFactory(configuration, databaseMetaData);
     }
 
 
+    /* INSERT OPERATIONS */
+
     public void insertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
         LoadDataSetStrategy insertDataSetStrategy = new InsertDataSetStrategy();
-        insertDataSetStrategy.init(configuration, createDatabase());
+        insertDataSetStrategy.init(configuration, databaseMetaData);
         performLoadDataSetStrategy(insertDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
     }
 
     public void insertDataSet(String... dataSetRows) {
         LoadDataSetStrategy insertDataSetStrategy = new InsertDataSetStrategy();
-        insertDataSetStrategy.init(configuration, createDatabase());
+        insertDataSetStrategy.init(configuration, databaseMetaData);
         performInlineLoadDataSetStrategy(insertDataSetStrategy, asList(dataSetRows));
     }
 
 
+    /* CLEAN INSERT OPERATIONS */
+
     public void cleanInsertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
         LoadDataSetStrategy cleanInsertDataSetStrategy = new CleanInsertDataSetStrategy();
-        cleanInsertDataSetStrategy.init(configuration, createDatabase());
+        cleanInsertDataSetStrategy.init(configuration, databaseMetaData);
         performLoadDataSetStrategy(cleanInsertDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
     }
 
     public void cleanInsertDataSet(String... dataSetRows) {
         LoadDataSetStrategy cleanInsertDataSetStrategy = new CleanInsertDataSetStrategy();
-        cleanInsertDataSetStrategy.init(configuration, createDatabase());
+        cleanInsertDataSetStrategy.init(configuration, databaseMetaData);
         performInlineLoadDataSetStrategy(cleanInsertDataSetStrategy, asList(dataSetRows));
     }
 
 
+    /* REFRESH OPERATIONS */
+
     public void refreshDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
         LoadDataSetStrategy refreshDataSetStrategy = new RefreshDataSetStrategy();
-        refreshDataSetStrategy.init(configuration, createDatabase());
+        refreshDataSetStrategy.init(configuration, databaseMetaData);
         performLoadDataSetStrategy(refreshDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
     }
 
     public void refreshDataSet(String... dataSetRows) {
         LoadDataSetStrategy refreshDataSetStrategy = new RefreshDataSetStrategy();
-        refreshDataSetStrategy.init(configuration, createDatabase());
+        refreshDataSetStrategy.init(configuration, databaseMetaData);
         performInlineLoadDataSetStrategy(refreshDataSetStrategy, asList(dataSetRows));
     }
 
 
+    /* ASSERT OPERATIONS */
+
     public void assertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean logDatabaseContentOnAssertionError, String... variables) {
         AssertDataSetStrategy defaultAssertDataSetStrategy = new DefaultAssertDataSetStrategy();
-        defaultAssertDataSetStrategy.init(configuration, database);
+        defaultAssertDataSetStrategy.init(configuration, databaseMetaData);
         performAssertDataSetStrategy(defaultAssertDataSetStrategy, dataSetFileNames, asList(variables), logDatabaseContentOnAssertionError, testInstance.getClass());
     }
 
     public void assertExpectedDataSet(boolean logDatabaseContentOnAssertionError, String... dataSetRows) {
         AssertDataSetStrategy defaultAssertDataSetStrategy = new DefaultAssertDataSetStrategy();
-        defaultAssertDataSetStrategy.init(configuration, database);
+        defaultAssertDataSetStrategy.init(configuration, databaseMetaData);
         performInlineExpectedDataSetStrategy(defaultAssertDataSetStrategy, asList(dataSetRows), logDatabaseContentOnAssertionError);
+    }
+
+
+    /**
+     * Gets the name of the default testdata file at class level The default name is constructed as
+     * follows: 'classname without packagename'.xml
+     *
+     * @param testClass The test class, not null
+     * @return The default filename, not null
+     */
+    public String getDefaultDataSetFileName(Class<?> testClass) {
+        String className = testClass.getName();
+        return className.substring(className.lastIndexOf(".") + 1) + ".xml";
+    }
+
+    /**
+     * Gets the name of the expected dataset file. The default name of this file is constructed as
+     * follows: 'classname without packagename'.'testname'-result.xml.
+     *
+     * @param testClass The test class, not null
+     * @return The expected dataset filename, not null
+     */
+    public String getDefaultExpectedDataSetFileName(Method testMethod, Class<?> testClass) {
+        String className = testClass.getName();
+        return className.substring(className.lastIndexOf(".") + 1) + "." + testMethod.getName() + "-result.xml";
     }
 
 
@@ -175,12 +207,12 @@ public class DataSetModule implements Module {
      */
     @SuppressWarnings({"unchecked"})
     protected void assertExpectedDataSet(Method testMethod, Object testObject) {
-        Annotation dataSetAnnotation = getMethodOrClassLevelAnnotationAnnotatedWith(MarkerForExpectedDataSetAnnotation.class, testMethod, testObject.getClass());
+        Annotation dataSetAnnotation = getMethodOrClassLevelAnnotationAnnotatedWith(MarkerForAssertDataSetAnnotation.class, testMethod, testObject.getClass());
         if (dataSetAnnotation == null) {
             return;
         }
 
-        MarkerForExpectedDataSetAnnotation annotation = dataSetAnnotation.annotationType().getAnnotation(MarkerForExpectedDataSetAnnotation.class);
+        MarkerForAssertDataSetAnnotation annotation = dataSetAnnotation.annotationType().getAnnotation(MarkerForAssertDataSetAnnotation.class);
         Class<? extends DataSetAnnotationHandler> dataSetAnnotationHandlerClass = annotation.value();
         DataSetAnnotationHandler dataSetAnnotationHandler = createInstanceOfType(dataSetAnnotationHandlerClass, false);
 
@@ -241,43 +273,37 @@ public class DataSetModule implements Module {
     }
 
 
-    /**
-     * Gets the name of the default testdata file at class level The default name is constructed as
-     * follows: 'classname without packagename'.xml
-     *
-     * @param testClass The test class, not null
-     * @return The default filename, not null
-     */
-    public String getDefaultDataSetFileName(Class<?> testClass) {
-        String className = testClass.getName();
-        return className.substring(className.lastIndexOf(".") + 1) + ".xml";
-    }
-
-    /**
-     * Gets the name of the expected dataset file. The default name of this file is constructed as
-     * follows: 'classname without packagename'.'testname'-result.xml.
-     *
-     * @param testClass The test class, not null
-     * @return The expected dataset filename, not null
-     */
-    public String getDefaultExpectedDataSetFileName(Method testMethod, Class<?> testClass) {
-        String className = testClass.getName();
-        return className.substring(className.lastIndexOf(".") + 1) + "." + testMethod.getName() + "-result.xml";
-    }
-
-
     /* FACTORY METHODS */
 
-    protected DatabaseMetaData createDatabase() {
-        DbSupport defaultDbSupport = getDefaultDbSupport();
+    protected DatabaseMetaData createDatabaseMetaData(Properties configuration) {
+        DbSupport defaultDbSupport = getDefaultDbSupport(configuration);
         SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
         return new DatabaseMetaData(defaultDbSupport, sqlTypeHandlerRepository);
     }
 
+    protected DataSetResolver createDataSetResolver(Properties configuration) {
+        DataSetResolver dataSetResolver = ConfigUtils.getInstanceOf(DataSetResolver.class, configuration);
+        dataSetResolver.init(configuration);
+        return dataSetResolver;
+    }
+
+    protected XmlDataSetRowSourceFactory createXmlDataSetRowSourceFactory(Properties configuration, DatabaseMetaData databaseMetaData) {
+        XmlDataSetRowSourceFactory xmlDataSetRowSourceFactory = new XmlDataSetRowSourceFactory();
+        xmlDataSetRowSourceFactory.init(configuration, databaseMetaData.getSchemaName());
+        return xmlDataSetRowSourceFactory;
+    }
+
+    protected InlineDataSetRowSourceFactory createInlineDataSetRowSourceFactory(Properties configuration, DatabaseMetaData databaseMetaData) {
+        InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = new InlineDataSetRowSourceFactory();
+        inlineDataSetRowSourceFactory.init(configuration, databaseMetaData.getSchemaName());
+        return inlineDataSetRowSourceFactory;
+    }
+
+
     /**
      * @return The default DbSupport (the one that connects to the default database schema)
      */
-    protected DbSupport getDefaultDbSupport() {
+    protected DbSupport getDefaultDbSupport(Properties configuration) {
         DataSource dataSource = getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded();
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
         return DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler);

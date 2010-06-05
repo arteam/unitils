@@ -18,7 +18,7 @@ package org.unitils.dataset;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.Unitils;
-import org.unitils.dataset.core.LoadDataSetStrategy;
+import org.unitils.dataset.loadstrategy.LoadDataSetStrategy;
 import org.unitils.inject.annotation.TestedObject;
 import org.unitils.mock.Mock;
 

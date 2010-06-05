@@ -18,7 +18,7 @@ package org.unitils.dataset;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.dataset.annotation.InlineDataSetInsert;
+import org.unitils.dataset.annotation.InlineInsertDataSet;
 
 import java.lang.reflect.Method;
 import java.util.Properties;
@@ -66,10 +66,10 @@ public class InlineDataSetInsertAnnotationTest extends DataSetTestBase {
     }
 
 
-    @InlineDataSetInsert("TEST col1=class")
+    @InlineInsertDataSet("TEST col1=class")
     public class TestClass {
 
-        @InlineDataSetInsert("TEST col1=method")
+        @InlineInsertDataSet("TEST col1=method")
         public void annotatedMethod() {
         }
 

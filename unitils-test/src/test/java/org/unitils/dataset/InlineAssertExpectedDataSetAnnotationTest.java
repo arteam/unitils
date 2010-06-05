@@ -18,8 +18,8 @@ package org.unitils.dataset;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.dataset.annotation.DataSetCleanInsert;
-import org.unitils.dataset.annotation.InlineExpectedDataSet;
+import org.unitils.dataset.annotation.CleanInsertDataSet;
+import org.unitils.dataset.annotation.InlineAssertDataSet;
 
 import java.lang.reflect.Method;
 import java.util.Properties;
@@ -80,14 +80,14 @@ public class InlineAssertExpectedDataSetAnnotationTest extends DataSetTestBase {
     }
 
 
-    @DataSetCleanInsert("DataSetModuleDataSetTest-simple.xml")
+    @CleanInsertDataSet("DataSetModuleDataSetTest-simple.xml")
     public class TestClass {
 
-        @InlineExpectedDataSet("TEST col1=xxxx")
+        @InlineAssertDataSet("TEST col1=xxxx")
         public void successfulAssert() {
         }
 
-        @InlineExpectedDataSet({"TEST col1=xxxx", "TEST col2=1"})
+        @InlineAssertDataSet({"TEST col1=xxxx", "TEST col2=1"})
         public void failingAssert() {
         }
 
@@ -99,8 +99,8 @@ public class InlineAssertExpectedDataSetAnnotationTest extends DataSetTestBase {
         }
     }
 
-    @DataSetCleanInsert("DataSetModuleDataSetTest-simple.xml")
-    @InlineExpectedDataSet({"TEST col1=value1", "TEST col2=1"})
+    @CleanInsertDataSet("DataSetModuleDataSetTest-simple.xml")
+    @InlineAssertDataSet({"TEST col1=value1", "TEST col2=1"})
     public class AnnotationOnClassTestClass {
 
         public void notAnnotatedMethod() {

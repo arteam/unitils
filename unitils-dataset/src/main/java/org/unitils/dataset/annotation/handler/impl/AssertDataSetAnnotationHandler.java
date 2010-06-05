@@ -24,6 +24,12 @@ import java.util.List;
 
 import static org.unitils.util.CollectionUtils.asList;
 
+/**
+ * Handles the execution of the {@link AssertDataSet} annotation.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
+ */
 public class AssertDataSetAnnotationHandler implements DataSetAnnotationHandler<AssertDataSet> {
 
 

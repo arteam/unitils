@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.annotation.DataSetCleanInsert;
+import org.unitils.dataset.annotation.CleanInsertDataSet;
 import org.unitils.inject.annotation.TestedObject;
 
 import java.util.Properties;
@@ -86,10 +86,10 @@ public class CleanInsertDefaultDataSetNameTest extends DataSetTestBase {
     }
 
 
-    @DataSetCleanInsert
+    @CleanInsertDataSet
     private static class TestClass {
 
-        @DataSetCleanInsert
+        @CleanInsertDataSet
         public void annotatedMethod() {
         }
 
@@ -103,7 +103,7 @@ public class CleanInsertDefaultDataSetNameTest extends DataSetTestBase {
 
     }
 
-    @DataSetCleanInsert
+    @CleanInsertDataSet
     private static class NoDataSetFileTestClass {
 
         public void method() {
