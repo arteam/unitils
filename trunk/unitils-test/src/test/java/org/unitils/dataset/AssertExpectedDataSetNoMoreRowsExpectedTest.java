@@ -18,7 +18,6 @@ package org.unitils.dataset;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
-import static org.unitils.dataset.DataSetAssert.assertExpectedDataSet;
 import static org.unitils.dataset.DataSetLoader.cleanInsertDataSetFile;
 
 /**
@@ -31,14 +30,14 @@ public class AssertExpectedDataSetNoMoreRowsExpectedTest extends DataSetTestBase
     @Test
     public void noMoreRowsFound() throws Exception {
         cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-simple.xml");
-        assertExpectedDataSet(this, "DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-noMoreRows.xml");
+        DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-noMoreRows.xml");
     }
 
     @Test
     public void moreRowsFound() throws Exception {
         try {
             cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-3rows.xml");
-            assertExpectedDataSet(this, "DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-moreRowsFound.xml");
+            DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-moreRowsFound.xml");
 
         } catch (AssertionError e) {
             assertMessageContains("Expected no more database records in table PUBLIC.TEST but found more records.", e);
@@ -54,7 +53,7 @@ public class AssertExpectedDataSetNoMoreRowsExpectedTest extends DataSetTestBase
     public void rowWithColumnsAfterEmptyRow() throws Exception {
         try {
             cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-3rows.xml");
-            assertExpectedDataSet(this, "DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-rowWithColumnsAfterEmptyRow.xml");
+            DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-rowWithColumnsAfterEmptyRow.xml");
 
         } catch (AssertionError e) {
             assertMessageContains("Expected no more database records in table PUBLIC.TEST but found more records.", e);
@@ -69,7 +68,7 @@ public class AssertExpectedDataSetNoMoreRowsExpectedTest extends DataSetTestBase
     @Test
     public void twoEmptyRows() throws Exception {
         cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-simple.xml");
-        assertExpectedDataSet(this, "DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-twoEmptyRows.xml");
+        DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetNoMoreRowsExpectedTest-twoEmptyRows.xml");
     }
 
 }

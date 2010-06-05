@@ -107,4 +107,6 @@ public @interface DataSetInsert {
      */
     String[] variables() default {};
 
+    boolean readOnly() default false;
+
 }

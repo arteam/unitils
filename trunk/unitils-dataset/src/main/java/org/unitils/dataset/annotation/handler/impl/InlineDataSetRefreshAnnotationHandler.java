@@ -19,10 +19,12 @@ import org.unitils.dataset.DataSetModule;
 import org.unitils.dataset.annotation.InlineDataSetRefresh;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 
+import java.lang.reflect.Method;
+
 public class InlineDataSetRefreshAnnotationHandler implements DataSetAnnotationHandler<InlineDataSetRefresh> {
 
 
-    public void handle(InlineDataSetRefresh annotation, Object testInstance, DataSetModule dataSetModule) {
+    public void handle(InlineDataSetRefresh annotation, Method testMethod, Object testInstance, DataSetModule dataSetModule) {
         String[] dataSetRows = annotation.value();
         dataSetModule.refreshDataSet(dataSetRows);
     }

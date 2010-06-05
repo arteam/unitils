@@ -16,7 +16,10 @@
 package org.unitils.dataset;
 
 import org.unitils.core.Unitils;
+import org.unitils.core.UnitilsException;
+import org.unitils.util.TestMethodFinder;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -27,20 +30,34 @@ import static java.util.Arrays.asList;
  */
 public class DataSetAssert {
 
-    public static void assertExpectedDataSet(Object testInstance, String expectedDataSetFileName, String... variables) {
-        assertExpectedDataSet(testInstance, asList(expectedDataSetFileName), variables);
+
+    public static void assertDefaultDataSet(Object testInstance, String... variables) {
+        Method testMethod;
+        try {
+            testMethod = TestMethodFinder.findCurrentTestMethod(testInstance.getClass());
+        } catch (UnitilsException e) {
+            throw new UnitilsException("Unable to assert using a default data set file. Could not find a test method needed to construct the default data set file name 'test-class'.'method'-result.xml.\n" +
+                    "A method call to the given test instance should be on the call stack.\nThe assertDefaultDataSet method should typically be called from within a test method, passing 'this' as test instance.", e);
+        }
+
+        String defaultExpectedDataSetFileName = getDataSetModule().getDefaultExpectedDataSetFileName(testMethod, testInstance.getClass());
+        assertDataSet(testInstance, asList(defaultExpectedDataSetFileName), variables);
     }
 
-    public static void assertExpectedDataSet(Object testInstance, String expectedDataSetFileName, boolean logDatabaseContentOnAssertionError, String... variables) {
-        assertExpectedDataSet(testInstance, asList(expectedDataSetFileName), logDatabaseContentOnAssertionError, variables);
+    public static void assertDataSet(Object testInstance, String expectedDataSetFileName, String... variables) {
+        assertDataSet(testInstance, asList(expectedDataSetFileName), variables);
     }
 
-    public static void assertExpectedDataSet(Object testInstance, List<String> expectedDataSetFileNames, String... variables) {
-        assertExpectedDataSet(testInstance, expectedDataSetFileNames, true, variables);
+    public static void assertDataSet(Object testInstance, String expectedDataSetFileName, boolean logDatabaseContentOnAssertionError, String... variables) {
+        assertDataSet(testInstance, asList(expectedDataSetFileName), logDatabaseContentOnAssertionError, variables);
     }
 
-    public static void assertExpectedDataSet(Object testInstance, List<String> expectedDataSetFileNames, boolean logDatabaseContentOnAssertionError, String... variables) {
-        getDataSetModule().assertExpectedDataSetFiles(testInstance, expectedDataSetFileNames, logDatabaseContentOnAssertionError, variables);
+    public static void assertDataSet(Object testInstance, List<String> expectedDataSetFileNames, String... variables) {
+        assertDataSet(testInstance, expectedDataSetFileNames, true, variables);
+    }
+
+    public static void assertDataSet(Object testInstance, List<String> expectedDataSetFileNames, boolean logDatabaseContentOnAssertionError, String... variables) {
+        getDataSetModule().assertDataSetFiles(testInstance, expectedDataSetFileNames, logDatabaseContentOnAssertionError, variables);
     }
 
 

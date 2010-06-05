@@ -19,10 +19,12 @@ import org.unitils.dataset.DataSetModule;
 import org.unitils.dataset.annotation.InlineDataSetCleanInsert;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 
+import java.lang.reflect.Method;
+
 public class InlineDataSetCleanInsertAnnotationHandler implements DataSetAnnotationHandler<InlineDataSetCleanInsert> {
 
 
-    public void handle(InlineDataSetCleanInsert annotation, Object testInstance, DataSetModule dataSetModule) {
+    public void handle(InlineDataSetCleanInsert annotation, Method testMethod, Object testInstance, DataSetModule dataSetModule) {
         String[] dataSetRows = annotation.value();
         dataSetModule.cleanInsertDataSet(dataSetRows);
     }

@@ -107,4 +107,5 @@ public @interface DataSetRefresh {
      */
     String[] variables() default {};
 
+    boolean readOnly() default false;
 }
