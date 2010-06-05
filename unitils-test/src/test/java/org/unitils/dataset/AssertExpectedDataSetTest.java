@@ -19,7 +19,6 @@ import org.junit.Test;
 import org.unitils.core.UnitilsException;
 
 import static org.junit.Assert.fail;
-import static org.unitils.dataset.DataSetAssert.assertExpectedDataSet;
 import static org.unitils.dataset.DataSetLoader.cleanInsertDataSetFile;
 
 /**
@@ -32,14 +31,14 @@ public class AssertExpectedDataSetTest extends DataSetTestBase {
     @Test
     public void matchingDataSet() throws Exception {
         cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-simple.xml");
-        assertExpectedDataSet(this, "DataSetModuleExpectedDataSetTest-simple.xml");
+        DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetTest-simple.xml");
     }
 
     @Test
     public void differentDataSet() throws Exception {
         try {
             cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-simple.xml");
-            assertExpectedDataSet(this, "DataSetModuleExpectedDataSetTest-different.xml");
+            DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetTest-different.xml");
 
         } catch (AssertionError e) {
             assertMessageContains("No match found for data set row:  PUBLIC.TEST [COL1=xxxx, COL2=9999]", e);
@@ -54,32 +53,32 @@ public class AssertExpectedDataSetTest extends DataSetTestBase {
     @Test(expected = UnitilsException.class)
     public void literalValuesNotSupportedInExpectedDataSet() throws Exception {
         cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-literalValues.xml");
-        assertExpectedDataSet(this, "DataSetModuleExpectedDataSetTest-literalValues.xml");
+        DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetTest-literalValues.xml");
     }
 
     @Test
     public void caseSensitive() throws Exception {
         cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-simple.xml");
-        assertExpectedDataSet(this, "DataSetModuleExpectedDataSetTest-caseSensitive.xml");
+        DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetTest-caseSensitive.xml");
     }
 
     @Test(expected = UnitilsException.class)
     public void caseSensitiveWrongCase() throws Exception {
         cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-simple.xml");
-        assertExpectedDataSet(this, "DataSetModuleExpectedDataSetTest-caseSensitiveWrongCase.xml");
+        DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetTest-caseSensitiveWrongCase.xml");
     }
 
     @Test
     public void equalVariables() throws Exception {
         cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-variables.xml", "test", "1");
-        assertExpectedDataSet(this, "DataSetModuleExpectedDataSetTest-variables.xml", "test", "1");
+        DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetTest-variables.xml", "test", "1");
     }
 
     @Test
     public void differentVariables() throws Exception {
         try {
             cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-variables.xml", "test", "1");
-            assertExpectedDataSet(this, "DataSetModuleExpectedDataSetTest-variables.xml", "xxxx", "9999");
+            DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetTest-variables.xml", "xxxx", "9999");
 
         } catch (AssertionError e) {
             assertMessageContains("test", e);
@@ -95,7 +94,7 @@ public class AssertExpectedDataSetTest extends DataSetTestBase {
     public void noDatabaseContentLogging() throws Exception {
         try {
             cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-simple.xml");
-            assertExpectedDataSet(this, "DataSetModuleExpectedDataSetTest-different.xml");
+            DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetTest-different.xml");
 
         } catch (AssertionError e) {
             assertMessageNotContains("Actual Database Content", e);
@@ -107,7 +106,7 @@ public class AssertExpectedDataSetTest extends DataSetTestBase {
     @Test
     public void emptyDataSet() throws Exception {
         cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-simple.xml");
-        assertExpectedDataSet(this, "DataSetModuleExpectedDataSetTest-emptyDataSet.xml");
+        DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetTest-emptyDataSet.xml");
     }
 
 }

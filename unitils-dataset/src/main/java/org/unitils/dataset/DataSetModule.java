@@ -18,18 +18,16 @@ package org.unitils.dataset;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
-import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.DatabaseModule;
-import org.unitils.dataset.annotation.ExpectedDataSet;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 import org.unitils.dataset.annotation.handler.MarkerForExpectedDataSetAnnotation;
 import org.unitils.dataset.annotation.handler.MarkerForLoadDataSetAnnotation;
-import org.unitils.dataset.comparison.ExpectedDataSetStrategy;
-import org.unitils.dataset.comparison.impl.DefaultExpectedDataSetStrategy;
+import org.unitils.dataset.comparison.AssertDataSetStrategy;
+import org.unitils.dataset.comparison.impl.DefaultAssertDataSetStrategy;
 import org.unitils.dataset.core.LoadDataSetStrategy;
 import org.unitils.dataset.core.impl.CleanInsertDataSetStrategy;
 import org.unitils.dataset.core.impl.InsertDataSetStrategy;
@@ -61,7 +59,7 @@ import static org.unitils.util.ReflectionUtils.createInstanceOfType;
  * of the data set files can be specified explicitly as an argument of the annotation. If no file name is specified, it looks
  * for a file in the same directory as the test class named: 'classname without packagename'.xml.
  * <p/>
- * By annotating a method with the {@link ExpectedDataSet} annotation or by calling the {@link #assertExpectedDataSetFiles}
+ * By annotating a method with the {@link org.unitils.dataset.annotation.AssertDataSet} annotation or by calling the {@link #assertDataSetFiles}
  * method, the contents of the database can be compared with the contents of a data set. The expected data set can be
  * passed as an argument of the annotation. If no file name is specified it looks for a file in the same directory
  * as the test class that has following name: 'class name without packagename'.'test method name'-result.xml.
@@ -80,6 +78,8 @@ public class DataSetModule implements Module {
     protected DataSetResolver dataSetResolver = new DefaultDataSetResolver();
     protected XmlDataSetRowSourceFactory xmlDataSetRowSourceFactory = new XmlDataSetRowSourceFactory();
     protected InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = new InlineDataSetRowSourceFactory();
+
+    protected List<File> lastLoadedReadOnlyFiles = new ArrayList<File>();
 
 
     /**
@@ -100,10 +100,10 @@ public class DataSetModule implements Module {
     }
 
 
-    public void insertDataSetFiles(Object testInstance, List<String> dataSetFileNames, String... variables) {
+    public void insertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
         LoadDataSetStrategy insertDataSetStrategy = new InsertDataSetStrategy();
         insertDataSetStrategy.init(configuration, createDatabase());
-        performLoadDataSetStrategy(insertDataSetStrategy, dataSetFileNames, asList(variables), testInstance.getClass());
+        performLoadDataSetStrategy(insertDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
     }
 
     public void insertDataSet(String... dataSetRows) {
@@ -113,10 +113,10 @@ public class DataSetModule implements Module {
     }
 
 
-    public void cleanInsertDataSetFiles(Object testInstance, List<String> dataSetFileNames, String... variables) {
+    public void cleanInsertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
         LoadDataSetStrategy cleanInsertDataSetStrategy = new CleanInsertDataSetStrategy();
         cleanInsertDataSetStrategy.init(configuration, createDatabase());
-        performLoadDataSetStrategy(cleanInsertDataSetStrategy, dataSetFileNames, asList(variables), testInstance.getClass());
+        performLoadDataSetStrategy(cleanInsertDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
     }
 
     public void cleanInsertDataSet(String... dataSetRows) {
@@ -126,10 +126,10 @@ public class DataSetModule implements Module {
     }
 
 
-    public void refreshDataSetFiles(Object testInstance, List<String> dataSetFileNames, String... variables) {
+    public void refreshDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
         LoadDataSetStrategy refreshDataSetStrategy = new RefreshDataSetStrategy();
         refreshDataSetStrategy.init(configuration, createDatabase());
-        performLoadDataSetStrategy(refreshDataSetStrategy, dataSetFileNames, asList(variables), testInstance.getClass());
+        performLoadDataSetStrategy(refreshDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
     }
 
     public void refreshDataSet(String... dataSetRows) {
@@ -139,36 +139,31 @@ public class DataSetModule implements Module {
     }
 
 
-    public void assertExpectedDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean logDatabaseContentOnAssertionError, String... variables) {
-        ExpectedDataSetStrategy defaultExpectedDataSetStrategy = new DefaultExpectedDataSetStrategy();
-        defaultExpectedDataSetStrategy.init(configuration, database);
-        performExpectedDataSetStrategy(defaultExpectedDataSetStrategy, dataSetFileNames, asList(variables), logDatabaseContentOnAssertionError, testInstance.getClass());
+    public void assertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean logDatabaseContentOnAssertionError, String... variables) {
+        AssertDataSetStrategy defaultAssertDataSetStrategy = new DefaultAssertDataSetStrategy();
+        defaultAssertDataSetStrategy.init(configuration, database);
+        performAssertDataSetStrategy(defaultAssertDataSetStrategy, dataSetFileNames, asList(variables), logDatabaseContentOnAssertionError, testInstance.getClass());
     }
 
     public void assertExpectedDataSet(boolean logDatabaseContentOnAssertionError, String... dataSetRows) {
-        ExpectedDataSetStrategy defaultExpectedDataSetStrategy = new DefaultExpectedDataSetStrategy();
-        defaultExpectedDataSetStrategy.init(configuration, database);
-        performInlineExpectedDataSetStrategy(defaultExpectedDataSetStrategy, asList(dataSetRows), logDatabaseContentOnAssertionError);
+        AssertDataSetStrategy defaultAssertDataSetStrategy = new DefaultAssertDataSetStrategy();
+        defaultAssertDataSetStrategy.init(configuration, database);
+        performInlineExpectedDataSetStrategy(defaultAssertDataSetStrategy, asList(dataSetRows), logDatabaseContentOnAssertionError);
     }
 
 
     @SuppressWarnings({"unchecked"})
     protected void loadDataSet(Method testMethod, Object testObject) {
-        try {
-            Annotation dataSetAnnotation = getMethodOrClassLevelAnnotationAnnotatedWith(MarkerForLoadDataSetAnnotation.class, testMethod, testObject.getClass());
-            if (dataSetAnnotation == null) {
-                return;
-            }
-
-            MarkerForLoadDataSetAnnotation annotation = dataSetAnnotation.annotationType().getAnnotation(MarkerForLoadDataSetAnnotation.class);
-            Class<? extends DataSetAnnotationHandler> dataSetAnnotationHandlerClass = annotation.value();
-            DataSetAnnotationHandler dataSetAnnotationHandler = createInstanceOfType(dataSetAnnotationHandlerClass, false);
-
-            dataSetAnnotationHandler.handle(dataSetAnnotation, testObject, this);
-
-        } catch (Exception e) {
-            throw new UnitilsException("Error inserting data set for method " + testMethod, e);
+        Annotation dataSetAnnotation = getMethodOrClassLevelAnnotationAnnotatedWith(MarkerForLoadDataSetAnnotation.class, testMethod, testObject.getClass());
+        if (dataSetAnnotation == null) {
+            return;
         }
+
+        MarkerForLoadDataSetAnnotation annotation = dataSetAnnotation.annotationType().getAnnotation(MarkerForLoadDataSetAnnotation.class);
+        Class<? extends DataSetAnnotationHandler> dataSetAnnotationHandlerClass = annotation.value();
+        DataSetAnnotationHandler dataSetAnnotationHandler = createInstanceOfType(dataSetAnnotationHandlerClass, false);
+
+        dataSetAnnotationHandler.handle(dataSetAnnotation, testMethod, testObject, this);
     }
 
     /**
@@ -180,29 +175,38 @@ public class DataSetModule implements Module {
      */
     @SuppressWarnings({"unchecked"})
     protected void assertExpectedDataSet(Method testMethod, Object testObject) {
-        try {
-            Annotation dataSetAnnotation = getMethodOrClassLevelAnnotationAnnotatedWith(MarkerForExpectedDataSetAnnotation.class, testMethod, testObject.getClass());
-            if (dataSetAnnotation == null) {
-                return;
-            }
-
-            MarkerForExpectedDataSetAnnotation annotation = dataSetAnnotation.annotationType().getAnnotation(MarkerForExpectedDataSetAnnotation.class);
-            Class<? extends DataSetAnnotationHandler> dataSetAnnotationHandlerClass = annotation.value();
-            DataSetAnnotationHandler dataSetAnnotationHandler = createInstanceOfType(dataSetAnnotationHandlerClass, false);
-
-            dataSetAnnotationHandler.handle(dataSetAnnotation, testObject, this);
-
-        } catch (Exception e) {
-            throw new UnitilsException("Error comparing data set for method " + testMethod, e);
+        Annotation dataSetAnnotation = getMethodOrClassLevelAnnotationAnnotatedWith(MarkerForExpectedDataSetAnnotation.class, testMethod, testObject.getClass());
+        if (dataSetAnnotation == null) {
+            return;
         }
+
+        MarkerForExpectedDataSetAnnotation annotation = dataSetAnnotation.annotationType().getAnnotation(MarkerForExpectedDataSetAnnotation.class);
+        Class<? extends DataSetAnnotationHandler> dataSetAnnotationHandlerClass = annotation.value();
+        DataSetAnnotationHandler dataSetAnnotationHandler = createInstanceOfType(dataSetAnnotationHandlerClass, false);
+
+        dataSetAnnotationHandler.handle(dataSetAnnotation, testMethod, testObject, this);
     }
 
 
-    protected void performLoadDataSetStrategy(LoadDataSetStrategy loadDataSetStrategy, List<String> dataSetFileNames, List<String> variables, Class<?> testClass) {
+    protected void performLoadDataSetStrategy(LoadDataSetStrategy loadDataSetStrategy, List<String> dataSetFileNames, List<String> variables, boolean readOnly, Class<?> testClass) {
+        if (dataSetFileNames.isEmpty()) {
+            // empty means, use default file name, which is the name of the class + extension
+            dataSetFileNames.add(getDefaultDataSetFileName(testClass));
+        }
+
         List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
         for (File dataSetFile : dataSetFiles) {
+            if (lastLoadedReadOnlyFiles.contains(dataSetFile)) {
+                continue;
+            }
             DataSetRowSource dataSetRowSource = xmlDataSetRowSourceFactory.createDataSetRowSource(dataSetFile);
             loadDataSetStrategy.perform(dataSetRowSource, variables);
+        }
+
+        if (readOnly) {
+            lastLoadedReadOnlyFiles.addAll(dataSetFiles);
+        } else {
+            lastLoadedReadOnlyFiles.clear();
         }
     }
 
@@ -212,17 +216,17 @@ public class DataSetModule implements Module {
     }
 
 
-    protected void performExpectedDataSetStrategy(ExpectedDataSetStrategy expectedDataSetStrategy, List<String> dataSetFileNames, List<String> variables, boolean logDatabaseContentOnAssertionError, Class<?> testClass) {
+    protected void performAssertDataSetStrategy(AssertDataSetStrategy assertDataSetStrategy, List<String> dataSetFileNames, List<String> variables, boolean logDatabaseContentOnAssertionError, Class<?> testClass) {
         List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
         for (File dataSetFile : dataSetFiles) {
             DataSetRowSource dataSetRowSource = xmlDataSetRowSourceFactory.createDataSetRowSource(dataSetFile);
-            expectedDataSetStrategy.assertExpectedDataSet(dataSetRowSource, variables, logDatabaseContentOnAssertionError);
+            assertDataSetStrategy.perform(dataSetRowSource, variables, logDatabaseContentOnAssertionError);
         }
     }
 
-    protected void performInlineExpectedDataSetStrategy(ExpectedDataSetStrategy expectedDataSetStrategy, List<String> dataSetRows, boolean logDatabaseContentOnAssertionError) {
+    protected void performInlineExpectedDataSetStrategy(AssertDataSetStrategy assertDataSetStrategy, List<String> dataSetRows, boolean logDatabaseContentOnAssertionError) {
         DataSetRowSource dataSetRowSource = inlineDataSetRowSourceFactory.createDataSetRowSource(dataSetRows);
-        expectedDataSetStrategy.assertExpectedDataSet(dataSetRowSource, new ArrayList<String>(), logDatabaseContentOnAssertionError);
+        assertDataSetStrategy.perform(dataSetRowSource, new ArrayList<String>(), logDatabaseContentOnAssertionError);
     }
 
 
@@ -234,6 +238,31 @@ public class DataSetModule implements Module {
             dataSetFiles.add(dataSetFile);
         }
         return dataSetFiles;
+    }
+
+
+    /**
+     * Gets the name of the default testdata file at class level The default name is constructed as
+     * follows: 'classname without packagename'.xml
+     *
+     * @param testClass The test class, not null
+     * @return The default filename, not null
+     */
+    public String getDefaultDataSetFileName(Class<?> testClass) {
+        String className = testClass.getName();
+        return className.substring(className.lastIndexOf(".") + 1) + ".xml";
+    }
+
+    /**
+     * Gets the name of the expected dataset file. The default name of this file is constructed as
+     * follows: 'classname without packagename'.'testname'-result.xml.
+     *
+     * @param testClass The test class, not null
+     * @return The expected dataset filename, not null
+     */
+    public String getDefaultExpectedDataSetFileName(Method testMethod, Class<?> testClass) {
+        String className = testClass.getName();
+        return className.substring(className.lastIndexOf(".") + 1) + "." + testMethod.getName() + "-result.xml";
     }
 
 

@@ -19,10 +19,12 @@ import org.unitils.dataset.DataSetModule;
 import org.unitils.dataset.annotation.InlineDataSetInsert;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 
+import java.lang.reflect.Method;
+
 public class InlineDataSetInsertAnnotationHandler implements DataSetAnnotationHandler<InlineDataSetInsert> {
 
 
-    public void handle(InlineDataSetInsert annotation, Object testInstance, DataSetModule dataSetModule) {
+    public void handle(InlineDataSetInsert annotation, Method testMethod, Object testInstance, DataSetModule dataSetModule) {
         String[] dataSetRows = annotation.value();
         dataSetModule.insertDataSet(dataSetRows);
     }

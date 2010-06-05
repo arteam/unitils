@@ -16,22 +16,28 @@
 package org.unitils.dataset.annotation.handler.impl;
 
 import org.unitils.dataset.DataSetModule;
-import org.unitils.dataset.annotation.ExpectedDataSet;
+import org.unitils.dataset.annotation.AssertDataSet;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
-import static java.util.Arrays.asList;
+import static org.unitils.util.CollectionUtils.asList;
 
-public class ExpectedDataSetAnnotationHandler implements DataSetAnnotationHandler<ExpectedDataSet> {
+public class AssertDataSetAnnotationHandler implements DataSetAnnotationHandler<AssertDataSet> {
 
 
-    public void handle(ExpectedDataSet annotation, Object testInstance, DataSetModule dataSetModule) {
+    public void handle(AssertDataSet annotation, Method testMethod, Object testInstance, DataSetModule dataSetModule) {
         List<String> fileNames = asList(annotation.value());
         String[] variables = annotation.variables();
         boolean logDatabaseContentOnAssertionError = annotation.logDatabaseContentOnAssertionError();
 
-        dataSetModule.assertExpectedDataSetFiles(testInstance, fileNames, logDatabaseContentOnAssertionError, variables);
+        if (fileNames.isEmpty()) {
+            // empty means use default file name
+            fileNames.add(dataSetModule.getDefaultExpectedDataSetFileName(testMethod, testInstance.getClass()));
+        }
+
+        dataSetModule.assertDataSetFiles(testInstance, fileNames, logDatabaseContentOnAssertionError, variables);
     }
 
 }

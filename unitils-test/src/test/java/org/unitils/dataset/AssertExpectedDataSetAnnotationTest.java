@@ -18,8 +18,8 @@ package org.unitils.dataset;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.dataset.annotation.AssertDataSet;
 import org.unitils.dataset.annotation.DataSetCleanInsert;
-import org.unitils.dataset.annotation.ExpectedDataSet;
 
 import java.lang.reflect.Method;
 import java.util.Properties;
@@ -83,11 +83,11 @@ public class AssertExpectedDataSetAnnotationTest extends DataSetTestBase {
     @DataSetCleanInsert("DataSetModuleDataSetTest-simple.xml")
     public class TestClass {
 
-        @ExpectedDataSet("DataSetModuleDataSetTest-simple.xml")
+        @AssertDataSet("DataSetModuleDataSetTest-simple.xml")
         public void successfulAssert() {
         }
 
-        @ExpectedDataSet("DataSetModuleDataSetTest-2rows.xml")
+        @AssertDataSet("DataSetModuleDataSetTest-2rows.xml")
         public void failingAssert() {
         }
 
@@ -100,7 +100,7 @@ public class AssertExpectedDataSetAnnotationTest extends DataSetTestBase {
     }
 
     @DataSetCleanInsert("DataSetModuleDataSetTest-simple.xml")
-    @ExpectedDataSet("DataSetModuleDataSetTest-2rows.xml")
+    @AssertDataSet("DataSetModuleDataSetTest-2rows.xml")
     public class AnnotationOnClassTestClass {
 
         public void notAnnotatedMethod() {

@@ -16,7 +16,7 @@
 package org.unitils.dataset.annotation;
 
 import org.unitils.dataset.annotation.handler.MarkerForExpectedDataSetAnnotation;
-import org.unitils.dataset.annotation.handler.impl.ExpectedDataSetAnnotationHandler;
+import org.unitils.dataset.annotation.handler.impl.AssertDataSetAnnotationHandler;
 
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -77,8 +77,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({TYPE, METHOD})
 @Retention(RUNTIME)
 @Inherited
-@MarkerForExpectedDataSetAnnotation(ExpectedDataSetAnnotationHandler.class)
-public @interface ExpectedDataSet {
+@MarkerForExpectedDataSetAnnotation(AssertDataSetAnnotationHandler.class)
+public @interface AssertDataSet {
 
     /**
      * The file name of the data set. If left empty, the default filename will be

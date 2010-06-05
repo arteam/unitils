@@ -141,7 +141,6 @@ public class DatabaseMetaData {
 
         Integer columnSqlType = columnSqlTypes.get(columnName);
         if (columnSqlType == null) {
-            // todo handle -1 in set object 
             return SQL_TYPE_UNKNOWN;
         }
         return columnSqlType;

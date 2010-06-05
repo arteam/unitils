@@ -18,7 +18,6 @@ package org.unitils.dataset;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
-import static org.unitils.dataset.DataSetAssert.assertExpectedDataSet;
 import static org.unitils.dataset.DataSetLoader.cleanInsertDataSetFile;
 
 /**
@@ -31,14 +30,14 @@ public class AssertExpectedDataSetNotExistsTest extends DataSetTestBase {
     @Test
     public void rowNotFound() throws Exception {
         cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-simple.xml");
-        assertExpectedDataSet(this, "DataSetModuleExpectedDataNotExistsTest-rowNotFound.xml");
+        DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataNotExistsTest-rowNotFound.xml");
     }
 
     @Test
     public void rowFound() throws Exception {
         try {
             cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-simple.xml");
-            assertExpectedDataSet(this, "DataSetModuleExpectedDataNotExistsTest-rowFound.xml");
+            DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataNotExistsTest-rowFound.xml");
         } catch (AssertionError e) {
             e.printStackTrace();
             assertMessageContains("Expected not to find a match for data set row: PUBLIC.TEST [COL1=value1, COL2=1]", e);
@@ -51,7 +50,7 @@ public class AssertExpectedDataSetNotExistsTest extends DataSetTestBase {
     @Test
     public void emptyRowInNotExists() throws Exception {
         cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-simple.xml");
-        assertExpectedDataSet(this, "DataSetModuleExpectedDataNotExistsTest-emptyRowInNotExists.xml");
+        DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataNotExistsTest-emptyRowInNotExists.xml");
     }
 
 }

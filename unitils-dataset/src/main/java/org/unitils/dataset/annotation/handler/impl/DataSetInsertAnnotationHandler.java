@@ -19,17 +19,19 @@ import org.unitils.dataset.DataSetModule;
 import org.unitils.dataset.annotation.DataSetInsert;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
-import static java.util.Arrays.asList;
+import static org.unitils.util.CollectionUtils.asList;
 
 public class DataSetInsertAnnotationHandler implements DataSetAnnotationHandler<DataSetInsert> {
 
 
-    public void handle(DataSetInsert annotation, Object testInstance, DataSetModule dataSetModule) {
+    public void handle(DataSetInsert annotation, Method testMethod, Object testInstance, DataSetModule dataSetModule) {
         List<String> fileNames = asList(annotation.value());
         String[] variables = annotation.variables();
+        boolean readOnly = annotation.readOnly();
 
-        dataSetModule.insertDataSetFiles(testInstance, fileNames, variables);
+        dataSetModule.insertDataSetFiles(testInstance, fileNames, readOnly, variables);
     }
 }

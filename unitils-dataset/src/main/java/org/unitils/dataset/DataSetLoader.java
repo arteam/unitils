@@ -17,9 +17,10 @@ package org.unitils.dataset;
 
 import org.unitils.core.Unitils;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Arrays.asList;
+import static org.unitils.util.CollectionUtils.asList;
 
 /**
  * @author Tim Ducheyne
@@ -27,13 +28,20 @@ import static java.util.Arrays.asList;
  */
 public class DataSetLoader {
 
+    public static void insertDefaultDataSetFile(Object testInstance, String... variables) {
+        insertDataSetFiles(testInstance, new ArrayList<String>(), variables);
+    }
 
     public static void insertDataSetFile(Object testInstance, String dataSetFileName, String... variables) {
         insertDataSetFiles(testInstance, asList(dataSetFileName), variables);
     }
 
     public static void insertDataSetFiles(Object testInstance, List<String> dataSetFileNames, String... variables) {
-        getDataSetModule().insertDataSetFiles(testInstance, dataSetFileNames, variables);
+        insertDataSetFiles(testInstance, dataSetFileNames, false, variables);
+    }
+
+    public static void insertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
+        getDataSetModule().insertDataSetFiles(testInstance, dataSetFileNames, readOnly, variables);
     }
 
     public static void insertDataSet(String... dataSetRows) {
@@ -41,12 +49,20 @@ public class DataSetLoader {
     }
 
 
+    public static void cleanInsertDefaultDataSetFile(Object testInstance, String... variables) {
+        cleanInsertDataSetFiles(testInstance, new ArrayList<String>(), variables);
+    }
+
     public static void cleanInsertDataSetFile(Object testInstance, String dataSetFileName, String... variables) {
         cleanInsertDataSetFiles(testInstance, asList(dataSetFileName), variables);
     }
 
     public static void cleanInsertDataSetFiles(Object testInstance, List<String> dataSetFileNames, String... variables) {
-        getDataSetModule().cleanInsertDataSetFiles(testInstance, dataSetFileNames, variables);
+        cleanInsertDataSetFiles(testInstance, dataSetFileNames, false, variables);
+    }
+
+    public static void cleanInsertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
+        getDataSetModule().cleanInsertDataSetFiles(testInstance, dataSetFileNames, readOnly, variables);
     }
 
     public static void cleanInsertDataSet(String... dataSetRows) {
@@ -54,12 +70,20 @@ public class DataSetLoader {
     }
 
 
+    public static void refreshDefaultDataSetFile(Object testInstance, String... variables) {
+        refreshDataSetFiles(testInstance, new ArrayList<String>(), variables);
+    }
+
     public static void refreshDataSetFile(Object testInstance, String dataSetFileName, String... variables) {
         refreshDataSetFiles(testInstance, asList(dataSetFileName), variables);
     }
 
     public static void refreshDataSetFiles(Object testInstance, List<String> dataSetFileNames, String... variables) {
-        getDataSetModule().refreshDataSetFiles(testInstance, dataSetFileNames, variables);
+        refreshDataSetFiles(testInstance, dataSetFileNames, false, variables);
+    }
+
+    public static void refreshDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
+        getDataSetModule().refreshDataSetFiles(testInstance, dataSetFileNames, readOnly, variables);
     }
 
     public static void refreshDataSet(String... dataSetRows) {

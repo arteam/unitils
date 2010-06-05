@@ -25,7 +25,7 @@ import java.util.Properties;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public interface ExpectedDataSetStrategy {
+public interface AssertDataSetStrategy {
 
 
     void init(Properties configuration, DatabaseMetaData database);
@@ -39,6 +39,6 @@ public interface ExpectedDataSetStrategy {
      * @param variables        Variables that will be replaced in the data set if needed, not null
      * @throws AssertionError When the assertion fails.
      */
-    void assertExpectedDataSet(DataSetRowSource dataSetRowSource, List<String> variables, boolean logDatabaseContentOnAssertionError) throws AssertionError;
+    void perform(DataSetRowSource dataSetRowSource, List<String> variables, boolean logDatabaseContentOnAssertionError) throws AssertionError;
 
 }

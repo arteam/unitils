@@ -18,9 +18,9 @@ package org.unitils.dataset.comparison.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
+import org.unitils.dataset.comparison.AssertDataSetStrategy;
 import org.unitils.dataset.comparison.DataSetComparator;
 import org.unitils.dataset.comparison.DatabaseContentLogger;
-import org.unitils.dataset.comparison.ExpectedDataSetStrategy;
 import org.unitils.dataset.comparison.model.ColumnDifference;
 import org.unitils.dataset.comparison.model.DataSetComparison;
 import org.unitils.dataset.comparison.model.RowComparison;
@@ -43,7 +43,7 @@ import static org.apache.commons.lang.StringUtils.rightPad;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DefaultExpectedDataSetStrategy implements ExpectedDataSetStrategy {
+public class DefaultAssertDataSetStrategy implements AssertDataSetStrategy {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(BaseLoadDataSetStrategy.class);
@@ -69,7 +69,7 @@ public class DefaultExpectedDataSetStrategy implements ExpectedDataSetStrategy {
      * Tables, rows or columns that are not specified in the expected schema will be ignored.
      * If an empty table is specified in the expected schema, it will check that the actual table is also be empty.
      */
-    public void assertExpectedDataSet(DataSetRowSource dataSetRowSource, List<String> variables, boolean logDatabaseContentOnAssertionError) {
+    public void perform(DataSetRowSource dataSetRowSource, List<String> variables, boolean logDatabaseContentOnAssertionError) {
         logger.info("Comparing data sets file: " + dataSetRowSource.getDataSetName());
         try {
             dataSetRowSource.open();

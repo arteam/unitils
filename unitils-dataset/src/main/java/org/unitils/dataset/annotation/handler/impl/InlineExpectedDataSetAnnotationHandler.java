@@ -19,10 +19,12 @@ import org.unitils.dataset.DataSetModule;
 import org.unitils.dataset.annotation.InlineExpectedDataSet;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 
+import java.lang.reflect.Method;
+
 public class InlineExpectedDataSetAnnotationHandler implements DataSetAnnotationHandler<InlineExpectedDataSet> {
 
 
-    public void handle(InlineExpectedDataSet annotation, Object testInstance, DataSetModule dataSetModule) {
+    public void handle(InlineExpectedDataSet annotation, Method testMethod, Object testInstance, DataSetModule dataSetModule) {
         String[] dataSetRows = annotation.value();
         boolean logDatabaseContentOnAssertionError = annotation.logDatabaseContentOnAssertionError();
 

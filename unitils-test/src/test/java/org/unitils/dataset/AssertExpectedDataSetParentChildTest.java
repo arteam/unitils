@@ -22,7 +22,6 @@ import org.junit.Test;
 import static org.junit.Assert.fail;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.DataSetAssert.assertExpectedDataSet;
 import static org.unitils.dataset.DataSetLoader.cleanInsertDataSetFile;
 
 /**
@@ -34,14 +33,14 @@ public class AssertExpectedDataSetParentChildTest extends DataSetTestBase {
     @Test
     public void matchingDataSet() throws Exception {
         cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetParentChildTest.xml");
-        assertExpectedDataSet(this, "DataSetModuleExpectedDataSetParentChildTest.xml");
+        DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetParentChildTest.xml");
     }
 
     @Test
     public void differentDataSet() throws Exception {
         try {
             cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetParentChildTest.xml");
-            assertExpectedDataSet(this, "DataSetModuleExpectedDataSetParentChildTest-different.xml");
+            DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetParentChildTest-different.xml");
 
         } catch (AssertionError e) {
             assertMessageContains("No match found for data set row:  PUBLIC.PARENT [PK1=777, PK2=888, PARENTCOLUMN=xxxx]", e);

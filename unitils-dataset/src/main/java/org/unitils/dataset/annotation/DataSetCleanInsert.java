@@ -27,8 +27,13 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Annotation indicating that a data set should be loaded before the test run.
- * <p/>
+ * Annotation for triggering the loading of a data set before the execution of a test.
+ * <br/><br/>
+ * This annotation can be put on method or on class level. If the annotation is found on class and method level, the
+ * one on method level is taken. If a method is annotated, a data set will be loaded when that test method is run.
+ * If a class (or super-class) is annotated, a data set will be loaded for all test methods in that class.
+ * <br/><br/>
+ * Zero or m  todo javadoc
  * If a class is annotated, a test data set will be loaded before the execution of each of the test methods in
  * the class. A data set file name can explicitly be specified. If no such file name is specified, first a data set
  * named 'classname'.'testmethod'.xml will be tried, if no such file exists, 'classname'.xml will be tried. If that
@@ -106,5 +111,7 @@ public @interface DataSetCleanInsert {
      * @return The values to use when replacing the variable declarations (e.g. $0) in the data set, empty by default
      */
     String[] variables() default {};
+
+    boolean readOnly() default false;
 
 }

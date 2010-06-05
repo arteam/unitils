@@ -19,18 +19,20 @@ import org.unitils.dataset.DataSetModule;
 import org.unitils.dataset.annotation.DataSetRefresh;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
-import static java.util.Arrays.asList;
+import static org.unitils.util.CollectionUtils.asList;
 
 public class DataSetRefreshAnnotationHandler implements DataSetAnnotationHandler<DataSetRefresh> {
 
 
-    public void handle(DataSetRefresh annotation, Object testInstance, DataSetModule dataSetModule) {
+    public void handle(DataSetRefresh annotation, Method testMethod, Object testInstance, DataSetModule dataSetModule) {
         List<String> fileNames = asList(annotation.value());
         String[] variables = annotation.variables();
+        boolean readOnly = annotation.readOnly();
 
-        dataSetModule.refreshDataSetFiles(testInstance, fileNames, variables);
+        dataSetModule.refreshDataSetFiles(testInstance, fileNames, readOnly, variables);
     }
 
 }
