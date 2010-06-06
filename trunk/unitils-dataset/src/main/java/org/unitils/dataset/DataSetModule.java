@@ -22,22 +22,17 @@ import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
-import org.unitils.core.util.ConfigUtils;
 import org.unitils.database.DatabaseModule;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 import org.unitils.dataset.annotation.handler.MarkerForAssertDataSetAnnotation;
 import org.unitils.dataset.annotation.handler.MarkerForLoadDataSetAnnotation;
 import org.unitils.dataset.assertstrategy.AssertDataSetStrategy;
-import org.unitils.dataset.assertstrategy.impl.DefaultAssertDataSetStrategy;
 import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.loadstrategy.LoadDataSetStrategy;
-import org.unitils.dataset.loadstrategy.impl.CleanInsertDataSetStrategy;
-import org.unitils.dataset.loadstrategy.impl.InsertDataSetStrategy;
-import org.unitils.dataset.loadstrategy.impl.RefreshDataSetStrategy;
 import org.unitils.dataset.resolver.DataSetResolver;
 import org.unitils.dataset.rowsource.DataSetRowSource;
-import org.unitils.dataset.rowsource.impl.InlineDataSetRowSourceFactory;
-import org.unitils.dataset.rowsource.impl.XmlDataSetRowSourceFactory;
+import org.unitils.dataset.rowsource.FileDataSetRowSourceFactory;
+import org.unitils.dataset.rowsource.InlineDataSetRowSourceFactory;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import javax.sql.DataSource;
@@ -73,11 +68,7 @@ public class DataSetModule implements Module {
 
     /* The unitils configuration */
     protected Properties configuration;
-
-    protected DatabaseMetaData databaseMetaData;
-    protected DataSetResolver dataSetResolver;
-    protected XmlDataSetRowSourceFactory xmlDataSetRowSourceFactory;
-    protected InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory;
+    protected DataSetModuleFactoryHelper dataSetModuleFactoryHelper;
 
     protected List<File> lastLoadedReadOnlyFiles = new ArrayList<File>();
 
@@ -92,70 +83,52 @@ public class DataSetModule implements Module {
     }
 
     public void afterInit() {
-        databaseMetaData = createDatabaseMetaData(configuration);
-        dataSetResolver = createDataSetResolver(configuration);
-        xmlDataSetRowSourceFactory = createXmlDataSetRowSourceFactory(configuration, databaseMetaData);
-        inlineDataSetRowSourceFactory = createInlineDataSetRowSourceFactory(configuration, databaseMetaData);
+        DatabaseMetaData databaseMetaData = createDatabaseMetaData(configuration);
+        dataSetModuleFactoryHelper = new DataSetModuleFactoryHelper(databaseMetaData, configuration);
     }
 
 
-    /* INSERT OPERATIONS */
-
     public void insertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        LoadDataSetStrategy insertDataSetStrategy = new InsertDataSetStrategy();
-        insertDataSetStrategy.init(configuration, databaseMetaData);
+        LoadDataSetStrategy insertDataSetStrategy = dataSetModuleFactoryHelper.createInsertDataSetStrategy();
         performLoadDataSetStrategy(insertDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
     }
 
     public void insertDataSet(String... dataSetRows) {
-        LoadDataSetStrategy insertDataSetStrategy = new InsertDataSetStrategy();
-        insertDataSetStrategy.init(configuration, databaseMetaData);
+        LoadDataSetStrategy insertDataSetStrategy = dataSetModuleFactoryHelper.createInsertDataSetStrategy();
         performInlineLoadDataSetStrategy(insertDataSetStrategy, asList(dataSetRows));
     }
 
 
-    /* CLEAN INSERT OPERATIONS */
-
     public void cleanInsertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        LoadDataSetStrategy cleanInsertDataSetStrategy = new CleanInsertDataSetStrategy();
-        cleanInsertDataSetStrategy.init(configuration, databaseMetaData);
+        LoadDataSetStrategy cleanInsertDataSetStrategy = dataSetModuleFactoryHelper.createCleanInsertDataSetStrategy();
         performLoadDataSetStrategy(cleanInsertDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
     }
 
     public void cleanInsertDataSet(String... dataSetRows) {
-        LoadDataSetStrategy cleanInsertDataSetStrategy = new CleanInsertDataSetStrategy();
-        cleanInsertDataSetStrategy.init(configuration, databaseMetaData);
+        LoadDataSetStrategy cleanInsertDataSetStrategy = dataSetModuleFactoryHelper.createCleanInsertDataSetStrategy();
         performInlineLoadDataSetStrategy(cleanInsertDataSetStrategy, asList(dataSetRows));
     }
 
 
-    /* REFRESH OPERATIONS */
-
     public void refreshDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        LoadDataSetStrategy refreshDataSetStrategy = new RefreshDataSetStrategy();
-        refreshDataSetStrategy.init(configuration, databaseMetaData);
+        LoadDataSetStrategy refreshDataSetStrategy = dataSetModuleFactoryHelper.createRefreshDataSetStrategy();
         performLoadDataSetStrategy(refreshDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
     }
 
     public void refreshDataSet(String... dataSetRows) {
-        LoadDataSetStrategy refreshDataSetStrategy = new RefreshDataSetStrategy();
-        refreshDataSetStrategy.init(configuration, databaseMetaData);
+        LoadDataSetStrategy refreshDataSetStrategy = dataSetModuleFactoryHelper.createRefreshDataSetStrategy();
         performInlineLoadDataSetStrategy(refreshDataSetStrategy, asList(dataSetRows));
     }
 
 
-    /* ASSERT OPERATIONS */
-
     public void assertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean logDatabaseContentOnAssertionError, String... variables) {
-        AssertDataSetStrategy defaultAssertDataSetStrategy = new DefaultAssertDataSetStrategy();
-        defaultAssertDataSetStrategy.init(configuration, databaseMetaData);
+        AssertDataSetStrategy defaultAssertDataSetStrategy = dataSetModuleFactoryHelper.createAssertDataSetStrategy();
         performAssertDataSetStrategy(defaultAssertDataSetStrategy, dataSetFileNames, asList(variables), logDatabaseContentOnAssertionError, testInstance.getClass());
     }
 
     public void assertExpectedDataSet(boolean logDatabaseContentOnAssertionError, String... dataSetRows) {
-        AssertDataSetStrategy defaultAssertDataSetStrategy = new DefaultAssertDataSetStrategy();
-        defaultAssertDataSetStrategy.init(configuration, databaseMetaData);
-        performInlineExpectedDataSetStrategy(defaultAssertDataSetStrategy, asList(dataSetRows), logDatabaseContentOnAssertionError);
+        AssertDataSetStrategy defaultAssertDataSetStrategy = dataSetModuleFactoryHelper.createAssertDataSetStrategy();
+        performInlineAssertDataSetStrategy(defaultAssertDataSetStrategy, asList(dataSetRows), logDatabaseContentOnAssertionError);
     }
 
 
@@ -175,12 +148,72 @@ public class DataSetModule implements Module {
      * Gets the name of the expected dataset file. The default name of this file is constructed as
      * follows: 'classname without packagename'.'testname'-result.xml.
      *
-     * @param testClass The test class, not null
+     * @param testMethod The current test method, not null
+     * @param testClass  The test class, not null
      * @return The expected dataset filename, not null
      */
     public String getDefaultExpectedDataSetFileName(Method testMethod, Class<?> testClass) {
         String className = testClass.getName();
         return className.substring(className.lastIndexOf(".") + 1) + "." + testMethod.getName() + "-result.xml";
+    }
+
+
+    public void performLoadDataSetStrategy(LoadDataSetStrategy loadDataSetStrategy, List<String> dataSetFileNames, List<String> variables, boolean readOnly, Class<?> testClass) {
+        if (dataSetFileNames.isEmpty()) {
+            // empty means, use default file name, which is the name of the class + extension
+            dataSetFileNames.add(getDefaultDataSetFileName(testClass));
+        }
+        FileDataSetRowSourceFactory fileDataSetRowSourceFactory = dataSetModuleFactoryHelper.createFileDataSetRowSourceFactory();
+
+        List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
+        for (File dataSetFile : dataSetFiles) {
+            if (lastLoadedReadOnlyFiles.contains(dataSetFile)) {
+                continue;
+            }
+            DataSetRowSource dataSetRowSource = fileDataSetRowSourceFactory.createDataSetRowSource(dataSetFile);
+            loadDataSetStrategy.perform(dataSetRowSource, variables);
+        }
+
+        if (readOnly) {
+            lastLoadedReadOnlyFiles.addAll(dataSetFiles);
+        } else {
+            lastLoadedReadOnlyFiles.clear();
+        }
+    }
+
+    public void performInlineLoadDataSetStrategy(LoadDataSetStrategy loadDataSetStrategy, List<String> dataSetRows) {
+        InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = dataSetModuleFactoryHelper.createInlineDataSetRowSourceFactory();
+        DataSetRowSource dataSetRowSource = inlineDataSetRowSourceFactory.createDataSetRowSource(dataSetRows);
+        loadDataSetStrategy.perform(dataSetRowSource, new ArrayList<String>());
+    }
+
+
+    public void performAssertDataSetStrategy(AssertDataSetStrategy assertDataSetStrategy, List<String> dataSetFileNames, List<String> variables, boolean logDatabaseContentOnAssertionError, Class<?> testClass) {
+        FileDataSetRowSourceFactory fileDataSetRowSourceFactory = dataSetModuleFactoryHelper.createFileDataSetRowSourceFactory();
+
+        List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
+        for (File dataSetFile : dataSetFiles) {
+            DataSetRowSource dataSetRowSource = fileDataSetRowSourceFactory.createDataSetRowSource(dataSetFile);
+            assertDataSetStrategy.perform(dataSetRowSource, variables, logDatabaseContentOnAssertionError);
+        }
+    }
+
+    public void performInlineAssertDataSetStrategy(AssertDataSetStrategy assertDataSetStrategy, List<String> dataSetRows, boolean logDatabaseContentOnAssertionError) {
+        InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = dataSetModuleFactoryHelper.createInlineDataSetRowSourceFactory();
+        DataSetRowSource dataSetRowSource = inlineDataSetRowSourceFactory.createDataSetRowSource(dataSetRows);
+        assertDataSetStrategy.perform(dataSetRowSource, new ArrayList<String>(), logDatabaseContentOnAssertionError);
+    }
+
+
+    protected List<File> resolveDataSets(Class<?> testClass, List<String> dataSetFileNames) {
+        List<File> dataSetFiles = new ArrayList<File>();
+
+        DataSetResolver dataSetResolver = dataSetModuleFactoryHelper.createDataSetResolver();
+        for (String dataSetFileName : dataSetFileNames) {
+            File dataSetFile = dataSetResolver.resolve(testClass, dataSetFileName);
+            dataSetFiles.add(dataSetFile);
+        }
+        return dataSetFiles;
     }
 
 
@@ -220,101 +253,21 @@ public class DataSetModule implements Module {
     }
 
 
-    protected void performLoadDataSetStrategy(LoadDataSetStrategy loadDataSetStrategy, List<String> dataSetFileNames, List<String> variables, boolean readOnly, Class<?> testClass) {
-        if (dataSetFileNames.isEmpty()) {
-            // empty means, use default file name, which is the name of the class + extension
-            dataSetFileNames.add(getDefaultDataSetFileName(testClass));
-        }
-
-        List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
-        for (File dataSetFile : dataSetFiles) {
-            if (lastLoadedReadOnlyFiles.contains(dataSetFile)) {
-                continue;
-            }
-            DataSetRowSource dataSetRowSource = xmlDataSetRowSourceFactory.createDataSetRowSource(dataSetFile);
-            loadDataSetStrategy.perform(dataSetRowSource, variables);
-        }
-
-        if (readOnly) {
-            lastLoadedReadOnlyFiles.addAll(dataSetFiles);
-        } else {
-            lastLoadedReadOnlyFiles.clear();
-        }
-    }
-
-    protected void performInlineLoadDataSetStrategy(LoadDataSetStrategy loadDataSetStrategy, List<String> dataSetRows) {
-        DataSetRowSource dataSetRowSource = inlineDataSetRowSourceFactory.createDataSetRowSource(dataSetRows);
-        loadDataSetStrategy.perform(dataSetRowSource, new ArrayList<String>());
-    }
-
-
-    protected void performAssertDataSetStrategy(AssertDataSetStrategy assertDataSetStrategy, List<String> dataSetFileNames, List<String> variables, boolean logDatabaseContentOnAssertionError, Class<?> testClass) {
-        List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
-        for (File dataSetFile : dataSetFiles) {
-            DataSetRowSource dataSetRowSource = xmlDataSetRowSourceFactory.createDataSetRowSource(dataSetFile);
-            assertDataSetStrategy.perform(dataSetRowSource, variables, logDatabaseContentOnAssertionError);
-        }
-    }
-
-    protected void performInlineExpectedDataSetStrategy(AssertDataSetStrategy assertDataSetStrategy, List<String> dataSetRows, boolean logDatabaseContentOnAssertionError) {
-        DataSetRowSource dataSetRowSource = inlineDataSetRowSourceFactory.createDataSetRowSource(dataSetRows);
-        assertDataSetStrategy.perform(dataSetRowSource, new ArrayList<String>(), logDatabaseContentOnAssertionError);
-    }
-
-
-    protected List<File> resolveDataSets(Class<?> testClass, List<String> dataSetFileNames) {
-        List<File> dataSetFiles = new ArrayList<File>();
-
-        for (String dataSetFileName : dataSetFileNames) {
-            File dataSetFile = dataSetResolver.resolve(testClass, dataSetFileName);
-            dataSetFiles.add(dataSetFile);
-        }
-        return dataSetFiles;
-    }
-
-
-    /* FACTORY METHODS */
-
     protected DatabaseMetaData createDatabaseMetaData(Properties configuration) {
         DbSupport defaultDbSupport = getDefaultDbSupport(configuration);
         SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
         return new DatabaseMetaData(defaultDbSupport, sqlTypeHandlerRepository);
     }
 
-    protected DataSetResolver createDataSetResolver(Properties configuration) {
-        DataSetResolver dataSetResolver = ConfigUtils.getInstanceOf(DataSetResolver.class, configuration);
-        dataSetResolver.init(configuration);
-        return dataSetResolver;
-    }
-
-    protected XmlDataSetRowSourceFactory createXmlDataSetRowSourceFactory(Properties configuration, DatabaseMetaData databaseMetaData) {
-        XmlDataSetRowSourceFactory xmlDataSetRowSourceFactory = new XmlDataSetRowSourceFactory();
-        xmlDataSetRowSourceFactory.init(configuration, databaseMetaData.getSchemaName());
-        return xmlDataSetRowSourceFactory;
-    }
-
-    protected InlineDataSetRowSourceFactory createInlineDataSetRowSourceFactory(Properties configuration, DatabaseMetaData databaseMetaData) {
-        InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = new InlineDataSetRowSourceFactory();
-        inlineDataSetRowSourceFactory.init(configuration, databaseMetaData.getSchemaName());
-        return inlineDataSetRowSourceFactory;
-    }
-
-
     /**
      * @return The default DbSupport (the one that connects to the default database schema)
      */
     protected DbSupport getDefaultDbSupport(Properties configuration) {
-        DataSource dataSource = getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded();
+        DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+        DataSource dataSource = databaseModule.getDataSourceAndActivateTransactionIfNeeded();
+
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
         return DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler);
-    }
-
-
-    /**
-     * @return Implementation of DatabaseModule, on which this module is dependent
-     */
-    protected DatabaseModule getDatabaseModule() {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
     }
 
 

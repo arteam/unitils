@@ -13,21 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.rowsource.impl;
+package org.unitils.dataset.rowsource;
 
-import org.unitils.dataset.rowsource.DataSetRowSource;
-
-import java.io.File;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class XmlDataSetRowSourceFactory extends BaseDataSetRowSourceFactory {
+public interface InlineDataSetRowSourceFactory {
 
+    /**
+     * @param configuration     The unitils configuration, not null
+     * @param defaultSchemaName The schema name to use when none is specified, not null
+     */
+    void init(Properties configuration, String defaultSchemaName);
 
-    public DataSetRowSource createDataSetRowSource(File dataSetFile) {
-        return new XmlDataSetRowSource(dataSetFile, defaultSchemaName, defaultDataSetSettings);
-    }
+    DataSetRowSource createDataSetRowSource(List<String> dataSetRows);
 
 }
