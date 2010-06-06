@@ -16,6 +16,7 @@
 package org.unitils.dataset.rowsource.impl;
 
 import org.unitils.dataset.rowsource.DataSetRowSource;
+import org.unitils.dataset.rowsource.InlineDataSetRowSourceFactory;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ import java.util.List;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class InlineDataSetRowSourceFactory extends BaseDataSetRowSourceFactory {
+public class DefaultInlineDataSetRowSourceFactory extends BaseDataSetRowSourceFactory implements InlineDataSetRowSourceFactory {
 
 
     public DataSetRowSource createDataSetRowSource(List<String> dataSetRows) {
