@@ -23,7 +23,6 @@ import org.unitils.dataset.database.DatabaseAccessor;
 import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.loadstrategy.LoadDataSetStrategy;
 import org.unitils.dataset.loadstrategy.loader.DataSetLoader;
-import org.unitils.dataset.loadstrategy.loader.impl.IdentifierNameProcessor;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 

@@ -19,6 +19,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.dataset.database.DatabaseAccessor;
+import org.unitils.dataset.loadstrategy.impl.IdentifierNameProcessor;
+import org.unitils.dataset.loadstrategy.impl.TableContentDeleter;
 import org.unitils.dataset.model.dataset.DataSetRow;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.mock.Mock;

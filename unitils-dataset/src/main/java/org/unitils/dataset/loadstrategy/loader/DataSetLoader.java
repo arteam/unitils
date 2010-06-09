@@ -22,13 +22,25 @@ import org.unitils.dataset.rowsource.DataSetRowSource;
 import java.util.List;
 
 /**
+ * Loader for loading data set rows.
+ *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public interface DataSetLoader {
 
+    /**
+     * @param dataSetRowProcessor Processes data set rows so that they are ready to be loaded in the database, not null
+     * @param databaseAccessor    The accessor for the database, not null
+     */
     void init(DataSetRowProcessor dataSetRowProcessor, DatabaseAccessor databaseAccessor);
 
+    /**
+     * Loads the rows provided by the given data set row source.
+     *
+     * @param dataSetRowSource The source that will provide the data set rows, not null
+     * @param variables        The variable values that will be filled into the data set rows, not null
+     */
     void load(DataSetRowSource dataSetRowSource, List<String> variables);
 
 }

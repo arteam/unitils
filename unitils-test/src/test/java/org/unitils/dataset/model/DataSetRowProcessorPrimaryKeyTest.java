@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
-import org.unitils.dataset.loadstrategy.loader.impl.IdentifierNameProcessor;
+import org.unitils.dataset.loadstrategy.impl.IdentifierNameProcessor;
 import org.unitils.dataset.model.database.Row;
 import org.unitils.dataset.model.database.Value;
 import org.unitils.dataset.model.dataset.DataSetRow;
@@ -64,11 +64,11 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
         SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
         dataSetRowProcessor = new DataSetRowProcessor(identifierNameProcessor.getMock(), sqlTypeHandlerRepository, databaseMetaData.getMock());
 
-        databaseMetaData.returns("\"PK\"").quoteIdentifier("PK");
-        databaseMetaData.returns("\"pk\"").quoteIdentifier("pk");
-        databaseMetaData.returns("PK1").toCorrectCaseIdentifier("pk1");
-        databaseMetaData.returns("PK2").toCorrectCaseIdentifier("pk2");
-        databaseMetaData.returns("COLUMN").toCorrectCaseIdentifier("column");
+        identifierNameProcessor.returns("\"PK\"").getCorrectCaseColumnName("PK", null);
+        identifierNameProcessor.returns("\"pk\"").getCorrectCaseColumnName("pk", null);
+        identifierNameProcessor.returns("PK1").getCorrectCaseColumnName("pk1", null);
+        identifierNameProcessor.returns("PK2").getCorrectCaseColumnName("pk2", null);
+        identifierNameProcessor.returns("COLUMN").getCorrectCaseColumnName("column", null);
         databaseMetaData.returns("PK").removeIdentifierQuotes("\"PK\"");
         databaseMetaData.returns("pk").removeIdentifierQuotes("\"pk\"");
         databaseMetaData.returns("PK1").removeIdentifierQuotes("PK1");

@@ -29,7 +29,7 @@ import org.unitils.dataset.assertstrategy.model.TableComparison;
 import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.loadstrategy.impl.BaseLoadDataSetStrategy;
 import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
-import org.unitils.dataset.loadstrategy.loader.impl.IdentifierNameProcessor;
+import org.unitils.dataset.loadstrategy.impl.IdentifierNameProcessor;
 import org.unitils.dataset.model.database.Row;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;

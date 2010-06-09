@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.loadstrategy.loader.impl;
+package org.unitils.dataset.loadstrategy.impl;
 
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.database.DatabaseAccessor;
@@ -25,6 +25,8 @@ import java.util.*;
 
 
 /**
+ * Deletes all content from the tables in the data set (in reverse order).
+ *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
