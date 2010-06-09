@@ -18,8 +18,8 @@ package org.unitils.dataset.loadstrategy.loader.impl;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.core.dataset.DataSetRow;
 import org.unitils.dataset.database.DatabaseAccessor;
+import org.unitils.dataset.model.dataset.DataSetRow;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.mock.Mock;
 
@@ -32,7 +32,7 @@ import org.unitils.mock.Mock;
 public class TableContentDeleterTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private TableContentDeleter tableContentDeleter = new TableContentDeleter();
+    private TableContentDeleter tableContentDeleter;
 
     protected Mock<DataSetRowSource> dataSetRowSource;
     protected Mock<DatabaseAccessor> databaseAccessor;
@@ -45,7 +45,7 @@ public class TableContentDeleterTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() throws Exception {
-        tableContentDeleter.init(identifierNameProcessor.getMock(), databaseAccessor.getMock());
+        tableContentDeleter = new TableContentDeleter(identifierNameProcessor.getMock(), databaseAccessor.getMock());
 
         dataSetRowTableA = new DataSetRow("schema_a", "table_a", null, false, null);
         dataSetRowTableB = new DataSetRow("schema_b", "table_b", null, false, null);

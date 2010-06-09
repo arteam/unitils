@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.core.database;
+package org.unitils.dataset.model.database;
 
 /**
  * A value of a data set column for which all variables and literal tokens were processed.

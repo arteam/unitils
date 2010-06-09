@@ -15,8 +15,8 @@
  */
 package org.unitils.dataset.loadstrategy.loader.impl;
 
-import org.unitils.dataset.core.database.Row;
-import org.unitils.dataset.core.database.Value;
+import org.unitils.dataset.model.database.Row;
+import org.unitils.dataset.model.database.Value;
 
 import java.util.ArrayList;
 import java.util.List;

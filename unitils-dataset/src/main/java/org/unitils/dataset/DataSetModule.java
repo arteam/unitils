@@ -34,6 +34,7 @@ import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.dataset.rowsource.FileDataSetRowSourceFactory;
 import org.unitils.dataset.rowsource.InlineDataSetRowSourceFactory;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
+import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -84,7 +85,7 @@ public class DataSetModule implements Module {
 
     public void afterInit() {
         DatabaseMetaData databaseMetaData = createDatabaseMetaData(configuration);
-        dataSetModuleFactoryHelper = new DataSetModuleFactoryHelper(databaseMetaData, configuration);
+        dataSetModuleFactoryHelper = new DataSetModuleFactoryHelper(configuration, databaseMetaData);
     }
 
 
@@ -202,6 +203,12 @@ public class DataSetModule implements Module {
         InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = dataSetModuleFactoryHelper.createInlineDataSetRowSourceFactory();
         DataSetRowSource dataSetRowSource = inlineDataSetRowSourceFactory.createDataSetRowSource(dataSetRows);
         assertDataSetStrategy.perform(dataSetRowSource, new ArrayList<String>(), logDatabaseContentOnAssertionError);
+    }
+
+
+    public void generateDataSetXSDs() {
+        DataSetStructureGenerator dataSetStructureGenerator = dataSetModuleFactoryHelper.createDataSetStructureGenerator();
+        dataSetStructureGenerator.generateDataSetStructure();
     }
 
 

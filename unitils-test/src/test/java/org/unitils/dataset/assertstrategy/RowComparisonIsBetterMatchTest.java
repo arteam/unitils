@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.comparison;
+package org.unitils.dataset.assertstrategy;
 
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.dataset.assertstrategy.model.RowComparison;
-import org.unitils.dataset.core.database.Column;
-import org.unitils.dataset.core.database.Row;
-import org.unitils.dataset.core.database.Value;
+import org.unitils.dataset.model.database.Column;
+import org.unitils.dataset.model.database.Row;
+import org.unitils.dataset.model.database.Value;
 
 import static java.sql.Types.VARCHAR;
 import static org.junit.Assert.assertFalse;

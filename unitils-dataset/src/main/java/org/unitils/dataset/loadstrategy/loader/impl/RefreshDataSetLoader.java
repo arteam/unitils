@@ -15,9 +15,9 @@
  */
 package org.unitils.dataset.loadstrategy.loader.impl;
 
-import org.unitils.dataset.core.dataset.DataSetRow;
 import org.unitils.dataset.database.DatabaseAccessor;
 import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
+import org.unitils.dataset.model.dataset.DataSetRow;
 
 import java.util.List;
 

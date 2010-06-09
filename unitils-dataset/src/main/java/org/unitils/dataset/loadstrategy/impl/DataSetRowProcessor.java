@@ -15,14 +15,14 @@
  */
 package org.unitils.dataset.loadstrategy.impl;
 
-import org.unitils.dataset.core.database.Column;
-import org.unitils.dataset.core.database.Row;
-import org.unitils.dataset.core.database.Value;
-import org.unitils.dataset.core.dataset.DataSetRow;
-import org.unitils.dataset.core.dataset.DataSetSettings;
-import org.unitils.dataset.core.dataset.DataSetValue;
 import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.loadstrategy.loader.impl.IdentifierNameProcessor;
+import org.unitils.dataset.model.database.Column;
+import org.unitils.dataset.model.database.Row;
+import org.unitils.dataset.model.database.Value;
+import org.unitils.dataset.model.dataset.DataSetRow;
+import org.unitils.dataset.model.dataset.DataSetSettings;
+import org.unitils.dataset.model.dataset.DataSetValue;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandler;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 

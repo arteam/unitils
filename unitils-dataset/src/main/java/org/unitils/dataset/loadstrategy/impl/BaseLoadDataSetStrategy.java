@@ -18,6 +18,7 @@ package org.unitils.dataset.loadstrategy.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
+import org.unitils.dataset.DataSetModuleFactoryHelper;
 import org.unitils.dataset.database.DatabaseAccessor;
 import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.loadstrategy.LoadDataSetStrategy;
@@ -44,9 +45,12 @@ public abstract class BaseLoadDataSetStrategy implements LoadDataSetStrategy {
 
 
     public void init(Properties configuration, DatabaseMetaData database) {
-        this.databaseAccessor = createDatabaseAccessor(database);
-        this.identifierNameProcessor = createIdentifierNameProcessor(database);
-        this.dataSetRowProcessor = createDataSetRowProcessor(identifierNameProcessor, database);
+        this.databaseAccessor = new DatabaseAccessor(database);
+        this.identifierNameProcessor = new IdentifierNameProcessor(database);
+
+        DataSetModuleFactoryHelper dataSetModuleFactoryHelper = new DataSetModuleFactoryHelper(configuration, database);
+        SqlTypeHandlerRepository sqlTypeHandlerRepository = dataSetModuleFactoryHelper.createSqlTypeHandlerRepository();
+        this.dataSetRowProcessor = new DataSetRowProcessor(identifierNameProcessor, sqlTypeHandlerRepository, database);
     }
 
 
@@ -67,24 +71,6 @@ public abstract class BaseLoadDataSetStrategy implements LoadDataSetStrategy {
 
 
     protected abstract DataSetLoader createDataSetLoader(DataSetRowProcessor dataSetRowProcessor, DatabaseAccessor databaseAccessor);
-
-
-    protected DatabaseAccessor createDatabaseAccessor(DatabaseMetaData database) {
-        return new DatabaseAccessor(database);
-    }
-
-    protected IdentifierNameProcessor createIdentifierNameProcessor(DatabaseMetaData database) {
-        // todo refactor initialization
-        IdentifierNameProcessor identifierNameProcessor = new IdentifierNameProcessor();
-        identifierNameProcessor.init(database);
-        return identifierNameProcessor;
-    }
-
-    protected DataSetRowProcessor createDataSetRowProcessor(IdentifierNameProcessor identifierNameProcessor, DatabaseMetaData database) {
-        // todo refactor initialization
-        SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
-        return new DataSetRowProcessor(identifierNameProcessor, sqlTypeHandlerRepository, database);
-    }
 
 
 }
