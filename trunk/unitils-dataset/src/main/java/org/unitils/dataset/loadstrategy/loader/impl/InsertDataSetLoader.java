@@ -23,6 +23,8 @@ import java.util.List;
 
 
 /**
+ * Data set loader that uses insert statements to load the data set rows.
+ *
  * @author Tim Ducheyne
  * @author Filip Neven
  */

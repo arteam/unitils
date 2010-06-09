@@ -25,6 +25,12 @@ import java.util.Set;
 
 
 /**
+ * Data set loader that uses an update statement to update the data set row in the database.
+ * An exception is raised uf no update was performed, (ie if the record could not be found).
+ *
+ * The PK columns are used to find the correct record to update. If no or not all values for the PK columns were
+ * specified in the data set, an exception will be raised (since we don't know what to update).
+ *
  * @author Tim Ducheyne
  * @author Filip Neven
  */

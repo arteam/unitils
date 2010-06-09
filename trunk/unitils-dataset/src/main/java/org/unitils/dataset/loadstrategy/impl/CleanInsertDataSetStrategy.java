@@ -17,7 +17,6 @@ package org.unitils.dataset.loadstrategy.impl;
 
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.database.DatabaseMetaData;
-import org.unitils.dataset.loadstrategy.loader.impl.TableContentDeleter;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 
 import java.util.List;

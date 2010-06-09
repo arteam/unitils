@@ -22,6 +22,9 @@ import org.unitils.dataset.model.dataset.DataSetRow;
 import java.util.List;
 
 /**
+ * Data set loader that first tries to update the data set row. If nothing was updated, it will use the {@link InsertDataSetLoader}
+ * to insert the row in the database
+ *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
@@ -38,6 +41,8 @@ public class RefreshDataSetLoader extends UpdateDataSetLoader {
 
     @Override
     protected void handleNoUpdatesPerformed() {
+        // by default the update data set loader throws an exception if no update was performed
+        // overridden to ignore this and then try the insert afterwards
     }
 
     @Override

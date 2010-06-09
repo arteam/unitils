@@ -16,7 +16,6 @@
 package org.unitils.dataset.loadstrategy.impl;
 
 import org.unitils.dataset.database.DatabaseMetaData;
-import org.unitils.dataset.loadstrategy.loader.impl.IdentifierNameProcessor;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.Row;
 import org.unitils.dataset.model.database.Value;
@@ -72,7 +71,7 @@ public class DataSetRowProcessor {
 
 
     protected Column createColumn(String qualifiedTableName, DataSetValue dataSetValue, DataSetSettings dataSetSettings, Set<String> allPrimaryKeyColumnNames, Set<String> remainingPrimaryKeyColumnNames) throws Exception {
-        String columnName = getCorrectCaseColumnName(dataSetValue.getColumnName(), dataSetSettings);
+        String columnName = identifierNameProcessor.getCorrectCaseColumnName(dataSetValue.getColumnName(), dataSetSettings);
         int sqlType = databaseMetaData.getColumnSqlType(qualifiedTableName, columnName);
         boolean primaryKey = isPrimaryKeyColumn(columnName, allPrimaryKeyColumnNames, remainingPrimaryKeyColumnNames);
 
@@ -114,15 +113,6 @@ public class DataSetRowProcessor {
         return new Value(correctTypeValue, isLiteralValue, column);
     }
 
-    protected String getCorrectCaseColumnName(String columnName, DataSetSettings dataSetSettings) {
-        boolean caseSensitive = dataSetSettings.isCaseSensitive();
-        if (caseSensitive) {
-            return databaseMetaData.quoteIdentifier(columnName);
-        } else {
-            return databaseMetaData.toCorrectCaseIdentifier(columnName);
-        }
-    }
-
 
     /**
      * @param value     The value, not null
@@ -157,7 +147,8 @@ public class DataSetRowProcessor {
 
 
     /**
-     * @param value The value, not null
+     * @param value        The value, not null
+     * @param literalToken The token that marks a literal value, eg =
      * @return True if the given value is a literal value
      */
     protected boolean isLiteralValue(String value, char literalToken) {
@@ -165,7 +156,8 @@ public class DataSetRowProcessor {
     }
 
     /**
-     * @param value The value, not null
+     * @param value        The value, not null
+     * @param literalToken The token that marks a literal value, eg =
      * @return True if the given value is an escaped literal value
      */
     protected boolean isEscapedLiteralValue(String value, char literalToken) {

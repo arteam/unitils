@@ -13,22 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.loadstrategy.loader.impl;
+package org.unitils.dataset.loadstrategy.impl;
 
 import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.model.dataset.DataSetRow;
+import org.unitils.dataset.model.dataset.DataSetSettings;
 
 /**
+ * Handles correct casing of database identifier, e.g. table names.
+ *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public class IdentifierNameProcessor {
 
-    private DatabaseMetaData database;
+    private DatabaseMetaData databaseMetaData;
 
 
-    public IdentifierNameProcessor(DatabaseMetaData database) {
-        this.database = database;
+    public IdentifierNameProcessor(DatabaseMetaData databaseMetaData) {
+        this.databaseMetaData = databaseMetaData;
     }
 
 
@@ -36,7 +39,7 @@ public class IdentifierNameProcessor {
      * Gets the table name prefixed with the schema name and quoted if it is a case-sensitive name.
      *
      * @param dataSetRow The data set row, not null
-     * @return The quoted name or the original name if quoting is not supported or not case sensitive
+     * @return The qualified table name, not null
      */
     public String getQualifiedTableName(DataSetRow dataSetRow) {
         String schemaName = dataSetRow.getSchemaName();
@@ -44,14 +47,28 @@ public class IdentifierNameProcessor {
 
         boolean caseSensitive = dataSetRow.getDataSetSettings().isCaseSensitive();
         if (caseSensitive) {
-            schemaName = database.quoteIdentifier(schemaName);
-            tableName = database.quoteIdentifier(tableName);
+            schemaName = databaseMetaData.quoteIdentifier(schemaName);
+            tableName = databaseMetaData.quoteIdentifier(tableName);
         } else {
-            schemaName = database.toCorrectCaseIdentifier(schemaName);
-            tableName = database.toCorrectCaseIdentifier(tableName);
+            schemaName = databaseMetaData.toCorrectCaseIdentifier(schemaName);
+            tableName = databaseMetaData.toCorrectCaseIdentifier(tableName);
         }
         return schemaName + "." + tableName;
     }
 
-
+    /**
+     * Gets the column name in the correct case and quoted if it's a case-sensitive name.
+     *
+     * @param columnName      The column name, not null
+     * @param dataSetSettings The data set settings, not null
+     * @return The column name in the correct case, not null
+     */
+    public String getCorrectCaseColumnName(String columnName, DataSetSettings dataSetSettings) {
+        boolean caseSensitive = dataSetSettings.isCaseSensitive();
+        if (caseSensitive) {
+            return databaseMetaData.quoteIdentifier(columnName);
+        } else {
+            return databaseMetaData.toCorrectCaseIdentifier(columnName);
+        }
+    }
 }
