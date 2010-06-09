@@ -16,8 +16,8 @@
 package org.unitils.dataset.assertstrategy.impl;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.core.database.Column;
 import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import java.sql.Connection;
@@ -39,7 +39,7 @@ public class TableContentRetriever {
     protected SqlTypeHandlerRepository sqlTypeHandlerRepository;
 
 
-    public void init(DatabaseMetaData database, SqlTypeHandlerRepository sqlTypeHandlerRepository) {
+    public TableContentRetriever(DatabaseMetaData database, SqlTypeHandlerRepository sqlTypeHandlerRepository) {
         this.database = database;
         this.sqlTypeHandlerRepository = sqlTypeHandlerRepository;
     }

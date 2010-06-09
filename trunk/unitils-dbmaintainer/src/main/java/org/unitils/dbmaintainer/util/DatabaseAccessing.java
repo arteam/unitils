@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package org.unitils.dbmaintainer.util;
 
-import java.util.Properties;
-
 import org.unitils.core.dbsupport.SQLHandler;
+
+import java.util.Properties;
 
 /**
  * Task that can be performed on a database.
@@ -33,6 +33,6 @@ public interface DatabaseAccessing {
      * @param configuration The configuration, not null
      * @param sqlHandler    The sql handler, not null
      */
-    public void init(Properties configuration, SQLHandler sqlHandler);
+    void init(Properties configuration, SQLHandler sqlHandler);
 
 }

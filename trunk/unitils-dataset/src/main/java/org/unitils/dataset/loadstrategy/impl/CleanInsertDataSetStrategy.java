@@ -16,9 +16,7 @@
 package org.unitils.dataset.loadstrategy.impl;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.database.DatabaseAccessor;
 import org.unitils.dataset.database.DatabaseMetaData;
-import org.unitils.dataset.loadstrategy.loader.impl.IdentifierNameProcessor;
 import org.unitils.dataset.loadstrategy.loader.impl.TableContentDeleter;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 
@@ -40,7 +38,7 @@ public class CleanInsertDataSetStrategy extends InsertDataSetStrategy {
     @Override
     public void init(Properties configuration, DatabaseMetaData database) {
         super.init(configuration, database);
-        tableContentDeleter = createTableContentDeleter(identifierNameProcessor, databaseAccessor);
+        tableContentDeleter = new TableContentDeleter(identifierNameProcessor, databaseAccessor);
     }
 
 
@@ -62,12 +60,4 @@ public class CleanInsertDataSetStrategy extends InsertDataSetStrategy {
             dataSetRowSource.close();
         }
     }
-
-
-    protected TableContentDeleter createTableContentDeleter(IdentifierNameProcessor identifierNameProcessor, DatabaseAccessor databaseAccessor) {
-        TableContentDeleter tableContentDeleter = new TableContentDeleter();
-        tableContentDeleter.init(identifierNameProcessor, databaseAccessor);
-        return tableContentDeleter;
-    }
-
 }

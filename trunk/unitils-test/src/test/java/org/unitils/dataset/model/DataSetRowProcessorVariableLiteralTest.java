@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.core;
+package org.unitils.dataset.model;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.core.database.Row;
-import org.unitils.dataset.core.database.Value;
-import org.unitils.dataset.core.dataset.DataSetRow;
-import org.unitils.dataset.core.dataset.DataSetSettings;
-import org.unitils.dataset.core.dataset.DataSetValue;
 import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
 import org.unitils.dataset.loadstrategy.loader.impl.IdentifierNameProcessor;
+import org.unitils.dataset.model.database.Row;
+import org.unitils.dataset.model.database.Value;
+import org.unitils.dataset.model.dataset.DataSetRow;
+import org.unitils.dataset.model.dataset.DataSetSettings;
+import org.unitils.dataset.model.dataset.DataSetValue;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 import org.unitils.dataset.sqltypehandler.impl.TextSqlTypeHandler;
 import org.unitils.mock.Mock;

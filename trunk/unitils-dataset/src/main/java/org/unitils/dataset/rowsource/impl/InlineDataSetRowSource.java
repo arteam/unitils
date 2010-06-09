@@ -16,9 +16,9 @@
 package org.unitils.dataset.rowsource.impl;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.core.dataset.DataSetRow;
-import org.unitils.dataset.core.dataset.DataSetSettings;
-import org.unitils.dataset.core.dataset.DataSetValue;
+import org.unitils.dataset.model.dataset.DataSetRow;
+import org.unitils.dataset.model.dataset.DataSetSettings;
+import org.unitils.dataset.model.dataset.DataSetValue;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 
 import java.util.List;

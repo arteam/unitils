@@ -18,6 +18,7 @@ package org.unitils.dataset.assertstrategy.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
+import org.unitils.dataset.DataSetModuleFactoryHelper;
 import org.unitils.dataset.assertstrategy.AssertDataSetStrategy;
 import org.unitils.dataset.assertstrategy.DataSetComparator;
 import org.unitils.dataset.assertstrategy.DatabaseContentLogger;
@@ -25,11 +26,11 @@ import org.unitils.dataset.assertstrategy.model.ColumnDifference;
 import org.unitils.dataset.assertstrategy.model.DataSetComparison;
 import org.unitils.dataset.assertstrategy.model.RowComparison;
 import org.unitils.dataset.assertstrategy.model.TableComparison;
-import org.unitils.dataset.core.database.Row;
 import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.loadstrategy.impl.BaseLoadDataSetStrategy;
 import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
 import org.unitils.dataset.loadstrategy.loader.impl.IdentifierNameProcessor;
+import org.unitils.dataset.model.database.Row;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
@@ -49,19 +50,19 @@ public class DefaultAssertDataSetStrategy implements AssertDataSetStrategy {
     private static Log logger = LogFactory.getLog(BaseLoadDataSetStrategy.class);
 
     protected DataSetComparator dataSetComparator;
-    protected IdentifierNameProcessor identifierNameProcessor;
-    protected DataSetRowProcessor dataSetRowProcessor;
-
     protected DatabaseContentLogger databaseContentLogger;
-    protected TableContentRetriever tableContentRetriever;
 
 
     public void init(Properties configuration, DatabaseMetaData database) {
-        this.identifierNameProcessor = createIdentifierNameProcessor(database);
-        this.dataSetRowProcessor = createDataSetRowProcessor(identifierNameProcessor, database);
-        this.tableContentRetriever = createTableContentRetriever(database);
-        this.dataSetComparator = createDataSetComparator(dataSetRowProcessor, tableContentRetriever, database);
-        this.databaseContentLogger = createDatabaseContentLogger(database, tableContentRetriever);
+        DataSetModuleFactoryHelper dataSetModuleFactoryHelper = new DataSetModuleFactoryHelper(configuration, database);
+
+        IdentifierNameProcessor identifierNameProcessor = new IdentifierNameProcessor(database);
+        SqlTypeHandlerRepository sqlTypeHandlerRepository = dataSetModuleFactoryHelper.createSqlTypeHandlerRepository();
+        DataSetRowProcessor dataSetRowProcessor = new DataSetRowProcessor(identifierNameProcessor, sqlTypeHandlerRepository, database);
+        TableContentRetriever tableContentRetriever = new TableContentRetriever(database, sqlTypeHandlerRepository);
+
+        this.dataSetComparator = dataSetModuleFactoryHelper.createDataSetComparator(dataSetRowProcessor, tableContentRetriever);
+        this.databaseContentLogger = dataSetModuleFactoryHelper.createDatabaseContentLogger(tableContentRetriever);
     }
 
     /**
@@ -172,39 +173,6 @@ public class DefaultAssertDataSetStrategy implements AssertDataSetStrategy {
         columnNames.append(rightPad(columnName, columnSize));
         expectedValues.append(rightPad(expectedValue, columnSize));
         actualValues.append(rightPad(actualValue, columnSize));
-    }
-
-
-    protected DataSetComparator createDataSetComparator(DataSetRowProcessor dataSetRowProcessor, TableContentRetriever tableContentRetriever, DatabaseMetaData database) {
-        DataSetComparator dataSetComparator = new DefaultDataSetComparator();
-        dataSetComparator.init(dataSetRowProcessor, tableContentRetriever, database);
-        return dataSetComparator;
-    }
-
-    protected DatabaseContentLogger createDatabaseContentLogger(DatabaseMetaData database, TableContentRetriever tableContentRetriever) {
-        DatabaseContentLogger databaseContentLogger = new DefaultDatabaseContentLogger();
-        databaseContentLogger.init(database, tableContentRetriever);
-        return databaseContentLogger;
-    }
-
-    protected TableContentRetriever createTableContentRetriever(DatabaseMetaData database) {
-        SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
-        TableContentRetriever tableContentRetriever = new TableContentRetriever();
-        tableContentRetriever.init(database, sqlTypeHandlerRepository);
-        return tableContentRetriever;
-    }
-
-    protected IdentifierNameProcessor createIdentifierNameProcessor(DatabaseMetaData database) {
-        // todo refactor initialization
-        IdentifierNameProcessor identifierNameProcessor = new IdentifierNameProcessor();
-        identifierNameProcessor.init(database);
-        return identifierNameProcessor;
-    }
-
-    protected DataSetRowProcessor createDataSetRowProcessor(IdentifierNameProcessor identifierNameProcessor, DatabaseMetaData database) {
-        // todo refactor initialization
-        SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
-        return new DataSetRowProcessor(identifierNameProcessor, sqlTypeHandlerRepository, database);
     }
 
 }

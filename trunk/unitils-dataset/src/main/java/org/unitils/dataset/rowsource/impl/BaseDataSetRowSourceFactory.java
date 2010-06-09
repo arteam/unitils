@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.rowsource.impl;
 
-import org.unitils.dataset.core.dataset.DataSetSettings;
+import org.unitils.dataset.model.dataset.DataSetSettings;
 import org.unitils.util.PropertyUtils;
 
 import java.util.Properties;

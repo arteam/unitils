@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.rowsource;
 
-import org.unitils.dataset.core.dataset.DataSetRow;
+import org.unitils.dataset.model.dataset.DataSetRow;
 
 /**
  * A source for reading out data set rows.

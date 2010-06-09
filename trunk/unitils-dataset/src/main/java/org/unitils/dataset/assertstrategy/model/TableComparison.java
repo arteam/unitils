@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.assertstrategy.model;
 
-import org.unitils.dataset.core.database.Row;
+import org.unitils.dataset.model.database.Row;
 
 import java.util.*;
 

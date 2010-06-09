@@ -19,9 +19,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.dataset.core.database.Column;
-import org.unitils.dataset.core.dataset.DataSetRow;
-import org.unitils.dataset.core.dataset.DataSetValue;
+import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.dataset.model.database.Column;
+import org.unitils.dataset.model.dataset.DataSetRow;
+import org.unitils.dataset.model.dataset.DataSetValue;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import java.sql.Connection;
@@ -78,6 +79,9 @@ public class DatabaseMetaData {
         return dbSupport.removeIdentifierQuotes(schemaName);
     }
 
+    public SQLHandler getSQLHandler() {
+        return dbSupport.getSQLHandler();
+    }
 
     public Connection getConnection() throws SQLException {
         // todo move to db utils and register with spring

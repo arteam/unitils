@@ -15,12 +15,10 @@
  */
 package org.unitils.dataset.loadstrategy.loader.impl;
 
-import org.unitils.dataset.core.dataset.DataSetRow;
 import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.model.dataset.DataSetRow;
 
 /**
- * todo merge with row processor ??
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
@@ -29,7 +27,7 @@ public class IdentifierNameProcessor {
     private DatabaseMetaData database;
 
 
-    public void init(DatabaseMetaData database) {
+    public IdentifierNameProcessor(DatabaseMetaData database) {
         this.database = database;
     }
 

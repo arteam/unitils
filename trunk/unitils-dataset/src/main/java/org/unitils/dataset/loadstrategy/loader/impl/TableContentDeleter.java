@@ -16,9 +16,9 @@
 package org.unitils.dataset.loadstrategy.loader.impl;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.core.database.Value;
-import org.unitils.dataset.core.dataset.DataSetRow;
 import org.unitils.dataset.database.DatabaseAccessor;
+import org.unitils.dataset.model.database.Value;
+import org.unitils.dataset.model.dataset.DataSetRow;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 
 import java.util.*;
@@ -34,7 +34,7 @@ public class TableContentDeleter {
     protected IdentifierNameProcessor identifierNameProcessor;
 
 
-    public void init(IdentifierNameProcessor identifierNameProcessor, DatabaseAccessor databaseAccessor) {
+    public TableContentDeleter(IdentifierNameProcessor identifierNameProcessor, DatabaseAccessor databaseAccessor) {
         this.databaseAccessor = databaseAccessor;
         this.identifierNameProcessor = identifierNameProcessor;
     }

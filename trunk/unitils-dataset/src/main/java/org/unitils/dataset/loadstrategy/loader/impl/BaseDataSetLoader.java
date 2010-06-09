@@ -16,11 +16,11 @@
 package org.unitils.dataset.loadstrategy.loader.impl;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.core.database.Row;
-import org.unitils.dataset.core.dataset.DataSetRow;
 import org.unitils.dataset.database.DatabaseAccessor;
 import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
 import org.unitils.dataset.loadstrategy.loader.DataSetLoader;
+import org.unitils.dataset.model.database.Row;
+import org.unitils.dataset.model.dataset.DataSetRow;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 
 import java.util.HashSet;

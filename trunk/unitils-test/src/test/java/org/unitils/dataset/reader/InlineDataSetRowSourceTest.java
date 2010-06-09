@@ -20,9 +20,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.core.dataset.DataSetRow;
-import org.unitils.dataset.core.dataset.DataSetSettings;
-import org.unitils.dataset.core.dataset.DataSetValue;
+import org.unitils.dataset.model.dataset.DataSetRow;
+import org.unitils.dataset.model.dataset.DataSetSettings;
+import org.unitils.dataset.model.dataset.DataSetValue;
 import org.unitils.dataset.rowsource.impl.InlineDataSetRowSource;
 
 import java.util.List;

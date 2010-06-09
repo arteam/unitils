@@ -19,8 +19,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.core.dataset.DataSetRow;
-import org.unitils.dataset.core.dataset.DataSetSettings;
+import org.unitils.dataset.model.dataset.DataSetRow;
+import org.unitils.dataset.model.dataset.DataSetSettings;
 import org.unitils.dataset.rowsource.impl.XmlDataSetRowSource;
 
 import java.io.File;

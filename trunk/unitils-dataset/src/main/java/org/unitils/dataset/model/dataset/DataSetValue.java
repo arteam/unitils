@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.core.dataset;
+package org.unitils.dataset.model.dataset;
 
 /**
  * A column in a data set row

@@ -20,12 +20,12 @@ import org.unitils.dataset.assertstrategy.DataSetComparator;
 import org.unitils.dataset.assertstrategy.model.DataSetComparison;
 import org.unitils.dataset.assertstrategy.model.RowComparison;
 import org.unitils.dataset.assertstrategy.model.TableComparison;
-import org.unitils.dataset.core.database.Column;
-import org.unitils.dataset.core.database.Row;
-import org.unitils.dataset.core.database.Value;
-import org.unitils.dataset.core.dataset.DataSetRow;
 import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
+import org.unitils.dataset.model.database.Column;
+import org.unitils.dataset.model.database.Row;
+import org.unitils.dataset.model.database.Value;
+import org.unitils.dataset.model.dataset.DataSetRow;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 
 import java.util.*;

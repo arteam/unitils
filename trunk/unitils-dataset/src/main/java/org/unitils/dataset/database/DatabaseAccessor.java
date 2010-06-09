@@ -17,7 +17,7 @@ package org.unitils.dataset.database;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitils.dataset.core.database.Value;
+import org.unitils.dataset.model.database.Value;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
