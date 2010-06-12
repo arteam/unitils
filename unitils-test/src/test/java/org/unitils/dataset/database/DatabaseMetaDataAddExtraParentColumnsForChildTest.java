@@ -21,23 +21,19 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.DefaultSQLHandler;
-import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dataset.model.dataset.DataSetRow;
 import org.unitils.dataset.model.dataset.DataSetSettings;
 import org.unitils.dataset.model.dataset.DataSetValue;
-import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import static org.unitils.dataset.util.TestUtils.createDatabaseMetaData;
 
 /**
  * @author Tim Ducheyne
@@ -61,9 +57,7 @@ public class DatabaseMetaDataAddExtraParentColumnsForChildTest extends UnitilsJU
     @Before
     public void initialize() throws SQLException {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        DbSupport dbSupport = getDefaultDbSupport(configuration, sqlHandler);
-        databaseMetaData = new DatabaseMetaData(dbSupport, new SqlTypeHandlerRepository());
+        databaseMetaData = createDatabaseMetaData(configuration, dataSource);
 
         dropTestTables();
         createTestTables();

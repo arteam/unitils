@@ -17,6 +17,8 @@ package org.unitils.dataset;
 
 import org.unitils.core.Unitils;
 
+import java.io.File;
+
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -26,6 +28,10 @@ public class DataSetXSDGenerator {
 
     public static void generateDataSetXSDs() {
         getDataSetModule().generateDataSetXSDs();
+    }
+
+    public static void generateDataSetXSDs(File targetDirectory) {
+        getDataSetModule().generateDataSetXSDs(targetDirectory);
     }
 
 

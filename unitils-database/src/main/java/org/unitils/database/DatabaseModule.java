@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,6 @@
  * limitations under the License.
  */
 package org.unitils.database;
-
-import static org.unitils.core.util.ConfigUtils.getInstanceOf;
-import static org.unitils.database.util.TransactionMode.COMMIT;
-import static org.unitils.database.util.TransactionMode.DEFAULT;
-import static org.unitils.database.util.TransactionMode.DISABLED;
-import static org.unitils.database.util.TransactionMode.ROLLBACK;
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
-import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -64,6 +41,19 @@ import org.unitils.dbmaintainer.structure.SequenceUpdater;
 import org.unitils.dbmaintainer.util.DatabaseAccessing;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import org.unitils.util.PropertyUtils;
+
+import javax.sql.DataSource;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.*;
+
+import static org.unitils.core.util.ConfigUtils.getInstanceOf;
+import static org.unitils.database.util.TransactionMode.*;
+import static org.unitils.util.AnnotationUtils.*;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
+import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
 /**
  * Module that provides support for database testing: Creation of a datasource that connects to the
@@ -142,6 +132,9 @@ public class DatabaseModule implements Module {
      */
     protected Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations = new HashSet<UnitilsTransactionManagementConfiguration>();
 
+    /* The registered database update listeners that will be called when db-maintain has updated the database */
+    protected List<DatabaseUpdateListener> databaseUpdateListeners = new ArrayList<DatabaseUpdateListener>();
+
 
     /**
      * Initializes this module using the given <code>Configuration</code>
@@ -167,15 +160,15 @@ public class DatabaseModule implements Module {
         // Make sure that a spring DataSourceTransactionManager is used for transaction management, if
         // no other transaction management configuration takes preference
         registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
-            
+
             public boolean isApplicableFor(Object testObject) {
                 return true;
             }
-            
+
             public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
                 return new DataSourceTransactionManager(getDataSourceAndActivateTransactionIfNeeded());
             }
-            
+
             public boolean isTransactionalResourceAvailable(Object testObject) {
                 return isDataSourceLoaded();
             }
@@ -183,11 +176,11 @@ public class DatabaseModule implements Module {
             public Integer getPreference() {
                 return 1;
             }
-            
+
         });
     }
-    
-    
+
+
     /**
      * Returns the <code>DataSource</code> that provides connection to the unit test database. When invoked the first
      * time, the DBMaintainer is invoked to make sure the test database is up-to-date (if database updating is enabled)
@@ -219,8 +212,8 @@ public class DatabaseModule implements Module {
         }
         return dataSource;
     }
-    
-    
+
+
     public DataSource getDataSource() {
         if (dataSource == null) {
             dataSource = createDataSource();
@@ -286,12 +279,13 @@ public class DatabaseModule implements Module {
      * latest changes.
      *
      * @param sqlHandler SQLHandler that needs to be used for the database updates
+     * @return True if an update occurred, false if the database was up to date
      * @see {@link DBMaintainer}
      */
-    public void updateDatabase(SQLHandler sqlHandler) {
+    public boolean updateDatabase(SQLHandler sqlHandler) {
         logger.info("Checking if database has to be updated.");
         DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler);
-        dbMaintainer.updateDatabase();
+        return dbMaintainer.updateDatabase();
     }
 
 
@@ -350,9 +344,26 @@ public class DatabaseModule implements Module {
 
         // Call the database maintainer if enabled
         if (updateDatabaseSchemaEnabled) {
-            updateDatabase(new DefaultSQLHandler(dataSource));
+            boolean databaseUpdated = updateDatabase(new DefaultSQLHandler(dataSource));
+            if (databaseUpdated) {
+                notifyDatabaseUpdateListeners();
+            }
         }
         return dataSource;
+    }
+
+    public void registerDatabaseUpdateListener(DatabaseUpdateListener databaseUpdateListener) {
+        databaseUpdateListeners.add(databaseUpdateListener);
+    }
+
+    public void unregisterDatabaseUpdateListener(DatabaseUpdateListener databaseUpdateListener) {
+        databaseUpdateListeners.remove(databaseUpdateListener);
+    }
+
+    private void notifyDatabaseUpdateListeners() {
+        for (DatabaseUpdateListener databaseUpdateListener : databaseUpdateListeners) {
+            databaseUpdateListener.databaseWasUpdated();
+        }
     }
 
 
@@ -409,8 +420,8 @@ public class DatabaseModule implements Module {
     public void startTransaction(Object testObject) {
         getTransactionManager().startTransaction(testObject);
     }
-    
-    
+
+
     /**
      * Commits the current transaction.
      *
@@ -487,9 +498,8 @@ public class DatabaseModule implements Module {
 
 
     /**
-     * @return A configured instance of {@link DatabaseAccessing} of the given type
-     *
      * @param databaseTaskType The type of database task, not null
+     * @return A configured instance of {@link DatabaseAccessing} of the given type
      */
     protected <T extends DatabaseAccessing> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType) {
         return DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(databaseTaskType, configuration, getDefaultSqlHandler());
@@ -506,11 +516,12 @@ public class DatabaseModule implements Module {
 
 
     // todo javadoc
+
     public void registerTransactionManagementConfiguration(UnitilsTransactionManagementConfiguration transactionManagementConfiguration) {
         transactionManagementConfigurations.add(transactionManagementConfiguration);
     }
-    
-    
+
+
     protected Object getTestObject() {
         return Unitils.getInstance().getTestContext().getTestObject();
     }
