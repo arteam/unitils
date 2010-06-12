@@ -18,15 +18,9 @@ package org.unitils.dataset;
 import org.junit.After;
 import org.junit.Before;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.DbSupportFactory;
-import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dataset.database.DatabaseMetaData;
-import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import javax.sql.DataSource;
-import java.util.Properties;
 import java.util.Set;
 
 import static org.junit.Assert.assertFalse;
@@ -56,11 +50,6 @@ public abstract class DataSetTestBase extends UnitilsJUnit4 {
         executeUpdateQuietly("drop table test", dataSource);
     }
 
-
-    protected DatabaseMetaData createDatabaseMetaData(Properties configuration) {
-        DbSupport defaultDbSupport = DbSupportFactory.getDefaultDbSupport(configuration, new DefaultSQLHandler(dataSource));
-        return new DatabaseMetaData(defaultDbSupport, new SqlTypeHandlerRepository());
-    }
 
     protected void assertValueInTable(String tableName, String columnName, String expectedValue) {
         Set<String> values = getValues(columnName, tableName);

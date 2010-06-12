@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
 import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import org.unitils.dbmaintainer.version.ExecutedScriptInfoSource;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.util.PropertyUtils;
@@ -38,6 +37,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 
 /**
  * A class for performing automatic maintenance of a database.<br>
@@ -223,8 +224,10 @@ public class DBMaintainer {
      * scripts are executed and the version number is increased. If an existing script has been
      * modified, the database is cleared and completely rebuilt from scratch. If an error occurs
      * with one of the scripts, a {@link UnitilsException} is thrown.
+     *
+     * @return True if an update occurred, false if the database was up to date
      */
-    public void updateDatabase() {
+    public boolean updateDatabase() {
         // Check if the executed scripts info source recommends a from-scratch update
         boolean fromScratchUpdateRecommended = versionSource.isFromScratchUpdateRecommended();
 
@@ -243,11 +246,11 @@ public class DBMaintainer {
             versionSource.clearAllExecutedScripts();
             // update database with all scripts
             updateDatabase(scriptSource.getAllUpdateScripts());
-            return;
+            return true;
         }
 
         // perform an incremental update
-        updateDatabase(scriptSource.getNewScripts(highestExecutedScriptVersion, alreadyExecutedScripts));
+        return updateDatabase(scriptSource.getNewScripts(highestExecutedScriptVersion, alreadyExecutedScripts));
     }
 
 
@@ -284,12 +287,13 @@ public class DBMaintainer {
      * Updates the state of the database using the given scripts.
      *
      * @param scripts The scripts, not null
+     * @return True if an update occurred, false if the database was up to date
      */
-    protected void updateDatabase(List<Script> scripts) {
+    protected boolean updateDatabase(List<Script> scripts) {
         if (scripts.isEmpty()) {
             // nothing to do
             logger.info("Database is up to date");
-            return;
+            return false;
         }
         logger.info("Database update scripts have been found and will be executed on the database.");
 
@@ -317,6 +321,7 @@ public class DBMaintainer {
         if (dataSetStructureGenerator != null) {
             dataSetStructureGenerator.generateDataSetStructure();
         }
+        return true;
     }
 
 
@@ -384,7 +389,8 @@ public class DBMaintainer {
      * database will only be rebuilt again after an unsuccessful build when changes were made to the
      * script files.
      *
-     * @param currentVersion The current database version, not null
+     * @param currentVersion         The current database version, not null
+     * @param alreadyExecutedScripts The list of scripts that was already executed on the database, not null
      * @return True if a from scratch rebuild is needed, false otherwise
      */
     protected boolean shouldUpdateDatabaseFromScratch(Version currentVersion, Set<ExecutedScript> alreadyExecutedScripts) {

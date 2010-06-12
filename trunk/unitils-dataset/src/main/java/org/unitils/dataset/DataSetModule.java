@@ -15,6 +15,8 @@
  */
 package org.unitils.dataset;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
@@ -34,7 +36,7 @@ import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.dataset.rowsource.FileDataSetRowSourceFactory;
 import org.unitils.dataset.rowsource.InlineDataSetRowSourceFactory;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
-import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
+import org.unitils.dataset.structure.DataSetStructureGenerator;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -66,6 +68,14 @@ import static org.unitils.util.ReflectionUtils.createInstanceOfType;
  * @author Filip Neven
  */
 public class DataSetModule implements Module {
+
+    /**
+     * Property key for the xsd target directory
+     */
+    public static final String PROPKEY_XSD_TARGETDIRNAME = "dataset.xsd.targetDirName";
+
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(DataSetModule.class);
 
     /* The unitils configuration */
     protected Properties configuration;
@@ -205,10 +215,19 @@ public class DataSetModule implements Module {
         assertDataSetStrategy.perform(dataSetRowSource, new ArrayList<String>(), logDatabaseContentOnAssertionError);
     }
 
-
     public void generateDataSetXSDs() {
+        String targetDirectoryName = configuration.getProperty(PROPKEY_XSD_TARGETDIRNAME);
+        if (targetDirectoryName == null) {
+            logger.info("No target XSD path was defined (" + PROPKEY_XSD_TARGETDIRNAME + ") in properties. Skipping data set XSD generation.");
+            return;
+        }
+        generateDataSetXSDs(new File(targetDirectoryName));
+    }
+
+    public void generateDataSetXSDs(File targetDirectory) {
         DataSetStructureGenerator dataSetStructureGenerator = dataSetModuleFactoryHelper.createDataSetStructureGenerator();
-        dataSetStructureGenerator.generateDataSetStructure();
+        dataSetStructureGenerator.generateDataSetStructure(targetDirectory);
+        dataSetStructureGenerator.generateDataSetTemplateXmlFile(targetDirectory);
     }
 
 
@@ -261,20 +280,15 @@ public class DataSetModule implements Module {
 
 
     protected DatabaseMetaData createDatabaseMetaData(Properties configuration) {
-        DbSupport defaultDbSupport = getDefaultDbSupport(configuration);
-        SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
-        return new DatabaseMetaData(defaultDbSupport, sqlTypeHandlerRepository);
-    }
-
-    /**
-     * @return The default DbSupport (the one that connects to the default database schema)
-     */
-    protected DbSupport getDefaultDbSupport(Properties configuration) {
         DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
         DataSource dataSource = databaseModule.getDataSourceAndActivateTransactionIfNeeded();
 
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        return DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler);
+        DbSupport defaultDbSupport = DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler);
+        List<DbSupport> dbSupports = DbSupportFactory.getDbSupports(configuration, sqlHandler);
+
+        SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
+        return new DatabaseMetaData(defaultDbSupport, dbSupports, sqlTypeHandlerRepository);
     }
 
 

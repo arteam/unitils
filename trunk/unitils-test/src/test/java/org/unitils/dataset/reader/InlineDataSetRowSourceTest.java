@@ -28,8 +28,7 @@ import org.unitils.dataset.rowsource.impl.InlineDataSetRowSource;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenientEquals;
 
 /**
@@ -162,6 +161,32 @@ public class InlineDataSetRowSourceTest extends UnitilsJUnit4 {
         inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, "SCHEMA_A", defaultDataSetSettings);
         inlineDataSetRowSource.open();
         inlineDataSetRowSource.getNextDataSetRow();
+    }
+
+    @Test
+    public void notExists() throws Exception {
+        List<String> dataSet = asList("!table col1=a");
+        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, "SCHEMA_A", defaultDataSetSettings);
+        inlineDataSetRowSource.open();
+
+        DataSetRow row = inlineDataSetRowSource.getNextDataSetRow();
+        assertTrue(row.isNotExists());
+        assertEquals("table", row.getTableName());
+        assertColumnNames(row, "col1");
+        assertColumnValues(row, "a");
+    }
+
+    @Test
+    public void notExistsWithSpaces() throws Exception {
+        List<String> dataSet = asList(" ! table col1=a");
+        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, "SCHEMA_A", defaultDataSetSettings);
+        inlineDataSetRowSource.open();
+
+        DataSetRow row = inlineDataSetRowSource.getNextDataSetRow();
+        assertTrue(row.isNotExists());
+        assertEquals("table", row.getTableName());
+        assertColumnNames(row, "col1");
+        assertColumnValues(row, "a");
     }
 
 

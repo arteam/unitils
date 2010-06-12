@@ -26,7 +26,7 @@ import org.unitils.dataset.resolver.DataSetResolver;
 import org.unitils.dataset.rowsource.FileDataSetRowSourceFactory;
 import org.unitils.dataset.rowsource.InlineDataSetRowSourceFactory;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
-import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
+import org.unitils.dataset.structure.DataSetStructureGenerator;
 
 import java.util.Properties;
 
@@ -122,7 +122,7 @@ public class DataSetModuleFactoryHelper {
 
     public DataSetStructureGenerator createDataSetStructureGenerator() {
         DataSetStructureGenerator dataSetStructureGenerator = getInstanceOf(DataSetStructureGenerator.class, configuration);
-        dataSetStructureGenerator.init(configuration, databaseMetaData.getSQLHandler());
+        dataSetStructureGenerator.init(databaseMetaData);
         return dataSetStructureGenerator;
     }
 }

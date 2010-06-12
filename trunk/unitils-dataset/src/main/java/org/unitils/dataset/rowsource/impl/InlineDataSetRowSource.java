@@ -24,6 +24,7 @@ import org.unitils.dataset.rowsource.DataSetRowSource;
 import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.stripStart;
 
 /**
  * Data set row source that reads out a data set from an xml file.
@@ -101,12 +102,19 @@ public class InlineDataSetRowSource implements DataSetRowSource {
 
         try {
             StringBuilder qualifiedTableName = new StringBuilder();
-            int index = parseQualifiedTableName(row, qualifiedTableName);
+            String trimmedRow = stripStart(row, null);
+
+            boolean notExists = isNotExists(trimmedRow);
+            if (notExists) {
+                trimmedRow = stripStart(trimmedRow.substring(1), null);
+            }
+
+            int index = parseQualifiedTableName(trimmedRow, qualifiedTableName);
             String schemaName = getSchemaName(qualifiedTableName.toString());
             String tableName = getTableName(qualifiedTableName.toString());
 
-            DataSetRow dataSetRow = new DataSetRow(schemaName, tableName, null, false, defaultDataSetSettings);
-            addDataSetColumns(row, index, dataSetRow);
+            DataSetRow dataSetRow = new DataSetRow(schemaName, tableName, null, notExists, defaultDataSetSettings);
+            addDataSetColumns(trimmedRow, index, dataSetRow);
             return dataSetRow;
 
         } catch (Exception e) {
@@ -120,12 +128,11 @@ public class InlineDataSetRowSource implements DataSetRowSource {
     }
 
     protected int parseQualifiedTableName(String row, StringBuilder qualifiedTableName) {
-        String trimmedRow = row.trim();
-        int index = trimmedRow.indexOf(' ');
+        int index = row.indexOf(' ');
         if (index == -1) {
             throw new UnitilsException("Table name could not be found. A row should begin with (schema_name.)table_name followed by a space. Data set row: " + row);
         }
-        qualifiedTableName.append(trimmedRow.substring(0, index));
+        qualifiedTableName.append(row.substring(0, index));
         return index;
     }
 
@@ -186,6 +193,10 @@ public class InlineDataSetRowSource implements DataSetRowSource {
             return row.length();
         }
         return nextCommaIndex;
+    }
+
+    protected boolean isNotExists(String row) {
+        return row.startsWith("!");
     }
 
     protected boolean isQuotedValue(String row, int index) {

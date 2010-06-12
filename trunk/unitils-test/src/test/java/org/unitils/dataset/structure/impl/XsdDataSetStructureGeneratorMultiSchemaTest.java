@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.xsd.impl;
+package org.unitils.dataset.structure.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,10 +22,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.dbsupport.DefaultSQLHandler;
-import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
+import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import org.unitils.util.PropertyUtils;
 
@@ -41,22 +39,23 @@ import static org.junit.Assert.assertTrue;
 import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import static org.unitils.dataset.util.TestUtils.createDatabaseMetaData;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
 /**
- * Test class for the {@link XsdDataSetStructureGenerator} for the generation of the sample data set template xml.
+ * Test class for the {@link XsdDataSetStructureGenerator} using multiple schemas.
  * <p/>
  * Currently this is only implemented for HsqlDb.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class XsdDataSetStructureGeneratorTemplateXmlTest extends UnitilsJUnit4 {
+public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
 
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(XsdDataSetStructureGeneratorTemplateXmlTest.class);
+    private static Log logger = LogFactory.getLog(XsdDataSetStructureGeneratorMultiSchemaTest.class);
 
     /* Tested object */
     private XsdDataSetStructureGenerator xsdDataSetStructureGenerator = new XsdDataSetStructureGenerator();
@@ -73,9 +72,7 @@ public class XsdDataSetStructureGeneratorTemplateXmlTest extends UnitilsJUnit4 {
 
 
     /**
-     * Initializes the test by creating following tables in the test database:
-     * tableOne(columnA not null, columnB not null, columnC) and
-     * tableTwo(column1, column2)
+     * Initializes the test fixture.
      */
     @Before
     public void setUp() throws Exception {
@@ -85,18 +82,16 @@ public class XsdDataSetStructureGeneratorTemplateXmlTest extends UnitilsJUnit4 {
             return;
         }
 
-        xsdDirectory = new File(System.getProperty("java.io.tmpdir"), "XsdDataSetStructureGeneratorTemplateXmlTest");
+        xsdDirectory = new File(System.getProperty("java.io.tmpdir"), "XsdDataSetStructureGeneratorMultiSchemaTest");
         if (xsdDirectory.exists()) {
             deleteDirectory(xsdDirectory);
         }
         xsdDirectory.mkdirs();
 
         configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A");
-        configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", XsdDataSetStructureGenerator.class.getName());
-        configuration.setProperty(org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
 
-        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        xsdDataSetStructureGenerator.init(configuration, sqlHandler);
+        DatabaseMetaData databaseMetaData = createDatabaseMetaData(configuration, dataSource);
+        xsdDataSetStructureGenerator.init(databaseMetaData);
 
         dropTestTables();
         createTestTables();
@@ -120,20 +115,42 @@ public class XsdDataSetStructureGeneratorTemplateXmlTest extends UnitilsJUnit4 {
     }
 
 
+    /**
+     * Tests the generation of the xsd files for 2 database schemas.
+     */
     @Test
-    public void generateDataSetTemplateXml() throws Exception {
+    public void testGenerateDataSetStructure() throws Exception {
         if (disabled) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        xsdDataSetStructureGenerator.generateDataSetStructure();
+        xsdDataSetStructureGenerator.generateDataSetStructure(xsdDirectory);
 
         // check content of general dataset xsd
-        File dataSetTemplateXml = new File(xsdDirectory, "dataset-template.xml");
-        assertFileContains("<uni:dataset xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"", dataSetTemplateXml);
-        assertFileContains("xmlns=\"PUBLIC\" xmlns:PUBLIC=\"PUBLIC\" xmlns:SCHEMA_A=\"SCHEMA_A\" xmlns:uni=\"unitils-dataset\"", dataSetTemplateXml);
-        assertFileContains("xsi:schemaLocation=\"PUBLIC PUBLIC.xsd SCHEMA_A SCHEMA_A.xsd unitils-dataset dataset.xsd\"", dataSetTemplateXml);
-        assertFileContains("</uni:dataset>", dataSetTemplateXml);
+        File dataSetXsd = new File(xsdDirectory, "dataset.xsd");
+        assertFileContains("targetNamespace=\"unitils-dataset\"", dataSetXsd);
+        assertFileContains("<xsd:import namespace=\"PUBLIC\" schemaLocation=\"PUBLIC.xsd\"/>", dataSetXsd);
+        assertFileContains("<xsd:import namespace=\"SCHEMA_A\" schemaLocation=\"SCHEMA_A.xsd\"/>", dataSetXsd);
+        assertFileContains("<xsd:any namespace=\"PUBLIC\"/>", dataSetXsd);
+        assertFileContains("<xsd:any namespace=\"SCHEMA_A\"/>", dataSetXsd);
+
+        // check content of PUBLIC schema dataset xsd
+        File publicSchemaDataSetXsd = new File(xsdDirectory, "PUBLIC.xsd");
+        assertFileContains("xmlns=\"PUBLIC\" targetNamespace=\"PUBLIC\"", publicSchemaDataSetXsd);
+        assertFileContains("<xsd:element name=\"TABLE_1\" type=\"TABLE_1__type\"/>", publicSchemaDataSetXsd);
+        assertFileContains("<xsd:complexType name=\"TABLE_1__type\">", publicSchemaDataSetXsd);
+        assertFileContains("<xsd:element name=\"TABLE_2\" type=\"TABLE_2__type\"/>", publicSchemaDataSetXsd);
+        assertFileContains("<xsd:complexType name=\"TABLE_2__type\">", publicSchemaDataSetXsd);
+
+        // check content of PUBLIC schema dataset xsd
+        File schemaADataSetXsd = new File(xsdDirectory, "SCHEMA_A.xsd");
+        assertFileContains("xmlns=\"SCHEMA_A\" targetNamespace=\"SCHEMA_A\"", schemaADataSetXsd);
+        assertFileContains("<xsd:element name=\"TABLE_1\" type=\"TABLE_1__type\" />", schemaADataSetXsd);
+        assertFileContains("<xsd:complexType name=\"TABLE_1__type\">", schemaADataSetXsd);
+        assertFileContains("<xsd:element name=\"TABLE_4\" type=\"TABLE_4__type\" />", schemaADataSetXsd);
+        assertFileContains("<xsd:complexType name=\"TABLE_4__type\">", schemaADataSetXsd);
+        assertFileContains("<xsd:element name=\"TABLE_3\" type=\"TABLE_3__type\" />", schemaADataSetXsd);
+        assertFileContains("<xsd:complexType name=\"TABLE_3__type\">", schemaADataSetXsd);
     }
 
 
@@ -141,8 +158,14 @@ public class XsdDataSetStructureGeneratorTemplateXmlTest extends UnitilsJUnit4 {
      * Creates the test tables.
      */
     private void createTestTables() {
+        // PUBLIC SCHEMA
         executeUpdate("create table TABLE_1(columnA int not null identity, columnB varchar(1) not null, columnC varchar(1))", dataSource);
         executeUpdate("create table TABLE_2(column1 varchar(1), column2 varchar(1))", dataSource);
+        // SCHEMA_A
+        executeUpdate("create schema SCHEMA_A AUTHORIZATION DBA", dataSource);
+        executeUpdate("create table SCHEMA_A.TABLE_1(columnA int not null identity, columnB varchar(1) not null, columnC varchar(1))", dataSource);
+        executeUpdate("create table SCHEMA_A.TABLE_3(columnA int not null identity, columnB varchar(1) not null, columnC varchar(1))", dataSource);
+        executeUpdate("create table SCHEMA_A.TABLE_4(column1 varchar(1), column2 varchar(1))", dataSource);
     }
 
 
@@ -152,6 +175,10 @@ public class XsdDataSetStructureGeneratorTemplateXmlTest extends UnitilsJUnit4 {
     private void dropTestTables() {
         executeUpdateQuietly("drop table TABLE_1", dataSource);
         executeUpdateQuietly("drop table TABLE_2", dataSource);
+        executeUpdateQuietly("drop table SCHEMA_A.TABLE_1", dataSource);
+        executeUpdateQuietly("drop table SCHEMA_A.TABLE_3", dataSource);
+        executeUpdateQuietly("drop table SCHEMA_A.TABLE_4", dataSource);
+        executeUpdateQuietly("drop schema SCHEMA_A", dataSource);
     }
 
 

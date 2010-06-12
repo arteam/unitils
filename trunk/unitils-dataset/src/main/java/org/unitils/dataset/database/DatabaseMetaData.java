@@ -19,7 +19,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.dataset.DataSetRow;
 import org.unitils.dataset.model.dataset.DataSetValue;
@@ -44,21 +43,23 @@ public class DatabaseMetaData {
 
     public static final int SQL_TYPE_UNKNOWN = -1;
 
-    protected DbSupport dbSupport;
+    protected DbSupport defaultDbSupport;
+    protected List<DbSupport> dbSupports;
     protected SqlTypeHandlerRepository sqlTypeHandlerRepository;
 
     protected Map<String, Set<String>> tablePrimaryKeysCache = new HashMap<String, Set<String>>();
     protected Map<String, Map<String, Integer>> tableColumnSqlTypesCache = new HashMap<String, Map<String, Integer>>();
 
 
-    public DatabaseMetaData(DbSupport dbSupport, SqlTypeHandlerRepository sqlTypeHandlerRepository) {
-        this.dbSupport = dbSupport;
+    public DatabaseMetaData(DbSupport defaultDbSupport, List<DbSupport> dbSupports, SqlTypeHandlerRepository sqlTypeHandlerRepository) {
+        this.defaultDbSupport = defaultDbSupport;
+        this.dbSupports = dbSupports;
         this.sqlTypeHandlerRepository = sqlTypeHandlerRepository;
     }
 
 
     public String getSchemaName() {
-        return dbSupport.getSchemaName();
+        return defaultDbSupport.getSchemaName();
     }
 
     /**
@@ -68,26 +69,29 @@ public class DatabaseMetaData {
      * @return The quoted name or the original name if quoting is not supported or not case sensitive
      */
     public String quoteIdentifier(String name) {
-        return dbSupport.quoted(name);
+        return defaultDbSupport.quoted(name);
     }
 
     public String toCorrectCaseIdentifier(String name) {
-        return dbSupport.toCorrectCaseIdentifier(name);
+        return defaultDbSupport.toCorrectCaseIdentifier(name);
     }
 
     public String removeIdentifierQuotes(String schemaName) {
-        return dbSupport.removeIdentifierQuotes(schemaName);
-    }
-
-    public SQLHandler getSQLHandler() {
-        return dbSupport.getSQLHandler();
+        return defaultDbSupport.removeIdentifierQuotes(schemaName);
     }
 
     public Connection getConnection() throws SQLException {
         // todo move to db utils and register with spring
-        return dbSupport.getSQLHandler().getDataSource().getConnection();
+        return defaultDbSupport.getSQLHandler().getDataSource().getConnection();
     }
 
+    public DbSupport getDefaultDbSupport() {
+        return defaultDbSupport;
+    }
+
+    public List<DbSupport> getDbSupports() {
+        return dbSupports;
+    }
 
     public Set<String> getPrimaryKeyColumnNames(String qualifiedTableName) throws SQLException {
         Set<String> primaryKeyColumnNames = tablePrimaryKeysCache.get(qualifiedTableName);

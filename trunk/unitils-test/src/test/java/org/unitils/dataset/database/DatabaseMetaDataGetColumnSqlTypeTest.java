@@ -20,11 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.DbSupportFactory;
-import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import javax.sql.DataSource;
 import java.util.Map;
@@ -35,6 +31,7 @@ import static org.junit.Assert.*;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.dataset.database.DatabaseMetaData.SQL_TYPE_UNKNOWN;
+import static org.unitils.dataset.util.TestUtils.createDatabaseMetaData;
 
 /**
  * Tests for getting the sql type for a column.
@@ -54,8 +51,7 @@ public class DatabaseMetaDataGetColumnSqlTypeTest extends UnitilsJUnit4 {
     @Before
     public void initialize() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        DbSupport defaultDbSupport = DbSupportFactory.getDefaultDbSupport(configuration, new DefaultSQLHandler(dataSource));
-        databaseMetaData = new DatabaseMetaData(defaultDbSupport, new SqlTypeHandlerRepository());
+        databaseMetaData = createDatabaseMetaData(configuration, dataSource);
     }
 
 

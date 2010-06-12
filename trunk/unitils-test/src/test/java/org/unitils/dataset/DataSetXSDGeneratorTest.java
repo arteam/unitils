@@ -23,9 +23,8 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.Unitils;
+import org.unitils.core.UnitilsException;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dataset.xsd.impl.XsdDataSetStructureGenerator;
-import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -36,7 +35,7 @@ import static org.junit.Assert.assertTrue;
 import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME;
+import static org.unitils.dataset.DataSetModule.PROPKEY_XSD_TARGETDIRNAME;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 
@@ -75,15 +74,6 @@ public class DataSetXSDGeneratorTest extends UnitilsJUnit4 {
         if (xsdDirectory.exists()) {
             deleteDirectory(xsdDirectory);
         }
-        xsdDirectory.mkdirs();
-
-        configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A");
-        configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", XsdDataSetStructureGenerator.class.getName());
-        configuration.setProperty(PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
-
-        DataSetModule dataSetModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DataSetModule.class);
-        dataSetModule.init(configuration);
-        dataSetModule.afterInit();
 
         dropTestTables();
         createTestTables();
@@ -98,6 +88,7 @@ public class DataSetXSDGeneratorTest extends UnitilsJUnit4 {
         if (disabled) {
             return;
         }
+        resetConfiguration();
         dropTestTables();
         try {
             deleteDirectory(xsdDirectory);
@@ -107,15 +98,26 @@ public class DataSetXSDGeneratorTest extends UnitilsJUnit4 {
     }
 
 
-    /**
-     * Tests the generation of the xsd files for 2 database schemas.
-     */
     @Test
-    public void testGenerateDataSetStructure() throws Exception {
+    public void targetFolderSpecifiedAsArgument() throws Exception {
         if (disabled) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
+        DataSetXSDGenerator.generateDataSetXSDs(xsdDirectory);
+
+        // check content of general dataset xsd
+        File dataSetXsd = new File(xsdDirectory, "dataset.xsd");
+        assertTrue(dataSetXsd.length() > 0);
+    }
+
+    @Test
+    public void targetFolderConfiguredInConfiguration() throws Exception {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
+        setTargetDirInUnitilsConfiguration();
         DataSetXSDGenerator.generateDataSetXSDs();
 
         // check content of general dataset xsd
@@ -123,6 +125,33 @@ public class DataSetXSDGeneratorTest extends UnitilsJUnit4 {
         assertTrue(dataSetXsd.length() > 0);
     }
 
+    @Test(expected = UnitilsException.class)
+    public void targetDirNotFoundInConfiguration() throws Exception {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
+        DataSetXSDGenerator.generateDataSetXSDs();
+    }
+
+
+    private void setTargetDirInUnitilsConfiguration() {
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A");
+        configuration.setProperty(PROPKEY_XSD_TARGETDIRNAME, xsdDirectory.getPath());
+        setUnitilsConfiguration(configuration);
+    }
+
+    private void resetConfiguration() {
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        setUnitilsConfiguration(configuration);
+    }
+
+    private void setUnitilsConfiguration(Properties configuration) {
+        DataSetModule dataSetModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DataSetModule.class);
+        dataSetModule.init(configuration);
+        dataSetModule.afterInit();
+    }
 
     /**
      * Creates the test tables.
