@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationAnnotatedWith;
 import static org.unitils.util.CollectionUtils.asList;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
@@ -217,7 +218,7 @@ public class DataSetModule implements Module {
 
     public void generateDataSetXSDs() {
         String targetDirectoryName = configuration.getProperty(PROPKEY_XSD_TARGETDIRNAME);
-        if (targetDirectoryName == null) {
+        if (isBlank(targetDirectoryName)) {
             logger.info("No target XSD path was defined (" + PROPKEY_XSD_TARGETDIRNAME + ") in properties. Skipping data set XSD generation.");
             return;
         }
