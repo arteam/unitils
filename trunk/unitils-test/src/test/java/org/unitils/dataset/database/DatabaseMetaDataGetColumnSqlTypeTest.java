@@ -19,12 +19,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
 
 import javax.sql.DataSource;
 import java.util.Map;
-import java.util.Properties;
 
 import static java.sql.Types.*;
 import static org.junit.Assert.*;
@@ -50,10 +48,8 @@ public class DatabaseMetaDataGetColumnSqlTypeTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() throws Exception {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        databaseMetaData = createDatabaseMetaData(configuration, dataSource);
+        databaseMetaData = createDatabaseMetaData();
     }
-
 
     @Before
     public void createTestTables() {

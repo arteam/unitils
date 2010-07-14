@@ -17,13 +17,10 @@ package org.unitils.dataset;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dbmaintain.dbsupport.DbSupport;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.DbSupportFactory;
-import org.unitils.core.dbsupport.DefaultSQLHandler;
-import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.DatabaseModule;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 import org.unitils.dataset.annotation.handler.MarkerForAssertDataSetAnnotation;
@@ -38,7 +35,6 @@ import org.unitils.dataset.rowsource.InlineDataSetRowSourceFactory;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 import org.unitils.dataset.structure.DataSetStructureGenerator;
 
-import javax.sql.DataSource;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -95,51 +91,58 @@ public class DataSetModule implements Module {
     }
 
     public void afterInit() {
-        DatabaseMetaData databaseMetaData = createDatabaseMetaData(configuration);
-        dataSetModuleFactoryHelper = new DataSetModuleFactoryHelper(configuration, databaseMetaData);
+    }
+
+
+    public DataSetModuleFactoryHelper getDataSetModuleFactoryHelper() {
+        if (dataSetModuleFactoryHelper == null) {
+            DatabaseMetaData databaseMetaData = createDatabaseMetaData();
+            dataSetModuleFactoryHelper = new DataSetModuleFactoryHelper(configuration, databaseMetaData);
+        }
+        return dataSetModuleFactoryHelper;
     }
 
 
     public void insertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        LoadDataSetStrategy insertDataSetStrategy = dataSetModuleFactoryHelper.createInsertDataSetStrategy();
+        LoadDataSetStrategy insertDataSetStrategy = getDataSetModuleFactoryHelper().createInsertDataSetStrategy();
         performLoadDataSetStrategy(insertDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
     }
 
     public void insertDataSet(String... dataSetRows) {
-        LoadDataSetStrategy insertDataSetStrategy = dataSetModuleFactoryHelper.createInsertDataSetStrategy();
+        LoadDataSetStrategy insertDataSetStrategy = getDataSetModuleFactoryHelper().createInsertDataSetStrategy();
         performInlineLoadDataSetStrategy(insertDataSetStrategy, asList(dataSetRows));
     }
 
 
     public void cleanInsertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        LoadDataSetStrategy cleanInsertDataSetStrategy = dataSetModuleFactoryHelper.createCleanInsertDataSetStrategy();
+        LoadDataSetStrategy cleanInsertDataSetStrategy = getDataSetModuleFactoryHelper().createCleanInsertDataSetStrategy();
         performLoadDataSetStrategy(cleanInsertDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
     }
 
     public void cleanInsertDataSet(String... dataSetRows) {
-        LoadDataSetStrategy cleanInsertDataSetStrategy = dataSetModuleFactoryHelper.createCleanInsertDataSetStrategy();
+        LoadDataSetStrategy cleanInsertDataSetStrategy = getDataSetModuleFactoryHelper().createCleanInsertDataSetStrategy();
         performInlineLoadDataSetStrategy(cleanInsertDataSetStrategy, asList(dataSetRows));
     }
 
 
     public void refreshDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        LoadDataSetStrategy refreshDataSetStrategy = dataSetModuleFactoryHelper.createRefreshDataSetStrategy();
+        LoadDataSetStrategy refreshDataSetStrategy = getDataSetModuleFactoryHelper().createRefreshDataSetStrategy();
         performLoadDataSetStrategy(refreshDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
     }
 
     public void refreshDataSet(String... dataSetRows) {
-        LoadDataSetStrategy refreshDataSetStrategy = dataSetModuleFactoryHelper.createRefreshDataSetStrategy();
+        LoadDataSetStrategy refreshDataSetStrategy = getDataSetModuleFactoryHelper().createRefreshDataSetStrategy();
         performInlineLoadDataSetStrategy(refreshDataSetStrategy, asList(dataSetRows));
     }
 
 
     public void assertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean logDatabaseContentOnAssertionError, String... variables) {
-        AssertDataSetStrategy defaultAssertDataSetStrategy = dataSetModuleFactoryHelper.createAssertDataSetStrategy();
+        AssertDataSetStrategy defaultAssertDataSetStrategy = getDataSetModuleFactoryHelper().createAssertDataSetStrategy();
         performAssertDataSetStrategy(defaultAssertDataSetStrategy, dataSetFileNames, asList(variables), logDatabaseContentOnAssertionError, testInstance.getClass());
     }
 
     public void assertExpectedDataSet(boolean logDatabaseContentOnAssertionError, String... dataSetRows) {
-        AssertDataSetStrategy defaultAssertDataSetStrategy = dataSetModuleFactoryHelper.createAssertDataSetStrategy();
+        AssertDataSetStrategy defaultAssertDataSetStrategy = getDataSetModuleFactoryHelper().createAssertDataSetStrategy();
         performInlineAssertDataSetStrategy(defaultAssertDataSetStrategy, asList(dataSetRows), logDatabaseContentOnAssertionError);
     }
 
@@ -175,7 +178,7 @@ public class DataSetModule implements Module {
             // empty means, use default file name, which is the name of the class + extension
             dataSetFileNames.add(getDefaultDataSetFileName(testClass));
         }
-        FileDataSetRowSourceFactory fileDataSetRowSourceFactory = dataSetModuleFactoryHelper.createFileDataSetRowSourceFactory();
+        FileDataSetRowSourceFactory fileDataSetRowSourceFactory = getDataSetModuleFactoryHelper().createFileDataSetRowSourceFactory();
 
         List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
         for (File dataSetFile : dataSetFiles) {
@@ -194,14 +197,14 @@ public class DataSetModule implements Module {
     }
 
     public void performInlineLoadDataSetStrategy(LoadDataSetStrategy loadDataSetStrategy, List<String> dataSetRows) {
-        InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = dataSetModuleFactoryHelper.createInlineDataSetRowSourceFactory();
+        InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = getDataSetModuleFactoryHelper().createInlineDataSetRowSourceFactory();
         DataSetRowSource dataSetRowSource = inlineDataSetRowSourceFactory.createDataSetRowSource(dataSetRows);
         loadDataSetStrategy.perform(dataSetRowSource, new ArrayList<String>());
     }
 
 
     public void performAssertDataSetStrategy(AssertDataSetStrategy assertDataSetStrategy, List<String> dataSetFileNames, List<String> variables, boolean logDatabaseContentOnAssertionError, Class<?> testClass) {
-        FileDataSetRowSourceFactory fileDataSetRowSourceFactory = dataSetModuleFactoryHelper.createFileDataSetRowSourceFactory();
+        FileDataSetRowSourceFactory fileDataSetRowSourceFactory = getDataSetModuleFactoryHelper().createFileDataSetRowSourceFactory();
 
         List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
         for (File dataSetFile : dataSetFiles) {
@@ -211,7 +214,7 @@ public class DataSetModule implements Module {
     }
 
     public void performInlineAssertDataSetStrategy(AssertDataSetStrategy assertDataSetStrategy, List<String> dataSetRows, boolean logDatabaseContentOnAssertionError) {
-        InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = dataSetModuleFactoryHelper.createInlineDataSetRowSourceFactory();
+        InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = getDataSetModuleFactoryHelper().createInlineDataSetRowSourceFactory();
         DataSetRowSource dataSetRowSource = inlineDataSetRowSourceFactory.createDataSetRowSource(dataSetRows);
         assertDataSetStrategy.perform(dataSetRowSource, new ArrayList<String>(), logDatabaseContentOnAssertionError);
     }
@@ -226,7 +229,7 @@ public class DataSetModule implements Module {
     }
 
     public void generateDataSetXSDs(File targetDirectory) {
-        DataSetStructureGenerator dataSetStructureGenerator = dataSetModuleFactoryHelper.createDataSetStructureGenerator();
+        DataSetStructureGenerator dataSetStructureGenerator = getDataSetModuleFactoryHelper().createDataSetStructureGenerator();
         dataSetStructureGenerator.generateDataSetStructure(targetDirectory);
         dataSetStructureGenerator.generateDataSetTemplateXmlFile(targetDirectory);
     }
@@ -235,7 +238,7 @@ public class DataSetModule implements Module {
     protected List<File> resolveDataSets(Class<?> testClass, List<String> dataSetFileNames) {
         List<File> dataSetFiles = new ArrayList<File>();
 
-        DataSetResolver dataSetResolver = dataSetModuleFactoryHelper.createDataSetResolver();
+        DataSetResolver dataSetResolver = getDataSetModuleFactoryHelper().createDataSetResolver();
         for (String dataSetFileName : dataSetFileNames) {
             File dataSetFile = dataSetResolver.resolve(testClass, dataSetFileName);
             dataSetFiles.add(dataSetFile);
@@ -280,16 +283,12 @@ public class DataSetModule implements Module {
     }
 
 
-    protected DatabaseMetaData createDatabaseMetaData(Properties configuration) {
+    protected DatabaseMetaData createDatabaseMetaData() {
         DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-        DataSource dataSource = databaseModule.getDataSourceAndActivateTransactionIfNeeded();
-
-        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        DbSupport defaultDbSupport = DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler);
-        List<DbSupport> dbSupports = DbSupportFactory.getDbSupports(configuration, sqlHandler);
+        DbSupport defaultDbSupport = databaseModule.getDbSupports().getDefaultDbSupport();
 
         SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
-        return new DatabaseMetaData(defaultDbSupport, dbSupports, sqlTypeHandlerRepository);
+        return new DatabaseMetaData(defaultDbSupport, sqlTypeHandlerRepository);
     }
 
 

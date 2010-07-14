@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,28 +17,24 @@ package org.unitils.dbmaintainer.structure;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dbmaintain.dbsupport.DbSupport;
 import org.junit.After;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.SQLHandler;
-
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
-import org.unitils.core.dbsupport.DefaultSQLHandler;
-import static org.unitils.core.util.SQLTestUtils.dropTestSequences;
-import static org.unitils.core.util.SQLTestUtils.dropTestTables;
-import static org.unitils.database.SQLUnitils.executeUpdate;
-import static org.unitils.database.SQLUnitils.getItemAsLong;
-import org.unitils.database.annotations.TestDataSource;
-import static org.unitils.dbmaintainer.structure.impl.DefaultSequenceUpdater.PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 
 import javax.sql.DataSource;
 import java.util.Properties;
+
+import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.unitils.core.util.SQLTestUtils.dropTestSequences;
+import static org.unitils.core.util.SQLTestUtils.dropTestTables;
+import static org.unitils.database.DatabaseUnitils.getDbSupports;
+import static org.unitils.database.DatabaseUnitils.updateSequences;
+import static org.unitils.database.SQLUnitils.executeUpdate;
+import static org.unitils.database.SQLUnitils.getItemAsLong;
+import static org.unitils.testutil.TestUnitilsConfiguration.*;
 
 /**
  * Test class for the SequenceUpdater. Contains tests that can be implemented generally for all different database dialects.
@@ -52,34 +48,23 @@ import java.util.Properties;
  * @author Tim Ducheyne
  * @author Scott Prater
  */
-public class SequenceUpdaterTest extends UnitilsJUnit4 {
+public class SequenceUpdaterTest {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(SequenceUpdaterTest.class);
 
-    /* DataSource for the test database, is injected */
-    @TestDataSource
-    private DataSource dataSource = null;
-
-    /* Tested object */
-    private SequenceUpdater sequenceUpdater;
-
-    /* DbSupport instance */
-    private DbSupport dbSupport;
+    private DataSource dataSource;
+    private DbSupport defaultDbSupport;
 
 
-    /**
-     * Test fixture. Configures the implementation of the SequenceUpdater that matches the currenlty configured dialect.
-     * Creates a test table and test sequence.
-     */
     @Before
     public void setUp() throws Exception {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        configuration.setProperty(PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, "1000");
+        Properties configuration = getUnitilsConfiguration();
+        configuration.setProperty(PROPERTY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, "1000");
+        reinitializeUnitils(configuration);
 
-        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, sqlHandler);
-        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
+        defaultDbSupport = getDbSupports().getDefaultDbSupport();
+        dataSource = defaultDbSupport.getDataSource();
 
         cleanupTestDatabase();
         createTestDatabase();
@@ -91,6 +76,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
      */
     @After
     public void tearDown() throws Exception {
+        resetUnitils();
         cleanupTestDatabase();
     }
 
@@ -100,12 +86,12 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
      */
     @Test
     public void testUpdateSequences() throws Exception {
-        if (!dbSupport.supportsSequences()) {
+        if (!defaultDbSupport.supportsSequences()) {
             logger.warn("Current dialect does not support sequences. Skipping test.");
             return;
         }
         assertCurrentSequenceValueBetween(0, 10);
-        sequenceUpdater.updateSequences();
+        updateSequences();
         assertCurrentSequenceValueBetween(1000, 1010);
     }
 
@@ -115,14 +101,14 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
      */
     @Test
     public void testUpdateSequences_valueAlreadyHighEnough() throws Exception {
-        if (!dbSupport.supportsSequences()) {
+        if (!defaultDbSupport.supportsSequences()) {
             logger.warn("Current dialect does not support sequences. Skipping test.");
             return;
         }
         assertCurrentSequenceValueBetween(0, 10);
-        sequenceUpdater.updateSequences();
+        updateSequences();
         assertCurrentSequenceValueBetween(1000, 1010);
-        sequenceUpdater.updateSequences();
+        updateSequences();
         assertCurrentSequenceValueBetween(1000, 1010);
     }
 
@@ -132,12 +118,12 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
      */
     @Test
     public void testUpdateSequences_identityColumns() throws Exception {
-        if (!dbSupport.supportsIdentityColumns()) {
+        if (!defaultDbSupport.supportsIdentityColumns()) {
             logger.warn("Current dialect does not support identity columns. Skipping test.");
             return;
         }
         assertCurrentIdentityColumnValueBetween(0, 10);
-        sequenceUpdater.updateSequences();
+        updateSequences();
         assertCurrentIdentityColumnValueBetween(1000, 1010);
     }
 
@@ -147,14 +133,14 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
      */
     @Test
     public void testUpdateSequences_identityColumnsValueAlreadyHighEnough() throws Exception {
-        if (!dbSupport.supportsIdentityColumns()) {
+        if (!defaultDbSupport.supportsIdentityColumns()) {
             logger.warn("Current dialect does not support identity columns. Skipping test.");
             return;
         }
         assertCurrentIdentityColumnValueBetween(0, 10);
-        sequenceUpdater.updateSequences();
+        updateSequences();
         assertCurrentIdentityColumnValueBetween(1000, 1010);
-        sequenceUpdater.updateSequences();
+        updateSequences();
         assertCurrentIdentityColumnValueBetween(1000, 1010);
     }
 
@@ -166,8 +152,8 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
      * @param maxValue The maximum value (included)
      */
     private void assertCurrentSequenceValueBetween(long minValue, long maxValue) {
-        String correctCaseSequenceName = dbSupport.toCorrectCaseIdentifier("test_sequence");
-        long currentValue = dbSupport.getSequenceValue(correctCaseSequenceName);
+        String correctCaseSequenceName = defaultDbSupport.toCorrectCaseIdentifier("test_sequence");
+        long currentValue = defaultDbSupport.getSequenceValue(correctCaseSequenceName);
         assertTrue("Current sequence value is not between " + minValue + " and " + maxValue, (currentValue >= minValue && currentValue <= maxValue));
     }
 
@@ -190,7 +176,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
      * Creates all test database structures (view, tables...)
      */
     private void createTestDatabase() throws Exception {
-        String dialect = dbSupport.getDatabaseDialect();
+        String dialect = defaultDbSupport.getDatabaseInfo().getDialect();
         if ("hsqldb".equals(dialect)) {
             createTestDatabaseHsqlDb();
         } else if ("mysql".equals(dialect)) {
@@ -215,7 +201,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
      * Drops all created test database structures (views, tables...)
      */
     private void cleanupTestDatabase() throws Exception {
-        String dialect = dbSupport.getDatabaseDialect();
+        String dialect = defaultDbSupport.getDatabaseInfo().getDialect();
         if ("hsqldb".equals(dialect)) {
             cleanupTestDatabaseHsqlDb();
         } else if ("mysql".equals(dialect)) {
@@ -254,8 +240,8 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
      * Drops all created test database structures
      */
     private void cleanupTestDatabaseHsqlDb() throws Exception {
-        dropTestTables(dbSupport, "test_table1", "test_table2");
-        dropTestSequences(dbSupport, "test_sequence");
+        dropTestTables(defaultDbSupport, "test_table1", "test_table2");
+        dropTestSequences(defaultDbSupport, "test_sequence");
     }
 
     //
@@ -277,7 +263,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
      * Drops all created test database structures
      */
     private void cleanupTestDatabaseMySql() throws Exception {
-        dropTestTables(dbSupport, "test_table1", "test_table2");
+        dropTestTables(defaultDbSupport, "test_table1", "test_table2");
     }
 
     //
@@ -297,7 +283,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
      * Drops all created test database structures (views, tables...)
      */
     private void cleanupTestDatabaseOracle() throws Exception {
-        dropTestSequences(dbSupport, "test_sequence");
+        dropTestSequences(defaultDbSupport, "test_sequence");
     }
 
     //
@@ -317,7 +303,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
      * Drops all created test database structures
      */
     private void cleanupTestDatabasePostgreSql() throws Exception {
-        dropTestSequences(dbSupport, "test_sequence");
+        dropTestSequences(defaultDbSupport, "test_sequence");
     }
 
     //
@@ -341,8 +327,8 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
      * Drops all created test database structures (views, tables...)
      */
     private void cleanupTestDatabaseDb2() throws Exception {
-        dropTestTables(dbSupport, "test_table1", "test_table2");
-        dropTestSequences(dbSupport, "test_sequence");
+        dropTestTables(defaultDbSupport, "test_table1", "test_table2");
+        dropTestSequences(defaultDbSupport, "test_sequence");
     }
 
     //
@@ -364,7 +350,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
      * Drops all created test database structures
      */
     private void cleanupTestDatabaseDerby() throws Exception {
-        dropTestTables(dbSupport, "test_table1", "test_table2");
+        dropTestTables(defaultDbSupport, "test_table1", "test_table2");
     }
 
     //
@@ -386,6 +372,6 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
      * Drops all created test database structures
      */
     private void cleanupTestDatabaseMsSql() throws Exception {
-        dropTestTables(dbSupport, "test_table1", "test_table2");
+        dropTestTables(defaultDbSupport, "test_table1", "test_table2");
     }
 }

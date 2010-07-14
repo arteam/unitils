@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ public class HibernateSessionFactoryLoader implements OrmPersistenceUnitLoader<S
     protected LocalSessionFactoryBean createSessionFactoryBean(Object testObject, OrmConfig entityManagerConfig) {
         // A custom subclass of spring's LocalSessionFactoryBean is used, to enable calling a custom config method
         UnitilsLocalSessionFactoryBean factoryBean = new UnitilsLocalSessionFactoryBean();
-        factoryBean.setDataSource(getDataSource());
+        factoryBean.setDataSource(getDataSourceAndActivateTransactionIfNeeded(testObject));
         factoryBean.setConfigurationClass(getConfigurationObjectClass());
         Resource[] hibernateConfigFiles = new Resource[entityManagerConfig.getConfigFiles().size()];
         int index = 0;
@@ -74,8 +74,8 @@ public class HibernateSessionFactoryLoader implements OrmPersistenceUnitLoader<S
     }
 
 
-    protected DataSource getDataSource() {
-        return getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded();
+    protected DataSource getDataSourceAndActivateTransactionIfNeeded(Object testObject) {
+        return getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded(testObject);
     }
 
 

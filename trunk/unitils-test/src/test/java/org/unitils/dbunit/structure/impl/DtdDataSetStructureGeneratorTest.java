@@ -1,21 +1,26 @@
-package org.unitils.dbmaintainer.structure;
+/*
+ * Copyright Unitils.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.unitils.dbunit.structure.impl;
 
 import org.apache.commons.lang.StringUtils;
+import org.dbmaintain.dbsupport.DbSupport;
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.dbsupport.DefaultSQLHandler;
-import org.unitils.core.dbsupport.SQLHandler;
-import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.clean.DBClearer;
-import org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator;
-import static org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator.PROPKEY_DTD_FILENAME;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
+import org.unitils.dbunit.structure.DataSetStructureGenerator;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 
 import javax.sql.DataSource;
@@ -26,23 +31,26 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.unitils.database.DatabaseUnitils.getDbSupports;
+import static org.unitils.dbunit.structure.impl.DtdDataSetStructureGenerator.PROPKEY_DTD_FILENAME;
+import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfiguration;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
+
 /**
  * Test class for the FlatXmlDataSetDtdGenerator
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
+public class DtdDataSetStructureGeneratorTest {
 
     /* Tested object */
-    private DataSetStructureGenerator dataSetStructureGenerator;
+    private DataSetStructureGenerator dataSetStructureGenerator = new DtdDataSetStructureGenerator();
 
-    /* The file to which to write the DTD */
     private File dtdFile;
-
-    /* DataSource for the test database. */
-    @TestDataSource
-    private DataSource dataSource = null;
+    private DataSource dataSource;
 
 
     /**
@@ -54,15 +62,14 @@ public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
     public void setUp() throws Exception {
         dtdFile = File.createTempFile("testDTD", ".dtd");
 
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", DtdDataSetStructureGenerator.class.getName());
+        Properties configuration = getUnitilsConfiguration();
         configuration.setProperty(PROPKEY_DTD_FILENAME, dtdFile.getPath());
 
-        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler);
-        DBClearer dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler);
+        DbSupport defaultDbSupport = getDbSupports().getDefaultDbSupport();
+        dataSource = defaultDbSupport.getDataSource();
+        dataSetStructureGenerator.init(configuration, defaultDbSupport);
 
-        dbClearer.clearSchemas();
+        dropTestTables();
         createTestTables();
     }
 

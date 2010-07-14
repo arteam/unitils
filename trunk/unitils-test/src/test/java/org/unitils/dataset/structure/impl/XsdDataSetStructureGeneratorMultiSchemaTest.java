@@ -17,6 +17,7 @@ package org.unitils.dataset.structure.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dbmaintain.dbsupport.DbSupports;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +25,7 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import org.unitils.util.PropertyUtils;
 
@@ -35,12 +37,11 @@ import java.io.Reader;
 import java.util.Properties;
 
 import static org.apache.commons.lang.StringUtils.deleteWhitespace;
+import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.util.TestUtils.createDatabaseMetaData;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
+import static org.unitils.dataset.util.TestUtils.createDbSupports;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
@@ -77,7 +78,7 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
+        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPERTY_DIALECT, configuration));
         if (disabled) {
             return;
         }
@@ -88,9 +89,8 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
         }
         xsdDirectory.mkdirs();
 
-        configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A");
-
-        DatabaseMetaData databaseMetaData = createDatabaseMetaData(configuration, dataSource);
+        DbSupports dbSupports = createDbSupports("PUBLIC, SCHEMA_A");
+        DatabaseMetaData databaseMetaData = new DatabaseMetaData(dbSupports.getDefaultDbSupport(), new SqlTypeHandlerRepository());
         xsdDataSetStructureGenerator.init(databaseMetaData);
 
         dropTestTables();

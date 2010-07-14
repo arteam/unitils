@@ -19,7 +19,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dataset.model.dataset.DataSetRow;
@@ -28,7 +27,6 @@ import org.unitils.dataset.model.dataset.DataSetValue;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.util.Properties;
 
 import static org.junit.Assert.*;
 import static org.unitils.database.SQLUnitils.executeUpdate;
@@ -56,8 +54,7 @@ public class DatabaseMetaDataAddExtraParentColumnsForChildTest extends UnitilsJU
 
     @Before
     public void initialize() throws SQLException {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        databaseMetaData = createDatabaseMetaData(configuration, dataSource);
+        databaseMetaData = createDatabaseMetaData();
 
         dropTestTables();
         createTestTables();

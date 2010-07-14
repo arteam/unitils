@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,20 @@
  */
 package org.unitils.dbmaintainer.structure;
 
+import org.dbmaintain.dbsupport.DbSupport;
 import org.junit.After;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.SQLHandler;
-
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
-import org.unitils.core.dbsupport.DefaultSQLHandler;
-import static org.unitils.database.SQLUnitils.executeUpdate;
-import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import org.unitils.database.annotations.TestDataSource;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 
 import javax.sql.DataSource;
-import java.util.Properties;
+
+import static org.junit.Assert.fail;
+import static org.unitils.database.DatabaseUnitils.disableConstraints;
+import static org.unitils.database.DatabaseUnitils.getDbSupports;
+import static org.unitils.database.SQLUnitils.executeUpdate;
+import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 
 /**
  * Test class for the ConstraintsDisabler. This test is independent of the dbms that is used. The database dialect that
@@ -44,15 +39,8 @@ import java.util.Properties;
  */
 public class ConstraintsDisablerTest extends UnitilsJUnit4 {
 
-    /* The tested object */
-    private ConstraintsDisabler constraintsDisabler;
-
-    /* Database support class instance */
-    protected DbSupport dbSupport;
-
-    /* DataSource for the test database, is injected */
-    @TestDataSource
-    protected DataSource dataSource = null;
+    protected DbSupport defaultDbSupport;
+    protected DataSource dataSource;
 
 
     /**
@@ -61,10 +49,8 @@ public class ConstraintsDisablerTest extends UnitilsJUnit4 {
      */
     @Before
     public void setUp() throws Exception {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
-        constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, sqlHandler);
+        defaultDbSupport = getDbSupports().getDefaultDbSupport();
+        dataSource = defaultDbSupport.getDataSource();
 
         cleanupTestDatabase();
         createTestTables();
@@ -91,7 +77,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit4 {
         } catch (UnitilsException e) {
             // Expected foreign key violation
         }
-        constraintsDisabler.disableConstraints();
+        disableConstraints();
         // Should not throw exception anymore
         executeUpdate("insert into table2 (col1) values ('test')", dataSource);
     }
@@ -109,7 +95,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit4 {
         } catch (UnitilsException e) {
             // Expected foreign key violation
         }
-        constraintsDisabler.disableConstraints();
+        disableConstraints();
         // Should not throw exception anymore
         executeUpdate("insert into table3 (col1) values ('test')", dataSource);
     }
@@ -126,7 +112,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit4 {
         } catch (UnitilsException e) {
             // Expected not null violation
         }
-        constraintsDisabler.disableConstraints();
+        disableConstraints();
         // Should not throw exception anymore
         executeUpdate("insert into table1 (col1, col2) values ('test', null)", dataSource);
     }

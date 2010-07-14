@@ -16,6 +16,9 @@
     <logger name="org.unitils">
         <level value="DEBUG"/>
     </logger>
+    <logger name="org.dbmaintain">
+        <level value="DEBUG"/>
+    </logger>
 
     <root>
         <priority value="INFO"/>

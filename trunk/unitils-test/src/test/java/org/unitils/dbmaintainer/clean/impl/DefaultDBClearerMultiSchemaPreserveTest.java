@@ -1,223 +1,189 @@
+/*
+ * Copyright Unitils.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils.dbmaintainer.clean.impl;
-
-import static org.junit.Assert.assertEquals;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
-import static org.unitils.database.SQLUnitils.executeUpdate;
-import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_SCHEMAS;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_SEQUENCES;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_TABLES;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_VIEWS;
-
-import java.util.Properties;
-
-import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dbmaintain.dbsupport.DbSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.DbSupportFactory;
-import org.unitils.core.dbsupport.DefaultSQLHandler;
-import org.unitils.core.dbsupport.SQLHandler;
-import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.clean.DBClearer;
-import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import org.unitils.util.PropertyUtils;
 
+import javax.sql.DataSource;
+import java.util.Properties;
+
+import static org.dbmaintain.config.DbMaintainProperties.*;
+import static org.junit.Assert.assertEquals;
+import static org.unitils.database.DatabaseUnitils.clearDatabase;
+import static org.unitils.database.DatabaseUnitils.getDbSupports;
+import static org.unitils.database.SQLUnitils.executeUpdate;
+import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import static org.unitils.testutil.TestUnitilsConfiguration.*;
+
 /**
- * Test class for the {@link DBClearer} using multiple database schemas with configuration to preserve all items. <p/>
- * This test is currenlty only implemented for HsqlDb
- * 
+ * Test class for the clearing the database using multiple database schema's with configuration to preserve all items. <p/>
+ * This test is currently only implemented for HsqlDb
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DefaultDBClearerMultiSchemaPreserveTest extends UnitilsJUnit4 {
+public class DefaultDBClearerMultiSchemaPreserveTest {
 
-	/* The logger instance for this class */
-	private static Log logger = LogFactory.getLog(DefaultDBClearerMultiSchemaPreserveTest.class);
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(DefaultDBClearerMultiSchemaPreserveTest.class);
 
-	/* DataSource for the test database, is injected */
-	@TestDataSource
-	private DataSource dataSource = null;
-
-	/* Tested object */
-	private DefaultDBClearer defaultDbClearer;
-
-	/* The db support for the default PUBLIC schema */
-	private DbSupport dbSupportPublic;
-
-	/* The db support for the SCHEMA_A schema */
-	private DbSupport dbSupportSchemaA;
-
-	/* The db support for the SCHEMA_B schema */
-	private DbSupport dbSupportSchemaB;
-
-	/* The db support for the SCHEMA_C schema */
-	private DbSupport dbSupportSchemaC;
-
-	/* True if current test is not for the current dialect */
-	private boolean disabled;
+    private DataSource dataSource;
+    private DbSupport defaultDbSupport;
+    private String versionTableName;
+    private boolean disabled;
 
 
-	/**
-	 * Configures the tested object. Creates a test table, index, view and sequence
-	 */
-	@Before
-	public void setUp() throws Exception {
-		Properties configuration = new ConfigurationLoader().loadConfiguration();
-		this.disabled = !"hsqldb".equals(PropertyUtils.getString(DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT, configuration));
-		if (disabled) {
-			return;
-		}
+    @Before
+    public void initialize() throws Exception {
+        Properties configuration = getUnitilsConfiguration();
+        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPERTY_DIALECT, configuration));
+        if (disabled) {
+            return;
+        }
 
-		// first create database, otherwise items to preserve do not yet exist
-		cleanupTestDatabase();
-		createTestDatabase();
+        // configure 3 schemas
+        configuration.setProperty(PROPERTY_SCHEMANAMES, "PUBLIC, SCHEMA_A, \"SCHEMA_B\", schema_c");
 
-		// configure 3 schemas
-		configuration.setProperty(DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, \"SCHEMA_B\", schema_c");
-		SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-		dbSupportPublic = getDbSupport(configuration, sqlHandler, "PUBLIC");
-		dbSupportSchemaA = getDbSupport(configuration, sqlHandler, "SCHEMA_A");
-		dbSupportSchemaB = getDbSupport(configuration, sqlHandler, "SCHEMA_B");
-		dbSupportSchemaC = getDbSupport(configuration, sqlHandler, "SCHEMA_C");
-		// configure items to preserve
-		configuration.setProperty(PROPKEY_PRESERVE_SCHEMAS, "schema_c");
-		configuration.setProperty(PROPKEY_PRESERVE_TABLES, "test_table, " + dbSupportSchemaA.quoted("SCHEMA_A") + "." + dbSupportSchemaA.quoted("TEST_TABLE"));
-		configuration.setProperty(PROPKEY_PRESERVE_VIEWS, "test_view, " + "schema_a." + dbSupportSchemaA.quoted("TEST_VIEW"));
-		configuration.setProperty(PROPKEY_PRESERVE_SEQUENCES, "test_sequence, " + dbSupportSchemaA.quoted("SCHEMA_A") + ".test_sequence");
-		// create clearer instance
-		defaultDbClearer = new DefaultDBClearer();
-		defaultDbClearer.init(configuration, sqlHandler);
-	}
+        // configure items to preserve
+        defaultDbSupport = getDbSupports().getDefaultDbSupport();
+        configuration.setProperty(PROPERTY_PRESERVE_SCHEMAS, "schema_c");
+        configuration.setProperty(PROPERTY_PRESERVE_TABLES, "test_table, " + defaultDbSupport.quoted("SCHEMA_A") + "." + defaultDbSupport.quoted("TEST_TABLE"));
+        configuration.setProperty(PROPERTY_PRESERVE_VIEWS, "test_view, " + "schema_a." + defaultDbSupport.quoted("TEST_VIEW"));
+        configuration.setProperty(PROPERTY_PRESERVE_SEQUENCES, "test_sequence, " + defaultDbSupport.quoted("SCHEMA_A") + ".test_sequence");
 
+        reinitializeUnitils(configuration);
+        versionTableName = configuration.getProperty(PROPERTY_EXECUTED_SCRIPTS_TABLE_NAME);
+        defaultDbSupport = getDbSupports().getDefaultDbSupport();
+        dataSource = defaultDbSupport.getDataSource();
 
-	/**
-	 * Removes all test tables.
-	 */
-	@After
-	public void tearDown() throws Exception {
-		if (disabled) {
-			return;
-		}
-		cleanupTestDatabase();
-	}
+        cleanupTestDatabase();
+        createTestDatabase();
+    }
+
+    @After
+    public void cleanUp() throws Exception {
+        if (disabled) {
+            return;
+        }
+        resetUnitils();
+        cleanupTestDatabase();
+    }
 
 
-	/**
-	 * Checks if the tables are correctly dropped.
-	 */
-	@Test
-	public void testClearDatabase_tables() throws Exception {
-		if (disabled) {
-			logger.warn("Test is not for current dialect. Skipping test.");
-			return;
-		}
-		assertEquals(1, dbSupportPublic.getTableNames().size());
-		assertEquals(1, dbSupportSchemaA.getTableNames().size());
-		assertEquals(1, dbSupportSchemaB.getTableNames().size());
-		defaultDbClearer.clearSchemas();
-		assertEquals(1, dbSupportPublic.getTableNames().size());
-		assertEquals(1, dbSupportSchemaA.getTableNames().size());
-		assertEquals(0, dbSupportSchemaB.getTableNames().size());
-		assertEquals(1, dbSupportSchemaC.getTableNames().size());
-	}
+    @Test
+    public void clearTables() throws Exception {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
+        assertEquals(1, defaultDbSupport.getTableNames("PUBLIC").size());
+        assertEquals(1, defaultDbSupport.getTableNames("SCHEMA_A").size());
+        assertEquals(1, defaultDbSupport.getTableNames("SCHEMA_B").size());
+        assertEquals(1, defaultDbSupport.getTableNames("SCHEMA_C").size());
+        clearDatabase();
+        assertEquals(2, defaultDbSupport.getTableNames("PUBLIC").size()); // version table was created
+        assertEquals(1, defaultDbSupport.getTableNames("SCHEMA_A").size());
+        assertEquals(0, defaultDbSupport.getTableNames("SCHEMA_B").size());
+        assertEquals(1, defaultDbSupport.getTableNames("SCHEMA_C").size());
+    }
+
+    @Test
+    public void clearViews() throws Exception {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
+        assertEquals(1, defaultDbSupport.getViewNames("PUBLIC").size());
+        assertEquals(1, defaultDbSupport.getViewNames("SCHEMA_A").size());
+        assertEquals(1, defaultDbSupport.getViewNames("SCHEMA_B").size());
+        assertEquals(1, defaultDbSupport.getViewNames("SCHEMA_C").size());
+        clearDatabase();
+        assertEquals(1, defaultDbSupport.getViewNames("PUBLIC").size());
+        assertEquals(1, defaultDbSupport.getViewNames("SCHEMA_A").size());
+        assertEquals(0, defaultDbSupport.getViewNames("SCHEMA_B").size());
+        assertEquals(1, defaultDbSupport.getViewNames("SCHEMA_C").size());
+    }
+
+    @Test
+    public void clearSequences() throws Exception {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
+        assertEquals(1, defaultDbSupport.getSequenceNames("PUBLIC").size());
+        assertEquals(1, defaultDbSupport.getSequenceNames("SCHEMA_A").size());
+        assertEquals(1, defaultDbSupport.getSequenceNames("SCHEMA_B").size());
+        assertEquals(1, defaultDbSupport.getSequenceNames("SCHEMA_C").size());
+        clearDatabase();
+        assertEquals(1, defaultDbSupport.getSequenceNames("PUBLIC").size());
+        assertEquals(1, defaultDbSupport.getSequenceNames("SCHEMA_A").size());
+        assertEquals(0, defaultDbSupport.getSequenceNames("SCHEMA_B").size());
+        assertEquals(1, defaultDbSupport.getSequenceNames("SCHEMA_C").size());
+    }
 
 
-	/**
-	 * Checks if the views are correctly dropped
-	 */
-	@Test
-	public void testClearDatabase_views() throws Exception {
-		if (disabled) {
-			logger.warn("Test is not for current dialect. Skipping test.");
-			return;
-		}
-		assertEquals(1, dbSupportPublic.getViewNames().size());
-		assertEquals(1, dbSupportSchemaA.getViewNames().size());
-		assertEquals(1, dbSupportSchemaB.getViewNames().size());
-		defaultDbClearer.clearSchemas();
-		assertEquals(1, dbSupportPublic.getViewNames().size());
-		assertEquals(1, dbSupportSchemaA.getViewNames().size());
-		assertEquals(0, dbSupportSchemaB.getViewNames().size());
-		assertEquals(1, dbSupportSchemaC.getViewNames().size());
-	}
+    private void createTestDatabase() throws Exception {
+        // create schemas
+        executeUpdate("create schema SCHEMA_A AUTHORIZATION DBA", dataSource);
+        executeUpdate("create schema SCHEMA_B AUTHORIZATION DBA", dataSource);
+        executeUpdate("create schema SCHEMA_C AUTHORIZATION DBA", dataSource);
+        // create tables
+        executeUpdate("create table TEST_TABLE (col1 varchar(100))", dataSource);
+        executeUpdate("create table SCHEMA_A.TEST_TABLE (col1 varchar(100))", dataSource);
+        executeUpdate("create table SCHEMA_B.TEST_TABLE (col1 varchar(100))", dataSource);
+        executeUpdate("create table SCHEMA_C.TEST_TABLE (col1 varchar(100))", dataSource);
+        // create views
+        executeUpdate("create view TEST_VIEW as select col1 from TEST_TABLE", dataSource);
+        executeUpdate("create view SCHEMA_A.TEST_VIEW as select col1 from SCHEMA_A.TEST_TABLE", dataSource);
+        executeUpdate("create view SCHEMA_B.TEST_VIEW as select col1 from SCHEMA_B.TEST_TABLE", dataSource);
+        executeUpdate("create view SCHEMA_C.TEST_VIEW as select col1 from SCHEMA_C.TEST_TABLE", dataSource);
+        // create sequences
+        executeUpdate("create sequence TEST_SEQUENCE", dataSource);
+        executeUpdate("create sequence SCHEMA_A.TEST_SEQUENCE", dataSource);
+        executeUpdate("create sequence SCHEMA_B.TEST_SEQUENCE", dataSource);
+        executeUpdate("create sequence SCHEMA_C.TEST_SEQUENCE", dataSource);
+    }
 
-
-	/**
-	 * Tests if the triggers are correctly dropped
-	 */
-	@Test
-	public void testClearDatabase_sequences() throws Exception {
-		if (disabled) {
-			logger.warn("Test is not for current dialect. Skipping test.");
-			return;
-		}
-		assertEquals(1, dbSupportPublic.getSequenceNames().size());
-		assertEquals(1, dbSupportSchemaA.getSequenceNames().size());
-		assertEquals(1, dbSupportSchemaB.getSequenceNames().size());
-		defaultDbClearer.clearSchemas();
-		assertEquals(1, dbSupportPublic.getSequenceNames().size());
-		assertEquals(1, dbSupportSchemaA.getSequenceNames().size());
-		assertEquals(0, dbSupportSchemaB.getSequenceNames().size());
-		assertEquals(1, dbSupportSchemaC.getSequenceNames().size());
-	}
-
-
-	/**
-	 * Creates all test database structures (view, tables...)
-	 */
-	private void createTestDatabase() throws Exception {
-		// create schemas
-		executeUpdate("create schema SCHEMA_A AUTHORIZATION DBA", dataSource);
-		executeUpdate("create schema SCHEMA_B AUTHORIZATION DBA", dataSource);
-		executeUpdate("create schema SCHEMA_C AUTHORIZATION DBA", dataSource);
-		// create tables
-		executeUpdate("create table TEST_TABLE (col1 varchar(100))", dataSource);
-		executeUpdate("create table SCHEMA_A.TEST_TABLE (col1 varchar(100))", dataSource);
-		executeUpdate("create table SCHEMA_B.TEST_TABLE (col1 varchar(100))", dataSource);
-		executeUpdate("create table SCHEMA_C.TEST_TABLE (col1 varchar(100))", dataSource);
-		// create views
-		executeUpdate("create view TEST_VIEW as select col1 from TEST_TABLE", dataSource);
-		executeUpdate("create view SCHEMA_A.TEST_VIEW as select col1 from SCHEMA_A.TEST_TABLE", dataSource);
-		executeUpdate("create view SCHEMA_B.TEST_VIEW as select col1 from SCHEMA_B.TEST_TABLE", dataSource);
-		executeUpdate("create view SCHEMA_C.TEST_VIEW as select col1 from SCHEMA_C.TEST_TABLE", dataSource);
-		// create sequences
-		executeUpdate("create sequence TEST_SEQUENCE", dataSource);
-		executeUpdate("create sequence SCHEMA_A.TEST_SEQUENCE", dataSource);
-		executeUpdate("create sequence SCHEMA_B.TEST_SEQUENCE", dataSource);
-		executeUpdate("create sequence SCHEMA_C.TEST_SEQUENCE", dataSource);
-	}
-
-
-	/**
-	 * Drops all created test database structures (views, tables...)
-	 */
-	private void cleanupTestDatabase() throws Exception {
-		// drop sequences
-		executeUpdateQuietly("drop sequence TEST_SEQUENCE", dataSource);
-		executeUpdateQuietly("drop sequence SCHEMA_A.TEST_SEQUENCE", dataSource);
-		executeUpdateQuietly("drop sequence SCHEMA_B.TEST_SEQUENCE", dataSource);
-		executeUpdateQuietly("drop sequence SCHEMA_C.TEST_SEQUENCE", dataSource);
-		// drop views
-		executeUpdateQuietly("drop view TEST_VIEW", dataSource);
-		executeUpdateQuietly("drop view SCHEMA_A.TEST_VIEW", dataSource);
-		executeUpdateQuietly("drop view SCHEMA_B.TEST_VIEW", dataSource);
-		executeUpdateQuietly("drop view SCHEMA_C.TEST_VIEW", dataSource);
-		// drop tables
-		executeUpdateQuietly("drop table TEST_TABLE", dataSource);
-		executeUpdateQuietly("drop table SCHEMA_A.TEST_TABLE", dataSource);
-		executeUpdateQuietly("drop table SCHEMA_B.TEST_TABLE", dataSource);
-		executeUpdateQuietly("drop table SCHEMA_C.TEST_TABLE", dataSource);
-		// drop schemas
-		executeUpdateQuietly("drop schema SCHEMA_A", dataSource);
-		executeUpdateQuietly("drop schema SCHEMA_B", dataSource);
-		executeUpdateQuietly("drop schema SCHEMA_C", dataSource);
-	}
+    private void cleanupTestDatabase() throws Exception {
+        // drop sequences
+        executeUpdateQuietly("drop sequence TEST_SEQUENCE", dataSource);
+        executeUpdateQuietly("drop sequence SCHEMA_A.TEST_SEQUENCE", dataSource);
+        executeUpdateQuietly("drop sequence SCHEMA_B.TEST_SEQUENCE", dataSource);
+        executeUpdateQuietly("drop sequence SCHEMA_C.TEST_SEQUENCE", dataSource);
+        // drop views
+        executeUpdateQuietly("drop view TEST_VIEW", dataSource);
+        executeUpdateQuietly("drop view SCHEMA_A.TEST_VIEW", dataSource);
+        executeUpdateQuietly("drop view SCHEMA_B.TEST_VIEW", dataSource);
+        executeUpdateQuietly("drop view SCHEMA_C.TEST_VIEW", dataSource);
+        // drop tables
+        executeUpdateQuietly("drop table " + versionTableName, dataSource);
+        executeUpdateQuietly("drop table TEST_TABLE", dataSource);
+        executeUpdateQuietly("drop table SCHEMA_A.TEST_TABLE", dataSource);
+        executeUpdateQuietly("drop table SCHEMA_B.TEST_TABLE", dataSource);
+        executeUpdateQuietly("drop table SCHEMA_C.TEST_TABLE", dataSource);
+        // drop schemas
+        executeUpdateQuietly("drop schema SCHEMA_A", dataSource);
+        executeUpdateQuietly("drop schema SCHEMA_B", dataSource);
+        executeUpdateQuietly("drop schema SCHEMA_C", dataSource);
+    }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbmaintainer.structure;
+package org.unitils.dbunit.structure.impl;
 
-import static org.apache.commons.lang.StringUtils.deleteWhitespace;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dbmaintain.dbsupport.DbSupport;
 import org.junit.After;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.dbsupport.DefaultSQLHandler;
-import org.unitils.core.dbsupport.SQLHandler;
-
-import static org.unitils.database.SQLUnitils.executeUpdate;
-import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.clean.DBClearer;
-import org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator;
-import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
-import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
+import org.unitils.dbunit.structure.DataSetStructureGenerator;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -46,6 +33,16 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.util.Properties;
 
+import static org.apache.commons.lang.StringUtils.deleteWhitespace;
+import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
+import static org.junit.Assert.assertTrue;
+import static org.unitils.database.DatabaseUnitils.getDbSupports;
+import static org.unitils.database.SQLUnitils.executeUpdate;
+import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import static org.unitils.dbunit.structure.impl.XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME;
+import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+
 /**
  * Test class for the {@link XsdDataSetStructureGenerator} for a single schema.
  * <p/>
@@ -54,22 +51,16 @@ import java.util.Properties;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
+public class XsdDataSetStructureGeneratorTest {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(XsdDataSetStructureGeneratorTest.class);
 
     /* Tested object */
-    private DataSetStructureGenerator dataSetStructureGenerator;
+    private DataSetStructureGenerator dataSetStructureGenerator = new XsdDataSetStructureGenerator();
 
-    /* The target directory for the test xsd files */
     private File xsdDirectory;
-
-    /* DataSource for the test database. */
-    @TestDataSource
-    private DataSource dataSource = null;
-
-    /* True if current test is not for the current dialect */
+    private DataSource dataSource;
     private boolean disabled;
 
 
@@ -81,7 +72,7 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
+        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPERTY_DIALECT, configuration));
         if (disabled) {
             return;
         }
@@ -92,14 +83,13 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
         }
         xsdDirectory.mkdirs();
 
-        configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", XsdDataSetStructureGenerator.class.getName());
-        configuration.setProperty(XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
+        configuration.setProperty(PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
 
-        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dataSetStructureGenerator = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler);
-        DBClearer dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler);
+        DbSupport defaultDbSupport = getDbSupports().getDefaultDbSupport();
+        dataSource = defaultDbSupport.getDataSource();
+        dataSetStructureGenerator.init(configuration, defaultDbSupport);
 
-        dbClearer.clearSchemas();
+        dropTestTables();
         createTestTables();
     }
 

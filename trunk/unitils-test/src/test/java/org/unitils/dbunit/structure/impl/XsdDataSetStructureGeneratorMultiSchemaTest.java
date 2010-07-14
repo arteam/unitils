@@ -13,18 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbmaintainer.structure;
+package org.unitils.dbunit.structure.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dbmaintain.dbsupport.DbSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.dbsupport.DefaultSQLHandler;
-import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator;
+import org.unitils.dbunit.structure.DataSetStructureGenerator;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import org.unitils.util.PropertyUtils;
 
@@ -36,13 +33,13 @@ import java.io.Reader;
 import java.util.Properties;
 
 import static org.apache.commons.lang.StringUtils.deleteWhitespace;
+import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
+import static org.unitils.dataset.util.TestUtils.createDbSupports;
+import static org.unitils.dbunit.structure.impl.XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME;
+import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfiguration;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
@@ -54,32 +51,23 @@ import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
+public class XsdDataSetStructureGeneratorMultiSchemaTest {
 
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(org.unitils.dataset.structure.impl.XsdDataSetStructureGeneratorMultiSchemaTest.class);
+    private static Log logger = LogFactory.getLog(XsdDataSetStructureGeneratorMultiSchemaTest.class);
 
     /* Tested object */
-    private DataSetStructureGenerator dataSetStructureGenerator;
+    private DataSetStructureGenerator dataSetStructureGenerator = new XsdDataSetStructureGenerator();
 
-    /* The target directory for the test xsd files */
     private File xsdDirectory;
-
-    /* DataSource for the test database. */
-    @TestDataSource
-    private DataSource dataSource = null;
-
-    /* True if current test is not for the current dialect */
+    private DataSource dataSource;
     private boolean disabled;
 
 
-    /**
-     * Initializes the test fixture.
-     */
     @Before
-    public void setUp() throws Exception {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
+    public void initialize() throws Exception {
+        Properties configuration = getUnitilsConfiguration();
+        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPERTY_DIALECT, configuration));
         if (disabled) {
             return;
         }
@@ -90,21 +78,18 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
         }
         xsdDirectory.mkdirs();
 
-        configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A");
-        configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", XsdDataSetStructureGenerator.class.getName());
+        DbSupport defaultDbSupport = createDbSupports("PUBLIC, SCHEMA_A").getDefaultDbSupport();
+        dataSource = defaultDbSupport.getDataSource();
+
         configuration.setProperty(PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
-        dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, new DefaultSQLHandler(dataSource));
+        dataSetStructureGenerator.init(configuration, defaultDbSupport);
 
         dropTestTables();
         createTestTables();
     }
 
-
-    /**
-     * Clean-up test database.
-     */
     @After
-    public void tearDown() throws Exception {
+    public void cleanUp() throws Exception {
         if (disabled) {
             return;
         }
@@ -117,11 +102,8 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
     }
 
 
-    /**
-     * Tests the generation of the xsd files for 2 database schemas.
-     */
     @Test
-    public void testGenerateDataSetStructure() throws Exception {
+    public void generateDataSetStructure() throws Exception {
         if (disabled) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
@@ -159,9 +141,6 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
     }
 
 
-    /**
-     * Creates the test tables.
-     */
     private void createTestTables() {
         // PUBLIC SCHEMA
         executeUpdate("create table TABLE_1(columnA int not null identity, columnB varchar(1) not null, columnC varchar(1))", dataSource);
@@ -173,10 +152,6 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
         executeUpdate("create table SCHEMA_A.TABLE_4(column1 varchar(1), column2 varchar(1))", dataSource);
     }
 
-
-    /**
-     * Removes the test database tables
-     */
     private void dropTestTables() {
         executeUpdateQuietly("drop table TABLE_1", dataSource);
         executeUpdateQuietly("drop table TABLE_2", dataSource);
