@@ -19,7 +19,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 
 import javax.sql.DataSource;
@@ -91,7 +90,8 @@ public class DatabaseModuleTest extends UnitilsJUnit4 {
 
         private boolean updateDataSchemaCalled = false;
 
-        public boolean updateDatabase(SQLHandler sqlHandler) {
+        @Override
+        public boolean updateDatabase() {
             updateDataSchemaCalled = true;
             return true;
         }

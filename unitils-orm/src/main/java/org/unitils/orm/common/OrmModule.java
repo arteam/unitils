@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,15 +26,16 @@ import org.unitils.orm.common.spring.OrmSpringSupport;
 import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
 import org.unitils.orm.common.util.OrmConfig;
 import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+
+import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
 /**
  * Base module defining common behavior for a module that provides object relational mapping support for tests.
@@ -180,12 +181,12 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
         if (configuredPersistenceUnit == null) {
             configuredPersistenceUnit = ormPersistenceUnitLoader.getConfiguredOrmPersistenceUnit(testObject, persistenceUnitConfig);
             configuredOrmPersistenceUnitCache.put(persistenceUnitConfig, configuredPersistenceUnit);
-            getDatabaseModule().activateTransactionIfNeeded();
+            getDatabaseModule().activateTransactionIfNeeded(testObject);
         }
         return configuredPersistenceUnit;
     }
-    
-    
+
+
     /*protected boolean isConfiguredPersistenceUnitActive(Object testObject) {
         if (ormSpringSupport != null && ormSpringSupport.isPersistenceUnitConfiguredInSpring(testObject)) {
             return true;

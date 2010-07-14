@@ -13,43 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.util;
+package org.unitils.database.util;
 
 import org.dbmaintain.config.DbSupportsFactory;
 import org.dbmaintain.config.PropertiesDatabaseInfoLoader;
+import org.dbmaintain.config.PropertiesDbMaintainConfigurer;
 import org.dbmaintain.dbsupport.DatabaseInfo;
-import org.dbmaintain.dbsupport.DbSupport;
 import org.dbmaintain.dbsupport.DbSupports;
 import org.dbmaintain.dbsupport.impl.DefaultSQLHandler;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.dataset.database.DatabaseMetaData;
-import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
+import org.dbmaintain.launch.DbMaintain;
 
 import java.util.List;
 import java.util.Properties;
-
-import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_SCHEMANAMES;
-import static org.unitils.database.DatabaseUnitils.getDbSupports;
-
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class TestUtils {
+public class DbMaintainFactory {
 
-    public static DatabaseMetaData createDatabaseMetaData() {
-        DbSupport defaultDbSupport = getDbSupports().getDefaultDbSupport();
-        return new DatabaseMetaData(defaultDbSupport, new SqlTypeHandlerRepository());
+    private Properties configuration;
+
+
+    public DbMaintainFactory(Properties configuration) {
+        this.configuration = configuration;
     }
 
-    public static DbSupports createDbSupports(String schemaNames) {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        configuration.setProperty(PROPERTY_SCHEMANAMES, schemaNames);
 
+    public DbSupports createDbSupports() {
         PropertiesDatabaseInfoLoader propertiesDatabaseInfoLoader = new PropertiesDatabaseInfoLoader(configuration);
         List<DatabaseInfo> databaseInfos = propertiesDatabaseInfoLoader.getDatabaseInfos();
-        DbSupportsFactory dbSupportsFactory = new DbSupportsFactory(configuration, new DefaultSQLHandler());
-        return dbSupportsFactory.createDbSupports(databaseInfos);
+
+        DbSupportsFactory dbSupportFactory = new DbSupportsFactory(configuration, new DefaultSQLHandler());
+        return dbSupportFactory.createDbSupports(databaseInfos);
     }
+
+    public DbMaintain createDbMaintain(DbSupports dbSupports) {
+        PropertiesDbMaintainConfigurer propertiesDbMaintainConfigurer = new PropertiesDbMaintainConfigurer(configuration, dbSupports, dbSupports.getDefaultDbSupport().getSQLHandler());
+        return new DbMaintain(propertiesDbMaintainConfigurer);
+    }
+
+
 }

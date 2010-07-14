@@ -17,8 +17,8 @@ package org.unitils.dataset.database;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dbmaintain.dbsupport.DbSupport;
 import org.unitils.core.UnitilsException;
-import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.dataset.DataSetRow;
 import org.unitils.dataset.model.dataset.DataSetValue;
@@ -44,22 +44,20 @@ public class DatabaseMetaData {
     public static final int SQL_TYPE_UNKNOWN = -1;
 
     protected DbSupport defaultDbSupport;
-    protected List<DbSupport> dbSupports;
     protected SqlTypeHandlerRepository sqlTypeHandlerRepository;
 
     protected Map<String, Set<String>> tablePrimaryKeysCache = new HashMap<String, Set<String>>();
     protected Map<String, Map<String, Integer>> tableColumnSqlTypesCache = new HashMap<String, Map<String, Integer>>();
 
 
-    public DatabaseMetaData(DbSupport defaultDbSupport, List<DbSupport> dbSupports, SqlTypeHandlerRepository sqlTypeHandlerRepository) {
+    public DatabaseMetaData(DbSupport defaultDbSupport, SqlTypeHandlerRepository sqlTypeHandlerRepository) {
         this.defaultDbSupport = defaultDbSupport;
-        this.dbSupports = dbSupports;
         this.sqlTypeHandlerRepository = sqlTypeHandlerRepository;
     }
 
 
     public String getSchemaName() {
-        return defaultDbSupport.getSchemaName();
+        return defaultDbSupport.getDefaultSchemaName();
     }
 
     /**
@@ -82,15 +80,11 @@ public class DatabaseMetaData {
 
     public Connection getConnection() throws SQLException {
         // todo move to db utils and register with spring
-        return defaultDbSupport.getSQLHandler().getDataSource().getConnection();
+        return defaultDbSupport.getDataSource().getConnection();
     }
 
     public DbSupport getDefaultDbSupport() {
         return defaultDbSupport;
-    }
-
-    public List<DbSupport> getDbSupports() {
-        return dbSupports;
     }
 
     public Set<String> getPrimaryKeyColumnNames(String qualifiedTableName) throws SQLException {

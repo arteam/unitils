@@ -35,11 +35,11 @@ import java.io.Reader;
 import java.util.Properties;
 
 import static org.apache.commons.lang.StringUtils.deleteWhitespace;
+import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.dataset.util.TestUtils.createDatabaseMetaData;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
@@ -61,24 +61,15 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
 
     /* The target directory for the test xsd files */
     private File xsdDirectory;
-
-    /* DataSource for the test database. */
     @TestDataSource
     private DataSource dataSource = null;
-
-    /* True if current test is not for the current dialect */
     private boolean disabled;
 
 
-    /**
-     * Initializes the test by creating following tables in the test database:
-     * tableOne(columnA not null, columnB not null, columnC) and
-     * tableTwo(column1, column2)
-     */
     @Before
-    public void setUp() throws Exception {
+    public void initialize() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
+        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPERTY_DIALECT, configuration));
         if (disabled) {
             return;
         }
@@ -88,19 +79,15 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
             deleteDirectory(xsdDirectory);
         }
 
-        DatabaseMetaData databaseMetaData = createDatabaseMetaData(configuration, dataSource);
+        DatabaseMetaData databaseMetaData = createDatabaseMetaData();
         xsdDataSetStructureGenerator.init(databaseMetaData);
 
         dropTestTables();
         createTestTables();
     }
 
-
-    /**
-     * Clean-up test database.
-     */
     @After
-    public void tearDown() throws Exception {
+    public void cleanUp() throws Exception {
         if (disabled) {
             return;
         }
@@ -113,11 +100,8 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
     }
 
 
-    /**
-     * Tests the generation of the xsd files for 1 database schema.
-     */
     @Test
-    public void testGenerateDataSetStructure() throws Exception {
+    public void generateDataSetStructure() throws Exception {
         if (disabled) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
@@ -154,18 +138,11 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
     }
 
 
-    /**
-     * Creates the test tables.
-     */
     private void createTestTables() {
         executeUpdate("create table TABLE_1(columnA int not null identity, columnB varchar(1) not null, columnC varchar(1))", dataSource);
         executeUpdate("create table TABLE_2(column1 varchar(1), column2 varchar(1))", dataSource);
     }
 
-
-    /**
-     * Removes the test database tables
-     */
     private void dropTestTables() {
         executeUpdateQuietly("drop table TABLE_1", dataSource);
         executeUpdateQuietly("drop table TABLE_2", dataSource);

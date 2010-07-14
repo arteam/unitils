@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,9 @@ import org.unitils.database.transaction.UnitilsTransactionManager;
 
 import javax.sql.DataSource;
 import java.util.*;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 
 /**
  * Implements transactions for unit tests, by delegating to a spring
@@ -95,17 +98,17 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
     public void startTransaction(Object testObject) {
         UnitilsTransactionManagementConfiguration transactionManagementConfiguration = getTransactionManagementConfiguration(testObject);
         if (transactionManagementConfiguration.isTransactionalResourceAvailable(testObject)) {
-            testObjectTransactionActiveMap.put(testObject, Boolean.TRUE);
+            testObjectTransactionActiveMap.put(testObject, TRUE);
             doStartTransaction(testObject, transactionManagementConfiguration);
         } else {
-            testObjectTransactionActiveMap.put(testObject, Boolean.FALSE);
+            testObjectTransactionActiveMap.put(testObject, FALSE);
         }
     }
 
 
     public void activateTransactionIfNeeded(Object testObject) {
         if (testObjectTransactionActiveMap.containsKey(testObject) && !testObjectTransactionActiveMap.get(testObject)) {
-            testObjectTransactionActiveMap.put(testObject, Boolean.TRUE);
+            testObjectTransactionActiveMap.put(testObject, TRUE);
             UnitilsTransactionManagementConfiguration transactionManagementConfiguration = getTransactionManagementConfiguration(testObject);
             doStartTransaction(testObject, transactionManagementConfiguration);
         }
