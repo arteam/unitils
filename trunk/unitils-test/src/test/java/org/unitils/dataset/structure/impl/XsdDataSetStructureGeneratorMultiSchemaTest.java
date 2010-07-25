@@ -17,7 +17,7 @@ package org.unitils.dataset.structure.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.dbsupport.DbSupports;
+import org.dbmaintain.database.Databases;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +41,7 @@ import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.util.TestUtils.createDbSupports;
+import static org.unitils.dataset.util.TestUtils.createDatabases;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
@@ -89,8 +89,8 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
         }
         xsdDirectory.mkdirs();
 
-        DbSupports dbSupports = createDbSupports("PUBLIC, SCHEMA_A");
-        DatabaseMetaData databaseMetaData = new DatabaseMetaData(dbSupports.getDefaultDbSupport(), new SqlTypeHandlerRepository());
+        Databases databases = createDatabases("PUBLIC, SCHEMA_A");
+        DatabaseMetaData databaseMetaData = new DatabaseMetaData(databases.getDefaultDatabase(), new SqlTypeHandlerRepository());
         xsdDataSetStructureGenerator.init(databaseMetaData);
 
         dropTestTables();

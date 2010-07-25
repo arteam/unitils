@@ -17,7 +17,7 @@ package org.unitils.dbunit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.dbsupport.DbSupport;
+import org.dbmaintain.database.Database;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
@@ -394,19 +394,19 @@ public class DbUnitModule implements Module {
      * @return A new instance of dbUnit's <code>IDatabaseConnection</code>
      */
     protected DbUnitDatabaseConnection createDbUnitConnection(String schemaName) {
-        DbSupport defaultDbSupport = getDefaultDbSupport();
-        DataSource dataSource = defaultDbSupport.getDataSource();
-        String correctCaseSchemaName = defaultDbSupport.toCorrectCaseIdentifier(schemaName);
+        Database defaultDatabase = getDefaultDatabase();
+        DataSource dataSource = defaultDatabase.getDataSource();
+        String correctCaseSchemaName = defaultDatabase.toCorrectCaseIdentifier(schemaName);
 
         // Create connection
         DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(dataSource, correctCaseSchemaName);
         DatabaseConfig config = connection.getConfig();
 
         // Make sure that dbunit's correct IDataTypeFactory, that handles dbms specific data type issues, is used
-        IDataTypeFactory dataTypeFactory = getInstanceOf(IDataTypeFactory.class, configuration, defaultDbSupport.getDatabaseInfo().getDialect());
+        IDataTypeFactory dataTypeFactory = getInstanceOf(IDataTypeFactory.class, configuration, defaultDatabase.getDatabaseInfo().getDialect());
         config.setProperty(PROPERTY_DATATYPE_FACTORY, dataTypeFactory);
         // Make sure that table and column names are escaped using the dbms-specific identifier quote string
-        config.setProperty(PROPERTY_ESCAPE_PATTERN, defaultDbSupport.getIdentifierQuoteString() + '?' + defaultDbSupport.getIdentifierQuoteString());
+        config.setProperty(PROPERTY_ESCAPE_PATTERN, defaultDatabase.getIdentifierQuoteString() + '?' + defaultDatabase.getIdentifierQuoteString());
         // Make sure that batched statements are used to insert the data into the database
         config.setProperty(FEATURE_BATCHED_STATEMENTS, "true");
         // Make sure that Oracle's recycled tables (BIN$) are ignored (value is used to ensure dbunit-2.2 compliancy)
@@ -493,7 +493,7 @@ public class DbUnitModule implements Module {
      */
     protected DataSetFactory getDataSetFactory(Class<? extends DataSetFactory> dataSetFactoryClass) {
         DataSetFactory dataSetFactory = createInstanceOfType(dataSetFactoryClass, false);
-        dataSetFactory.init(configuration, getDefaultDbSupport().getDefaultSchemaName());
+        dataSetFactory.init(configuration, getDefaultDatabase().getDefaultSchemaName());
         return dataSetFactory;
     }
 
@@ -517,10 +517,10 @@ public class DbUnitModule implements Module {
 
 
     /**
-     * @return The default DbSupport (the one that connects to the default database schema)
+     * @return The default database (the first one that was configured)
      */
-    protected DbSupport getDefaultDbSupport() {
-        return getDatabaseModule().getDbSupports().getDefaultDbSupport();
+    protected Database getDefaultDatabase() {
+        return getDatabaseModule().getDatabases().getDefaultDatabase();
     }
 
 

@@ -17,7 +17,7 @@ package org.unitils.dbmaintainer.structure;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.dbsupport.DbSupport;
+import org.dbmaintain.database.Database;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +30,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.unitils.core.util.SQLTestUtils.dropTestSequences;
 import static org.unitils.core.util.SQLTestUtils.dropTestTables;
-import static org.unitils.database.DatabaseUnitils.getDbSupports;
+import static org.unitils.database.DatabaseUnitils.getDatabases;
 import static org.unitils.database.DatabaseUnitils.updateSequences;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.getItemAsLong;
@@ -54,7 +54,7 @@ public class SequenceUpdaterTest {
     private static Log logger = LogFactory.getLog(SequenceUpdaterTest.class);
 
     private DataSource dataSource;
-    private DbSupport defaultDbSupport;
+    private Database defaultDatabase;
 
 
     @Before
@@ -63,8 +63,8 @@ public class SequenceUpdaterTest {
         configuration.setProperty(PROPERTY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, "1000");
         reinitializeUnitils(configuration);
 
-        defaultDbSupport = getDbSupports().getDefaultDbSupport();
-        dataSource = defaultDbSupport.getDataSource();
+        defaultDatabase = getDatabases().getDefaultDatabase();
+        dataSource = defaultDatabase.getDataSource();
 
         cleanupTestDatabase();
         createTestDatabase();
@@ -86,7 +86,7 @@ public class SequenceUpdaterTest {
      */
     @Test
     public void testUpdateSequences() throws Exception {
-        if (!defaultDbSupport.supportsSequences()) {
+        if (!defaultDatabase.supportsSequences()) {
             logger.warn("Current dialect does not support sequences. Skipping test.");
             return;
         }
@@ -101,7 +101,7 @@ public class SequenceUpdaterTest {
      */
     @Test
     public void testUpdateSequences_valueAlreadyHighEnough() throws Exception {
-        if (!defaultDbSupport.supportsSequences()) {
+        if (!defaultDatabase.supportsSequences()) {
             logger.warn("Current dialect does not support sequences. Skipping test.");
             return;
         }
@@ -118,7 +118,7 @@ public class SequenceUpdaterTest {
      */
     @Test
     public void testUpdateSequences_identityColumns() throws Exception {
-        if (!defaultDbSupport.supportsIdentityColumns()) {
+        if (!defaultDatabase.supportsIdentityColumns()) {
             logger.warn("Current dialect does not support identity columns. Skipping test.");
             return;
         }
@@ -133,7 +133,7 @@ public class SequenceUpdaterTest {
      */
     @Test
     public void testUpdateSequences_identityColumnsValueAlreadyHighEnough() throws Exception {
-        if (!defaultDbSupport.supportsIdentityColumns()) {
+        if (!defaultDatabase.supportsIdentityColumns()) {
             logger.warn("Current dialect does not support identity columns. Skipping test.");
             return;
         }
@@ -152,8 +152,8 @@ public class SequenceUpdaterTest {
      * @param maxValue The maximum value (included)
      */
     private void assertCurrentSequenceValueBetween(long minValue, long maxValue) {
-        String correctCaseSequenceName = defaultDbSupport.toCorrectCaseIdentifier("test_sequence");
-        long currentValue = defaultDbSupport.getSequenceValue(correctCaseSequenceName);
+        String correctCaseSequenceName = defaultDatabase.toCorrectCaseIdentifier("test_sequence");
+        long currentValue = defaultDatabase.getSequenceValue(correctCaseSequenceName);
         assertTrue("Current sequence value is not between " + minValue + " and " + maxValue, (currentValue >= minValue && currentValue <= maxValue));
     }
 
@@ -176,7 +176,7 @@ public class SequenceUpdaterTest {
      * Creates all test database structures (view, tables...)
      */
     private void createTestDatabase() throws Exception {
-        String dialect = defaultDbSupport.getDatabaseInfo().getDialect();
+        String dialect = defaultDatabase.getDatabaseInfo().getDialect();
         if ("hsqldb".equals(dialect)) {
             createTestDatabaseHsqlDb();
         } else if ("mysql".equals(dialect)) {
@@ -201,7 +201,7 @@ public class SequenceUpdaterTest {
      * Drops all created test database structures (views, tables...)
      */
     private void cleanupTestDatabase() throws Exception {
-        String dialect = defaultDbSupport.getDatabaseInfo().getDialect();
+        String dialect = defaultDatabase.getDatabaseInfo().getDialect();
         if ("hsqldb".equals(dialect)) {
             cleanupTestDatabaseHsqlDb();
         } else if ("mysql".equals(dialect)) {
@@ -240,8 +240,8 @@ public class SequenceUpdaterTest {
      * Drops all created test database structures
      */
     private void cleanupTestDatabaseHsqlDb() throws Exception {
-        dropTestTables(defaultDbSupport, "test_table1", "test_table2");
-        dropTestSequences(defaultDbSupport, "test_sequence");
+        dropTestTables(defaultDatabase, "test_table1", "test_table2");
+        dropTestSequences(defaultDatabase, "test_sequence");
     }
 
     //
@@ -263,7 +263,7 @@ public class SequenceUpdaterTest {
      * Drops all created test database structures
      */
     private void cleanupTestDatabaseMySql() throws Exception {
-        dropTestTables(defaultDbSupport, "test_table1", "test_table2");
+        dropTestTables(defaultDatabase, "test_table1", "test_table2");
     }
 
     //
@@ -283,7 +283,7 @@ public class SequenceUpdaterTest {
      * Drops all created test database structures (views, tables...)
      */
     private void cleanupTestDatabaseOracle() throws Exception {
-        dropTestSequences(defaultDbSupport, "test_sequence");
+        dropTestSequences(defaultDatabase, "test_sequence");
     }
 
     //
@@ -303,7 +303,7 @@ public class SequenceUpdaterTest {
      * Drops all created test database structures
      */
     private void cleanupTestDatabasePostgreSql() throws Exception {
-        dropTestSequences(defaultDbSupport, "test_sequence");
+        dropTestSequences(defaultDatabase, "test_sequence");
     }
 
     //
@@ -327,8 +327,8 @@ public class SequenceUpdaterTest {
      * Drops all created test database structures (views, tables...)
      */
     private void cleanupTestDatabaseDb2() throws Exception {
-        dropTestTables(defaultDbSupport, "test_table1", "test_table2");
-        dropTestSequences(defaultDbSupport, "test_sequence");
+        dropTestTables(defaultDatabase, "test_table1", "test_table2");
+        dropTestSequences(defaultDatabase, "test_sequence");
     }
 
     //
@@ -350,7 +350,7 @@ public class SequenceUpdaterTest {
      * Drops all created test database structures
      */
     private void cleanupTestDatabaseDerby() throws Exception {
-        dropTestTables(defaultDbSupport, "test_table1", "test_table2");
+        dropTestTables(defaultDatabase, "test_table1", "test_table2");
     }
 
     //
@@ -372,6 +372,6 @@ public class SequenceUpdaterTest {
      * Drops all created test database structures
      */
     private void cleanupTestDatabaseMsSql() throws Exception {
-        dropTestTables(defaultDbSupport, "test_table1", "test_table2");
+        dropTestTables(defaultDatabase, "test_table1", "test_table2");
     }
 }

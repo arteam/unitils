@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.structure;
 
-import org.dbmaintain.dbsupport.DbSupport;
+import org.dbmaintain.database.Database;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +26,7 @@ import javax.sql.DataSource;
 
 import static org.junit.Assert.fail;
 import static org.unitils.database.DatabaseUnitils.disableConstraints;
-import static org.unitils.database.DatabaseUnitils.getDbSupports;
+import static org.unitils.database.DatabaseUnitils.getDatabases;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 
@@ -39,7 +39,7 @@ import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
  */
 public class ConstraintsDisablerTest extends UnitilsJUnit4 {
 
-    protected DbSupport defaultDbSupport;
+    protected Database defaultDatabase;
     protected DataSource dataSource;
 
 
@@ -49,8 +49,8 @@ public class ConstraintsDisablerTest extends UnitilsJUnit4 {
      */
     @Before
     public void setUp() throws Exception {
-        defaultDbSupport = getDbSupports().getDefaultDbSupport();
-        dataSource = defaultDbSupport.getDataSource();
+        defaultDatabase = getDatabases().getDefaultDatabase();
+        dataSource = defaultDatabase.getDataSource();
 
         cleanupTestDatabase();
         createTestTables();

@@ -17,7 +17,7 @@ package org.unitils.dataset.database;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.dbsupport.DbSupport;
+import org.dbmaintain.database.Database;
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.dataset.DataSetRow;
@@ -43,21 +43,21 @@ public class DatabaseMetaData {
 
     public static final int SQL_TYPE_UNKNOWN = -1;
 
-    protected DbSupport defaultDbSupport;
+    protected Database defaultDatabase;
     protected SqlTypeHandlerRepository sqlTypeHandlerRepository;
 
     protected Map<String, Set<String>> tablePrimaryKeysCache = new HashMap<String, Set<String>>();
     protected Map<String, Map<String, Integer>> tableColumnSqlTypesCache = new HashMap<String, Map<String, Integer>>();
 
 
-    public DatabaseMetaData(DbSupport defaultDbSupport, SqlTypeHandlerRepository sqlTypeHandlerRepository) {
-        this.defaultDbSupport = defaultDbSupport;
+    public DatabaseMetaData(Database defaultDatabase, SqlTypeHandlerRepository sqlTypeHandlerRepository) {
+        this.defaultDatabase = defaultDatabase;
         this.sqlTypeHandlerRepository = sqlTypeHandlerRepository;
     }
 
 
     public String getSchemaName() {
-        return defaultDbSupport.getDefaultSchemaName();
+        return defaultDatabase.getDefaultSchemaName();
     }
 
     /**
@@ -67,24 +67,24 @@ public class DatabaseMetaData {
      * @return The quoted name or the original name if quoting is not supported or not case sensitive
      */
     public String quoteIdentifier(String name) {
-        return defaultDbSupport.quoted(name);
+        return defaultDatabase.quoted(name);
     }
 
     public String toCorrectCaseIdentifier(String name) {
-        return defaultDbSupport.toCorrectCaseIdentifier(name);
+        return defaultDatabase.toCorrectCaseIdentifier(name);
     }
 
     public String removeIdentifierQuotes(String schemaName) {
-        return defaultDbSupport.removeIdentifierQuotes(schemaName);
+        return defaultDatabase.removeIdentifierQuotes(schemaName);
     }
 
     public Connection getConnection() throws SQLException {
         // todo move to db utils and register with spring
-        return defaultDbSupport.getDataSource().getConnection();
+        return defaultDatabase.getDataSource().getConnection();
     }
 
-    public DbSupport getDefaultDbSupport() {
-        return defaultDbSupport;
+    public Database getDefaultDatabase() {
+        return defaultDatabase;
     }
 
     public Set<String> getPrimaryKeyColumnNames(String qualifiedTableName) throws SQLException {

@@ -17,7 +17,7 @@ package org.unitils.dbmaintainer.clean.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.dbsupport.DbSupport;
+import org.dbmaintain.database.Database;
 import org.hsqldb.Trigger;
 import org.junit.After;
 import org.junit.Before;
@@ -31,7 +31,7 @@ import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_EXECUTED_SCRIP
 import static org.junit.Assert.*;
 import static org.unitils.core.util.SQLTestUtils.*;
 import static org.unitils.database.DatabaseUnitils.clearDatabase;
-import static org.unitils.database.DatabaseUnitils.getDbSupports;
+import static org.unitils.database.DatabaseUnitils.getDatabases;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfiguration;
 
@@ -48,7 +48,7 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
     private static Log logger = LogFactory.getLog(DefaultDBClearerTest.class);
 
     private DataSource dataSource;
-    private DbSupport defaultDbSupport;
+    private Database defaultDatabase;
     private String versionTableName;
 
 
@@ -57,8 +57,8 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
         Properties configuration = getUnitilsConfiguration();
         versionTableName = configuration.getProperty(PROPERTY_EXECUTED_SCRIPTS_TABLE_NAME);
 
-        defaultDbSupport = getDbSupports().getDefaultDbSupport();
-        dataSource = defaultDbSupport.getDataSource();
+        defaultDatabase = getDatabases().getDefaultDatabase();
+        dataSource = defaultDatabase.getDataSource();
 
         cleanupTestDatabase();
         createTestDatabase();
@@ -72,68 +72,68 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
 
     @Test
     public void clearTables() throws Exception {
-        assertEquals(2, defaultDbSupport.getTableNames().size());
+        assertEquals(2, defaultDatabase.getTableNames().size());
         clearDatabase();
-        assertEquals(1, defaultDbSupport.getTableNames().size()); // version table was created
+        assertEquals(1, defaultDatabase.getTableNames().size()); // version table was created
     }
 
     @Test
     public void versionTableAutoCreated() throws Exception {
         clearDatabase();
-        assertTrue(defaultDbSupport.getTableNames().contains(defaultDbSupport.toCorrectCaseIdentifier(versionTableName)));
+        assertTrue(defaultDatabase.getTableNames().contains(defaultDatabase.toCorrectCaseIdentifier(versionTableName)));
     }
 
     @Test
     public void doNotClearVersionTable() throws Exception {
         executeUpdate("create table " + versionTableName + "(testcolumn varchar(10))", dataSource);
-        assertEquals(3, defaultDbSupport.getTableNames().size());
+        assertEquals(3, defaultDatabase.getTableNames().size());
         clearDatabase();
-        assertEquals(1, defaultDbSupport.getTableNames().size()); // version table
+        assertEquals(1, defaultDatabase.getTableNames().size()); // version table
     }
 
     @Test
     public void clearViews() throws Exception {
-        assertEquals(2, defaultDbSupport.getViewNames().size());
+        assertEquals(2, defaultDatabase.getViewNames().size());
         clearDatabase();
-        assertTrue(defaultDbSupport.getViewNames().isEmpty());
+        assertTrue(defaultDatabase.getViewNames().isEmpty());
     }
 
     @Test
     public void clearMaterializedViews() throws Exception {
-        if (!defaultDbSupport.supportsMaterializedViews()) {
+        if (!defaultDatabase.supportsMaterializedViews()) {
             logger.warn("Current dialect does not support materialized views. Skipping test.");
             return;
         }
-        assertEquals(2, defaultDbSupport.getMaterializedViewNames().size());
+        assertEquals(2, defaultDatabase.getMaterializedViewNames().size());
         clearDatabase();
-        assertTrue(defaultDbSupport.getMaterializedViewNames().isEmpty());
+        assertTrue(defaultDatabase.getMaterializedViewNames().isEmpty());
     }
 
     @Test
     public void clearSynonyms() throws Exception {
-        if (!defaultDbSupport.supportsSynonyms()) {
+        if (!defaultDatabase.supportsSynonyms()) {
             logger.warn("Current dialect does not support synonyms. Skipping test.");
             return;
         }
-        assertEquals(2, defaultDbSupport.getSynonymNames().size());
+        assertEquals(2, defaultDatabase.getSynonymNames().size());
         clearDatabase();
-        assertTrue(defaultDbSupport.getSynonymNames().isEmpty());
+        assertTrue(defaultDatabase.getSynonymNames().isEmpty());
     }
 
     @Test
     public void clearSequences() throws Exception {
-        if (!defaultDbSupport.supportsSequences()) {
+        if (!defaultDatabase.supportsSequences()) {
             logger.warn("Current dialect does not support sequences. Skipping test.");
             return;
         }
-        assertEquals(2, defaultDbSupport.getSequenceNames().size());
+        assertEquals(2, defaultDatabase.getSequenceNames().size());
         clearDatabase();
-        assertTrue(defaultDbSupport.getSequenceNames().isEmpty());
+        assertTrue(defaultDatabase.getSequenceNames().isEmpty());
     }
 
 
     private void createTestDatabase() throws Exception {
-        String dialect = defaultDbSupport.getDatabaseInfo().getDialect();
+        String dialect = defaultDatabase.getDatabaseInfo().getDialect();
         if ("hsqldb".equals(dialect)) {
             createTestDatabaseHsqlDb();
         } else if ("mysql".equals(dialect)) {
@@ -154,7 +154,7 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
     }
 
     private void cleanupTestDatabase() throws Exception {
-        String dialect = defaultDbSupport.getDatabaseInfo().getDialect();
+        String dialect = defaultDatabase.getDatabaseInfo().getDialect();
         if ("hsqldb".equals(dialect)) {
             cleanupTestDatabaseHsqlDb();
         } else if ("mysql".equals(dialect)) {
@@ -192,10 +192,10 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
     }
 
     private void cleanupTestDatabaseHsqlDb() throws Exception {
-        dropTestTables(defaultDbSupport, "test_table", "\"Test_CASE_Table\"", versionTableName);
-        dropTestViews(defaultDbSupport, "test_view", "\"Test_CASE_View\"");
-        dropTestSequences(defaultDbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
-        dropTestTriggers(defaultDbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
+        dropTestTables(defaultDatabase, "test_table", "\"Test_CASE_Table\"", versionTableName);
+        dropTestViews(defaultDatabase, "test_view", "\"Test_CASE_View\"");
+        dropTestSequences(defaultDatabase, "test_sequence", "\"Test_CASE_Sequence\"");
+        dropTestTriggers(defaultDatabase, "test_trigger", "\"Test_CASE_Trigger\"");
     }
 
     /**
@@ -230,9 +230,9 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
     }
 
     private void cleanupTestDatabaseMySql() throws Exception {
-        dropTestTables(defaultDbSupport, "test_table", "`Test_CASE_Table`", versionTableName);
-        dropTestViews(defaultDbSupport, "test_view", "`Test_CASE_View`");
-        dropTestTriggers(defaultDbSupport, "test_trigger", "`Test_CASE_Trigger`");
+        dropTestTables(defaultDatabase, "test_table", "`Test_CASE_Table`", versionTableName);
+        dropTestViews(defaultDatabase, "test_view", "`Test_CASE_View`");
+        dropTestTriggers(defaultDatabase, "test_trigger", "`Test_CASE_Trigger`");
     }
 
     //
@@ -264,13 +264,13 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
     }
 
     private void cleanupTestDatabaseOracle() throws Exception {
-        dropTestTables(defaultDbSupport, "test_table", "\"Test_CASE_Table\"", versionTableName);
-        dropTestViews(defaultDbSupport, "test_view", "\"Test_CASE_View\"");
-        dropTestMaterializedViews(defaultDbSupport, "test_mview", "\"Test_CASE_MView\"");
-        dropTestSynonyms(defaultDbSupport, "test_synonym", "\"Test_CASE_Synonym\"");
-        dropTestSequences(defaultDbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
-        dropTestTriggers(defaultDbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
-        dropTestTypes(defaultDbSupport, "test_type", "\"Test_CASE_Type\"");
+        dropTestTables(defaultDatabase, "test_table", "\"Test_CASE_Table\"", versionTableName);
+        dropTestViews(defaultDatabase, "test_view", "\"Test_CASE_View\"");
+        dropTestMaterializedViews(defaultDatabase, "test_mview", "\"Test_CASE_MView\"");
+        dropTestSynonyms(defaultDatabase, "test_synonym", "\"Test_CASE_Synonym\"");
+        dropTestSequences(defaultDatabase, "test_sequence", "\"Test_CASE_Sequence\"");
+        dropTestTriggers(defaultDatabase, "test_trigger", "\"Test_CASE_Trigger\"");
+        dropTestTypes(defaultDatabase, "test_type", "\"Test_CASE_Type\"");
     }
 
     //
@@ -302,11 +302,11 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
     }
 
     private void cleanupTestDatabasePostgreSql() throws Exception {
-        dropTestTables(defaultDbSupport, "test_table", "\"Test_CASE_Table\"", versionTableName);
-        dropTestViews(defaultDbSupport, "test_view", "\"Test_CASE_View\"");
-        dropTestSequences(defaultDbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
-        dropTestTriggers(defaultDbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
-        dropTestTypes(defaultDbSupport, "test_type", "\"Test_CASE_Type\"");
+        dropTestTables(defaultDatabase, "test_table", "\"Test_CASE_Table\"", versionTableName);
+        dropTestViews(defaultDatabase, "test_view", "\"Test_CASE_View\"");
+        dropTestSequences(defaultDatabase, "test_sequence", "\"Test_CASE_Sequence\"");
+        dropTestTriggers(defaultDatabase, "test_trigger", "\"Test_CASE_Trigger\"");
+        dropTestTypes(defaultDatabase, "test_type", "\"Test_CASE_Type\"");
     }
 
     //
@@ -332,12 +332,12 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
     }
 
     private void cleanupTestDatabaseDb2() throws Exception {
-        dropTestTables(defaultDbSupport, "test_table", "\"Test_CASE_Table\"", versionTableName);
-        dropTestViews(defaultDbSupport, "test_view", "\"Test_CASE_View\"");
-        dropTestSynonyms(defaultDbSupport, "test_synonym", "\"Test_CASE_Synonym\"");
-        dropTestSequences(defaultDbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
-        dropTestTriggers(defaultDbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
-        dropTestTypes(defaultDbSupport, "test_type", "\"Test_CASE_Type\"");
+        dropTestTables(defaultDatabase, "test_table", "\"Test_CASE_Table\"", versionTableName);
+        dropTestViews(defaultDatabase, "test_view", "\"Test_CASE_View\"");
+        dropTestSynonyms(defaultDatabase, "test_synonym", "\"Test_CASE_Synonym\"");
+        dropTestSequences(defaultDatabase, "test_sequence", "\"Test_CASE_Sequence\"");
+        dropTestTriggers(defaultDatabase, "test_trigger", "\"Test_CASE_Trigger\"");
+        dropTestTypes(defaultDatabase, "test_type", "\"Test_CASE_Type\"");
     }
 
     //
@@ -364,10 +364,10 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
      * First drop the views, since Derby doesn't support "drop table ... cascade" (yet, as of Derby 10.3)
      */
     private void cleanupTestDatabaseDerby() throws Exception {
-        dropTestSynonyms(defaultDbSupport, "test_synonym", "\"Test_CASE_Synonym\"");
-        dropTestViews(defaultDbSupport, "test_view", "\"Test_CASE_View\"");
-        dropTestTriggers(defaultDbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
-        dropTestTables(defaultDbSupport, "\"Test_CASE_Table\"", "TEST_TABLE", versionTableName);
+        dropTestSynonyms(defaultDatabase, "test_synonym", "\"Test_CASE_Synonym\"");
+        dropTestViews(defaultDatabase, "test_view", "\"Test_CASE_View\"");
+        dropTestTriggers(defaultDatabase, "test_trigger", "\"Test_CASE_Trigger\"");
+        dropTestTables(defaultDatabase, "\"Test_CASE_Table\"", "TEST_TABLE", versionTableName);
     }
 
     //
@@ -393,10 +393,10 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
     }
 
     private void cleanupTestDatabaseMsSql() throws Exception {
-        dropTestSynonyms(defaultDbSupport, "test_synonym", "\"Test_CASE_Synonym\"");
-        dropTestViews(defaultDbSupport, "test_view", "\"Test_CASE_View\"");
-        dropTestTriggers(defaultDbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
-        dropTestTables(defaultDbSupport, "\"Test_CASE_Table\"", "test_table", versionTableName);
-        dropTestTypes(defaultDbSupport, "test_type", "\"Test_CASE_Type\"");
+        dropTestSynonyms(defaultDatabase, "test_synonym", "\"Test_CASE_Synonym\"");
+        dropTestViews(defaultDatabase, "test_view", "\"Test_CASE_View\"");
+        dropTestTriggers(defaultDatabase, "test_trigger", "\"Test_CASE_Trigger\"");
+        dropTestTables(defaultDatabase, "\"Test_CASE_Table\"", "test_table", versionTableName);
+        dropTestTypes(defaultDatabase, "test_type", "\"Test_CASE_Type\"");
     }
 }

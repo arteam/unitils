@@ -17,7 +17,7 @@ package org.unitils.dbunit.structure.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.dbsupport.DbSupport;
+import org.dbmaintain.database.Database;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +37,7 @@ import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.util.TestUtils.createDbSupports;
+import static org.unitils.dataset.util.TestUtils.createDatabases;
 import static org.unitils.dbunit.structure.impl.XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME;
 import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfiguration;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
@@ -78,11 +78,11 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest {
         }
         xsdDirectory.mkdirs();
 
-        DbSupport defaultDbSupport = createDbSupports("PUBLIC, SCHEMA_A").getDefaultDbSupport();
-        dataSource = defaultDbSupport.getDataSource();
+        Database defaultDatabase = createDatabases("PUBLIC, SCHEMA_A").getDefaultDatabase();
+        dataSource = defaultDatabase.getDataSource();
 
         configuration.setProperty(PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
-        dataSetStructureGenerator.init(configuration, defaultDbSupport);
+        dataSetStructureGenerator.init(configuration, defaultDatabase);
 
         dropTestTables();
         createTestTables();

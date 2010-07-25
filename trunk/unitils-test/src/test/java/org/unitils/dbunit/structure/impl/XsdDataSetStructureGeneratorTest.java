@@ -17,7 +17,7 @@ package org.unitils.dbunit.structure.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.dbsupport.DbSupport;
+import org.dbmaintain.database.Database;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +36,7 @@ import java.util.Properties;
 import static org.apache.commons.lang.StringUtils.deleteWhitespace;
 import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.database.DatabaseUnitils.getDbSupports;
+import static org.unitils.database.DatabaseUnitils.getDatabases;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.dbunit.structure.impl.XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME;
@@ -85,9 +85,9 @@ public class XsdDataSetStructureGeneratorTest {
 
         configuration.setProperty(PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
 
-        DbSupport defaultDbSupport = getDbSupports().getDefaultDbSupport();
-        dataSource = defaultDbSupport.getDataSource();
-        dataSetStructureGenerator.init(configuration, defaultDbSupport);
+        Database defaultDatabase = getDatabases().getDefaultDatabase();
+        dataSource = defaultDatabase.getDataSource();
+        dataSetStructureGenerator.init(configuration, defaultDatabase);
 
         dropTestTables();
         createTestTables();

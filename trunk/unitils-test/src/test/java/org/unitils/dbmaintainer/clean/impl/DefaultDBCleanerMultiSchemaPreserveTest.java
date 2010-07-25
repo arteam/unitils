@@ -17,7 +17,7 @@ package org.unitils.dbmaintainer.clean.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.dbsupport.DbSupport;
+import org.dbmaintain.database.Database;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +30,7 @@ import java.util.Properties;
 import static org.dbmaintain.config.DbMaintainProperties.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.database.DatabaseUnitils.getDbSupports;
+import static org.unitils.database.DatabaseUnitils.getDatabases;
 import static org.unitils.database.SQLUnitils.*;
 import static org.unitils.testutil.TestUnitilsConfiguration.*;
 
@@ -47,7 +47,7 @@ public class DefaultDBCleanerMultiSchemaPreserveTest {
     private static Log logger = LogFactory.getLog(DefaultDBCleanerMultiSchemaPreserveTest.class);
 
     private DataSource dataSource;
-    private DbSupport defaultDbSupport;
+    private Database defaultDatabase;
     private boolean disabled;
 
 
@@ -63,15 +63,15 @@ public class DefaultDBCleanerMultiSchemaPreserveTest {
         }
 
         // configure 3 schemas
-        defaultDbSupport = getDbSupports().getDefaultDbSupport();
+        defaultDatabase = getDatabases().getDefaultDatabase();
         configuration.setProperty(PROPERTY_SCHEMANAMES, "PUBLIC, SCHEMA_A, \"SCHEMA_B\", schema_c");
         // items to preserve
         configuration.setProperty(PROPERTY_PRESERVE_DATA_SCHEMAS, "schema_c");
-        configuration.setProperty(PROPERTY_PRESERVE_DATA_TABLES, "test, " + defaultDbSupport.quoted("SCHEMA_A") + "." + defaultDbSupport.quoted("TEST"));
+        configuration.setProperty(PROPERTY_PRESERVE_DATA_TABLES, "test, " + defaultDatabase.quoted("SCHEMA_A") + "." + defaultDatabase.quoted("TEST"));
 
         reinitializeUnitils(configuration);
-        defaultDbSupport = getDbSupports().getDefaultDbSupport();
-        dataSource = defaultDbSupport.getDataSource();
+        defaultDatabase = getDatabases().getDefaultDatabase();
+        dataSource = defaultDatabase.getDataSource();
 
         dropTestTables();
         createTestTables();

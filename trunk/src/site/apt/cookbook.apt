@@ -191,8 +191,8 @@ unitils.configuration.localFileName=unitils-<myproject>-local.properties
 database.driverClassName=<my driver classname>
 database.url=<my database connection url>
 
-# This property specifies the underlying DBMS implementation. Supported values are 'oracle', 'db2', 'mysql' and 'hsqldb'.
-# The value of this property defines which vendor specific implementations of DbSupport and ConstraintsDisabler are chosen.
+# This property specifies the underlying DBMS implementation. Supported values are 'oracle', 'db2', 'mysql', 'hsqldb',
+# 'postgresql', 'derby' and 'mssql'.
 database.dialect=<my database dialect>
 +------+
 
