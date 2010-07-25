@@ -17,7 +17,7 @@ package org.unitils.dbmaintainer.clean.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.dbsupport.DbSupport;
+import org.dbmaintain.database.Database;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +29,7 @@ import java.util.Properties;
 import static org.dbmaintain.config.DbMaintainProperties.*;
 import static org.junit.Assert.assertEquals;
 import static org.unitils.database.DatabaseUnitils.clearDatabase;
-import static org.unitils.database.DatabaseUnitils.getDbSupports;
+import static org.unitils.database.DatabaseUnitils.getDatabases;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.testutil.TestUnitilsConfiguration.*;
@@ -47,7 +47,7 @@ public class DefaultDBClearerMultiSchemaPreserveTest {
     private static Log logger = LogFactory.getLog(DefaultDBClearerMultiSchemaPreserveTest.class);
 
     private DataSource dataSource;
-    private DbSupport defaultDbSupport;
+    private Database defaultDatabase;
     private String versionTableName;
     private boolean disabled;
 
@@ -64,16 +64,16 @@ public class DefaultDBClearerMultiSchemaPreserveTest {
         configuration.setProperty(PROPERTY_SCHEMANAMES, "PUBLIC, SCHEMA_A, \"SCHEMA_B\", schema_c");
 
         // configure items to preserve
-        defaultDbSupport = getDbSupports().getDefaultDbSupport();
+        defaultDatabase = getDatabases().getDefaultDatabase();
         configuration.setProperty(PROPERTY_PRESERVE_SCHEMAS, "schema_c");
-        configuration.setProperty(PROPERTY_PRESERVE_TABLES, "test_table, " + defaultDbSupport.quoted("SCHEMA_A") + "." + defaultDbSupport.quoted("TEST_TABLE"));
-        configuration.setProperty(PROPERTY_PRESERVE_VIEWS, "test_view, " + "schema_a." + defaultDbSupport.quoted("TEST_VIEW"));
-        configuration.setProperty(PROPERTY_PRESERVE_SEQUENCES, "test_sequence, " + defaultDbSupport.quoted("SCHEMA_A") + ".test_sequence");
+        configuration.setProperty(PROPERTY_PRESERVE_TABLES, "test_table, " + defaultDatabase.quoted("SCHEMA_A") + "." + defaultDatabase.quoted("TEST_TABLE"));
+        configuration.setProperty(PROPERTY_PRESERVE_VIEWS, "test_view, " + "schema_a." + defaultDatabase.quoted("TEST_VIEW"));
+        configuration.setProperty(PROPERTY_PRESERVE_SEQUENCES, "test_sequence, " + defaultDatabase.quoted("SCHEMA_A") + ".test_sequence");
 
         reinitializeUnitils(configuration);
         versionTableName = configuration.getProperty(PROPERTY_EXECUTED_SCRIPTS_TABLE_NAME);
-        defaultDbSupport = getDbSupports().getDefaultDbSupport();
-        dataSource = defaultDbSupport.getDataSource();
+        defaultDatabase = getDatabases().getDefaultDatabase();
+        dataSource = defaultDatabase.getDataSource();
 
         cleanupTestDatabase();
         createTestDatabase();
@@ -95,15 +95,15 @@ public class DefaultDBClearerMultiSchemaPreserveTest {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        assertEquals(1, defaultDbSupport.getTableNames("PUBLIC").size());
-        assertEquals(1, defaultDbSupport.getTableNames("SCHEMA_A").size());
-        assertEquals(1, defaultDbSupport.getTableNames("SCHEMA_B").size());
-        assertEquals(1, defaultDbSupport.getTableNames("SCHEMA_C").size());
+        assertEquals(1, defaultDatabase.getTableNames("PUBLIC").size());
+        assertEquals(1, defaultDatabase.getTableNames("SCHEMA_A").size());
+        assertEquals(1, defaultDatabase.getTableNames("SCHEMA_B").size());
+        assertEquals(1, defaultDatabase.getTableNames("SCHEMA_C").size());
         clearDatabase();
-        assertEquals(2, defaultDbSupport.getTableNames("PUBLIC").size()); // version table was created
-        assertEquals(1, defaultDbSupport.getTableNames("SCHEMA_A").size());
-        assertEquals(0, defaultDbSupport.getTableNames("SCHEMA_B").size());
-        assertEquals(1, defaultDbSupport.getTableNames("SCHEMA_C").size());
+        assertEquals(2, defaultDatabase.getTableNames("PUBLIC").size()); // version table was created
+        assertEquals(1, defaultDatabase.getTableNames("SCHEMA_A").size());
+        assertEquals(0, defaultDatabase.getTableNames("SCHEMA_B").size());
+        assertEquals(1, defaultDatabase.getTableNames("SCHEMA_C").size());
     }
 
     @Test
@@ -112,15 +112,15 @@ public class DefaultDBClearerMultiSchemaPreserveTest {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        assertEquals(1, defaultDbSupport.getViewNames("PUBLIC").size());
-        assertEquals(1, defaultDbSupport.getViewNames("SCHEMA_A").size());
-        assertEquals(1, defaultDbSupport.getViewNames("SCHEMA_B").size());
-        assertEquals(1, defaultDbSupport.getViewNames("SCHEMA_C").size());
+        assertEquals(1, defaultDatabase.getViewNames("PUBLIC").size());
+        assertEquals(1, defaultDatabase.getViewNames("SCHEMA_A").size());
+        assertEquals(1, defaultDatabase.getViewNames("SCHEMA_B").size());
+        assertEquals(1, defaultDatabase.getViewNames("SCHEMA_C").size());
         clearDatabase();
-        assertEquals(1, defaultDbSupport.getViewNames("PUBLIC").size());
-        assertEquals(1, defaultDbSupport.getViewNames("SCHEMA_A").size());
-        assertEquals(0, defaultDbSupport.getViewNames("SCHEMA_B").size());
-        assertEquals(1, defaultDbSupport.getViewNames("SCHEMA_C").size());
+        assertEquals(1, defaultDatabase.getViewNames("PUBLIC").size());
+        assertEquals(1, defaultDatabase.getViewNames("SCHEMA_A").size());
+        assertEquals(0, defaultDatabase.getViewNames("SCHEMA_B").size());
+        assertEquals(1, defaultDatabase.getViewNames("SCHEMA_C").size());
     }
 
     @Test
@@ -129,15 +129,15 @@ public class DefaultDBClearerMultiSchemaPreserveTest {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        assertEquals(1, defaultDbSupport.getSequenceNames("PUBLIC").size());
-        assertEquals(1, defaultDbSupport.getSequenceNames("SCHEMA_A").size());
-        assertEquals(1, defaultDbSupport.getSequenceNames("SCHEMA_B").size());
-        assertEquals(1, defaultDbSupport.getSequenceNames("SCHEMA_C").size());
+        assertEquals(1, defaultDatabase.getSequenceNames("PUBLIC").size());
+        assertEquals(1, defaultDatabase.getSequenceNames("SCHEMA_A").size());
+        assertEquals(1, defaultDatabase.getSequenceNames("SCHEMA_B").size());
+        assertEquals(1, defaultDatabase.getSequenceNames("SCHEMA_C").size());
         clearDatabase();
-        assertEquals(1, defaultDbSupport.getSequenceNames("PUBLIC").size());
-        assertEquals(1, defaultDbSupport.getSequenceNames("SCHEMA_A").size());
-        assertEquals(0, defaultDbSupport.getSequenceNames("SCHEMA_B").size());
-        assertEquals(1, defaultDbSupport.getSequenceNames("SCHEMA_C").size());
+        assertEquals(1, defaultDatabase.getSequenceNames("PUBLIC").size());
+        assertEquals(1, defaultDatabase.getSequenceNames("SCHEMA_A").size());
+        assertEquals(0, defaultDatabase.getSequenceNames("SCHEMA_B").size());
+        assertEquals(1, defaultDatabase.getSequenceNames("SCHEMA_C").size());
     }
 
 

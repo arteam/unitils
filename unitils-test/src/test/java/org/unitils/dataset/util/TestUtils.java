@@ -15,12 +15,8 @@
  */
 package org.unitils.dataset.util;
 
-import org.dbmaintain.config.DbSupportsFactory;
-import org.dbmaintain.config.PropertiesDatabaseInfoLoader;
-import org.dbmaintain.dbsupport.DatabaseInfo;
-import org.dbmaintain.dbsupport.DbSupport;
-import org.dbmaintain.dbsupport.DbSupports;
-import org.dbmaintain.dbsupport.impl.DefaultSQLHandler;
+import org.dbmaintain.database.*;
+import org.dbmaintain.database.impl.DefaultSQLHandler;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
@@ -29,7 +25,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_SCHEMANAMES;
-import static org.unitils.database.DatabaseUnitils.getDbSupports;
+import static org.unitils.database.DatabaseUnitils.getDatabases;
 
 
 /**
@@ -39,17 +35,17 @@ import static org.unitils.database.DatabaseUnitils.getDbSupports;
 public class TestUtils {
 
     public static DatabaseMetaData createDatabaseMetaData() {
-        DbSupport defaultDbSupport = getDbSupports().getDefaultDbSupport();
-        return new DatabaseMetaData(defaultDbSupport, new SqlTypeHandlerRepository());
+        Database defaultDatabase = getDatabases().getDefaultDatabase();
+        return new DatabaseMetaData(defaultDatabase, new SqlTypeHandlerRepository());
     }
 
-    public static DbSupports createDbSupports(String schemaNames) {
+    public static Databases createDatabases(String schemaNames) {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(PROPERTY_SCHEMANAMES, schemaNames);
 
-        PropertiesDatabaseInfoLoader propertiesDatabaseInfoLoader = new PropertiesDatabaseInfoLoader(configuration);
-        List<DatabaseInfo> databaseInfos = propertiesDatabaseInfoLoader.getDatabaseInfos();
-        DbSupportsFactory dbSupportsFactory = new DbSupportsFactory(configuration, new DefaultSQLHandler());
-        return dbSupportsFactory.createDbSupports(databaseInfos);
+        DatabaseInfoFactory databaseInfoFactory = new DatabaseInfoFactory(configuration);
+        List<DatabaseInfo> databaseInfos = databaseInfoFactory.getDatabaseInfos();
+        DatabasesFactory databasesFactory = new DatabasesFactory(configuration, new DefaultSQLHandler());
+        return databasesFactory.createDatabases(databaseInfos);
     }
 }

@@ -17,7 +17,7 @@ package org.unitils.dbmaintainer.clean.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.dbsupport.DbSupport;
+import org.dbmaintain.database.Database;
 import org.dbmaintain.util.DbMaintainException;
 import org.junit.After;
 import org.junit.Before;
@@ -29,7 +29,7 @@ import java.util.Properties;
 import static org.dbmaintain.config.DbMaintainProperties.*;
 import static org.junit.Assert.fail;
 import static org.unitils.database.DatabaseUnitils.clearDatabase;
-import static org.unitils.database.DatabaseUnitils.getDbSupports;
+import static org.unitils.database.DatabaseUnitils.getDatabases;
 import static org.unitils.testutil.TestUnitilsConfiguration.reinitializeUnitils;
 import static org.unitils.testutil.TestUnitilsConfiguration.resetUnitils;
 
@@ -44,7 +44,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DefaultDBClearerPreserveDoesNotExistTest.class);
 
-    private DbSupport defaultDbSupport;
+    private Database defaultDatabase;
     private Properties configuration;
 
 
@@ -56,7 +56,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest {
     @Before
     public void setUp() throws Exception {
         configuration = new ConfigurationLoader().loadConfiguration();
-        defaultDbSupport = getDbSupports().getDefaultDbSupport();
+        defaultDatabase = getDatabases().getDefaultDatabase();
     }
 
     @After
@@ -118,7 +118,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest {
      */
     @Test
     public void testClearDatabase_sequencesToPreserveDoNotExist() throws Exception {
-        if (!defaultDbSupport.supportsSequences()) {
+        if (!defaultDatabase.supportsSequences()) {
             logger.warn("Current dialect does not support sequences. Skipping test.");
             return;
         }
@@ -139,7 +139,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest {
      */
     @Test
     public void testClearDatabase_synonymsToPreserveDoNotExist() throws Exception {
-        if (!defaultDbSupport.supportsSynonyms()) {
+        if (!defaultDatabase.supportsSynonyms()) {
             logger.warn("Current dialect does not support synonyms. Skipping test.");
             return;
         }

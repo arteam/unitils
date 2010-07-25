@@ -15,8 +15,8 @@
  */
 package org.unitils.database;
 
-import org.dbmaintain.dbsupport.DbSupports;
-import org.dbmaintain.launch.DbMaintain;
+import org.dbmaintain.MainFactory;
+import org.dbmaintain.database.Databases;
 import org.unitils.core.Unitils;
 
 import javax.sql.DataSource;
@@ -43,8 +43,8 @@ public class DatabaseUnitils {
     /**
      * @return The utility classes for working with databases. For example for getting all table names within a schema.
      */
-    public static DbSupports getDbSupports() {
-        return getDatabaseModule().getDbSupports();
+    public static Databases getDatabases() {
+        return getDatabaseModule().getDatabases();
     }
 
 
@@ -98,28 +98,28 @@ public class DatabaseUnitils {
      * reinitializing the database after having reorganized the scripts folder.
      */
     public static void markDatabaseAsUpToDate() {
-        getDbMaintain().markDatabaseAsUpToDate();
+        getMainFactory().createDbMaintainer().markDatabaseAsUpToDate();
     }
 
     /**
      * Clears all configured schema's. I.e. drops all tables, views and other database objects.
      */
     public static void clearDatabase() {
-        getDbMaintain().clearDatabase();
+        getMainFactory().createDBClearer().clearDatabase();
     }
 
     /**
      * Cleans all configured schema's. I.e. removes all data from its database tables.
      */
     public static void cleanDatabase() {
-        getDbMaintain().cleanDatabase();
+        getMainFactory().createDBCleaner().cleanDatabase();
     }
 
     /**
      * Disables all foreign key and not-null constraints on the configured schema's.
      */
     public static void disableConstraints() {
-        getDbMaintain().disableConstraints();
+        getMainFactory().createConstraintsDisabler().disableConstraints();
     }
 
     /**
@@ -127,7 +127,7 @@ public class DatabaseUnitils {
      * to this treshold
      */
     public static void updateSequences() {
-        getDbMaintain().updateSequences();
+        getMainFactory().createSequenceUpdater().updateSequences();
     }
 
 
@@ -142,8 +142,8 @@ public class DatabaseUnitils {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
     }
 
-    private static DbMaintain getDbMaintain() {
-        return getDatabaseModule().getDbMaintain();
+    private static MainFactory getMainFactory() {
+        return getDatabaseModule().getMainFactory();
     }
 
     /**

@@ -17,7 +17,7 @@ package org.unitils.dbmaintainer.clean.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.dbsupport.DbSupport;
+import org.dbmaintain.database.Database;
 import org.hsqldb.Trigger;
 import org.junit.After;
 import org.junit.Before;
@@ -31,7 +31,7 @@ import static org.dbmaintain.config.DbMaintainProperties.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.database.DatabaseUnitils.clearDatabase;
-import static org.unitils.database.DatabaseUnitils.getDbSupports;
+import static org.unitils.database.DatabaseUnitils.getDatabases;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.testutil.TestUnitilsConfiguration.*;
@@ -49,7 +49,7 @@ public class DefaultDBClearerMultiSchemaTest {
     private static Log logger = LogFactory.getLog(DefaultDBClearerMultiSchemaTest.class);
 
     private DataSource dataSource;
-    private DbSupport defaultDbSupport;
+    private Database defaultDatabase;
     private String versionTableName;
     private boolean disabled;
 
@@ -67,8 +67,8 @@ public class DefaultDBClearerMultiSchemaTest {
 
         reinitializeUnitils(configuration);
         versionTableName = configuration.getProperty(PROPERTY_EXECUTED_SCRIPTS_TABLE_NAME);
-        defaultDbSupport = getDbSupports().getDefaultDbSupport();
-        dataSource = defaultDbSupport.getDataSource();
+        defaultDatabase = getDatabases().getDefaultDatabase();
+        dataSource = defaultDatabase.getDataSource();
 
         dropTestDatabase();
         createTestDatabase();
@@ -90,13 +90,13 @@ public class DefaultDBClearerMultiSchemaTest {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        assertEquals(1, defaultDbSupport.getTableNames("PUBLIC").size());
-        assertEquals(1, defaultDbSupport.getTableNames("SCHEMA_A").size());
-        assertEquals(1, defaultDbSupport.getTableNames("SCHEMA_B").size());
+        assertEquals(1, defaultDatabase.getTableNames("PUBLIC").size());
+        assertEquals(1, defaultDatabase.getTableNames("SCHEMA_A").size());
+        assertEquals(1, defaultDatabase.getTableNames("SCHEMA_B").size());
         clearDatabase();
-        assertEquals(1, defaultDbSupport.getTableNames("PUBLIC").size());  // version table was created
-        assertEquals(0, defaultDbSupport.getTableNames("SCHEMA_A").size());
-        assertEquals(0, defaultDbSupport.getTableNames("SCHEMA_B").size());
+        assertEquals(1, defaultDatabase.getTableNames("PUBLIC").size());  // version table was created
+        assertEquals(0, defaultDatabase.getTableNames("SCHEMA_A").size());
+        assertEquals(0, defaultDatabase.getTableNames("SCHEMA_B").size());
     }
 
     @Test
@@ -105,13 +105,13 @@ public class DefaultDBClearerMultiSchemaTest {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        assertEquals(1, defaultDbSupport.getViewNames("PUBLIC").size());
-        assertEquals(1, defaultDbSupport.getViewNames("SCHEMA_A").size());
-        assertEquals(1, defaultDbSupport.getViewNames("SCHEMA_B").size());
+        assertEquals(1, defaultDatabase.getViewNames("PUBLIC").size());
+        assertEquals(1, defaultDatabase.getViewNames("SCHEMA_A").size());
+        assertEquals(1, defaultDatabase.getViewNames("SCHEMA_B").size());
         clearDatabase();
-        assertTrue(defaultDbSupport.getViewNames("PUBLIC").isEmpty());
-        assertTrue(defaultDbSupport.getViewNames("SCHEMA_A").isEmpty());
-        assertTrue(defaultDbSupport.getViewNames("SCHEMA_B").isEmpty());
+        assertTrue(defaultDatabase.getViewNames("PUBLIC").isEmpty());
+        assertTrue(defaultDatabase.getViewNames("SCHEMA_A").isEmpty());
+        assertTrue(defaultDatabase.getViewNames("SCHEMA_B").isEmpty());
     }
 
     @Test
@@ -120,13 +120,13 @@ public class DefaultDBClearerMultiSchemaTest {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        assertEquals(1, defaultDbSupport.getSequenceNames("PUBLIC").size());
-        assertEquals(1, defaultDbSupport.getSequenceNames("SCHEMA_A").size());
-        assertEquals(1, defaultDbSupport.getSequenceNames("SCHEMA_B").size());
+        assertEquals(1, defaultDatabase.getSequenceNames("PUBLIC").size());
+        assertEquals(1, defaultDatabase.getSequenceNames("SCHEMA_A").size());
+        assertEquals(1, defaultDatabase.getSequenceNames("SCHEMA_B").size());
         clearDatabase();
-        assertTrue(defaultDbSupport.getSequenceNames("PUBLIC").isEmpty());
-        assertTrue(defaultDbSupport.getSequenceNames("SCHEMA_A").isEmpty());
-        assertTrue(defaultDbSupport.getSequenceNames("SCHEMA_B").isEmpty());
+        assertTrue(defaultDatabase.getSequenceNames("PUBLIC").isEmpty());
+        assertTrue(defaultDatabase.getSequenceNames("SCHEMA_A").isEmpty());
+        assertTrue(defaultDatabase.getSequenceNames("SCHEMA_B").isEmpty());
     }
 
 

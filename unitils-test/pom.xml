@@ -45,11 +45,6 @@
         </dependency>
         <dependency>
             <groupId>org.unitils</groupId>
-            <artifactId>unitils-dbmaintainer</artifactId>
-            <version>${pom.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.unitils</groupId>
             <artifactId>unitils-dbunit</artifactId>
             <version>${pom.version}</version>
         </dependency>

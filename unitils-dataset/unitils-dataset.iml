@@ -17,9 +17,8 @@
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.3" level="project" />
     <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2" level="project" />
     <orderEntry type="library" name="Maven: ognl:ognl:2.6.9" level="project" />
-    <orderEntry type="library" name="Maven: org.dbmaintain:dbmaintain:1.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.dbmaintain:dbmaintain:2.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: ant:ant:1.6.5" level="project" />
-    <orderEntry type="library" name="Maven: org.unitils:unitils-dbmaintainer:3.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: commons-dbcp:commons-dbcp:1.2.2" level="project" />
     <orderEntry type="library" name="Maven: commons-pool:commons-pool:1.3" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-jdbc:2.5.2" level="project" />

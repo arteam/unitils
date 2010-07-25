@@ -17,8 +17,12 @@ package org.unitils.database;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.dbsupport.DbSupports;
-import org.dbmaintain.launch.DbMaintain;
+import org.dbmaintain.MainFactory;
+import org.dbmaintain.database.DatabaseInfo;
+import org.dbmaintain.database.DatabaseInfoFactory;
+import org.dbmaintain.database.Databases;
+import org.dbmaintain.database.DatabasesFactory;
+import org.dbmaintain.database.impl.DefaultSQLHandler;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.unitils.core.Module;
@@ -29,7 +33,6 @@ import org.unitils.database.annotations.Transactional;
 import org.unitils.database.config.DataSourceFactory;
 import org.unitils.database.transaction.UnitilsTransactionManager;
 import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
-import org.unitils.database.util.DbMaintainFactory;
 import org.unitils.database.util.Flushable;
 import org.unitils.database.util.TransactionMode;
 import org.unitils.util.PropertyUtils;
@@ -92,14 +95,13 @@ public class DatabaseModule implements Module {
     protected Map<Class<? extends Annotation>, Map<String, String>> defaultAnnotationPropertyValues;
 
     /* The db support instances */
-    protected DbSupports dbSupports;
+    protected Databases databases;
     /* The configuration of Unitils */
     protected Properties configuration;
     /* Indicates if the DBMaintain should be invoked to update the database */
     protected boolean updateDatabaseSchemaEnabled;
-    protected DbMaintainFactory dbMaintainFactory;
-    /* The db maintain instance */
-    protected DbMaintain dbMaintain;
+    /* The main db-maintain factory instance */
+    protected MainFactory mainFactory;
     /* Indicates whether the datasource injected onto test fields annotated with @TestDataSource or retrieved using
      * {@link #getTransactionalDataSourceAndActivateTransactionIfNeeded} must be wrapped in a transactional proxy */
     protected boolean wrapDataSourceInTransactionalProxy;
@@ -120,7 +122,6 @@ public class DatabaseModule implements Module {
     @SuppressWarnings("unchecked")
     public void init(Properties configuration) {
         this.configuration = configuration;
-        this.dbMaintainFactory = new DbMaintainFactory(configuration);
         this.defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(DatabaseModule.class, configuration, Transactional.class);
         this.updateDatabaseSchemaEnabled = PropertyUtils.getBoolean(PROPERTY_UPDATEDATABASESCHEMA_ENABLED, configuration);
         this.wrapDataSourceInTransactionalProxy = PropertyUtils.getBoolean(PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY, configuration);
@@ -192,28 +193,35 @@ public class DatabaseModule implements Module {
     }
 
 
-    public synchronized DbSupports getDbSupports() {
-        if (dbSupports == null) {
-            dbSupports = dbMaintainFactory.createDbSupports();
+    public synchronized Databases getDatabases() {
+        if (databases == null) {
+            DatabaseInfoFactory databaseInfoFactory = new DatabaseInfoFactory(configuration);
+            List<DatabaseInfo> databaseInfos = databaseInfoFactory.getDatabaseInfos();
+            DatabasesFactory databasesFactory = new DatabasesFactory(configuration, new DefaultSQLHandler());
+            databases = databasesFactory.createDatabases(databaseInfos);
 
-            // Call the database maintainer if enabled
-            if (updateDatabaseSchemaEnabled) {
-                boolean databaseUpdated = updateDatabase();
-                if (databaseUpdated) {
-                    notifyDatabaseUpdateListeners();
-                }
+            updateDatabaseIfNeeded();
+        }
+        return databases;
+    }
+
+    private void updateDatabaseIfNeeded() {
+        // Call the database maintainer if enabled
+        if (updateDatabaseSchemaEnabled) {
+            boolean databaseUpdated = updateDatabase();
+            if (databaseUpdated) {
+                notifyDatabaseUpdateListeners();
             }
         }
-        return dbSupports;
     }
 
 
     public DataSource getDataSource() {
-        return getDbSupports().getDefaultDbSupport().getDataSource();
+        return getDatabases().getDefaultDatabase().getDataSource();
     }
 
     public boolean isDataSourceLoaded() {
-        return dbSupports != null;
+        return databases != null;
     }
 
 
@@ -255,11 +263,11 @@ public class DatabaseModule implements Module {
     }
 
 
-    public synchronized DbMaintain getDbMaintain() {
-        if (dbMaintain == null) {
-            dbMaintain = dbMaintainFactory.createDbMaintain(getDbSupports());
+    public synchronized MainFactory getMainFactory() {
+        if (mainFactory == null) {
+            mainFactory = new MainFactory(configuration, getDatabases());
         }
-        return dbMaintain;
+        return mainFactory;
     }
 
     /**
@@ -271,7 +279,7 @@ public class DatabaseModule implements Module {
      */
     public boolean updateDatabase() {
         logger.info("Checking if database has to be updated.");
-        return getDbMaintain().updateDatabase();
+        return getMainFactory().createDbMaintainer().updateDatabase(false);
     }
 
 

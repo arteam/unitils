@@ -17,7 +17,7 @@ package org.unitils.dataset;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.dbsupport.DbSupport;
+import org.dbmaintain.database.Database;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
@@ -285,10 +285,10 @@ public class DataSetModule implements Module {
 
     protected DatabaseMetaData createDatabaseMetaData() {
         DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-        DbSupport defaultDbSupport = databaseModule.getDbSupports().getDefaultDbSupport();
+        Database defaultDatabase = databaseModule.getDatabases().getDefaultDatabase();
 
         SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
-        return new DatabaseMetaData(defaultDbSupport, sqlTypeHandlerRepository);
+        return new DatabaseMetaData(defaultDatabase, sqlTypeHandlerRepository);
     }
 
 
