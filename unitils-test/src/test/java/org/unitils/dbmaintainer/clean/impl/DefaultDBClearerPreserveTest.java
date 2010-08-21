@@ -59,6 +59,7 @@ public class DefaultDBClearerPreserveTest {
         Properties configuration = getUnitilsConfiguration();
 
         defaultDatabase = getDatabases().getDefaultDatabase();
+        configuration.setProperty(PROPERTY_AUTO_CREATE_DBMAINTAIN_SCRIPTS_TABLE, "true");
         configuration.setProperty(PROPERTY_PRESERVE_TABLES, "Test_Table, " + defaultDatabase.quoted("Test_CASE_Table"));
         configuration.setProperty(PROPERTY_PRESERVE_VIEWS, "Test_View, " + defaultDatabase.quoted("Test_CASE_View"));
         if (defaultDatabase.supportsMaterializedViews()) {

@@ -22,18 +22,18 @@ import org.hsqldb.Trigger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 
 import javax.sql.DataSource;
 import java.util.Properties;
 
+import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_AUTO_CREATE_DBMAINTAIN_SCRIPTS_TABLE;
 import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_EXECUTED_SCRIPTS_TABLE_NAME;
 import static org.junit.Assert.*;
 import static org.unitils.core.util.SQLTestUtils.*;
 import static org.unitils.database.DatabaseUnitils.clearDatabase;
 import static org.unitils.database.DatabaseUnitils.getDatabases;
 import static org.unitils.database.SQLUnitils.executeUpdate;
-import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfiguration;
+import static org.unitils.testutil.TestUnitilsConfiguration.*;
 
 /**
  * Test class for the clearing the database.
@@ -42,7 +42,7 @@ import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfigurat
  * @author Tim Ducheyne
  * @author Scott Prater
  */
-public class DefaultDBClearerTest extends UnitilsJUnit4 {
+public class DefaultDBClearerTest {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DefaultDBClearerTest.class);
@@ -57,6 +57,9 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
         Properties configuration = getUnitilsConfiguration();
         versionTableName = configuration.getProperty(PROPERTY_EXECUTED_SCRIPTS_TABLE_NAME);
 
+        configuration.setProperty(PROPERTY_AUTO_CREATE_DBMAINTAIN_SCRIPTS_TABLE, "true");
+        reinitializeUnitils(configuration);
+
         defaultDatabase = getDatabases().getDefaultDatabase();
         dataSource = defaultDatabase.getDataSource();
 
@@ -66,6 +69,7 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
 
     @After
     public void cleanUp() throws Exception {
+        resetUnitils();
         cleanupTestDatabase();
     }
 

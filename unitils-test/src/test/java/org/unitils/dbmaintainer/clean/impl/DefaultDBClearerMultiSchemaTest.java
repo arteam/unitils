@@ -63,6 +63,7 @@ public class DefaultDBClearerMultiSchemaTest {
         }
 
         // configure 3 schemas
+        configuration.setProperty(PROPERTY_AUTO_CREATE_DBMAINTAIN_SCRIPTS_TABLE, "true");
         configuration.setProperty(PROPERTY_SCHEMANAMES, "PUBLIC, SCHEMA_A, SCHEMA_B");
 
         reinitializeUnitils(configuration);
