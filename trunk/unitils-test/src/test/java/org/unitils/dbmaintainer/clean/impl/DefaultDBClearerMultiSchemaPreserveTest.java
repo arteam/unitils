@@ -65,6 +65,7 @@ public class DefaultDBClearerMultiSchemaPreserveTest {
 
         // configure items to preserve
         defaultDatabase = getDatabases().getDefaultDatabase();
+        configuration.setProperty(PROPERTY_AUTO_CREATE_DBMAINTAIN_SCRIPTS_TABLE, "true");
         configuration.setProperty(PROPERTY_PRESERVE_SCHEMAS, "schema_c");
         configuration.setProperty(PROPERTY_PRESERVE_TABLES, "test_table, " + defaultDatabase.quoted("SCHEMA_A") + "." + defaultDatabase.quoted("TEST_TABLE"));
         configuration.setProperty(PROPERTY_PRESERVE_VIEWS, "test_view, " + "schema_a." + defaultDatabase.quoted("TEST_VIEW"));
