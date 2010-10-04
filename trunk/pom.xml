@@ -14,11 +14,11 @@
         <module>unitils-easymock</module>
         <module>unitils-inject</module>
         <module>unitils-mock</module>
+        <module>unitils-hibernate</module>
         <module>unitils-tapestry</module>
-
-        <module>unitils-test</module>
         <module>unitils-dataset</module>
-        <!--module>unitils-testng-test</module-->       <!-- todo convert tests to TestNG -->
+        
+        <module>unitils-test</module>
     </modules>
 
     <!-- Project information -->

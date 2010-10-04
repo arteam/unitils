@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.orm.hibernate.util;
+package org.unitils.hibernate.util;
 
-import static junit.framework.Assert.assertTrue;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
@@ -25,6 +24,8 @@ import org.unitils.core.UnitilsException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Assert class that offers assert methods for testing things that are specific to Hibernate.
