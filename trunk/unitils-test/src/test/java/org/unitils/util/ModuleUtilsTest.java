@@ -17,14 +17,15 @@ package org.unitils.util;
 
 import junit.framework.TestCase;
 import org.unitils.core.Module;
-import org.unitils.core.TestListener;
+import org.unitils.core.TestExecutionListenerAdapter;
 import org.unitils.core.UnitilsException;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.Properties;
+
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 
 /**
  * Test for {@link ModuleUtils}.
@@ -54,7 +55,6 @@ public class ModuleUtilsTest extends TestCase {
     /**
      * Test the loading of the default values.
      */
-    @SuppressWarnings("unchecked")
     public void testGetAnnotationEnumDefaults() {
         Map<Class<? extends Annotation>, Map<String, String>> result = getAnnotationPropertyDefaults(TestModule.class, configuration, TestAnnotation1.class, TestAnnotation2.class);
 
@@ -202,7 +202,7 @@ public class ModuleUtilsTest extends TestCase {
         public void afterInit() {
         }
 
-        public TestListener getTestListener() {
+        public TestExecutionListenerAdapter getTestListener() {
             return null;
         }
 

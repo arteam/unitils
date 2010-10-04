@@ -15,12 +15,11 @@
  */
 package org.unitils.orm.jpa;
 
+import org.unitils.core.Unitils;
+import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-
-import org.unitils.core.Unitils;
-import org.unitils.core.UnitilsException;
-import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
 
 /**
  * Utility facade for handling JPA related stuff such as asserting whether the mappings correspond to the actual
@@ -31,13 +30,15 @@ import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
  */
 public class JpaUnitils {
 
-	
-	/**
+
+    /**
      * Checks if the mapping of the JPA entities with the database is still correct for the configurations
      * that are loaded for the current test.
+     *
+     * @param testInstance The current test instance (e.g. this if your in the test), not null
      */
-    public static void assertMappingWithDatabaseConsistent() {
-        getJpaModule().assertMappingWithDatabaseConsistent(getTestObject());
+    public static void assertMappingWithDatabaseConsistent(Object testInstance) {
+        getJpaModule().assertMappingWithDatabaseConsistent(testInstance);
     }
 
 
@@ -45,57 +46,50 @@ public class JpaUnitils {
      * Flushes all pending entity manager updates to the database. This method is useful when the effect
      * of updates needs to be checked directly on the database, without passing through the currently active
      * <code>EntityManager</code>
+     *
+     * @param testInstance The current test instance (e.g. this if your in the test), not null
      */
-    public static void flushDatabaseUpdates() {
-    	getJpaModule().flushDatabaseUpdates(getTestObject());
+    public static void flushDatabaseUpdates(Object testInstance) {
+        getJpaModule().flushDatabaseUpdates(testInstance);
     }
-    
-    
+
+
     /**
-     * For the given target object, injects the active, transactional <code>EntityManager</code> into 
+     * For the given target object, injects the active, transactional <code>EntityManager</code> into
      * fields or methods annotated with <code>javax.persistence.PersistenceContext</code>
-     * 
-     * @param target
+     *
+     * @param testInstance The current test instance (e.g. this if your in the test), not null
+     * @param target       The target instance for the injection, not null
      */
-    public static void injectEntityManagerInto(Object target) {
-    	getJpaModule().injectJpaResourcesInto(getTestObject(), target);
+    public static void injectEntityManagerInto(Object target, Object testInstance) {
+        getJpaModule().injectJpaResourcesInto(testInstance, target);
     }
-    
-    
+
+
     /**
+     * @param testInstance The current test instance (e.g. this if your in the test), not null
      * @return The <code>EntityManagerFactory</code> configured for the current test object (spring or using
-     * the {@link JpaEntityManagerFactory} annotation. 
+     *         the {@link JpaEntityManagerFactory} annotation.
      */
-    public static EntityManagerFactory getEntityManagerFactory() {
-    	return getJpaModule().getPersistenceUnit(getTestObject());
-    }
-    
-    
-    /**
-     * @return An <code>EntityManager</code> associated with the current transaction. This method returns the 
-     * same <code>EntityManager</code> during the course of a transaction.
-     */
-    public static EntityManager getEntityManager() {
-    	return getJpaModule().getPersistenceContext(getTestObject());
+    public static EntityManagerFactory getEntityManagerFactory(Object testInstance) {
+        return getJpaModule().getPersistenceUnit(testInstance);
     }
 
 
     /**
-	 * @return The current test object
-	 */
-	private static Object getTestObject() {
-		Object testObject = Unitils.getInstance().getTestContext().getTestObject();
-        if (testObject == null) {
-            throw new UnitilsException("No current test found in context. Unable to execute specified operation");
-        }
-		return testObject;
-	}
-    
-    
+     * @param testInstance The current test instance (e.g. this if your in the test), not null
+     * @return An <code>EntityManager</code> associated with the current transaction. This method returns the
+     *         same <code>EntityManager</code> during the course of a transaction.
+     */
+    public static EntityManager getEntityManager(Object testInstance) {
+        return getJpaModule().getPersistenceContext(testInstance);
+    }
+
+
     /**
-	 * @return The {@link JpaModule}
-	 */
-	private static JpaModule getJpaModule() {
-		return Unitils.getInstance().getModulesRepository().getModuleOfType(JpaModule.class);
-	}
+     * @return The {@link JpaModule}
+     */
+    private static JpaModule getJpaModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(JpaModule.class);
+    }
 }

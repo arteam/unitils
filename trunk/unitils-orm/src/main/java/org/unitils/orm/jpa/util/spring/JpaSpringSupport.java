@@ -21,10 +21,8 @@ import org.unitils.core.Unitils;
 import org.unitils.orm.common.spring.OrmSpringSupport;
 import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
 import org.unitils.orm.jpa.JpaModule;
-import org.unitils.spring.SpringModule;
 
 import javax.persistence.EntityManagerFactory;
-import java.util.Collection;
 
 
 /**
@@ -56,21 +54,11 @@ public class JpaSpringSupport implements OrmSpringSupport<EntityManagerFactory, 
      * @return Instance of {@link LocalSessionFactoryBean} that wraps the configuration of hibernate in spring
      */
     protected AbstractEntityManagerFactoryBean getEntityManagerFactoryBean(Object testObject) {
-        if (!getSpringModule().isApplicationContextConfiguredFor(testObject)) {
-            return null;
-        }
-        Collection<?> entityManagerFactoryBeans = getSpringModule().getApplicationContext(testObject).getBeansOfType(AbstractEntityManagerFactoryBean.class).values();
-        if (entityManagerFactoryBeans.size() == 0) {
-            return null;
-        }
-        return (AbstractEntityManagerFactoryBean) entityManagerFactoryBeans.iterator().next();
+        return null;
     }
 
 
-    protected SpringModule getSpringModule() {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(SpringModule.class);
-    }
-
+    
 
     protected JpaModule getJpaModule() {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(JpaModule.class);

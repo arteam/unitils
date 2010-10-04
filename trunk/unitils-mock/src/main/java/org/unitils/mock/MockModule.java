@@ -17,8 +17,9 @@ package org.unitils.mock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.test.context.TestContext;
 import org.unitils.core.Module;
-import org.unitils.core.TestListener;
+import org.unitils.core.TestExecutionListenerAdapter;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.annotation.AfterCreateMock;
 import org.unitils.mock.annotation.Dummy;
@@ -214,7 +215,7 @@ public class MockModule implements Module {
      *
      * @return the listener
      */
-    public TestListener getTestListener() {
+    public TestExecutionListenerAdapter getTestListener() {
         return new MockTestListener();
     }
 
@@ -223,17 +224,17 @@ public class MockModule implements Module {
      * Test listener that handles the scenario and mock creation, and makes sure a final syntax check
      * is performed after each test and that scenario reports are logged if required.
      */
-    protected class MockTestListener extends TestListener {
+    protected class MockTestListener extends TestExecutionListenerAdapter {
 
         @Override
-        public void beforeTestSetUp(Object testObject, Method testMethod) {
+        public void prepareTestInstance(Object testObject, TestContext testContext) throws Exception {
             createAndInjectPartialMocksIntoTest(testObject);
             createAndInjectMocksIntoTest(testObject);
             createAndInjectDummiesIntoTest(testObject);
         }
 
         @Override
-        public void afterTestTearDown(Object testObject, Method testMethod) {
+        public void afterTestMethod(Object testObject, Method testMethod, Throwable testThrowable, TestContext testContext) throws Exception {
             if (logFullScenarioReport) {
                 logFullScenarioReport();
                 return;
@@ -248,9 +249,5 @@ public class MockModule implements Module {
                 logSuggestedAsserts();
             }
         }
-
-
     }
-
-
 }

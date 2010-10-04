@@ -21,16 +21,19 @@ import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
-import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.difference.Difference;
 import org.unitils.util.PropertyUtils;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.util.Properties;
 
@@ -53,6 +56,8 @@ import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRef
  * @author Filip Neven
  */
 @Transactional(COMMIT)
+@ContextConfiguration
+@TestExecutionListeners(DependencyInjectionTestExecutionListener.class)
 public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
 
     /* The logger instance for this class */
@@ -64,7 +69,7 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
     @TestDataSource
     protected DataSource dataSource;
 
-    @HibernateSessionFactory("org/unitils/reflectionassert/hibernate/hibernate.cfg.xml")
+    @Resource
     protected SessionFactory sessionFactory;
 
     /* Class under test */

@@ -32,13 +32,27 @@ public class DatabaseUnitils {
 
 
     /**
-     * Returns the DataSource that connects to the test database
+     * Returns the DataSource that connects to the default test database
+     *
+     * NOTE: this will not retrieve a data source from a Spring context.
+     * Use injection or applicationContext.getBean() instead.
      *
      * @return The DataSource that connects to the test database
      */
     public static DataSource getDataSource() {
-        return getDatabaseModule().getTransactionalDataSourceAndActivateTransactionIfNeeded(getTestObject());
+        return getDataSource(null);
     }
+
+    /**
+     * Returns the DataSource that connects to the test database
+     *
+     * @param databaseName The name of the database to get a data source for, null for the default database
+     * @return The DataSource that connects to the test database
+     */
+    public static DataSource getDataSource(String databaseName) {
+        return getDatabaseModule().getDataSource(databaseName, null);
+    }
+
 
     /**
      * @return The utility classes for working with databases. For example for getting all table names within a schema.
@@ -49,37 +63,30 @@ public class DatabaseUnitils {
 
 
     /**
-     * Flushes all pending updates to the database. This method is useful when the effect of updates
-     * needs to be checked directly on the database.
-     * <p/>
-     * A typical usage of this method is, when updates were issues to the database using hibernate,
-     * making sure that these updates are flushed, to be able to check the effect of these updates
-     * using plain old JDBC.
-     */
-    public static void flushDatabaseUpdates() {
-        getDatabaseModule().flushDatabaseUpdates(getTestObject());
-    }
-
-
-    /**
      * Starts a new transaction on the transaction manager configured in unitils
+     *
+     * @param testObject The current test instance (e.g. this if your in the test), not null
      */
-    public static void startTransaction() {
-        getDatabaseModule().startTransaction(getTestObject());
+    public static void startTransaction(Object testObject) {
+        getDatabaseModule().startTransaction(testObject, null);
     }
 
     /**
      * Commits the current unitils transaction
+     *
+     * @param testObject The current test instance (e.g. this if your in the test), not null
      */
-    public static void commitTransaction() {
-        getDatabaseModule().commitTransaction(getTestObject());
+    public static void commitTransaction(Object testObject) {
+        getDatabaseModule().commitTransaction(testObject);
     }
 
     /**
      * Performs a rollback of the current unitils transaction
+     *
+     * @param testObject The current test instance (e.g. this if your in the test), not null
      */
-    public static void rollbackTransaction() {
-        getDatabaseModule().rollbackTransaction(getTestObject());
+    public static void rollbackTransaction(Object testObject) {
+        getDatabaseModule().rollbackTransaction(testObject);
     }
 
 
@@ -144,12 +151,5 @@ public class DatabaseUnitils {
 
     private static MainFactory getMainFactory() {
         return getDatabaseModule().getMainFactory();
-    }
-
-    /**
-     * @return The current test object
-     */
-    private static Object getTestObject() {
-        return Unitils.getInstance().getTestContext().getTestObject();
     }
 }

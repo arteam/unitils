@@ -15,13 +15,12 @@
  */
 package org.unitils.core;
 
-import static org.unitils.util.ReflectionUtils.getClassWithName;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
+
+import static org.unitils.util.ReflectionUtils.getClassWithName;
 
 /**
  * A class for holding and retrieving modules.
@@ -35,7 +34,7 @@ public class ModulesRepository {
     private List<Module> modules;
 
     /* A map containing the test listeners of each module */
-    private Map<Module, TestListener> testListeners;
+    private Map<Module, TestExecutionListenerAdapter> testListeners;
 
 
     /**
@@ -64,7 +63,7 @@ public class ModulesRepository {
      *
      * @return the listeners per module, not null
      */
-    public Map<Module, TestListener> getTestListeners() {
+    public Map<Module, TestExecutionListenerAdapter> getTestListeners() {
         return testListeners;
     }
 
@@ -150,7 +149,7 @@ public class ModulesRepository {
      * @param module the module, not null
      * @return the listener, null if the module could not be found
      */
-    public TestListener getTestListener(Module module) {
+    public TestExecutionListenerAdapter getTestListener(Module module) {
         return testListeners.get(module);
     }
 
@@ -161,8 +160,8 @@ public class ModulesRepository {
      * @param moduleList the modules, not null
      * @return the listeners for each module, not null
      */
-    private Map<Module, TestListener> createTestListeners(List<Module> moduleList) {
-        Map<Module, TestListener> result = new HashMap<Module, TestListener>(moduleList.size());
+    private Map<Module, TestExecutionListenerAdapter> createTestListeners(List<Module> moduleList) {
+        Map<Module, TestExecutionListenerAdapter> result = new HashMap<Module, TestExecutionListenerAdapter>(moduleList.size());
         for (Module module : moduleList) {
             result.put(module, module.getTestListener());
         }

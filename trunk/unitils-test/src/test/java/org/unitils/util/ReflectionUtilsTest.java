@@ -17,12 +17,11 @@ package org.unitils.util;
 
 import junit.framework.TestCase;
 import org.unitils.core.UnitilsException;
-import static org.unitils.util.CollectionUtils.asSet;
-import static org.unitils.util.ReflectionUtils.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashSet;
+
+import static org.unitils.util.ReflectionUtils.*;
 
 /**
  * Test for {@link ReflectionUtils}.
@@ -142,53 +141,27 @@ public class ReflectionUtilsTest extends TestCase {
     /**
      * Test for setting the value of a field and setter.
      */
-    public void testSetFieldAndSetterValue_field() {
-        setFieldAndSetterValue(testObject, asSet(field), new HashSet<Method>(), "newValue");
+    public void testSetSetterValue() {
+        setSetterValue(testObject, fieldSetterMethod, "newValue");
         assertEquals("newValue", testObject.getField());
     }
-
-
-    /**
-     * Test for setting the value of a field and setter.
-     */
-    public void testSetFieldAndSetterValue_setter() {
-        setFieldAndSetterValue(testObject, new HashSet<Field>(), asSet(fieldSetterMethod), "newValue");
-        assertEquals("newValue", testObject.getField());
-    }
-
 
     /**
      * Test for setting the value of a field and setter. Null value
      */
-    public void testSetFieldAndSetterValue_null() {
-        setFieldAndSetterValue(testObject, asSet(field), asSet(fieldSetterMethod), null);
+    public void testSetSetterValue_null() {
+        setSetterValue(testObject, fieldSetterMethod, null);
         assertNull(testObject.getField());
     }
-
-
-    /**
-     * Test for setting the value of a field and setter. Field not found
-     */
-    public void testSetFieldAndSetterValue_unexistingField() throws Exception {
-        //get another field
-        Field anotherField = getClass().getDeclaredField("testObject");
-        try {
-            setFieldAndSetterValue(testObject, asSet(anotherField), asSet(fieldSetterMethod), "newValue");
-            fail("UnitilsException expected");
-        } catch (UnitilsException e) {
-            //expected
-        }
-    }
-
 
     /**
      * Test for setting the value of a field and setter. Method not found
      */
-    public void testSetFieldAndSetterValue_unexistingMethod() throws Exception {
+    public void testSetSetterValue_unexistingMethod() throws Exception {
         //get another field
         Method anotherMethod = getClass().getDeclaredMethod("testInvokeMethod_unexistingMethod");
         try {
-            setFieldAndSetterValue(testObject, asSet(field), asSet(anotherMethod), "newValue");
+            setSetterValue(testObject, anotherMethod, "newValue");
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             //expected

@@ -75,7 +75,8 @@ public class HibernateSessionFactoryLoader implements OrmPersistenceUnitLoader<S
 
 
     protected DataSource getDataSourceAndActivateTransactionIfNeeded(Object testObject) {
-        return getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded(testObject);
+        //return getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded(testObject);
+        return null;
     }
 
 

@@ -15,13 +15,14 @@
  */
 package org.unitils.mock;
 
-import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests the mock module functionality.

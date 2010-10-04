@@ -17,35 +17,33 @@ package org.unitils.easymock;
 
 import org.easymock.classextension.internal.MocksClassControl;
 import org.easymock.internal.MocksControl;
-import static org.easymock.internal.MocksControl.MockType.DEFAULT;
-import static org.easymock.internal.MocksControl.MockType.NICE;
 import org.easymock.internal.ReplayState;
+import org.springframework.test.context.TestContext;
 import org.unitils.core.Module;
-import org.unitils.core.TestListener;
+import org.unitils.core.TestExecutionListenerAdapter;
 import org.unitils.core.UnitilsException;
 import org.unitils.easymock.annotation.AfterCreateMock;
 import org.unitils.easymock.annotation.Mock;
 import org.unitils.easymock.annotation.RegularMock;
 import org.unitils.easymock.util.*;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.*;
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 import org.unitils.util.PropertyUtils;
-import static org.unitils.util.ReflectionUtils.invokeMethod;
-import static org.unitils.util.ReflectionUtils.setFieldValue;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
+
+import static org.easymock.internal.MocksControl.MockType.DEFAULT;
+import static org.easymock.internal.MocksControl.MockType.NICE;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.*;
+import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
+import static org.unitils.util.ReflectionUtils.invokeMethod;
+import static org.unitils.util.ReflectionUtils.setFieldValue;
 
 /**
  * Module for testing with mock objects using EasyMock.
@@ -86,7 +84,7 @@ public class EasyMockModule implements Module {
      * Initializes the module
      */
     @SuppressWarnings("unchecked")
-	public void init(Properties configuration) {
+    public void init(Properties configuration) {
         mocksControls = new ArrayList<MocksControl>();
         defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(EasyMockModule.class, configuration, RegularMock.class, Mock.class);
         autoVerifyAfterTestEnabled = PropertyUtils.getBoolean(PROPKEY_AUTO_VERIFY_AFTER_TEST_ENABLED, configuration);
@@ -97,15 +95,15 @@ public class EasyMockModule implements Module {
      * No after initialization needed for this module
      */
     public void afterInit() {
-	}
+    }
 
 
-	/**
+    /**
      * Creates the listener for plugging in the behavior of this module into the test runs.
      *
      * @return the listener
      */
-    public TestListener getTestListener() {
+    public TestExecutionListenerAdapter getTestListener() {
         return new EasyMockTestListener();
     }
 
@@ -252,8 +250,9 @@ public class EasyMockModule implements Module {
 
 
     //todo javadoc
+
     protected void createAndInjectMocksIntoTest(Object testObject) {
-    	Set<Field> mockFields = getFieldsAnnotatedWith(testObject.getClass(), Mock.class);
+        Set<Field> mockFields = getFieldsAnnotatedWith(testObject.getClass(), Mock.class);
         for (Field mockField : mockFields) {
 
             Class<?> mockType = mockField.getType();
@@ -278,7 +277,7 @@ public class EasyMockModule implements Module {
      * @param type       the field(=mock) type
      */
     protected void callAfterCreateMockMethods(Object testObject, Object mockObject, String name, Class<?> type) {
-    	Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), AfterCreateMock.class);
+        Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), AfterCreateMock.class);
         for (Method method : methods) {
             try {
                 invokeMethod(testObject, method, mockObject, name, type);
@@ -296,14 +295,14 @@ public class EasyMockModule implements Module {
     /**
      * Test listener that handles the mock creation and injection.
      */
-    protected class EasyMockTestListener extends TestListener {
+    protected class EasyMockTestListener extends TestExecutionListenerAdapter {
 
         /**
          * Before the test is executed this calls {@link EasyMockModule#createAndInjectRegularMocksIntoTest(Object)} to
          * create and inject all mocks on the class.
          */
         @Override
-        public void beforeTestSetUp(Object testObject, Method testMethod) {
+        public void prepareTestInstance(Object testObject, TestContext testContext) throws Exception {
             // Clear all previously created mocks controls
             mocksControls.clear();
 
@@ -316,8 +315,8 @@ public class EasyMockModule implements Module {
          * of all created mocks.
          */
         @Override
-        public void afterTestMethod(Object testObject, Method testMethod, Throwable throwable) {
-            if (autoVerifyAfterTestEnabled && throwable == null) {
+        public void afterTestMethod(Object testObject, Method testMethod, Throwable testThrowable, TestContext testContext) throws Exception {
+            if (autoVerifyAfterTestEnabled && testThrowable == null) {
                 verify();
             }
         }

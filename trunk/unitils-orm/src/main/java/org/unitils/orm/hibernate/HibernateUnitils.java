@@ -18,7 +18,6 @@ package org.unitils.orm.hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.unitils.core.Unitils;
-import org.unitils.core.UnitilsException;
 import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
 
 /**
@@ -34,10 +33,11 @@ public class HibernateUnitils {
     /**
      * Checks if the mapping of the Hibernate managed objects with the database is still correct for the configurations
      * that are loaded for the current test.
+     *
+     * @param testInstance The current test instance (e.g. this if your in the test), not null
      */
-    public static void assertMappingWithDatabaseConsistent() {
-        Object testObject = getTestObject();
-        getHibernateModule().assertMappingWithDatabaseConsistent(testObject);
+    public static void assertMappingWithDatabaseConsistent(Object testInstance) {
+        getHibernateModule().assertMappingWithDatabaseConsistent(testInstance);
     }
 
 
@@ -45,48 +45,38 @@ public class HibernateUnitils {
      * Flushes all pending Hibernate updates to the database. This method is useful when the effect
      * of updates needs to be checked directly on the database, without passing through the currently
      * active hibernate session.
+     *
+     * @param testInstance The current test instance (e.g. this if your in the test), not null
      */
-    public static void flushDatabaseUpdates() {
-    	Object testObject = getTestObject();
-    	getHibernateModule().flushDatabaseUpdates(testObject);
+    public static void flushDatabaseUpdates(Object testInstance) {
+        getHibernateModule().flushDatabaseUpdates(testInstance);
     }
-    
-    
+
+
     /**
+     * @param testInstance The current test instance (e.g. this if your in the test), not null
      * @return The <code>SessionFactory</code> configured for the current test object (spring or using
-     * the {@link HibernateSessionFactory} annotation. 
+     *         the {@link HibernateSessionFactory} annotation.
      */
-    public static SessionFactory getSessionFactory() {
-    	return getHibernateModule().getPersistenceUnit(getTestObject());
-    }
-    
-    
-    /**
-     * @return A <code>Session</code> associated with the current transaction. This method returns the 
-     * same <code>Session</code> during the course of a transaction.
-     */
-    public static Session getSession() {
-    	return getHibernateModule().getPersistenceContext(getTestObject());
+    public static SessionFactory getSessionFactory(Object testInstance) {
+        return getHibernateModule().getPersistenceUnit(testInstance);
     }
 
 
     /**
-	 * @return The current test object
-	 */
-	private static Object getTestObject() {
-		Object testObject = Unitils.getInstance().getTestContext().getTestObject();
-        if (testObject == null) {
-            throw new UnitilsException("No current test found in context. Unable to execute specified operation");
-        }
-		return testObject;
-	}
-    
-    
+     * @param testInstance The current test instance (e.g. this if your in the test), not null
+     * @return A <code>Session</code> associated with the current transaction. This method returns the
+     *         same <code>Session</code> during the course of a transaction.
+     */
+    public static Session getSession(Object testInstance) {
+        return getHibernateModule().getPersistenceContext(testInstance);
+    }
+
     /**
-	 * @return The {@link HibernateModule}
-	 */
-	private static HibernateModule getHibernateModule() {
-		return Unitils.getInstance().getModulesRepository().getModuleOfType(HibernateModule.class);
-	}
+     * @return The {@link HibernateModule}
+     */
+    private static HibernateModule getHibernateModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(HibernateModule.class);
+    }
 
 }

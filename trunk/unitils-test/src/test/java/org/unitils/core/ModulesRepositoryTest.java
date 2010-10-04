@@ -154,7 +154,7 @@ public class ModulesRepositoryTest extends UnitilsJUnit4 {
 		public void afterInit() {
 		}
 
-		public TestListener getTestListener() {
+		public TestExecutionListenerAdapter getTestListener() {
 			return new TestListener1();
 		}
 
@@ -162,7 +162,7 @@ public class ModulesRepositoryTest extends UnitilsJUnit4 {
             return null;
         }
 
-        public static class TestListener1 extends TestListener {
+        public static class TestListener1 extends TestExecutionListenerAdapter {
 		}
 	}
 
@@ -173,7 +173,7 @@ public class ModulesRepositoryTest extends UnitilsJUnit4 {
 	private static class TestModule2 extends TestModule1 implements Module {
 
 		@Override
-		public TestListener getTestListener() {
+		public TestExecutionListenerAdapter getTestListener() {
 			return new TestListener2();
 		}
 
@@ -181,7 +181,7 @@ public class ModulesRepositoryTest extends UnitilsJUnit4 {
             return null;
         }
 
-        public static class TestListener2 extends TestListener {
+        public static class TestListener2 extends TestExecutionListenerAdapter {
 		}
 	}
 
