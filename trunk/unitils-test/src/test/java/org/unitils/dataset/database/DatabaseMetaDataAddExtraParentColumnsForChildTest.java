@@ -31,7 +31,7 @@ import java.sql.SQLException;
 import static org.junit.Assert.*;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.util.TestUtils.createDatabaseMetaData;
+import static org.unitils.dataset.util.DatabaseTestUtils.createDatabaseMetaData;
 
 /**
  * @author Tim Ducheyne

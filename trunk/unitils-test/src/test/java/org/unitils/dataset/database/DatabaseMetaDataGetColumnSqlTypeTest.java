@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.dataset.database.DatabaseMetaData.SQL_TYPE_UNKNOWN;
-import static org.unitils.dataset.util.TestUtils.createDatabaseMetaData;
+import static org.unitils.dataset.util.DatabaseTestUtils.createDatabaseMetaData;
 
 /**
  * Tests for getting the sql type for a column.
