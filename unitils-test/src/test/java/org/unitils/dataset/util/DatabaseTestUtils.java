@@ -32,7 +32,7 @@ import static org.unitils.database.DatabaseUnitils.getDatabases;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class TestUtils {
+public class DatabaseTestUtils {
 
     public static DatabaseMetaData createDatabaseMetaData() {
         Database defaultDatabase = getDatabases().getDefaultDatabase();

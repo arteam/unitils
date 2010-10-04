@@ -28,7 +28,7 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.util.TestUtils.createDatabaseMetaData;
+import static org.unitils.dataset.util.DatabaseTestUtils.createDatabaseMetaData;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 /**
