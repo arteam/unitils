@@ -9,6 +9,9 @@
         </layout>
     </appender>
 
+    <logger name="org.springframework.test.context.TestContext">
+        <level value="WARN"/>
+    </logger>
     <logger name="org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver">
         <level value="INFO"/>
     </logger>
