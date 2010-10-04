@@ -16,17 +16,20 @@
 package org.unitils.core;
 
 import org.apache.commons.logging.Log;
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import static org.unitils.core.ConfigurationLoader.PROPKEY_CUSTOM_CONFIGURATION;
-import static org.unitils.core.ConfigurationLoader.PROPKEY_LOCAL_CONFIGURATION;
 import org.unitils.core.util.PropertiesReader;
-import org.unitils.inject.annotation.*;
+import org.unitils.inject.annotation.InjectIntoByType;
+import org.unitils.inject.annotation.InjectIntoStaticByType;
+import org.unitils.inject.annotation.TestedObject;
 import org.unitils.mock.Mock;
 
 import java.util.Properties;
+
+import static org.junit.Assert.assertEquals;
+import static org.unitils.core.ConfigurationLoader.PROPKEY_CUSTOM_CONFIGURATION;
+import static org.unitils.core.ConfigurationLoader.PROPKEY_LOCAL_CONFIGURATION;
 
 /**
  * Tests how the configuration loader deals with loading, overriding and expanding property values.
@@ -61,8 +64,6 @@ public class ConfigurationLoaderPropertyTest extends UnitilsJUnit4 {
 
     @Before
     public void setUp() {
-        configurationLoader = new ConfigurationLoader();
-
         localProperties = new Properties();
         customProperties = new Properties();
         unitilsDefaultProperties = new Properties();

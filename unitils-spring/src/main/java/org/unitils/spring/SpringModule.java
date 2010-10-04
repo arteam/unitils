@@ -15,26 +15,12 @@
  */
 package org.unitils.spring;
 
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.PropertyUtils.getInstance;
-import static org.unitils.util.ReflectionUtils.getPropertyName;
-import static org.unitils.util.ReflectionUtils.invokeMethod;
-import static org.unitils.util.ReflectionUtils.isSetter;
-import static org.unitils.util.ReflectionUtils.setFieldValue;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.TestContext;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.unitils.core.Module;
-import org.unitils.core.TestListener;
+import org.unitils.core.TestExecutionListenerAdapter;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.DatabaseModule;
@@ -46,6 +32,18 @@ import org.unitils.spring.annotation.SpringBeanByType;
 import org.unitils.spring.util.ApplicationContextFactory;
 import org.unitils.spring.util.ApplicationContextManager;
 import org.unitils.util.ReflectionUtils;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.PropertyUtils.getInstance;
+import static org.unitils.util.ReflectionUtils.*;
 
 /**
  * A module for Spring enabling a test class by offering an easy way to load application contexts and
@@ -71,10 +69,10 @@ public class SpringModule implements Module {
 
     /* Manager for storing and creating spring application contexts */
     private ApplicationContextManager applicationContextManager;
-    
+
     /* TestContext used by the spring testcontext framework*/
 //    private TestContext testContext;
-    
+
 
     /**
      * Initializes this module using the given configuration
@@ -96,7 +94,7 @@ public class SpringModule implements Module {
         // the current test, it is used for managing transactions. 
         if (isDatabaseModuleEnabled()) {
             getDatabaseModule().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
-                
+
                 public boolean isApplicableFor(Object testObject) {
                     if (!isApplicationContextConfiguredFor(testObject)) {
                         return false;
@@ -104,11 +102,11 @@ public class SpringModule implements Module {
                     ApplicationContext context = getApplicationContext(testObject);
                     return context.getBeansOfType(getPlatformTransactionManagerClass()).size() != 0;
                 }
-                
+
                 @SuppressWarnings("unchecked")
                 public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
                     ApplicationContext context = getApplicationContext(testObject);
-                    Class<?> platformTransactionManagerClass = getPlatformTransactionManagerClass();
+                    Class<PlatformTransactionManager> platformTransactionManagerClass = getPlatformTransactionManagerClass();
                     Map<String, PlatformTransactionManager> platformTransactionManagers = context.getBeansOfType(platformTransactionManagerClass);
                     if (platformTransactionManagers.size() == 0) {
                         throw new UnitilsException("Could not find a bean of type " + platformTransactionManagerClass.getSimpleName()
@@ -120,7 +118,7 @@ public class SpringModule implements Module {
                     }
                     return platformTransactionManagers.values().iterator().next();
                 }
-                
+
                 public boolean isTransactionalResourceAvailable(Object testObject) {
                     return true;
                 }
@@ -128,17 +126,17 @@ public class SpringModule implements Module {
                 public Integer getPreference() {
                     return 20;
                 }
-                
-                protected Class<?> getPlatformTransactionManagerClass() {
+
+                protected Class<PlatformTransactionManager> getPlatformTransactionManagerClass() {
                     return ReflectionUtils.getClassWithName("org.springframework.transaction.PlatformTransactionManager");
                 }
-                
+
             });
         }
-	}
+    }
 
 
-	/**
+    /**
      * Gets the spring bean with the given name. The given test instance, by using {@link SpringApplicationContext},
      * determines the application context in which to look for the bean.
      * <p/>
@@ -168,7 +166,7 @@ public class SpringModule implements Module {
      * @return The bean, not null
      */
     @SuppressWarnings("unchecked")
-	public <T> T getSpringBeanByType(Object testObject, Class<T> type) {
+    public <T> T getSpringBeanByType(Object testObject, Class<T> type) {
         Map<String, T> beans = getApplicationContext(testObject).getBeansOfType(type);
         if (beans == null || beans.size() == 0) {
             throw new UnitilsException("Unable to get Spring bean by type. No Spring bean found for type " + type.getSimpleName());
@@ -184,7 +182,7 @@ public class SpringModule implements Module {
      * @return Whether an ApplicationContext has been configured for the given testObject
      */
     public boolean isApplicationContextConfiguredFor(Object testObject) {
-    	//checkForIncompatibleUse(testObject);
+        //checkForIncompatibleUse(testObject);
         return applicationContextManager.hasApplicationContext(testObject);
     }
 
@@ -209,17 +207,17 @@ public class SpringModule implements Module {
      * @return The application context, not null
      */
     public ApplicationContext getApplicationContext(Object testObject) {
-    	// Verify if the spring testcontext framework is used, and if an ApplicationContext has been configured 
-    	// using @ContextConfiguration. If yes, any unitils specific configured ApplicationContext is ignored
-    	/*checkForIncompatibleUse(testObject);
-    	if (isContextConfigurationAnnotationAvailable(testObject)) {
-	    	try {
-				return testContext.getApplicationContext();
-			} catch (Exception e) {
-				throw new UnitilsException(e);
-			}
-    	}*/
-    	return applicationContextManager.getApplicationContext(testObject);
+        // Verify if the spring testcontext framework is used, and if an ApplicationContext has been configured
+        // using @ContextConfiguration. If yes, any unitils specific configured ApplicationContext is ignored
+        /*checkForIncompatibleUse(testObject);
+          if (isContextConfigurationAnnotationAvailable(testObject)) {
+              try {
+                  return testContext.getApplicationContext();
+              } catch (Exception e) {
+                  throw new UnitilsException(e);
+              }
+          }*/
+        return applicationContextManager.getApplicationContext(testObject);
     }
 
 
@@ -227,27 +225,27 @@ public class SpringModule implements Module {
      * Verify that the spring testcontext framework and unitils are not used together in an incompatible
      * way: Check if not using the unitils core module system, and spring's @ContextConfiguration annotation for 
      * configuring the applicationcontext
-     * 
+     *
      * @param testObject The test instance, not null
      */
-	/*protected void checkForIncompatibleUse(Object testObject) {
-		if (isContextConfigurationAnnotationAvailable(testObject) && testContext == null) {
-    		throw new UnitilsException("You've annotated your class with @" + ContextConfiguration.class.getSimpleName()
-    				+ " but you're not using one of spring's base classes to execute your test");
-    	}
-	}*/
+    /*protected void checkForIncompatibleUse(Object testObject) {
+         if (isContextConfigurationAnnotationAvailable(testObject) && testContext == null) {
+             throw new UnitilsException("You've annotated your class with @" + ContextConfiguration.class.getSimpleName()
+                     + " but you're not using one of spring's base classes to execute your test");
+         }
+     }*/
 
 
-	/**
-	 * @param testObject The test instance, not null
-	 * 
-	 * @return Whether an @ContextConfiguration annotation can be found somewhere in the hierarchy
-	 */
-	/*protected boolean isContextConfigurationAnnotationAvailable(Object testObject) {
-		ContextConfiguration contextConfigurationAnnotation = AnnotationUtils.getClassLevelAnnotation(
-    			ContextConfiguration.class, testObject.getClass());
-		return contextConfigurationAnnotation != null;
-	}*/
+    /**
+     * @param testObject The test instance, not null
+     *
+     * @return Whether an @ContextConfiguration annotation can be found somewhere in the hierarchy
+     */
+    /*protected boolean isContextConfigurationAnnotationAvailable(Object testObject) {
+         ContextConfiguration contextConfigurationAnnotation = AnnotationUtils.getClassLevelAnnotation(
+                 ContextConfiguration.class, testObject.getClass());
+         return contextConfigurationAnnotation != null;
+     }*/
 
 
     /**
@@ -271,7 +269,7 @@ public class SpringModule implements Module {
      */
     public void injectApplicationContext(Object testObject) {
         // inject into fields annotated with @SpringApplicationContext
-    	Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringApplicationContext.class);
+        Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringApplicationContext.class);
         for (Field field : fields) {
             try {
                 setFieldValue(testObject, field, getApplicationContext(testObject));
@@ -305,7 +303,7 @@ public class SpringModule implements Module {
      */
     public void injectSpringBeans(Object testObject) {
         // assign to fields
-    	Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringBean.class);
+        Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringBean.class);
         for (Field field : fields) {
             try {
                 SpringBean springBeanAnnotation = field.getAnnotation(SpringBean.class);
@@ -344,7 +342,7 @@ public class SpringModule implements Module {
      */
     public void injectSpringBeansByType(Object testObject) {
         // assign to fields
-    	Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringBeanByType.class);
+        Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringBeanByType.class);
         for (Field field : fields) {
             try {
                 setFieldValue(testObject, field, getSpringBeanByType(testObject, field.getType()));
@@ -381,7 +379,7 @@ public class SpringModule implements Module {
      */
     public void injectSpringBeansByName(Object testObject) {
         // assign to fields
-    	Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringBeanByName.class);
+        Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringBeanByName.class);
         for (Field field : fields) {
             try {
                 setFieldValue(testObject, field, getSpringBean(testObject, field.getName()));
@@ -409,38 +407,38 @@ public class SpringModule implements Module {
             }
         }
     }
-    
-    
+
+
     /*public void registerTestContext(TestContext testContext) {
-    	this.testContext = testContext;
-	}*/
-    
-    
+         this.testContext = testContext;
+     }*/
+
+
     protected boolean isDatabaseModuleEnabled() {
         return Unitils.getInstance().getModulesRepository().isModuleEnabled(DatabaseModule.class);
     }
-    
-    
+
+
     protected DatabaseModule getDatabaseModule() {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
     }
 
 
-	/**
-     * @return The {@link TestListener} for this module
+    /**
+     * @return The {@link org.unitils.core.TestExecutionListenerAdapter} for this module
      */
-    public TestListener getTestListener() {
+    public TestExecutionListenerAdapter getTestListener() {
         return new SpringTestListener();
     }
 
 
     /**
-     * The {@link TestListener} for this module
+     * The {@link org.unitils.core.TestExecutionListenerAdapter} for this module
      */
-    protected class SpringTestListener extends TestListener {
+    protected class SpringTestListener extends TestExecutionListenerAdapter {
 
         @Override
-        public void beforeTestSetUp(Object testObject, Method testMethod) {
+        public void prepareTestInstance(Object testObject, TestContext testContext) throws Exception {
             injectApplicationContext(testObject);
             injectSpringBeans(testObject);
             injectSpringBeansByType(testObject);

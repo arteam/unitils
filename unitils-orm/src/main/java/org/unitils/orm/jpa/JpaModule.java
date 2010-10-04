@@ -20,12 +20,10 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 import org.springframework.orm.jpa.EntityManagerHolder;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.test.context.TestContext;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.unitils.core.TestListener;
+import org.unitils.core.TestExecutionListenerAdapter;
 import org.unitils.core.util.ConfigUtils;
-import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 import org.unitils.orm.common.OrmModule;
 import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
 import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
@@ -39,6 +37,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Properties;
@@ -65,7 +64,7 @@ import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
  * todo injection into other objects
  * <p/>
  * This module also offers a test to check whether the mapping of all entities is consistent with the structure of the
- * database. It is highly recommended to write a unit test that invokes {@link JpaUnitils#assertMappingWithDatabaseConsistent()},
+ * database. It is highly recommended to write a unit test that invokes {@link JpaUnitils#assertMappingWithDatabaseConsistent},
  * This is a very useful test that verifies whether the mapping of all your objects entities still corresponds
  * with the actual structure of the database. Currently, it's only available when the persistence provider is hibernate.
  *
@@ -103,37 +102,6 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
 
         String persistenceProviderImplClassName = getString(PROPKEY_PERSISTENCE_PROVIDER, configuration);
         jpaProviderSupport = ConfigUtils.getInstanceOf(JpaProviderSupport.class, configuration, persistenceProviderImplClassName);
-    }
-
-
-    public void afterInit() {
-        super.afterInit();
-
-        // Make sure that a spring JpaTransactionManager is used for transaction management in the database module, if the
-        // current test object defines a JPA EntityManagerFactory
-        getDatabaseModule().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
-
-            public boolean isApplicableFor(Object testObject) {
-                return isPersistenceUnitConfiguredFor(testObject);
-            }
-
-            public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
-                EntityManagerFactory entityManagerFactory = getPersistenceUnit(testObject);
-                JpaTransactionManager jpaTransactionManager = new JpaTransactionManager(entityManagerFactory);
-                jpaTransactionManager.setDataSource(getDataSource());
-                jpaTransactionManager.setJpaDialect(jpaProviderSupport.getSpringJpaVendorAdaptor().getJpaDialect());
-                return jpaTransactionManager;
-            }
-
-            public boolean isTransactionalResourceAvailable(Object testObject) {
-                return getDatabaseModule().isDataSourceLoaded();
-            }
-
-            public Integer getPreference() {
-                return 10;
-            }
-
-        });
     }
 
 
@@ -279,18 +247,22 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
     /**
      * @return The TestListener associated with this module
      */
-    public TestListener getTestListener() {
+    public TestExecutionListenerAdapter getTestListener() {
         return new JpaTestListener();
+    }
+
+    public void flush() throws IOException {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
 
     /**
-     * The {@link TestListener} for this module
+     * The {@link org.unitils.core.TestExecutionListenerAdapter} for this module
      */
     protected class JpaTestListener extends OrmTestListener {
 
         @Override
-        public void beforeTestSetUp(Object testObject, Method testMethod) {
+        public void prepareTestInstance(Object testObject, TestContext testContext) throws Exception {
             injectJpaResourcesIntoTestObject(testObject);
         }
 

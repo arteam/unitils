@@ -15,15 +15,15 @@
  */
 package org.unitils.inject;
 
-import static org.junit.Assert.assertSame;
-
-import java.util.Properties;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.inject.annotation.InjectInto;
 import org.unitils.inject.annotation.TestedObject;
+
+import java.util.Properties;
+
+import static org.junit.Assert.assertSame;
 
 /**
  * @author Filip Neven

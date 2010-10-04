@@ -15,15 +15,16 @@
  */
 package org.unitils.util;
 
-import static org.apache.commons.lang.StringUtils.capitalize;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.TypeUtils;
 
 import java.lang.reflect.*;
-import static java.lang.reflect.Modifier.isStatic;
-import static java.util.Arrays.asList;
 import java.util.HashSet;
 import java.util.Set;
+
+import static java.lang.reflect.Modifier.isStatic;
+import static java.util.Arrays.asList;
+import static org.apache.commons.lang.StringUtils.capitalize;
 
 /**
  * Utility methods that use reflection for instance creation or class inspection.
@@ -161,33 +162,22 @@ public class ReflectionUtils {
     /**
      * Sets the given value to the given field and setters on the given object.
      *
-     * @param object        The object containing the field and setters, not null
-     * @param fields        The fields, not null
-     * @param setterMethods The setter methods, not null
-     * @param value         The value for the given field and setters in the given object
+     * @param object       The object containing the field and setters, not null
+     * @param setterMethod The setter method, not null
+     * @param value        The value for the given field and setters in the given object
      */
-    public static void setFieldAndSetterValue(Object object, Set<Field> fields, Set<Method> setterMethods, Object value) {
-        for (Field field : fields) {
-            try {
-                setFieldValue(object, field, value);
-
-            } catch (UnitilsException e) {
-                throw new UnitilsException("Unable to assign the value to field: " + field.getName() + ". Ensure that this field is of the correct type.", e);
-            }
+    public static void setSetterValue(Object object, Method setterMethod, Object value) {
+        if (!isSetter(setterMethod)) {
+            throw new UnitilsException("Method " + setterMethod.getName() + " is expected to be a setter method, but is not.");
         }
-        for (Method method : setterMethods) {
-            if (!isSetter(method)) {
-                throw new UnitilsException("Method " + method.getName() + " is expected to be a setter method, but is not.");
-            }
-            try {
-                invokeMethod(object, method, value);
+        try {
+            invokeMethod(object, setterMethod, value);
 
-            } catch (UnitilsException e) {
-                throw new UnitilsException("Unable to invoke method: " + object.getClass().getSimpleName() + "." + method.getName() + ". Ensure that this method has following signature: void myMethod(ValueType value).", e);
+        } catch (UnitilsException e) {
+            throw new UnitilsException("Unable to invoke method: " + object.getClass().getSimpleName() + "." + setterMethod.getName() + ". Ensure that this method has following signature: void myMethod(ValueType value).", e);
 
-            } catch (InvocationTargetException e) {
-                throw new UnitilsException("Unable to invoke method: " + object.getClass().getSimpleName() + "." + method.getName() + ". Method has thrown an exception.", e.getCause());
-            }
+        } catch (InvocationTargetException e) {
+            throw new UnitilsException("Unable to invoke method: " + object.getClass().getSimpleName() + "." + setterMethod.getName() + ". Method has thrown an exception.", e.getCause());
         }
     }
 

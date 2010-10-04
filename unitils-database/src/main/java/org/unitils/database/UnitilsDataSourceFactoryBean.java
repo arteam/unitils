@@ -33,7 +33,6 @@ import javax.sql.DataSource;
  */
 public class UnitilsDataSourceFactoryBean implements FactoryBean {
 
-
     /**
      * Gets the data source instance.
      *
@@ -41,10 +40,8 @@ public class UnitilsDataSourceFactoryBean implements FactoryBean {
      */
     public Object getObject() throws Exception {
         DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-        Object testObject = Unitils.getInstance().getTestContext().getTestObject();
-        return databaseModule.getDataSourceAndActivateTransactionIfNeeded(testObject);
+        return databaseModule.getDataSource(null, null);
     }
-
 
     /**
      * Gets the type of the object provided by this <code>FactoryBean</code>, i.e. <code>DataSource</code>
@@ -54,7 +51,6 @@ public class UnitilsDataSourceFactoryBean implements FactoryBean {
     public Class<?> getObjectType() {
         return DataSource.class;
     }
-
 
     /**
      * @return true, this is a singleton

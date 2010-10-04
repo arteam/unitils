@@ -21,8 +21,9 @@ import org.dbmaintain.database.Database;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
+import org.springframework.test.context.TestContext;
 import org.unitils.core.Module;
-import org.unitils.core.TestListener;
+import org.unitils.core.TestExecutionListenerAdapter;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.ConfigUtils;
@@ -248,7 +249,7 @@ public class DbUnitModule implements Module {
                 return;
             }
             // first make sure every database update is flushed to the database
-            getDatabaseModule().flushDatabaseUpdates(testObject);
+//            getDatabaseModule().flushDatabaseUpdates(testObject);
 
             DataSetAssert dataSetAssert = new DataSetAssert();
             for (String schemaName : multiSchemaExpectedDataSet.getSchemaNames()) {
@@ -535,7 +536,7 @@ public class DbUnitModule implements Module {
     /**
      * @return The TestListener object that implements Unitils' DbUnit support
      */
-    public TestListener getTestListener() {
+    public TestExecutionListenerAdapter getTestListener() {
         return new DbUnitListener();
     }
 
@@ -543,20 +544,19 @@ public class DbUnitModule implements Module {
     /**
      * Test listener that is called while the test framework is running tests
      */
-    protected class DbUnitListener extends TestListener {
+    protected class DbUnitListener extends TestExecutionListenerAdapter {
 
         @Override
-        public void beforeTestSetUp(Object testObject, Method testMethod) {
+        public void beforeTestMethod(Object testObject, Method testMethod, TestContext testContext) throws Exception {
             insertDataSet(testMethod, testObject);
         }
 
         @Override
-        public void afterTestMethod(Object testObject, Method testMethod, Throwable throwable) {
-            if (throwable == null) {
+        public void afterTestMethod(Object testObject, Method testMethod, Throwable testThrowable, TestContext testContext) throws Exception {
+            if (testThrowable == null) {
                 assertDbContentAsExpected(testMethod, testObject);
             }
         }
-
     }
 
 }

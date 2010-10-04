@@ -18,10 +18,12 @@ package org.unitils.dataset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbmaintain.database.Database;
+import org.springframework.test.context.TestContext;
 import org.unitils.core.Module;
-import org.unitils.core.TestListener;
+import org.unitils.core.TestExecutionListenerAdapter;
 import org.unitils.core.Unitils;
 import org.unitils.database.DatabaseModule;
+import org.unitils.database.DatabaseUpdateListener;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 import org.unitils.dataset.annotation.handler.MarkerForAssertDataSetAnnotation;
 import org.unitils.dataset.annotation.handler.MarkerForLoadDataSetAnnotation;
@@ -91,6 +93,8 @@ public class DataSetModule implements Module {
     }
 
     public void afterInit() {
+        DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+        databaseModule.registerDatabaseUpdateListener(new DataSetXSDsGeneratingDatabaseUpdateListener());
     }
 
 
@@ -295,7 +299,7 @@ public class DataSetModule implements Module {
     /**
      * @return The TestListener object that implements Unitils' data set support
      */
-    public TestListener getTestListener() {
+    public TestExecutionListenerAdapter getTestListener() {
         return new DataSetListener();
     }
 
@@ -303,18 +307,27 @@ public class DataSetModule implements Module {
     /**
      * Test listener that is called while the test framework is running tests
      */
-    protected class DataSetListener extends TestListener {
+    protected class DataSetListener extends TestExecutionListenerAdapter {
 
         @Override
-        public void beforeTestSetUp(Object testObject, Method testMethod) {
+        public void beforeTestMethod(Object testObject, Method testMethod, TestContext testContext) throws Exception {
             loadDataSet(testMethod, testObject);
         }
 
         @Override
-        public void afterTestMethod(Object testObject, Method testMethod, Throwable throwable) {
-            if (throwable == null) {
-                assertExpectedDataSet(testMethod, testObject);
+        public void afterTestMethod(Object testObject, Method testMethod, Throwable testThrowable, TestContext testContext) throws Exception {
+            if (testThrowable != null) {
+                return;
             }
+            assertExpectedDataSet(testMethod, testObject);
+        }
+    }
+
+
+    protected class DataSetXSDsGeneratingDatabaseUpdateListener implements DatabaseUpdateListener {
+
+        public void databaseWasUpdated() {
+            generateDataSetXSDs();
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,71 +15,126 @@
  */
 package org.unitils.database.transaction;
 
-import java.util.Set;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.unitils.core.UnitilsException;
 
 import javax.sql.DataSource;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
-import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
-
+import static org.springframework.transaction.TransactionDefinition.PROPAGATION_REQUIRED;
 
 /**
- * Defines the contract for implementations that enable unit tests managed by unitils to be executed in a transaction.
+ * Implements transactions for unit tests, by delegating to a spring
+ * <code>PlatformTransactionManager</code>. The concrete implementation of
+ * <code>PlatformTransactionManager</code> that is used depends on the test
+ * class. If a custom <code>PlatformTransactionManager</code> was configured
+ * in a spring <code>ApplicationContext</code>, this one is used. If not, a
+ * suitable subclass of <code>PlatformTransactionManager</code> is created,
+ * depending on the configuration of a test. E.g. if some ORM persistence unit
+ * was configured on the test, a <code>PlatformTransactionManager</code> that
+ * can offer transactional behavior for such a persistence unit is used. If no
+ * such configuration is found, a <code>DataSourceTransactionManager</code> is
+ * used.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface UnitilsTransactionManager {
+public class UnitilsTransactionManager {
+
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(UnitilsTransactionManager.class);
+
+    protected PlatformTransactionManager platformTransactionManager;
+    protected Map<Object, TransactionStatus> testObjectTransactionStatusMap = new IdentityHashMap<Object, TransactionStatus>();
 
 
     /**
-     * Initialize the transaction manager
+     * Starts the transaction on the PlatformTransactionManager for the given testObject.
      *
-     * @param transactionManagementConfigurations
-     *                              Set of possible providers of a spring <code>PlatformTransactionManager</code>, not null
+     * @param testObject         The test object, not null
+     * @param applicationContext The spring application context, null if not defined
+     * @param dataSource         The data source, not null
      */
-    void init(Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations);
+    public void startTransaction(Object testObject, ApplicationContext applicationContext, DataSource dataSource) {
+        if (platformTransactionManager == null) {
+            platformTransactionManager = createPlatformTransactionManager(applicationContext, dataSource);
+        }
+        logger.debug("Starting transaction");
+
+        TransactionStatus transactionStatus = platformTransactionManager.getTransaction(createTransactionDefinition());
+        testObjectTransactionStatusMap.put(testObject, transactionStatus);
+    }
+
+    /**
+     * Commits the transaction. Uses the PlatformTransactionManager and transaction
+     * that is associated with the given test object.
+     *
+     * @param testObject The test object, not null
+     */
+    public void commit(Object testObject) {
+        TransactionStatus transactionStatus = testObjectTransactionStatusMap.get(testObject);
+        if (transactionStatus == null) {
+            throw new UnitilsException("Trying to commit, while no transaction is currently active");
+        }
+        platformTransactionManager.commit(transactionStatus);
+        testObjectTransactionStatusMap.remove(testObject);
+    }
+
+    /**
+     * Rolls back the transaction. Uses the PlatformTransactionManager and transaction
+     * that is associated with the given test object.
+     *
+     * @param testObject The test object, not null
+     */
+    public void rollback(Object testObject) {
+        TransactionStatus transactionStatus = testObjectTransactionStatusMap.get(testObject);
+        if (transactionStatus == null) {
+            throw new UnitilsException("Trying to rollback, while no transaction is currently active");
+        }
+        logger.debug("Rolling back transaction");
+        platformTransactionManager.rollback(transactionStatus);
+        testObjectTransactionStatusMap.remove(testObject);
+    }
 
 
     /**
-     * Wraps the given <code>DataSource</code> in a transactional proxy.
-     * <p/>
-     * The <code>DataSource</code> returned will make sure that, for the duration of a transaction, the same <code>java.sql.Connection</code>
-     * is returned, and that invocations on the close() method of these connections are suppressed.
+     * Returns a <code>TransactionDefinition</code> object containing the
+     * necessary transaction parameters. Simply returns a default
+     * <code>DefaultTransactionDefinition</code> object with the 'propagation
+     * required' attribute
      *
-     * @param dataSource The data source to wrap, not null
-     * @return A transactional data source, not null
+     * @return The default TransactionDefinition
      */
-    DataSource getTransactionalDataSource(DataSource dataSource);
+    protected TransactionDefinition createTransactionDefinition() {
+        // todo make configurable
+        return new DefaultTransactionDefinition(PROPAGATION_REQUIRED);
+    }
 
-    
-    /**
-     * Starts a transaction.
-     *
-     * @param testObject The test instance, not null
-     */
-    void startTransaction(Object testObject);
+    protected PlatformTransactionManager createPlatformTransactionManager(ApplicationContext applicationContext, DataSource dataSource) {
+        PlatformTransactionManager platformTransactionManager = getPlatformTransactionManagerFromApplicationContext(applicationContext);
+        if (platformTransactionManager != null) {
+            return platformTransactionManager;
+        }
+        return new DataSourceTransactionManager(dataSource);
+    }
 
-
-    /**
-     * Commits the currently active transaction. This transaction must have been initiated by calling
-     * {@link #startTransaction(Object)} with the same testObject within the same thread.
-     *
-     * @param testObject The test instance, not null
-     */
-    void commit(Object testObject);
-
-
-    /**
-     * Rolls back the currently active transaction. This transaction must have been initiated by calling
-     * {@link #startTransaction(Object)} with the same testObject within the same thread.
-     *
-     * @param testObject The test instance, not null
-     */
-    void rollback(Object testObject);
-
-
-    void activateTransactionIfNeeded(Object testObject);
-
-
+    protected PlatformTransactionManager getPlatformTransactionManagerFromApplicationContext(ApplicationContext applicationContext) {
+        if (applicationContext == null) {
+            return null;
+        }
+        try {
+            return applicationContext.getBean(PlatformTransactionManager.class); // todo configurable
+        } catch (Exception e) {
+            // no spring application context defined
+            return null;
+        }
+    }
 }
-

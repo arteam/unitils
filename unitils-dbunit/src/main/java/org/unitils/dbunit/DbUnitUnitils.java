@@ -33,19 +33,22 @@ public class DbUnitUnitils {
 
     /**
      * Inserts the default dataset for the given test class into the database
+     *
+     * @param testInstance The current test instance (e.g. this if your in the test), not null
      */
-    public static void insertDefaultDataSet() {
-        getDbUnitModule().insertDefaultDataSet(Unitils.getInstance().getTestContext().getTestClass());
+    public static void insertDefaultDataSet(Object testInstance) {
+        getDbUnitModule().insertDefaultDataSet(testInstance.getClass());
     }
 
 
     /**
      * Inserts the dataset consisting of the given list of files into the database
      *
+     * @param testInstance     The current test instance (e.g. this if your in the test), not null
      * @param dataSetFileNames The names of the files that define the test data
      */
-    public static void insertDataSet(String... dataSetFileNames) {
-        getDbUnitModule().insertDataSet(Unitils.getInstance().getTestContext().getTestClass(), dataSetFileNames);
+    public static void insertDataSet(Object testInstance, String... dataSetFileNames) {
+        getDbUnitModule().insertDataSet(testInstance.getClass(), dataSetFileNames);
     }
 
 

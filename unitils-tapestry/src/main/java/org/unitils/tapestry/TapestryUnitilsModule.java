@@ -9,8 +9,9 @@ import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.InjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.test.context.TestContext;
 import org.unitils.core.Module;
-import org.unitils.core.TestListener;
+import org.unitils.core.TestExecutionListenerAdapter;
 import org.unitils.core.UnitilsException;
 import org.unitils.tapestry.annotation.RegistryFactory;
 import org.unitils.tapestry.annotation.RegistryShutdown;
@@ -56,8 +57,8 @@ public class TapestryUnitilsModule implements Module {
 
     private static Logger logger = LoggerFactory.getLogger(TapestryUnitilsModule.class);
 
-    private Class<?> testClass;
-    private Object testObject;
+    private Class<?> lastTestClass;
+    private Object lastTestObject;
     private Registry registry;
 
     public void afterInit() {
@@ -65,14 +66,14 @@ public class TapestryUnitilsModule implements Module {
             @Override
             public void run() {
                 // shutdown the registry of the last test class
-                if (testClass != null) {
-                    shutdownRegistryFor(testClass.getAnnotation(TapestryRegistry.class), testClass, testObject, registry);
+                if (lastTestClass != null) {
+                    shutdownRegistryFor(lastTestClass.getAnnotation(TapestryRegistry.class), lastTestClass, lastTestObject, registry);
                 }
             }
         });
     }
 
-    public TestListener getTestListener() {
+    public TestExecutionListenerAdapter getTestListener() {
         return new TapestryIoCTestListener();
     }
 
@@ -150,23 +151,23 @@ public class TapestryUnitilsModule implements Module {
                 throw new TapestryUnitilsModuleException(String.format("Could not find registry shutdown method '%s'", annotation.registryShutdownMethodName()),
                         e);
             }
-        } else if(annotation != null) {
-        	shutdownMethod = findMostSpecificAnnotatedMethod(testClass, RegistryShutdown.class, void.class, Registry.class);
+        } else if (annotation != null) {
+            shutdownMethod = findMostSpecificAnnotatedMethod(testClass, RegistryShutdown.class, void.class, Registry.class);
         }
-        
-        if(shutdownMethod == null)
-        	return null;
-        
-    	if(!Modifier.isPublic(shutdownMethod.getModifiers())) {
-	        throw new TapestryUnitilsModuleException(String.format("Registry shutdown method '%s' must be public", shutdownMethod.getName()));
-    	}
+
+        if (shutdownMethod == null)
+            return null;
+
+        if (!Modifier.isPublic(shutdownMethod.getModifiers())) {
+            throw new TapestryUnitilsModuleException(String.format("Registry shutdown method '%s' must be public", shutdownMethod.getName()));
+        }
         if (Modifier.isStatic(shutdownMethod.getModifiers())) {
             throw new TapestryUnitilsModuleException(String.format("Registry factory method '%s' may not be static", shutdownMethod.getName()));
         }
-        
+
         return shutdownMethod;
     }
-    
+
     private void shutdownRegistryFor(TapestryRegistry annotation, Class<?> testClass, Object testObject, Registry registry) {
         if (registry != null) {
             if (logger.isDebugEnabled()) {
@@ -209,23 +210,23 @@ public class TapestryUnitilsModule implements Module {
     }
 
     private Method findMostSpecificAnnotatedMethod(Class<?> type, Class<? extends Annotation> annotationType, Class<?> returnType, Class<?>... parameterTypes) {
-    	if(type == null) 
-    		return null;
-    	
-    	for(Method method : type.getDeclaredMethods()) {
-    		if(method.getAnnotation(annotationType) != null && method.getReturnType().equals(returnType) && 
-    				Arrays.equals(method.getParameterTypes(), parameterTypes)) {
-    			return method;
-    		}
-    	}
-    	return findMostSpecificAnnotatedMethod(type.getSuperclass(), annotationType, returnType, parameterTypes);
+        if (type == null)
+            return null;
+
+        for (Method method : type.getDeclaredMethods()) {
+            if (method.getAnnotation(annotationType) != null && method.getReturnType().equals(returnType) &&
+                    Arrays.equals(method.getParameterTypes(), parameterTypes)) {
+                return method;
+            }
+        }
+        return findMostSpecificAnnotatedMethod(type.getSuperclass(), annotationType, returnType, parameterTypes);
     }
-    
+
     private Method getRegistryFactoryMethodFor(TapestryRegistry annotation, Class<?> testClass, Object testObject) {
-        Method method = null;
-    	if (annotation.registryFactoryMethodName().length() == 0) {
+        Method method;
+        if (annotation.registryFactoryMethodName().length() == 0) {
             method = findMostSpecificAnnotatedMethod(testClass, RegistryFactory.class, Registry.class, Class[].class);
-    	} else {
+        } else {
             try {
                 method = testClass.getMethod(annotation.registryFactoryMethodName(), String.class, Class[].class);
             } catch (SecurityException e) {
@@ -241,14 +242,14 @@ public class TapestryUnitilsModule implements Module {
                             e);
                 }
             }
-    	}
-    	
-    	if(method == null) 
-    		return null;
-    	
-    	if(!Modifier.isPublic(method.getModifiers())) {
-	        throw new TapestryUnitilsModuleException(String.format("Registry factory method '%s' must be public", method.getName()));
-    	}
+        }
+
+        if (method == null)
+            return null;
+
+        if (!Modifier.isPublic(method.getModifiers())) {
+            throw new TapestryUnitilsModuleException(String.format("Registry factory method '%s' must be public", method.getName()));
+        }
         if (!Registry.class.isAssignableFrom(method.getReturnType())) {
             throw new TapestryUnitilsModuleException(String.format("Registry factory method '%s' must return an instance of Registry", method.getName()));
         }
@@ -310,11 +311,11 @@ public class TapestryUnitilsModule implements Module {
     }
 
     private boolean needsStaticRegistry(Class<?> type) {
-        return testClass.isAnnotationPresent(TapestryRegistry.class) && needsStaticInjection(testClass);
+        return lastTestClass.isAnnotationPresent(TapestryRegistry.class) && needsStaticInjection(lastTestClass);
     }
 
     private boolean needsRegistry(Class<?> type) {
-        return testClass.isAnnotationPresent(TapestryRegistry.class);
+        return lastTestClass.isAnnotationPresent(TapestryRegistry.class);
     }
 
     private boolean needsRegistry(Class<?> type, Method method) {
@@ -326,49 +327,50 @@ public class TapestryUnitilsModule implements Module {
         return method.isAnnotationPresent(TapestryRegistry.class) ? method.getAnnotation(TapestryRegistry.class) : type.getAnnotation(TapestryRegistry.class);
     }
 
-    private class TapestryIoCTestListener extends TestListener {
+    private class TapestryIoCTestListener extends TestExecutionListenerAdapter {
+
         @Override
-        public void beforeTestClass(Class<?> currentTestClass) {
+        public void beforeTestClass(Class<?> testClass, TestContext testContext) throws Exception {
             // shutdown the registry of the last test class
-            if (testClass != null) {
-                shutdownRegistryFor(testClass.getAnnotation(TapestryRegistry.class), testClass, testObject, registry);
+            if (lastTestClass != null) {
+                shutdownRegistryFor(lastTestClass.getAnnotation(TapestryRegistry.class), lastTestClass, lastTestObject, registry);
                 registry = null;
             }
 
-            testObject = null;
-            testClass = currentTestClass;
-            if (needsStaticRegistry(testClass)) {
-                runBeforeRegistryIsCreatedMethods(testClass, null);
-                registry = createRegistryFor(testClass.getAnnotation(TapestryRegistry.class), testClass, null);
-                injectTapestryStuff(registry, testClass, null);
+            lastTestObject = null;
+            lastTestClass = testClass;
+            if (needsStaticRegistry(lastTestClass)) {
+                runBeforeRegistryIsCreatedMethods(lastTestClass, null);
+                registry = createRegistryFor(lastTestClass.getAnnotation(TapestryRegistry.class), lastTestClass, null);
+                injectTapestryStuff(registry, lastTestClass, null);
             }
         }
 
         @Override
-        public void beforeTestSetUp(Object currentTestObject, Method testMethod) {
-            testObject = currentTestObject;
-            if (needsRegistry(testClass, testMethod)) {
+        public void beforeTestMethod(Object testObject, Method testMethod, TestContext testContext) throws Exception {
+            lastTestObject = testObject;
+            if (needsRegistry(lastTestClass, testMethod)) {
                 // per method registry
 
                 // shutdown class registry
-                shutdownRegistryFor(testClass.getAnnotation(TapestryRegistry.class), testClass, currentTestObject, registry);
-                runBeforeRegistryIsCreatedMethods(currentTestObject.getClass(), currentTestObject);
-                registry = createRegistryFor(getAnnotation(testClass, testMethod), currentTestObject.getClass(), currentTestObject);
-            } else if (needsRegistry(testClass) && registry == null) {
+                shutdownRegistryFor(lastTestClass.getAnnotation(TapestryRegistry.class), lastTestClass, testObject, registry);
+                runBeforeRegistryIsCreatedMethods(testObject.getClass(), testObject);
+                registry = createRegistryFor(getAnnotation(lastTestClass, testMethod), testObject.getClass(), testObject);
+            } else if (needsRegistry(lastTestClass) && registry == null) {
                 // per class registry
-                runBeforeRegistryIsCreatedMethods(currentTestObject.getClass(), currentTestObject);
-                registry = createRegistryFor(currentTestObject.getClass().getAnnotation(TapestryRegistry.class), currentTestObject.getClass(), currentTestObject);
+                runBeforeRegistryIsCreatedMethods(testObject.getClass(), testObject);
+                registry = createRegistryFor(testObject.getClass().getAnnotation(TapestryRegistry.class), testObject.getClass(), testObject);
             }
             if (registry != null) {
-                injectTapestryStuff(registry, currentTestObject.getClass(), currentTestObject);
+                injectTapestryStuff(registry, testObject.getClass(), testObject);
             }
         }
 
         @Override
-        public void afterTestTearDown(Object testObject, Method testMethod) {
-            if (needsRegistry(testClass, testMethod)) {
+        public void afterTestMethod(Object testObject, Method testMethod, Throwable testThrowable, TestContext testContext) throws Exception {
+            if (needsRegistry(lastTestClass, testMethod)) {
                 // shutdown method registry
-                shutdownRegistryFor(getAnnotation(testClass, testMethod), testClass, testObject, registry);
+                shutdownRegistryFor(getAnnotation(lastTestClass, testMethod), lastTestClass, testObject, registry);
                 registry = null;
             }
         }

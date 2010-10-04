@@ -15,18 +15,19 @@
  */
 package org.unitils.orm.common;
 
+import org.springframework.test.context.TestContext;
 import org.unitils.core.Module;
-import org.unitils.core.TestListener;
+import org.unitils.core.TestExecutionListenerAdapter;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.ResourceConfigLoader;
 import org.unitils.database.DatabaseModule;
-import org.unitils.database.util.Flushable;
 import org.unitils.orm.common.spring.OrmSpringSupport;
 import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
 import org.unitils.orm.common.util.OrmConfig;
 import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
 
+import java.io.Flushable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -181,7 +182,6 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
         if (configuredPersistenceUnit == null) {
             configuredPersistenceUnit = ormPersistenceUnitLoader.getConfiguredOrmPersistenceUnit(testObject, persistenceUnitConfig);
             configuredOrmPersistenceUnitCache.put(persistenceUnitConfig, configuredPersistenceUnit);
-            getDatabaseModule().activateTransactionIfNeeded(testObject);
         }
         return configuredPersistenceUnit;
     }
@@ -327,8 +327,6 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
 
     /**
      * Creates an instance of {@link org.unitils.orm.common.spring.OrmSpringSupport}, that
-     * implements the dependency to the {@link org.unitils.spring.SpringModule}. If the
-     * {@link org.unitils.spring.SpringModule} is not active, or if a dependency of
      * {@link org.unitils.orm.common.spring.OrmSpringSupport} could not be found in the classpath,
      * the instance is not loaded.
      */
@@ -359,12 +357,12 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
 
 
     /**
-     * The {@link TestListener} for this module
+     * The {@link org.unitils.core.TestExecutionListenerAdapter} for this module
      */
-    protected class OrmTestListener extends TestListener {
+    protected class OrmTestListener extends TestExecutionListenerAdapter {
 
         @Override
-        public void beforeTestSetUp(Object testObject, Method testMethod) {
+        public void prepareTestInstance(Object testObject, TestContext testContext) throws Exception {
             injectOrmPersistenceUnitIntoTestObject(testObject);
         }
 
