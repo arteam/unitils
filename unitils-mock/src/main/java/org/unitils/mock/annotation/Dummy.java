@@ -21,28 +21,34 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
- * Annotation that can be used on fields to create dummy objects for these fields.
- * A dummy object is a proxy that will return default values for every method. This can be used to quickly create test
- * objects without having to worry about correctly filling in every field. Even classes with non-public default constructors
- * can be dummyfied by annotating the field.
- *
+ * Annotation that can be used on fields to create dummy objects for these fields. A dummy object is a proxy that will return default values
+ * for every method. This can be used to quickly create test objects without having to worry about correctly filling in every field. Even
+ * classes with non-public default constructors can be dummyfied by annotating the field.
+ * 
+ * The stuffed gives the dummy the capability to return dummy values for return values returned by the methods of the dummy. This is
+ * especially handy to avoid NullPointerException in debug statements, etc.
+ * 
  * Example:
- *
- * '@Dummy
- * private MyClass myClass;
- *
- * This will create a proxy for MyClass that will return default values for all methods (when needed ofcourse). The
- * dummy will be created regardless whether there is a default constructor.
- *
+ * <ul>
+ * <li>'@Dummy private MyClass myClass; '</li>
+ * <li>'@Dummy (stuffed = true) private MyClass myClass; '</li>
+ * </ul>
+ * This will create a proxy for MyClass that will return default values for all methods (when needed ofcourse). The dummy will be created
+ * regardless whether there is a default constructor.
+ * 
  * <p/>
- * Following defaults are used:<ul>
+ * Following defaults are used:
+ * <ul>
  * <li>Number values: 0</li>
- * <li>Object values: null</li>
- * <li>Collectionn, arrays etc: empty values</li></ul>
+ * <li>Object values: null or a dummy depending on stuffed parameter</li>
+ * <li>Collection: empty value or a dummy depending on the stuffed parameter</li>
+ * <li>arrays, etc: empty values</li>
+ * </ul>
  * <p/>
  */
 @Target(FIELD)
 @Retention(RUNTIME)
 public @interface Dummy {
 
+    boolean stuffed() default false;
 }
