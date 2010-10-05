@@ -175,10 +175,22 @@ public class MockModule implements Module {
     }
 
 
+    /**
+     * checks for the {@link Dummy} annotation on the testObject. If so it is created by the DummyObjectUtil. The two aproaches possible are
+     * stuffed or normal depending on the value in the {@link Dummy} annotation.
+     * 
+     * @param testObject
+     */
     protected void createAndInjectDummiesIntoTest(Object testObject) {
         Set<Field> dummyFields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), Dummy.class);
         for (Field dummyField : dummyFields) {
-            Object dummy = DummyObjectUtil.createDummy(dummyField.getType());
+            Dummy dummyAnnotation = dummyField.getAnnotation(Dummy.class);
+            Object dummy = null;
+            if (dummyAnnotation.stuffed()) {
+                dummy = DummyObjectUtil.createStuffedDummy(dummyField.getType());
+            } else {
+                dummy = DummyObjectUtil.createDummy(dummyField.getType());
+            }
             setFieldValue(testObject, dummyField, dummy);
         }
     }
