@@ -29,6 +29,7 @@ import org.unitils.dataset.model.dataset.DataSetValue;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 import org.unitils.mock.Mock;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -60,7 +61,7 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
 
 
     @Before
-    public void initialize() {
+    public void initialize() throws SQLException {
         SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
         dataSetRowProcessor = new DataSetRowProcessor(identifierNameProcessor.getMock(), sqlTypeHandlerRepository, databaseMetaData.getMock());
 
@@ -74,7 +75,8 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
         databaseMetaData.returns("PK1").removeIdentifierQuotes("PK1");
         databaseMetaData.returns("PK2").removeIdentifierQuotes("PK2");
         databaseMetaData.returns("COLUMN").removeIdentifierQuotes("COLUMN");
-
+        databaseMetaData.returns(true).tableExists(null);
+        
         dataSetRow = new DataSetRow("schema", "table", null, false, new DataSetSettings('=', '$', false));
         dataSetRowCaseSensitive = new DataSetRow("schema", "table", null, false, new DataSetSettings('=', '$', true));
     }
