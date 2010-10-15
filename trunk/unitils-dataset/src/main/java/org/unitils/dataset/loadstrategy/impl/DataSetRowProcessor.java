@@ -15,6 +15,7 @@
  */
 package org.unitils.dataset.loadstrategy.impl;
 
+import org.unitils.core.UnitilsException;
 import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.Row;
@@ -25,6 +26,7 @@ import org.unitils.dataset.model.dataset.DataSetValue;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandler;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,8 +54,12 @@ public class DataSetRowProcessor {
         DataSetSettings dataSetSettings = dataSetRow.getDataSetSettings();
 
         databaseMetaData.addExtraParentColumnsForChild(dataSetRow);
-
         String qualifiedTableName = identifierNameProcessor.getQualifiedTableName(dataSetRow);
+
+        if (!checkIfTableExists(qualifiedTableName)) {
+            handleTableDoesNotExists(qualifiedTableName);
+        }
+
         Row row = new Row(qualifiedTableName);
 
         Set<String> allPrimaryKeyColumnNames = databaseMetaData.getPrimaryKeyColumnNames(qualifiedTableName);
@@ -69,6 +75,17 @@ public class DataSetRowProcessor {
         return row;
     }
 
+    protected boolean checkIfTableExists(String qualifiedTableName) {
+        try {
+            return databaseMetaData.tableExists(qualifiedTableName);
+        } catch (SQLException e) {
+            throw new UnitilsException("Error looking up the table name : " + qualifiedTableName);
+        }
+    }
+
+    protected void handleTableDoesNotExists(String qualifiedTableName) {
+        throw new UnitilsException("Insert not possible, no table found with the name " + qualifiedTableName);
+    }
 
     protected Column createColumn(String qualifiedTableName, DataSetValue dataSetValue, DataSetSettings dataSetSettings, Set<String> allPrimaryKeyColumnNames, Set<String> remainingPrimaryKeyColumnNames) throws Exception {
         String columnName = identifierNameProcessor.getCorrectCaseColumnName(dataSetValue.getColumnName(), dataSetSettings);

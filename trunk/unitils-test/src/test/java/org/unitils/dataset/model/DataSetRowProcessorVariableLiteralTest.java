@@ -30,6 +30,7 @@ import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 import org.unitils.dataset.sqltypehandler.impl.TextSqlTypeHandler;
 import org.unitils.mock.Mock;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -60,9 +61,9 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
 
 
     @Before
-    public void initialize() {
+    public void initialize() throws SQLException {
         sqlTypeHandlerRepository.returns(new TextSqlTypeHandler()).getSqlTypeHandler(0);
-
+        database.returns(true).tableExists(null);
         dataSetRowProcessor = new DataSetRowProcessor(identifierNameProcessor.getMock(), sqlTypeHandlerRepository.getMock(), database.getMock());
 
         DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);

@@ -48,7 +48,7 @@ public class DatabaseMetaData {
 
     protected Map<String, Set<String>> tablePrimaryKeysCache = new HashMap<String, Set<String>>();
     protected Map<String, Map<String, Integer>> tableColumnSqlTypesCache = new HashMap<String, Map<String, Integer>>();
-
+    private Set<String> confirmedTableNames = new HashSet<String>();
 
     public DatabaseMetaData(Database defaultDatabase, SqlTypeHandlerRepository sqlTypeHandlerRepository) {
         this.defaultDatabase = defaultDatabase;
@@ -146,6 +146,19 @@ public class DatabaseMetaData {
             return SQL_TYPE_UNKNOWN;
         }
         return columnSqlType;
+    }
+
+    public Boolean tableExists(String qualifiedTableName) throws SQLException {
+        if (confirmedTableNames.contains(qualifiedTableName)) {
+            return true;
+        }
+        Connection connection = getConnection();
+        ResultSet tables = connection.getMetaData().getTables(null, getSchemaName(qualifiedTableName), getTableName(qualifiedTableName), null);
+        if (tables.first()) {
+            confirmedTableNames.add(qualifiedTableName);
+            return true;
+        }
+        return false;
     }
 
     protected Map<String, Integer> getColumnSqlTypes(String qualifiedTableName) throws SQLException {
