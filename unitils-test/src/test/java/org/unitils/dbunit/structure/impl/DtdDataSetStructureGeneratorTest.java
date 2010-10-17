@@ -33,7 +33,7 @@ import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.database.DatabaseUnitils.getDatabases;
+import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.dbunit.structure.impl.DtdDataSetStructureGenerator.PROPKEY_DTD_FILENAME;
 import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfiguration;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
@@ -65,7 +65,7 @@ public class DtdDataSetStructureGeneratorTest {
         Properties configuration = getUnitilsConfiguration();
         configuration.setProperty(PROPKEY_DTD_FILENAME, dtdFile.getPath());
 
-        Database defaultDatabase = getDatabases().getDefaultDatabase();
+        Database defaultDatabase = getDefaultDatabase();
         dataSource = defaultDatabase.getDataSource();
         dataSetStructureGenerator.init(configuration, defaultDatabase);
 

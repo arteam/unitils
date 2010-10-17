@@ -30,7 +30,7 @@ import java.util.Properties;
 import static org.dbmaintain.config.DbMaintainProperties.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.database.DatabaseUnitils.getDatabases;
+import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.database.SQLUnitils.*;
 import static org.unitils.testutil.TestUnitilsConfiguration.*;
 
@@ -63,14 +63,14 @@ public class DefaultDBCleanerMultiSchemaPreserveTest {
         }
 
         // configure 3 schemas
-        defaultDatabase = getDatabases().getDefaultDatabase();
+        defaultDatabase = getDefaultDatabase();
         configuration.setProperty(PROPERTY_SCHEMANAMES, "PUBLIC, SCHEMA_A, \"SCHEMA_B\", schema_c");
         // items to preserve
         configuration.setProperty(PROPERTY_PRESERVE_DATA_SCHEMAS, "schema_c");
         configuration.setProperty(PROPERTY_PRESERVE_DATA_TABLES, "test, " + defaultDatabase.quoted("SCHEMA_A") + "." + defaultDatabase.quoted("TEST"));
 
         reinitializeUnitils(configuration);
-        defaultDatabase = getDatabases().getDefaultDatabase();
+        defaultDatabase = getDefaultDatabase();
         dataSource = defaultDatabase.getDataSource();
 
         dropTestTables();

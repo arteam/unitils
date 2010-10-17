@@ -30,7 +30,7 @@ import static org.junit.Assert.assertTrue;
 import static org.unitils.core.util.SQLTestUtils.dropTestTables;
 import static org.unitils.core.util.SQLTestUtils.dropTestViews;
 import static org.unitils.database.DatabaseUnitils.cleanDatabase;
-import static org.unitils.database.DatabaseUnitils.getDatabases;
+import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.isEmpty;
 import static org.unitils.testutil.TestUnitilsConfiguration.*;
@@ -62,13 +62,13 @@ public class DefaultDBCleanerTest {
         }
 
         // items to preserve
-        defaultDatabase = getDatabases().getDefaultDatabase();
+        defaultDatabase = getDefaultDatabase();
         configuration.setProperty(PROPERTY_PRESERVE_DATA_TABLES, "Test_table_Preserve");
         configuration.setProperty(PROPERTY_PRESERVE_TABLES, defaultDatabase.quoted("Test_CASE_Table_Preserve"));
         versionTableName = configuration.getProperty(PROPERTY_EXECUTED_SCRIPTS_TABLE_NAME);
         reinitializeUnitils(configuration);
 
-        defaultDatabase = getDatabases().getDefaultDatabase();
+        defaultDatabase = getDefaultDatabase();
         dataSource = defaultDatabase.getDataSource();
 
         cleanupTestDatabase();
