@@ -29,7 +29,7 @@ import java.util.Set;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.unitils.core.util.SQLTestUtils.*;
-import static org.unitils.database.DatabaseUnitils.getDatabases;
+import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.getItemAsLong;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
@@ -56,7 +56,7 @@ public class DatabaseTest {
      */
     @Before
     public void setUp() throws Exception {
-        defaultDatabase = getDatabases().getDefaultDatabase();
+        defaultDatabase = getDefaultDatabase();
         dataSource = defaultDatabase.getDataSource();
 
         cleanupTestDatabase();

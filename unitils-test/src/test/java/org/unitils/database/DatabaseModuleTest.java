@@ -24,7 +24,9 @@ import org.unitils.database.annotations.TestDataSource;
 import javax.sql.DataSource;
 import java.util.Properties;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.unitils.database.transaction.UnitilsDatabaseManager.PROPERTY_UPDATEDATABASESCHEMA_ENABLED;
 
 /**
  * Tests for the DatabaseModule
@@ -35,7 +37,7 @@ import static org.junit.Assert.*;
 public class DatabaseModuleTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private TestDatabaseModule databaseModule;
+    private DatabaseModule databaseModule;
 
 
     /**
@@ -44,9 +46,9 @@ public class DatabaseModuleTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        configuration.setProperty(DatabaseModule.PROPERTY_UPDATEDATABASESCHEMA_ENABLED, "true");
+        configuration.setProperty(PROPERTY_UPDATEDATABASESCHEMA_ENABLED, "true");
 
-        databaseModule = new TestDatabaseModule();
+        databaseModule = new DatabaseModule();
         databaseModule.init(configuration);
     }
 
@@ -57,12 +59,11 @@ public class DatabaseModuleTest extends UnitilsJUnit4 {
     @Test
     public void testInjectDataSource() throws Exception {
         DbTest dbTest = new DbTest();
-        databaseModule.injectDataSource(dbTest, null);
+        databaseModule.injectDataSources(dbTest, null);
 
         assertNotNull(dbTest.dataSourceFromField);
         assertNotNull(dbTest.dataSourceFromMethod);
         assertSame(dbTest.dataSourceFromField, dbTest.dataSourceFromMethod);
-        assertTrue(databaseModule.updateDataSchemaCalled);
     }
 
 
@@ -81,20 +82,4 @@ public class DatabaseModuleTest extends UnitilsJUnit4 {
             this.dataSourceFromMethod = dataSource;
         }
     }
-
-
-    /**
-     * Database module that intercepts the updating of the database schema.
-     */
-    public class TestDatabaseModule extends DatabaseModule {
-
-        private boolean updateDataSchemaCalled = false;
-
-        @Override
-        public boolean updateDatabase() {
-            updateDataSchemaCalled = true;
-            return true;
-        }
-    }
-
 }
