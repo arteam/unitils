@@ -75,8 +75,12 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
         databaseMetaData.returns("PK1").removeIdentifierQuotes("PK1");
         databaseMetaData.returns("PK2").removeIdentifierQuotes("PK2");
         databaseMetaData.returns("COLUMN").removeIdentifierQuotes("COLUMN");
-        databaseMetaData.returns(true).tableExists(null);
-        
+        databaseMetaData.returns("schema").getSchemaName("\"schema\".\"table\"");
+        databaseMetaData.returns("schema").getSchemaName("schema.table");
+        databaseMetaData.returns("table").getTableName("schema.table");
+        databaseMetaData.returns("table").getTableName("\"schema\".\"table\"");
+        databaseMetaData.returns(asSet("table")).getTableNames("schema");
+
         dataSetRow = new DataSetRow("schema", "table", null, false, new DataSetSettings('=', '$', false));
         dataSetRowCaseSensitive = new DataSetRow("schema", "table", null, false, new DataSetSettings('=', '$', true));
     }
