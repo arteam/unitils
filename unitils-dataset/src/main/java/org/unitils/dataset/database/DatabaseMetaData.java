@@ -48,7 +48,7 @@ public class DatabaseMetaData {
 
     protected Map<String, Set<String>> tablePrimaryKeysCache = new HashMap<String, Set<String>>();
     protected Map<String, Map<String, Integer>> tableColumnSqlTypesCache = new HashMap<String, Map<String, Integer>>();
-    private Set<String> confirmedTableNames = new HashSet<String>();
+
 
     public DatabaseMetaData(Database defaultDatabase, SqlTypeHandlerRepository sqlTypeHandlerRepository) {
         this.defaultDatabase = defaultDatabase;
@@ -148,17 +148,8 @@ public class DatabaseMetaData {
         return columnSqlType;
     }
 
-    public Boolean tableExists(String qualifiedTableName) throws SQLException {
-        if (confirmedTableNames.contains(qualifiedTableName)) {
-            return true;
-        }
-        Connection connection = getConnection();
-        ResultSet tables = connection.getMetaData().getTables(null, getSchemaName(qualifiedTableName), getTableName(qualifiedTableName), null);
-        if (tables.first()) {
-            confirmedTableNames.add(qualifiedTableName);
-            return true;
-        }
-        return false;
+    public Set<String> getTableNames(String schemaName) {
+        return defaultDatabase.getTableNames(schemaName);
     }
 
     protected Map<String, Integer> getColumnSqlTypes(String qualifiedTableName) throws SQLException {
@@ -256,7 +247,7 @@ public class DatabaseMetaData {
     }
 
 
-    protected String getSchemaName(String qualifiedTableName) {
+    public String getSchemaName(String qualifiedTableName) {
         int index = qualifiedTableName.indexOf('.');
         if (index == -1) {
             throw new UnitilsException("Unable to determine schema name for qualified table name " + qualifiedTableName);
@@ -265,8 +256,7 @@ public class DatabaseMetaData {
         return removeIdentifierQuotes(schemaName);
     }
 
-
-    protected String getTableName(String qualifiedTableName) {
+    public String getTableName(String qualifiedTableName) {
         int index = qualifiedTableName.indexOf('.');
         if (index == -1) {
             throw new UnitilsException("Unable to determine table name for qualified table name " + qualifiedTableName);

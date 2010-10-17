@@ -38,6 +38,7 @@ import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
+import static org.unitils.util.CollectionUtils.asSet;
 
 /**
  * Tests the variable and literal value processing
@@ -52,7 +53,7 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
 
     protected Mock<IdentifierNameProcessor> identifierNameProcessor;
     protected Mock<SqlTypeHandlerRepository> sqlTypeHandlerRepository;
-    protected Mock<DatabaseMetaData> database;
+    protected Mock<DatabaseMetaData> databaseMetaData;
 
     private DataSetRow dataSetRow;
 
@@ -63,8 +64,11 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
     @Before
     public void initialize() throws SQLException {
         sqlTypeHandlerRepository.returns(new TextSqlTypeHandler()).getSqlTypeHandler(0);
-        database.returns(true).tableExists(null);
-        dataSetRowProcessor = new DataSetRowProcessor(identifierNameProcessor.getMock(), sqlTypeHandlerRepository.getMock(), database.getMock());
+        identifierNameProcessor.returns("schema.table").getQualifiedTableName(null);
+        databaseMetaData.returns("schema").getSchemaName("schema.table");
+        databaseMetaData.returns("table").getTableName("schema.table");
+        databaseMetaData.returns(asSet("table")).getTableNames("schema");
+        dataSetRowProcessor = new DataSetRowProcessor(identifierNameProcessor.getMock(), sqlTypeHandlerRepository.getMock(), databaseMetaData.getMock());
 
         DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
         dataSetRow = new DataSetRow("schema", "table", null, false, dataSetSettings);
