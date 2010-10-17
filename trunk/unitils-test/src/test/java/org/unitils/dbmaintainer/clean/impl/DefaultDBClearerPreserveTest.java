@@ -31,7 +31,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.unitils.core.util.SQLTestUtils.*;
 import static org.unitils.database.DatabaseUnitils.clearDatabase;
-import static org.unitils.database.DatabaseUnitils.getDatabases;
+import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.testutil.TestUnitilsConfiguration.*;
@@ -58,7 +58,7 @@ public class DefaultDBClearerPreserveTest {
         // configure items to preserve
         Properties configuration = getUnitilsConfiguration();
 
-        defaultDatabase = getDatabases().getDefaultDatabase();
+        defaultDatabase = getDefaultDatabase();
         configuration.setProperty(PROPERTY_AUTO_CREATE_DBMAINTAIN_SCRIPTS_TABLE, "true");
         configuration.setProperty(PROPERTY_PRESERVE_TABLES, "Test_Table, " + defaultDatabase.quoted("Test_CASE_Table"));
         configuration.setProperty(PROPERTY_PRESERVE_VIEWS, "Test_View, " + defaultDatabase.quoted("Test_CASE_View"));
@@ -74,7 +74,7 @@ public class DefaultDBClearerPreserveTest {
 
         reinitializeUnitils(configuration);
         versionTableName = configuration.getProperty(PROPERTY_EXECUTED_SCRIPTS_TABLE_NAME);
-        defaultDatabase = getDatabases().getDefaultDatabase();
+        defaultDatabase = getDefaultDatabase();
         dataSource = defaultDatabase.getDataSource();
 
         cleanupTestDatabase();

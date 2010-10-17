@@ -26,7 +26,7 @@ import javax.sql.DataSource;
 
 import static org.junit.Assert.fail;
 import static org.unitils.database.DatabaseUnitils.disableConstraints;
-import static org.unitils.database.DatabaseUnitils.getDatabases;
+import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 
@@ -49,7 +49,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit4 {
      */
     @Before
     public void setUp() throws Exception {
-        defaultDatabase = getDatabases().getDefaultDatabase();
+        defaultDatabase = getDefaultDatabase();
         dataSource = defaultDatabase.getDataSource();
 
         cleanupTestDatabase();

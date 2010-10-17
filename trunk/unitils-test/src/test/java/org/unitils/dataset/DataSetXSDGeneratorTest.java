@@ -31,7 +31,7 @@ import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
 import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_SCHEMANAMES;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.database.DatabaseUnitils.getDatabases;
+import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.dataset.DataSetModule.PROPKEY_XSD_TARGETDIRNAME;
@@ -68,7 +68,7 @@ public class DataSetXSDGeneratorTest {
             deleteDirectory(xsdDirectory);
         }
 
-        dataSource = getDatabases().getDefaultDatabase().getDataSource();
+        dataSource = getDefaultDatabase().getDataSource();
 
         dropTestTables();
         createTestTables();

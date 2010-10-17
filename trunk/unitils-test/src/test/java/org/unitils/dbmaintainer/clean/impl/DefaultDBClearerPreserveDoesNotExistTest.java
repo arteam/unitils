@@ -29,7 +29,7 @@ import java.util.Properties;
 import static org.dbmaintain.config.DbMaintainProperties.*;
 import static org.junit.Assert.fail;
 import static org.unitils.database.DatabaseUnitils.clearDatabase;
-import static org.unitils.database.DatabaseUnitils.getDatabases;
+import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.testutil.TestUnitilsConfiguration.reinitializeUnitils;
 import static org.unitils.testutil.TestUnitilsConfiguration.resetUnitils;
 
@@ -56,7 +56,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest {
     @Before
     public void setUp() throws Exception {
         configuration = new ConfigurationLoader().loadConfiguration();
-        defaultDatabase = getDatabases().getDefaultDatabase();
+        defaultDatabase = getDefaultDatabase();
     }
 
     @After

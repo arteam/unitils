@@ -18,6 +18,7 @@ package org.unitils.dataset.util;
 import org.dbmaintain.database.*;
 import org.dbmaintain.database.impl.DefaultSQLHandler;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
 import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
@@ -25,7 +26,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_SCHEMANAMES;
-import static org.unitils.database.DatabaseUnitils.getDatabases;
+import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 
 
 /**
@@ -35,7 +36,7 @@ import static org.unitils.database.DatabaseUnitils.getDatabases;
 public class DatabaseTestUtils {
 
     public static DatabaseMetaData createDatabaseMetaData() {
-        Database defaultDatabase = getDatabases().getDefaultDatabase();
+        Database defaultDatabase = getDefaultDatabase();
         return new DatabaseMetaData(defaultDatabase, new SqlTypeHandlerRepository());
     }
 
@@ -45,7 +46,7 @@ public class DatabaseTestUtils {
 
         DatabaseInfoFactory databaseInfoFactory = new DatabaseInfoFactory(configuration);
         List<DatabaseInfo> databaseInfos = databaseInfoFactory.getDatabaseInfos();
-        DatabasesFactory databasesFactory = new DatabasesFactory(configuration, new DefaultSQLHandler());
+        DatabasesFactory databasesFactory = new DatabasesFactory(configuration, new DefaultSQLHandler(), new DefaultDataSourceFactory());
         return databasesFactory.createDatabases(databaseInfos);
     }
 }

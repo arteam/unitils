@@ -29,7 +29,7 @@ import java.util.Properties;
 import static org.dbmaintain.config.DbMaintainProperties.*;
 import static org.junit.Assert.assertEquals;
 import static org.unitils.database.DatabaseUnitils.clearDatabase;
-import static org.unitils.database.DatabaseUnitils.getDatabases;
+import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.testutil.TestUnitilsConfiguration.*;
@@ -64,7 +64,7 @@ public class DefaultDBClearerMultiSchemaPreserveTest {
         configuration.setProperty(PROPERTY_SCHEMANAMES, "PUBLIC, SCHEMA_A, \"SCHEMA_B\", schema_c");
 
         // configure items to preserve
-        defaultDatabase = getDatabases().getDefaultDatabase();
+        defaultDatabase = getDefaultDatabase();
         configuration.setProperty(PROPERTY_AUTO_CREATE_DBMAINTAIN_SCRIPTS_TABLE, "true");
         configuration.setProperty(PROPERTY_PRESERVE_SCHEMAS, "schema_c");
         configuration.setProperty(PROPERTY_PRESERVE_TABLES, "test_table, " + defaultDatabase.quoted("SCHEMA_A") + "." + defaultDatabase.quoted("TEST_TABLE"));
@@ -73,7 +73,7 @@ public class DefaultDBClearerMultiSchemaPreserveTest {
 
         reinitializeUnitils(configuration);
         versionTableName = configuration.getProperty(PROPERTY_EXECUTED_SCRIPTS_TABLE_NAME);
-        defaultDatabase = getDatabases().getDefaultDatabase();
+        defaultDatabase = getDefaultDatabase();
         dataSource = defaultDatabase.getDataSource();
 
         cleanupTestDatabase();

@@ -31,7 +31,7 @@ import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_EXECUTED_SCRIP
 import static org.junit.Assert.*;
 import static org.unitils.core.util.SQLTestUtils.*;
 import static org.unitils.database.DatabaseUnitils.clearDatabase;
-import static org.unitils.database.DatabaseUnitils.getDatabases;
+import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.testutil.TestUnitilsConfiguration.*;
 
@@ -60,7 +60,7 @@ public class DefaultDBClearerTest {
         configuration.setProperty(PROPERTY_AUTO_CREATE_DBMAINTAIN_SCRIPTS_TABLE, "true");
         reinitializeUnitils(configuration);
 
-        defaultDatabase = getDatabases().getDefaultDatabase();
+        defaultDatabase = getDefaultDatabase();
         dataSource = defaultDatabase.getDataSource();
 
         cleanupTestDatabase();

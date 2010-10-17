@@ -36,7 +36,7 @@ import java.util.Properties;
 import static org.apache.commons.lang.StringUtils.deleteWhitespace;
 import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.database.DatabaseUnitils.getDatabases;
+import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.dbunit.structure.impl.XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME;
@@ -85,7 +85,7 @@ public class XsdDataSetStructureGeneratorTest {
 
         configuration.setProperty(PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
 
-        Database defaultDatabase = getDatabases().getDefaultDatabase();
+        Database defaultDatabase = getDefaultDatabase();
         dataSource = defaultDatabase.getDataSource();
         dataSetStructureGenerator.init(configuration, defaultDatabase);
 
