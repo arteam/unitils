@@ -16,7 +16,7 @@
 package org.unitils.database;
 
 import org.dbmaintain.MainFactory;
-import org.dbmaintain.database.Databases;
+import org.dbmaintain.database.Database;
 import org.unitils.core.Unitils;
 
 import javax.sql.DataSource;
@@ -39,8 +39,8 @@ public class DatabaseUnitils {
      *
      * @return The DataSource that connects to the test database
      */
-    public static DataSource getDataSource() {
-        return getDataSource(null);
+    public static DataSource getDataSource(Object testObject) {
+        return getDataSource(testObject, null);
     }
 
     /**
@@ -49,16 +49,24 @@ public class DatabaseUnitils {
      * @param databaseName The name of the database to get a data source for, null for the default database
      * @return The DataSource that connects to the test database
      */
-    public static DataSource getDataSource(String databaseName) {
-        return getDatabaseModule().getDataSource(databaseName, null);
+    public static DataSource getDataSource(Object testObject, String databaseName) {
+        return getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded(testObject, databaseName, null);
     }
 
 
     /**
-     * @return The utility classes for working with databases. For example for getting all table names within a schema.
+     * @return The utility class for working with the default database. For example for getting all table names within a schema.
      */
-    public static Databases getDatabases() {
-        return getDatabaseModule().getDatabases();
+    public static Database getDefaultDatabase() {
+        return getDatabase(null);
+    }
+
+    /**
+     * @param databaseName The name of the database to get the database support for, null for the default database
+     * @return The utility classes for working with the database. For example for getting all table names within a schema.
+     */
+    public static Database getDatabase(String databaseName) {
+        return getDatabaseModule().getDatabase(databaseName);
     }
 
 
@@ -67,8 +75,8 @@ public class DatabaseUnitils {
      *
      * @param testObject The current test instance (e.g. this if your in the test), not null
      */
-    public static void startTransaction(Object testObject) {
-        getDatabaseModule().startTransaction(testObject, null);
+    public static void startTransaction(Object testObject, DataSource dataSource) {
+        getDatabaseModule().startTransactionForDataSource(testObject, dataSource);
     }
 
     /**
@@ -94,8 +102,8 @@ public class DatabaseUnitils {
      * Determines whether the test database is outdated and, if that is the case, updates the database with the
      * latest changes. See {@link org.dbmaintain.DbMaintainer} for more information.
      */
-    public static void updateDatabase() {
-        getDatabaseModule().updateDatabase();
+    public static void updateDatabaseIfNeeded() {
+        getDatabaseModule().updateDatabaseIfNeeded();
     }
 
     /**
@@ -150,6 +158,6 @@ public class DatabaseUnitils {
     }
 
     private static MainFactory getMainFactory() {
-        return getDatabaseModule().getMainFactory();
+        return getDatabaseModule().createDbMaintainMainFactory();
     }
 }

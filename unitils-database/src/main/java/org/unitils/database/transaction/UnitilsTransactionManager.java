@@ -26,23 +26,19 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.unitils.core.UnitilsException;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.transaction.TransactionDefinition.PROPAGATION_REQUIRED;
 
 /**
- * Implements transactions for unit tests, by delegating to a spring
- * <code>PlatformTransactionManager</code>. The concrete implementation of
- * <code>PlatformTransactionManager</code> that is used depends on the test
- * class. If a custom <code>PlatformTransactionManager</code> was configured
- * in a spring <code>ApplicationContext</code>, this one is used. If not, a
- * suitable subclass of <code>PlatformTransactionManager</code> is created,
- * depending on the configuration of a test. E.g. if some ORM persistence unit
- * was configured on the test, a <code>PlatformTransactionManager</code> that
- * can offer transactional behavior for such a persistence unit is used. If no
- * such configuration is found, a <code>DataSourceTransactionManager</code> is
- * used.
+ * Implements transactions for unit tests, by delegating to a spring <code>PlatformTransactionManager</code>.
+ * The concrete implementation of <code>PlatformTransactionManager</code> that is used depends on the test
+ * class. If a custom <code>PlatformTransactionManager</code> was configured in a spring <code>ApplicationContext</code>,
+ * this one is used. If not, a <code>DataSourceTransactionManager</code> is created,
+ * depending on the configuration of a test.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -52,26 +48,54 @@ public class UnitilsTransactionManager {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(UnitilsTransactionManager.class);
 
-    protected PlatformTransactionManager platformTransactionManager;
-    protected Map<Object, TransactionStatus> testObjectTransactionStatusMap = new IdentityHashMap<Object, TransactionStatus>();
+    protected Map<Object, List<TransactionManagerAndStatus>> transactionManagersAndStatus = new IdentityHashMap<Object, List<TransactionManagerAndStatus>>();
 
+
+    public void startTransactionOnTransactionManagersInApplicationContext(Object testObject, List<String> transactionManagerBeanNames, ApplicationContext applicationContext) {
+        List<TransactionManagerAndStatus> transactionManagersAndStatusForTestObject = getTransactionManagersAndStatusForTestObject(testObject);
+        if (!transactionManagersAndStatusForTestObject.isEmpty()) {
+            throw new UnitilsException("Unable to start transaction. A transaction was already started for this test object.");
+        }
+
+        if (transactionManagerBeanNames.isEmpty()) {
+            PlatformTransactionManager platformTransactionManager = getDefaultPlatformTransactionManagerFromApplicationContext(applicationContext);
+            if (platformTransactionManager == null) {
+                return;
+            }
+            logger.debug("Starting transaction on configured Spring PlatformTransactionManager bean.");
+            TransactionManagerAndStatus transactionManagerAndStatus = startTransaction(platformTransactionManager);
+            transactionManagersAndStatusForTestObject.add(transactionManagerAndStatus);
+            return;
+        }
+        for (String transactionManagerBeanName : transactionManagerBeanNames) {
+            logger.debug("Starting transaction on configured Spring PlatformTransactionManager bean with name " + transactionManagerBeanName + ".");
+            PlatformTransactionManager platformTransactionManager = getPlatformTransactionManagerFromApplicationContext(transactionManagerBeanName, applicationContext);
+            TransactionManagerAndStatus transactionManagerAndStatus = startTransaction(platformTransactionManager);
+            transactionManagersAndStatusForTestObject.add(transactionManagerAndStatus);
+        }
+    }
 
     /**
      * Starts the transaction on the PlatformTransactionManager for the given testObject.
      *
-     * @param testObject         The test object, not null
-     * @param applicationContext The spring application context, null if not defined
-     * @param dataSource         The data source, not null
+     * @param testObject The test object, not null
+     * @param dataSource The data source, not null
      */
-    public void startTransaction(Object testObject, ApplicationContext applicationContext, DataSource dataSource) {
-        if (platformTransactionManager == null) {
-            platformTransactionManager = createPlatformTransactionManager(applicationContext, dataSource);
+    public void startTransactionForDataSource(Object testObject, DataSource dataSource, boolean ignoreIfAlreadyActive) {
+        List<TransactionManagerAndStatus> transactionManagersAndStatusForTestObject = getTransactionManagersAndStatusForTestObject(testObject);
+        if (!transactionManagersAndStatusForTestObject.isEmpty()) {
+            if (ignoreIfAlreadyActive) {
+                return;
+            }
+            throw new UnitilsException("Unable to start transaction. A transaction was already started for this test object.");
         }
-        logger.debug("Starting transaction");
 
-        TransactionStatus transactionStatus = platformTransactionManager.getTransaction(createTransactionDefinition());
-        testObjectTransactionStatusMap.put(testObject, transactionStatus);
+        logger.debug("Starting transaction using default transaction manager.");
+        PlatformTransactionManager platformTransactionManager = new DataSourceTransactionManager(dataSource);
+        TransactionManagerAndStatus transactionManagerAndStatus = startTransaction(platformTransactionManager);
+        transactionManagersAndStatusForTestObject.add(transactionManagerAndStatus);
     }
+
 
     /**
      * Commits the transaction. Uses the PlatformTransactionManager and transaction
@@ -80,12 +104,17 @@ public class UnitilsTransactionManager {
      * @param testObject The test object, not null
      */
     public void commit(Object testObject) {
-        TransactionStatus transactionStatus = testObjectTransactionStatusMap.get(testObject);
-        if (transactionStatus == null) {
-            throw new UnitilsException("Trying to commit, while no transaction is currently active");
+        List<TransactionManagerAndStatus> transactionManagersAndStatusForTestObject = getTransactionManagersAndStatusForTestObject(testObject);
+        if (transactionManagersAndStatusForTestObject.isEmpty()) {
+            throw new UnitilsException("Trying to commit while no transaction is currently active. Make sure to call startTransaction to start a transaction.");
         }
-        platformTransactionManager.commit(transactionStatus);
-        testObjectTransactionStatusMap.remove(testObject);
+        logger.debug("Committing transaction(s).");
+        for (TransactionManagerAndStatus transactionManagerAndStatus : transactionManagersAndStatusForTestObject) {
+            PlatformTransactionManager platformTransactionManager = transactionManagerAndStatus.getPlatformTransactionManager();
+            TransactionStatus transactionStatus = transactionManagerAndStatus.getTransactionStatus();
+            platformTransactionManager.commit(transactionStatus);
+        }
+        transactionManagersAndStatus.remove(testObject);
     }
 
     /**
@@ -95,13 +124,17 @@ public class UnitilsTransactionManager {
      * @param testObject The test object, not null
      */
     public void rollback(Object testObject) {
-        TransactionStatus transactionStatus = testObjectTransactionStatusMap.get(testObject);
-        if (transactionStatus == null) {
-            throw new UnitilsException("Trying to rollback, while no transaction is currently active");
+        List<TransactionManagerAndStatus> transactionManagersAndStatusForTestObject = getTransactionManagersAndStatusForTestObject(testObject);
+        if (transactionManagersAndStatusForTestObject.isEmpty()) {
+            throw new UnitilsException("Trying to rollback while no transaction is currently active. Make sure to call startTransaction to start a transaction.");
         }
-        logger.debug("Rolling back transaction");
-        platformTransactionManager.rollback(transactionStatus);
-        testObjectTransactionStatusMap.remove(testObject);
+        logger.debug("Rolling back transaction(s).");
+        for (TransactionManagerAndStatus transactionManagerAndStatus : transactionManagersAndStatusForTestObject) {
+            PlatformTransactionManager platformTransactionManager = transactionManagerAndStatus.getPlatformTransactionManager();
+            TransactionStatus transactionStatus = transactionManagerAndStatus.getTransactionStatus();
+            platformTransactionManager.rollback(transactionStatus);
+        }
+        transactionManagersAndStatus.remove(testObject);
     }
 
 
@@ -114,27 +147,61 @@ public class UnitilsTransactionManager {
      * @return The default TransactionDefinition
      */
     protected TransactionDefinition createTransactionDefinition() {
-        // todo make configurable
         return new DefaultTransactionDefinition(PROPAGATION_REQUIRED);
     }
 
-    protected PlatformTransactionManager createPlatformTransactionManager(ApplicationContext applicationContext, DataSource dataSource) {
-        PlatformTransactionManager platformTransactionManager = getPlatformTransactionManagerFromApplicationContext(applicationContext);
-        if (platformTransactionManager != null) {
-            return platformTransactionManager;
+
+    protected List<TransactionManagerAndStatus> getTransactionManagersAndStatusForTestObject(Object testObject) {
+        List<TransactionManagerAndStatus> transactionManagersAndStatusForTestObject = transactionManagersAndStatus.get(testObject);
+        if (transactionManagersAndStatusForTestObject == null) {
+            transactionManagersAndStatusForTestObject = new ArrayList<TransactionManagerAndStatus>();
+            transactionManagersAndStatus.put(testObject, transactionManagersAndStatusForTestObject);
         }
-        return new DataSourceTransactionManager(dataSource);
+        return transactionManagersAndStatusForTestObject;
     }
 
-    protected PlatformTransactionManager getPlatformTransactionManagerFromApplicationContext(ApplicationContext applicationContext) {
-        if (applicationContext == null) {
+    protected TransactionManagerAndStatus startTransaction(PlatformTransactionManager platformTransactionManager) {
+        TransactionStatus transactionStatus = platformTransactionManager.getTransaction(createTransactionDefinition());
+        return new TransactionManagerAndStatus(platformTransactionManager, transactionStatus);
+    }
+
+
+    protected PlatformTransactionManager getDefaultPlatformTransactionManagerFromApplicationContext(ApplicationContext applicationContext) {
+        Map<String, PlatformTransactionManager> platformTransactionManagers = applicationContext.getBeansOfType(PlatformTransactionManager.class);
+        if (platformTransactionManagers.isEmpty()) {
             return null;
         }
+        if (platformTransactionManagers.size() > 1) {
+            throw new UnitilsException("Unable to get default transaction manager from test application context. More than one bean of type PlatformTransactionManager found. Please specify the bean name explicitly in the @Transactional annotation.");
+        }
+        return platformTransactionManagers.values().iterator().next();
+    }
+
+    protected PlatformTransactionManager getPlatformTransactionManagerFromApplicationContext(String transactionManagerBeanName, ApplicationContext applicationContext) {
         try {
-            return applicationContext.getBean(PlatformTransactionManager.class); // todo configurable
+            return applicationContext.getBean(transactionManagerBeanName, PlatformTransactionManager.class);
         } catch (Exception e) {
-            // no spring application context defined
-            return null;
+            throw new UnitilsException("Unable to get transaction manager for name " + transactionManagerBeanName + " from test application context: " + e.getMessage(), e);
+        }
+    }
+
+
+    protected static class TransactionManagerAndStatus {
+
+        private PlatformTransactionManager platformTransactionManager;
+        private TransactionStatus transactionStatus;
+
+        public TransactionManagerAndStatus(PlatformTransactionManager platformTransactionManager, TransactionStatus transactionStatus) {
+            this.platformTransactionManager = platformTransactionManager;
+            this.transactionStatus = transactionStatus;
+        }
+
+        public PlatformTransactionManager getPlatformTransactionManager() {
+            return platformTransactionManager;
+        }
+
+        public TransactionStatus getTransactionStatus() {
+            return transactionStatus;
         }
     }
 }
