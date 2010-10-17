@@ -42,7 +42,7 @@ public class UnitilsDataSource {
     }
 
 
-    public boolean hasName(String databaseName) {
+    public boolean hasDatabaseName(String databaseName) {
         return (this.databaseName == null && databaseName == null) || (databaseName != null && databaseName.equals(this.databaseName));
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,10 +37,9 @@ import static org.unitils.database.util.TransactionMode.DEFAULT;
  * <code>DatabaseModule.Transactional.value.default</code>. This configured default will be used when the value property
  * is unspecified or explicitly set to {@link TransactionMode#DEFAULT}.
  *
- * @see TransactionMode
- *
  * @author Filip Neven
  * @author Tim Ducheyne
+ * @see TransactionMode
  */
 @Target({TYPE})
 @Retention(RUNTIME)
@@ -56,4 +55,15 @@ public @interface Transactional {
      * @return The TransactionMode
      */
     TransactionMode value() default DEFAULT;
+
+    /**
+     * The name(s) of the transaction manager(s) that will participate in the transaction.
+     * This is only applicable if you have more than 1 transaction manager configured in a Spring application
+     * context. If you are using properties or there is only 1 bean of type PlatformTransactionManager defined,
+     * this should be left empty.
+     *
+     * @return The bean names of the transaction managers, empty by default
+     */
+    String[] transactionManagerBeanNames() default {};
+
 }

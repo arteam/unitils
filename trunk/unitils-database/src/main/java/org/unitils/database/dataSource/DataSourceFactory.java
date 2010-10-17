@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.database.config;
+package org.unitils.database.datasource;
+
+import org.dbmaintain.database.DatabaseInfo;
+import org.unitils.core.util.Configurable;
 
 import javax.sql.DataSource;
-
-import org.unitils.core.util.Configurable;
 
 /**
  * Defines the contract of a factory that can provide an instance of a test <code>DataSource</code>.
@@ -25,13 +26,14 @@ import org.unitils.core.util.Configurable;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface DataSourceFactory extends Configurable {
+public interface DataSourceFactory extends Configurable, org.dbmaintain.datasource.DataSourceFactory {
 
     /**
      * Creates a new <code>DataSource</code>
      *
+     * @param databaseInfo The database connection info, not null
      * @return The DataSource, not null
      */
-    DataSource createDataSource();
+    DataSource createDataSource(DatabaseInfo databaseInfo);
 
 }
