@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationAnnotatedWith;
 import static org.unitils.util.CollectionUtils.asList;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
@@ -288,8 +289,7 @@ public class DataSetModule implements Module {
 
 
     protected DatabaseMetaData createDatabaseMetaData() {
-        DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-        Database defaultDatabase = databaseModule.getDatabases().getDefaultDatabase();
+        Database defaultDatabase = getDefaultDatabase();
 
         SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
         return new DatabaseMetaData(defaultDatabase, sqlTypeHandlerRepository);

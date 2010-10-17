@@ -24,7 +24,6 @@ import org.dbunit.dataset.datatype.IDataTypeFactory;
 import org.springframework.test.context.TestContext;
 import org.unitils.core.Module;
 import org.unitils.core.TestExecutionListenerAdapter;
-import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.ConfigUtils;
 import org.unitils.database.DatabaseModule;
@@ -46,6 +45,7 @@ import java.util.*;
 
 import static org.dbunit.database.DatabaseConfig.*;
 import static org.unitils.core.util.ConfigUtils.getInstanceOf;
+import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
 import static org.unitils.util.ModuleUtils.*;
@@ -514,22 +514,6 @@ public class DbUnitModule implements Module {
      */
     protected DataSetResolver getDataSetResolver() {
         return ConfigUtils.getConfiguredInstanceOf(DataSetResolver.class, configuration);
-    }
-
-
-    /**
-     * @return The default database (the first one that was configured)
-     */
-    protected Database getDefaultDatabase() {
-        return getDatabaseModule().getDatabases().getDefaultDatabase();
-    }
-
-
-    /**
-     * @return Implementation of DatabaseModule, on which this module is dependent
-     */
-    protected DatabaseModule getDatabaseModule() {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
     }
 
 
