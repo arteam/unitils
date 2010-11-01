@@ -22,6 +22,8 @@ import org.unitils.dataset.rowsource.DataSetRowSource;
 import java.util.List;
 import java.util.Properties;
 
+import static org.unitils.util.ExceptionUtils.getAllMessages;
+
 /**
  * First deletes all data from the tables in the data set and then
  * loads the data using insert statements.
@@ -35,9 +37,9 @@ public class CleanInsertDataSetStrategy extends InsertDataSetStrategy {
 
 
     @Override
-    public void init(Properties configuration, DatabaseMetaData database) {
-        super.init(configuration, database);
-        tableContentDeleter = new TableContentDeleter(identifierNameProcessor, databaseAccessor);
+    public void init(Properties configuration, DatabaseMetaData databaseMetaData) {
+        super.init(configuration, databaseMetaData);
+        tableContentDeleter = new TableContentDeleter(identifierNameProcessor, databaseAccessor, databaseMetaData);
     }
 
 
@@ -54,7 +56,8 @@ public class CleanInsertDataSetStrategy extends InsertDataSetStrategy {
             tableContentDeleter.deleteDataFromTablesInReverseOrder(dataSetRowSource);
 
         } catch (Exception e) {
-            throw new UnitilsException("Unable to delete table data for data set file: " + dataSetRowSource.getDataSetName(), e);
+            String message = getAllMessages(e);
+            throw new UnitilsException("Unable to delete table data for data set file: " + dataSetRowSource.getDataSetName() + "\n" + message, e);
         } finally {
             dataSetRowSource.close();
         }

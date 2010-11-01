@@ -16,20 +16,20 @@
 package org.unitils.dataset.database;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.core.UnitilsException;
 import org.unitils.database.annotations.TestDataSource;
 
 import javax.sql.DataSource;
-import java.util.Set;
+import java.sql.SQLException;
 
-import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.dataset.util.DatabaseTestUtils.createDatabaseMetaData;
-import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 /**
  * Simple test to see if the tableExists works as intended.
@@ -37,7 +37,7 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEqua
  * @author Jeroen Horemans
  */
 
-public class DatabaseMetaDataGetTableNamesTest extends UnitilsJUnit4 {
+public class DatabaseMetaDataAssertTableNameExists extends UnitilsJUnit4 {
 
     private DatabaseMetaData databaseMetaData;
 
@@ -58,15 +58,25 @@ public class DatabaseMetaDataGetTableNamesTest extends UnitilsJUnit4 {
 
 
     @Test
-    public void tableNames() {
-        Set<String> result = databaseMetaData.getTableNames("PUBLIC");
-        assertReflectionEquals(asList("TEST"), result);
+    public void tableNameDoesNotExist() throws SQLException {
+        try {
+            databaseMetaData.assertTableNameExists("PUBLIC.NON_EXISTING_TABLE");
+            fail("Expected UnitilsException");
+        } catch (UnitilsException e) {
+            assertEquals("No table with name NON_EXISTING_TABLE found in schema PUBLIC.", e.getMessage());
+        }
     }
 
     @Test
-    public void schemaNotFound() {
-        Set<String> result = databaseMetaData.getTableNames("XXXX");
-        Assert.assertTrue(result.isEmpty());
+    public void tableNameExists() throws SQLException {
+        databaseMetaData.assertTableNameExists("PUBLIC.TEST");
+    }
+
+    @Test
+    public void tableExistsCachedTest() throws SQLException {
+        databaseMetaData.assertTableNameExists("PUBLIC.TEST");
+        dropTestTables();
+        databaseMetaData.assertTableNameExists("PUBLIC.TEST");
     }
 
 

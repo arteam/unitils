@@ -23,7 +23,7 @@
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.3" level="project" />
     <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2" level="project" />
     <orderEntry type="library" name="Maven: ognl:ognl:2.6.9" level="project" />
-    <orderEntry type="library" name="Maven: org.dbmaintain:dbmaintain:2.1" level="project" />
+    <orderEntry type="library" name="Maven: org.dbmaintain:dbmaintain:2.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: ant:ant:1.6.5" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate:hibernate:3.2.7.ga" level="project" />
     <orderEntry type="library" name="Maven: net.sf.ehcache:ehcache:1.2.3" level="project" />

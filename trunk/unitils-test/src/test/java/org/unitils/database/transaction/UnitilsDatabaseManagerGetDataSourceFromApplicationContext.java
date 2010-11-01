@@ -17,20 +17,14 @@ package org.unitils.database.transaction;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.support.StaticApplicationContext;
-import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.core.UnitilsException;
-import org.unitils.database.UnitilsDataSource;
-import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
 import org.unitils.mock.annotation.Dummy;
 
 import javax.sql.DataSource;
-import java.util.Properties;
 
 import static org.junit.Assert.*;
-import static org.unitils.database.transaction.UnitilsDatabaseManager.PROPERTY_UPDATEDATABASESCHEMA_ENABLED;
-import static org.unitils.database.transaction.UnitilsDatabaseManager.PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY;
 
 /**
  * @author Tim Ducheyne
@@ -50,57 +44,38 @@ public class UnitilsDatabaseManagerGetDataSourceFromApplicationContext extends U
 
     @Before
     public void initialize() {
-        Properties configuration = new Properties();
-        configuration.setProperty(PROPERTY_UPDATEDATABASESCHEMA_ENABLED, "false");
-        configuration.setProperty(PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY, "true");
-
+        unitilsDatabaseManager = new UnitilsDatabaseManager(false, null);
         staticApplicationContext = new StaticApplicationContext();
-
-        unitilsDatabaseManager = new UnitilsDatabaseManager(configuration, new DefaultDataSourceFactory());
     }
 
 
     @Test
     public void withDatabaseName() throws Exception {
-        registerSpringBean("1", new UnitilsDataSource("database1", dataSource1));
-        registerSpringBean("2", new UnitilsDataSource("database2", dataSource2));
+        registerSpringBean("database1", dataSource1);
+        registerSpringBean("database2", dataSource2);
 
-        DataSource dataSource = unitilsDatabaseManager.getDataSource("database1", staticApplicationContext);
-        assertSame(dataSource1, ((TransactionAwareDataSourceProxy) dataSource).getTargetDataSource());
+        DataSource result = unitilsDatabaseManager.getDataSource("database1", staticApplicationContext);
+        assertSame(dataSource1, result);
     }
 
     @Test
-    public void noDatabaseNameIsDefaultDataSource() throws Exception {
-        registerSpringBean("default", new UnitilsDataSource(dataSource1));
-        registerSpringBean("database2", new UnitilsDataSource("database2", dataSource2));
+    public void defaultDataSourceIfOnlyOneDataSourceDefined() throws Exception {
+        registerSpringBean("default", dataSource1);
 
-        DataSource dataSource = unitilsDatabaseManager.getDataSource(null, staticApplicationContext);
-        assertSame(dataSource1, ((TransactionAwareDataSourceProxy) dataSource).getTargetDataSource());
+        DataSource result = unitilsDatabaseManager.getDataSource(null, staticApplicationContext);
+        assertSame(dataSource1, result);
     }
 
     @Test
-    public void moreThanOneDefaultDataSourceConfigured() throws Exception {
-        registerSpringBean("default", new UnitilsDataSource(dataSource1));
-        registerSpringBean("other default", new UnitilsDataSource(dataSource2));
+    public void defaultDataSourceWhenMultipleDataSourcesDefined() throws Exception {
+        registerSpringBean("database1", dataSource1);
+        registerSpringBean("database2", dataSource2);
 
         try {
             unitilsDatabaseManager.getDataSource(null, staticApplicationContext);
-            fail("UnitilsException expected");
-        } catch (UnitilsException e) {
-            assertTrue(e.getMessage().contains("Unable to get default unitils data source from test application context."));
-        }
-    }
-
-    @Test
-    public void moreThanOneNamedDataSourceConfigured() throws Exception {
-        registerSpringBean("dataSource1", new UnitilsDataSource("dataSource1", dataSource1));
-        registerSpringBean("other dataSource1", new UnitilsDataSource("dataSource1", dataSource2));
-
-        try {
-            unitilsDatabaseManager.getDataSource("dataSource1", staticApplicationContext);
-            fail("UnitilsException expected");
-        } catch (UnitilsException e) {
-            assertTrue(e.getMessage().contains("Unable to get unitils data source for database name dataSource1 from test application context."));
+            fail("NoSuchBeanDefinitionException expected");
+        } catch (NoSuchBeanDefinitionException e) {
+            assertEquals("No unique bean of type [javax.sql.DataSource] is defined: expected single bean but found 2: database1,database2", e.getMessage());
         }
     }
 
@@ -108,9 +83,9 @@ public class UnitilsDatabaseManagerGetDataSourceFromApplicationContext extends U
     public void unknownDatabaseName() throws Exception {
         try {
             unitilsDatabaseManager.getDataSource("xxxx", staticApplicationContext);
-            fail("DatabaseException expected");
-        } catch (UnitilsException e) {
-            assertTrue(e.getMessage().contains("Unable to get unitils data source for database name xxxx from test application context."));
+            fail("NoSuchBeanDefinitionException expected");
+        } catch (NoSuchBeanDefinitionException e) {
+            assertEquals("No bean named 'xxxx' is defined", e.getMessage());
         }
     }
 
@@ -118,9 +93,9 @@ public class UnitilsDatabaseManagerGetDataSourceFromApplicationContext extends U
     public void unknownDefaultDatabase() throws Exception {
         try {
             unitilsDatabaseManager.getDataSourceFromApplicationContext(null, staticApplicationContext);
-            fail("DatabaseException expected");
-        } catch (UnitilsException e) {
-            assertTrue(e.getMessage().contains("Unable to get default unitils data source from test application context."));
+            fail("NoSuchBeanDefinitionException expected");
+        } catch (NoSuchBeanDefinitionException e) {
+            assertEquals("No unique bean of type [javax.sql.DataSource] is defined: expected single bean but found 0: ", e.getMessage());
         }
     }
 

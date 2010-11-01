@@ -32,9 +32,9 @@ import java.util.Properties;
 import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_AUTO_CREATE_DBMAINTAIN_SCRIPTS_TABLE;
 import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_SCRIPT_LOCATIONS;
 import static org.junit.Assert.fail;
+import static org.unitils.database.DatabaseModule.PROPERTY_UPDATEDATABASESCHEMA_ENABLED;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.database.transaction.UnitilsDatabaseManager.PROPERTY_UPDATEDATABASESCHEMA_ENABLED;
 
 /**
  * Tests for the DatabaseModule
@@ -42,7 +42,7 @@ import static org.unitils.database.transaction.UnitilsDatabaseManager.PROPERTY_U
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DatabaseModuleUpdateDatabaseTest extends UnitilsJUnit4 {
+public class DatabaseModuleUpdateDatabaseFromPropertiesTest extends UnitilsJUnit4 {
 
     /* Tested object */
     private DatabaseModule databaseModule = new DatabaseModule();
@@ -79,7 +79,7 @@ public class DatabaseModuleUpdateDatabaseTest extends UnitilsJUnit4 {
         configuration.setProperty(PROPERTY_UPDATEDATABASESCHEMA_ENABLED, "true");
         databaseModule.init(configuration);
 
-        databaseModule.updateDatabaseIfNeeded();
+        databaseModule.updateDatabaseIfNeeded(null);
         assertTestTableExists();
     }
 
@@ -87,7 +87,7 @@ public class DatabaseModuleUpdateDatabaseTest extends UnitilsJUnit4 {
     public void updateDatabaseDisabledByDefault() throws Exception {
         databaseModule.init(configuration);
 
-        databaseModule.updateDatabaseIfNeeded();
+        databaseModule.updateDatabaseIfNeeded(null);
         assertTestTableNotExists();
     }
 
@@ -95,10 +95,10 @@ public class DatabaseModuleUpdateDatabaseTest extends UnitilsJUnit4 {
     public void callUpdateDatabaseOnlyOnce() throws Exception {
         databaseModule.init(configuration);
 
-        databaseModule.updateDatabaseIfNeeded();
+        databaseModule.updateDatabaseIfNeeded(null);
         dropTestTables();
 
-        databaseModule.updateDatabaseIfNeeded();
+        databaseModule.updateDatabaseIfNeeded(null);
         assertTestTableNotExists();
     }
 

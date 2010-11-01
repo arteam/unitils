@@ -20,10 +20,10 @@ import org.junit.Test;
 import org.unitils.database.annotations.Transactional;
 
 import java.util.List;
-import java.util.Properties;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertTrue;
+import static org.unitils.database.util.TransactionMode.COMMIT;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 /**
@@ -38,7 +38,7 @@ public class DatabaseAnnotationHelperGetTransactionManagerBeanNamesTest {
 
     @Before
     public void initialize() {
-        databaseAnnotationHelper = new DatabaseAnnotationHelper(new Properties());
+        databaseAnnotationHelper = new DatabaseAnnotationHelper(COMMIT);
     }
 
     @Test

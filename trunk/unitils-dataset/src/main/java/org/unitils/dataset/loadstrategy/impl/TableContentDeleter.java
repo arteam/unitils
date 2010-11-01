@@ -17,6 +17,7 @@ package org.unitils.dataset.loadstrategy.impl;
 
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.database.DatabaseAccessor;
+import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.model.database.Value;
 import org.unitils.dataset.model.dataset.DataSetRow;
 import org.unitils.dataset.rowsource.DataSetRowSource;
@@ -34,11 +35,13 @@ public class TableContentDeleter {
 
     protected DatabaseAccessor databaseAccessor;
     protected IdentifierNameProcessor identifierNameProcessor;
+    protected DatabaseMetaData databaseMetaData;
 
 
-    public TableContentDeleter(IdentifierNameProcessor identifierNameProcessor, DatabaseAccessor databaseAccessor) {
+    public TableContentDeleter(IdentifierNameProcessor identifierNameProcessor, DatabaseAccessor databaseAccessor, DatabaseMetaData databaseMetaData) {
         this.databaseAccessor = databaseAccessor;
         this.identifierNameProcessor = identifierNameProcessor;
+        this.databaseMetaData = databaseMetaData;
     }
 
 
@@ -47,6 +50,7 @@ public class TableContentDeleter {
         Collections.reverse(qualifiedTableNames);
         for (String qualifiedTableName : qualifiedTableNames) {
             try {
+                databaseMetaData.assertTableNameExists(qualifiedTableName);
                 deleteTableContent(qualifiedTableName);
             } catch (Exception e) {
                 throw new UnitilsException("Unable to delete data from table " + qualifiedTableName, e);

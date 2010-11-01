@@ -15,20 +15,21 @@
  */
 package org.unitils.database.transaction;
 
+import org.dbmaintain.database.Database;
+import org.dbmaintain.database.DatabaseConnection;
+import org.dbmaintain.database.DatabaseException;
+import org.dbmaintain.database.Databases;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.UnitilsException;
-import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
+import org.unitils.mock.Mock;
+import org.unitils.mock.annotation.Dummy;
 
 import javax.sql.DataSource;
-import java.util.Properties;
 
-import static org.dbmaintain.config.DbMaintainProperties.*;
 import static org.junit.Assert.*;
-import static org.unitils.database.transaction.UnitilsDatabaseManager.PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY;
+import static org.unitils.mock.ArgumentMatchers.isNull;
 
 /**
  * @author Tim Ducheyne
@@ -39,64 +40,54 @@ public class UnitilsDatabaseManagerGetDataSourceFromPropertiesTest extends Uniti
     /* Tested object */
     private UnitilsDatabaseManager unitilsDatabaseManager;
 
-    private Properties configuration;
+    protected Mock<DbMaintainManager> dbMaintainManager;
+    protected Mock<Databases> databases;
+    protected Mock<Database> database;
+
+    protected Mock<DatabaseConnection> databaseConnection;
+    @Dummy
+    protected DataSource dataSource;
+
 
     @Before
     public void initialize() {
-        configuration = new ConfigurationLoader().loadConfiguration();
+        unitilsDatabaseManager = new UnitilsDatabaseManager(false, dbMaintainManager.getMock());
+        databaseConnection.returns(dataSource).getDataSource();
     }
 
 
     @Test
     public void dataSourceForDatabaseWithName() throws Exception {
-        configuration.setProperty(PROPERTY_DATABASE_NAMES, "database1, database2");
-        unitilsDatabaseManager = new UnitilsDatabaseManager(configuration, new DefaultDataSourceFactory());
+        dbMaintainManager.returns(databaseConnection).getDatabaseConnection("database1");
 
-        DataSource dataSource = unitilsDatabaseManager.getDataSource("database1", null);
-        assertNotNull(dataSource.getConnection());
+        DataSource result = unitilsDatabaseManager.getDataSource("database1", null);
+        assertSame(dataSource, result);
     }
 
     @Test
     public void defaultDataSource() throws Exception {
-        unitilsDatabaseManager = new UnitilsDatabaseManager(configuration, new DefaultDataSourceFactory());
+        dbMaintainManager.returns(databaseConnection).getDatabaseConnection(isNull(String.class));
 
-        DataSource dataSource = unitilsDatabaseManager.getDataSource(null, null);
-        assertNotNull(dataSource.getConnection());
+        DataSource result = unitilsDatabaseManager.getDataSource(null, null);
+        assertSame(dataSource, result);
     }
 
     @Test
     public void unknownDatabaseName() throws Exception {
         try {
-            unitilsDatabaseManager = new UnitilsDatabaseManager(configuration, new DefaultDataSourceFactory());
+            dbMaintainManager.raises(DatabaseException.class).getDatabaseConnection("xxxx");
 
             unitilsDatabaseManager.getDataSource("xxxx", null);
             fail("DatabaseException expected");
-        } catch (UnitilsException e) {
-            assertTrue(e.getMessage().contains("Unable to create data source for database name xxxx"));
+        } catch (DatabaseException e) {
+            // expected
         }
     }
 
     @Test
-    public void unknownDefaultDatabase() throws Exception {
-        try {
-            configuration.remove(PROPERTY_DRIVERCLASSNAME);
-            configuration.remove(PROPERTY_URL);
-            configuration.remove(PROPERTY_USERNAME);
-            configuration.remove(PROPERTY_PASSWORD);
-            unitilsDatabaseManager = new UnitilsDatabaseManager(configuration, new DefaultDataSourceFactory());
-
-            unitilsDatabaseManager.getDataSource(null, null);
-            fail("DatabaseException expected");
-        } catch (UnitilsException e) {
-            e.printStackTrace();
-            assertTrue(e.getMessage().contains("Unable to create data source for the default database"));
-        }
-    }
-
-
-    @Test
-    public void dataSourceWrappedInTransactionAwareProxyByDefault() throws Exception {
-        unitilsDatabaseManager = new UnitilsDatabaseManager(configuration, new DefaultDataSourceFactory());
+    public void dataSourceWrappedInTransactionAwareProxy() throws Exception {
+        unitilsDatabaseManager = new UnitilsDatabaseManager(true, dbMaintainManager.getMock());
+        dbMaintainManager.returns(databaseConnection).getDatabaseConnection(null);
 
         DataSource dataSource = unitilsDatabaseManager.getDataSource(null, null);
         assertTrue(dataSource instanceof TransactionAwareDataSourceProxy);
@@ -104,11 +95,20 @@ public class UnitilsDatabaseManagerGetDataSourceFromPropertiesTest extends Uniti
 
     @Test
     public void disableWrappingInTransactionAwareProxy() throws Exception {
-        configuration.setProperty(PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY, "false");
-        unitilsDatabaseManager = new UnitilsDatabaseManager(configuration, new DefaultDataSourceFactory());
+        unitilsDatabaseManager = new UnitilsDatabaseManager(false, dbMaintainManager.getMock());
+        dbMaintainManager.returns(databaseConnection).getDatabaseConnection(null);
 
         DataSource dataSource = unitilsDatabaseManager.getDataSource(null, null);
         assertFalse(dataSource instanceof TransactionAwareDataSourceProxy);
     }
 
+    @Test
+    public void sameWrappedDataSourceReturned() throws Exception {
+        unitilsDatabaseManager = new UnitilsDatabaseManager(true, dbMaintainManager.getMock());
+        dbMaintainManager.returns(databaseConnection).getDatabaseConnection(null);
+
+        DataSource dataSource1 = unitilsDatabaseManager.getDataSource(null, null);
+        DataSource dataSource2 = unitilsDatabaseManager.getDataSource(null, null);
+        assertSame(dataSource1, dataSource2);
+    }
 }

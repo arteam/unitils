@@ -19,11 +19,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.database.annotations.Transactional;
 
-import java.util.Properties;
-
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-import static org.unitils.database.util.DatabaseAnnotationHelper.DEFAULT_TRANSACTION_MODE_PROPERTY;
 import static org.unitils.database.util.TransactionMode.*;
 
 /**
@@ -38,9 +35,7 @@ public class DatabaseAnnotationHelperGetTransactionModeTest {
 
     @Before
     public void initialize() {
-        Properties configuration = new Properties();
-        configuration.put(DEFAULT_TRANSACTION_MODE_PROPERTY, "commit");
-        databaseAnnotationHelper = new DatabaseAnnotationHelper(configuration);
+        databaseAnnotationHelper = new DatabaseAnnotationHelper(COMMIT);
     }
 
     @Test

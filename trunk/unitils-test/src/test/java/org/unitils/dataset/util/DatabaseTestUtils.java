@@ -15,14 +15,18 @@
  */
 package org.unitils.dataset.util;
 
-import org.dbmaintain.database.*;
+import org.dbmaintain.database.Database;
+import org.dbmaintain.database.DatabaseConnectionManager;
+import org.dbmaintain.database.Databases;
+import org.dbmaintain.database.DatabasesFactory;
+import org.dbmaintain.database.impl.DefaultDatabaseConnectionManager;
 import org.dbmaintain.database.impl.DefaultSQLHandler;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
+import org.unitils.database.datasource1.DataSourceFactory;
+import org.unitils.database.datasource1.impl.DefaultDataSourceFactory;
 import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
-import java.util.List;
 import java.util.Properties;
 
 import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_SCHEMANAMES;
@@ -44,9 +48,9 @@ public class DatabaseTestUtils {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(PROPERTY_SCHEMANAMES, schemaNames);
 
-        DatabaseInfoFactory databaseInfoFactory = new DatabaseInfoFactory(configuration);
-        List<DatabaseInfo> databaseInfos = databaseInfoFactory.getDatabaseInfos();
-        DatabasesFactory databasesFactory = new DatabasesFactory(configuration, new DefaultSQLHandler(), new DefaultDataSourceFactory());
-        return databasesFactory.createDatabases(databaseInfos);
+        DataSourceFactory dataSourceFactory = new DefaultDataSourceFactory();
+        DatabaseConnectionManager databaseConnectionManager = new DefaultDatabaseConnectionManager(configuration, new DefaultSQLHandler(), dataSourceFactory);
+        DatabasesFactory databasesFactory = new DatabasesFactory(configuration, databaseConnectionManager);
+        return databasesFactory.createDatabases();
     }
 }

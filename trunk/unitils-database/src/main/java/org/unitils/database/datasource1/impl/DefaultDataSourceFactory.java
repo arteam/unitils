@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.database.datasource.impl;
+package org.unitils.database.datasource1.impl;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.dbmaintain.database.DatabaseException;
 import org.dbmaintain.database.DatabaseInfo;
 import org.unitils.database.DatabaseModule;
-import org.unitils.database.datasource.DataSourceFactory;
+import org.unitils.database.datasource1.DataSourceFactory;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -51,6 +51,7 @@ public class DefaultDataSourceFactory implements DataSourceFactory {
      * @return An instance of <code>BasicDataSource</code>
      */
     public DataSource createDataSource(DatabaseInfo databaseInfo) {
+        databaseInfo.validateFull();
         String driverClassName = databaseInfo.getDriverClassName();
         String url = databaseInfo.getUrl();
         String userName = databaseInfo.getUserName();

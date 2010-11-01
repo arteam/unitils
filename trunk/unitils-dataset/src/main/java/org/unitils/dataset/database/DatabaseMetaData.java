@@ -48,6 +48,7 @@ public class DatabaseMetaData {
 
     protected Map<String, Set<String>> tablePrimaryKeysCache = new HashMap<String, Set<String>>();
     protected Map<String, Map<String, Integer>> tableColumnSqlTypesCache = new HashMap<String, Map<String, Integer>>();
+    private Set<String> existingTableNames = new HashSet<String>();
 
 
     public DatabaseMetaData(Database defaultDatabase, SqlTypeHandlerRepository sqlTypeHandlerRepository) {
@@ -148,9 +149,33 @@ public class DatabaseMetaData {
         return columnSqlType;
     }
 
-    public Set<String> getTableNames(String schemaName) {
-        return defaultDatabase.getTableNames(schemaName);
+    public void assertTableNameExists(String qualifiedTableName) throws SQLException {
+        boolean existingTable = isExistingTableName(qualifiedTableName);
+        if (!existingTable) {
+            String schemaName = getSchemaName(qualifiedTableName);
+            String tableName = getTableName(qualifiedTableName);
+            throw new UnitilsException("No table with name " + tableName + " found in schema " + schemaName + ".");
+        }
     }
+
+    protected boolean isExistingTableName(String qualifiedTableName) throws SQLException {
+        if (existingTableNames.contains(qualifiedTableName)) {
+            return true;
+        }
+        Connection connection = getConnection();
+        ResultSet resultSet = null;
+        try {
+            resultSet = connection.getMetaData().getTables(null, getSchemaName(qualifiedTableName), getTableName(qualifiedTableName), null);
+            if (resultSet.first()) {
+                existingTableNames.add(qualifiedTableName);
+                return true;
+            }
+            return false;
+        } finally {
+            close(connection, null, resultSet);
+        }
+    }
+
 
     protected Map<String, Integer> getColumnSqlTypes(String qualifiedTableName) throws SQLException {
         Map<String, Integer> columnSqlTypes = tableColumnSqlTypesCache.get(qualifiedTableName);

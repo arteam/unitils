@@ -502,6 +502,8 @@ public class DatabaseTest {
      * Drops all created test database structures (views, tables...)
      */
     private void cleanupTestDatabase() throws Exception {
+        dropTestTables(defaultDatabase, "DBMAINTAIN_SCRIPTS");
+
         String dialect = defaultDatabase.getDatabaseInfo().getDialect();
         if ("hsqldb".equals(dialect)) {
             cleanupTestDatabaseHsqlDb();
