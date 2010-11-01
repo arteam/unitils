@@ -31,8 +31,8 @@ import java.util.Properties;
 import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_AUTO_CREATE_DBMAINTAIN_SCRIPTS_TABLE;
 import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_SCRIPT_LOCATIONS;
 import static org.junit.Assert.assertEquals;
+import static org.unitils.database.DatabaseModule.PROPERTY_UPDATEDATABASESCHEMA_ENABLED;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.database.transaction.UnitilsDatabaseManager.PROPERTY_UPDATEDATABASESCHEMA_ENABLED;
 
 /**
  * Tests for the DatabaseModule
@@ -73,18 +73,18 @@ public class DatabaseModuleUpdateDatabaseListenerTest extends UnitilsJUnit4 {
         TestDatabaseUpdateListener databaseUpdateListener = new TestDatabaseUpdateListener();
         databaseModule.registerDatabaseUpdateListener(databaseUpdateListener);
 
-        databaseModule.updateDatabaseIfNeeded();
+        databaseModule.updateDatabaseIfNeeded(null);
         assertEquals(1, databaseUpdateListener.callCount);
     }
 
     @Test
     public void listenerNotCalledWhenDatabaseIsUpToDate() throws Exception {
-        databaseModule.updateDatabaseIfNeeded();
+        databaseModule.updateDatabaseIfNeeded(null);
 
         TestDatabaseUpdateListener databaseUpdateListener = new TestDatabaseUpdateListener();
         databaseModule.registerDatabaseUpdateListener(databaseUpdateListener);
 
-        databaseModule.updateDatabaseIfNeeded();
+        databaseModule.updateDatabaseIfNeeded(null);
         assertEquals(0, databaseUpdateListener.callCount);
     }
 
@@ -94,7 +94,7 @@ public class DatabaseModuleUpdateDatabaseListenerTest extends UnitilsJUnit4 {
         databaseModule.registerDatabaseUpdateListener(databaseUpdateListener);
 
         databaseModule.unregisterDatabaseUpdateListener(databaseUpdateListener);
-        databaseModule.updateDatabaseIfNeeded();
+        databaseModule.updateDatabaseIfNeeded(null);
         assertEquals(0, databaseUpdateListener.callCount);
     }
 

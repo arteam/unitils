@@ -18,7 +18,7 @@ package org.unitils.dataset;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.unitils.dataset.DataSetLoader.insertDataSetFile;
 
 /**
@@ -84,5 +84,15 @@ public class InsertDataSetTest extends DataSetTestBase {
         assertValueInTable("test", "col1", "test value1 2");
         assertValueInTable("test", "col2", "2");
         assertFalse("No value found for col3", getValues("col3", "test").isEmpty());
+    }
+
+    @Test
+    public void tableDoesNotExist() throws Exception {
+        try {
+            insertDataSetFile(this, "DataSetModuleDataSetTest-tableDoesNotExist.xml");
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertTrue(e.getMessage().contains("No table with name XXXX found in schema PUBLIC."));
+        }
     }
 }

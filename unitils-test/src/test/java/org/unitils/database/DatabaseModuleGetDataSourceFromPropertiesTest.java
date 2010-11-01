@@ -15,18 +15,18 @@
  */
 package org.unitils.database;
 
+import org.dbmaintain.database.DatabaseException;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.UnitilsException;
 
 import javax.sql.DataSource;
 import java.util.Properties;
 
 import static org.dbmaintain.config.DbMaintainProperties.*;
-import static org.junit.Assert.assertNotNull;
-import static org.unitils.database.transaction.UnitilsDatabaseManager.PROPERTY_UPDATEDATABASESCHEMA_ENABLED;
+import static org.junit.Assert.*;
+import static org.unitils.database.DatabaseModule.PROPERTY_UPDATEDATABASESCHEMA_ENABLED;
 
 /**
  * Tests for the DatabaseModule
@@ -57,12 +57,17 @@ public class DatabaseModuleGetDataSourceFromPropertiesTest extends UnitilsJUnit4
         assertNotNull(dataSource);
     }
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void noDefaultDatabaseConfigured() throws Exception {
         clearConfigForDefaultDatabase();
         databaseModule.init(configuration);
 
-        databaseModule.getDataSource(null, null);
+        try {
+            databaseModule.getDataSource(null, null);
+            fail("Expected DatabaseException");
+        } catch (DatabaseException e) {
+            assertEquals("Invalid database configuration: no driver class name defined.", e.getMessage());
+        }
     }
 
     @Test
@@ -74,12 +79,16 @@ public class DatabaseModuleGetDataSourceFromPropertiesTest extends UnitilsJUnit4
         assertNotNull(dataSource);
     }
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void unknownDatabaseName() throws Exception {
         databaseModule.init(configuration);
 
-        DataSource dataSource = databaseModule.getDataSource("xxxx", null);
-        assertNotNull(dataSource);
+        try {
+            databaseModule.getDataSource("xxxx", null);
+            fail("Expected DatabaseException");
+        } catch (DatabaseException e) {
+            assertEquals("No database configuration found for database with name xxxx.", e.getMessage());
+        }
     }
 
     private void clearConfigForDefaultDatabase() {

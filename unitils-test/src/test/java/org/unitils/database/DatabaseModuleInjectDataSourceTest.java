@@ -26,7 +26,7 @@ import java.util.Properties;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
-import static org.unitils.database.transaction.UnitilsDatabaseManager.PROPERTY_UPDATEDATABASESCHEMA_ENABLED;
+import static org.unitils.database.DatabaseModule.PROPERTY_UPDATEDATABASESCHEMA_ENABLED;
 
 /**
  * Tests for the DatabaseModule
@@ -34,15 +34,12 @@ import static org.unitils.database.transaction.UnitilsDatabaseManager.PROPERTY_U
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DatabaseModuleTest extends UnitilsJUnit4 {
+public class DatabaseModuleInjectDataSourceTest extends UnitilsJUnit4 {
 
     /* Tested object */
     private DatabaseModule databaseModule;
 
 
-    /**
-     * Initializes the test fixture.
-     */
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
@@ -53,12 +50,9 @@ public class DatabaseModuleTest extends UnitilsJUnit4 {
     }
 
 
-    /**
-     * Test the injection of the dataSource into a test object. This should also have triggered the DbMaintainer.
-     */
     @Test
     public void testInjectDataSource() throws Exception {
-        DbTest dbTest = new DbTest();
+        TestTarget dbTest = new TestTarget();
         databaseModule.injectDataSources(dbTest, null);
 
         assertNotNull(dbTest.dataSourceFromField);
@@ -67,10 +61,7 @@ public class DatabaseModuleTest extends UnitilsJUnit4 {
     }
 
 
-    /**
-     * Object that plays the role of database test object in this class's tests.
-     */
-    public static class DbTest {
+    public static class TestTarget {
 
         private DataSource dataSourceFromMethod;
 

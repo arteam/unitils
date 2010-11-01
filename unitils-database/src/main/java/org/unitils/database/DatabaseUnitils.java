@@ -103,7 +103,7 @@ public class DatabaseUnitils {
      * latest changes. See {@link org.dbmaintain.DbMaintainer} for more information.
      */
     public static void updateDatabaseIfNeeded() {
-        getDatabaseModule().updateDatabaseIfNeeded();
+        getDatabaseModule().updateDatabaseIfNeeded(null);
     }
 
     /**
@@ -158,6 +158,6 @@ public class DatabaseUnitils {
     }
 
     private static MainFactory getMainFactory() {
-        return getDatabaseModule().createDbMaintainMainFactory();
+        return getDatabaseModule().getDbMaintainMainFactory();
     }
 }

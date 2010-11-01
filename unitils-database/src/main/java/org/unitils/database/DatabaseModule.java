@@ -24,11 +24,13 @@ import org.unitils.core.TestExecutionListenerAdapter;
 import org.unitils.core.util.ConfigUtils;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
-import org.unitils.database.datasource.DataSourceFactory;
+import org.unitils.database.datasource1.DataSourceFactory;
+import org.unitils.database.transaction.DbMaintainManager;
 import org.unitils.database.transaction.UnitilsDatabaseManager;
 import org.unitils.database.transaction.UnitilsTransactionManager;
 import org.unitils.database.util.DatabaseAnnotationHelper;
 import org.unitils.database.util.TransactionMode;
+import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
@@ -38,12 +40,10 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.unitils.database.util.TransactionMode.*;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ReflectionUtils.setFieldValue;
-import static org.unitils.util.ReflectionUtils.setSetterValue;
+import static org.unitils.util.ReflectionUtils.*;
 
 /**
  * Module that provides support for database testing: Creation of a data source that connects to the
@@ -56,7 +56,7 @@ import static org.unitils.util.ReflectionUtils.setSetterValue;
  * The created data source can be injected into a field of the test by annotating the field with {@link TestDataSource}.
  * It can then be used to install it in your DAO or other class under test.
  * <p/>
- * If the DBMaintainer is enabled (by setting {@link UnitilsDatabaseManager#PROPERTY_UPDATEDATABASESCHEMA_ENABLED} to true), the test database
+ * If the DBMaintainer is enabled (by setting {@link #PROPERTY_UPDATEDATABASESCHEMA_ENABLED} to true), the test database
  * schema will automatically be updated if needed. This check will be performed once during your test-suite run, namely
  * when the data source is created.
  * <p/>
@@ -72,9 +72,20 @@ import static org.unitils.util.ReflectionUtils.setSetterValue;
  */
 public class DatabaseModule implements Module {
 
-    /* The configuration of Unitils */
-    protected Properties configuration;
-    /* The data source manager */
+    public static final String DEFAULT_TRANSACTION_MODE_PROPERTY = "database.default.transaction.mode";
+    /**
+     * Property indicating if the database schema should be updated before performing the tests
+     */
+    public static final String PROPERTY_UPDATEDATABASESCHEMA_ENABLED = "updateDataBaseSchema.enabled";
+    /**
+     * Property indicating whether the data source should be wrapped in a {@link org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy}
+     */
+    public static final String PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY = "dataSource.wrapInTransactionalProxy";
+
+
+    /* The data source and database manager */
+    protected DbMaintainManager dbMaintainManager;
+    /* The data source and database manager */
     protected UnitilsDatabaseManager unitilsDatabaseManager;
     /* The transaction manager */
     protected UnitilsTransactionManager unitilsTransactionManager;
@@ -91,13 +102,9 @@ public class DatabaseModule implements Module {
      * @param configuration The config, not null
      */
     public void init(Properties configuration) {
-        this.configuration = configuration;
-        this.databaseAnnotationHelper = new DatabaseAnnotationHelper(configuration);
-
-        DataSourceFactory dataSourceFactory = ConfigUtils.getConfiguredInstanceOf(DataSourceFactory.class, configuration);
-        dataSourceFactory.init(configuration);
-
-        this.unitilsDatabaseManager = new UnitilsDatabaseManager(configuration, dataSourceFactory);
+        this.databaseAnnotationHelper = createDatabaseAnnotationHelper(configuration);
+        this.dbMaintainManager = createDbMaintainMainManager(configuration);
+        this.unitilsDatabaseManager = createUnitilsDatabaseManager(configuration, dbMaintainManager);
         this.unitilsTransactionManager = new UnitilsTransactionManager();
     }
 
@@ -113,7 +120,7 @@ public class DatabaseModule implements Module {
      * By default, the data source will be wrapped in a Spring TransactionAwareDataSourceProxy to make sure that the same
      * connection is always returned within the same transaction and will make sure that the tx synchronization is done correctly.
      * If needed, this can be disabled in the configuration by setting the
-     * {@link org.unitils.database.transaction.UnitilsDatabaseManager#PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY}.
+     * {@link #PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY}.
      * property to false.
      *
      * @param databaseName       The name of the database to get a data source for, null for the default database
@@ -127,23 +134,20 @@ public class DatabaseModule implements Module {
     }
 
     public DataSource getDataSource(String databaseName, ApplicationContext applicationContext) {
-        if (isBlank(databaseName)) {
-            databaseName = null;
-        }
         return unitilsDatabaseManager.getDataSource(databaseName, applicationContext);
     }
 
     public Database getDatabase(String databaseName) {
-        return unitilsDatabaseManager.getDatabase(databaseName);
+        return dbMaintainManager.getDatabase(databaseName);
     }
 
-    public MainFactory createDbMaintainMainFactory() {
-        return unitilsDatabaseManager.createDbMaintainMainFactory();
+    public MainFactory getDbMaintainMainFactory() {
+        return dbMaintainManager.getDbMaintainMainFactory();
     }
 
 
-    public boolean updateDatabaseIfNeeded() {
-        boolean databaseUpdated = unitilsDatabaseManager.updateDatabaseIfNeeded();
+    public boolean updateDatabaseIfNeeded(ApplicationContext applicationContext) {
+        boolean databaseUpdated = dbMaintainManager.updateDatabaseIfNeeded(applicationContext);
         if (databaseUpdated) {
             notifyDatabaseUpdateListeners();
         }
@@ -275,6 +279,24 @@ public class DatabaseModule implements Module {
     }
 
 
+    protected DatabaseAnnotationHelper createDatabaseAnnotationHelper(Properties configuration) {
+        String defaultValue = PropertyUtils.getString(DEFAULT_TRANSACTION_MODE_PROPERTY, configuration);
+        TransactionMode defaultTransactionMode = getEnumValue(TransactionMode.class, defaultValue);
+        return new DatabaseAnnotationHelper(defaultTransactionMode);
+    }
+
+    protected DbMaintainManager createDbMaintainMainManager(Properties configuration) {
+        boolean updateDatabaseSchemaEnabled = PropertyUtils.getBoolean(PROPERTY_UPDATEDATABASESCHEMA_ENABLED, configuration);
+        DataSourceFactory dataSourceFactory = ConfigUtils.getConfiguredInstanceOf(DataSourceFactory.class, configuration);
+        dataSourceFactory.init(configuration);
+        return new DbMaintainManager(configuration, updateDatabaseSchemaEnabled, dataSourceFactory);
+    }
+
+    protected UnitilsDatabaseManager createUnitilsDatabaseManager(Properties configuration, DbMaintainManager dbMaintainManager) {
+        boolean wrapDataSourceInTransactionalProxy = PropertyUtils.getBoolean(PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY, configuration);
+        return new UnitilsDatabaseManager(wrapDataSourceInTransactionalProxy, dbMaintainManager);
+    }
+
     /**
      * @return The {@link org.unitils.core.TestExecutionListenerAdapter} associated with this module
      */
@@ -282,13 +304,17 @@ public class DatabaseModule implements Module {
         return new DatabaseTestListener();
     }
 
-
     protected class DatabaseTestListener extends TestExecutionListenerAdapter {
 
         @Override
-        public void prepareTestInstance(Object testObject, TestContext testContext) throws Exception {
+        public void beforeTestClass(Class<?> testClass, TestContext testContext) throws Exception {
             ApplicationContext applicationContext = getApplicationContext(testContext);
-            updateDatabaseIfNeeded();
+            updateDatabaseIfNeeded(applicationContext);
+        }
+
+        @Override
+        public void beforeTestMethod(Object testObject, Method testMethod, TestContext testContext) throws Exception {
+            ApplicationContext applicationContext = getApplicationContext(testContext);
             startTransactionForTransactionManagersInApplicationContext(testObject, applicationContext);
             injectDataSources(testObject, applicationContext);
         }

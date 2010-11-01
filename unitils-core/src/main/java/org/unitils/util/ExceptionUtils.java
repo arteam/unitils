@@ -13,27 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.database.datasource;
-
-import org.dbmaintain.database.DatabaseInfo;
-import org.unitils.core.util.Configurable;
-
-import javax.sql.DataSource;
+package org.unitils.util;
 
 /**
- * Defines the contract of a factory that can provide an instance of a test <code>DataSource</code>.
- *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
-public interface DataSourceFactory extends Configurable, org.dbmaintain.datasource.DataSourceFactory {
+public class ExceptionUtils {
 
-    /**
-     * Creates a new <code>DataSource</code>
-     *
-     * @param databaseInfo The database connection info, not null
-     * @return The DataSource, not null
-     */
-    DataSource createDataSource(DatabaseInfo databaseInfo);
+    public static String getAllMessages(Throwable t) {
+        StringBuilder stringBuilder = new StringBuilder();
 
+        while (t != null) {
+            stringBuilder.append(t.getMessage());
+            stringBuilder.append("\n");
+            t = t.getCause();
+        }
+        return stringBuilder.toString();
+    }
 }

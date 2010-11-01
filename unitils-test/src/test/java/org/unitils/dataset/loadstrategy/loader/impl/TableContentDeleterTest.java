@@ -18,12 +18,16 @@ package org.unitils.dataset.loadstrategy.loader.impl;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.core.UnitilsException;
 import org.unitils.dataset.database.DatabaseAccessor;
+import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.loadstrategy.impl.IdentifierNameProcessor;
 import org.unitils.dataset.loadstrategy.impl.TableContentDeleter;
 import org.unitils.dataset.model.dataset.DataSetRow;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.mock.Mock;
+
+import static org.junit.Assert.fail;
 
 /**
  * Tests for deleting all data from tables.
@@ -39,6 +43,7 @@ public class TableContentDeleterTest extends UnitilsJUnit4 {
     protected Mock<DataSetRowSource> dataSetRowSource;
     protected Mock<DatabaseAccessor> databaseAccessor;
     protected Mock<IdentifierNameProcessor> identifierNameProcessor;
+    protected Mock<DatabaseMetaData> databaseMetaData;
 
     private DataSetRow dataSetRowTableA;
     private DataSetRow dataSetRowTableB;
@@ -47,7 +52,7 @@ public class TableContentDeleterTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() throws Exception {
-        tableContentDeleter = new TableContentDeleter(identifierNameProcessor.getMock(), databaseAccessor.getMock());
+        tableContentDeleter = new TableContentDeleter(identifierNameProcessor.getMock(), databaseAccessor.getMock(), databaseMetaData.getMock());
 
         dataSetRowTableA = new DataSetRow("schema_a", "table_a", null, false, null);
         dataSetRowTableB = new DataSetRow("schema_b", "table_b", null, false, null);
@@ -83,5 +88,17 @@ public class TableContentDeleterTest extends UnitilsJUnit4 {
     public void emptyDataSet() throws Exception {
         tableContentDeleter.deleteDataFromTablesInReverseOrder(dataSetRowSource.getMock());
         databaseAccessor.assertNotInvoked().executeUpdate(null, null);
+    }
+
+    @Test
+    public void tableDoesNotExist() throws Exception {
+        dataSetRowSource.onceReturns(dataSetRowTableA).getNextDataSetRow();
+        databaseMetaData.raises(UnitilsException.class).assertTableNameExists("schema_a.table_a");
+        try {
+            tableContentDeleter.deleteDataFromTablesInReverseOrder(dataSetRowSource.getMock());
+            fail("Expected UnitilsException");
+        } catch (UnitilsException e) {
+            //expected
+        }
     }
 }

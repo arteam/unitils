@@ -18,6 +18,10 @@ package org.unitils.dataset;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.unitils.dataset.DataSetLoader.cleanInsertDataSetFile;
+
 /**
  * Test class for loading of data sets using the clean insert data set strategy.
  *
@@ -26,12 +30,11 @@ import org.unitils.core.UnitilsException;
  */
 public class CleanInsertDataSetTest extends DataSetTestBase {
 
-
     @Test
     public void cleanInsertDataSet() throws Exception {
         insertValueInTableTest("yyyy");
 
-        DataSetLoader.cleanInsertDataSetFile(this, "DataSetModuleDataSetTest-simple.xml");
+        cleanInsertDataSetFile(this, "DataSetModuleDataSetTest-simple.xml");
         assertValueInTable("test", "col1", "xxxx");
         assertValueNotInTable("test", "col1", "yyyy");
     }
@@ -41,7 +44,7 @@ public class CleanInsertDataSetTest extends DataSetTestBase {
         insertValueInTableTest("yyyy");
         insertValueInTableDependent("yyyy");
 
-        DataSetLoader.cleanInsertDataSetFile(this, "DataSetModuleDataSetTest-dependency.xml");
+        cleanInsertDataSetFile(this, "DataSetModuleDataSetTest-dependency.xml");
         assertValueInTable("test", "col1", "xxxx");
         assertValueInTable("dependent", "col1", "xxxx");
         assertValueNotInTable("test", "col1", "yyyy");
@@ -53,7 +56,18 @@ public class CleanInsertDataSetTest extends DataSetTestBase {
         insertValueInTableTest("yyyy");
         insertValueInTableDependent("yyyy");
 
-        DataSetLoader.cleanInsertDataSetFile(this, "DataSetModuleDataSetTest-dependencyWrongOrder.xml");
+        cleanInsertDataSetFile(this, "DataSetModuleDataSetTest-dependencyWrongOrder.xml");
+    }
+
+    @Test
+    public void tableDoesNotExist() throws Exception {
+        try {
+            cleanInsertDataSetFile(this, "DataSetModuleDataSetTest-tableDoesNotExist.xml");
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            e.printStackTrace();
+            assertTrue(e.getMessage().contains("No table with name XXXX found in schema PUBLIC."));
+        }
     }
 
 }

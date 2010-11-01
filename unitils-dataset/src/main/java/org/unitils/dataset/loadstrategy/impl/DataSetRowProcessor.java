@@ -15,7 +15,6 @@
  */
 package org.unitils.dataset.loadstrategy.impl;
 
-import org.unitils.core.UnitilsException;
 import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.Row;
@@ -26,7 +25,9 @@ import org.unitils.dataset.model.dataset.DataSetValue;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandler;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -38,7 +39,6 @@ public class DataSetRowProcessor {
     protected IdentifierNameProcessor identifierNameProcessor;
     protected SqlTypeHandlerRepository sqlTypeHandlerRepository;
     protected DatabaseMetaData databaseMetaData;
-    protected Map<String, Set<String>> tableNamesPerSchema = new HashMap<String, Set<String>>();
 
 
     public DataSetRowProcessor(IdentifierNameProcessor identifierNameProcessor, SqlTypeHandlerRepository sqlTypeHandlerRepository, DatabaseMetaData databaseMetaData) {
@@ -52,7 +52,7 @@ public class DataSetRowProcessor {
         DataSetSettings dataSetSettings = dataSetRow.getDataSetSettings();
 
         String qualifiedTableName = identifierNameProcessor.getQualifiedTableName(dataSetRow);
-        assertTableExists(qualifiedTableName);
+        databaseMetaData.assertTableNameExists(qualifiedTableName);
         databaseMetaData.addExtraParentColumnsForChild(dataSetRow);
 
         Row row = new Row(qualifiedTableName);
@@ -187,20 +187,6 @@ public class DataSetRowProcessor {
             return true;
         }
         return false;
-    }
-
-    protected void assertTableExists(String qualifiedTableName) {
-        String schemaName = databaseMetaData.getSchemaName(qualifiedTableName);
-
-        Set<String> tableNames = tableNamesPerSchema.get(schemaName);
-        if (tableNames == null) {
-            tableNames = databaseMetaData.getTableNames(schemaName);
-            tableNamesPerSchema.put(schemaName, tableNames);
-        }
-        String tableName = databaseMetaData.getTableName(qualifiedTableName);
-        if (!tableNames.contains(tableName)) {
-            throw new UnitilsException("No table with name " + tableName + " found in schema " + schemaName + ".");
-        }
     }
 
 }

@@ -29,6 +29,8 @@ import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 import java.util.List;
 import java.util.Properties;
 
+import static org.unitils.util.ExceptionUtils.getAllMessages;
+
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -62,7 +64,8 @@ public abstract class BaseLoadDataSetStrategy implements LoadDataSetStrategy {
             dataSetLoader.load(dataSetRowSource, variables);
 
         } catch (Exception e) {
-            throw new UnitilsException("Unable to load data set file: " + dataSetRowSource.getDataSetName(), e);
+            String message = getAllMessages(e);
+            throw new UnitilsException("Unable to load data set file: " + dataSetRowSource.getDataSetName() + "\n" + message, e);
         } finally {
             dataSetRowSource.close();
         }

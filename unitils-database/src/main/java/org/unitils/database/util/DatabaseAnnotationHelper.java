@@ -16,16 +16,13 @@
 package org.unitils.database.util;
 
 import org.unitils.database.annotations.Transactional;
-import org.unitils.util.PropertyUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import static java.util.Arrays.asList;
 import static org.unitils.database.util.TransactionMode.DEFAULT;
 import static org.unitils.util.AnnotationUtils.getClassLevelAnnotation;
-import static org.unitils.util.ReflectionUtils.getEnumValue;
 
 /**
  * @author Tim Ducheyne
@@ -33,13 +30,11 @@ import static org.unitils.util.ReflectionUtils.getEnumValue;
  */
 public class DatabaseAnnotationHelper {
 
-    public static final String DEFAULT_TRANSACTION_MODE_PROPERTY = "database.default.transaction.mode";
-
-    protected Properties configuration;
+    protected TransactionMode defaultTransactionMode;
 
 
-    public DatabaseAnnotationHelper(Properties configuration) {
-        this.configuration = configuration;
+    public DatabaseAnnotationHelper(TransactionMode defaultTransactionMode) {
+        this.defaultTransactionMode = defaultTransactionMode;
     }
 
 
@@ -71,8 +66,7 @@ public class DatabaseAnnotationHelper {
         }
         TransactionMode transactionMode = transactional.value();
         if (transactionMode == DEFAULT) {
-            String defaultValue = PropertyUtils.getString(DEFAULT_TRANSACTION_MODE_PROPERTY, configuration);
-            return getEnumValue(TransactionMode.class, defaultValue);
+            return defaultTransactionMode;
         }
         return transactionMode;
     }

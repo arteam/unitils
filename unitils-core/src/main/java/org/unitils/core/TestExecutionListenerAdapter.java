@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,7 @@ public abstract class TestExecutionListenerAdapter implements TestExecutionListe
     }
 
     /**
-     * Invoked before the test but after the test setup (eg @Before) is run.
+     * Invoked before the test setup (eg @Before) is run.
      * This can be overridden to for example further initialize the test-fixture using values that were set during
      * the test setup.
      *

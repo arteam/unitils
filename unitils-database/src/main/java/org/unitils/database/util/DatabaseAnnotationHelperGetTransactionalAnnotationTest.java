@@ -18,9 +18,8 @@ package org.unitils.database.util;
 import org.junit.Test;
 import org.unitils.database.annotations.Transactional;
 
-import java.util.Properties;
-
 import static org.junit.Assert.*;
+import static org.unitils.database.util.TransactionMode.COMMIT;
 import static org.unitils.database.util.TransactionMode.ROLLBACK;
 
 /**
@@ -30,7 +29,7 @@ import static org.unitils.database.util.TransactionMode.ROLLBACK;
 public class DatabaseAnnotationHelperGetTransactionalAnnotationTest {
 
     /* Tested object */
-    private DatabaseAnnotationHelper databaseAnnotationHelper = new DatabaseAnnotationHelper(new Properties());
+    private DatabaseAnnotationHelper databaseAnnotationHelper = new DatabaseAnnotationHelper(COMMIT);
 
 
     @Test
