@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.database.datasource1;
+package org.unitils.database.datasource;
 
 import org.dbmaintain.database.DatabaseInfo;
 import org.unitils.core.util.Configurable;

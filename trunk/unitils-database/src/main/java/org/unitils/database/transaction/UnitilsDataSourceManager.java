@@ -29,7 +29,7 @@ import static org.apache.commons.lang.StringUtils.isBlank;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class UnitilsDatabaseManager {
+public class UnitilsDataSourceManager {
 
     /* Indicates whether the data sources should be wrapped in a TransactionAwareDataSourceProxy */
     protected boolean wrapDataSourceInTransactionalProxy;
@@ -38,7 +38,7 @@ public class UnitilsDatabaseManager {
     protected Map<DataSource, TransactionAwareDataSourceProxy> wrappedDataSources = new IdentityHashMap<DataSource, TransactionAwareDataSourceProxy>();
 
 
-    public UnitilsDatabaseManager(boolean wrapDataSourceInTransactionalProxy, DbMaintainManager dbMaintainManager) {
+    public UnitilsDataSourceManager(boolean wrapDataSourceInTransactionalProxy, DbMaintainManager dbMaintainManager) {
         this.wrapDataSourceInTransactionalProxy = wrapDataSourceInTransactionalProxy;
         this.dbMaintainManager = dbMaintainManager;
     }

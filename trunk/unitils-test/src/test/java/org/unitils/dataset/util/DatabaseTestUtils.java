@@ -22,8 +22,8 @@ import org.dbmaintain.database.DatabasesFactory;
 import org.dbmaintain.database.impl.DefaultDatabaseConnectionManager;
 import org.dbmaintain.database.impl.DefaultSQLHandler;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.database.datasource1.DataSourceFactory;
-import org.unitils.database.datasource1.impl.DefaultDataSourceFactory;
+import org.unitils.database.datasource.DataSourceFactory;
+import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
 import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 

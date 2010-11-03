@@ -66,7 +66,7 @@ public class DefaultDBCleanerMultiSchemaTest {
         configuration.setProperty(PROPERTY_SCHEMANAMES, "PUBLIC, SCHEMA_A, SCHEMA_B");
         reinitializeUnitils(configuration);
 
-        dataSource = getDataSource(this);
+        dataSource = getDataSource();
         dropTestTables();
         createTestTables();
     }

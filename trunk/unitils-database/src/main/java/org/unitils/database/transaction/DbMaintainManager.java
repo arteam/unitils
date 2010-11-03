@@ -24,7 +24,7 @@ import org.dbmaintain.database.impl.DefaultDatabaseConnectionManager;
 import org.dbmaintain.database.impl.DefaultSQLHandler;
 import org.dbmaintain.launch.task.UpdateDatabaseTask;
 import org.springframework.context.ApplicationContext;
-import org.unitils.database.datasource1.DataSourceFactory;
+import org.unitils.database.datasource.DataSourceFactory;
 
 import java.util.Map;
 import java.util.Properties;

@@ -24,9 +24,9 @@ import org.unitils.core.TestExecutionListenerAdapter;
 import org.unitils.core.util.ConfigUtils;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
-import org.unitils.database.datasource1.DataSourceFactory;
+import org.unitils.database.datasource.DataSourceFactory;
 import org.unitils.database.transaction.DbMaintainManager;
-import org.unitils.database.transaction.UnitilsDatabaseManager;
+import org.unitils.database.transaction.UnitilsDataSourceManager;
 import org.unitils.database.transaction.UnitilsTransactionManager;
 import org.unitils.database.util.DatabaseAnnotationHelper;
 import org.unitils.database.util.TransactionMode;
@@ -86,7 +86,7 @@ public class DatabaseModule implements Module {
     /* The data source and database manager */
     protected DbMaintainManager dbMaintainManager;
     /* The data source and database manager */
-    protected UnitilsDatabaseManager unitilsDatabaseManager;
+    protected UnitilsDataSourceManager unitilsDataSourceManager;
     /* The transaction manager */
     protected UnitilsTransactionManager unitilsTransactionManager;
     /* Utility class for handling annotations */
@@ -104,7 +104,7 @@ public class DatabaseModule implements Module {
     public void init(Properties configuration) {
         this.databaseAnnotationHelper = createDatabaseAnnotationHelper(configuration);
         this.dbMaintainManager = createDbMaintainMainManager(configuration);
-        this.unitilsDatabaseManager = createUnitilsDatabaseManager(configuration, dbMaintainManager);
+        this.unitilsDataSourceManager = createUnitilsDatabaseManager(configuration, dbMaintainManager);
         this.unitilsTransactionManager = new UnitilsTransactionManager();
     }
 
@@ -123,18 +123,20 @@ public class DatabaseModule implements Module {
      * {@link #PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY}.
      * property to false.
      *
+     * @param testObject         The test instance, not null
+     * @param testMethod         The test method, not null
      * @param databaseName       The name of the database to get a data source for, null for the default database
      * @param applicationContext The spring application context, null if not defined
      * @return The <code>DataSource</code>
      */
-    public DataSource getDataSourceAndActivateTransactionIfNeeded(Object testObject, String databaseName, ApplicationContext applicationContext) {
+    public DataSource getDataSourceAndActivateTransactionIfNeeded(Object testObject, Method testMethod, String databaseName, ApplicationContext applicationContext) {
         DataSource dataSource = getDataSource(databaseName, applicationContext);
-        startTransactionForDataSourceIfNoTransactionActive(testObject, dataSource);
+        startTransactionForDataSourceIfNoTransactionActive(testObject, testMethod, dataSource);
         return dataSource;
     }
 
     public DataSource getDataSource(String databaseName, ApplicationContext applicationContext) {
-        return unitilsDatabaseManager.getDataSource(databaseName, applicationContext);
+        return unitilsDataSourceManager.getDataSource(databaseName, applicationContext);
     }
 
     public Database getDatabase(String databaseName) {
@@ -160,9 +162,10 @@ public class DatabaseModule implements Module {
      * annotated with {@link TestDataSource}
      *
      * @param testObject         The test instance, not null
+     * @param testMethod         The test method, not null
      * @param applicationContext The spring application context, null if not defined
      */
-    public void injectDataSources(Object testObject, ApplicationContext applicationContext) {
+    protected void injectDataSources(Object testObject, Method testMethod, ApplicationContext applicationContext) {
         Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), TestDataSource.class);
         Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), TestDataSource.class);
 
@@ -170,14 +173,14 @@ public class DatabaseModule implements Module {
             TestDataSource testDataSourceAnnotation = field.getAnnotation(TestDataSource.class);
             String databaseName = testDataSourceAnnotation.value();
 
-            DataSource dataSource = getDataSourceAndActivateTransactionIfNeeded(testObject, databaseName, applicationContext);
+            DataSource dataSource = getDataSourceAndActivateTransactionIfNeeded(testObject, testMethod, databaseName, applicationContext);
             setFieldValue(testObject, field, dataSource);
         }
         for (Method method : methods) {
             TestDataSource testDataSourceAnnotation = method.getAnnotation(TestDataSource.class);
             String databaseName = testDataSourceAnnotation.value();
 
-            DataSource dataSource = getDataSourceAndActivateTransactionIfNeeded(testObject, databaseName, applicationContext);
+            DataSource dataSource = getDataSourceAndActivateTransactionIfNeeded(testObject, testMethod, databaseName, applicationContext);
             setSetterValue(testObject, method, dataSource);
         }
     }
@@ -197,8 +200,8 @@ public class DatabaseModule implements Module {
         }
     }
 
-    protected void startTransactionForTransactionManagersInApplicationContext(Object testObject, ApplicationContext applicationContext) {
-        Transactional transactional = databaseAnnotationHelper.getTransactionalAnnotation(testObject);
+    protected void startTransactionForTransactionManagersInApplicationContext(Object testObject, Method testMethod, ApplicationContext applicationContext) {
+        Transactional transactional = databaseAnnotationHelper.getTransactionalAnnotation(testObject, testMethod);
         if (isTransactionsEnabled(transactional)) {
             List<String> transactionManagerBeanNames = databaseAnnotationHelper.getTransactionManagerBeanNames(transactional);
             unitilsTransactionManager.startTransactionOnTransactionManagersInApplicationContext(testObject, transactionManagerBeanNames, applicationContext);
@@ -206,12 +209,14 @@ public class DatabaseModule implements Module {
     }
 
     /**
-     * Starts a new transaction.
+     * Starts a new transaction for the given transaction. Ignored if a transaction is already
+     * active for this data source.
      *
      * @param testObject The test object, not null
+     * @param dataSource The data source, not null
      */
     public void startTransactionForDataSource(Object testObject, DataSource dataSource) {
-        unitilsTransactionManager.startTransactionForDataSource(testObject, dataSource, false);
+        unitilsTransactionManager.startTransactionForDataSource(testObject, dataSource);
     }
 
     /**
@@ -234,27 +239,29 @@ public class DatabaseModule implements Module {
 
 
     /**
-     * Starts a transaction. If the Unitils DataSource was not loaded yet, we simply remember that a
-     * transaction was started but don't actually start it. If the DataSource is loaded within this
-     * test, the transaction will be started immediately after loading the DataSource.
+     * Starts a transaction. Ignored if a transaction is already active for this data source or when transaction
+     * management is not enabled for this test method.
      *
      * @param testObject The test object, not null
+     * @param testMethod The test method, not null
+     * @param dataSource The data source, not null
      */
-    protected void startTransactionForDataSourceIfNoTransactionActive(Object testObject, DataSource dataSource) {
-        Transactional transactional = databaseAnnotationHelper.getTransactionalAnnotation(testObject);
+    protected void startTransactionForDataSourceIfNoTransactionActive(Object testObject, Method testMethod, DataSource dataSource) {
+        Transactional transactional = databaseAnnotationHelper.getTransactionalAnnotation(testObject, testMethod);
         if (!isTransactionsEnabled(transactional)) {
             return;
         }
-        unitilsTransactionManager.startTransactionForDataSource(testObject, dataSource, true);
+        unitilsTransactionManager.startTransactionForDataSource(testObject, dataSource);
     }
 
     /**
      * Commits or rollbacks the current transactions if transactions are enabled.
      *
      * @param testObject The test object, not null
+     * @param testMethod The test method, not null
      */
-    protected void endTransactions(Object testObject) {
-        Transactional transactional = databaseAnnotationHelper.getTransactionalAnnotation(testObject);
+    protected void endTransactions(Object testObject, Method testMethod) {
+        Transactional transactional = databaseAnnotationHelper.getTransactionalAnnotation(testObject, testMethod);
         if (!isTransactionsEnabled(transactional)) {
             return;
         }
@@ -292,9 +299,9 @@ public class DatabaseModule implements Module {
         return new DbMaintainManager(configuration, updateDatabaseSchemaEnabled, dataSourceFactory);
     }
 
-    protected UnitilsDatabaseManager createUnitilsDatabaseManager(Properties configuration, DbMaintainManager dbMaintainManager) {
+    protected UnitilsDataSourceManager createUnitilsDatabaseManager(Properties configuration, DbMaintainManager dbMaintainManager) {
         boolean wrapDataSourceInTransactionalProxy = PropertyUtils.getBoolean(PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY, configuration);
-        return new UnitilsDatabaseManager(wrapDataSourceInTransactionalProxy, dbMaintainManager);
+        return new UnitilsDataSourceManager(wrapDataSourceInTransactionalProxy, dbMaintainManager);
     }
 
     /**
@@ -315,13 +322,13 @@ public class DatabaseModule implements Module {
         @Override
         public void beforeTestMethod(Object testObject, Method testMethod, TestContext testContext) throws Exception {
             ApplicationContext applicationContext = getApplicationContext(testContext);
-            startTransactionForTransactionManagersInApplicationContext(testObject, applicationContext);
-            injectDataSources(testObject, applicationContext);
+            startTransactionForTransactionManagersInApplicationContext(testObject, testMethod, applicationContext);
+            injectDataSources(testObject, testMethod, applicationContext);
         }
 
         @Override
         public void afterTestMethod(Object testObject, Method testMethod, Throwable testThrowable, TestContext testContext) throws Exception {
-            endTransactions(testObject);
+            endTransactions(testObject, testMethod);
         }
     }
 }

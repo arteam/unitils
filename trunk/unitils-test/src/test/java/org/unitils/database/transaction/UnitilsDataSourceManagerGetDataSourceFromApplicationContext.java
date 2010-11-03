@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.support.StaticApplicationContext;
+import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.annotation.Dummy;
 
@@ -30,21 +31,23 @@ import static org.junit.Assert.*;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class UnitilsDatabaseManagerGetDataSourceFromApplicationContext extends UnitilsJUnit4 {
+public class UnitilsDataSourceManagerGetDataSourceFromApplicationContext extends UnitilsJUnit4 {
 
     /* Tested object */
-    private UnitilsDatabaseManager unitilsDatabaseManager;
+    private UnitilsDataSourceManager unitilsDataSourceManager;
 
     @Dummy
     protected DataSource dataSource1;
     @Dummy
     protected DataSource dataSource2;
+    @Dummy
+    protected TransactionAwareDataSourceProxy transactionAwareDataSourceProxy;
 
     private StaticApplicationContext staticApplicationContext;
 
     @Before
     public void initialize() {
-        unitilsDatabaseManager = new UnitilsDatabaseManager(false, null);
+        unitilsDataSourceManager = new UnitilsDataSourceManager(false, null);
         staticApplicationContext = new StaticApplicationContext();
     }
 
@@ -54,15 +57,15 @@ public class UnitilsDatabaseManagerGetDataSourceFromApplicationContext extends U
         registerSpringBean("database1", dataSource1);
         registerSpringBean("database2", dataSource2);
 
-        DataSource result = unitilsDatabaseManager.getDataSource("database1", staticApplicationContext);
+        DataSource result = unitilsDataSourceManager.getDataSource("database1", staticApplicationContext);
         assertSame(dataSource1, result);
     }
 
     @Test
     public void defaultDataSourceIfOnlyOneDataSourceDefined() throws Exception {
-        registerSpringBean("default", dataSource1);
+        registerSpringBean("name", dataSource1);
 
-        DataSource result = unitilsDatabaseManager.getDataSource(null, staticApplicationContext);
+        DataSource result = unitilsDataSourceManager.getDataSource(null, staticApplicationContext);
         assertSame(dataSource1, result);
     }
 
@@ -72,7 +75,7 @@ public class UnitilsDatabaseManagerGetDataSourceFromApplicationContext extends U
         registerSpringBean("database2", dataSource2);
 
         try {
-            unitilsDatabaseManager.getDataSource(null, staticApplicationContext);
+            unitilsDataSourceManager.getDataSource(null, staticApplicationContext);
             fail("NoSuchBeanDefinitionException expected");
         } catch (NoSuchBeanDefinitionException e) {
             assertEquals("No unique bean of type [javax.sql.DataSource] is defined: expected single bean but found 2: database1,database2", e.getMessage());
@@ -82,7 +85,7 @@ public class UnitilsDatabaseManagerGetDataSourceFromApplicationContext extends U
     @Test
     public void unknownDatabaseName() throws Exception {
         try {
-            unitilsDatabaseManager.getDataSource("xxxx", staticApplicationContext);
+            unitilsDataSourceManager.getDataSource("xxxx", staticApplicationContext);
             fail("NoSuchBeanDefinitionException expected");
         } catch (NoSuchBeanDefinitionException e) {
             assertEquals("No bean named 'xxxx' is defined", e.getMessage());
@@ -92,13 +95,49 @@ public class UnitilsDatabaseManagerGetDataSourceFromApplicationContext extends U
     @Test
     public void unknownDefaultDatabase() throws Exception {
         try {
-            unitilsDatabaseManager.getDataSourceFromApplicationContext(null, staticApplicationContext);
+            unitilsDataSourceManager.getDataSourceFromApplicationContext(null, staticApplicationContext);
             fail("NoSuchBeanDefinitionException expected");
         } catch (NoSuchBeanDefinitionException e) {
             assertEquals("No unique bean of type [javax.sql.DataSource] is defined: expected single bean but found 0: ", e.getMessage());
         }
     }
 
+    @Test
+    public void dataSourceWrappedInTransactionAwareProxy() throws Exception {
+        registerSpringBean("name", dataSource1);
+        unitilsDataSourceManager = new UnitilsDataSourceManager(true, null);
+
+        DataSource dataSource = unitilsDataSourceManager.getDataSource(null, staticApplicationContext);
+        assertTrue(dataSource instanceof TransactionAwareDataSourceProxy);
+    }
+
+    @Test
+    public void disableWrappingInTransactionAwareProxy() throws Exception {
+        registerSpringBean("name", dataSource1);
+        unitilsDataSourceManager = new UnitilsDataSourceManager(false, null);
+
+        DataSource dataSource = unitilsDataSourceManager.getDataSource(null, staticApplicationContext);
+        assertFalse(dataSource instanceof TransactionAwareDataSourceProxy);
+    }
+
+    @Test
+    public void sameWrappedDataSourceReturned() throws Exception {
+        registerSpringBean("name", dataSource1);
+        unitilsDataSourceManager = new UnitilsDataSourceManager(true, null);
+
+        DataSource dataSource1 = unitilsDataSourceManager.getDataSource(null, staticApplicationContext);
+        DataSource dataSource2 = unitilsDataSourceManager.getDataSource(null, staticApplicationContext);
+        assertSame(dataSource1, dataSource2);
+    }
+
+    @Test
+    public void doNotWrapIfAlreadyTransactionAwareDataSourceProxy() throws Exception {
+        registerSpringBean("name", transactionAwareDataSourceProxy);
+        unitilsDataSourceManager = new UnitilsDataSourceManager(true, null);
+
+        DataSource dataSource = unitilsDataSourceManager.getDataSource(null, staticApplicationContext);
+        assertSame(transactionAwareDataSourceProxy, dataSource);
+    }
 
     private void registerSpringBean(String name, Object bean) {
         staticApplicationContext.getBeanFactory().registerSingleton(name, bean);

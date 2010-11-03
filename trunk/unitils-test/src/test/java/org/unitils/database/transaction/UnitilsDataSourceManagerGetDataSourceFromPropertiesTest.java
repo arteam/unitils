@@ -15,10 +15,8 @@
  */
 package org.unitils.database.transaction;
 
-import org.dbmaintain.database.Database;
 import org.dbmaintain.database.DatabaseConnection;
 import org.dbmaintain.database.DatabaseException;
-import org.dbmaintain.database.Databases;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
@@ -35,15 +33,12 @@ import static org.unitils.mock.ArgumentMatchers.isNull;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class UnitilsDatabaseManagerGetDataSourceFromPropertiesTest extends UnitilsJUnit4 {
+public class UnitilsDataSourceManagerGetDataSourceFromPropertiesTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private UnitilsDatabaseManager unitilsDatabaseManager;
+    private UnitilsDataSourceManager unitilsDataSourceManager;
 
     protected Mock<DbMaintainManager> dbMaintainManager;
-    protected Mock<Databases> databases;
-    protected Mock<Database> database;
-
     protected Mock<DatabaseConnection> databaseConnection;
     @Dummy
     protected DataSource dataSource;
@@ -51,7 +46,7 @@ public class UnitilsDatabaseManagerGetDataSourceFromPropertiesTest extends Uniti
 
     @Before
     public void initialize() {
-        unitilsDatabaseManager = new UnitilsDatabaseManager(false, dbMaintainManager.getMock());
+        unitilsDataSourceManager = new UnitilsDataSourceManager(false, dbMaintainManager.getMock());
         databaseConnection.returns(dataSource).getDataSource();
     }
 
@@ -60,7 +55,7 @@ public class UnitilsDatabaseManagerGetDataSourceFromPropertiesTest extends Uniti
     public void dataSourceForDatabaseWithName() throws Exception {
         dbMaintainManager.returns(databaseConnection).getDatabaseConnection("database1");
 
-        DataSource result = unitilsDatabaseManager.getDataSource("database1", null);
+        DataSource result = unitilsDataSourceManager.getDataSource("database1", null);
         assertSame(dataSource, result);
     }
 
@@ -68,7 +63,7 @@ public class UnitilsDatabaseManagerGetDataSourceFromPropertiesTest extends Uniti
     public void defaultDataSource() throws Exception {
         dbMaintainManager.returns(databaseConnection).getDatabaseConnection(isNull(String.class));
 
-        DataSource result = unitilsDatabaseManager.getDataSource(null, null);
+        DataSource result = unitilsDataSourceManager.getDataSource(null, null);
         assertSame(dataSource, result);
     }
 
@@ -77,7 +72,7 @@ public class UnitilsDatabaseManagerGetDataSourceFromPropertiesTest extends Uniti
         try {
             dbMaintainManager.raises(DatabaseException.class).getDatabaseConnection("xxxx");
 
-            unitilsDatabaseManager.getDataSource("xxxx", null);
+            unitilsDataSourceManager.getDataSource("xxxx", null);
             fail("DatabaseException expected");
         } catch (DatabaseException e) {
             // expected
@@ -86,29 +81,29 @@ public class UnitilsDatabaseManagerGetDataSourceFromPropertiesTest extends Uniti
 
     @Test
     public void dataSourceWrappedInTransactionAwareProxy() throws Exception {
-        unitilsDatabaseManager = new UnitilsDatabaseManager(true, dbMaintainManager.getMock());
+        unitilsDataSourceManager = new UnitilsDataSourceManager(true, dbMaintainManager.getMock());
         dbMaintainManager.returns(databaseConnection).getDatabaseConnection(null);
 
-        DataSource dataSource = unitilsDatabaseManager.getDataSource(null, null);
+        DataSource dataSource = unitilsDataSourceManager.getDataSource(null, null);
         assertTrue(dataSource instanceof TransactionAwareDataSourceProxy);
     }
 
     @Test
     public void disableWrappingInTransactionAwareProxy() throws Exception {
-        unitilsDatabaseManager = new UnitilsDatabaseManager(false, dbMaintainManager.getMock());
+        unitilsDataSourceManager = new UnitilsDataSourceManager(false, dbMaintainManager.getMock());
         dbMaintainManager.returns(databaseConnection).getDatabaseConnection(null);
 
-        DataSource dataSource = unitilsDatabaseManager.getDataSource(null, null);
+        DataSource dataSource = unitilsDataSourceManager.getDataSource(null, null);
         assertFalse(dataSource instanceof TransactionAwareDataSourceProxy);
     }
 
     @Test
     public void sameWrappedDataSourceReturned() throws Exception {
-        unitilsDatabaseManager = new UnitilsDatabaseManager(true, dbMaintainManager.getMock());
+        unitilsDataSourceManager = new UnitilsDataSourceManager(true, dbMaintainManager.getMock());
         dbMaintainManager.returns(databaseConnection).getDatabaseConnection(null);
 
-        DataSource dataSource1 = unitilsDatabaseManager.getDataSource(null, null);
-        DataSource dataSource2 = unitilsDatabaseManager.getDataSource(null, null);
+        DataSource dataSource1 = unitilsDataSourceManager.getDataSource(null, null);
+        DataSource dataSource2 = unitilsDataSourceManager.getDataSource(null, null);
         assertSame(dataSource1, dataSource2);
     }
 }

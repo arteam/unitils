@@ -81,13 +81,11 @@ public class UnitilsTransactionManager {
      * @param testObject The test object, not null
      * @param dataSource The data source, not null
      */
-    public void startTransactionForDataSource(Object testObject, DataSource dataSource, boolean ignoreIfAlreadyActive) {
+    public void startTransactionForDataSource(Object testObject, DataSource dataSource) {
         List<TransactionManagerAndStatus> transactionManagersAndStatusForTestObject = getTransactionManagersAndStatusForTestObject(testObject);
         if (!transactionManagersAndStatusForTestObject.isEmpty()) {
-            if (ignoreIfAlreadyActive) {
-                return;
-            }
-            throw new UnitilsException("Unable to start transaction. A transaction was already started for this test object.");
+            // transaction already active, ignore
+            return;
         }
 
         logger.debug("Starting transaction using default transaction manager.");
