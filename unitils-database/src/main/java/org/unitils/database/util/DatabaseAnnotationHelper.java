@@ -17,12 +17,13 @@ package org.unitils.database.util;
 
 import org.unitils.database.annotations.Transactional;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.unitils.database.util.TransactionMode.DEFAULT;
-import static org.unitils.util.AnnotationUtils.getClassLevelAnnotation;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
 
 /**
  * @author Tim Ducheyne
@@ -39,11 +40,12 @@ public class DatabaseAnnotationHelper {
 
 
     /**
+     * @param testMethod The test method, not null
      * @param testObject The test object, not null
      * @return The transactional annotation, null if none found
      */
-    public Transactional getTransactionalAnnotation(Object testObject) {
-        return getClassLevelAnnotation(Transactional.class, testObject.getClass());
+    public Transactional getTransactionalAnnotation(Object testObject, Method testMethod) {
+        return getMethodOrClassLevelAnnotation(Transactional.class, testMethod, testObject.getClass());
     }
 
     public List<String> getTransactionManagerBeanNames(Transactional transactional) {

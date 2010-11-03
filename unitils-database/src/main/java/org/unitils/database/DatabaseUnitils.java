@@ -39,8 +39,8 @@ public class DatabaseUnitils {
      *
      * @return The DataSource that connects to the test database
      */
-    public static DataSource getDataSource(Object testObject) {
-        return getDataSource(testObject, null);
+    public static DataSource getDataSource() {
+        return getDataSource(null);
     }
 
     /**
@@ -49,8 +49,8 @@ public class DatabaseUnitils {
      * @param databaseName The name of the database to get a data source for, null for the default database
      * @return The DataSource that connects to the test database
      */
-    public static DataSource getDataSource(Object testObject, String databaseName) {
-        return getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded(testObject, databaseName, null);
+    public static DataSource getDataSource(String databaseName) {
+        return getDatabaseModule().getDataSource(databaseName, null);
     }
 
 

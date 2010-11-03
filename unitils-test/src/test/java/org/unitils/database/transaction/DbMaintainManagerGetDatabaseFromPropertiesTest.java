@@ -21,7 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.database.datasource1.impl.DefaultDataSourceFactory;
+import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
 
 import java.util.Properties;
 
