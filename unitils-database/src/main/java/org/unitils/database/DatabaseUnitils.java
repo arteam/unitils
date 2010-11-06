@@ -18,6 +18,8 @@ package org.unitils.database;
 import org.dbmaintain.MainFactory;
 import org.dbmaintain.database.Database;
 import org.unitils.core.Unitils;
+import org.unitils.database.transaction.UnitilsDataSourceManager;
+import org.unitils.database.transaction.UnitilsTransactionManager;
 
 import javax.sql.DataSource;
 
@@ -43,6 +45,10 @@ public class DatabaseUnitils {
         return getDataSource(null);
     }
 
+    public static DataSource getDataSourceAndStartTransaction() {
+        return getDataSourceAndStartTransaction(null);
+    }
+
     /**
      * Returns the DataSource that connects to the test database
      *
@@ -50,7 +56,13 @@ public class DatabaseUnitils {
      * @return The DataSource that connects to the test database
      */
     public static DataSource getDataSource(String databaseName) {
-        return getDatabaseModule().getDataSource(databaseName, null);
+        return getUnitilsDataSourceManager().getDataSource(databaseName, null);
+    }
+
+    public static DataSource getDataSourceAndStartTransaction(String databaseName) {
+        DataSource dataSource = getDataSource(databaseName);
+        getUnitilsTransactionManager().startTransactionForDataSource(dataSource);
+        return dataSource;
     }
 
 
@@ -71,30 +83,30 @@ public class DatabaseUnitils {
 
 
     /**
-     * Starts a new transaction on the transaction manager configured in unitils
+     * Starts a transaction for the give data source using a {@link org.springframework.jdbc.datasource.DataSourceTransactionManager}.
+     * If a transaction is already started for the given data source, the start will be ignored.
+     * If a transaction is already started for another data source, an expception will be raised.
      *
-     * @param testObject The current test instance (e.g. this if your in the test), not null
+     * @param dataSource The data source, not null
      */
-    public static void startTransaction(Object testObject, DataSource dataSource) {
-        getDatabaseModule().startTransactionForDataSource(testObject, dataSource);
+    public static void startTransaction(DataSource dataSource) {
+        getUnitilsTransactionManager().startTransactionForDataSource(dataSource);
     }
 
     /**
-     * Commits the current unitils transaction
-     *
-     * @param testObject The current test instance (e.g. this if your in the test), not null
+     * Commits the current transaction.
+     * An exception will be raised if no transaction is currently active.
      */
-    public static void commitTransaction(Object testObject) {
-        getDatabaseModule().commitTransaction(testObject);
+    public static void commitTransaction() {
+        getUnitilsTransactionManager().commit();
     }
 
     /**
-     * Performs a rollback of the current unitils transaction
-     *
-     * @param testObject The current test instance (e.g. this if your in the test), not null
+     * Rolls back the current transaction.
+     * An exception will be raised if no transaction is currently active.
      */
-    public static void rollbackTransaction(Object testObject) {
-        getDatabaseModule().rollbackTransaction(testObject);
+    public static void rollbackTransaction() {
+        getUnitilsTransactionManager().rollback();
     }
 
 
@@ -155,6 +167,14 @@ public class DatabaseUnitils {
      */
     private static DatabaseModule getDatabaseModule() {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+    }
+
+    private static UnitilsTransactionManager getUnitilsTransactionManager() {
+        return getDatabaseModule().getUnitilsTransactionManager();
+    }
+
+    private static UnitilsDataSourceManager getUnitilsDataSourceManager() {
+        return getDatabaseModule().getUnitilsDataSourceManager();
     }
 
     private static MainFactory getMainFactory() {

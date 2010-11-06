@@ -19,24 +19,29 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.core.UnitilsException;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.mock.annotation.Dummy;
 
 import javax.sql.DataSource;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.unitils.database.SQLUnitils.*;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class UnitilsTransactionManagerForDataSourceTest extends UnitilsJUnit4 {
+public class UnitilsTransactionManagerTest extends UnitilsJUnit4 {
 
     /* Tested object */
     private UnitilsTransactionManager unitilsTransactionManager = new UnitilsTransactionManager();
 
     @TestDataSource
     protected DataSource dataSource;
+    @Dummy
+    protected DataSource otherDataSource;
 
 
     @Before
@@ -48,7 +53,7 @@ public class UnitilsTransactionManagerForDataSourceTest extends UnitilsJUnit4 {
     @After
     public void dropTestTable() {
         try {
-            unitilsTransactionManager.rollback(this);
+            unitilsTransactionManager.rollback();
         } catch (Exception e) {
             // ingored
         }
@@ -58,40 +63,40 @@ public class UnitilsTransactionManagerForDataSourceTest extends UnitilsJUnit4 {
 
     @Test
     public void commitTransaction() {
-        unitilsTransactionManager.startTransactionForDataSource(this, dataSource);
+        unitilsTransactionManager.startTransactionForDataSource(dataSource);
         performDatabaseUpdate();
-        unitilsTransactionManager.commit(this);
+        unitilsTransactionManager.commit();
 
         assertDatabaseUpdateCommitted();
     }
 
     @Test
     public void rollbackTransaction() {
-        unitilsTransactionManager.startTransactionForDataSource(this, dataSource);
+        unitilsTransactionManager.startTransactionForDataSource(dataSource);
         performDatabaseUpdate();
-        unitilsTransactionManager.rollback(this);
+        unitilsTransactionManager.rollback();
 
         assertDatabaseUpdateRolledBack();
     }
 
     @Test
-    public void ignoreWhenStartedMoreThanOnce() {
-        unitilsTransactionManager.startTransactionForDataSource(this, dataSource);
-        unitilsTransactionManager.startTransactionForDataSource(this, dataSource);
+    public void ignoreWhenStartedMoreThanOnceOnSameDataSource() {
+        unitilsTransactionManager.startTransactionForDataSource(dataSource);
+        unitilsTransactionManager.startTransactionForDataSource(dataSource);
         performDatabaseUpdate();
-        unitilsTransactionManager.rollback(this);
+        unitilsTransactionManager.rollback();
 
         assertDatabaseUpdateRolledBack();
     }
 
     @Test
-    public void startMoreThanOnce_ignored() {
-        unitilsTransactionManager.startTransactionForDataSource(this, dataSource);
-        unitilsTransactionManager.startTransactionForDataSource(this, dataSource);
-        performDatabaseUpdate();
-        unitilsTransactionManager.rollback(this);
-
-        assertDatabaseUpdateRolledBack();
+    public void failWhenStartedMoreThanOnceOnDifferentDataSource() {
+        try {
+            unitilsTransactionManager.startTransactionForDataSource(dataSource);
+            unitilsTransactionManager.startTransactionForDataSource(otherDataSource);
+        } catch (UnitilsException e) {
+            assertTrue(e.getMessage().contains("Unable to start transaction: a transaction for another data source is already active for this test."));
+        }
     }
 
 

@@ -55,7 +55,7 @@ public class DatabaseModuleInjectDataSourceTest extends UnitilsJUnit4 {
     public void testInjectDataSource() throws Exception {
         TestTarget testTarget = new TestTarget();
         Method method = TestTarget.class.getMethod("testMethod");
-        databaseModule.injectDataSources(testTarget, method, null);
+        databaseModule.injectDataSources(testTarget, null);
 
         assertNotNull(testTarget.dataSourceFromField);
         assertNotNull(testTarget.dataSourceFromMethod);

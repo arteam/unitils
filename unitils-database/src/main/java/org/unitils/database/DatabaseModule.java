@@ -21,6 +21,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.TestContext;
 import org.unitils.core.Module;
 import org.unitils.core.TestExecutionListenerAdapter;
+import org.unitils.core.UnitilsException;
 import org.unitils.core.util.ConfigUtils;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
@@ -35,10 +36,7 @@ import org.unitils.util.PropertyUtils;
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import static org.unitils.database.util.TransactionMode.*;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
@@ -113,30 +111,8 @@ public class DatabaseModule implements Module {
     }
 
 
-    /**
-     * Returns the <code>DataSource</code> that provides connection to the unit test database. When invoked the first
-     * time, the DBMaintainer is invoked to make sure the test database is up-to-date (if database updating is enabled).
-     *
-     * By default, the data source will be wrapped in a Spring TransactionAwareDataSourceProxy to make sure that the same
-     * connection is always returned within the same transaction and will make sure that the tx synchronization is done correctly.
-     * If needed, this can be disabled in the configuration by setting the
-     * {@link #PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY}.
-     * property to false.
-     *
-     * @param testObject         The test instance, not null
-     * @param testMethod         The test method, not null
-     * @param databaseName       The name of the database to get a data source for, null for the default database
-     * @param applicationContext The spring application context, null if not defined
-     * @return The <code>DataSource</code>
-     */
-    public DataSource getDataSourceAndActivateTransactionIfNeeded(Object testObject, Method testMethod, String databaseName, ApplicationContext applicationContext) {
-        DataSource dataSource = getDataSource(databaseName, applicationContext);
-        startTransactionForDataSourceIfNoTransactionActive(testObject, testMethod, dataSource);
-        return dataSource;
-    }
-
-    public DataSource getDataSource(String databaseName, ApplicationContext applicationContext) {
-        return unitilsDataSourceManager.getDataSource(databaseName, applicationContext);
+    public UnitilsDataSourceManager getUnitilsDataSourceManager() {
+        return unitilsDataSourceManager;
     }
 
     public Database getDatabase(String databaseName) {
@@ -162,10 +138,12 @@ public class DatabaseModule implements Module {
      * annotated with {@link TestDataSource}
      *
      * @param testObject         The test instance, not null
-     * @param testMethod         The test method, not null
      * @param applicationContext The spring application context, null if not defined
+     * @return The data sources that were injected, not null
      */
-    protected void injectDataSources(Object testObject, Method testMethod, ApplicationContext applicationContext) {
+    protected Set<DataSource> injectDataSources(Object testObject, ApplicationContext applicationContext) {
+        Set<DataSource> injectedDataSources = new HashSet<DataSource>();
+
         Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), TestDataSource.class);
         Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), TestDataSource.class);
 
@@ -173,86 +151,40 @@ public class DatabaseModule implements Module {
             TestDataSource testDataSourceAnnotation = field.getAnnotation(TestDataSource.class);
             String databaseName = testDataSourceAnnotation.value();
 
-            DataSource dataSource = getDataSourceAndActivateTransactionIfNeeded(testObject, testMethod, databaseName, applicationContext);
+            DataSource dataSource = unitilsDataSourceManager.getDataSource(databaseName, applicationContext);
             setFieldValue(testObject, field, dataSource);
+            injectedDataSources.add(dataSource);
         }
         for (Method method : methods) {
             TestDataSource testDataSourceAnnotation = method.getAnnotation(TestDataSource.class);
             String databaseName = testDataSourceAnnotation.value();
 
-            DataSource dataSource = getDataSourceAndActivateTransactionIfNeeded(testObject, testMethod, databaseName, applicationContext);
+            DataSource dataSource = unitilsDataSourceManager.getDataSource(databaseName, applicationContext);
             setSetterValue(testObject, method, dataSource);
+            injectedDataSources.add(dataSource);
         }
+        return injectedDataSources;
     }
 
-
-    public void registerDatabaseUpdateListener(DatabaseUpdateListener databaseUpdateListener) {
-        databaseUpdateListeners.add(databaseUpdateListener);
-    }
-
-    public void unregisterDatabaseUpdateListener(DatabaseUpdateListener databaseUpdateListener) {
-        databaseUpdateListeners.remove(databaseUpdateListener);
-    }
-
-    private void notifyDatabaseUpdateListeners() {
-        for (DatabaseUpdateListener databaseUpdateListener : databaseUpdateListeners) {
-            databaseUpdateListener.databaseWasUpdated();
-        }
-    }
-
-    protected void startTransactionForTransactionManagersInApplicationContext(Object testObject, Method testMethod, ApplicationContext applicationContext) {
+    protected void startTransactionForInjectedDataSources(Object testObject, Method testMethod, Set<DataSource> injectedDataSources) {
         Transactional transactional = databaseAnnotationHelper.getTransactionalAnnotation(testObject, testMethod);
-        if (isTransactionsEnabled(transactional)) {
-            List<String> transactionManagerBeanNames = databaseAnnotationHelper.getTransactionManagerBeanNames(transactional);
-            unitilsTransactionManager.startTransactionOnTransactionManagersInApplicationContext(testObject, transactionManagerBeanNames, applicationContext);
-        }
-    }
-
-    /**
-     * Starts a new transaction for the given transaction. Ignored if a transaction is already
-     * active for this data source.
-     *
-     * @param testObject The test object, not null
-     * @param dataSource The data source, not null
-     */
-    public void startTransactionForDataSource(Object testObject, DataSource dataSource) {
-        unitilsTransactionManager.startTransactionForDataSource(testObject, dataSource);
-    }
-
-    /**
-     * Commits the current transaction.
-     *
-     * @param testObject The test object, not null
-     */
-    protected void commitTransaction(Object testObject) {
-        unitilsTransactionManager.commit(testObject);
-    }
-
-    /**
-     * Performs a rollback of the current transaction
-     *
-     * @param testObject The test object, not null
-     */
-    protected void rollbackTransaction(Object testObject) {
-        unitilsTransactionManager.rollback(testObject);
-    }
-
-
-    /**
-     * Starts a transaction. Ignored if a transaction is already active for this data source or when transaction
-     * management is not enabled for this test method.
-     *
-     * @param testObject The test object, not null
-     * @param testMethod The test method, not null
-     * @param dataSource The data source, not null
-     */
-    protected void startTransactionForDataSourceIfNoTransactionActive(Object testObject, Method testMethod, DataSource dataSource) {
-        Transactional transactional = databaseAnnotationHelper.getTransactionalAnnotation(testObject, testMethod);
-        if (!isTransactionsEnabled(transactional)) {
+        if (!isTransactionsEnabled(transactional) || injectedDataSources.isEmpty()) {
+            // nothing to do
             return;
         }
-        unitilsTransactionManager.startTransactionForDataSource(testObject, dataSource);
+        if (injectedDataSources.size() > 1) {
+            throw new UnitilsException("Starting a transaction for multiple data sources is not supported. You cannot use the @Transactional annotation when there is more than 1 @TestDataSource.\n" +
+                    "A transaction can only be started for 1 data source at the same time. If you want a transaction spanning multiple data sources, you will need to set up an XA-transaction manager in a spring context. See the tutorial for more info.");
+        }
+        DataSource injectedDataSource = injectedDataSources.iterator().next();
+        unitilsTransactionManager.startTransactionForDataSource(injectedDataSource);
     }
+
+
+    public UnitilsTransactionManager getUnitilsTransactionManager() {
+        return unitilsTransactionManager;
+    }
+
 
     /**
      * Commits or rollbacks the current transactions if transactions are enabled.
@@ -267,9 +199,9 @@ public class DatabaseModule implements Module {
         }
         TransactionMode transactionMode = databaseAnnotationHelper.getTransactionMode(transactional);
         if (transactionMode == COMMIT) {
-            commitTransaction(testObject);
+            unitilsTransactionManager.commit();
         } else if (transactionMode == ROLLBACK) {
-            rollbackTransaction(testObject);
+            unitilsTransactionManager.rollback();
         }
     }
 
@@ -283,6 +215,21 @@ public class DatabaseModule implements Module {
         }
         TransactionMode transactionMode = databaseAnnotationHelper.getTransactionMode(transactional);
         return transactionMode != DISABLED;
+    }
+
+
+    public void registerDatabaseUpdateListener(DatabaseUpdateListener databaseUpdateListener) {
+        databaseUpdateListeners.add(databaseUpdateListener);
+    }
+
+    public void unregisterDatabaseUpdateListener(DatabaseUpdateListener databaseUpdateListener) {
+        databaseUpdateListeners.remove(databaseUpdateListener);
+    }
+
+    protected void notifyDatabaseUpdateListeners() {
+        for (DatabaseUpdateListener databaseUpdateListener : databaseUpdateListeners) {
+            databaseUpdateListener.databaseWasUpdated();
+        }
     }
 
 
@@ -322,8 +269,8 @@ public class DatabaseModule implements Module {
         @Override
         public void beforeTestMethod(Object testObject, Method testMethod, TestContext testContext) throws Exception {
             ApplicationContext applicationContext = getApplicationContext(testContext);
-            startTransactionForTransactionManagersInApplicationContext(testObject, testMethod, applicationContext);
-            injectDataSources(testObject, testMethod, applicationContext);
+            Set<DataSource> injectedDataSources = injectDataSources(testObject, applicationContext);
+            startTransactionForInjectedDataSources(testObject, testMethod, injectedDataSources);
         }
 
         @Override
