@@ -16,10 +16,12 @@
 package org.unitils.database;
 
 import org.dbmaintain.database.DatabaseException;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.Unitils;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -34,18 +36,26 @@ import static org.unitils.database.DatabaseModule.PROPERTY_UPDATEDATABASESCHEMA_
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DatabaseModuleGetDataSourceFromPropertiesTest extends UnitilsJUnit4 {
+public class DatabaseUnitilsGetDataSourceTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private DatabaseModule databaseModule = new DatabaseModule();
+    private DatabaseModule databaseModule;
 
     private Properties configuration;
 
 
     @Before
-    public void setUp() throws Exception {
+    public void initialize() throws Exception {
+        databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+
         configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(PROPERTY_UPDATEDATABASESCHEMA_ENABLED, "false");
+    }
+
+    @After
+    public void resetDataSetModule() {
+        configuration = new ConfigurationLoader().loadConfiguration();
+        databaseModule.init(configuration);
     }
 
 
@@ -53,7 +63,7 @@ public class DatabaseModuleGetDataSourceFromPropertiesTest extends UnitilsJUnit4
     public void getDefaultDatabase() throws Exception {
         databaseModule.init(configuration);
 
-        DataSource dataSource = databaseModule.getDataSource(null, null);
+        DataSource dataSource = DatabaseUnitils.getDataSource();
         assertNotNull(dataSource);
     }
 
@@ -63,7 +73,7 @@ public class DatabaseModuleGetDataSourceFromPropertiesTest extends UnitilsJUnit4
         databaseModule.init(configuration);
 
         try {
-            databaseModule.getDataSource(null, null);
+            DatabaseUnitils.getDataSource();
             fail("Expected DatabaseException");
         } catch (DatabaseException e) {
             assertEquals("Invalid database configuration: no driver class name defined.", e.getMessage());
@@ -75,7 +85,7 @@ public class DatabaseModuleGetDataSourceFromPropertiesTest extends UnitilsJUnit4
         configuration.setProperty(PROPERTY_DATABASE_NAMES, "myDatabase");
         databaseModule.init(configuration);
 
-        DataSource dataSource = databaseModule.getDataSource("myDatabase", null);
+        DataSource dataSource = DatabaseUnitils.getDataSource("myDatabase");
         assertNotNull(dataSource);
     }
 
@@ -84,7 +94,7 @@ public class DatabaseModuleGetDataSourceFromPropertiesTest extends UnitilsJUnit4
         databaseModule.init(configuration);
 
         try {
-            databaseModule.getDataSource("xxxx", null);
+            DatabaseUnitils.getDataSource("xxxx");
             fail("Expected DatabaseException");
         } catch (DatabaseException e) {
             assertEquals("No database configuration found for database with name xxxx.", e.getMessage());

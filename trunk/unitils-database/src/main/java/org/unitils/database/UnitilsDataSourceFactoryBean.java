@@ -16,7 +16,6 @@
 package org.unitils.database;
 
 import org.springframework.beans.factory.FactoryBean;
-import org.unitils.core.Unitils;
 
 import javax.sql.DataSource;
 
@@ -39,10 +38,8 @@ public class UnitilsDataSourceFactoryBean implements FactoryBean {
      * @return The data source, not null
      */
     public Object getObject() throws Exception {
-        DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-
         // todo make database name configurable
-        return databaseModule.getDataSource(null, null);
+        return DatabaseUnitils.getDataSource();
     }
 
     /**
