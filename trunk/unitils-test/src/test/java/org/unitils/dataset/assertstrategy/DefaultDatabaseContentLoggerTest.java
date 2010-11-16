@@ -24,7 +24,8 @@ import org.unitils.dataset.assertstrategy.impl.TableContents;
 import org.unitils.dataset.assertstrategy.model.DataSetComparison;
 import org.unitils.dataset.assertstrategy.model.RowComparison;
 import org.unitils.dataset.assertstrategy.model.TableComparison;
-import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.database.DataSetDatabaseHelper;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.Row;
 import org.unitils.dataset.model.database.Value;
@@ -33,6 +34,7 @@ import org.unitils.mock.Mock;
 import static java.sql.Types.VARCHAR;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.unitils.dataset.util.DataSetTestUtils.*;
 import static org.unitils.util.CollectionUtils.asSet;
 
 /**
@@ -44,8 +46,9 @@ public class DefaultDatabaseContentLoggerTest extends UnitilsJUnit4 {
     /* Tested object */
     private DefaultDatabaseContentLogger defaultDatabaseContentRetriever = new DefaultDatabaseContentLogger();
 
-    protected Mock<DatabaseMetaData> database;
+    protected Mock<DataSourceWrapper> dataSourceWrapper;
     protected Mock<TableContentRetriever> tableContentRetriever;
+    protected Mock<DataSetDatabaseHelper> dataSetDatabaseHelper;
     protected Mock<TableContents> tableContent;
 
     protected DataSetComparison dataSetComparison;
@@ -58,22 +61,22 @@ public class DefaultDatabaseContentLoggerTest extends UnitilsJUnit4 {
     public void initialize() throws Exception {
         Column column1 = new Column("pk1", VARCHAR, true);
         Column column2 = new Column("column", VARCHAR, false);
-        database.returns(asSet("pk1")).getPrimaryKeyColumnNames("schema.table");
-        database.returns(asList(column1, column2)).getColumns("schema.table");
+        dataSourceWrapper.returns(asSet("pk1")).getPrimaryKeyColumnNames(createTableName("schema", "table"));
+        dataSourceWrapper.returns(asSet(column1, column2)).getColumns(createTableName("schema", "table"));
 
-        tableContentRetriever.returns(tableContent).getTableContents("schema.table", asList(column1, column2), asSet("pk1"));
+        tableContentRetriever.returns(tableContent).getTableContents(createTableName(), asSet(column1, column2), asSet("pk1"));
         tableContent.returns(2).getNrOfColumns();
         tableContent.returns(asList("column1", "column2")).getColumnNames();
 
-        defaultDatabaseContentRetriever.init(database.getMock(), tableContentRetriever.getMock());
+        defaultDatabaseContentRetriever.init(dataSourceWrapper.getMock(), tableContentRetriever.getMock(), dataSetDatabaseHelper.getMock());
 
-        tableComparison = new TableComparison("schema.table");
+        tableComparison = new TableComparison(createTableName());
         dataSetComparison = createDataSetComparison(tableComparison);
 
-        row1 = new Row("1", "schema.table");
+        row1 = createRowWithIdentifier("1");
         row1.addValue(new Value("row1col1", false, new Column("column1", VARCHAR, true)));
         row1.addValue(new Value("row1col2", false, new Column("column2", VARCHAR, true)));
-        row2 = new Row("2", "schema.table");
+        row2 = createRowWithIdentifier("2");
         row2.addValue(new Value("row2col1", false, new Column("column1", VARCHAR, true)));
         row2.addValue(new Value("row2col2", false, new Column("column2", VARCHAR, true)));
     }
@@ -120,7 +123,7 @@ public class DefaultDatabaseContentLoggerTest extends UnitilsJUnit4 {
     }
 
     private void setActualRowIdentifiersWithMatch(String identifier) {
-        tableComparison.setMatchingRow(new RowComparison(new Row(null), new Row(identifier, null)));
+        tableComparison.setMatchingRow(new RowComparison(createRow(), createRowWithIdentifier(identifier)));
     }
 
 

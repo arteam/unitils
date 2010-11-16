@@ -29,8 +29,8 @@ import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
 import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_SCHEMANAMES;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.database.DatabaseUnitils.cleanDatabase;
 import static org.unitils.database.DatabaseUnitils.getDataSource;
+import static org.unitils.database.DbMaintainUnitils.cleanDatabase;
 import static org.unitils.database.SQLUnitils.*;
 import static org.unitils.testutil.TestUnitilsConfiguration.*;
 

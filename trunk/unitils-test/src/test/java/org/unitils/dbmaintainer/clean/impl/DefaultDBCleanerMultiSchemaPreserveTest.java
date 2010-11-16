@@ -21,7 +21,6 @@ import org.dbmaintain.database.Database;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.database.DatabaseUnitils;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -31,6 +30,7 @@ import static org.dbmaintain.config.DbMaintainProperties.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
+import static org.unitils.database.DbMaintainUnitils.cleanDatabase;
 import static org.unitils.database.SQLUnitils.*;
 import static org.unitils.testutil.TestUnitilsConfiguration.*;
 
@@ -104,7 +104,7 @@ public class DefaultDBCleanerMultiSchemaPreserveTest {
         assertFalse(isEmpty("SCHEMA_A.TEST", dataSource));
         assertFalse(isEmpty("SCHEMA_B.TEST", dataSource));
         assertFalse(isEmpty("SCHEMA_C.TEST", dataSource));
-        DatabaseUnitils.cleanDatabase();
+        cleanDatabase();
         assertFalse(isEmpty("TEST", dataSource));
         assertFalse(isEmpty("SCHEMA_A.TEST", dataSource));
         assertTrue(isEmpty("SCHEMA_B.TEST", dataSource));

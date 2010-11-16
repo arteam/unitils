@@ -34,16 +34,16 @@ public class DatabaseAccessor {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DatabaseAccessor.class);
 
-    private DatabaseMetaData database;
+    private DataSourceWrapper dataSourceWrapper;
 
 
-    public DatabaseAccessor(DatabaseMetaData database) {
-        this.database = database;
+    public DatabaseAccessor(DataSourceWrapper dataSourceWrapper) {
+        this.dataSourceWrapper = dataSourceWrapper;
     }
 
     public int executeUpdate(String sql, List<Value> statementValues) throws Exception {
         PreparedStatement preparedStatement = null;
-        Connection connection = database.getConnection();
+        Connection connection = dataSourceWrapper.getConnection();
         try {
             logStatement(sql, statementValues);
             preparedStatement = connection.prepareStatement(sql);

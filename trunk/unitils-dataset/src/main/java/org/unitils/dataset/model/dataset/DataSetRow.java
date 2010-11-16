@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static thirdparty.org.apache.commons.lang.StringUtils.isBlank;
+
 /**
  * A data set row.
  *
@@ -32,7 +34,7 @@ public class DataSetRow {
     /* The columns of the row */
     private List<DataSetValue> dataSetValues = new ArrayList<DataSetValue>();
 
-    /* The name of the schema */
+    /* The name of the schema, null for the default schema */
     private String schemaName;
     /* The name of the table */
     private String tableName;
@@ -47,7 +49,7 @@ public class DataSetRow {
     /**
      * Creates a data set row.
      *
-     * @param schemaName      The name of the schema, not null
+     * @param schemaName      The name of the schema, null for the default schema
      * @param tableName       The name of the table, not null
      * @param parentRow       The parent row that is referenced (foreign key) by this row, null if not defined
      * @param notExists       True if the row should not exist, false if it should exist
@@ -63,7 +65,7 @@ public class DataSetRow {
 
 
     /**
-     * @return The name of the schema, not null
+     * @return The name of the schema, null for the default schema
      */
     public String getSchemaName() {
         return schemaName;
@@ -175,8 +177,10 @@ public class DataSetRow {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(schemaName);
-        stringBuilder.append(".");
+        if (!isBlank(schemaName)) {
+            stringBuilder.append(schemaName);
+            stringBuilder.append(".");
+        }
         stringBuilder.append(tableName);
         stringBuilder.append(" [");
         for (DataSetValue value : dataSetValues) {

@@ -20,10 +20,11 @@ import org.unitils.dataset.assertstrategy.DataSetComparator;
 import org.unitils.dataset.assertstrategy.model.DataSetComparison;
 import org.unitils.dataset.assertstrategy.model.RowComparison;
 import org.unitils.dataset.assertstrategy.model.TableComparison;
-import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.Row;
+import org.unitils.dataset.model.database.TableName;
 import org.unitils.dataset.model.database.Value;
 import org.unitils.dataset.model.dataset.DataSetRow;
 import org.unitils.dataset.rowsource.DataSetRowSource;
@@ -39,27 +40,27 @@ public class DefaultDataSetComparator implements DataSetComparator {
     protected DataSetRowProcessor dataSetRowProcessor;
     protected TableContentRetriever tableContentRetriever;
 
-    protected DatabaseMetaData database;
+    protected DataSourceWrapper dataSourceWrapper;
 
 
-    public void init(DataSetRowProcessor dataSetRowProcessor, TableContentRetriever tableContentRetriever, DatabaseMetaData database) {
+    public void init(DataSetRowProcessor dataSetRowProcessor, TableContentRetriever tableContentRetriever, DataSourceWrapper dataSourceWrapper) {
         this.dataSetRowProcessor = dataSetRowProcessor;
         this.tableContentRetriever = tableContentRetriever;
-        this.database = database;
+        this.dataSourceWrapper = dataSourceWrapper;
     }
 
     public DataSetComparison compare(DataSetRowSource expectedDataSetRowSource, List<String> variables) {
         DataSetComparison dataSetComparison = new DataSetComparison();
         try {
-            Map<String, Map<DataSetRow, Row>> rowsPerTable = getRowsPerTable(expectedDataSetRowSource, variables);
-            for (Map.Entry<String, Map<DataSetRow, Row>> entry : rowsPerTable.entrySet()) {
-                String qualifiedTableName = entry.getKey();
+            Map<TableName, Map<DataSetRow, Row>> rowsPerTable = getRowsPerTable(expectedDataSetRowSource, variables);
+            for (Map.Entry<TableName, Map<DataSetRow, Row>> entry : rowsPerTable.entrySet()) {
+                TableName tableName = entry.getKey();
                 Map<DataSetRow, Row> dataSetRows = entry.getValue();
 
-                List<Column> columns = getAllUsedColumns(dataSetRows);
-                Set<String> primaryKeyColumnNames = database.getPrimaryKeyColumnNames(qualifiedTableName);
+                Set<Column> columns = getAllUsedColumns(dataSetRows);
+                Set<String> primaryKeyColumnNames = dataSourceWrapper.getPrimaryKeyColumnNames(tableName);
 
-                TableComparison tableComparison = compareDataSetRowsForTable(qualifiedTableName, columns, dataSetRows, primaryKeyColumnNames);
+                TableComparison tableComparison = compareDataSetRowsForTable(tableName, columns, dataSetRows, primaryKeyColumnNames);
                 dataSetComparison.addTableComparison(tableComparison);
             }
             return dataSetComparison;
@@ -71,7 +72,7 @@ public class DefaultDataSetComparator implements DataSetComparator {
         }
     }
 
-    protected List<Column> getAllUsedColumns(Map<DataSetRow, Row> dataSetRows) {
+    protected Set<Column> getAllUsedColumns(Map<DataSetRow, Row> dataSetRows) {
         Map<String, Column> columnsPerName = new LinkedHashMap<String, Column>();
         for (Row row : dataSetRows.values()) {
             for (Value value : row.getValues()) {
@@ -79,22 +80,22 @@ public class DefaultDataSetComparator implements DataSetComparator {
                 columnsPerName.put(column.getName(), column);
             }
         }
-        return new ArrayList<Column>(columnsPerName.values());
+        return new LinkedHashSet<Column>(columnsPerName.values());
     }
 
 
-    protected TableComparison compareDataSetRowsForTable(String qualifiedTableName, List<Column> columns, Map<DataSetRow, Row> dataSetRows, Set<String> primaryKeyColumnNames) throws Exception {
-        TableContents tableContents = tableContentRetriever.getTableContents(qualifiedTableName, columns, primaryKeyColumnNames);
+    protected TableComparison compareDataSetRowsForTable(TableName tableName, Set<Column> columns, Map<DataSetRow, Row> dataSetRows, Set<String> primaryKeyColumnNames) throws Exception {
+        TableContents tableContents = tableContentRetriever.getTableContents(tableName, columns, primaryKeyColumnNames);
         try {
-            return compareTable(qualifiedTableName, tableContents, dataSetRows);
+            return compareTable(tableName, tableContents, dataSetRows);
         } finally {
             tableContents.close();
         }
     }
 
 
-    protected Map<String, Map<DataSetRow, Row>> getRowsPerTable(DataSetRowSource dataSetRowSource, List<String> variables) throws Exception {
-        Map<String, Map<DataSetRow, Row>> dataSetRowsPerTable = new LinkedHashMap<String, Map<DataSetRow, Row>>();
+    protected Map<TableName, Map<DataSetRow, Row>> getRowsPerTable(DataSetRowSource dataSetRowSource, List<String> variables) throws Exception {
+        Map<TableName, Map<DataSetRow, Row>> dataSetRowsPerTable = new LinkedHashMap<TableName, Map<DataSetRow, Row>>();
         DataSetRow dataSetRow;
         while ((dataSetRow = dataSetRowSource.getNextDataSetRow()) != null) {
             Row row = dataSetRowProcessor.process(dataSetRow, variables, new HashSet<String>());
@@ -104,12 +105,11 @@ public class DefaultDataSetComparator implements DataSetComparator {
                 }
             }
 
-            String qualifiedTableName = row.getQualifiedTableName();
-
-            Map<DataSetRow, Row> dataSetRows = dataSetRowsPerTable.get(qualifiedTableName);
+            TableName tableName = row.getTableName();
+            Map<DataSetRow, Row> dataSetRows = dataSetRowsPerTable.get(tableName);
             if (dataSetRows == null) {
                 dataSetRows = new LinkedHashMap<DataSetRow, Row>();
-                dataSetRowsPerTable.put(qualifiedTableName, dataSetRows);
+                dataSetRowsPerTable.put(tableName, dataSetRows);
             }
             dataSetRows.put(dataSetRow, row);
         }
@@ -117,8 +117,8 @@ public class DefaultDataSetComparator implements DataSetComparator {
     }
 
 
-    protected TableComparison compareTable(String qualifiedTableName, TableContents tableContents, Map<DataSetRow, Row> dataSetRows) throws Exception {
-        TableComparison tableComparison = new TableComparison(qualifiedTableName);
+    protected TableComparison compareTable(TableName tableName, TableContents tableContents, Map<DataSetRow, Row> dataSetRows) throws Exception {
+        TableComparison tableComparison = new TableComparison(tableName);
 
         List<RowComparison> currentRowComparisons = new ArrayList<RowComparison>();
 

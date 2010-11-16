@@ -15,8 +15,9 @@
  */
 package org.unitils.dataset.loadstrategy.impl;
 
+import org.dbmaintain.database.IdentifierProcessor;
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 
 import java.util.List;
@@ -37,9 +38,10 @@ public class CleanInsertDataSetStrategy extends InsertDataSetStrategy {
 
 
     @Override
-    public void init(Properties configuration, DatabaseMetaData databaseMetaData) {
-        super.init(configuration, databaseMetaData);
-        tableContentDeleter = new TableContentDeleter(identifierNameProcessor, databaseAccessor, databaseMetaData);
+    public void init(Properties configuration, DataSourceWrapper dataSourceWrapper, IdentifierProcessor identifierProcessor) {
+        super.init(configuration, dataSourceWrapper, identifierProcessor);
+        // todo move out
+        tableContentDeleter = new TableContentDeleter(databaseAccessor, dataSourceWrapper);
     }
 
 

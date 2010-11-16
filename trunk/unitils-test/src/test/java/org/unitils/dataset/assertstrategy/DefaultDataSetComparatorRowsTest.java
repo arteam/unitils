@@ -25,7 +25,7 @@ import org.unitils.dataset.assertstrategy.model.ColumnDifference;
 import org.unitils.dataset.assertstrategy.model.DataSetComparison;
 import org.unitils.dataset.assertstrategy.model.RowComparison;
 import org.unitils.dataset.assertstrategy.model.TableComparison;
-import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.Row;
@@ -41,6 +41,7 @@ import java.util.List;
 
 import static java.sql.Types.INTEGER;
 import static org.junit.Assert.*;
+import static org.unitils.dataset.util.DataSetTestUtils.*;
 
 /**
  * @author Tim Ducheyne
@@ -51,7 +52,7 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
     /* Tested object */
     private DefaultDataSetComparator defaultDataSetComparator = new DefaultDataSetComparator();
 
-    protected Mock<DatabaseMetaData> database;
+    protected Mock<DataSourceWrapper> database;
     protected Mock<DataSetRowProcessor> dataSetRowProcessor;
     protected Mock<TableContentRetriever> tableContentRetriever;
     protected Mock<TableContents> tableContents;
@@ -69,17 +70,17 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
 
         tableContentRetriever.onceReturns(tableContents).getTableContents(null, null, null);
 
-        actualRow1 = new Row("1", "schema.table");
+        actualRow1 = createRowWithIdentifier("1");
         actualRow1.addValue(new Value(11, false, new Column("column1", INTEGER, true)));
         actualRow1.addValue(new Value(12, false, new Column("column2", INTEGER, true)));
         actualRow1.addValue(new Value(13, false, new Column("column3", INTEGER, true)));
 
-        actualRow2 = new Row("2", "schema.table");
+        actualRow2 = createRowWithIdentifier("2");
         actualRow2.addValue(new Value(21, false, new Column("column1", INTEGER, true)));
         actualRow2.addValue(new Value(22, false, new Column("column2", INTEGER, true)));
         actualRow2.addValue(new Value(23, false, new Column("column3", INTEGER, true)));
 
-        actualRow3 = new Row("3", "schema.table");
+        actualRow3 = createRowWithIdentifier("3");
         actualRow3.addValue(new Value(31, false, new Column("column1", INTEGER, true)));
         actualRow3.addValue(new Value(32, false, new Column("column2", INTEGER, true)));
         actualRow3.addValue(new Value(33, false, new Column("column3", INTEGER, true)));
@@ -88,8 +89,8 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
 
     @Test
     public void allRowsAreMatches() throws Exception {
-        setExpectedRow(createExpectedRow(createColumn("column1", 11), createColumn("column2", 12)));
-        setExpectedRow(createExpectedRow(createColumn("column1", 21), createColumn("column2", 22), createColumn("column3", 23)));
+        setExpectedRow(createRow(createValue("column1", 11), createValue("column2", 12)));
+        setExpectedRow(createRow(createValue("column1", 21), createValue("column2", 22), createValue("column3", 23)));
         setActualRow(actualRow1);
         setActualRow(actualRow2);
         setActualRow(actualRow3);
@@ -103,7 +104,7 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
 
     @Test
     public void firstRowIsAMatch() throws Exception {
-        setExpectedRow(createExpectedRow(createColumn("column1", 11)));
+        setExpectedRow(createRow(createValue("column1", 11)));
         setActualRow(actualRow1);
         setActualRow(actualRow2);
 
@@ -114,7 +115,7 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
 
     @Test
     public void lastRowIsAMatch() throws Exception {
-        setExpectedRow(createExpectedRow(createColumn("column1", 21)));
+        setExpectedRow(createRow(createValue("column1", 21)));
         setActualRow(actualRow1);
         setActualRow(actualRow2);
 
@@ -125,8 +126,8 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
 
     @Test
     public void missingRow() throws Exception {
-        setExpectedRow(createExpectedRow(createColumn("column1", 11)));
-        setExpectedRow(createExpectedRow(createColumn("column1", 21)));
+        setExpectedRow(createRow(createValue("column1", 11)));
+        setExpectedRow(createRow(createValue("column1", 21)));
         setActualRow(actualRow1);
 
         DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetRowSource.getMock(), emptyVariables);
@@ -135,7 +136,7 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
 
     @Test
     public void difference() throws Exception {
-        setExpectedRow(createExpectedRow(createColumn("column1", 777), createColumn("column2", 888), createColumn("column3", 999)));
+        setExpectedRow(createRow(createValue("column1", 777), createValue("column2", 888), createValue("column3", 999)));
         setActualRow(actualRow1);
 
         DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetRowSource.getMock(), emptyVariables);
@@ -147,8 +148,8 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
 
     @Test
     public void allRowsHaveDifferences() throws Exception {
-        Row expectedRow1 = createExpectedRow(createColumn("column1", 999), createColumn("column2", 999));
-        Row expectedRow2 = createExpectedRow(createColumn("column1", 999), createColumn("column2", 999), createColumn("column3", 999));
+        Row expectedRow1 = createRow(createValue("column1", 999), createValue("column2", 999));
+        Row expectedRow2 = createRow(createValue("column1", 999), createValue("column2", 999), createValue("column3", 999));
         setExpectedRow(expectedRow1);
         setExpectedRow(expectedRow2);
         setActualRow(actualRow1);
@@ -163,7 +164,7 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
 
     @Test
     public void firstRowIsBetterMatch() throws Exception {
-        Row expectedRow1 = createExpectedRow(createColumn("column1", 11), createColumn("column2", 999));
+        Row expectedRow1 = createRow(createValue("column1", 11), createValue("column2", 999));
         setExpectedRow(expectedRow1);
         setActualRow(actualRow1);
         setActualRow(actualRow2);
@@ -175,7 +176,7 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
 
     @Test
     public void lastRowIsBetterMatch() throws Exception {
-        Row expectedRow1 = createExpectedRow(createColumn("column1", 999), createColumn("column2", 22));
+        Row expectedRow1 = createRow(createValue("column1", 999), createValue("column2", 22));
         setExpectedRow(expectedRow1);
         setActualRow(actualRow1);
         setActualRow(actualRow2);
@@ -187,8 +188,8 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
 
     @Test
     public void expectedNoMoreRecordsInDatabase() throws Exception {
-        setExpectedRow(createExpectedRow(createColumn("column1", 11)));
-        setExpectedRow(createExpectedRow(createColumn("column1", 21)));
+        setExpectedRow(createRow(createValue("column1", 11)));
+        setExpectedRow(createRow(createValue("column1", 21)));
         setEmptyExpectedRow();
         setActualRow(actualRow1);
         setActualRow(actualRow2);
@@ -200,8 +201,8 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
 
     @Test
     public void expectedNoMoreRecordsInDatabaseButFoundMore() throws Exception {
-        setExpectedRow(createExpectedRow(createColumn("column1", 11)));
-        setExpectedRow(createExpectedRow(createColumn("column1", 21)));
+        setExpectedRow(createRow(createValue("column1", 11)));
+        setExpectedRow(createRow(createValue("column1", 21)));
         setEmptyExpectedRow();
         setActualRow(actualRow1);
         setActualRow(actualRow2);
@@ -223,7 +224,7 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
 
     @Test
     public void noRowsInTable() throws Exception {
-        setExpectedRow(createExpectedRow(createColumn("column1", 11)));
+        setExpectedRow(createRow(createValue("column1", 11)));
 
         DataSetComparison dataSetComparison = defaultDataSetComparator.compare(dataSetRowSource.getMock(), emptyVariables);
         assertFalse(dataSetComparison.isMatch());
@@ -238,18 +239,6 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
     }
 
 
-    private Value createColumn(String name, Object value) {
-        return new Value(value, false, new Column(name, INTEGER, true));
-    }
-
-    private Row createExpectedRow(Value... values) {
-        Row expectedRow = new Row("schema.table");
-        for (Value value : values) {
-            expectedRow.addValue(value);
-        }
-        return expectedRow;
-    }
-
     private void setExpectedRow(Row row) throws Exception {
         dataSetRowSource.onceReturns(createDataSetRow()).getNextDataSetRow();
         dataSetRowProcessor.onceReturns(row).process(null, emptyVariables, null);
@@ -257,7 +246,7 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
 
     private void setEmptyExpectedRow() throws Exception {
         dataSetRowSource.onceReturns(createEmptyDataSetRow()).getNextDataSetRow();
-        dataSetRowProcessor.onceReturns(createExpectedRow()).process(null, emptyVariables, null);
+        dataSetRowProcessor.onceReturns(createRow()).process(null, emptyVariables, null);
     }
 
     private void setActualRow(Row row) throws Exception {
@@ -300,14 +289,14 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
 
 
     private DataSetRow createDataSetRow() {
-        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
+        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false, null);
         DataSetRow dataSetRow = new DataSetRow("schema", "table", null, false, dataSetSettings);
         dataSetRow.addDataSetValue(new DataSetValue("column", "value"));
         return dataSetRow;
     }
 
     private DataSetRow createEmptyDataSetRow() {
-        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
+        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false, null);
         return new DataSetRow("schema", "table", null, false, dataSetSettings);
     }
 

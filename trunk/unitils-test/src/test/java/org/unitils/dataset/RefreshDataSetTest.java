@@ -38,7 +38,7 @@ public class RefreshDataSetTest extends DataSetTestBase {
             refreshDataSetFile(this, "DataSetModuleDataSetTest-tableDoesNotExist.xml");
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertTrue(e.getMessage().contains("No table with name XXXX found in schema PUBLIC."));
+            assertTrue(e.getMessage().contains("No table found with name PUBLIC.XXXX"));
         }
     }
 }

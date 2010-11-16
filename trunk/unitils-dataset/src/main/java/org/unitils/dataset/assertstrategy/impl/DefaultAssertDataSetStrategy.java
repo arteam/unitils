@@ -17,8 +17,9 @@ package org.unitils.dataset.assertstrategy.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dbmaintain.database.IdentifierProcessor;
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.DataSetModuleFactoryHelper;
+import org.unitils.dataset.DataSetModuleFactory;
 import org.unitils.dataset.assertstrategy.AssertDataSetStrategy;
 import org.unitils.dataset.assertstrategy.DataSetComparator;
 import org.unitils.dataset.assertstrategy.DatabaseContentLogger;
@@ -26,10 +27,10 @@ import org.unitils.dataset.assertstrategy.model.ColumnDifference;
 import org.unitils.dataset.assertstrategy.model.DataSetComparison;
 import org.unitils.dataset.assertstrategy.model.RowComparison;
 import org.unitils.dataset.assertstrategy.model.TableComparison;
-import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.database.DataSetDatabaseHelper;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.loadstrategy.impl.BaseLoadDataSetStrategy;
 import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
-import org.unitils.dataset.loadstrategy.impl.IdentifierNameProcessor;
 import org.unitils.dataset.model.database.Row;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
@@ -53,16 +54,17 @@ public class DefaultAssertDataSetStrategy implements AssertDataSetStrategy {
     protected DatabaseContentLogger databaseContentLogger;
 
 
-    public void init(Properties configuration, DatabaseMetaData database) {
-        DataSetModuleFactoryHelper dataSetModuleFactoryHelper = new DataSetModuleFactoryHelper(configuration, database);
+    public void init(Properties configuration, DataSourceWrapper dataSourceWrapper, IdentifierProcessor identifierProcessor) {
+        // todo move out
+        DataSetModuleFactory dataSetModuleFactory = new DataSetModuleFactory(configuration, dataSourceWrapper, identifierProcessor);
 
-        IdentifierNameProcessor identifierNameProcessor = new IdentifierNameProcessor(database);
-        SqlTypeHandlerRepository sqlTypeHandlerRepository = dataSetModuleFactoryHelper.createSqlTypeHandlerRepository();
-        DataSetRowProcessor dataSetRowProcessor = new DataSetRowProcessor(identifierNameProcessor, sqlTypeHandlerRepository, database);
-        TableContentRetriever tableContentRetriever = new TableContentRetriever(database, sqlTypeHandlerRepository);
+        DataSetDatabaseHelper dataSetDatabaseHelper = new DataSetDatabaseHelper(dataSourceWrapper, identifierProcessor);
+        SqlTypeHandlerRepository sqlTypeHandlerRepository = dataSetModuleFactory.createSqlTypeHandlerRepository();
+        DataSetRowProcessor dataSetRowProcessor = new DataSetRowProcessor(dataSetDatabaseHelper, sqlTypeHandlerRepository, dataSourceWrapper);
+        TableContentRetriever tableContentRetriever = new TableContentRetriever(dataSourceWrapper, sqlTypeHandlerRepository);
 
-        this.dataSetComparator = dataSetModuleFactoryHelper.createDataSetComparator(dataSetRowProcessor, tableContentRetriever);
-        this.databaseContentLogger = dataSetModuleFactoryHelper.createDatabaseContentLogger(tableContentRetriever);
+        this.dataSetComparator = dataSetModuleFactory.createDataSetComparator(dataSetRowProcessor, tableContentRetriever);
+        this.databaseContentLogger = dataSetModuleFactory.createDatabaseContentLogger(tableContentRetriever);
     }
 
     /**
@@ -113,7 +115,7 @@ public class DefaultAssertDataSetStrategy implements AssertDataSetStrategy {
 
     protected void appendExpectedToBeEmptyButWasNotTableComparison(TableComparison tableComparison, StringBuilder result) {
         result.append("Expected no more database records in table ");
-        result.append(tableComparison.getQualifiedTableName());
+        result.append(tableComparison.getTableName());
         result.append(" but found more records.\n\n");
     }
 

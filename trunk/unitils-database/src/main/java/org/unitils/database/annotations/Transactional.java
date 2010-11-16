@@ -27,19 +27,19 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.unitils.database.util.TransactionMode.DEFAULT;
 
 /**
- * Annotation enabling to specify if tests should be run in a transaction and, if yes, whether at the end of the test,
+ * Annotation enabling to specify if tests should be run in a transaction and whether at the end of the test,
  * the transaction should be <i>committed</i> or <i>rolled back</i>.
  * <p/>
  * If this annotation is specified at class-level, it is valid for all tests in the annotated class and its subclasses. A
- * class level annotation overrides the settings of a super-class annotation.
+ * class level annotation overrides the settings of a super-class annotation. If this method is defined at method-level,
+ * it overrides the class level annotation.
  * <p/>
- * The value attribute defines whether the annotated test(s) run in a transaction and, if yes, what will be the
- * commit/rollback behavior. The default behavior is defined by the unitils property
- * <code>DatabaseModule.Transactional.value.default</code>. This configured default will be used when the value property
- * is unspecified or explicitly set to {@link TransactionMode#DEFAULT}.
+ * The default behavior is defined by the unitils property <code>DatabaseModule.Transactional.value.default</code>.
+ * This configured default will be used when the value property is unspecified or explicitly set to {@link TransactionMode#DEFAULT}.
+ * By default it is set to COMMIT.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  * @see TransactionMode
  */
 @Target({TYPE, METHOD})
@@ -50,21 +50,10 @@ public @interface Transactional {
     /**
      * Defines whether the annotated test(s) run in a transaction and, if yes, what will be commit/rollback behavior.
      * The default behavior is defined by the unitils property <code>DatabaseModule.Transactional.value.default</code>.
-     * This configured default will be used when the value property
-     * is unspecified or explicitly set to {@link TransactionMode#DEFAULT}.
+     * This configured default will be used when the value property is unspecified or explicitly set to {@link TransactionMode#DEFAULT}.
      *
      * @return The TransactionMode
      */
     TransactionMode value() default DEFAULT;
-
-    /**
-     * The name(s) of the transaction manager(s) that will participate in the transaction.
-     * This is only applicable if you have more than 1 transaction manager configured in a Spring application
-     * context. If you are using properties or there is only 1 bean of type PlatformTransactionManager defined,
-     * this should be left empty.
-     *
-     * @return The bean names of the transaction managers, empty by default
-     */
-    String[] transactionManagerBeanNames() default {};
 
 }

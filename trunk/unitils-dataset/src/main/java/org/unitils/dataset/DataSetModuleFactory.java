@@ -15,11 +15,13 @@
  */
 package org.unitils.dataset;
 
+import org.dbmaintain.database.IdentifierProcessor;
 import org.unitils.dataset.assertstrategy.AssertDataSetStrategy;
 import org.unitils.dataset.assertstrategy.DataSetComparator;
 import org.unitils.dataset.assertstrategy.DatabaseContentLogger;
 import org.unitils.dataset.assertstrategy.impl.TableContentRetriever;
-import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.database.DataSetDatabaseHelper;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.loadstrategy.LoadDataSetStrategy;
 import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
 import org.unitils.dataset.resolver.DataSetResolver;
@@ -38,46 +40,50 @@ import static org.unitils.core.util.ConfigUtils.getInstanceOf;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DataSetModuleFactoryHelper {
+public class DataSetModuleFactory {
 
     /* The unitils configuration */
     protected Properties configuration;
 
-    protected DatabaseMetaData databaseMetaData;
+    protected DataSourceWrapper dataSourceWrapper;
+    protected IdentifierProcessor identifierProcessor;
 
 
-    /**
-     * @param configuration    The unitils configuration, not null
-     * @param databaseMetaData The data base meta data, not null
-     */
-    public DataSetModuleFactoryHelper(Properties configuration, DatabaseMetaData databaseMetaData) {
+    public DataSetModuleFactory(Properties configuration, DataSourceWrapper dataSourceWrapper, IdentifierProcessor identifierProcessor) {
         this.configuration = configuration;
-        this.databaseMetaData = databaseMetaData;
+        this.dataSourceWrapper = dataSourceWrapper;
+        this.identifierProcessor = identifierProcessor;
     }
 
 
     public LoadDataSetStrategy createInsertDataSetStrategy() {
         LoadDataSetStrategy insertDataSetStrategy = getInstanceOf(LoadDataSetStrategy.class, configuration, "insert");
-        insertDataSetStrategy.init(configuration, databaseMetaData);
+        insertDataSetStrategy.init(configuration, dataSourceWrapper, identifierProcessor);
         return insertDataSetStrategy;
     }
 
     public LoadDataSetStrategy createCleanInsertDataSetStrategy() {
         LoadDataSetStrategy cleanInsertDataSetStrategy = getInstanceOf(LoadDataSetStrategy.class, configuration, "cleaninsert");
-        cleanInsertDataSetStrategy.init(configuration, databaseMetaData);
+        cleanInsertDataSetStrategy.init(configuration, dataSourceWrapper, identifierProcessor);
         return cleanInsertDataSetStrategy;
     }
 
     public LoadDataSetStrategy createRefreshDataSetStrategy() {
         LoadDataSetStrategy refreshDataSetStrategy = getInstanceOf(LoadDataSetStrategy.class, configuration, "refresh");
-        refreshDataSetStrategy.init(configuration, databaseMetaData);
+        refreshDataSetStrategy.init(configuration, dataSourceWrapper, identifierProcessor);
         return refreshDataSetStrategy;
+    }
+
+    public LoadDataSetStrategy createUpdateDataSetStrategy() {
+        LoadDataSetStrategy updateDataSetStrategy = getInstanceOf(LoadDataSetStrategy.class, configuration, "update");
+        updateDataSetStrategy.init(configuration, dataSourceWrapper, identifierProcessor);
+        return updateDataSetStrategy;
     }
 
 
     public AssertDataSetStrategy createAssertDataSetStrategy() {
         AssertDataSetStrategy defaultAssertDataSetStrategy = getInstanceOf(AssertDataSetStrategy.class, configuration);
-        defaultAssertDataSetStrategy.init(configuration, databaseMetaData);
+        defaultAssertDataSetStrategy.init(configuration, dataSourceWrapper, identifierProcessor);
         return defaultAssertDataSetStrategy;
     }
 
@@ -91,13 +97,13 @@ public class DataSetModuleFactoryHelper {
 
     public FileDataSetRowSourceFactory createFileDataSetRowSourceFactory() {
         FileDataSetRowSourceFactory xmlDataSetRowSourceFactory = getInstanceOf(FileDataSetRowSourceFactory.class, configuration);
-        xmlDataSetRowSourceFactory.init(configuration, databaseMetaData.getSchemaName());
+        xmlDataSetRowSourceFactory.init(configuration);
         return xmlDataSetRowSourceFactory;
     }
 
     public InlineDataSetRowSourceFactory createInlineDataSetRowSourceFactory() {
         InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = getInstanceOf(InlineDataSetRowSourceFactory.class, configuration);
-        inlineDataSetRowSourceFactory.init(configuration, databaseMetaData.getSchemaName());
+        inlineDataSetRowSourceFactory.init(configuration);
         return inlineDataSetRowSourceFactory;
     }
 
@@ -110,19 +116,21 @@ public class DataSetModuleFactoryHelper {
 
     public DataSetComparator createDataSetComparator(DataSetRowProcessor dataSetRowProcessor, TableContentRetriever tableContentRetriever) {
         DataSetComparator dataSetComparator = getInstanceOf(DataSetComparator.class, configuration);
-        dataSetComparator.init(dataSetRowProcessor, tableContentRetriever, databaseMetaData);
+        dataSetComparator.init(dataSetRowProcessor, tableContentRetriever, dataSourceWrapper);
         return dataSetComparator;
     }
 
     public DatabaseContentLogger createDatabaseContentLogger(TableContentRetriever tableContentRetriever) {
         DatabaseContentLogger databaseContentLogger = getInstanceOf(DatabaseContentLogger.class, configuration);
-        databaseContentLogger.init(databaseMetaData, tableContentRetriever);
+        // todo move out
+        DataSetDatabaseHelper dataSetDatabaseHelper = new DataSetDatabaseHelper(dataSourceWrapper, identifierProcessor);
+        databaseContentLogger.init(dataSourceWrapper, tableContentRetriever, dataSetDatabaseHelper);
         return databaseContentLogger;
     }
 
     public DataSetStructureGenerator createDataSetStructureGenerator() {
         DataSetStructureGenerator dataSetStructureGenerator = getInstanceOf(DataSetStructureGenerator.class, configuration);
-        dataSetStructureGenerator.init(databaseMetaData);
+        dataSetStructureGenerator.init(dataSourceWrapper);
         return dataSetStructureGenerator;
     }
 }

@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import org.unitils.util.PropertyUtils;
 
@@ -39,7 +39,7 @@ import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.util.DatabaseTestUtils.createDatabaseMetaData;
+import static org.unitils.dataset.util.DataSetTestUtils.createDataSourceWrapper;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
@@ -79,8 +79,8 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
             deleteDirectory(xsdDirectory);
         }
 
-        DatabaseMetaData databaseMetaData = createDatabaseMetaData();
-        xsdDataSetStructureGenerator.init(databaseMetaData);
+        DataSourceWrapper dataSourceWrapper = createDataSourceWrapper();
+        xsdDataSetStructureGenerator.init(dataSourceWrapper);
 
         dropTestTables();
         createTestTables();

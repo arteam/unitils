@@ -17,7 +17,7 @@ package org.unitils.dataset.assertstrategy;
 
 import org.unitils.dataset.assertstrategy.impl.TableContentRetriever;
 import org.unitils.dataset.assertstrategy.model.DataSetComparison;
-import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 
@@ -29,7 +29,7 @@ import java.util.List;
  */
 public interface DataSetComparator {
 
-    void init(DataSetRowProcessor dataSetRowProcessor, TableContentRetriever tableContentRetriever, DatabaseMetaData database);
+    void init(DataSetRowProcessor dataSetRowProcessor, TableContentRetriever tableContentRetriever, DataSourceWrapper dataSourceWrapper);
 
     DataSetComparison compare(DataSetRowSource expectedDataSetRowSource, List<String> variables);
 

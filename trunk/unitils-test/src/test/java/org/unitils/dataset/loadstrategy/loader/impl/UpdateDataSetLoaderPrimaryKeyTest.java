@@ -38,6 +38,7 @@ import java.util.Set;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.unitils.dataset.util.DataSetTestUtils.createRow;
 import static org.unitils.util.AssertionUtils.assertExceptionMessageContains;
 
 /**
@@ -66,8 +67,8 @@ public class UpdateDataSetLoaderPrimaryKeyTest extends UnitilsJUnit4 {
         updateDataSetLoader.init(dataSetRowProcessor.getMock(), databaseAccessor.getMock());
 
         dataSetRow = createDataSetRow();
-        rowPrimaryKey = createRow(true);
-        rowNoPrimaryKey = createRow(false);
+        rowPrimaryKey = createRow(new Value("value", false, new Column("column", 0, true)));
+        rowNoPrimaryKey = createRow(new Value("value", false, new Column("column", 0, false)));
 
         databaseAccessor.returns(1).executeUpdate(null, null);
         dataSetRowProcessor.returns(rowPrimaryKey).process(null, null, null);
@@ -117,18 +118,11 @@ public class UpdateDataSetLoaderPrimaryKeyTest extends UnitilsJUnit4 {
 
 
     private DataSetRow createDataSetRow() {
-        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
+        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false, null);
         DataSetRow dataSetRow = new DataSetRow("schema", "table", null, false, dataSetSettings);
         dataSetRow.addDataSetValue(new DataSetValue("column", "value"));
         return dataSetRow;
     }
-
-    private Row createRow(boolean primaryKey) {
-        Row row = new Row("schema.table");
-        row.addValue(new Value("value", false, new Column("column", 0, primaryKey)));
-        return row;
-    }
-
 
     private void assertExceptionContainsPkColumnNames(UnitilsException e, String... pkColumnNames) {
         String message = e.getCause().getMessage();

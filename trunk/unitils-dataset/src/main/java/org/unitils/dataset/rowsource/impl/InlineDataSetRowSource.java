@@ -27,53 +27,19 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.stripStart;
 
 /**
- * Data set row source that reads out a data set from an xml file.
- * <p/>
- * Following format is expected:
- * <code><pre>
- * &lt;dataset&gt;
- *      &lt;first_table  myColumn1="value1" myColumn2="value2" /&gt;
- *      &lt;second_table myColumnA="A" /&gt;
- *      &lt;first_table  myColumn2="other value2" /&gt;
- *      &lt;empty_table /&gt;
- * &lt;/dataset&gt;
- * </pre></code>
- * <p/>
- * Elements for a table may occur more than once and anywhere in the data set. If multiple elements
- * exist, they may specify different attributes (columns). Missing attributes (columns) will be treated as null values.
- * <p/>
- * Namespaces can be used to specify tables from different database schemas. The namespace URI should contain the name
- * of the database schema:
- * <code><pre>
- * &lt;dataset xmlns="SCHEMA_A" xmlns:b="SCHEMA_B"&gt;
- *      &lt;first_table  myColumn1="value1" myColumn2="value2" /&gt;
- *      &lt;b:second_table myColumnA="A" /&gt;
- *      &lt;first_table  myColumn2="other value2" /&gt;
- *      &lt;empty_table /&gt;
- * &lt;/dataset&gt;
- * </pre></code>
- * <p/>
- * This example defines 2 schemas: SCHEMA_A and SCHEMA_B. The first schema is set as default schema (=default namespace).
- * The 'first_table' table has no namespce and is therefore linked to SCHEMA_A. The 'second_table' table is prefixed
- * with namespace b which is linked to SCHEMA_B. If no default namespace is defined, the schema that is
- * passed as constructor argument is taken as default schema.
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public class InlineDataSetRowSource implements DataSetRowSource {
 
     protected List<String> inlineDataSet;
-    /* The schema name to use when none is specified */
-    protected String defaultSchemaName;
     /* The default settings of the data set */
     protected DataSetSettings defaultDataSetSettings;
 
     protected int currentIndex;
 
-    public InlineDataSetRowSource(List<String> inlineDataSet, String defaultSchemaName, DataSetSettings defaultDataSetSettings) {
+    public InlineDataSetRowSource(List<String> inlineDataSet, DataSetSettings defaultDataSetSettings) {
         this.inlineDataSet = inlineDataSet;
-        this.defaultSchemaName = defaultSchemaName;
         this.defaultDataSetSettings = defaultDataSetSettings;
     }
 
@@ -89,6 +55,12 @@ public class InlineDataSetRowSource implements DataSetRowSource {
         currentIndex = 0;
     }
 
+    /**
+     * @return The general properties of the data set, not null
+     */
+    public DataSetSettings getDataSetSettings() {
+        return defaultDataSetSettings;
+    }
 
     /**
      * @return the next row from the data set, null if the end of the data set is reached.
@@ -139,7 +111,7 @@ public class InlineDataSetRowSource implements DataSetRowSource {
     protected String getSchemaName(String qualifiedTableName) {
         int index = qualifiedTableName.indexOf('.');
         if (index == -1) {
-            return defaultSchemaName;
+            return null;
         }
         return qualifiedTableName.substring(0, index);
     }

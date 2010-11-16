@@ -16,6 +16,7 @@
 package org.unitils.dataset.rowsource;
 
 import org.unitils.dataset.model.dataset.DataSetRow;
+import org.unitils.dataset.model.dataset.DataSetSettings;
 
 /**
  * A source for reading out data set rows.
@@ -32,6 +33,11 @@ public interface DataSetRowSource {
      * Don't forget to call close afterwards.
      */
     void open();
+
+    /**
+     * @return The general properties of the data set, not null
+     */
+    DataSetSettings getDataSetSettings();
 
     /**
      * @return the next row from the opened data set, null if the end of the data set is reached.

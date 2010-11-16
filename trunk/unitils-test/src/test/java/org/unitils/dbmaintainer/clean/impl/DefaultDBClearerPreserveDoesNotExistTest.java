@@ -28,8 +28,8 @@ import java.util.Properties;
 
 import static org.dbmaintain.config.DbMaintainProperties.*;
 import static org.junit.Assert.fail;
-import static org.unitils.database.DatabaseUnitils.clearDatabase;
 import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
+import static org.unitils.database.DbMaintainUnitils.clearDatabase;
 import static org.unitils.testutil.TestUnitilsConfiguration.reinitializeUnitils;
 import static org.unitils.testutil.TestUnitilsConfiguration.resetUnitils;
 

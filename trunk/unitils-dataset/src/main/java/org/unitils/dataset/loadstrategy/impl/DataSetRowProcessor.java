@@ -15,9 +15,11 @@
  */
 package org.unitils.dataset.loadstrategy.impl;
 
-import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.database.DataSetDatabaseHelper;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.Row;
+import org.unitils.dataset.model.database.TableName;
 import org.unitils.dataset.model.database.Value;
 import org.unitils.dataset.model.dataset.DataSetRow;
 import org.unitils.dataset.model.dataset.DataSetSettings;
@@ -36,32 +38,33 @@ import java.util.Set;
  */
 public class DataSetRowProcessor {
 
-    protected IdentifierNameProcessor identifierNameProcessor;
+    protected DataSetDatabaseHelper dataSetDatabaseHelper;
     protected SqlTypeHandlerRepository sqlTypeHandlerRepository;
-    protected DatabaseMetaData databaseMetaData;
+    protected DataSourceWrapper dataSourceWrapper;
 
 
-    public DataSetRowProcessor(IdentifierNameProcessor identifierNameProcessor, SqlTypeHandlerRepository sqlTypeHandlerRepository, DatabaseMetaData databaseMetaData) {
-        this.identifierNameProcessor = identifierNameProcessor;
+    public DataSetRowProcessor(DataSetDatabaseHelper dataSetDatabaseHelper, SqlTypeHandlerRepository sqlTypeHandlerRepository, DataSourceWrapper dataSourceWrapper) {
+        this.dataSetDatabaseHelper = dataSetDatabaseHelper;
         this.sqlTypeHandlerRepository = sqlTypeHandlerRepository;
-        this.databaseMetaData = databaseMetaData;
+        this.dataSourceWrapper = dataSourceWrapper;
     }
 
 
     public Row process(DataSetRow dataSetRow, List<String> variables, Set<String> unusedPrimaryKeyColumnNames) throws Exception {
         DataSetSettings dataSetSettings = dataSetRow.getDataSetSettings();
 
-        String qualifiedTableName = identifierNameProcessor.getQualifiedTableName(dataSetRow);
-        databaseMetaData.assertTableNameExists(qualifiedTableName);
-        databaseMetaData.addExtraParentColumnsForChild(dataSetRow);
+        TableName tableName = dataSourceWrapper.getTableName(dataSetRow.getSchemaName(), dataSetRow.getTableName(), dataSetSettings.isCaseSensitive());
 
-        Row row = new Row(qualifiedTableName);
+        dataSourceWrapper.assertTableNameExists(tableName);
+        dataSetDatabaseHelper.addExtraParentColumnsForChild(dataSetRow);
 
-        Set<String> allPrimaryKeyColumnNames = databaseMetaData.getPrimaryKeyColumnNames(qualifiedTableName);
+        Row row = new Row(tableName);
+
+        Set<String> allPrimaryKeyColumnNames = dataSourceWrapper.getPrimaryKeyColumnNames(tableName);
         Set<String> remainingPrimaryKeyColumnNames = new HashSet<String>(allPrimaryKeyColumnNames);
 
         for (DataSetValue dataSetValue : dataSetRow.getColumns()) {
-            Column column = createColumn(qualifiedTableName, dataSetValue, dataSetSettings, allPrimaryKeyColumnNames, remainingPrimaryKeyColumnNames);
+            Column column = createColumn(tableName, dataSetValue, dataSetSettings, allPrimaryKeyColumnNames, remainingPrimaryKeyColumnNames);
             Value value = createValue(dataSetValue, column, variables, dataSetSettings);
             row.addValue(value);
         }
@@ -70,9 +73,9 @@ public class DataSetRowProcessor {
         return row;
     }
 
-    protected Column createColumn(String qualifiedTableName, DataSetValue dataSetValue, DataSetSettings dataSetSettings, Set<String> allPrimaryKeyColumnNames, Set<String> remainingPrimaryKeyColumnNames) throws Exception {
-        String columnName = identifierNameProcessor.getCorrectCaseColumnName(dataSetValue.getColumnName(), dataSetSettings);
-        int sqlType = databaseMetaData.getColumnSqlType(qualifiedTableName, columnName);
+    protected Column createColumn(TableName tableName, DataSetValue dataSetValue, DataSetSettings dataSetSettings, Set<String> allPrimaryKeyColumnNames, Set<String> remainingPrimaryKeyColumnNames) throws Exception {
+        String columnName = dataSetDatabaseHelper.getCorrectCaseColumnName(dataSetValue.getColumnName(), dataSetSettings);
+        int sqlType = dataSourceWrapper.getColumnSqlType(tableName, columnName);
         boolean primaryKey = isPrimaryKeyColumn(columnName, allPrimaryKeyColumnNames, remainingPrimaryKeyColumnNames);
 
         return new Column(columnName, sqlType, primaryKey);
@@ -174,7 +177,7 @@ public class DataSetRowProcessor {
     }
 
     protected boolean isPrimaryKeyColumn(String columnName, Set<String> allPrimaryKeyColumnNames, Set<String> remainingPrimaryKeyColumnNames) {
-        String columnNameWithoutQuotes = databaseMetaData.removeIdentifierQuotes(columnName);
+        String columnNameWithoutQuotes = dataSetDatabaseHelper.removeIdentifierQuotes(columnName);
         String matchedPrimaryKeyColumnName = null;
         for (String primaryKeyColumnName : allPrimaryKeyColumnNames) {
             if (primaryKeyColumnName.equals(columnNameWithoutQuotes)) {

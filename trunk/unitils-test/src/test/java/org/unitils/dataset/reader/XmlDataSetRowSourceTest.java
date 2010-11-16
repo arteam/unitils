@@ -47,7 +47,7 @@ public class XmlDataSetRowSourceTest extends UnitilsJUnit4 {
 
     @Before
     public void setUp() throws Exception {
-        defaultDataSetSettings = new DataSetSettings('=', '$', false);
+        defaultDataSetSettings = new DataSetSettings('=', '$', false, null);
     }
 
     @After
@@ -58,17 +58,17 @@ public class XmlDataSetRowSourceTest extends UnitilsJUnit4 {
 
     @Test
     public void readTwoRows() throws Exception {
-        xmlDataSetRowSource = new XmlDataSetRowSource(getDataSetFile("LessColumnsLastDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetRowSource = new XmlDataSetRowSource(getDataSetFile("LessColumnsLastDataSet.xml"), defaultDataSetSettings);
         xmlDataSetRowSource.open();
 
         DataSetRow row1 = xmlDataSetRowSource.getNextDataSetRow();
-        assertEquals("SCHEMA_A", row1.getSchemaName());
+        assertNull(row1.getSchemaName());
         assertEquals("TABLE_A", row1.getTableName());
         assertColumnNames(row1, "COLUMN_1", "COLUMN_2", "COLUMN_3");
         assertColumnValues(row1, "1", "2", "3");
 
         DataSetRow row2 = xmlDataSetRowSource.getNextDataSetRow();
-        assertEquals("SCHEMA_A", row2.getSchemaName());
+        assertNull(row2.getSchemaName());
         assertEquals("TABLE_A", row2.getTableName());
         assertColumnNames(row2, "COLUMN_2");
         assertColumnValues(row2, "4");
@@ -79,7 +79,7 @@ public class XmlDataSetRowSourceTest extends UnitilsJUnit4 {
 
     @Test
     public void lessColumnsForLastRow() throws Exception {
-        xmlDataSetRowSource = new XmlDataSetRowSource(getDataSetFile("LessColumnsLastDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetRowSource = new XmlDataSetRowSource(getDataSetFile("LessColumnsLastDataSet.xml"), defaultDataSetSettings);
         xmlDataSetRowSource.open();
 
         DataSetRow row1 = xmlDataSetRowSource.getNextDataSetRow();
@@ -93,7 +93,7 @@ public class XmlDataSetRowSourceTest extends UnitilsJUnit4 {
 
     @Test
     public void lessColumnsForFirstRow() throws Exception {
-        xmlDataSetRowSource = new XmlDataSetRowSource(getDataSetFile("LessColumnsFirstDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetRowSource = new XmlDataSetRowSource(getDataSetFile("LessColumnsFirstDataSet.xml"), defaultDataSetSettings);
         xmlDataSetRowSource.open();
 
         DataSetRow row1 = xmlDataSetRowSource.getNextDataSetRow();
@@ -107,7 +107,7 @@ public class XmlDataSetRowSourceTest extends UnitilsJUnit4 {
 
     @Test
     public void parentChild() throws Exception {
-        xmlDataSetRowSource = new XmlDataSetRowSource(getDataSetFile("ParentChildDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetRowSource = new XmlDataSetRowSource(getDataSetFile("ParentChildDataSet.xml"), defaultDataSetSettings);
         xmlDataSetRowSource.open();
 
         DataSetRow row1 = xmlDataSetRowSource.getNextDataSetRow();
@@ -127,7 +127,7 @@ public class XmlDataSetRowSourceTest extends UnitilsJUnit4 {
 
     @Test
     public void notExists() throws Exception {
-        xmlDataSetRowSource = new XmlDataSetRowSource(getDataSetFile("NotExistsDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetRowSource = new XmlDataSetRowSource(getDataSetFile("NotExistsDataSet.xml"), defaultDataSetSettings);
         xmlDataSetRowSource.open();
 
         DataSetRow row1 = xmlDataSetRowSource.getNextDataSetRow();
@@ -140,7 +140,7 @@ public class XmlDataSetRowSourceTest extends UnitilsJUnit4 {
 
     @Test
     public void fullyQualifiedWithNamespacesAndXsdDeclarations() throws Exception {
-        xmlDataSetRowSource = new XmlDataSetRowSource(getDataSetFile("FullyQualifiedDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetRowSource = new XmlDataSetRowSource(getDataSetFile("FullyQualifiedDataSet.xml"), defaultDataSetSettings);
         xmlDataSetRowSource.open();
 
         DataSetRow row1 = xmlDataSetRowSource.getNextDataSetRow();

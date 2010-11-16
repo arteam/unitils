@@ -31,7 +31,7 @@ import static org.junit.Assert.fail;
 import static org.unitils.core.util.SQLTestUtils.dropTestSequences;
 import static org.unitils.core.util.SQLTestUtils.dropTestTables;
 import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
-import static org.unitils.database.DatabaseUnitils.updateSequences;
+import static org.unitils.database.DbMaintainUnitils.updateSequences;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.getItemAsLong;
 import static org.unitils.testutil.TestUnitilsConfiguration.*;

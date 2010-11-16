@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package org.unitils.core.util;
 
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-
-import java.util.Properties;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.util.PropertyUtils;
+
+import java.util.Properties;
+
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
 /**
  * Class containing configuration related utilities
@@ -35,7 +35,7 @@ public class ConfigUtils {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(ConfigUtils.class);
 
-    
+
     /**
      * Retrieves the concrete instance of the class with the given type as configured by the given <code>Configuration</code>.
      * Tries to retrieve a specific implementation first (propery key = fully qualified name of the interface
@@ -71,7 +71,6 @@ public class ConfigUtils {
     @SuppressWarnings({"unchecked"})
     public static <T> T getInstanceOf(Class<? extends T> type, Properties configuration, String... implementationDiscriminatorValues) {
         String implClassName = getConfiguredClassName(type, configuration, implementationDiscriminatorValues);
-        logger.debug("Creating instance of " + type + ". Implementation class " + implClassName);
         return (T) createInstanceOfType(implClassName, false);
     }
 

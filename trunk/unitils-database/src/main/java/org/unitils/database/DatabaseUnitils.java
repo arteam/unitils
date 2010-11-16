@@ -15,10 +15,10 @@
  */
 package org.unitils.database;
 
-import org.dbmaintain.MainFactory;
 import org.dbmaintain.database.Database;
 import org.unitils.core.Unitils;
-import org.unitils.database.transaction.UnitilsDataSourceManager;
+import org.unitils.database.manager.DbMaintainManager;
+import org.unitils.database.manager.UnitilsDataSourceManager;
 import org.unitils.database.transaction.UnitilsTransactionManager;
 
 import javax.sql.DataSource;
@@ -53,7 +53,7 @@ public class DatabaseUnitils {
      * Returns the DataSource that connects to the test database
      *
      * @param databaseName The name of the database to get a data source for, null for the default database
-     * @return The DataSource that connects to the test database
+     * @return The DataSource that connects to the test database, not null
      */
     public static DataSource getDataSource(String databaseName) {
         return getUnitilsDataSourceManager().getDataSource(databaseName, null);
@@ -63,6 +63,28 @@ public class DatabaseUnitils {
         DataSource dataSource = getDataSource(databaseName);
         getUnitilsTransactionManager().startTransactionForDataSource(dataSource);
         return dataSource;
+    }
+
+
+    /**
+     * Returns the default {@link UnitilsDataSource} that connects to the test database. This is a wrapper around the data source
+     * and adds some extra info like the schema names that the data source uses.
+     *
+     * @return The UnitilsDataSource that connects to the test database, not null
+     */
+    public static UnitilsDataSource getUnitilsDataSource() {
+        return getUnitilsDataSource(null);
+    }
+
+    /**
+     * Returns the {@link UnitilsDataSource} that connects to the test database. This is a wrapper around the data source
+     * and adds some extra info like the schema names that the data source uses.
+     *
+     * @param databaseName The name of the database to get a data source for, null for the default database
+     * @return The UnitilsDataSource that connects to the test database, not null
+     */
+    public static UnitilsDataSource getUnitilsDataSource(String databaseName) {
+        return getUnitilsDataSourceManager().getUnitilsDataSource(databaseName, null);
     }
 
 
@@ -78,7 +100,7 @@ public class DatabaseUnitils {
      * @return The utility classes for working with the database. For example for getting all table names within a schema.
      */
     public static Database getDatabase(String databaseName) {
-        return getDatabaseModule().getDatabase(databaseName);
+        return getDbMaintainManager().getDatabase(databaseName);
     }
 
 
@@ -115,48 +137,8 @@ public class DatabaseUnitils {
      * latest changes. See {@link org.dbmaintain.DbMaintainer} for more information.
      */
     public static void updateDatabaseIfNeeded() {
-        getDatabaseModule().updateDatabaseIfNeeded(null);
+        getDbMaintainManager().updateDatabaseIfNeeded(null);
     }
-
-    /**
-     * Updates the database version to the current version, without issuing any other updates to the database.
-     * This method can be used for example after you've manually brought the database to the latest version, but
-     * the database version is not yet set to the current one. This method can also be useful for example for
-     * reinitializing the database after having reorganized the scripts folder.
-     */
-    public static void markDatabaseAsUpToDate() {
-        getMainFactory().createDbMaintainer().markDatabaseAsUpToDate();
-    }
-
-    /**
-     * Clears all configured schema's. I.e. drops all tables, views and other database objects.
-     */
-    public static void clearDatabase() {
-        getMainFactory().createDBClearer().clearDatabase();
-    }
-
-    /**
-     * Cleans all configured schema's. I.e. removes all data from its database tables.
-     */
-    public static void cleanDatabase() {
-        getMainFactory().createDBCleaner().cleanDatabase();
-    }
-
-    /**
-     * Disables all foreign key and not-null constraints on the configured schema's.
-     */
-    public static void disableConstraints() {
-        getMainFactory().createConstraintsDisabler().disableConstraints();
-    }
-
-    /**
-     * Updates all sequences that have a value below a certain configurable treshold to become equal
-     * to this treshold
-     */
-    public static void updateSequences() {
-        getMainFactory().createSequenceUpdater().updateSequences();
-    }
-
 
     /**
      * Gets the instance DatabaseModule that is registered in the modules repository.
@@ -165,19 +147,19 @@ public class DatabaseUnitils {
      *
      * @return the instance, not null
      */
-    private static DatabaseModule getDatabaseModule() {
+    public static DatabaseModule getDatabaseModule() {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
     }
 
-    private static UnitilsTransactionManager getUnitilsTransactionManager() {
+    public static UnitilsTransactionManager getUnitilsTransactionManager() {
         return getDatabaseModule().getUnitilsTransactionManager();
     }
 
-    private static UnitilsDataSourceManager getUnitilsDataSourceManager() {
+    public static UnitilsDataSourceManager getUnitilsDataSourceManager() {
         return getDatabaseModule().getUnitilsDataSourceManager();
     }
 
-    private static MainFactory getMainFactory() {
-        return getDatabaseModule().getDbMaintainMainFactory();
+    public static DbMaintainManager getDbMaintainManager() {
+        return getDatabaseModule().getDbMaintainManager();
     }
 }

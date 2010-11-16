@@ -37,7 +37,7 @@ import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.util.DatabaseTestUtils.createDatabases;
+import static org.unitils.dataset.util.DataSetTestUtils.createDatabases;
 import static org.unitils.dbunit.structure.impl.XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME;
 import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfiguration;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;

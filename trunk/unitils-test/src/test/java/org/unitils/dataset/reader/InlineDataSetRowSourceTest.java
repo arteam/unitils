@@ -46,7 +46,7 @@ public class InlineDataSetRowSourceTest extends UnitilsJUnit4 {
 
     @Before
     public void setUp() throws Exception {
-        defaultDataSetSettings = new DataSetSettings('=', '$', false);
+        defaultDataSetSettings = new DataSetSettings('=', '$', false, null);
     }
 
     @After
@@ -58,7 +58,7 @@ public class InlineDataSetRowSourceTest extends UnitilsJUnit4 {
     @Test
     public void getNextDataSetRow() throws Exception {
         List<String> dataSet = asList("SCHEMA_A.TABLE_A COL1=test, col2=5  , col3  =   spaces  ");
-        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, "SCHEMA_A", defaultDataSetSettings);
+        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, defaultDataSetSettings);
         inlineDataSetRowSource.open();
 
         DataSetRow row1 = inlineDataSetRowSource.getNextDataSetRow();
@@ -71,7 +71,7 @@ public class InlineDataSetRowSourceTest extends UnitilsJUnit4 {
     @Test
     public void quotedValues() throws Exception {
         List<String> dataSet = asList("SCHEMA_A.TABLE_A COL1='test', col2='5  ', col3  ='  ,spaces  '  ");
-        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, "SCHEMA_A", defaultDataSetSettings);
+        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, defaultDataSetSettings);
         inlineDataSetRowSource.open();
 
         DataSetRow row1 = inlineDataSetRowSource.getNextDataSetRow();
@@ -84,7 +84,7 @@ public class InlineDataSetRowSourceTest extends UnitilsJUnit4 {
     @Test(expected = UnitilsException.class)
     public void invalidTextAfterFinalQuotes() throws Exception {
         List<String> dataSet = asList("SCHEMA_A.TABLE_A COL1='test' xxx");
-        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, "SCHEMA_A", defaultDataSetSettings);
+        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, defaultDataSetSettings);
         inlineDataSetRowSource.open();
         inlineDataSetRowSource.getNextDataSetRow();
     }
@@ -92,7 +92,7 @@ public class InlineDataSetRowSourceTest extends UnitilsJUnit4 {
     @Test
     public void twoRows() throws Exception {
         List<String> dataSet = asList("schema1.table1 column1=1", "schema2.table2 column2=2");
-        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, "SCHEMA_A", defaultDataSetSettings);
+        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, defaultDataSetSettings);
         inlineDataSetRowSource.open();
 
         DataSetRow row1 = inlineDataSetRowSource.getNextDataSetRow();
@@ -114,18 +114,18 @@ public class InlineDataSetRowSourceTest extends UnitilsJUnit4 {
     @Test
     public void defaultSchemaName() throws Exception {
         List<String> dataSet = asList("table column=1");
-        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, "SCHEMA_A", defaultDataSetSettings);
+        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, defaultDataSetSettings);
         inlineDataSetRowSource.open();
 
         DataSetRow row = inlineDataSetRowSource.getNextDataSetRow();
-        assertEquals("SCHEMA_A", row.getSchemaName());
+        assertNull(row.getSchemaName());
         assertEquals("table", row.getTableName());
     }
 
     @Test
     public void escapedCommas() throws Exception {
         List<String> dataSet = asList("table col1=,,,col2=,,,,");
-        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, "SCHEMA_A", defaultDataSetSettings);
+        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, defaultDataSetSettings);
         inlineDataSetRowSource.open();
 
         DataSetRow row = inlineDataSetRowSource.getNextDataSetRow();
@@ -136,7 +136,7 @@ public class InlineDataSetRowSourceTest extends UnitilsJUnit4 {
     @Test
     public void escapedQuotes() throws Exception {
         List<String> dataSet = asList("table col1='''', col2='', col3=''''''");
-        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, "SCHEMA_A", defaultDataSetSettings);
+        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, defaultDataSetSettings);
         inlineDataSetRowSource.open();
 
         DataSetRow row = inlineDataSetRowSource.getNextDataSetRow();
@@ -147,7 +147,7 @@ public class InlineDataSetRowSourceTest extends UnitilsJUnit4 {
     @Test
     public void spaces() throws Exception {
         List<String> dataSet = asList("table col1=    'a '' value'   , col2  = d , col3 =  , col4=,col5 = 'a'   ");
-        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, "SCHEMA_A", defaultDataSetSettings);
+        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, defaultDataSetSettings);
         inlineDataSetRowSource.open();
 
         DataSetRow row = inlineDataSetRowSource.getNextDataSetRow();
@@ -158,7 +158,7 @@ public class InlineDataSetRowSourceTest extends UnitilsJUnit4 {
     @Test(expected = UnitilsException.class)
     public void quotesNotClosed() throws Exception {
         List<String> dataSet = asList("table col1=' , col2=d");
-        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, "SCHEMA_A", defaultDataSetSettings);
+        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, defaultDataSetSettings);
         inlineDataSetRowSource.open();
         inlineDataSetRowSource.getNextDataSetRow();
     }
@@ -166,7 +166,7 @@ public class InlineDataSetRowSourceTest extends UnitilsJUnit4 {
     @Test
     public void notExists() throws Exception {
         List<String> dataSet = asList("!table col1=a");
-        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, "SCHEMA_A", defaultDataSetSettings);
+        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, defaultDataSetSettings);
         inlineDataSetRowSource.open();
 
         DataSetRow row = inlineDataSetRowSource.getNextDataSetRow();
@@ -179,7 +179,7 @@ public class InlineDataSetRowSourceTest extends UnitilsJUnit4 {
     @Test
     public void notExistsWithSpaces() throws Exception {
         List<String> dataSet = asList(" ! table col1=a");
-        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, "SCHEMA_A", defaultDataSetSettings);
+        inlineDataSetRowSource = new InlineDataSetRowSource(dataSet, defaultDataSetSettings);
         inlineDataSetRowSource.open();
 
         DataSetRow row = inlineDataSetRowSource.getNextDataSetRow();

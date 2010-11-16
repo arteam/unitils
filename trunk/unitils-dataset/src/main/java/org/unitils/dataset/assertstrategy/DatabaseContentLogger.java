@@ -17,7 +17,8 @@ package org.unitils.dataset.assertstrategy;
 
 import org.unitils.dataset.assertstrategy.impl.TableContentRetriever;
 import org.unitils.dataset.assertstrategy.model.DataSetComparison;
-import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.database.DataSetDatabaseHelper;
+import org.unitils.dataset.database.DataSourceWrapper;
 
 /**
  * @author Tim Ducheyne
@@ -25,7 +26,7 @@ import org.unitils.dataset.database.DatabaseMetaData;
  */
 public interface DatabaseContentLogger {
 
-    void init(DatabaseMetaData database, TableContentRetriever tableContentRetriever);
+    void init(DataSourceWrapper dataSourceWrapper, TableContentRetriever tableContentRetriever, DataSetDatabaseHelper dataSetDatabaseHelper);
 
     String getDatabaseContentForComparison(DataSetComparison dataSetComparison);
 

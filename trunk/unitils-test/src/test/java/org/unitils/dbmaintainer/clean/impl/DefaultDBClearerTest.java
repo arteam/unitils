@@ -30,8 +30,8 @@ import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_AUTO_CREATE_DB
 import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_EXECUTED_SCRIPTS_TABLE_NAME;
 import static org.junit.Assert.*;
 import static org.unitils.core.util.SQLTestUtils.*;
-import static org.unitils.database.DatabaseUnitils.clearDatabase;
 import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
+import static org.unitils.database.DbMaintainUnitils.clearDatabase;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.testutil.TestUnitilsConfiguration.*;
 

@@ -35,7 +35,7 @@ import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.toFile;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class XmlDataSetRowSourceDataSetSettingsTest extends UnitilsJUnit4 {
+public class XmlDataSetRowSourceGetDataSetSettingsTest extends UnitilsJUnit4 {
 
     /* Tested object */
     private XmlDataSetRowSource xmlDataSetStaxReader;
@@ -45,7 +45,7 @@ public class XmlDataSetRowSourceDataSetSettingsTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() throws Exception {
-        defaultDataSetSettings = new DataSetSettings('=', '$', false);
+        defaultDataSetSettings = new DataSetSettings('=', '$', false, null);
     }
 
     @After
@@ -56,23 +56,28 @@ public class XmlDataSetRowSourceDataSetSettingsTest extends UnitilsJUnit4 {
 
     @Test
     public void defaultDataSetAttributes() throws Exception {
-        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("LessColumnsLastDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("LessColumnsLastDataSet.xml"), defaultDataSetSettings);
         xmlDataSetStaxReader.open();
 
-        DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
-        DataSetSettings dataSetSettings1 = row1.getDataSetSettings();
+        DataSetSettings dataSetSettings1 = xmlDataSetStaxReader.getDataSetSettings();
         assertEquals('=', dataSetSettings1.getLiteralToken());
         assertEquals('$', dataSetSettings1.getVariableToken());
         assertFalse(dataSetSettings1.isCaseSensitive());
+    }
 
-        DataSetRow row2 = xmlDataSetStaxReader.getNextDataSetRow();
-        DataSetSettings dataSetSettings2 = row2.getDataSetSettings();
+    @Test
+    public void sameInstanceReturned() throws Exception {
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("LessColumnsLastDataSet.xml"), defaultDataSetSettings);
+        xmlDataSetStaxReader.open();
+
+        DataSetSettings dataSetSettings1 = xmlDataSetStaxReader.getDataSetSettings();
+        DataSetSettings dataSetSettings2 = xmlDataSetStaxReader.getDataSetSettings();
         assertSame(dataSetSettings1, dataSetSettings2);
     }
 
     @Test
     public void dataSetSettingsReusedForEveryRow() throws Exception {
-        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("LessColumnsLastDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("LessColumnsLastDataSet.xml"), defaultDataSetSettings);
         xmlDataSetStaxReader.open();
 
         DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
@@ -85,11 +90,10 @@ public class XmlDataSetRowSourceDataSetSettingsTest extends UnitilsJUnit4 {
 
     @Test
     public void overridingDataSetAttributes() throws Exception {
-        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("OverridingAttributesDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("OverridingAttributesDataSet.xml"), defaultDataSetSettings);
         xmlDataSetStaxReader.open();
 
-        DataSetRow row = xmlDataSetStaxReader.getNextDataSetRow();
-        DataSetSettings dataSetSettings = row.getDataSetSettings();
+        DataSetSettings dataSetSettings = xmlDataSetStaxReader.getDataSetSettings();
         assertEquals('%', dataSetSettings.getLiteralToken());
         assertEquals(':', dataSetSettings.getVariableToken());
         assertTrue(dataSetSettings.isCaseSensitive());
@@ -97,23 +101,20 @@ public class XmlDataSetRowSourceDataSetSettingsTest extends UnitilsJUnit4 {
 
     @Test(expected = UnitilsException.class)
     public void invalidCaseSensitiveValue() throws Exception {
-        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("InvalidCaseSensitiveValueDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("InvalidCaseSensitiveValueDataSet.xml"), defaultDataSetSettings);
         xmlDataSetStaxReader.open();
-        xmlDataSetStaxReader.getNextDataSetRow();
     }
 
     @Test(expected = UnitilsException.class)
     public void invalidLiteralTokenValue() throws Exception {
-        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("InvalidLiteralTokenValueDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("InvalidLiteralTokenValueDataSet.xml"), defaultDataSetSettings);
         xmlDataSetStaxReader.open();
-        xmlDataSetStaxReader.getNextDataSetRow();
     }
 
     @Test(expected = UnitilsException.class)
     public void invalidVariableTokenValue() throws Exception {
-        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("InvalidVariableTokenValueDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("InvalidVariableTokenValueDataSet.xml"), defaultDataSetSettings);
         xmlDataSetStaxReader.open();
-        xmlDataSetStaxReader.getNextDataSetRow();
     }
 
 

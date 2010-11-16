@@ -18,6 +18,7 @@ package org.unitils.dataset.assertstrategy.impl;
 import org.unitils.core.util.DbUtils;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.Row;
+import org.unitils.dataset.model.database.TableName;
 import org.unitils.dataset.model.database.Value;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandler;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
@@ -36,8 +37,8 @@ import java.util.Set;
  */
 public class TableContents {
 
-    protected String qualifiedTableName;
-    protected List<Column> columns;
+    protected TableName tableName;
+    protected Set<Column> columns;
 
     protected Connection connection;
     protected PreparedStatement preparedStatement;
@@ -51,8 +52,8 @@ public class TableContents {
     protected boolean useRowIndexAsIdentifier = false;
 
 
-    public TableContents(String qualifiedTableName, List<Column> columns, SqlTypeHandlerRepository sqlTypeHandlerRepository, Set<String> primaryKeyColumnNames, Connection connection, PreparedStatement preparedStatement, ResultSet resultSet) {
-        this.qualifiedTableName = qualifiedTableName;
+    public TableContents(TableName tableName, Set<Column> columns, SqlTypeHandlerRepository sqlTypeHandlerRepository, Set<String> primaryKeyColumnNames, Connection connection, PreparedStatement preparedStatement, ResultSet resultSet) {
+        this.tableName = tableName;
         this.columns = columns;
         this.sqlTypeHandlerRepository = sqlTypeHandlerRepository;
         this.primaryKeyColumnNames = primaryKeyColumnNames;
@@ -97,23 +98,23 @@ public class TableContents {
             return null;
         }
         rowIndex++;
-        Row row = new Row(getRowIdentifier(), qualifiedTableName);
+        Row row = new Row(getRowIdentifier(), tableName);
 
-        for (int i = 0; i < columns.size(); i++) {
-            Column column = columns.get(i);
-
+        int index = 1;
+        for (Column column : columns) {
             int sqlType = column.getSqlType();
             SqlTypeHandler<?> sqlTypeHandler = sqlTypeHandlerRepository.getSqlTypeHandler(sqlType);
 
-            Object value = sqlTypeHandler.getResultSetValue(resultSet, i + 1, sqlType);
+            Object value = sqlTypeHandler.getResultSetValue(resultSet, index, sqlType);
             row.addValue(new Value(value, false, column));
+            index++;
         }
         return row;
     }
 
     protected Object getValue(Column column, SqlTypeHandler sqlTypeHandler) throws Exception {
         // todo not correct
-        int index = columns.indexOf(column) + 1;
+        int index = new ArrayList<Column>(columns).indexOf(column) + 1;
 
         int sqlType = column.getSqlType();
         return sqlTypeHandler.getResultSetValue(resultSet, index, sqlType);

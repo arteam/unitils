@@ -26,6 +26,7 @@ import org.unitils.dataset.rowsource.impl.XmlDataSetRowSource;
 import java.io.File;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.toFile;
 
 /**
@@ -43,7 +44,7 @@ public class XmlDataSetRowSourceMultiSchemaTest extends UnitilsJUnit4 {
 
     @Before
     public void setUp() throws Exception {
-        defaultDataSetSettings = new DataSetSettings('=', '$', false);
+        defaultDataSetSettings = new DataSetSettings('=', '$', false, null);
     }
 
     @After
@@ -54,7 +55,7 @@ public class XmlDataSetRowSourceMultiSchemaTest extends UnitilsJUnit4 {
 
     @Test
     public void schemaDisDefaultDataSetInXml_overridesDefaultSchemaA() throws Exception {
-        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("MultiSchemaDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("MultiSchemaDataSet.xml"), defaultDataSetSettings);
         xmlDataSetStaxReader.open();
 
         DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
@@ -72,17 +73,17 @@ public class XmlDataSetRowSourceMultiSchemaTest extends UnitilsJUnit4 {
 
     @Test
     public void noDefaultSchemaInDataSetXml_schemaAisDefault() throws Exception {
-        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("MultiSchemaNoDefaultDataSet.xml"), "SCHEMA_A", defaultDataSetSettings);
+        xmlDataSetStaxReader = new XmlDataSetRowSource(getDataSetFile("MultiSchemaNoDefaultDataSet.xml"), defaultDataSetSettings);
         xmlDataSetStaxReader.open();
 
         DataSetRow row1 = xmlDataSetStaxReader.getNextDataSetRow();
-        assertEquals("SCHEMA_A", row1.getSchemaName());
+        assertNull(row1.getSchemaName());
 
         DataSetRow row2 = xmlDataSetStaxReader.getNextDataSetRow();
         assertEquals("SCHEMA_B", row2.getSchemaName());
 
         DataSetRow row3 = xmlDataSetStaxReader.getNextDataSetRow();
-        assertEquals("SCHEMA_A", row3.getSchemaName());
+        assertNull(row3.getSchemaName());
 
         DataSetRow row4 = xmlDataSetStaxReader.getNextDataSetRow();
         assertEquals("SCHEMA_C", row4.getSchemaName());

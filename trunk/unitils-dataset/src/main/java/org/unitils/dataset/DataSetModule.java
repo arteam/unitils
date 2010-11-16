@@ -17,26 +17,27 @@ package org.unitils.dataset;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.database.Database;
+import org.dbmaintain.database.IdentifierProcessor;
+import org.dbmaintain.database.IdentifierProcessorFactory;
 import org.springframework.test.context.TestContext;
 import org.unitils.core.Module;
 import org.unitils.core.TestExecutionListenerAdapter;
-import org.unitils.core.Unitils;
-import org.unitils.database.DatabaseModule;
+import org.unitils.database.DatabaseUnitils;
 import org.unitils.database.DatabaseUpdateListener;
+import org.unitils.database.UnitilsDataSource;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 import org.unitils.dataset.annotation.handler.MarkerForAssertDataSetAnnotation;
 import org.unitils.dataset.annotation.handler.MarkerForLoadDataSetAnnotation;
 import org.unitils.dataset.assertstrategy.AssertDataSetStrategy;
-import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.loadstrategy.LoadDataSetStrategy;
 import org.unitils.dataset.resolver.DataSetResolver;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.dataset.rowsource.FileDataSetRowSourceFactory;
 import org.unitils.dataset.rowsource.InlineDataSetRowSourceFactory;
-import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 import org.unitils.dataset.structure.DataSetStructureGenerator;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -45,7 +46,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
+import static org.unitils.database.DatabaseUnitils.getDbMaintainManager;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationAnnotatedWith;
 import static org.unitils.util.CollectionUtils.asList;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
@@ -79,7 +80,7 @@ public class DataSetModule implements Module {
 
     /* The unitils configuration */
     protected Properties configuration;
-    protected DataSetModuleFactoryHelper dataSetModuleFactoryHelper;
+    protected DataSetModuleFactory dataSetModuleFactory;
 
     protected List<File> lastLoadedReadOnlyFiles = new ArrayList<File>();
 
@@ -94,17 +95,21 @@ public class DataSetModule implements Module {
     }
 
     public void afterInit() {
-        DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-        databaseModule.registerDatabaseUpdateListener(new DataSetXSDsGeneratingDatabaseUpdateListener());
+        DatabaseUpdateListener databaseUpdateListener = new DataSetXSDsGeneratingDatabaseUpdateListener();
+        getDbMaintainManager().registerDatabaseUpdateListener(databaseUpdateListener);
     }
 
 
-    public DataSetModuleFactoryHelper getDataSetModuleFactoryHelper() {
-        if (dataSetModuleFactoryHelper == null) {
-            DatabaseMetaData databaseMetaData = createDatabaseMetaData();
-            dataSetModuleFactoryHelper = new DataSetModuleFactoryHelper(configuration, databaseMetaData);
+    public DataSetModuleFactory getDataSetModuleFactoryHelper() {
+        if (dataSetModuleFactory == null) {
+            // todo database name
+            UnitilsDataSource unitilsDataSource = DatabaseUnitils.getUnitilsDataSource(null);
+
+            IdentifierProcessor identifierProcessor = createIdentifierProcessor(unitilsDataSource);
+            DataSourceWrapper dataSourceWrapper = createDataSourceWrapper(identifierProcessor, unitilsDataSource);
+            dataSetModuleFactory = new DataSetModuleFactory(configuration, dataSourceWrapper, identifierProcessor);
         }
-        return dataSetModuleFactoryHelper;
+        return dataSetModuleFactory;
     }
 
 
@@ -138,6 +143,17 @@ public class DataSetModule implements Module {
     public void refreshDataSet(String... dataSetRows) {
         LoadDataSetStrategy refreshDataSetStrategy = getDataSetModuleFactoryHelper().createRefreshDataSetStrategy();
         performInlineLoadDataSetStrategy(refreshDataSetStrategy, asList(dataSetRows));
+    }
+
+
+    public void updateDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
+        LoadDataSetStrategy updateDataSetStrategy = getDataSetModuleFactoryHelper().createUpdateDataSetStrategy();
+        performLoadDataSetStrategy(updateDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
+    }
+
+    public void updateDataSet(String... dataSetRows) {
+        LoadDataSetStrategy updateDataSetStrategy = getDataSetModuleFactoryHelper().createUpdateDataSetStrategy();
+        performInlineLoadDataSetStrategy(updateDataSetStrategy, asList(dataSetRows));
     }
 
 
@@ -288,11 +304,16 @@ public class DataSetModule implements Module {
     }
 
 
-    protected DatabaseMetaData createDatabaseMetaData() {
-        Database defaultDatabase = getDefaultDatabase();
+    protected DataSourceWrapper createDataSourceWrapper(IdentifierProcessor identifierProcessor, UnitilsDataSource unitilsDataSource) {
+        return new DataSourceWrapper(unitilsDataSource, identifierProcessor);
+    }
 
-        SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
-        return new DatabaseMetaData(defaultDatabase, sqlTypeHandlerRepository);
+    protected IdentifierProcessor createIdentifierProcessor(UnitilsDataSource unitilsDataSource) {
+        String databaseDialect = unitilsDataSource.getDialect();
+        String defaultSchemaName = unitilsDataSource.getDefaultSchemaName();
+        DataSource dataSource = unitilsDataSource.getDataSource();
+        IdentifierProcessorFactory identifierProcessorFactory = new IdentifierProcessorFactory(configuration);
+        return identifierProcessorFactory.createIdentifierProcessor(databaseDialect, defaultSchemaName, dataSource);
     }
 
 

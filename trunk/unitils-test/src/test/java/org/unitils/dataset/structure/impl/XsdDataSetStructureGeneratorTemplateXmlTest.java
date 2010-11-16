@@ -17,15 +17,13 @@ package org.unitils.dataset.structure.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.database.Databases;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dataset.database.DatabaseMetaData;
-import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import org.unitils.util.PropertyUtils;
 
@@ -41,7 +39,7 @@ import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.util.DatabaseTestUtils.createDatabases;
+import static org.unitils.dataset.util.DataSetTestUtils.createDataSourceWrapper;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
@@ -90,9 +88,8 @@ public class XsdDataSetStructureGeneratorTemplateXmlTest extends UnitilsJUnit4 {
             deleteDirectory(xsdDirectory);
         }
 
-        Databases databases = createDatabases("PUBLIC, SCHEMA_A");
-        DatabaseMetaData databaseMetaData = new DatabaseMetaData(databases.getDefaultDatabase(), new SqlTypeHandlerRepository());
-        xsdDataSetStructureGenerator.init(databaseMetaData);
+        DataSourceWrapper dataSourceWrapper = createDataSourceWrapper("public", "schema_a");
+        xsdDataSetStructureGenerator.init(dataSourceWrapper);
 
         dropTestTables();
         createTestTables();

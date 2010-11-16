@@ -13,40 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.database;
+package org.unitils.database.datasource;
 
+import org.dbmaintain.database.IdentifierProcessor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dataset.database.DataSourceWrapper;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.unitils.database.DatabaseUnitils.getUnitilsDataSource;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.util.DatabaseTestUtils.createDatabaseMetaData;
+import static org.unitils.dataset.util.DataSetTestUtils.createIdentifierProcessor;
+import static org.unitils.dataset.util.DataSetTestUtils.createTableName;
 
 /**
- * Simple test to see if the tableExists works as intended.
- *
  * @author Jeroen Horemans
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
+public class DataSourceWrapperAssertTableNameExists extends UnitilsJUnit4 {
 
-public class DatabaseMetaDataAssertTableNameExists extends UnitilsJUnit4 {
-
-    private DatabaseMetaData databaseMetaData;
+    private DataSourceWrapper dataSourceWrapper;
 
     @TestDataSource
     protected DataSource dataSource;
 
     @Before
     public void initialize() {
-        databaseMetaData = createDatabaseMetaData();
+        IdentifierProcessor identifierProcessor = createIdentifierProcessor();
+        dataSourceWrapper = new DataSourceWrapper(getUnitilsDataSource(), identifierProcessor);
         dropTestTables();
         createTestTables();
     }
@@ -60,23 +64,23 @@ public class DatabaseMetaDataAssertTableNameExists extends UnitilsJUnit4 {
     @Test
     public void tableNameDoesNotExist() throws SQLException {
         try {
-            databaseMetaData.assertTableNameExists("PUBLIC.NON_EXISTING_TABLE");
+            dataSourceWrapper.assertTableNameExists(createTableName("PUBLIC", "NON_EXISTING_TABLE"));
             fail("Expected UnitilsException");
         } catch (UnitilsException e) {
-            assertEquals("No table with name NON_EXISTING_TABLE found in schema PUBLIC.", e.getMessage());
+            assertEquals("No table found with name PUBLIC.NON_EXISTING_TABLE", e.getMessage());
         }
     }
 
     @Test
     public void tableNameExists() throws SQLException {
-        databaseMetaData.assertTableNameExists("PUBLIC.TEST");
+        dataSourceWrapper.assertTableNameExists(createTableName("PUBLIC", "TEST"));
     }
 
     @Test
     public void tableExistsCachedTest() throws SQLException {
-        databaseMetaData.assertTableNameExists("PUBLIC.TEST");
+        dataSourceWrapper.assertTableNameExists(createTableName("PUBLIC", "TEST"));
         dropTestTables();
-        databaseMetaData.assertTableNameExists("PUBLIC.TEST");
+        dataSourceWrapper.assertTableNameExists(createTableName("PUBLIC", "TEST"));
     }
 
 
