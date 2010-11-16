@@ -30,8 +30,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Annotation for triggering the loading of a data set before the execution of a test.
  * <br/><br/>
  * Insert means the data set will just be loaded in the database. If the record is already in the database or there
- * are conflicting records in the table, an exception will be raised. See {@link CleanInsertDataSet} and
- * {@link RefreshDataSet} for other possible ways of loading.
+ * are conflicting records in the table, an exception will be raised.
+ * See {@link CleanInsertDataSet}, {@link RefreshDataSet} and {@link UpdateDataSet} for other possible ways of loading.
  * <br/><br/>
  * This annotation can be put on method or on class level. If the annotation is found on class and method level, the
  * one on method level is taken. If a method is annotated, a data set will be loaded when that test method is run.

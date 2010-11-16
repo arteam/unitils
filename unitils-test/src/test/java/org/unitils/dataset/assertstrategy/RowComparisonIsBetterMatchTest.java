@@ -20,6 +20,7 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.dataset.assertstrategy.model.RowComparison;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.Row;
+import org.unitils.dataset.model.database.TableName;
 import org.unitils.dataset.model.database.Value;
 
 import static java.sql.Types.VARCHAR;
@@ -119,7 +120,7 @@ public class RowComparisonIsBetterMatchTest extends UnitilsJUnit4 {
 
 
     private Row createRow(Object pk1, Object pk2, Object value1, Object value2) {
-        Row row = new Row("schema.table");
+        Row row = new Row(new TableName("schema", "table", "schema.table"));
         row.addValue(new Value(pk1, false, new Column("pk1", VARCHAR, true)));
         row.addValue(new Value(pk2, false, new Column("pk2", VARCHAR, true)));
         row.addValue(new Value(value1, false, new Column("column1", VARCHAR, false)));

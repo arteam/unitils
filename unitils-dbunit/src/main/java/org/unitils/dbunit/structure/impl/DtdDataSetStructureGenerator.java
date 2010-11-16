@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,13 @@ import org.dbunit.dataset.FilteredDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.filter.IncludeTableFilter;
 import org.dbunit.dataset.xml.FlatDtdWriter;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbunit.structure.DataSetStructureGenerator;
 import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
 import org.unitils.util.PropertyUtils;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.StringWriter;
@@ -109,10 +111,11 @@ public class DtdDataSetStructureGenerator implements DataSetStructureGenerator {
      * @return the DTD content, not null
      */
     protected String generateDtdContent() {
-        Connection conn = null;
+        Connection connection = null;
         try {
-            conn = defaultDatabase.getDataSource().getConnection();
-            IDatabaseConnection dbUnitDatabaseConnection = new DatabaseConnection(conn, defaultDatabase.getDefaultSchemaName());
+            DataSource dataSource = defaultDatabase.getDataSource();
+            connection = DataSourceUtils.getConnection(dataSource);
+            IDatabaseConnection dbUnitDatabaseConnection = new DatabaseConnection(connection, defaultDatabase.getDefaultSchemaName());
 
             StringWriter stringWriter = new StringWriter();
 
@@ -131,7 +134,7 @@ public class DtdDataSetStructureGenerator implements DataSetStructureGenerator {
         } catch (Exception e) {
             throw new UnitilsException("Error generating content for DTD file.", e);
         } finally {
-            DbUtils.closeQuietly(conn);
+            DbUtils.closeQuietly(connection);
         }
     }
 }

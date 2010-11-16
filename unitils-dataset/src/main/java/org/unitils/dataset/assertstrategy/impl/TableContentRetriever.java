@@ -16,15 +16,15 @@
 package org.unitils.dataset.assertstrategy.impl;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.model.database.Column;
+import org.unitils.dataset.model.database.TableName;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Set;
 
 import static org.unitils.core.util.DbUtils.closeQuietly;
@@ -35,28 +35,28 @@ import static org.unitils.core.util.DbUtils.closeQuietly;
  */
 public class TableContentRetriever {
 
-    protected DatabaseMetaData database;
+    protected DataSourceWrapper dataSourceWrapper;
     protected SqlTypeHandlerRepository sqlTypeHandlerRepository;
 
 
-    public TableContentRetriever(DatabaseMetaData database, SqlTypeHandlerRepository sqlTypeHandlerRepository) {
-        this.database = database;
+    public TableContentRetriever(DataSourceWrapper dataSourceWrapper, SqlTypeHandlerRepository sqlTypeHandlerRepository) {
+        this.dataSourceWrapper = dataSourceWrapper;
         this.sqlTypeHandlerRepository = sqlTypeHandlerRepository;
     }
 
 
     // todo remove primary key column names  (implicit in database columns)
 
-    public TableContents getTableContents(String qualifiedTableName, List<Column> columns, Set<String> primaryKeyColumnNames) throws SQLException {
-        String sql = createStatement(qualifiedTableName, columns, primaryKeyColumnNames);
+    public TableContents getTableContents(TableName tableName, Set<Column> columns, Set<String> primaryKeyColumnNames) throws SQLException {
+        String sql = createStatement(tableName, columns, primaryKeyColumnNames);
 
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
-        Connection connection = database.getConnection();
+        Connection connection = dataSourceWrapper.getConnection();
         try {
             preparedStatement = connection.prepareStatement(sql);
             resultSet = preparedStatement.executeQuery();
-            return new TableContents(qualifiedTableName, columns, sqlTypeHandlerRepository, primaryKeyColumnNames, connection, preparedStatement, resultSet);
+            return new TableContents(tableName, columns, sqlTypeHandlerRepository, primaryKeyColumnNames, connection, preparedStatement, resultSet);
 
         } catch (Exception e) {
             closeQuietly(connection, preparedStatement, resultSet);
@@ -65,7 +65,7 @@ public class TableContentRetriever {
     }
 
 
-    protected String createStatement(String qualifiedTableName, List<Column> columns, Set<String> primaryKeyColumnNames) {
+    protected String createStatement(TableName tableName, Set<Column> columns, Set<String> primaryKeyColumnNames) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("select ");
         for (Column column : columns) {
@@ -78,7 +78,7 @@ public class TableContentRetriever {
         }
         stringBuilder.setLength(stringBuilder.length() - 2);
         stringBuilder.append(" from ");
-        stringBuilder.append(qualifiedTableName);
+        stringBuilder.append(tableName.getQualifiedTableName());
         return stringBuilder.toString();
     }
 

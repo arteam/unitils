@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.database;
+package org.unitils.database.manager;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.UnitilsException;
+import org.unitils.database.DatabaseUpdateListener;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
+import org.unitils.mock.Mock;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -31,9 +33,7 @@ import java.util.Properties;
 
 import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_AUTO_CREATE_DBMAINTAIN_SCRIPTS_TABLE;
 import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_SCRIPT_LOCATIONS;
-import static org.junit.Assert.fail;
 import static org.unitils.database.DatabaseModule.PROPERTY_UPDATEDATABASESCHEMA_ENABLED;
-import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 
 /**
@@ -42,83 +42,64 @@ import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DatabaseModuleUpdateDatabaseFromPropertiesTest extends UnitilsJUnit4 {
+public class DbMaintainManagerUpdateDatabaseListenerTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private DatabaseModule databaseModule = new DatabaseModule();
+    private DbMaintainManager dbMaintainManager;
 
     @TestDataSource
     protected DataSource dataSource;
-
-    private Properties configuration;
+    protected Mock<DatabaseUpdateListener> databaseUpdateListener;
 
 
     @Before
     public void initialize() throws Exception {
-        configuration = new ConfigurationLoader().loadConfiguration();
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
 
         File scriptLocation = getScriptLocation();
+        configuration.setProperty(PROPERTY_UPDATEDATABASESCHEMA_ENABLED, "true");
         configuration.setProperty(PROPERTY_SCRIPT_LOCATIONS, scriptLocation.getPath());
         configuration.setProperty(PROPERTY_AUTO_CREATE_DBMAINTAIN_SCRIPTS_TABLE, "true");
+
+        dbMaintainManager = new DbMaintainManager(configuration, true, new DefaultDataSourceFactory());
     }
 
     @Before
-    public void createTestTable() {
-        dropTestTables();
-    }
-
     @After
-    public void dropTestTables() {
+    public void dropTestTable() {
         executeUpdateQuietly("drop table test", dataSource);
-        executeUpdateQuietly("drop table dbmaintain_scripts", dataSource);
     }
 
 
     @Test
-    public void updateDatabase() throws Exception {
-        configuration.setProperty(PROPERTY_UPDATEDATABASESCHEMA_ENABLED, "true");
-        databaseModule.init(configuration);
+    public void listenerCalledOnUpdateDatabase() throws Exception {
+        dbMaintainManager.registerDatabaseUpdateListener(databaseUpdateListener.getMock());
 
-        databaseModule.updateDatabaseIfNeeded(null);
-        assertTestTableExists();
+        dbMaintainManager.updateDatabaseIfNeeded(null);
+        databaseUpdateListener.assertInvoked().databaseWasUpdated();
     }
 
     @Test
-    public void updateDatabaseDisabledByDefault() throws Exception {
-        databaseModule.init(configuration);
+    public void listenerNotCalledWhenDatabaseIsUpToDate() throws Exception {
+        dbMaintainManager.updateDatabaseIfNeeded(null);
+        dbMaintainManager.registerDatabaseUpdateListener(databaseUpdateListener.getMock());
 
-        databaseModule.updateDatabaseIfNeeded(null);
-        assertTestTableNotExists();
+        dbMaintainManager.updateDatabaseIfNeeded(null);
+        databaseUpdateListener.assertNotInvoked().databaseWasUpdated();
     }
 
     @Test
-    public void callUpdateDatabaseOnlyOnce() throws Exception {
-        databaseModule.init(configuration);
+    public void unregisterListener() throws Exception {
+        dbMaintainManager.registerDatabaseUpdateListener(databaseUpdateListener.getMock());
 
-        databaseModule.updateDatabaseIfNeeded(null);
-        dropTestTables();
-
-        databaseModule.updateDatabaseIfNeeded(null);
-        assertTestTableNotExists();
+        dbMaintainManager.unregisterDatabaseUpdateListener(databaseUpdateListener.getMock());
+        dbMaintainManager.updateDatabaseIfNeeded(null);
+        databaseUpdateListener.assertNotInvoked().databaseWasUpdated();
     }
 
-
-    private void assertTestTableExists() {
-        executeUpdate("insert into test(val) values(1)", dataSource);
-    }
-
-    private void assertTestTableNotExists() {
-        try {
-            executeUpdate("insert into test(val) values(1)", dataSource);
-            fail("Test table exists. DbMaintain should not have been called.");
-        } catch (UnitilsException e) {
-            // expected
-        }
-    }
 
     private File getScriptLocation() throws URISyntaxException {
         URL script = getClass().getResource("/org/unitils/database/scripts/01_create-test-table.sql");
         return new File(script.toURI()).getParentFile();
     }
-
 }

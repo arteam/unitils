@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.structure;
 
-import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.database.DataSourceWrapper;
 
 import java.io.File;
 
@@ -28,9 +28,9 @@ import java.io.File;
 public interface DataSetStructureGenerator {
 
     /**
-     * @param databaseMetaData The database meta data, not null
+     * @param dataSourceWrapper The database meta data, not null
      */
-    void init(DatabaseMetaData databaseMetaData);
+    void init(DataSourceWrapper dataSourceWrapper);
 
     /**
      * Generates the XSDs or DTDs.

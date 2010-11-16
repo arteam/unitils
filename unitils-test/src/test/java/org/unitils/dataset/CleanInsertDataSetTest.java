@@ -65,8 +65,7 @@ public class CleanInsertDataSetTest extends DataSetTestBase {
             cleanInsertDataSetFile(this, "DataSetModuleDataSetTest-tableDoesNotExist.xml");
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            e.printStackTrace();
-            assertTrue(e.getMessage().contains("No table with name XXXX found in schema PUBLIC."));
+            assertTrue(e.getMessage().contains("No table found with name PUBLIC.XXXX"));
         }
     }
 

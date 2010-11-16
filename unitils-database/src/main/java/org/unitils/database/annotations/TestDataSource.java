@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Annotation indicating that this field or method should be initialized with the <code>DataSource</code> that supplies
- * a connection to the unit test database.
- * <p/>
+ * a connection to the unit test database.<br/>
  * If a field is annotated, it should be of type <code>DataSource</code>. This field can be private. Example:
  * <pre><code>
  * '    @DataSource
@@ -36,9 +35,19 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * '    @DataSource
  *      void myMethod(DataSource dataSource)
  * </code></pre>
+ * If there is more than 1 data source, you can specify the name of the database if you are configuring unitils
+ * from properties or the id/name of the spring bean if you are using spring.<br/>
+ * <b>NOTE</b>: you cannot use the {@link Transactional} annotation when there is more than 1 data source.
+ * <br/><br/>
+ * <i>Configuration in properties</i>: if the updateDataBaseSchema.enabled property is set to true, the test database
+ * schema will automatically be updated using DbMaintain if needed. This check will be performed only once,
+ * when the data source is created.
+ * <i>Configuration in spring</i>: if there is a DbMaintain UpdateDatabaseTask bean configured in the
+ * test application context, it will automatically be called to update the database. This will only be done
+ * once per instance of the UpdateDatabaseTask bean.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
 @Target({METHOD, FIELD})
 @Retention(RUNTIME)

@@ -24,6 +24,7 @@ import org.unitils.dataset.model.database.Value;
 
 import static java.sql.Types.VARCHAR;
 import static org.junit.Assert.assertEquals;
+import static org.unitils.dataset.util.DataSetTestUtils.createRow;
 
 /**
  * @author Tim Ducheyne
@@ -34,8 +35,8 @@ public class RowComparisonGetNrOfPrimaryKeyDifferencesTest extends UnitilsJUnit4
 
     @Test
     public void equal() throws Exception {
-        Row expectedRow = createRow(1, 2, 3, 4);
-        Row actualRow = createRow(1, 2, 3, 4);
+        Row expectedRow = createRowWithPks(1, 2, 3, 4);
+        Row actualRow = createRowWithPks(1, 2, 3, 4);
         RowComparison rowComparison = new RowComparison(expectedRow, actualRow);
 
         int result = rowComparison.getNrOfPrimaryKeyDifferences();
@@ -44,15 +45,17 @@ public class RowComparisonGetNrOfPrimaryKeyDifferencesTest extends UnitilsJUnit4
 
     @Test
     public void noPrimaryKeys() throws Exception {
-        RowComparison rowComparison = new RowComparison(new Row("schema.table"), new Row("schema.table"));
+        Row row1 = createRow();
+        Row row2 = createRow();
+        RowComparison rowComparison = new RowComparison(row1, row2);
         int result = rowComparison.getNrOfPrimaryKeyDifferences();
         assertEquals(0, result);
     }
 
     @Test
     public void differences() throws Exception {
-        Row expectedRow = createRow(1, 2, 3, 4);
-        Row actualRow = createRow(888, 999, 3, 4);
+        Row expectedRow = createRowWithPks(1, 2, 3, 4);
+        Row actualRow = createRowWithPks(888, 999, 3, 4);
         RowComparison rowComparison = new RowComparison(expectedRow, actualRow);
 
         int result = rowComparison.getNrOfPrimaryKeyDifferences();
@@ -60,8 +63,8 @@ public class RowComparisonGetNrOfPrimaryKeyDifferencesTest extends UnitilsJUnit4
     }
 
 
-    private Row createRow(Object pk1, Object pk2, Object value1, Object value2) {
-        Row row = new Row("schema.table");
+    private Row createRowWithPks(Object pk1, Object pk2, Object value1, Object value2) {
+        Row row = createRow();
         row.addValue(new Value(pk1, false, new Column("pk1", VARCHAR, true)));
         row.addValue(new Value(pk2, false, new Column("pk2", VARCHAR, true)));
         row.addValue(new Value(value1, false, new Column("column1", VARCHAR, false)));

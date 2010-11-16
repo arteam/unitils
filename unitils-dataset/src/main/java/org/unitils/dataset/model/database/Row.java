@@ -30,8 +30,8 @@ public class Row {
 
     /* The identifier of the row (e.g. primary keys or row number), null if undefined */
     private String identifier;
-    /* The table name prefixed with the schema name and quoted if it is a case-sensitive name. */
-    private String qualifiedTableName;
+    /* The table name, not null */
+    private TableName tableName;
     /* The columns of the row */
     private Map<String, Value> valuesPerColumnName = new LinkedHashMap<String, Value>();
 
@@ -39,21 +39,21 @@ public class Row {
     /**
      * Creates a database row.
      *
-     * @param qualifiedTableName The table name prefixed with the schema name and quoted if it is a case-sensitive name, not null
+     * @param tableName The table name, not null
      */
-    public Row(String qualifiedTableName) {
-        this(null, qualifiedTableName);
+    public Row(TableName tableName) {
+        this(null, tableName);
     }
 
     /**
      * Creates a database row.
      *
-     * @param identifier         The identifier of the row (e.g. primary keys or row number), null if undefined
-     * @param qualifiedTableName The table name prefixed with the schema name and quoted if it is a case-sensitive name, not null
+     * @param identifier The identifier of the row (e.g. primary keys or row number), null if undefined
+     * @param tableName  The table name, not null
      */
-    public Row(String identifier, String qualifiedTableName) {
+    public Row(String identifier, TableName tableName) {
         this.identifier = identifier;
-        this.qualifiedTableName = qualifiedTableName;
+        this.tableName = tableName;
     }
 
 
@@ -65,10 +65,10 @@ public class Row {
     }
 
     /**
-     * @return The table name prefixed with the schema name and quoted if it is a case-sensitive name, not null
+     * @return The table name, not null
      */
-    public String getQualifiedTableName() {
-        return qualifiedTableName;
+    public TableName getTableName() {
+        return tableName;
     }
 
     /**
@@ -109,7 +109,7 @@ public class Row {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(qualifiedTableName);
+        stringBuilder.append(tableName);
         stringBuilder.append(" [");
         for (Value value : valuesPerColumnName.values()) {
             stringBuilder.append(value);

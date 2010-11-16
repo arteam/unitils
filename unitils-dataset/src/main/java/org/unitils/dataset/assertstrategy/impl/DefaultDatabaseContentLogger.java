@@ -19,9 +19,11 @@ import org.unitils.core.UnitilsException;
 import org.unitils.dataset.assertstrategy.DatabaseContentLogger;
 import org.unitils.dataset.assertstrategy.model.DataSetComparison;
 import org.unitils.dataset.assertstrategy.model.TableComparison;
-import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.database.DataSetDatabaseHelper;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.Row;
+import org.unitils.dataset.model.database.TableName;
 import org.unitils.dataset.model.database.Value;
 
 import java.util.ArrayList;
@@ -36,13 +38,15 @@ import static org.apache.commons.lang.StringUtils.rightPad;
  */
 public class DefaultDatabaseContentLogger implements DatabaseContentLogger {
 
-    protected DatabaseMetaData database;
+    protected DataSourceWrapper dataSourceWrapper;
     protected TableContentRetriever tableContentRetriever;
+    protected DataSetDatabaseHelper dataSetDatabaseHelper;
 
 
-    public void init(DatabaseMetaData database, TableContentRetriever tableContentRetriever) {
-        this.database = database;
+    public void init(DataSourceWrapper dataSourceWrapper, TableContentRetriever tableContentRetriever, DataSetDatabaseHelper dataSetDatabaseHelper) {
+        this.dataSourceWrapper = dataSourceWrapper;
         this.tableContentRetriever = tableContentRetriever;
+        this.dataSetDatabaseHelper = dataSetDatabaseHelper;
     }
 
 
@@ -62,11 +66,11 @@ public class DefaultDatabaseContentLogger implements DatabaseContentLogger {
 
 
     protected void getActualTableContent(TableComparison tableComparison, StringBuilder contentBuilder) throws Exception {
-        String qualifiedTableName = tableComparison.getQualifiedTableName();
-        Set<String> primaryKeyColumnNames = database.getPrimaryKeyColumnNames(qualifiedTableName);
-        List<Column> columns = database.getColumns(qualifiedTableName);
+        TableName tableName = tableComparison.getTableName();
+        Set<String> primaryKeyColumnNames = dataSourceWrapper.getPrimaryKeyColumnNames(tableName);
+        Set<Column> columns = dataSourceWrapper.getColumns(tableName);
 
-        TableContents tableContents = tableContentRetriever.getTableContents(qualifiedTableName, columns, primaryKeyColumnNames);
+        TableContents tableContents = tableContentRetriever.getTableContents(tableName, columns, primaryKeyColumnNames);
         try {
             int nrOfColumns = tableContents.getNrOfColumns();
             List<String> columnNames = tableContents.getColumnNames();
@@ -74,7 +78,7 @@ public class DefaultDatabaseContentLogger implements DatabaseContentLogger {
             List<Integer> columnSizes = new ArrayList<Integer>(nrOfColumns);
             List<Boolean> rowWithExactMatch = new ArrayList<Boolean>();
 
-            contentBuilder.append(qualifiedTableName);
+            contentBuilder.append(tableName);
             contentBuilder.append('\n');
             for (String columnName : columnNames) {
                 columnSizes.add(columnName.length());
@@ -129,5 +133,4 @@ public class DefaultDatabaseContentLogger implements DatabaseContentLogger {
             contentBuilder.append('\n');
         }
     }
-
 }

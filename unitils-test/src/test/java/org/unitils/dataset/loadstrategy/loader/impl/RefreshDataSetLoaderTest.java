@@ -32,6 +32,8 @@ import org.unitils.mock.Mock;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.unitils.dataset.util.DataSetTestUtils.createRow;
+
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -56,7 +58,7 @@ public class RefreshDataSetLoaderTest extends UnitilsJUnit4 {
         refreshRowLoader.init(dataSetRowProcessor.getMock(), databaseAccessor.getMock());
 
         dataSetRow = createDataSetRow();
-        rowPrimaryKey = createRow(true);
+        rowPrimaryKey = createRow(new Value("value", false, new Column("column", 0, true)));
 
         dataSetRowSource.onceReturns(dataSetRow).getNextDataSetRow();
         dataSetRowProcessor.returns(rowPrimaryKey).process(null, null, null);
@@ -85,15 +87,9 @@ public class RefreshDataSetLoaderTest extends UnitilsJUnit4 {
 
 
     private DataSetRow createDataSetRow() {
-        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
+        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false, null);
         DataSetRow dataSetRow = new DataSetRow("schema", "table", null, false, dataSetSettings);
         dataSetRow.addDataSetValue(new DataSetValue("column", "value"));
         return dataSetRow;
-    }
-
-    private Row createRow(boolean primaryKey) {
-        Row row = new Row("schema.table");
-        row.addValue(new Value("value", false, new Column("column", 0, primaryKey)));
-        return row;
     }
 }

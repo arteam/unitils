@@ -17,6 +17,7 @@ package org.unitils.dataset.loadstrategy.loader.impl;
 
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.model.database.Row;
+import org.unitils.dataset.model.database.TableName;
 import org.unitils.dataset.model.database.Value;
 
 import java.util.ArrayList;
@@ -85,7 +86,7 @@ public class UpdateDataSetLoader extends BaseDataSetLoader {
 
         statementValues.addAll(columnsValues);
         statementValues.addAll(whereValues);
-        return createStatement(row.getQualifiedTableName(), columnsPart, wherePart);
+        return createStatement(row.getTableName(), columnsPart, wherePart);
     }
 
     protected void addColumnToStatementPart(Value value, StringBuilder statementPart, List<Value> parameters) {
@@ -101,13 +102,13 @@ public class UpdateDataSetLoader extends BaseDataSetLoader {
         statementPart.append(", ");
     }
 
-    protected String createStatement(String tableName, StringBuilder columnsPart, StringBuilder wherePart) {
+    protected String createStatement(TableName tableName, StringBuilder columnsPart, StringBuilder wherePart) {
         columnsPart.setLength(columnsPart.length() - 2);
         wherePart.setLength(wherePart.length() - 2);
 
         StringBuilder sql = new StringBuilder();
         sql.append("update ");
-        sql.append(tableName);
+        sql.append(tableName.getQualifiedTableName());
         sql.append(" set ");
         sql.append(columnsPart);
         sql.append(" where ");

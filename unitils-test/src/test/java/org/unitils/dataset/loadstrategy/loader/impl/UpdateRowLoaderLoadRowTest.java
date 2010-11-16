@@ -27,6 +27,7 @@ import org.unitils.mock.Mock;
 
 import static java.sql.Types.VARCHAR;
 import static java.util.Arrays.asList;
+import static org.unitils.dataset.util.DataSetTestUtils.createRow;
 
 /**
  * @author Tim Ducheyne
@@ -52,7 +53,7 @@ public class UpdateRowLoaderLoadRowTest extends UnitilsJUnit4 {
         databaseAccessor.returns(1).executeUpdate(null, null);
         updateDataSetLoader.init(null, databaseAccessor.getMock());
 
-        row = new Row("my_schema.table_a");
+        row = createRow("my_schema", "table_a");
         valuePk1 = new Value("1", false, new Column("pk1", VARCHAR, true));
         valuePk2 = new Value("2", false, new Column("pk2", VARCHAR, true));
         valuePkLiteral = new Value("pk-literal", true, new Column("pk3", VARCHAR, true));

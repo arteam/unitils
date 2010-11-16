@@ -28,7 +28,7 @@ public class XmlFileDataSetRowSourceFactory extends BaseDataSetRowSourceFactory 
 
 
     public DataSetRowSource createDataSetRowSource(File dataSetFile) {
-        return new XmlDataSetRowSource(dataSetFile, defaultSchemaName, defaultDataSetSettings);
+        return new XmlDataSetRowSource(dataSetFile, defaultDataSetSettings);
     }
 
 }

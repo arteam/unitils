@@ -18,9 +18,9 @@ package org.unitils.dataset.model;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.database.DataSetDatabaseHelper;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
-import org.unitils.dataset.loadstrategy.impl.IdentifierNameProcessor;
 import org.unitils.dataset.model.database.Row;
 import org.unitils.dataset.model.database.Value;
 import org.unitils.dataset.model.dataset.DataSetRow;
@@ -50,9 +50,9 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
     /* Tested object */
     private DataSetRowProcessor dataSetRowProcessor;
 
-    protected Mock<IdentifierNameProcessor> identifierNameProcessor;
+    protected Mock<DataSetDatabaseHelper> identifierNameProcessor;
     protected Mock<SqlTypeHandlerRepository> sqlTypeHandlerRepository;
-    protected Mock<DatabaseMetaData> databaseMetaData;
+    protected Mock<DataSourceWrapper> dataSourceWrapper;
 
     private DataSetRow dataSetRow;
 
@@ -63,12 +63,9 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
     @Before
     public void initialize() throws SQLException {
         sqlTypeHandlerRepository.returns(new TextSqlTypeHandler()).getSqlTypeHandler(0);
-        identifierNameProcessor.returns("schema.table").getQualifiedTableName(null);
-        databaseMetaData.returns("schema").getSchemaName("schema.table");
-        databaseMetaData.returns("table").getTableName("schema.table");
-        dataSetRowProcessor = new DataSetRowProcessor(identifierNameProcessor.getMock(), sqlTypeHandlerRepository.getMock(), databaseMetaData.getMock());
+        dataSetRowProcessor = new DataSetRowProcessor(identifierNameProcessor.getMock(), sqlTypeHandlerRepository.getMock(), dataSourceWrapper.getMock());
 
-        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
+        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false, null);
         dataSetRow = new DataSetRow("schema", "table", null, false, dataSetSettings);
     }
 

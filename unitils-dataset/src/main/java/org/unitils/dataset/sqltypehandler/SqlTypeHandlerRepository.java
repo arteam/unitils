@@ -30,57 +30,109 @@ import static java.sql.Types.*;
  */
 public class SqlTypeHandlerRepository {
 
-    private Map<Integer, SqlTypeHandler<?>> sqlTypeHandlers = new HashMap<Integer, SqlTypeHandler<?>>();
+    protected Properties configuration;
+    private SqlTypeHandler<?> defaultSqlTypeHandler;
 
-    private SqlTypeHandler<?> defaultSqlTypeHandler = new TextSqlTypeHandler();
+    private Map<Integer, SqlTypeHandler<?>> sqlTypeHandlers = new HashMap<Integer, SqlTypeHandler<?>>();
 
 
     public void init(Properties configuration) {
-        addConfiguredSqlTypeHandler(BIT, "BIT", configuration);
-        addConfiguredSqlTypeHandler(TINYINT, "TINYINT", configuration);
-        addConfiguredSqlTypeHandler(SMALLINT, "SMALLINT", configuration);
-        addConfiguredSqlTypeHandler(INTEGER, "INTEGER", configuration);
-        addConfiguredSqlTypeHandler(BIGINT, "BIGINT", configuration);
-        addConfiguredSqlTypeHandler(FLOAT, "FLOAT", configuration);
-        addConfiguredSqlTypeHandler(REAL, "REAL", configuration);
-        addConfiguredSqlTypeHandler(DOUBLE, "DOUBLE", configuration);
-        addConfiguredSqlTypeHandler(NUMERIC, "NUMERIC", configuration);
-        addConfiguredSqlTypeHandler(DECIMAL, "DECIMAL", configuration);
-        addConfiguredSqlTypeHandler(CHAR, "CHAR", configuration);
-        addConfiguredSqlTypeHandler(VARCHAR, "VARCHAR", configuration);
-        addConfiguredSqlTypeHandler(LONGVARCHAR, "LONGVARCHAR", configuration);
-        // todo correctly handle date formats
-        addConfiguredSqlTypeHandler(DATE, "DATE", configuration);
-        addConfiguredSqlTypeHandler(TIME, "TIME", configuration);
-        addConfiguredSqlTypeHandler(TIMESTAMP, "TIMESTAMP", configuration);
-        addConfiguredSqlTypeHandler(BINARY, "BINARY", configuration);
-        addConfiguredSqlTypeHandler(VARBINARY, "VARBINARY", configuration);
-        addConfiguredSqlTypeHandler(LONGVARBINARY, "LONGVARBINARY", configuration);
-        addConfiguredSqlTypeHandler(NULL, "NULL", configuration);
-        addConfiguredSqlTypeHandler(OTHER, "OTHER", configuration);
-        addConfiguredSqlTypeHandler(JAVA_OBJECT, "JAVA_OBJECT", configuration);
-        addConfiguredSqlTypeHandler(DISTINCT, "DISTINCT", configuration);
-        addConfiguredSqlTypeHandler(STRUCT, "STRUCT", configuration);
-        addConfiguredSqlTypeHandler(ARRAY, "ARRAY", configuration);
-        addConfiguredSqlTypeHandler(BLOB, "BLOB", configuration);
-        addConfiguredSqlTypeHandler(CLOB, "CLOB", configuration);
-        addConfiguredSqlTypeHandler(REF, "REF", configuration);
-        addConfiguredSqlTypeHandler(DATALINK, "DATALINK", configuration);
-        addConfiguredSqlTypeHandler(BOOLEAN, "BOOLEAN", configuration);
+        this.configuration = configuration;
+        this.defaultSqlTypeHandler = new TextSqlTypeHandler();
     }
 
 
     public SqlTypeHandler<?> getSqlTypeHandler(int sqlType) {
         SqlTypeHandler<?> sqlTypeHandler = sqlTypeHandlers.get(sqlType);
-        if (sqlTypeHandler != null) {
-            return sqlTypeHandler;
+        if (sqlTypeHandler == null) {
+            sqlTypeHandler = createConfiguredSqlTypeHandler(sqlType);
+            sqlTypeHandlers.put(sqlType, sqlTypeHandler);
         }
-        return defaultSqlTypeHandler;
+        return sqlTypeHandler;
     }
 
 
-    protected void addConfiguredSqlTypeHandler(int sqlType, String name, Properties configuration) {
-        SqlTypeHandler<?> sqlTypeHandler = ConfigUtils.getInstanceOf(SqlTypeHandler.class, configuration, name);
-        sqlTypeHandlers.put(sqlType, sqlTypeHandler);
+    protected SqlTypeHandler<?> createConfiguredSqlTypeHandler(int sqlType) {
+        switch (sqlType) {
+            case BIT:
+                return createConfiguredSqlTypeHandler("BIT");
+            case TINYINT:
+                return createConfiguredSqlTypeHandler("TINYINT");
+            case SMALLINT:
+                return createConfiguredSqlTypeHandler("SMALLINT");
+            case INTEGER:
+                return createConfiguredSqlTypeHandler("INTEGER");
+            case BIGINT:
+                return createConfiguredSqlTypeHandler("BIGINT");
+            case FLOAT:
+                return createConfiguredSqlTypeHandler("FLOAT");
+            case REAL:
+                return createConfiguredSqlTypeHandler("REAL");
+            case DOUBLE:
+                return createConfiguredSqlTypeHandler("DOUBLE");
+            case NUMERIC:
+                return createConfiguredSqlTypeHandler("NUMERIC");
+            case DECIMAL:
+                return createConfiguredSqlTypeHandler("DECIMAL");
+            case CHAR:
+                return createConfiguredSqlTypeHandler("CHAR");
+            case VARCHAR:
+                return createConfiguredSqlTypeHandler("VARCHAR");
+            case LONGVARCHAR:
+                return createConfiguredSqlTypeHandler("LONGVARCHAR");
+            // todo correctly handle date formats
+            case DATE:
+                return createConfiguredSqlTypeHandler("DATE");
+            case TIME:
+                return createConfiguredSqlTypeHandler("TIME");
+            case TIMESTAMP:
+                return createConfiguredSqlTypeHandler("TIMESTAMP");
+            case BINARY:
+                return createConfiguredSqlTypeHandler("BINARY");
+            case VARBINARY:
+                return createConfiguredSqlTypeHandler("VARBINARY");
+            case LONGVARBINARY:
+                return createConfiguredSqlTypeHandler("LONGVARBINARY");
+            case NULL:
+                return createConfiguredSqlTypeHandler("NULL");
+            case OTHER:
+                return createConfiguredSqlTypeHandler("OTHER");
+            case JAVA_OBJECT:
+                return createConfiguredSqlTypeHandler("JAVA_OBJECT");
+            case DISTINCT:
+                return createConfiguredSqlTypeHandler("DISTINCT");
+            case STRUCT:
+                return createConfiguredSqlTypeHandler("STRUCT");
+            case ARRAY:
+                return createConfiguredSqlTypeHandler("ARRAY");
+            case BLOB:
+                return createConfiguredSqlTypeHandler("BLOB");
+            case CLOB:
+                return createConfiguredSqlTypeHandler("CLOB");
+            case REF:
+                return createConfiguredSqlTypeHandler("REF");
+            case DATALINK:
+                return createConfiguredSqlTypeHandler("DATALINK");
+            case BOOLEAN:
+                return createConfiguredSqlTypeHandler("BOOLEAN");
+            case ROWID:
+                return createConfiguredSqlTypeHandler("ROWID");
+            case NCHAR:
+                return createConfiguredSqlTypeHandler("NCHAR");
+            case NVARCHAR:
+                return createConfiguredSqlTypeHandler("NVARCHAR");
+            case LONGNVARCHAR:
+                return createConfiguredSqlTypeHandler("LONGNVARCHAR");
+            case NCLOB:
+                return createConfiguredSqlTypeHandler("NCLOB");
+            case SQLXML:
+                return createConfiguredSqlTypeHandler("SQLXML");
+        }
+        return defaultSqlTypeHandler;
+
+    }
+
+    protected SqlTypeHandler<?> createConfiguredSqlTypeHandler(String name) {
+        return ConfigUtils.getInstanceOf(SqlTypeHandler.class, configuration, name);
     }
 }

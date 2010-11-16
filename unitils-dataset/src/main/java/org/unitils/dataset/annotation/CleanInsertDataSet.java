@@ -30,8 +30,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Annotation for triggering the loading of a data set before the execution of a test.
  * <br/><br/>
  * Clean insert means that all data in tables specified in the data set will first be deleted before the data set
- * is loaded. Tables that are not mentioned in the data set will not be touched. See {@link InsertDataSet} and
- * {@link RefreshDataSet} for other possible ways of loading.
+ * is loaded. Tables that are not mentioned in the data set will not be touched.
+ * See {@link InsertDataSet}, {@link RefreshDataSet} and {@link UpdateDataSet} for other possible ways of loading.
  * <br/><br/>
  * This annotation can be put on method or on class level. If the annotation is found on class and method level, the
  * one on method level is taken. If a method is annotated, a data set will be loaded when that test method is run.

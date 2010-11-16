@@ -30,18 +30,14 @@ public abstract class BaseDataSetRowSourceFactory {
     public static String DEFAULT_LITERAL_TOKEN_PROPERTY = "dataset.literaltoken.default";
     public static String DEFAULT_VARIABLE_TOKEN_PROPERTY = "dataset.variabletoken.default";
 
-    /* The schema name to use when none is specified */
-    protected String defaultSchemaName;
     /* The default settings of the data set */
     protected DataSetSettings defaultDataSetSettings;
 
 
     /**
-     * @param configuration     The unitils configuration, not null
-     * @param defaultSchemaName The schema name to use when none is specified, not null
+     * @param configuration The unitils configuration, not null
      */
-    public void init(Properties configuration, String defaultSchemaName) {
-        this.defaultSchemaName = defaultSchemaName;
+    public void init(Properties configuration) {
         this.defaultDataSetSettings = createDefaultDataSetSettings(configuration);
     }
 
@@ -49,6 +45,6 @@ public abstract class BaseDataSetRowSourceFactory {
         char defaultLiteralToken = PropertyUtils.getString(DEFAULT_LITERAL_TOKEN_PROPERTY, configuration).charAt(0);
         char defaultVariableToken = PropertyUtils.getString(DEFAULT_VARIABLE_TOKEN_PROPERTY, configuration).charAt(0);
         boolean defaultCaseSensitive = PropertyUtils.getBoolean(DEFAULT_CASE_SENSITIVE_PROPERTY, configuration);
-        return new DataSetSettings(defaultLiteralToken, defaultVariableToken, defaultCaseSensitive);
+        return new DataSetSettings(defaultLiteralToken, defaultVariableToken, defaultCaseSensitive, null);
     }
 }

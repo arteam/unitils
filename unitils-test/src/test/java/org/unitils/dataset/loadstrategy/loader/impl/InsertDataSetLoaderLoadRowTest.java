@@ -27,6 +27,7 @@ import org.unitils.mock.Mock;
 
 import static java.sql.Types.VARCHAR;
 import static java.util.Arrays.asList;
+import static org.unitils.dataset.util.DataSetTestUtils.createRow;
 
 /**
  * Tests for creating using insert statements for loading rows
@@ -53,7 +54,7 @@ public class InsertDataSetLoaderLoadRowTest extends UnitilsJUnit4 {
     public void initialize() throws Exception {
         insertDataSetLoader.init(dataSetRowProcessor.getMock(), databaseAccessor.getMock());
 
-        row = new Row("my_schema.table_a");
+        row = createRow("my_schema", "table_a");
         valuePk = new Value("1", false, new Column("column_1", VARCHAR, true));
         value = new Value("2", false, new Column("column_2", VARCHAR, false));
         valueLiteral = new Value("literal", true, new Column("column_3", VARCHAR, false));

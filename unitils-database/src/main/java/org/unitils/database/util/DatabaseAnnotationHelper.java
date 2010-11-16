@@ -18,10 +18,7 @@ package org.unitils.database.util;
 import org.unitils.database.annotations.Transactional;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
-import static java.util.Arrays.asList;
 import static org.unitils.database.util.TransactionMode.DEFAULT;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
 
@@ -46,14 +43,6 @@ public class DatabaseAnnotationHelper {
      */
     public Transactional getTransactionalAnnotation(Object testObject, Method testMethod) {
         return getMethodOrClassLevelAnnotation(Transactional.class, testMethod, testObject.getClass());
-    }
-
-    public List<String> getTransactionManagerBeanNames(Transactional transactional) {
-        if (transactional == null) {
-            return new ArrayList<String>();
-        }
-        String[] transactionManagerBeanNames = transactional.transactionManagerBeanNames();
-        return asList(transactionManagerBeanNames);
     }
 
     /**

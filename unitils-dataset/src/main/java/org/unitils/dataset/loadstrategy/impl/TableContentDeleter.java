@@ -16,10 +16,12 @@
 package org.unitils.dataset.loadstrategy.impl;
 
 import org.unitils.core.UnitilsException;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.database.DatabaseAccessor;
-import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.model.database.TableName;
 import org.unitils.dataset.model.database.Value;
 import org.unitils.dataset.model.dataset.DataSetRow;
+import org.unitils.dataset.model.dataset.DataSetSettings;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 
 import java.util.*;
@@ -34,56 +36,55 @@ import java.util.*;
 public class TableContentDeleter {
 
     protected DatabaseAccessor databaseAccessor;
-    protected IdentifierNameProcessor identifierNameProcessor;
-    protected DatabaseMetaData databaseMetaData;
+    protected DataSourceWrapper dataSourceWrapper;
 
 
-    public TableContentDeleter(IdentifierNameProcessor identifierNameProcessor, DatabaseAccessor databaseAccessor, DatabaseMetaData databaseMetaData) {
+    public TableContentDeleter(DatabaseAccessor databaseAccessor, DataSourceWrapper dataSourceWrapper) {
         this.databaseAccessor = databaseAccessor;
-        this.identifierNameProcessor = identifierNameProcessor;
-        this.databaseMetaData = databaseMetaData;
+        this.dataSourceWrapper = dataSourceWrapper;
     }
 
 
     public void deleteDataFromTablesInReverseOrder(DataSetRowSource dataSetRowSource) {
-        List<String> qualifiedTableNames = getQualifiedTableNames(dataSetRowSource);
-        Collections.reverse(qualifiedTableNames);
-        for (String qualifiedTableName : qualifiedTableNames) {
+        List<TableName> tableNames = getTableNamesInReverseOrder(dataSetRowSource);
+        for (TableName tableName : tableNames) {
             try {
-                databaseMetaData.assertTableNameExists(qualifiedTableName);
-                deleteTableContent(qualifiedTableName);
+                dataSourceWrapper.assertTableNameExists(tableName);
+                deleteTableContent(tableName);
             } catch (Exception e) {
-                throw new UnitilsException("Unable to delete data from table " + qualifiedTableName, e);
+                throw new UnitilsException("Unable to delete data from table " + tableName, e);
             }
         }
     }
 
 
-    protected List<String> getQualifiedTableNames(DataSetRowSource dataSetRowSource) {
-        List<String> qualifiedTableNames = new ArrayList<String>();
-        Map<String, String> qualifiedTableNameMap = new LinkedHashMap<String, String>();
+    protected List<TableName> getTableNamesInReverseOrder(DataSetRowSource dataSetRowSource) {
+        Map<TableName, TableName> tableNamesMap = new LinkedHashMap<TableName, TableName>();
 
         DataSetRow dataSetRow;
         while ((dataSetRow = dataSetRowSource.getNextDataSetRow()) != null) {
-            String qualifiedTableName = identifierNameProcessor.getQualifiedTableName(dataSetRow);
-            if (!qualifiedTableNameMap.containsKey(qualifiedTableName)) {
-                qualifiedTableNameMap.put(qualifiedTableName, qualifiedTableName);
-                qualifiedTableNames.add(qualifiedTableName);
+            DataSetSettings dataSetSettings = dataSetRow.getDataSetSettings();
+            TableName tableName = dataSourceWrapper.getTableName(dataSetRow.getSchemaName(), dataSetRow.getTableName(), dataSetSettings.isCaseSensitive());
+
+            if (!tableNamesMap.containsKey(tableName)) {
+                tableNamesMap.put(tableName, tableName);
             }
         }
-        return qualifiedTableNames;
+        List<TableName> tableNames = new ArrayList<TableName>(tableNamesMap.values());
+        Collections.reverse(tableNames);
+        return tableNames;
     }
 
 
-    protected void deleteTableContent(String qualifiedTableName) throws Exception {
-        String sql = createStatement(qualifiedTableName);
+    protected void deleteTableContent(TableName tableName) throws Exception {
+        String sql = createStatement(tableName);
         databaseAccessor.executeUpdate(sql, new ArrayList<Value>());
     }
 
-    protected String createStatement(String qualifiedTableName) {
+    protected String createStatement(TableName tableName) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("delete from ");
-        stringBuilder.append(qualifiedTableName);
+        stringBuilder.append(tableName.getQualifiedTableName());
         return stringBuilder.toString();
     }
 

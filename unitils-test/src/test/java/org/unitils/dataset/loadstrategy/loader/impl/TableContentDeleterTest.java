@@ -19,15 +19,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.database.DatabaseAccessor;
-import org.unitils.dataset.database.DatabaseMetaData;
-import org.unitils.dataset.loadstrategy.impl.IdentifierNameProcessor;
 import org.unitils.dataset.loadstrategy.impl.TableContentDeleter;
+import org.unitils.dataset.model.database.TableName;
 import org.unitils.dataset.model.dataset.DataSetRow;
+import org.unitils.dataset.model.dataset.DataSetSettings;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.mock.Mock;
 
 import static org.junit.Assert.fail;
+import static org.unitils.dataset.util.DataSetTestUtils.createTableName;
 
 /**
  * Tests for deleting all data from tables.
@@ -42,8 +44,7 @@ public class TableContentDeleterTest extends UnitilsJUnit4 {
 
     protected Mock<DataSetRowSource> dataSetRowSource;
     protected Mock<DatabaseAccessor> databaseAccessor;
-    protected Mock<IdentifierNameProcessor> identifierNameProcessor;
-    protected Mock<DatabaseMetaData> databaseMetaData;
+    protected Mock<DataSourceWrapper> dataSourceWrapper;
 
     private DataSetRow dataSetRowTableA;
     private DataSetRow dataSetRowTableB;
@@ -52,15 +53,18 @@ public class TableContentDeleterTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() throws Exception {
-        tableContentDeleter = new TableContentDeleter(identifierNameProcessor.getMock(), databaseAccessor.getMock(), databaseMetaData.getMock());
+        tableContentDeleter = new TableContentDeleter(databaseAccessor.getMock(), dataSourceWrapper.getMock());
 
-        dataSetRowTableA = new DataSetRow("schema_a", "table_a", null, false, null);
-        dataSetRowTableB = new DataSetRow("schema_b", "table_b", null, false, null);
-        dataSetRowTableCaseSensitive = new DataSetRow("schema_c", "table_c", null, false, null);
+        DataSetSettings dataSetSettings = new DataSetSettings('\'', '$', false, null);
+        DataSetSettings dataSetSettingsCaseSensitive = new DataSetSettings('\'', '$', true, null);
 
-        identifierNameProcessor.returns("schema_a.table_a").getQualifiedTableName(dataSetRowTableA);
-        identifierNameProcessor.returns("schema_b.table_b").getQualifiedTableName(dataSetRowTableB);
-        identifierNameProcessor.returns("\"schema_c\".\"table_c\"").getQualifiedTableName(dataSetRowTableCaseSensitive);
+        dataSetRowTableA = new DataSetRow("schema_a", "table_a", null, false, dataSetSettings);
+        dataSetRowTableB = new DataSetRow("schema_b", "table_b", null, false, dataSetSettings);
+        dataSetRowTableCaseSensitive = new DataSetRow("schema_c", "table_c", null, false, dataSetSettingsCaseSensitive);
+
+        dataSourceWrapper.returns(createTableName("schema_a", "table_a")).getTableName("schema_a", "table_a", false);
+        dataSourceWrapper.returns(createTableName("schema_b", "table_b")).getTableName("schema_b", "table_b", false);
+        dataSourceWrapper.returns(new TableName("schema_c", "table_c", "\"schema_c\".\"table_c\"")).getTableName("schema_c", "table_c", true);
     }
 
 
@@ -93,7 +97,7 @@ public class TableContentDeleterTest extends UnitilsJUnit4 {
     @Test
     public void tableDoesNotExist() throws Exception {
         dataSetRowSource.onceReturns(dataSetRowTableA).getNextDataSetRow();
-        databaseMetaData.raises(UnitilsException.class).assertTableNameExists("schema_a.table_a");
+        dataSourceWrapper.raises(UnitilsException.class).assertTableNameExists(createTableName("schema_a", "table_a"));
         try {
             tableContentDeleter.deleteDataFromTablesInReverseOrder(dataSetRowSource.getMock());
             fail("Expected UnitilsException");

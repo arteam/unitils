@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ package org.unitils.database;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.unitils.core.UnitilsException;
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -26,6 +26,8 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 /**
  * Utilities for executing statements and queries.
@@ -53,7 +55,7 @@ public class SQLUnitils {
         Connection connection = null;
         Statement statement = null;
         try {
-            connection = dataSource.getConnection();
+            connection = DataSourceUtils.getConnection(dataSource);
             statement = connection.createStatement();
             return statement.executeUpdate(sql);
         } catch (Exception e) {
@@ -96,7 +98,7 @@ public class SQLUnitils {
         Statement statement = null;
         ResultSet resultSet = null;
         try {
-            connection = dataSource.getConnection();
+            connection = DataSourceUtils.getConnection(dataSource);
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
             if (resultSet.next()) {
@@ -128,7 +130,7 @@ public class SQLUnitils {
         Statement statement = null;
         ResultSet resultSet = null;
         try {
-            connection = dataSource.getConnection();
+            connection = DataSourceUtils.getConnection(dataSource);
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
             if (resultSet.next()) {
@@ -159,7 +161,7 @@ public class SQLUnitils {
         Statement statement = null;
         ResultSet resultSet = null;
         try {
-            connection = dataSource.getConnection();
+            connection = DataSourceUtils.getConnection(dataSource);
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
             Set<String> result = new HashSet<String>();

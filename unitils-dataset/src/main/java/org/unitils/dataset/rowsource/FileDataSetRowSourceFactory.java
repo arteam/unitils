@@ -25,10 +25,9 @@ import java.util.Properties;
 public interface FileDataSetRowSourceFactory {
 
     /**
-     * @param configuration     The unitils configuration, not null
-     * @param defaultSchemaName The schema name to use when none is specified, not null
+     * @param configuration The unitils configuration, not null
      */
-    void init(Properties configuration, String defaultSchemaName);
+    void init(Properties configuration);
 
     DataSetRowSource createDataSetRowSource(File dataSetFile);
 

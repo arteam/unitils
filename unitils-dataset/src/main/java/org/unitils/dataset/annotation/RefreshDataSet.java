@@ -32,8 +32,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Refresh means that if a record with the same primary key values is in the database, it will be updated. If no such record
  * exists yet in the database, it will be inserted. If no or not all values for the PK columns are provided in the data set,
  * an exception will be raised.
- * See {@link CleanInsertDataSet} and {@link InsertDataSet}
- * for other possible ways of loading.
+ * See {@link CleanInsertDataSet}, {@link InsertDataSet} and {@link UpdateDataSet} for other possible ways of loading.
  * <br/><br/>
  * This annotation can be put on method or on class level. If the annotation is found on class and method level, the
  * one on method level is taken. If a method is annotated, a data set will be loaded when that test method is run.

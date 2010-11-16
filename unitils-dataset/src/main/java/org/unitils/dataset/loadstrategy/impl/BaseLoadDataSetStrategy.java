@@ -17,10 +17,12 @@ package org.unitils.dataset.loadstrategy.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dbmaintain.database.IdentifierProcessor;
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.DataSetModuleFactoryHelper;
+import org.unitils.dataset.DataSetModuleFactory;
+import org.unitils.dataset.database.DataSetDatabaseHelper;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.database.DatabaseAccessor;
-import org.unitils.dataset.database.DatabaseMetaData;
 import org.unitils.dataset.loadstrategy.LoadDataSetStrategy;
 import org.unitils.dataset.loadstrategy.loader.DataSetLoader;
 import org.unitils.dataset.rowsource.DataSetRowSource;
@@ -41,17 +43,18 @@ public abstract class BaseLoadDataSetStrategy implements LoadDataSetStrategy {
     private static Log logger = LogFactory.getLog(BaseLoadDataSetStrategy.class);
 
     protected DatabaseAccessor databaseAccessor;
-    protected IdentifierNameProcessor identifierNameProcessor;
+    protected DataSetDatabaseHelper dataSetDatabaseHelper;
     protected DataSetRowProcessor dataSetRowProcessor;
 
 
-    public void init(Properties configuration, DatabaseMetaData database) {
-        this.databaseAccessor = new DatabaseAccessor(database);
-        this.identifierNameProcessor = new IdentifierNameProcessor(database);
+    public void init(Properties configuration, DataSourceWrapper dataSourceWrapper, IdentifierProcessor identifierProcessor) {
+        this.databaseAccessor = new DatabaseAccessor(dataSourceWrapper);
+        this.dataSetDatabaseHelper = new DataSetDatabaseHelper(dataSourceWrapper, identifierProcessor);
 
-        DataSetModuleFactoryHelper dataSetModuleFactoryHelper = new DataSetModuleFactoryHelper(configuration, database);
-        SqlTypeHandlerRepository sqlTypeHandlerRepository = dataSetModuleFactoryHelper.createSqlTypeHandlerRepository();
-        this.dataSetRowProcessor = new DataSetRowProcessor(identifierNameProcessor, sqlTypeHandlerRepository, database);
+        // todo move out
+        DataSetModuleFactory dataSetModuleFactory = new DataSetModuleFactory(configuration, dataSourceWrapper, identifierProcessor);
+        SqlTypeHandlerRepository sqlTypeHandlerRepository = dataSetModuleFactory.createSqlTypeHandlerRepository();
+        this.dataSetRowProcessor = new DataSetRowProcessor(dataSetDatabaseHelper, sqlTypeHandlerRepository, dataSourceWrapper);
     }
 
 

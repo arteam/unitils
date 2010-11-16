@@ -16,6 +16,7 @@
 package org.unitils.dataset.loadstrategy.loader.impl;
 
 import org.unitils.dataset.model.database.Row;
+import org.unitils.dataset.model.database.TableName;
 import org.unitils.dataset.model.database.Value;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class InsertDataSetLoader extends BaseDataSetLoader {
         for (Value value : row.getValues()) {
             addValueToStatementParts(value, columnsPart, valuesPart, statementValues);
         }
-        String sql = createStatement(row.getQualifiedTableName(), columnsPart, valuesPart);
+        String sql = createStatement(row.getTableName(), columnsPart, valuesPart);
         return databaseAccessor.executeUpdate(sql, statementValues);
     }
 
@@ -57,13 +58,13 @@ public class InsertDataSetLoader extends BaseDataSetLoader {
         valuesPart.append(", ");
     }
 
-    protected String createStatement(String tableName, StringBuilder columnsPart, StringBuilder valuesPart) {
+    protected String createStatement(TableName tableName, StringBuilder columnsPart, StringBuilder valuesPart) {
         columnsPart.setLength(columnsPart.length() - 2);
         valuesPart.setLength(valuesPart.length() - 2);
 
         StringBuilder sql = new StringBuilder();
         sql.append("insert into ");
-        sql.append(tableName);
+        sql.append(tableName.getQualifiedTableName());
         sql.append(" (");
         sql.append(columnsPart);
         sql.append(") values (");

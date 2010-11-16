@@ -13,34 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.database;
+package org.unitils.database.datasource;
 
+import org.dbmaintain.database.IdentifierProcessor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dataset.database.DataSourceWrapper;
 
 import javax.sql.DataSource;
-import java.util.Map;
 
 import static java.sql.Types.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.unitils.database.DatabaseUnitils.getUnitilsDataSource;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.database.DatabaseMetaData.SQL_TYPE_UNKNOWN;
-import static org.unitils.dataset.util.DatabaseTestUtils.createDatabaseMetaData;
+import static org.unitils.dataset.database.DataSourceWrapper.SQL_TYPE_UNKNOWN;
+import static org.unitils.dataset.util.DataSetTestUtils.createIdentifierProcessor;
+import static org.unitils.dataset.util.DataSetTestUtils.createTableName;
 
 /**
- * Tests for getting the sql type for a column.
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DatabaseMetaDataGetColumnSqlTypeTest extends UnitilsJUnit4 {
+public class DataSourceWrapperGetColumnSqlTypeTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private DatabaseMetaData databaseMetaData;
+    private DataSourceWrapper dataSourceWrapper;
 
     @TestDataSource
     protected DataSource dataSource;
@@ -48,7 +49,8 @@ public class DatabaseMetaDataGetColumnSqlTypeTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() throws Exception {
-        databaseMetaData = createDatabaseMetaData();
+        IdentifierProcessor identifierProcessor = createIdentifierProcessor();
+        dataSourceWrapper = new DataSourceWrapper(getUnitilsDataSource(), identifierProcessor);
     }
 
     @Before
@@ -66,10 +68,10 @@ public class DatabaseMetaDataGetColumnSqlTypeTest extends UnitilsJUnit4 {
 
 
     @Test
-    public void getPrimaryKeyColumnNames() throws Exception {
-        int col1Type = databaseMetaData.getColumnSqlType("PUBLIC.TEST", "COL1");
-        int col2Type = databaseMetaData.getColumnSqlType("PUBLIC.TEST", "COL2");
-        int col3Type = databaseMetaData.getColumnSqlType("PUBLIC.TEST", "COL3");
+    public void getSqlTypes() throws Exception {
+        int col1Type = dataSourceWrapper.getColumnSqlType(createTableName("PUBLIC", "TEST"), "COL1");
+        int col2Type = dataSourceWrapper.getColumnSqlType(createTableName("PUBLIC", "TEST"), "COL2");
+        int col3Type = dataSourceWrapper.getColumnSqlType(createTableName("PUBLIC", "TEST"), "COL3");
 
         assertEquals(VARCHAR, col1Type);
         assertEquals(INTEGER, col2Type);
@@ -78,9 +80,9 @@ public class DatabaseMetaDataGetColumnSqlTypeTest extends UnitilsJUnit4 {
 
     @Test
     public void caseSensitive() throws Exception {
-        int col1Type = databaseMetaData.getColumnSqlType("\"PUBLIC\".\"TestCase\"", "Col1");
-        int col2Type = databaseMetaData.getColumnSqlType("\"PUBLIC\".\"TestCase\"", "col2");
-        int col3Type = databaseMetaData.getColumnSqlType("\"PUBLIC\".\"TestCase\"", "COL3");
+        int col1Type = dataSourceWrapper.getColumnSqlType(createTableName("PUBLIC", "TestCase"), "Col1");
+        int col2Type = dataSourceWrapper.getColumnSqlType(createTableName("PUBLIC", "TestCase"), "col2");
+        int col3Type = dataSourceWrapper.getColumnSqlType(createTableName("PUBLIC", "TestCase"), "COL3");
 
         assertEquals(VARCHAR, col1Type);
         assertEquals(INTEGER, col2Type);
@@ -88,22 +90,16 @@ public class DatabaseMetaDataGetColumnSqlTypeTest extends UnitilsJUnit4 {
     }
 
     @Test
-    public void primaryKeySetCached() throws Exception {
-        Map<String, Integer> columnSqlTypes1 = databaseMetaData.getColumnSqlTypes("PUBLIC.TEST");
-        Map<String, Integer> columnSqlTypes2 = databaseMetaData.getColumnSqlTypes("PUBLIC.TEST");
-        assertSame(columnSqlTypes1, columnSqlTypes2);
-    }
-
-    @Test
-    public void onlyCachedForIdenticalSchemaAndTableName() throws Exception {
-        Map<String, Integer> columnSqlTypes1 = databaseMetaData.getColumnSqlTypes("PUBLIC.TEST");
-        Map<String, Integer> columnSqlTypes2 = databaseMetaData.getColumnSqlTypes("public.\"TEST\"");
-        assertNotSame(columnSqlTypes1, columnSqlTypes2);
+    public void columnSqlTypesSetCached() throws Exception {
+        dataSourceWrapper.getColumnSqlType(createTableName("PUBLIC", "TEST"), "COL1");
+        dropTestTables();
+        int col1Type = dataSourceWrapper.getColumnSqlType(createTableName("PUBLIC", "TEST"), "COL1");
+        assertEquals(VARCHAR, col1Type);
     }
 
     @Test
     public void tableNotFound() throws Exception {
-        int result = databaseMetaData.getColumnSqlType("xxxx.xxxx", "xxxx");
+        int result = dataSourceWrapper.getColumnSqlType(createTableName("xxxx", "xxxx"), "xxxx");
         assertEquals(SQL_TYPE_UNKNOWN, result);
     }
 }

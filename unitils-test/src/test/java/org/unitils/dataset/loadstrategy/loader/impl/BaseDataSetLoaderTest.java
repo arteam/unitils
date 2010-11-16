@@ -35,6 +35,7 @@ import static java.sql.Types.VARCHAR;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.unitils.dataset.util.DataSetTestUtils.createRow;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.unitils.util.AssertionUtils.assertExceptionMessageContains;
 
@@ -68,11 +69,11 @@ public class BaseDataSetLoaderTest extends UnitilsJUnit4 {
 
         dataSetRow1 = createDataSetRow();
         dataSetRow2 = createDataSetRow();
-        row1 = createRow();
-        row2 = createRow();
+        row1 = createRow(new Value("value", false, new Column("column", VARCHAR, false)));
+        row2 = createRow(new Value("value", false, new Column("column", VARCHAR, false)));
 
         emptyDataSetRow = createDataSetRowWithoutColumns();
-        emptyRow = createRowWithoutColumns();
+        emptyRow = createRow();
     }
 
 
@@ -122,24 +123,15 @@ public class BaseDataSetLoaderTest extends UnitilsJUnit4 {
 
 
     private DataSetRow createDataSetRow() {
-        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
+        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false, null);
         DataSetRow dataSetRow = new DataSetRow("schema", "table", null, false, dataSetSettings);
         dataSetRow.addDataSetValue(new DataSetValue("column", "value"));
         return dataSetRow;
     }
 
-    private Row createRow() {
-        Row row = new Row("schema.table");
-        row.addValue(new Value("value", false, new Column("column", VARCHAR, false)));
-        return row;
-    }
 
     private DataSetRow createDataSetRowWithoutColumns() {
         return new DataSetRow("schema", "table", null, false, null);
-    }
-
-    private Row createRowWithoutColumns() {
-        return new Row("schema.table");
     }
 
 

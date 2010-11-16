@@ -28,7 +28,7 @@ public class DefaultInlineDataSetRowSourceFactory extends BaseDataSetRowSourceFa
 
 
     public DataSetRowSource createDataSetRowSource(List<String> dataSetRows) {
-        return new InlineDataSetRowSource(dataSetRows, defaultSchemaName, defaultDataSetSettings);
+        return new InlineDataSetRowSource(dataSetRows, defaultDataSetSettings);
     }
 
 }

@@ -20,6 +20,7 @@ import org.dbmaintain.database.Database;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.unitils.dbunit.structure.DataSetStructureGenerator;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 
@@ -111,16 +112,16 @@ public class DtdDataSetStructureGeneratorTest {
      * Creates the test tables
      */
     private void createTestTables() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
+        Connection connection = null;
+        Statement statement = null;
         try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            st.execute("create table tableOne(columnA varchar(1) not null, columnB varchar(1) not null, columnC varchar(1))");
-            st.execute("create table tableTwo(column1 varchar(1), column2 varchar(1))");
+            connection = DataSourceUtils.getConnection(dataSource);
+            statement = connection.createStatement();
+            statement.execute("create table tableOne(columnA varchar(1) not null, columnB varchar(1) not null, columnC varchar(1))");
+            statement.execute("create table tableTwo(column1 varchar(1), column2 varchar(1))");
 
         } finally {
-            closeQuietly(conn, st, null);
+            closeQuietly(connection, statement, null);
         }
     }
 
@@ -129,23 +130,23 @@ public class DtdDataSetStructureGeneratorTest {
      * Removes the test database tables
      */
     private void dropTestTables() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
+        Connection connection = null;
+        Statement statement = null;
         try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
+            connection = DataSourceUtils.getConnection(dataSource);
+            statement = connection.createStatement();
             try {
-                st.executeUpdate("drop table TABLEONE");
+                statement.executeUpdate("drop table TABLEONE");
             } catch (SQLException e) {
                 // Ignored
             }
             try {
-                st.executeUpdate("drop table TABLETWO");
+                statement.executeUpdate("drop table TABLETWO");
             } catch (SQLException e) {
                 // Ignored
             }
         } finally {
-            closeQuietly(conn, st, null);
+            closeQuietly(connection, statement, null);
         }
     }
 

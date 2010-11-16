@@ -16,6 +16,7 @@
 package org.unitils.dataset.assertstrategy.model;
 
 import org.unitils.dataset.model.database.Row;
+import org.unitils.dataset.model.database.TableName;
 
 import java.util.*;
 
@@ -27,8 +28,8 @@ import java.util.*;
  */
 public class TableComparison {
 
-    /* The table name prefixed with the schema name and quoted if it is a case-sensitive name. */
-    private String qualifiedTableName;
+    /* The table name, not null. */
+    private TableName tableName;
 
     /* True if expected no more records but found more records in the database */
     private boolean expectedNoMoreRecordsButFoundMore = false;
@@ -47,18 +48,18 @@ public class TableComparison {
     /**
      * Creates a table difference.
      *
-     * @param qualifiedTableName The table name prefixed with the schema name and quoted if it is a case-sensitive name, not null
+     * @param tableName The table name, not null
      */
-    public TableComparison(String qualifiedTableName) {
-        this.qualifiedTableName = qualifiedTableName;
+    public TableComparison(TableName tableName) {
+        this.tableName = tableName;
     }
 
 
     /**
-     * @return The table name prefixed with the schema name and quoted if it is a case-sensitive name, not null
+     * @return The table name, not null
      */
-    public String getQualifiedTableName() {
-        return qualifiedTableName;
+    public TableName getTableName() {
+        return tableName;
     }
 
     /**

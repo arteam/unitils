@@ -18,15 +18,16 @@ package org.unitils.dataset.model;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.database.DatabaseMetaData;
+import org.unitils.dataset.database.DataSetDatabaseHelper;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
-import org.unitils.dataset.loadstrategy.impl.IdentifierNameProcessor;
 import org.unitils.dataset.model.database.Row;
 import org.unitils.dataset.model.database.Value;
 import org.unitils.dataset.model.dataset.DataSetRow;
 import org.unitils.dataset.model.dataset.DataSetSettings;
 import org.unitils.dataset.model.dataset.DataSetValue;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
+import org.unitils.dataset.sqltypehandler.impl.TextSqlTypeHandler;
 import org.unitils.mock.Mock;
 
 import java.sql.SQLException;
@@ -37,6 +38,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.unitils.dataset.util.DataSetTestUtils.createTableName;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.unitils.util.CollectionUtils.asSet;
 
@@ -51,8 +53,9 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
     /* Tested object */
     private DataSetRowProcessor dataSetRowProcessor;
 
-    protected Mock<IdentifierNameProcessor> identifierNameProcessor;
-    protected Mock<DatabaseMetaData> databaseMetaData;
+    protected Mock<DataSetDatabaseHelper> identifierNameProcessor;
+    protected Mock<DataSourceWrapper> dataSourceWrapper;
+    protected Mock<SqlTypeHandlerRepository> sqlTypeHandlerRepository;
 
     private DataSetRow dataSetRow;
     private DataSetRow dataSetRowCaseSensitive;
@@ -62,33 +65,32 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() throws SQLException {
-        SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
-        dataSetRowProcessor = new DataSetRowProcessor(identifierNameProcessor.getMock(), sqlTypeHandlerRepository, databaseMetaData.getMock());
+        dataSetRowProcessor = new DataSetRowProcessor(identifierNameProcessor.getMock(), sqlTypeHandlerRepository.getMock(), dataSourceWrapper.getMock());
 
         identifierNameProcessor.returns("\"PK\"").getCorrectCaseColumnName("PK", null);
         identifierNameProcessor.returns("\"pk\"").getCorrectCaseColumnName("pk", null);
         identifierNameProcessor.returns("PK1").getCorrectCaseColumnName("pk1", null);
         identifierNameProcessor.returns("PK2").getCorrectCaseColumnName("pk2", null);
         identifierNameProcessor.returns("COLUMN").getCorrectCaseColumnName("column", null);
-        databaseMetaData.returns("PK").removeIdentifierQuotes("\"PK\"");
-        databaseMetaData.returns("pk").removeIdentifierQuotes("\"pk\"");
-        databaseMetaData.returns("PK1").removeIdentifierQuotes("PK1");
-        databaseMetaData.returns("PK2").removeIdentifierQuotes("PK2");
-        databaseMetaData.returns("COLUMN").removeIdentifierQuotes("COLUMN");
-        databaseMetaData.returns("schema").getSchemaName("\"schema\".\"table\"");
-        databaseMetaData.returns("schema").getSchemaName("schema.table");
-        databaseMetaData.returns("table").getTableName("schema.table");
-        databaseMetaData.returns("table").getTableName("\"schema\".\"table\"");
+        identifierNameProcessor.returns("PK").removeIdentifierQuotes("\"PK\"");
+        identifierNameProcessor.returns("pk").removeIdentifierQuotes("\"pk\"");
+        identifierNameProcessor.returns("PK1").removeIdentifierQuotes("PK1");
+        identifierNameProcessor.returns("PK2").removeIdentifierQuotes("PK2");
+        identifierNameProcessor.returns("COLUMN").removeIdentifierQuotes("COLUMN");
 
-        dataSetRow = new DataSetRow("schema", "table", null, false, new DataSetSettings('=', '$', false));
-        dataSetRowCaseSensitive = new DataSetRow("schema", "table", null, false, new DataSetSettings('=', '$', true));
+        sqlTypeHandlerRepository.returns(new TextSqlTypeHandler()).getSqlTypeHandler(0);
+
+        dataSourceWrapper.returns(createTableName()).getTableName("schema", "table", false);
+        dataSourceWrapper.returns(createTableName()).getTableName("schema", "table", true);
+
+        dataSetRow = new DataSetRow("schema", "table", null, false, new DataSetSettings('=', '$', false, null));
+        dataSetRowCaseSensitive = new DataSetRow("schema", "table", null, false, new DataSetSettings('=', '$', true, null));
     }
 
 
     @Test
     public void primaryKeyColumns() throws Exception {
-        identifierNameProcessor.returns("schema.table").getQualifiedTableName(null);
-        databaseMetaData.returns(asSet("PK1", "PK2")).getPrimaryKeyColumnNames("schema.table");
+        dataSourceWrapper.returns(asSet("PK1", "PK2")).getPrimaryKeyColumnNames(createTableName());
         dataSetRow.addDataSetValue(new DataSetValue("pk1", "value"));
         dataSetRow.addDataSetValue(new DataSetValue("pk2", "value"));
         dataSetRow.addDataSetValue(new DataSetValue("column", "value"));
@@ -107,8 +109,7 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
 
     @Test
     public void unusedPrimaryKeyColumns() throws Exception {
-        identifierNameProcessor.returns("schema.table").getQualifiedTableName(null);
-        databaseMetaData.returns(asSet("PK1", "PK2", "PK3")).getPrimaryKeyColumnNames("schema.table");
+        dataSourceWrapper.returns(asSet("PK1", "PK2", "PK3")).getPrimaryKeyColumnNames(createTableName());
         dataSetRow.addDataSetValue(new DataSetValue("pk1", "value"));
 
         Set<String> unusedPrimaryKeys = new HashSet<String>();
@@ -121,8 +122,7 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
 
     @Test
     public void caseSensitive() throws Exception {
-        identifierNameProcessor.returns("\"schema\".\"table\"").getQualifiedTableName(null);
-        databaseMetaData.returns(asSet("pk")).getPrimaryKeyColumnNames("\"schema\".\"table\"");
+        dataSourceWrapper.returns(asSet("pk")).getPrimaryKeyColumnNames(createTableName("schema", "table"));
         dataSetRowCaseSensitive.addDataSetValue(new DataSetValue("PK", "value"));
         dataSetRowCaseSensitive.addDataSetValue(new DataSetValue("pk", "value"));
 

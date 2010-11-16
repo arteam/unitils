@@ -13,22 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset.database;
+package org.unitils.database.datasource;
 
+import org.dbmaintain.database.IdentifierProcessor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dataset.database.DataSourceWrapper;
 
 import javax.sql.DataSource;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.unitils.database.DatabaseUnitils.getUnitilsDataSource;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.util.DatabaseTestUtils.createDatabaseMetaData;
+import static org.unitils.dataset.util.DataSetTestUtils.createIdentifierProcessor;
+import static org.unitils.dataset.util.DataSetTestUtils.createTableName;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 /**
@@ -37,10 +42,10 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEqua
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DatabaseMetaDataGetPrimaryKeyColumnNamesTest extends UnitilsJUnit4 {
+public class DataSourceWrapperGetPrimaryKeyColumnNamesTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private DatabaseMetaData databaseMetaData;
+    private DataSourceWrapper dataSourceWrapper;
 
     @TestDataSource
     protected DataSource dataSource;
@@ -48,7 +53,8 @@ public class DatabaseMetaDataGetPrimaryKeyColumnNamesTest extends UnitilsJUnit4 
 
     @Before
     public void initialize() throws Exception {
-        databaseMetaData = createDatabaseMetaData();
+        IdentifierProcessor identifierProcessor = createIdentifierProcessor();
+        dataSourceWrapper = new DataSourceWrapper(getUnitilsDataSource(), identifierProcessor);
     }
 
     @Before
@@ -69,39 +75,32 @@ public class DatabaseMetaDataGetPrimaryKeyColumnNamesTest extends UnitilsJUnit4 
 
     @Test
     public void getPrimaryKeyColumnNames() throws Exception {
-        Set<String> result = databaseMetaData.getPrimaryKeyColumnNames("PUBLIC.TEST");
+        Set<String> result = dataSourceWrapper.getPrimaryKeyColumnNames(createTableName("PUBLIC", "TEST"));
         assertReflectionEquals(asList("COL1", "COL2"), result);
     }
 
     @Test
     public void noPrimaryKeys() throws Exception {
-        Set<String> result = databaseMetaData.getPrimaryKeyColumnNames("PUBLIC.NOPRIMARYKEYS");
+        Set<String> result = dataSourceWrapper.getPrimaryKeyColumnNames(createTableName("PUBLIC", "NOPRIMARYKEYS"));
         assertTrue(result.isEmpty());
     }
 
     @Test
     public void caseSensitive() throws Exception {
-        Set<String> result = databaseMetaData.getPrimaryKeyColumnNames("\"PUBLIC\".\"TestCase\"");
+        Set<String> result = dataSourceWrapper.getPrimaryKeyColumnNames(createTableName("PUBLIC", "TestCase"));
         assertReflectionEquals(asList("Col1", "col2"), result);
     }
 
     @Test
     public void primaryKeySetCached() throws Exception {
-        Set<String> result1 = databaseMetaData.getPrimaryKeyColumnNames("PUBLIC.TEST");
-        Set<String> result2 = databaseMetaData.getPrimaryKeyColumnNames("PUBLIC.TEST");
+        Set<String> result1 = dataSourceWrapper.getPrimaryKeyColumnNames(createTableName("PUBLIC", "TEST"));
+        Set<String> result2 = dataSourceWrapper.getPrimaryKeyColumnNames(createTableName("PUBLIC", "TEST"));
         assertSame(result1, result2);
     }
 
     @Test
-    public void onlyCachedForIdenticalSchemaAndTableName() throws Exception {
-        Set<String> result1 = databaseMetaData.getPrimaryKeyColumnNames("PUBLIC.TEST");
-        Set<String> result2 = databaseMetaData.getPrimaryKeyColumnNames("\"PUBLIC\".\"TEST\"");
-        assertNotSame(result1, result2);
-    }
-
-    @Test
     public void tableNotFound() throws Exception {
-        Set<String> result = databaseMetaData.getPrimaryKeyColumnNames("xxxx.xxxx");
+        Set<String> result = dataSourceWrapper.getPrimaryKeyColumnNames(createTableName("xxxx", "xxxx"));
         assertTrue(result.isEmpty());
     }
 }

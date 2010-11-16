@@ -25,8 +25,11 @@ public class ExceptionUtils {
         StringBuilder stringBuilder = new StringBuilder();
 
         while (t != null) {
-            stringBuilder.append(t.getMessage());
-            stringBuilder.append("\n");
+            String message = t.getMessage();
+            if (message != null) {
+                stringBuilder.append(message);
+                stringBuilder.append("\n");
+            }
             t = t.getCause();
         }
         return stringBuilder.toString();

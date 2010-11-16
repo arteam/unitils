@@ -25,8 +25,8 @@ import org.unitils.core.UnitilsException;
 import javax.sql.DataSource;
 
 import static org.junit.Assert.fail;
-import static org.unitils.database.DatabaseUnitils.disableConstraints;
 import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
+import static org.unitils.database.DbMaintainUnitils.disableConstraints;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 

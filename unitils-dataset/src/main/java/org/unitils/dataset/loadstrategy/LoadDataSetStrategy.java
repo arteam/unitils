@@ -15,7 +15,8 @@
  */
 package org.unitils.dataset.loadstrategy;
 
-import org.unitils.dataset.database.DatabaseMetaData;
+import org.dbmaintain.database.IdentifierProcessor;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.Properties;
  */
 public interface LoadDataSetStrategy {
 
-    void init(Properties configuration, DatabaseMetaData database);
+    void init(Properties configuration, DataSourceWrapper dataSourceWrapper, IdentifierProcessor identifierProcessor);
 
     void perform(DataSetRowSource dataSetRowSource, List<String> variables);
 

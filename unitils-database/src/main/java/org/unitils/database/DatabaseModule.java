@@ -16,7 +16,6 @@
 package org.unitils.database;
 
 import org.dbmaintain.MainFactory;
-import org.dbmaintain.database.Database;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.TestContext;
 import org.unitils.core.Module;
@@ -26,8 +25,8 @@ import org.unitils.core.util.ConfigUtils;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.datasource.DataSourceFactory;
-import org.unitils.database.transaction.DbMaintainManager;
-import org.unitils.database.transaction.UnitilsDataSourceManager;
+import org.unitils.database.manager.DbMaintainManager;
+import org.unitils.database.manager.UnitilsDataSourceManager;
 import org.unitils.database.transaction.UnitilsTransactionManager;
 import org.unitils.database.util.DatabaseAnnotationHelper;
 import org.unitils.database.util.TransactionMode;
@@ -36,7 +35,9 @@ import org.unitils.util.PropertyUtils;
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.Set;
 
 import static org.unitils.database.util.TransactionMode.*;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
@@ -44,23 +45,12 @@ import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.*;
 
 /**
- * Module that provides support for database testing: Creation of a data source that connects to the
+ * Module that provides support for database testing: creation of a data source that connects to the
  * test database, support for executing tests in a transaction and automatic maintenance of the test database.
- * <p/>
- * A data source will be created the first time one is requested. Which type of data source will be created depends on
- * the configured {@link DataSourceFactory}. By default this will be a pooled data source that gets its connection-url,
- * user name and password from the unitils configuration.
- * <p/>
- * The created data source can be injected into a field of the test by annotating the field with {@link TestDataSource}.
- * It can then be used to install it in your DAO or other class under test.
- * <p/>
- * If the DBMaintainer is enabled (by setting {@link #PROPERTY_UPDATEDATABASESCHEMA_ENABLED} to true), the test database
- * schema will automatically be updated if needed. This check will be performed once during your test-suite run, namely
- * when the data source is created.
- * <p/>
- * If the test class or method is annotated with {@link Transactional} with transaction mode {@link TransactionMode#COMMIT} or
- * {@link TransactionMode#ROLLBACK}, or if the property 'DatabaseModule.Transactional.value.default' was set to 'commit' or
- * 'rollback', every test is executed in a transaction.
+ * <br/>
+ * The module listens to the test execution and can be configured by adding annotations to your test class.
+ * It should not be used directly. See {@link DatabaseUnitils} and {@link DbMaintainUnitils} if you want to
+ * programmatically start transactions, get data sources etc.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -90,9 +80,6 @@ public class DatabaseModule implements Module {
     /* Utility class for handling annotations */
     protected DatabaseAnnotationHelper databaseAnnotationHelper;
 
-    /* The registered database update listeners that will be called when db-maintain has updated the database */
-    protected List<DatabaseUpdateListener> databaseUpdateListeners = new ArrayList<DatabaseUpdateListener>();
-
 
     /**
      * Initializes this module using the given <code>Configuration</code>
@@ -115,21 +102,16 @@ public class DatabaseModule implements Module {
         return unitilsDataSourceManager;
     }
 
-    public Database getDatabase(String databaseName) {
-        return dbMaintainManager.getDatabase(databaseName);
-    }
-
     public MainFactory getDbMaintainMainFactory() {
         return dbMaintainManager.getDbMaintainMainFactory();
     }
 
+    public DbMaintainManager getDbMaintainManager() {
+        return dbMaintainManager;
+    }
 
-    public boolean updateDatabaseIfNeeded(ApplicationContext applicationContext) {
-        boolean databaseUpdated = dbMaintainManager.updateDatabaseIfNeeded(applicationContext);
-        if (databaseUpdated) {
-            notifyDatabaseUpdateListeners();
-        }
-        return databaseUpdated;
+    public UnitilsTransactionManager getUnitilsTransactionManager() {
+        return unitilsTransactionManager;
     }
 
 
@@ -180,12 +162,6 @@ public class DatabaseModule implements Module {
         unitilsTransactionManager.startTransactionForDataSource(injectedDataSource);
     }
 
-
-    public UnitilsTransactionManager getUnitilsTransactionManager() {
-        return unitilsTransactionManager;
-    }
-
-
     /**
      * Commits or rollbacks the current transactions if transactions are enabled.
      *
@@ -218,21 +194,6 @@ public class DatabaseModule implements Module {
     }
 
 
-    public void registerDatabaseUpdateListener(DatabaseUpdateListener databaseUpdateListener) {
-        databaseUpdateListeners.add(databaseUpdateListener);
-    }
-
-    public void unregisterDatabaseUpdateListener(DatabaseUpdateListener databaseUpdateListener) {
-        databaseUpdateListeners.remove(databaseUpdateListener);
-    }
-
-    protected void notifyDatabaseUpdateListeners() {
-        for (DatabaseUpdateListener databaseUpdateListener : databaseUpdateListeners) {
-            databaseUpdateListener.databaseWasUpdated();
-        }
-    }
-
-
     protected DatabaseAnnotationHelper createDatabaseAnnotationHelper(Properties configuration) {
         String defaultValue = PropertyUtils.getString(DEFAULT_TRANSACTION_MODE_PROPERTY, configuration);
         TransactionMode defaultTransactionMode = getEnumValue(TransactionMode.class, defaultValue);
@@ -251,6 +212,7 @@ public class DatabaseModule implements Module {
         return new UnitilsDataSourceManager(wrapDataSourceInTransactionalProxy, dbMaintainManager);
     }
 
+
     /**
      * @return The {@link org.unitils.core.TestExecutionListenerAdapter} associated with this module
      */
@@ -263,7 +225,7 @@ public class DatabaseModule implements Module {
         @Override
         public void beforeTestClass(Class<?> testClass, TestContext testContext) throws Exception {
             ApplicationContext applicationContext = getApplicationContext(testContext);
-            updateDatabaseIfNeeded(applicationContext);
+            dbMaintainManager.updateDatabaseIfNeeded(applicationContext);
         }
 
         @Override
