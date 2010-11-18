@@ -16,8 +16,10 @@
 package org.unitils.dataset.annotation.handler.impl;
 
 import org.unitils.dataset.DataSetModule;
+import org.unitils.dataset.DataSetModuleFactory;
 import org.unitils.dataset.annotation.AssertDataSet;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
+import org.unitils.dataset.assertstrategy.AssertDataSetStrategyHandler;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -43,7 +45,9 @@ public class AssertDataSetAnnotationHandler implements DataSetAnnotationHandler<
             fileNames.add(dataSetModule.getDefaultExpectedDataSetFileName(testMethod, testInstance.getClass()));
         }
 
-        dataSetModule.assertDataSetFiles(testInstance, fileNames, logDatabaseContentOnAssertionError, variables);
+        DataSetModuleFactory dataSetModuleFactory = dataSetModule.getDataSetModuleFactory();
+        AssertDataSetStrategyHandler assertDataSetStrategyHandler = dataSetModuleFactory.getAssertDataSetStrategyHandler();
+        assertDataSetStrategyHandler.assertDataSetFiles(testInstance, fileNames, logDatabaseContentOnAssertionError, variables);
     }
 
 }

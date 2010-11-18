@@ -15,12 +15,16 @@
  */
 package org.unitils.dataset.sqltypehandler.impl;
 
+import org.unitils.core.UnitilsException;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandler;
+import org.unitils.util.PropertyUtils;
 
 import java.sql.ResultSet;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Properties;
 
 
 /**
@@ -29,9 +33,29 @@ import java.util.Date;
  */
 public class DateSqlTypeHandler implements SqlTypeHandler<Date> {
 
+    public static final String PROPKEY_DATE_FORMAT = "dataset.dateFormat";
+    public static final String PROPKEY_TIME_FORMAT = "dataset.timeFormat";
+    public static final String PROPKEY_DATETIME_FORMAT = "dataset.dateTimeFormat";
+
+    private String datePattern;
+    private String timePattern;
+    private String dateTimePattern;
+
+    private DateFormat defaultDateFormat;
+    private DateFormat defaultTimeFormat;
+    private DateFormat defaultDateTimeFormat;
+
+    public void init(Properties configuration) {
+        datePattern = PropertyUtils.getString(PROPKEY_DATE_FORMAT, configuration);
+        timePattern = PropertyUtils.getString(PROPKEY_TIME_FORMAT, configuration);
+        dateTimePattern = datePattern + " " + timePattern;
+        defaultDateFormat = new SimpleDateFormat(datePattern);
+        defaultTimeFormat = new SimpleDateFormat(timePattern);
+        defaultDateTimeFormat = new SimpleDateFormat(dateTimePattern);
+    }
+
     public Date getValue(String valueAsString, int sqlType) throws Exception {
-        DateFormat dateFormat = new SimpleDateFormat();
-        return dateFormat.parse(valueAsString);
+        return parseDate(valueAsString);
     }
 
     public Date getResultSetValue(ResultSet resultSet, int columnIndex, int sqlType) throws Exception {
@@ -40,5 +64,25 @@ public class DateSqlTypeHandler implements SqlTypeHandler<Date> {
             return null;
         }
         return new Date(date.getTime());
+    }
+
+
+    protected Date parseDate(String dateAsString) {
+        try {
+            return defaultDateTimeFormat.parse(dateAsString);
+        } catch (ParseException e) {
+            // ignore
+        }
+        try {
+            return defaultDateFormat.parse(dateAsString);
+        } catch (ParseException e) {
+            // ignore
+        }
+        try {
+            return defaultTimeFormat.parse(dateAsString);
+        } catch (ParseException e) {
+            // ignore
+        }
+        throw new UnitilsException("Unable to parse date value. Tried following patterns: '" + dateTimePattern + "', '" + datePattern + "' and '" + timePattern + "'");
     }
 }

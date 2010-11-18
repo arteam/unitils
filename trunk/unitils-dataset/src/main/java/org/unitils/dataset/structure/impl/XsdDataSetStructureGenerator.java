@@ -29,6 +29,7 @@ import java.io.FileWriter;
 import java.io.Writer;
 import java.util.Set;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
 /**
@@ -52,18 +53,40 @@ public class XsdDataSetStructureGenerator implements DataSetStructureGenerator {
 
     /* The meta data for the database */
     protected DataSourceWrapper dataSourceWrapper;
+    /* The default target directory, null if generation should be skipped*/
+    protected String defaultTargetDirectory;
 
 
     /**
      * @param dataSourceWrapper The database meta data, not null
      */
-    public void init(DataSourceWrapper dataSourceWrapper) {
+    public void init(DataSourceWrapper dataSourceWrapper, String defaultTargetDirectory) {
         this.dataSourceWrapper = dataSourceWrapper;
+        this.defaultTargetDirectory = defaultTargetDirectory;
+    }
+
+
+    public void generateDataSetStructureAndTemplate() {
+        if (isBlank(defaultTargetDirectory)) {
+            logger.info("No target XSD path was defined in properties. Skipping data set XSD generation.");
+            return;
+        }
+        generateDataSetStructureAndTemplate(new File(defaultTargetDirectory));
     }
 
 
     /**
-     * Generates the XSDs that describe the stucture of the database schemas.
+     * Generates both the XSDs or DTDs and the template xml.
+     *
+     * @param targetDirectory The target directory for the files, not null
+     */
+    public void generateDataSetStructureAndTemplate(File targetDirectory) {
+        generateDataSetStructure(targetDirectory);
+        generateDataSetTemplateXmlFile(targetDirectory);
+    }
+
+    /**
+     * Generates the XSDs that describe the structure of the database schemas.
      *
      * @param targetDirectory The target directory for the files, not null
      */

@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.DataSetModule.PROPKEY_XSD_TARGETDIRNAME;
+import static org.unitils.dataset.DataSetModuleFactory.PROPKEY_XSD_TARGETDIRNAME;
 import static org.unitils.testutil.TestUnitilsConfiguration.*;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 

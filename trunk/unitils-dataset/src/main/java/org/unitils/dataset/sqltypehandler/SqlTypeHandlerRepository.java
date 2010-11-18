@@ -133,6 +133,8 @@ public class SqlTypeHandlerRepository {
     }
 
     protected SqlTypeHandler<?> createConfiguredSqlTypeHandler(String name) {
-        return ConfigUtils.getInstanceOf(SqlTypeHandler.class, configuration, name);
+        SqlTypeHandler<?> sqlTypeHandler = ConfigUtils.getInstanceOf(SqlTypeHandler.class, configuration, name);
+        sqlTypeHandler.init(configuration);
+        return sqlTypeHandler;
     }
 }

@@ -17,6 +17,7 @@ package org.unitils.dataset;
 
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
+import org.unitils.dataset.assertstrategy.AssertDataSetStrategyHandler;
 import org.unitils.util.TestMethodFinder;
 
 import java.lang.reflect.Method;
@@ -57,9 +58,17 @@ public class DataSetAssert {
     }
 
     public static void assertDataSet(Object testInstance, List<String> expectedDataSetFileNames, boolean logDatabaseContentOnAssertionError, String... variables) {
-        getDataSetModule().assertDataSetFiles(testInstance, expectedDataSetFileNames, logDatabaseContentOnAssertionError, variables);
+        getAssertDataSetStrategyHandler().assertDataSetFiles(testInstance, expectedDataSetFileNames, logDatabaseContentOnAssertionError, variables);
     }
 
+
+    // todo add inline assert methods
+
+
+    private static AssertDataSetStrategyHandler getAssertDataSetStrategyHandler() {
+        DataSetModuleFactory dataSetModuleFactory = getDataSetModule().getDataSetModuleFactory();
+        return dataSetModuleFactory.getAssertDataSetStrategyHandler();
+    }
 
     /**
      * Gets the instance DataSetModule that is registered in the modules repository.

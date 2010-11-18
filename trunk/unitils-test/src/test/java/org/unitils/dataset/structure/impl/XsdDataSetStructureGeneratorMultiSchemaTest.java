@@ -88,7 +88,7 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
         xsdDirectory.mkdirs();
 
         DataSourceWrapper dataSourceWrapper = createDataSourceWrapper("public", "schema_a");
-        xsdDataSetStructureGenerator.init(dataSourceWrapper);
+        xsdDataSetStructureGenerator.init(dataSourceWrapper, null);
 
         dropTestTables();
         createTestTables();

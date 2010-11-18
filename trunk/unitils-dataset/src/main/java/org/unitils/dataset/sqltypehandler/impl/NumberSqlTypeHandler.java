@@ -19,12 +19,16 @@ import org.unitils.dataset.sqltypehandler.SqlTypeHandler;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
+import java.util.Properties;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public class NumberSqlTypeHandler implements SqlTypeHandler<BigDecimal> {
+
+    public void init(Properties configuration) {
+    }
 
     public BigDecimal getValue(String valueAsString, int sqlType) throws Exception {
         return new BigDecimal(valueAsString);

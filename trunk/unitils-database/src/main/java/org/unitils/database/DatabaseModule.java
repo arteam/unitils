@@ -27,7 +27,7 @@ import org.unitils.database.annotations.Transactional;
 import org.unitils.database.datasource.DataSourceFactory;
 import org.unitils.database.manager.DbMaintainManager;
 import org.unitils.database.manager.UnitilsDataSourceManager;
-import org.unitils.database.transaction.UnitilsTransactionManager;
+import org.unitils.database.manager.UnitilsTransactionManager;
 import org.unitils.database.util.DatabaseAnnotationHelper;
 import org.unitils.database.util.TransactionMode;
 import org.unitils.util.PropertyUtils;
