@@ -49,7 +49,6 @@ public class TableContentDeleter {
         List<TableName> tableNames = getTableNamesInReverseOrder(dataSetRowSource);
         for (TableName tableName : tableNames) {
             try {
-                dataSourceWrapper.assertTableNameExists(tableName);
                 deleteTableContent(tableName);
             } catch (Exception e) {
                 throw new UnitilsException("Unable to delete data from table " + tableName, e);

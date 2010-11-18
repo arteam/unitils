@@ -20,6 +20,7 @@ import org.unitils.dataset.sqltypehandler.SqlTypeHandler;
 import org.unitils.util.PropertyUtils;
 
 import java.sql.ResultSet;
+import java.sql.Types;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -55,7 +56,13 @@ public class DateSqlTypeHandler implements SqlTypeHandler<Date> {
     }
 
     public Date getValue(String valueAsString, int sqlType) throws Exception {
-        return parseDate(valueAsString);
+        Date date = parseDate(valueAsString);
+        if (Types.DATE == sqlType) {
+            return new java.sql.Date(date.getTime());
+        } else if (Types.TIME == sqlType) {
+            return new java.sql.Time(date.getTime());
+        }
+        return new java.sql.Timestamp(date.getTime());
     }
 
     public Date getResultSetValue(ResultSet resultSet, int columnIndex, int sqlType) throws Exception {

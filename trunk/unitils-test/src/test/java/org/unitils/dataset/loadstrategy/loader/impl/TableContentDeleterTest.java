@@ -18,7 +18,6 @@ package org.unitils.dataset.loadstrategy.loader.impl;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.core.UnitilsException;
 import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.database.DatabaseAccessor;
 import org.unitils.dataset.loadstrategy.impl.TableContentDeleter;
@@ -28,7 +27,6 @@ import org.unitils.dataset.model.dataset.DataSetSettings;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.mock.Mock;
 
-import static org.junit.Assert.fail;
 import static org.unitils.dataset.util.DataSetTestUtils.createTableName;
 
 /**
@@ -92,17 +90,5 @@ public class TableContentDeleterTest extends UnitilsJUnit4 {
     public void emptyDataSet() throws Exception {
         tableContentDeleter.deleteDataFromTablesInReverseOrder(dataSetRowSource.getMock());
         databaseAccessor.assertNotInvoked().executeUpdate(null, null);
-    }
-
-    @Test
-    public void tableDoesNotExist() throws Exception {
-        dataSetRowSource.onceReturns(dataSetRowTableA).getNextDataSetRow();
-        dataSourceWrapper.raises(UnitilsException.class).assertTableNameExists(createTableName("schema_a", "table_a"));
-        try {
-            tableContentDeleter.deleteDataFromTablesInReverseOrder(dataSetRowSource.getMock());
-            fail("Expected UnitilsException");
-        } catch (UnitilsException e) {
-            //expected
-        }
     }
 }
