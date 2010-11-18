@@ -54,8 +54,6 @@ public class DataSetRowProcessor {
         DataSetSettings dataSetSettings = dataSetRow.getDataSetSettings();
 
         TableName tableName = dataSourceWrapper.getTableName(dataSetRow.getSchemaName(), dataSetRow.getTableName(), dataSetSettings.isCaseSensitive());
-
-        dataSourceWrapper.assertTableNameExists(tableName);
         dataSetDatabaseHelper.addExtraParentColumnsForChild(dataSetRow);
 
         Row row = new Row(tableName);

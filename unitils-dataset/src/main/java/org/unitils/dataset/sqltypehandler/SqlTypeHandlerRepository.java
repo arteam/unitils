@@ -80,7 +80,6 @@ public class SqlTypeHandlerRepository {
                 return createConfiguredSqlTypeHandler("VARCHAR");
             case LONGVARCHAR:
                 return createConfiguredSqlTypeHandler("LONGVARCHAR");
-            // todo correctly handle date formats
             case DATE:
                 return createConfiguredSqlTypeHandler("DATE");
             case TIME:

@@ -17,7 +17,6 @@ package org.unitils.dataset.database;
 
 import org.dbmaintain.database.IdentifierProcessor;
 import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.unitils.core.UnitilsException;
 import org.unitils.database.UnitilsDataSource;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.TableName;
@@ -172,32 +171,6 @@ public class DataSourceWrapper {
             return SQL_TYPE_UNKNOWN;
         }
         return columnSqlType;
-    }
-
-
-    public void assertTableNameExists(TableName tableName) throws SQLException {
-        boolean existingTable = isExistingTableName(tableName);
-        if (!existingTable) {
-            throw new UnitilsException("No table found with name " + tableName);
-        }
-    }
-
-    protected boolean isExistingTableName(TableName tableName) throws SQLException {
-        if (existingTableNames.contains(tableName)) {
-            return true;
-        }
-        Connection connection = getConnection();
-        ResultSet resultSet = null;
-        try {
-            resultSet = connection.getMetaData().getTables(null, tableName.getSchemaName(), tableName.getTableName(), null);
-            if (resultSet.first()) {
-                existingTableNames.add(tableName);
-                return true;
-            }
-            return false;
-        } finally {
-            close(connection, null, resultSet);
-        }
     }
 
 
