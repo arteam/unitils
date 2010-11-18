@@ -80,7 +80,7 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
         }
 
         DataSourceWrapper dataSourceWrapper = createDataSourceWrapper();
-        xsdDataSetStructureGenerator.init(dataSourceWrapper);
+        xsdDataSetStructureGenerator.init(dataSourceWrapper, null);
 
         dropTestTables();
         createTestTables();

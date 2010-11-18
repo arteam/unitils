@@ -28,9 +28,23 @@ import java.io.File;
 public interface DataSetStructureGenerator {
 
     /**
-     * @param dataSourceWrapper The database meta data, not null
+     * @param dataSourceWrapper      The database meta data, not null
+     * @param defaultTargetDirectory The default target directory, null if generation should be skipped
      */
-    void init(DataSourceWrapper dataSourceWrapper);
+    void init(DataSourceWrapper dataSourceWrapper, String defaultTargetDirectory);
+
+    /**
+     * Generates both the XSDs or DTDs and the template xml using the default target directory.
+     * If the default target directory is null, generation will be skipped.
+     */
+    void generateDataSetStructureAndTemplate();
+
+    /**
+     * Generates both the XSDs or DTDs and the template xml.
+     *
+     * @param targetDirectory The target directory for the files, not null
+     */
+    void generateDataSetStructureAndTemplate(File targetDirectory);
 
     /**
      * Generates the XSDs or DTDs.

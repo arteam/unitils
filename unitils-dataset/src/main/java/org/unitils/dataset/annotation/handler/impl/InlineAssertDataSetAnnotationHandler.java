@@ -16,8 +16,10 @@
 package org.unitils.dataset.annotation.handler.impl;
 
 import org.unitils.dataset.DataSetModule;
+import org.unitils.dataset.DataSetModuleFactory;
 import org.unitils.dataset.annotation.InlineAssertDataSet;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
+import org.unitils.dataset.assertstrategy.InlineAssertDataSetStrategyHandler;
 
 import java.lang.reflect.Method;
 
@@ -34,7 +36,9 @@ public class InlineAssertDataSetAnnotationHandler implements DataSetAnnotationHa
         String[] dataSetRows = annotation.value();
         boolean logDatabaseContentOnAssertionError = annotation.logDatabaseContentOnAssertionError();
 
-        dataSetModule.assertExpectedDataSet(logDatabaseContentOnAssertionError, dataSetRows);
+        DataSetModuleFactory dataSetModuleFactory = dataSetModule.getDataSetModuleFactory();
+        InlineAssertDataSetStrategyHandler inlineAssertDataSetStrategyHandler = dataSetModuleFactory.getInlineAssertDataSetStrategyHandler();
+        inlineAssertDataSetStrategyHandler.assertExpectedDataSet(logDatabaseContentOnAssertionError, dataSetRows);
     }
 
 }

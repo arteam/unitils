@@ -16,6 +16,7 @@
 package org.unitils.dataset;
 
 import org.unitils.core.Unitils;
+import org.unitils.dataset.structure.DataSetStructureGenerator;
 
 import java.io.File;
 
@@ -27,22 +28,18 @@ public class DataSetXSDGenerator {
 
 
     public static void generateDataSetXSDs() {
-        getDataSetModule().generateDataSetXSDs();
+        getDataSetStructureGenerator().generateDataSetStructureAndTemplate();
     }
 
     public static void generateDataSetXSDs(File targetDirectory) {
-        getDataSetModule().generateDataSetXSDs(targetDirectory);
+        getDataSetStructureGenerator().generateDataSetStructureAndTemplate(targetDirectory);
     }
 
 
-    /**
-     * Gets the instance DataSetModule that is registered in the modules repository.
-     * This instance implements the actual behavior of the static methods in this class.
-     * This way, other implementations can be plugged in, while keeping the simplicity of using static methods.
-     *
-     * @return the instance, not null
-     */
-    private static DataSetModule getDataSetModule() {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(DataSetModule.class);
+    private static DataSetStructureGenerator getDataSetStructureGenerator() {
+        DataSetModule dataSetModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DataSetModule.class);
+        DataSetModuleFactory dataSetModuleFactory = dataSetModule.getDataSetModuleFactory();
+        return dataSetModuleFactory.getDataSetStructureGenerator();
     }
+
 }

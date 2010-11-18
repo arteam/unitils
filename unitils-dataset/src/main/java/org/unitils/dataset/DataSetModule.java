@@ -28,27 +28,16 @@ import org.unitils.database.UnitilsDataSource;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 import org.unitils.dataset.annotation.handler.MarkerForAssertDataSetAnnotation;
 import org.unitils.dataset.annotation.handler.MarkerForLoadDataSetAnnotation;
-import org.unitils.dataset.assertstrategy.AssertDataSetStrategy;
 import org.unitils.dataset.database.DataSourceWrapper;
-import org.unitils.dataset.loadstrategy.LoadDataSetStrategy;
-import org.unitils.dataset.resolver.DataSetResolver;
-import org.unitils.dataset.rowsource.DataSetRowSource;
-import org.unitils.dataset.rowsource.FileDataSetRowSourceFactory;
-import org.unitils.dataset.rowsource.InlineDataSetRowSourceFactory;
 import org.unitils.dataset.structure.DataSetStructureGenerator;
 
 import javax.sql.DataSource;
-import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.unitils.database.DatabaseUnitils.getDbMaintainManager;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationAnnotatedWith;
-import static org.unitils.util.CollectionUtils.asList;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
 /**
@@ -58,7 +47,7 @@ import static org.unitils.util.ReflectionUtils.createInstanceOfType;
  * of the data set files can be specified explicitly as an argument of the annotation. If no file name is specified, it looks
  * for a file in the same directory as the test class named: 'classname without packagename'.xml.
  * <p/>
- * By annotating a method with the {@link org.unitils.dataset.annotation.AssertDataSet} annotation or by calling the {@link #assertDataSetFiles}
+ * By annotating a method with the {@link org.unitils.dataset.annotation.AssertDataSet} annotation or by calling the assertDataSetFiles
  * method, the contents of the database can be compared with the contents of a data set. The expected data set can be
  * passed as an argument of the annotation. If no file name is specified it looks for a file in the same directory
  * as the test class that has following name: 'class name without packagename'.'test method name'-result.xml.
@@ -70,19 +59,12 @@ import static org.unitils.util.ReflectionUtils.createInstanceOfType;
  */
 public class DataSetModule implements Module {
 
-    /**
-     * Property key for the xsd target directory
-     */
-    public static final String PROPKEY_XSD_TARGETDIRNAME = "dataset.xsd.targetDirName";
-
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DataSetModule.class);
 
     /* The unitils configuration */
     protected Properties configuration;
     protected DataSetModuleFactory dataSetModuleFactory;
-
-    protected List<File> lastLoadedReadOnlyFiles = new ArrayList<File>();
 
 
     /**
@@ -92,6 +74,7 @@ public class DataSetModule implements Module {
      */
     public void init(Properties configuration) {
         this.configuration = configuration;
+
     }
 
     public void afterInit() {
@@ -100,85 +83,22 @@ public class DataSetModule implements Module {
     }
 
 
-    public DataSetModuleFactory getDataSetModuleFactoryHelper() {
+    public DataSetModuleFactory getDataSetModuleFactory() {
         if (dataSetModuleFactory == null) {
-            // todo database name
-            UnitilsDataSource unitilsDataSource = DatabaseUnitils.getUnitilsDataSource(null);
-
-            IdentifierProcessor identifierProcessor = createIdentifierProcessor(unitilsDataSource);
-            DataSourceWrapper dataSourceWrapper = createDataSourceWrapper(identifierProcessor, unitilsDataSource);
-            dataSetModuleFactory = new DataSetModuleFactory(configuration, dataSourceWrapper, identifierProcessor);
+            dataSetModuleFactory = createDataSetModuleFactory();
         }
         return dataSetModuleFactory;
     }
 
+    protected DataSetModuleFactory createDataSetModuleFactory() {
+        // todo database name
+        UnitilsDataSource unitilsDataSource = DatabaseUnitils.getUnitilsDataSource(null);
 
-    public void insertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        LoadDataSetStrategy insertDataSetStrategy = getDataSetModuleFactoryHelper().createInsertDataSetStrategy();
-        performLoadDataSetStrategy(insertDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
+        IdentifierProcessor identifierProcessor = createIdentifierProcessor(unitilsDataSource);
+        DataSourceWrapper dataSourceWrapper = createDataSourceWrapper(identifierProcessor, unitilsDataSource);
+        return new DataSetModuleFactory(configuration, dataSourceWrapper, identifierProcessor);
     }
 
-    public void insertDataSet(String... dataSetRows) {
-        LoadDataSetStrategy insertDataSetStrategy = getDataSetModuleFactoryHelper().createInsertDataSetStrategy();
-        performInlineLoadDataSetStrategy(insertDataSetStrategy, asList(dataSetRows));
-    }
-
-
-    public void cleanInsertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        LoadDataSetStrategy cleanInsertDataSetStrategy = getDataSetModuleFactoryHelper().createCleanInsertDataSetStrategy();
-        performLoadDataSetStrategy(cleanInsertDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
-    }
-
-    public void cleanInsertDataSet(String... dataSetRows) {
-        LoadDataSetStrategy cleanInsertDataSetStrategy = getDataSetModuleFactoryHelper().createCleanInsertDataSetStrategy();
-        performInlineLoadDataSetStrategy(cleanInsertDataSetStrategy, asList(dataSetRows));
-    }
-
-
-    public void refreshDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        LoadDataSetStrategy refreshDataSetStrategy = getDataSetModuleFactoryHelper().createRefreshDataSetStrategy();
-        performLoadDataSetStrategy(refreshDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
-    }
-
-    public void refreshDataSet(String... dataSetRows) {
-        LoadDataSetStrategy refreshDataSetStrategy = getDataSetModuleFactoryHelper().createRefreshDataSetStrategy();
-        performInlineLoadDataSetStrategy(refreshDataSetStrategy, asList(dataSetRows));
-    }
-
-
-    public void updateDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        LoadDataSetStrategy updateDataSetStrategy = getDataSetModuleFactoryHelper().createUpdateDataSetStrategy();
-        performLoadDataSetStrategy(updateDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
-    }
-
-    public void updateDataSet(String... dataSetRows) {
-        LoadDataSetStrategy updateDataSetStrategy = getDataSetModuleFactoryHelper().createUpdateDataSetStrategy();
-        performInlineLoadDataSetStrategy(updateDataSetStrategy, asList(dataSetRows));
-    }
-
-
-    public void assertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean logDatabaseContentOnAssertionError, String... variables) {
-        AssertDataSetStrategy defaultAssertDataSetStrategy = getDataSetModuleFactoryHelper().createAssertDataSetStrategy();
-        performAssertDataSetStrategy(defaultAssertDataSetStrategy, dataSetFileNames, asList(variables), logDatabaseContentOnAssertionError, testInstance.getClass());
-    }
-
-    public void assertExpectedDataSet(boolean logDatabaseContentOnAssertionError, String... dataSetRows) {
-        AssertDataSetStrategy defaultAssertDataSetStrategy = getDataSetModuleFactoryHelper().createAssertDataSetStrategy();
-        performInlineAssertDataSetStrategy(defaultAssertDataSetStrategy, asList(dataSetRows), logDatabaseContentOnAssertionError);
-    }
-
-
-    /**
-     * Gets the name of the default testdata file at class level The default name is constructed as
-     * follows: 'classname without packagename'.xml
-     *
-     * @param testClass The test class, not null
-     * @return The default filename, not null
-     */
-    public String getDefaultDataSetFileName(Class<?> testClass) {
-        String className = testClass.getName();
-        return className.substring(className.lastIndexOf(".") + 1) + ".xml";
-    }
 
     /**
      * Gets the name of the expected dataset file. The default name of this file is constructed as
@@ -191,80 +111,6 @@ public class DataSetModule implements Module {
     public String getDefaultExpectedDataSetFileName(Method testMethod, Class<?> testClass) {
         String className = testClass.getName();
         return className.substring(className.lastIndexOf(".") + 1) + "." + testMethod.getName() + "-result.xml";
-    }
-
-
-    public void performLoadDataSetStrategy(LoadDataSetStrategy loadDataSetStrategy, List<String> dataSetFileNames, List<String> variables, boolean readOnly, Class<?> testClass) {
-        if (dataSetFileNames.isEmpty()) {
-            // empty means, use default file name, which is the name of the class + extension
-            dataSetFileNames.add(getDefaultDataSetFileName(testClass));
-        }
-        FileDataSetRowSourceFactory fileDataSetRowSourceFactory = getDataSetModuleFactoryHelper().createFileDataSetRowSourceFactory();
-
-        List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
-        for (File dataSetFile : dataSetFiles) {
-            if (lastLoadedReadOnlyFiles.contains(dataSetFile)) {
-                continue;
-            }
-            DataSetRowSource dataSetRowSource = fileDataSetRowSourceFactory.createDataSetRowSource(dataSetFile);
-            loadDataSetStrategy.perform(dataSetRowSource, variables);
-        }
-
-        if (readOnly) {
-            lastLoadedReadOnlyFiles.addAll(dataSetFiles);
-        } else {
-            lastLoadedReadOnlyFiles.clear();
-        }
-    }
-
-    public void performInlineLoadDataSetStrategy(LoadDataSetStrategy loadDataSetStrategy, List<String> dataSetRows) {
-        InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = getDataSetModuleFactoryHelper().createInlineDataSetRowSourceFactory();
-        DataSetRowSource dataSetRowSource = inlineDataSetRowSourceFactory.createDataSetRowSource(dataSetRows);
-        loadDataSetStrategy.perform(dataSetRowSource, new ArrayList<String>());
-    }
-
-
-    public void performAssertDataSetStrategy(AssertDataSetStrategy assertDataSetStrategy, List<String> dataSetFileNames, List<String> variables, boolean logDatabaseContentOnAssertionError, Class<?> testClass) {
-        FileDataSetRowSourceFactory fileDataSetRowSourceFactory = getDataSetModuleFactoryHelper().createFileDataSetRowSourceFactory();
-
-        List<File> dataSetFiles = resolveDataSets(testClass, dataSetFileNames);
-        for (File dataSetFile : dataSetFiles) {
-            DataSetRowSource dataSetRowSource = fileDataSetRowSourceFactory.createDataSetRowSource(dataSetFile);
-            assertDataSetStrategy.perform(dataSetRowSource, variables, logDatabaseContentOnAssertionError);
-        }
-    }
-
-    public void performInlineAssertDataSetStrategy(AssertDataSetStrategy assertDataSetStrategy, List<String> dataSetRows, boolean logDatabaseContentOnAssertionError) {
-        InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = getDataSetModuleFactoryHelper().createInlineDataSetRowSourceFactory();
-        DataSetRowSource dataSetRowSource = inlineDataSetRowSourceFactory.createDataSetRowSource(dataSetRows);
-        assertDataSetStrategy.perform(dataSetRowSource, new ArrayList<String>(), logDatabaseContentOnAssertionError);
-    }
-
-    public void generateDataSetXSDs() {
-        String targetDirectoryName = configuration.getProperty(PROPKEY_XSD_TARGETDIRNAME);
-        if (isBlank(targetDirectoryName)) {
-            logger.info("No target XSD path was defined (" + PROPKEY_XSD_TARGETDIRNAME + ") in properties. Skipping data set XSD generation.");
-            return;
-        }
-        generateDataSetXSDs(new File(targetDirectoryName));
-    }
-
-    public void generateDataSetXSDs(File targetDirectory) {
-        DataSetStructureGenerator dataSetStructureGenerator = getDataSetModuleFactoryHelper().createDataSetStructureGenerator();
-        dataSetStructureGenerator.generateDataSetStructure(targetDirectory);
-        dataSetStructureGenerator.generateDataSetTemplateXmlFile(targetDirectory);
-    }
-
-
-    protected List<File> resolveDataSets(Class<?> testClass, List<String> dataSetFileNames) {
-        List<File> dataSetFiles = new ArrayList<File>();
-
-        DataSetResolver dataSetResolver = getDataSetModuleFactoryHelper().createDataSetResolver();
-        for (String dataSetFileName : dataSetFileNames) {
-            File dataSetFile = dataSetResolver.resolve(testClass, dataSetFileName);
-            dataSetFiles.add(dataSetFile);
-        }
-        return dataSetFiles;
     }
 
 
@@ -348,7 +194,8 @@ public class DataSetModule implements Module {
     protected class DataSetXSDsGeneratingDatabaseUpdateListener implements DatabaseUpdateListener {
 
         public void databaseWasUpdated() {
-            generateDataSetXSDs();
+            DataSetStructureGenerator dataSetStructureGenerator = getDataSetModuleFactory().getDataSetStructureGenerator();
+            dataSetStructureGenerator.generateDataSetStructureAndTemplate();
         }
     }
 

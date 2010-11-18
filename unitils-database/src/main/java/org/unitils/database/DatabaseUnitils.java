@@ -19,7 +19,7 @@ import org.dbmaintain.database.Database;
 import org.unitils.core.Unitils;
 import org.unitils.database.manager.DbMaintainManager;
 import org.unitils.database.manager.UnitilsDataSourceManager;
-import org.unitils.database.transaction.UnitilsTransactionManager;
+import org.unitils.database.manager.UnitilsTransactionManager;
 
 import javax.sql.DataSource;
 

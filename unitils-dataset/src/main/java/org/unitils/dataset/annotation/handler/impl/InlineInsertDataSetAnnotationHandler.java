@@ -16,8 +16,10 @@
 package org.unitils.dataset.annotation.handler.impl;
 
 import org.unitils.dataset.DataSetModule;
+import org.unitils.dataset.DataSetModuleFactory;
 import org.unitils.dataset.annotation.InlineInsertDataSet;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
+import org.unitils.dataset.loadstrategy.InlineLoadDataSetStrategyHandler;
 
 import java.lang.reflect.Method;
 
@@ -32,7 +34,10 @@ public class InlineInsertDataSetAnnotationHandler implements DataSetAnnotationHa
 
     public void handle(InlineInsertDataSet annotation, Method testMethod, Object testInstance, DataSetModule dataSetModule) {
         String[] dataSetRows = annotation.value();
-        dataSetModule.insertDataSet(dataSetRows);
+
+        DataSetModuleFactory dataSetModuleFactory = dataSetModule.getDataSetModuleFactory();
+        InlineLoadDataSetStrategyHandler inlineLoadDataSetStrategyHandler = dataSetModuleFactory.getInlineLoadDataSetStrategyHandler();
+        inlineLoadDataSetStrategyHandler.insertDataSet(dataSetRows);
     }
 
 }

@@ -18,12 +18,16 @@ package org.unitils.dataset.sqltypehandler.impl;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandler;
 
 import java.sql.ResultSet;
+import java.util.Properties;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public class BooleanSqlTypeHandler implements SqlTypeHandler<Boolean> {
+
+    public void init(Properties configuration) {
+    }
 
     public Boolean getValue(String value, int sqlType) throws Exception {
         String trimmedLowerCaseValue = value.trim().toLowerCase();

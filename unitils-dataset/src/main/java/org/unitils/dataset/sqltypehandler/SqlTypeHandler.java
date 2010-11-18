@@ -16,12 +16,15 @@
 package org.unitils.dataset.sqltypehandler;
 
 import java.sql.ResultSet;
+import java.util.Properties;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public interface SqlTypeHandler<T> {
+
+    void init(Properties configuration);
 
     T getValue(String valueAsString, int sqlType) throws Exception;
 

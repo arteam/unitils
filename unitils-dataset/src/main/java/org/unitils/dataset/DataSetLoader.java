@@ -16,6 +16,8 @@
 package org.unitils.dataset;
 
 import org.unitils.core.Unitils;
+import org.unitils.dataset.loadstrategy.InlineLoadDataSetStrategyHandler;
+import org.unitils.dataset.loadstrategy.LoadDataSetStrategyHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,11 +43,11 @@ public class DataSetLoader {
     }
 
     public static void insertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        getDataSetModule().insertDataSetFiles(testInstance, dataSetFileNames, readOnly, variables);
+        getLoadDataSetStrategyHandler().insertDataSetFiles(testInstance, dataSetFileNames, readOnly, variables);
     }
 
     public static void insertDataSet(String... dataSetRows) {
-        getDataSetModule().insertDataSet(dataSetRows);
+        getInlineLoadDataSetStrategyHandler().insertDataSet(dataSetRows);
     }
 
 
@@ -62,11 +64,11 @@ public class DataSetLoader {
     }
 
     public static void cleanInsertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        getDataSetModule().cleanInsertDataSetFiles(testInstance, dataSetFileNames, readOnly, variables);
+        getLoadDataSetStrategyHandler().cleanInsertDataSetFiles(testInstance, dataSetFileNames, readOnly, variables);
     }
 
     public static void cleanInsertDataSet(String... dataSetRows) {
-        getDataSetModule().cleanInsertDataSet(dataSetRows);
+        getInlineLoadDataSetStrategyHandler().cleanInsertDataSet(dataSetRows);
     }
 
 
@@ -83,13 +85,23 @@ public class DataSetLoader {
     }
 
     public static void refreshDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        getDataSetModule().refreshDataSetFiles(testInstance, dataSetFileNames, readOnly, variables);
+        getLoadDataSetStrategyHandler().refreshDataSetFiles(testInstance, dataSetFileNames, readOnly, variables);
     }
 
     public static void refreshDataSet(String... dataSetRows) {
-        getDataSetModule().refreshDataSet(dataSetRows);
+        getInlineLoadDataSetStrategyHandler().refreshDataSet(dataSetRows);
     }
 
+
+    private static LoadDataSetStrategyHandler getLoadDataSetStrategyHandler() {
+        DataSetModuleFactory dataSetModuleFactory = getDataSetModule().getDataSetModuleFactory();
+        return dataSetModuleFactory.getLoadDataSetStrategyHandler();
+    }
+
+    private static InlineLoadDataSetStrategyHandler getInlineLoadDataSetStrategyHandler() {
+        DataSetModuleFactory dataSetModuleFactory = getDataSetModule().getDataSetModuleFactory();
+        return dataSetModuleFactory.getInlineLoadDataSetStrategyHandler();
+    }
 
     /**
      * Gets the instance DataSetModule that is registered in the modules repository.

@@ -18,12 +18,16 @@ package org.unitils.dataset.sqltypehandler.impl;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandler;
 
 import java.sql.ResultSet;
+import java.util.Properties;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public class TextSqlTypeHandler implements SqlTypeHandler<String> {
+
+    public void init(Properties configuration) {
+    }
 
     public String getValue(String valueAsString, int sqlType) throws Exception {
         return valueAsString;

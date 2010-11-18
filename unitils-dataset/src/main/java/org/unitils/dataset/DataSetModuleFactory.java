@@ -16,13 +16,13 @@
 package org.unitils.dataset;
 
 import org.dbmaintain.database.IdentifierProcessor;
-import org.unitils.dataset.assertstrategy.AssertDataSetStrategy;
-import org.unitils.dataset.assertstrategy.DataSetComparator;
-import org.unitils.dataset.assertstrategy.DatabaseContentLogger;
+import org.unitils.dataset.assertstrategy.*;
 import org.unitils.dataset.assertstrategy.impl.TableContentRetriever;
 import org.unitils.dataset.database.DataSetDatabaseHelper;
 import org.unitils.dataset.database.DataSourceWrapper;
+import org.unitils.dataset.loadstrategy.InlineLoadDataSetStrategyHandler;
 import org.unitils.dataset.loadstrategy.LoadDataSetStrategy;
+import org.unitils.dataset.loadstrategy.LoadDataSetStrategyHandler;
 import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
 import org.unitils.dataset.resolver.DataSetResolver;
 import org.unitils.dataset.rowsource.FileDataSetRowSourceFactory;
@@ -42,17 +42,69 @@ import static org.unitils.core.util.ConfigUtils.getInstanceOf;
  */
 public class DataSetModuleFactory {
 
+    /**
+     * Property key for the xsd target directory
+     */
+    public static final String PROPKEY_XSD_TARGETDIRNAME = "dataset.xsd.targetDirName";
+
     /* The unitils configuration */
     protected Properties configuration;
 
     protected DataSourceWrapper dataSourceWrapper;
     protected IdentifierProcessor identifierProcessor;
 
+    protected InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory;
+    protected FileDataSetRowSourceFactory fileDataSetRowSourceFactory;
+
+    protected DataSetResolver dataSetResolver;
+
+    protected LoadDataSetStrategyHandler loadDataSetStrategyHandler;
+    protected InlineLoadDataSetStrategyHandler inlineLoadDataSetStrategyHandler;
+    protected AssertDataSetStrategyHandler assertDataSetStrategyHandler;
+    protected InlineAssertDataSetStrategyHandler inlineAssertDataSetStrategyHandler;
+    protected DataSetStructureGenerator dataSetStructureGenerator;
+
 
     public DataSetModuleFactory(Properties configuration, DataSourceWrapper dataSourceWrapper, IdentifierProcessor identifierProcessor) {
         this.configuration = configuration;
         this.dataSourceWrapper = dataSourceWrapper;
         this.identifierProcessor = identifierProcessor;
+
+    }
+
+
+    public LoadDataSetStrategyHandler getLoadDataSetStrategyHandler() {
+        if (loadDataSetStrategyHandler == null) {
+            FileDataSetRowSourceFactory fileDataSetRowSourceFactory = getFileDataSetRowSourceFactory();
+            DataSetResolver dataSetResolver = getDataSetResolver();
+            loadDataSetStrategyHandler = new LoadDataSetStrategyHandler(fileDataSetRowSourceFactory, dataSetResolver, this);
+        }
+        return loadDataSetStrategyHandler;
+    }
+
+    public InlineLoadDataSetStrategyHandler getInlineLoadDataSetStrategyHandler() {
+        if (inlineLoadDataSetStrategyHandler == null) {
+            InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = getInlineDataSetRowSourceFactory();
+            inlineLoadDataSetStrategyHandler = new InlineLoadDataSetStrategyHandler(inlineDataSetRowSourceFactory, this);
+        }
+        return inlineLoadDataSetStrategyHandler;
+    }
+
+    public AssertDataSetStrategyHandler getAssertDataSetStrategyHandler() {
+        if (assertDataSetStrategyHandler == null) {
+            FileDataSetRowSourceFactory fileDataSetRowSourceFactory = getFileDataSetRowSourceFactory();
+            DataSetResolver dataSetResolver = getDataSetResolver();
+            assertDataSetStrategyHandler = new AssertDataSetStrategyHandler(fileDataSetRowSourceFactory, dataSetResolver, this);
+        }
+        return assertDataSetStrategyHandler;
+    }
+
+    public InlineAssertDataSetStrategyHandler getInlineAssertDataSetStrategyHandler() {
+        if (inlineAssertDataSetStrategyHandler == null) {
+            InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = getInlineDataSetRowSourceFactory();
+            inlineAssertDataSetStrategyHandler = new InlineAssertDataSetStrategyHandler(inlineDataSetRowSourceFactory, this);
+        }
+        return inlineAssertDataSetStrategyHandler;
     }
 
 
@@ -88,22 +140,28 @@ public class DataSetModuleFactory {
     }
 
 
-    public DataSetResolver createDataSetResolver() {
-        DataSetResolver dataSetResolver = getInstanceOf(DataSetResolver.class, configuration);
-        dataSetResolver.init(configuration);
+    public DataSetResolver getDataSetResolver() {
+        if (dataSetResolver == null) {
+            dataSetResolver = getInstanceOf(DataSetResolver.class, configuration);
+            dataSetResolver.init(configuration);
+        }
         return dataSetResolver;
     }
 
 
-    public FileDataSetRowSourceFactory createFileDataSetRowSourceFactory() {
-        FileDataSetRowSourceFactory xmlDataSetRowSourceFactory = getInstanceOf(FileDataSetRowSourceFactory.class, configuration);
-        xmlDataSetRowSourceFactory.init(configuration);
-        return xmlDataSetRowSourceFactory;
+    public FileDataSetRowSourceFactory getFileDataSetRowSourceFactory() {
+        if (fileDataSetRowSourceFactory == null) {
+            fileDataSetRowSourceFactory = getInstanceOf(FileDataSetRowSourceFactory.class, configuration);
+            fileDataSetRowSourceFactory.init(configuration);
+        }
+        return fileDataSetRowSourceFactory;
     }
 
-    public InlineDataSetRowSourceFactory createInlineDataSetRowSourceFactory() {
-        InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = getInstanceOf(InlineDataSetRowSourceFactory.class, configuration);
-        inlineDataSetRowSourceFactory.init(configuration);
+    public InlineDataSetRowSourceFactory getInlineDataSetRowSourceFactory() {
+        if (inlineDataSetRowSourceFactory == null) {
+            inlineDataSetRowSourceFactory = getInstanceOf(InlineDataSetRowSourceFactory.class, configuration);
+            inlineDataSetRowSourceFactory.init(configuration);
+        }
         return inlineDataSetRowSourceFactory;
     }
 
@@ -128,9 +186,13 @@ public class DataSetModuleFactory {
         return databaseContentLogger;
     }
 
-    public DataSetStructureGenerator createDataSetStructureGenerator() {
-        DataSetStructureGenerator dataSetStructureGenerator = getInstanceOf(DataSetStructureGenerator.class, configuration);
-        dataSetStructureGenerator.init(dataSourceWrapper);
+
+    public DataSetStructureGenerator getDataSetStructureGenerator() {
+        if (dataSetStructureGenerator == null) {
+            String defaultTargetDirectory = configuration.getProperty(PROPKEY_XSD_TARGETDIRNAME);
+            dataSetStructureGenerator = getInstanceOf(DataSetStructureGenerator.class, configuration);
+            dataSetStructureGenerator.init(dataSourceWrapper, defaultTargetDirectory);
+        }
         return dataSetStructureGenerator;
     }
 }

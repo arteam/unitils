@@ -16,8 +16,10 @@
 package org.unitils.dataset.annotation.handler.impl;
 
 import org.unitils.dataset.DataSetModule;
+import org.unitils.dataset.DataSetModuleFactory;
 import org.unitils.dataset.annotation.UpdateDataSet;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
+import org.unitils.dataset.loadstrategy.LoadDataSetStrategyHandler;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -38,6 +40,8 @@ public class UpdateDataSetAnnotationHandler implements DataSetAnnotationHandler<
         String[] variables = annotation.variables();
         boolean readOnly = annotation.readOnly();
 
-        dataSetModule.updateDataSetFiles(testInstance, fileNames, readOnly, variables);
+        DataSetModuleFactory dataSetModuleFactory = dataSetModule.getDataSetModuleFactory();
+        LoadDataSetStrategyHandler loadDataSetStrategyHandler = dataSetModuleFactory.getLoadDataSetStrategyHandler();
+        loadDataSetStrategyHandler.updateDataSetFiles(testInstance, fileNames, readOnly, variables);
     }
 }
