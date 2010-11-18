@@ -21,7 +21,6 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.database.transaction.UnitilsTransactionManager;
 import org.unitils.mock.annotation.Dummy;
 
 import javax.sql.DataSource;
