@@ -154,7 +154,7 @@ public class DbMaintainManager {
         for (UpdateDatabaseTask updateDatabaseTask : updateDatabaseTasks.values()) {
             databaseUpdated = databaseUpdated || updateDatabaseTask.execute();
         }
-        return updateDatabaseCalled;
+        return databaseUpdated;
     }
 
 
