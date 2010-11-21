@@ -52,11 +52,17 @@ public class DataSetModuleFactory {
 
     protected DataSourceWrapper dataSourceWrapper;
     protected IdentifierProcessor identifierProcessor;
+    protected DataSetRowProcessor dataSetRowProcessor;
+    protected SqlTypeHandlerRepository sqlTypeHandlerRepository;
+    protected DataSetDatabaseHelper dataSetDatabaseHelper;
 
     protected InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory;
     protected FileDataSetRowSourceFactory fileDataSetRowSourceFactory;
 
     protected DataSetResolver dataSetResolver;
+    protected DataSetComparator dataSetComparator;
+    protected TableContentRetriever tableContentRetriever;
+    protected DatabaseContentLogger databaseContentLogger;
 
     protected LoadDataSetStrategyHandler loadDataSetStrategyHandler;
     protected InlineLoadDataSetStrategyHandler inlineLoadDataSetStrategyHandler;
@@ -135,7 +141,7 @@ public class DataSetModuleFactory {
 
     public AssertDataSetStrategy createAssertDataSetStrategy() {
         AssertDataSetStrategy defaultAssertDataSetStrategy = getInstanceOf(AssertDataSetStrategy.class, configuration);
-        defaultAssertDataSetStrategy.init(configuration, dataSourceWrapper, identifierProcessor);
+        defaultAssertDataSetStrategy.init(configuration, this);
         return defaultAssertDataSetStrategy;
     }
 
@@ -165,24 +171,55 @@ public class DataSetModuleFactory {
         return inlineDataSetRowSourceFactory;
     }
 
-    public SqlTypeHandlerRepository createSqlTypeHandlerRepository() {
-        SqlTypeHandlerRepository sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
-        sqlTypeHandlerRepository.init(configuration);
+    public SqlTypeHandlerRepository getSqlTypeHandlerRepository() {
+        if (sqlTypeHandlerRepository == null) {
+            sqlTypeHandlerRepository = new SqlTypeHandlerRepository();
+            sqlTypeHandlerRepository.init(configuration);
+        }
         return sqlTypeHandlerRepository;
     }
 
+    public DataSetDatabaseHelper getDataSetDatabaseHelper() {
+        if (dataSetDatabaseHelper == null) {
+            dataSetDatabaseHelper = new DataSetDatabaseHelper(dataSourceWrapper, identifierProcessor);
+        }
+        return dataSetDatabaseHelper;
+    }
 
-    public DataSetComparator createDataSetComparator(DataSetRowProcessor dataSetRowProcessor, TableContentRetriever tableContentRetriever) {
-        DataSetComparator dataSetComparator = getInstanceOf(DataSetComparator.class, configuration);
-        dataSetComparator.init(dataSetRowProcessor, tableContentRetriever, dataSourceWrapper);
+    public DataSetRowProcessor getDataSetRowProcessor() {
+        if (dataSetRowProcessor == null) {
+            DataSetDatabaseHelper dataSetDatabaseHelper = getDataSetDatabaseHelper();
+            SqlTypeHandlerRepository sqlTypeHandlerRepository = getSqlTypeHandlerRepository();
+            dataSetRowProcessor = new DataSetRowProcessor(dataSetDatabaseHelper, sqlTypeHandlerRepository, dataSourceWrapper);
+        }
+        return dataSetRowProcessor;
+    }
+
+    public DataSetComparator getDataSetComparator() {
+        if (dataSetComparator == null) {
+            DataSetRowProcessor dataSetRowProcessor = getDataSetRowProcessor();
+            TableContentRetriever tableContentRetriever = getTableContentRetriever();
+            dataSetComparator = getInstanceOf(DataSetComparator.class, configuration);
+            dataSetComparator.init(dataSetRowProcessor, tableContentRetriever, dataSourceWrapper);
+        }
         return dataSetComparator;
     }
 
-    public DatabaseContentLogger createDatabaseContentLogger(TableContentRetriever tableContentRetriever) {
-        DatabaseContentLogger databaseContentLogger = getInstanceOf(DatabaseContentLogger.class, configuration);
-        // todo move out
-        DataSetDatabaseHelper dataSetDatabaseHelper = new DataSetDatabaseHelper(dataSourceWrapper, identifierProcessor);
-        databaseContentLogger.init(dataSourceWrapper, tableContentRetriever, dataSetDatabaseHelper);
+    public TableContentRetriever getTableContentRetriever() {
+        if (tableContentRetriever == null) {
+            SqlTypeHandlerRepository sqlTypeHandlerRepository = getSqlTypeHandlerRepository();
+            tableContentRetriever = new TableContentRetriever(dataSourceWrapper, sqlTypeHandlerRepository);
+        }
+        return tableContentRetriever;
+    }
+
+    public DatabaseContentLogger getDatabaseContentLogger() {
+        if (databaseContentLogger == null) {
+            DataSetDatabaseHelper dataSetDatabaseHelper = getDataSetDatabaseHelper();
+            TableContentRetriever tableContentRetriever = getTableContentRetriever();
+            databaseContentLogger = getInstanceOf(DatabaseContentLogger.class, configuration);
+            databaseContentLogger.init(dataSourceWrapper, tableContentRetriever, dataSetDatabaseHelper);
+        }
         return databaseContentLogger;
     }
 

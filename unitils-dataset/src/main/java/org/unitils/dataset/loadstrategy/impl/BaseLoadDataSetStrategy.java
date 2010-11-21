@@ -53,7 +53,7 @@ public abstract class BaseLoadDataSetStrategy implements LoadDataSetStrategy {
 
         // todo move out
         DataSetModuleFactory dataSetModuleFactory = new DataSetModuleFactory(configuration, dataSourceWrapper, identifierProcessor);
-        SqlTypeHandlerRepository sqlTypeHandlerRepository = dataSetModuleFactory.createSqlTypeHandlerRepository();
+        SqlTypeHandlerRepository sqlTypeHandlerRepository = dataSetModuleFactory.getSqlTypeHandlerRepository();
         this.dataSetRowProcessor = new DataSetRowProcessor(dataSetDatabaseHelper, sqlTypeHandlerRepository, dataSourceWrapper);
     }
 

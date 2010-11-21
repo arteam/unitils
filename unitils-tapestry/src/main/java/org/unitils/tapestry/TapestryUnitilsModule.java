@@ -1,3 +1,18 @@
+/*
+ * Copyright Unitils.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils.tapestry;
 
 import org.apache.commons.lang.ClassUtils;
@@ -9,10 +24,7 @@ import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.InjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.test.context.TestContext;
-import org.unitils.core.Module;
-import org.unitils.core.TestExecutionListenerAdapter;
-import org.unitils.core.UnitilsException;
+import org.unitils.core.*;
 import org.unitils.tapestry.annotation.RegistryFactory;
 import org.unitils.tapestry.annotation.RegistryShutdown;
 import org.unitils.tapestry.annotation.RunBeforeTapestryRegistryIsCreated;
@@ -330,7 +342,7 @@ public class TapestryUnitilsModule implements Module {
     private class TapestryIoCTestListener extends TestExecutionListenerAdapter {
 
         @Override
-        public void beforeTestClass(Class<?> testClass, TestContext testContext) throws Exception {
+        public void beforeTestClass(CurrentTestClass currentTestClass) throws Exception {
             // shutdown the registry of the last test class
             if (lastTestClass != null) {
                 shutdownRegistryFor(lastTestClass.getAnnotation(TapestryRegistry.class), lastTestClass, lastTestObject, registry);
@@ -338,7 +350,7 @@ public class TapestryUnitilsModule implements Module {
             }
 
             lastTestObject = null;
-            lastTestClass = testClass;
+            lastTestClass = currentTestClass.getTestClass();
             if (needsStaticRegistry(lastTestClass)) {
                 runBeforeRegistryIsCreatedMethods(lastTestClass, null);
                 registry = createRegistryFor(lastTestClass.getAnnotation(TapestryRegistry.class), lastTestClass, null);
@@ -346,8 +358,12 @@ public class TapestryUnitilsModule implements Module {
             }
         }
 
+
         @Override
-        public void beforeTestMethod(Object testObject, Method testMethod, TestContext testContext) throws Exception {
+        public void beforeTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+            Object testObject = currentTestInstance.getTestObject();
+            Method testMethod = currentTestInstance.getTestMethod();
+
             lastTestObject = testObject;
             if (needsRegistry(lastTestClass, testMethod)) {
                 // per method registry
@@ -367,7 +383,10 @@ public class TapestryUnitilsModule implements Module {
         }
 
         @Override
-        public void afterTestMethod(Object testObject, Method testMethod, Throwable testThrowable, TestContext testContext) throws Exception {
+        public void afterTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+            Object testObject = currentTestInstance.getTestObject();
+            Method testMethod = currentTestInstance.getTestMethod();
+
             if (needsRegistry(lastTestClass, testMethod)) {
                 // shutdown method registry
                 shutdownRegistryFor(getAnnotation(lastTestClass, testMethod), lastTestClass, testObject, registry);

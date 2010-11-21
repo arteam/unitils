@@ -15,8 +15,7 @@
  */
 package org.unitils.dataset.assertstrategy;
 
-import org.dbmaintain.database.IdentifierProcessor;
-import org.unitils.dataset.database.DataSourceWrapper;
+import org.unitils.dataset.DataSetModuleFactory;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 
 import java.util.List;
@@ -29,7 +28,7 @@ import java.util.Properties;
 public interface AssertDataSetStrategy {
 
 
-    void init(Properties configuration, DataSourceWrapper dataSourceWrapper, IdentifierProcessor identifierProcessor);
+    void init(Properties configuration, DataSetModuleFactory dataSetModuleFactory);
 
     /**
      * Asserts that the given expected schema is equal to the actual schema.

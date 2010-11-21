@@ -19,7 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbmaintain.database.IdentifierProcessor;
 import org.dbmaintain.database.IdentifierProcessorFactory;
-import org.springframework.test.context.TestContext;
+import org.unitils.core.CurrentTestInstance;
 import org.unitils.core.Module;
 import org.unitils.core.TestExecutionListenerAdapter;
 import org.unitils.database.DatabaseUnitils;
@@ -36,7 +36,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Properties;
 
-import static org.unitils.database.DatabaseUnitils.getDbMaintainManager;
+import static org.unitils.database.DatabaseUnitils.registerDatabaseUpdateListener;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
@@ -79,7 +79,7 @@ public class DataSetModule implements Module {
 
     public void afterInit() {
         DatabaseUpdateListener databaseUpdateListener = new DataSetXSDsGeneratingDatabaseUpdateListener();
-        getDbMaintainManager().registerDatabaseUpdateListener(databaseUpdateListener);
+        registerDatabaseUpdateListener(databaseUpdateListener);
     }
 
 
@@ -177,12 +177,19 @@ public class DataSetModule implements Module {
     protected class DataSetListener extends TestExecutionListenerAdapter {
 
         @Override
-        public void beforeTestMethod(Object testObject, Method testMethod, TestContext testContext) throws Exception {
+        public void beforeTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+            Object testObject = currentTestInstance.getTestObject();
+            Method testMethod = currentTestInstance.getTestMethod();
+
             loadDataSet(testMethod, testObject);
         }
 
         @Override
-        public void afterTestMethod(Object testObject, Method testMethod, Throwable testThrowable, TestContext testContext) throws Exception {
+        public void afterTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+            Object testObject = currentTestInstance.getTestObject();
+            Method testMethod = currentTestInstance.getTestMethod();
+            Throwable testThrowable = currentTestInstance.getTestThrowable();
+
             if (testThrowable != null) {
                 return;
             }

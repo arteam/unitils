@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.util.PropertyUtils;
 
@@ -42,7 +43,7 @@ import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirec
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DataSetXSDGeneratorTest {
+public class DataSetXSDGeneratorTest extends UnitilsJUnit4 {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DataSetXSDGeneratorTest.class);

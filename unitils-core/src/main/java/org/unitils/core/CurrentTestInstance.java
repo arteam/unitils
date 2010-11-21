@@ -15,27 +15,33 @@
  */
 package org.unitils.core;
 
+import org.springframework.test.context.TestContext;
+
+import java.lang.reflect.Method;
+
 /**
- * Empty test execution listener implementation. Override methods to add behavior.
+ * Class for holding the current test instance.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public abstract class TestExecutionListenerAdapter {
+public class CurrentTestInstance extends CurrentTestClass {
 
-    /**
-     * warning: this method is not called for JUnit 3
-     */
-    public void beforeTestClass(CurrentTestClass currentTestClass) throws Exception {
+
+    public CurrentTestInstance(TestContext testContext) {
+        super(testContext);
     }
 
-    public void prepareTestInstance(CurrentTestInstance currentTestInstance) throws Exception {
+
+    public Object getTestObject() {
+        return testContext.getTestInstance();
     }
 
-    public void beforeTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+    public Method getTestMethod() {
+        return testContext.getTestMethod();
     }
 
-    public void afterTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+    public Throwable getTestThrowable() {
+        return testContext.getTestException();
     }
-
 }

@@ -23,6 +23,11 @@
             <artifactId>hibernate</artifactId>
             <version>3.2.7.ga</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

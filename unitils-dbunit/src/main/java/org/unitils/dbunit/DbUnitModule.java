@@ -21,7 +21,7 @@ import org.dbmaintain.database.Database;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
-import org.springframework.test.context.TestContext;
+import org.unitils.core.CurrentTestInstance;
 import org.unitils.core.Module;
 import org.unitils.core.TestExecutionListenerAdapter;
 import org.unitils.core.UnitilsException;
@@ -531,15 +531,23 @@ public class DbUnitModule implements Module {
     protected class DbUnitListener extends TestExecutionListenerAdapter {
 
         @Override
-        public void beforeTestMethod(Object testObject, Method testMethod, TestContext testContext) throws Exception {
+        public void beforeTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+            Object testObject = currentTestInstance.getTestObject();
+            Method testMethod = currentTestInstance.getTestMethod();
+
             insertDataSet(testMethod, testObject);
         }
 
         @Override
-        public void afterTestMethod(Object testObject, Method testMethod, Throwable testThrowable, TestContext testContext) throws Exception {
-            if (testThrowable == null) {
-                assertDbContentAsExpected(testMethod, testObject);
+        public void afterTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+            Object testObject = currentTestInstance.getTestObject();
+            Method testMethod = currentTestInstance.getTestMethod();
+            Throwable testThrowable = currentTestInstance.getTestThrowable();
+
+            if (testThrowable != null) {
+                return;
             }
+            assertDbContentAsExpected(testMethod, testObject);
         }
     }
 

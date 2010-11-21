@@ -16,6 +16,8 @@
 package org.unitils.database;
 
 import org.dbmaintain.database.Database;
+import org.springframework.context.ApplicationContext;
+import org.unitils.core.CurrentTestClass;
 import org.unitils.core.Unitils;
 import org.unitils.database.manager.DbMaintainManager;
 import org.unitils.database.manager.UnitilsDataSourceManager;
@@ -56,7 +58,8 @@ public class DatabaseUnitils {
      * @return The DataSource that connects to the test database, not null
      */
     public static DataSource getDataSource(String databaseName) {
-        return getUnitilsDataSourceManager().getDataSource(databaseName, null);
+        ApplicationContext applicationContext = getApplicationContext();
+        return getUnitilsDataSourceManager().getDataSource(databaseName, applicationContext);
     }
 
     public static DataSource getDataSourceAndStartTransaction(String databaseName) {
@@ -84,7 +87,8 @@ public class DatabaseUnitils {
      * @return The UnitilsDataSource that connects to the test database, not null
      */
     public static UnitilsDataSource getUnitilsDataSource(String databaseName) {
-        return getUnitilsDataSourceManager().getUnitilsDataSource(databaseName, null);
+        ApplicationContext applicationContext = getApplicationContext();
+        return getUnitilsDataSourceManager().getUnitilsDataSource(databaseName, applicationContext);
     }
 
 
@@ -137,8 +141,19 @@ public class DatabaseUnitils {
      * latest changes. See {@link org.dbmaintain.DbMaintainer} for more information.
      */
     public static void updateDatabaseIfNeeded() {
-        getDbMaintainManager().updateDatabaseIfNeeded(null);
+        ApplicationContext applicationContext = getApplicationContext();
+        getDbMaintainManager().updateDatabaseIfNeeded(applicationContext);
     }
+
+
+    public static void registerDatabaseUpdateListener(DatabaseUpdateListener databaseUpdateListener) {
+        getDbMaintainManager().registerDatabaseUpdateListener(databaseUpdateListener);
+    }
+
+    public static void unregisterDatabaseUpdateListener(DatabaseUpdateListener databaseUpdateListener) {
+        getDbMaintainManager().unregisterDatabaseUpdateListener(databaseUpdateListener);
+    }
+
 
     /**
      * Gets the instance DatabaseModule that is registered in the modules repository.
@@ -147,19 +162,24 @@ public class DatabaseUnitils {
      *
      * @return the instance, not null
      */
-    public static DatabaseModule getDatabaseModule() {
+    private static DatabaseModule getDatabaseModule() {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
     }
 
-    public static UnitilsTransactionManager getUnitilsTransactionManager() {
+    private static UnitilsTransactionManager getUnitilsTransactionManager() {
         return getDatabaseModule().getUnitilsTransactionManager();
     }
 
-    public static UnitilsDataSourceManager getUnitilsDataSourceManager() {
+    private static UnitilsDataSourceManager getUnitilsDataSourceManager() {
         return getDatabaseModule().getUnitilsDataSourceManager();
     }
 
-    public static DbMaintainManager getDbMaintainManager() {
+    private static DbMaintainManager getDbMaintainManager() {
         return getDatabaseModule().getDbMaintainManager();
+    }
+
+    private static ApplicationContext getApplicationContext() {
+        CurrentTestClass currentTestClass = Unitils.getInstance().getCurrentTestClass();
+        return currentTestClass.getApplicationContext();
     }
 }

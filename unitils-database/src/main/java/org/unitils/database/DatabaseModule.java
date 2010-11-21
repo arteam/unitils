@@ -17,10 +17,7 @@ package org.unitils.database;
 
 import org.dbmaintain.MainFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.TestContext;
-import org.unitils.core.Module;
-import org.unitils.core.TestExecutionListenerAdapter;
-import org.unitils.core.UnitilsException;
+import org.unitils.core.*;
 import org.unitils.core.util.ConfigUtils;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
@@ -223,20 +220,25 @@ public class DatabaseModule implements Module {
     protected class DatabaseTestListener extends TestExecutionListenerAdapter {
 
         @Override
-        public void beforeTestClass(Class<?> testClass, TestContext testContext) throws Exception {
-            ApplicationContext applicationContext = getApplicationContext(testContext);
+        public void beforeTestClass(CurrentTestClass currentTestClass) throws Exception {
+            ApplicationContext applicationContext = currentTestClass.getApplicationContext();
             dbMaintainManager.updateDatabaseIfNeeded(applicationContext);
         }
 
         @Override
-        public void beforeTestMethod(Object testObject, Method testMethod, TestContext testContext) throws Exception {
-            ApplicationContext applicationContext = getApplicationContext(testContext);
+        public void beforeTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+            Object testObject = currentTestInstance.getTestObject();
+            Method testMethod = currentTestInstance.getTestMethod();
+            ApplicationContext applicationContext = currentTestInstance.getApplicationContext();
+
             Set<DataSource> injectedDataSources = injectDataSources(testObject, applicationContext);
             startTransactionForInjectedDataSources(testObject, testMethod, injectedDataSources);
         }
 
         @Override
-        public void afterTestMethod(Object testObject, Method testMethod, Throwable testThrowable, TestContext testContext) throws Exception {
+        public void afterTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+            Object testObject = currentTestInstance.getTestObject();
+            Method testMethod = currentTestInstance.getTestMethod();
             endTransactions(testObject, testMethod);
         }
     }

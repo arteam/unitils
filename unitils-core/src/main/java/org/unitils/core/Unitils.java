@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +29,6 @@ import java.util.Properties;
  * This default instance can be set to a custom initialized instance or instance of a custom subclass using
  * {@link #setInstance(Unitils)}.
  * <p/>
- * If not set, the singleton instance is initialized by default using {@link #initSingletonInstance()}. This method uses
- * the {@link ConfigurationLoader} to load the configuration. An instance of {@link ModulesRepository} is used to
- * initialize and maintain the modules.
- * <p/>
  * Unitils itself is also implemented as a module. In fact, an instance of Unitils behaves like a module who's behaviour
  * is defined by the added behaviour of all modules.
  */
@@ -40,7 +36,7 @@ public class Unitils {
 
 
     /* The singleton instance */
-    private static Unitils unitils;
+    private static ThreadLocal<Unitils> unitilsThreadLocal = new ThreadLocal<Unitils>();
 
 
     /**
@@ -49,12 +45,14 @@ public class Unitils {
      * @return the singleton instance, not null
      */
     public static synchronized Unitils getInstance() {
+        Unitils unitils = unitilsThreadLocal.get();
         if (unitils == null) {
-            initSingletonInstance();
+            unitils = new Unitils();
+            unitilsThreadLocal.set(unitils);
+            unitils.init();
         }
         return unitils;
     }
-
 
     /**
      * Sets the singleton instance to the given object
@@ -62,25 +60,18 @@ public class Unitils {
      * @param unitils the singleton instance
      */
     public static void setInstance(Unitils unitils) {
-        Unitils.unitils = unitils;
-    }
-
-
-    /**
-     * Initializes the singleton instance to the default value, loading the configuration using the {@link
-     * ConfigurationLoader}
-     */
-    public static void initSingletonInstance() {
-        unitils = new Unitils();
-        unitils.init();
+        unitilsThreadLocal.set(unitils);
     }
 
 
     /* Repository for all modules that are currently active in Unitils */
-    private ModulesRepository modulesRepository;
-
+    protected ModulesRepository modulesRepository;
     /* Configuration of Unitils, made up of different properties files */
-    private Properties configuration;
+    protected Properties configuration;
+    /* The current test class, null if not known */
+    protected CurrentTestClass currentTestClass;
+    /* The current test instance, null if not known  */
+    protected CurrentTestInstance currentTestInstance;
 
 
     /**
@@ -116,6 +107,7 @@ public class Unitils {
         }
     }
 
+
     /**
      * Returns the {@link ModulesRepository} that provides access to the modules that are configured in unitils.
      *
@@ -132,6 +124,43 @@ public class Unitils {
      */
     public Properties getConfiguration() {
         return configuration;
+    }
+
+
+    /**
+     * @return The current test class, null if not known
+     */
+    public CurrentTestClass getCurrentTestClass() {
+        if (currentTestClass == null) {
+            throw new UnitilsException("Current test class is not known. Make sure your test class is Unitils enabled, i.e. extends a base class or uses the Spring test execution listener.");
+        }
+        return currentTestClass;
+    }
+
+    /**
+     * @param currentTestClass The current test class, null if not known
+     */
+    public void setCurrentTestClass(CurrentTestClass currentTestClass) {
+        this.currentTestClass = currentTestClass;
+    }
+
+    /**
+     * @return The current test instance, null if not known
+     */
+    public CurrentTestInstance getCurrentTestInstance() {
+        if (currentTestClass == null) {
+            throw new UnitilsException("Current test instance is not known. Possible causes:\n" +
+                    "- Your test class is not Unitils enabled, i.e. it does not extend one of the base classes or does not use the Spring test execution listener.\n" +
+                    "- Your calling a method that needs the test instance from a test method where the test instance is not known, e.g. a before class or static method.");
+        }
+        return currentTestInstance;
+    }
+
+    /**
+     * @param currentTestInstance The current test instance, null if not known
+     */
+    public void setCurrentTestInstance(CurrentTestInstance currentTestInstance) {
+        this.currentTestInstance = currentTestInstance;
     }
 
 
