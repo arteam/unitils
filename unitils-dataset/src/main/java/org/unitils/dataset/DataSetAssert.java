@@ -18,6 +18,7 @@ package org.unitils.dataset;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.assertstrategy.AssertDataSetStrategyHandler;
+import org.unitils.dataset.assertstrategy.InlineAssertDataSetStrategyHandler;
 import org.unitils.util.TestMethodFinder;
 
 import java.lang.reflect.Method;
@@ -62,12 +63,23 @@ public class DataSetAssert {
     }
 
 
-    // todo add inline assert methods
+    public static void assertInlineDataSet(String... dataSetRows) {
+        assertInlineDataSet(true, dataSetRows);
+    }
+
+    public static void assertInlineDataSet(boolean logDatabaseContentOnAssertionError, String... dataSetRows) {
+        getInlineAssertDataSetStrategyHandler().assertExpectedDataSet(logDatabaseContentOnAssertionError, dataSetRows);
+    }
 
 
     private static AssertDataSetStrategyHandler getAssertDataSetStrategyHandler() {
         DataSetModuleFactory dataSetModuleFactory = getDataSetModule().getDataSetModuleFactory();
         return dataSetModuleFactory.getAssertDataSetStrategyHandler();
+    }
+
+    private static InlineAssertDataSetStrategyHandler getInlineAssertDataSetStrategyHandler() {
+        DataSetModuleFactory dataSetModuleFactory = getDataSetModule().getDataSetModuleFactory();
+        return dataSetModuleFactory.getInlineAssertDataSetStrategyHandler();
     }
 
     /**
