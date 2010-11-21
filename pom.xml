@@ -14,7 +14,6 @@
         <module>unitils-inject</module>
         <module>unitils-mock</module>
         <module>unitils-hibernate</module>
-        <module>unitils-tapestry</module>
         <module>unitils-dataset</module>
 
         <module>unitils-test</module>
@@ -38,7 +37,6 @@
 
     <properties>
         <spring.version>3.0.2.RELEASE</spring.version>
-        <tapestry.version>5.1.0.5</tapestry.version>
         <project.build.java.target>1.5</project.build.java.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
