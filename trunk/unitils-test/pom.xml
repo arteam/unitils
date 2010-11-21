@@ -73,11 +73,6 @@
             <artifactId>unitils-hibernate</artifactId>
             <version>${pom.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.unitils</groupId>
-            <artifactId>unitils-tapestry</artifactId>
-            <version>${pom.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>log4j</groupId>
