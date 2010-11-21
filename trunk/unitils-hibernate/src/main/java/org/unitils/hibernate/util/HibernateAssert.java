@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static junit.framework.Assert.assertTrue;
 
 /**
  * Assert class that offers assert methods for testing things that are specific to Hibernate.
@@ -35,7 +34,6 @@ import static junit.framework.Assert.assertTrue;
  * @author Tim Ducheyne
  */
 public class HibernateAssert {
-
 
     /**
      * Checks if the mapping of the Hibernate managed objects with the database is still correct.
@@ -54,8 +52,10 @@ public class HibernateAssert {
                 differences.add(line);
             }
         }
-        assertTrue("Found mismatches between Java objects and database tables. Applying following DDL statements to the " +
-                "database should resolve the problem: \n" + formatErrorMessage(differences), differences.isEmpty());
+        if (!differences.isEmpty()) {
+            throw new AssertionError("Found mismatches between Java objects and database tables. Applying following DDL statements to the " +
+                    "database should resolve the problem: \n" + formatErrorMessage(differences));
+        }
     }
 
 
