@@ -8,7 +8,6 @@
 
     <modules>
         <module>unitils-core</module>
-        <module>unitils-testng</module>
         <module>unitils-database</module>
         <module>unitils-dbunit</module>
         <module>unitils-easymock</module>
@@ -17,7 +16,7 @@
         <module>unitils-hibernate</module>
         <module>unitils-tapestry</module>
         <module>unitils-dataset</module>
-        
+
         <module>unitils-test</module>
     </modules>
 
