@@ -51,19 +51,19 @@ import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
+public class XsdDataSetStructureGeneratorGenerateDataSetStructureTest extends UnitilsJUnit4 {
 
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(XsdDataSetStructureGeneratorTest.class);
+    private static Log logger = LogFactory.getLog(XsdDataSetStructureGeneratorGenerateDataSetStructureTest.class);
 
     /* Tested object */
     private XsdDataSetStructureGenerator xsdDataSetStructureGenerator = new XsdDataSetStructureGenerator();
 
     /* The target directory for the test xsd files */
-    private File xsdDirectory;
+    protected File xsdDirectory;
     @TestDataSource
-    private DataSource dataSource = null;
-    private boolean disabled;
+    protected DataSource dataSource;
+    protected boolean disabled;
 
 
     @Before

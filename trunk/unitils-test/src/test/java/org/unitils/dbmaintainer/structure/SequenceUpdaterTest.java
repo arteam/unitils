@@ -21,6 +21,7 @@ import org.dbmaintain.database.Database;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.core.Unitils;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -34,7 +35,7 @@ import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.database.DbMaintainUnitils.updateSequences;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.getItemAsLong;
-import static org.unitils.testutil.TestUnitilsConfiguration.*;
+import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfiguration;
 
 /**
  * Test class for the SequenceUpdater. Contains tests that can be implemented generally for all different database dialects.
@@ -61,7 +62,7 @@ public class SequenceUpdaterTest {
     public void setUp() throws Exception {
         Properties configuration = getUnitilsConfiguration();
         configuration.setProperty(PROPERTY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, "1000");
-        reinitializeUnitils(configuration);
+        Unitils.getInstance().init(configuration);
 
         defaultDatabase = getDefaultDatabase();
         dataSource = defaultDatabase.getDataSource();
@@ -76,7 +77,7 @@ public class SequenceUpdaterTest {
      */
     @After
     public void tearDown() throws Exception {
-        resetUnitils();
+        Unitils.getInstance().init(null);
         cleanupTestDatabase();
     }
 

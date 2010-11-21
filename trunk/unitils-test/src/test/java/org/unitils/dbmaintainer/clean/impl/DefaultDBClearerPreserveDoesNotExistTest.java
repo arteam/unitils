@@ -23,6 +23,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.Unitils;
 
 import java.util.Properties;
 
@@ -30,8 +31,6 @@ import static org.dbmaintain.config.DbMaintainProperties.*;
 import static org.junit.Assert.fail;
 import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.database.DbMaintainUnitils.clearDatabase;
-import static org.unitils.testutil.TestUnitilsConfiguration.reinitializeUnitils;
-import static org.unitils.testutil.TestUnitilsConfiguration.resetUnitils;
 
 /**
  * Test class for clearing the database with preserve items configured, but some items do not exist.
@@ -61,7 +60,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest {
 
     @After
     public void tearDown() throws Exception {
-        resetUnitils();
+        Unitils.getInstance().init(null);
     }
 
 
@@ -71,7 +70,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest {
     @Test(expected = DbMaintainException.class)
     public void testClearDatabase_schemasToPreserveDoNotExist() throws Exception {
         configuration.setProperty(PROPERTY_PRESERVE_SCHEMAS, "unexisting_schema1, unexisting_schema2");
-        reinitializeUnitils(configuration);
+        Unitils.getInstance().init(configuration);
 
         clearDatabase();
     }
@@ -83,7 +82,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest {
     @Test(expected = DbMaintainException.class)
     public void testClearDatabase_tablesToPreserveDoNotExist() throws Exception {
         configuration.setProperty(PROPERTY_PRESERVE_TABLES, "unexisting_table1, unexisting_table2");
-        reinitializeUnitils(configuration);
+        Unitils.getInstance().init(configuration);
 
         clearDatabase();
     }
@@ -95,7 +94,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest {
     @Test(expected = DbMaintainException.class)
     public void testClearDatabase_viewsToPreserveDoNotExist() throws Exception {
         configuration.setProperty(PROPERTY_PRESERVE_VIEWS, "unexisting_view1, unexisting_view2");
-        reinitializeUnitils(configuration);
+        Unitils.getInstance().init(configuration);
 
         clearDatabase();
     }
@@ -107,7 +106,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest {
     @Test(expected = DbMaintainException.class)
     public void testClearDatabase_materializedViewsToPreserveDoNotExist() throws Exception {
         configuration.setProperty(PROPERTY_PRESERVE_MATERIALIZED_VIEWS, "unexisting_materializedView1, unexisting_materializedView2");
-        reinitializeUnitils(configuration);
+        Unitils.getInstance().init(configuration);
 
         clearDatabase();
     }
@@ -124,7 +123,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest {
         }
         try {
             configuration.setProperty(PROPERTY_PRESERVE_SEQUENCES, "unexisting_sequence1, unexisting_sequence2");
-            reinitializeUnitils(configuration);
+            Unitils.getInstance().init(configuration);
 
             clearDatabase();
             fail("DbMaintainException expected.");
@@ -145,7 +144,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest {
         }
         try {
             configuration.setProperty(PROPERTY_PRESERVE_SYNONYMS, "unexisting_synonym1, unexisting_synonym2");
-            reinitializeUnitils(configuration);
+            Unitils.getInstance().init(configuration);
 
             clearDatabase();
             fail("DbMaintainException expected.");

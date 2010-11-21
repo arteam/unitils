@@ -21,6 +21,7 @@ import org.dbmaintain.database.Database;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.core.Unitils;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -32,7 +33,7 @@ import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.database.DbMaintainUnitils.clearDatabase;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.testutil.TestUnitilsConfiguration.*;
+import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfiguration;
 
 /**
  * Test class for the clearing the database using multiple database schema's with configuration to preserve all items. <p/>
@@ -71,7 +72,7 @@ public class DefaultDBClearerMultiSchemaPreserveTest {
         configuration.setProperty(PROPERTY_PRESERVE_VIEWS, "test_view, " + "schema_a." + defaultDatabase.quoted("TEST_VIEW"));
         configuration.setProperty(PROPERTY_PRESERVE_SEQUENCES, "test_sequence, " + defaultDatabase.quoted("SCHEMA_A") + ".test_sequence");
 
-        reinitializeUnitils(configuration);
+        Unitils.getInstance().init(configuration);
         versionTableName = configuration.getProperty(PROPERTY_EXECUTED_SCRIPTS_TABLE_NAME);
         defaultDatabase = getDefaultDatabase();
         dataSource = defaultDatabase.getDataSource();
@@ -85,7 +86,7 @@ public class DefaultDBClearerMultiSchemaPreserveTest {
         if (disabled) {
             return;
         }
-        resetUnitils();
+        Unitils.getInstance().init(null);
         cleanupTestDatabase();
     }
 

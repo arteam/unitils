@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset;
+package org.unitils.dataset.structure.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,6 +22,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -29,52 +31,50 @@ import java.io.File;
 import java.util.Properties;
 
 import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
-import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_SCHEMANAMES;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.DataSetModuleFactory.PROPKEY_XSD_TARGETDIRNAME;
-import static org.unitils.testutil.TestUnitilsConfiguration.*;
+import static org.unitils.dataset.util.DataSetTestUtils.createDataSourceWrapper;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DataSetXSDGeneratorTest extends UnitilsJUnit4 {
+public class XsdDataSetStructureGeneratorGenerateDataSetStructureAndTemplateTest extends UnitilsJUnit4 {
 
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(DataSetXSDGeneratorTest.class);
+    private static Log logger = LogFactory.getLog(XsdDataSetStructureGeneratorGenerateDataSetStructureAndTemplateTest.class);
 
-    private File xsdDirectory;
-    private DataSource dataSource;
-    private boolean disabled;
+    /* Tested object */
+    private XsdDataSetStructureGenerator xsdDataSetStructureGenerator = new XsdDataSetStructureGenerator();
+
+    protected File xsdDirectory;
+    @TestDataSource
+    protected DataSource dataSource;
+    protected DataSourceWrapper dataSourceWrapper;
+    protected boolean disabled;
 
 
-    /**
-     * Initializes the test fixture.
-     */
     @Before
-    public void setUp() throws Exception {
-        Properties configuration = getUnitilsConfiguration();
+    public void initialize() throws Exception {
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
         this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPERTY_DIALECT, configuration));
         if (disabled) {
             return;
         }
 
-        xsdDirectory = new File(System.getProperty("java.io.tmpdir"), "DataSetXSDGeneratorTest");
+        xsdDirectory = new File(System.getProperty("java.io.tmpdir"), "XmlSchemaDatabaseStructureGeneratorTest");
         if (xsdDirectory.exists()) {
             deleteDirectory(xsdDirectory);
         }
 
-        dataSource = getDefaultDatabase().getDataSource();
+        dataSourceWrapper = createDataSourceWrapper();
 
         dropTestTables();
         createTestTables();
     }
-
 
     /**
      * Clean-up test database.
@@ -84,7 +84,6 @@ public class DataSetXSDGeneratorTest extends UnitilsJUnit4 {
         if (disabled) {
             return;
         }
-        resetUnitils();
         dropTestTables();
         try {
             deleteDirectory(xsdDirectory);
@@ -100,45 +99,39 @@ public class DataSetXSDGeneratorTest extends UnitilsJUnit4 {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        DataSetXSDGenerator.generateDataSetXSDs(xsdDirectory);
+        xsdDataSetStructureGenerator.init(dataSourceWrapper, null);
+        xsdDataSetStructureGenerator.generateDataSetStructureAndTemplate(xsdDirectory);
 
-        // check content of general dataset xsd
         File dataSetXsd = new File(xsdDirectory, "dataset.xsd");
         assertTrue(dataSetXsd.length() > 0);
     }
 
     @Test
-    public void targetFolderConfiguredInConfiguration() throws Exception {
+    public void defaultTargetFolder() throws Exception {
         if (disabled) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        setTargetDirInUnitilsConfiguration();
-        DataSetXSDGenerator.generateDataSetXSDs();
+        xsdDataSetStructureGenerator.init(dataSourceWrapper, xsdDirectory.getPath());
+        xsdDataSetStructureGenerator.generateDataSetStructureAndTemplate();
 
-        // check content of general dataset xsd
         File dataSetXsd = new File(xsdDirectory, "dataset.xsd");
         assertTrue(dataSetXsd.length() > 0);
     }
 
     @Test
-    public void targetDirNotFoundInConfiguration() throws Exception {
+    public void noDefaultTargetFolderDefined() throws Exception {
         if (disabled) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        DataSetXSDGenerator.generateDataSetXSDs();
+        xsdDataSetStructureGenerator.init(dataSourceWrapper, null);
+        xsdDataSetStructureGenerator.generateDataSetStructureAndTemplate();
+
         File dataSetXsd = new File(xsdDirectory, "dataset.xsd");
         assertFalse(dataSetXsd.exists());
     }
 
-
-    private void setTargetDirInUnitilsConfiguration() {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        configuration.setProperty(PROPERTY_SCHEMANAMES, "PUBLIC, SCHEMA_A");
-        configuration.setProperty(PROPKEY_XSD_TARGETDIRNAME, xsdDirectory.getPath());
-        reinitializeUnitils(configuration);
-    }
 
     /**
      * Creates the test tables.

@@ -22,6 +22,7 @@ import org.hsqldb.Trigger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.core.Unitils;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -34,7 +35,7 @@ import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.database.DbMaintainUnitils.clearDatabase;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.testutil.TestUnitilsConfiguration.*;
+import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfiguration;
 
 /**
  * Test class for the clearing the database using multiple database schema's. <p/> This test is currenlty only implemented
@@ -66,7 +67,7 @@ public class DefaultDBClearerMultiSchemaTest {
         configuration.setProperty(PROPERTY_AUTO_CREATE_DBMAINTAIN_SCRIPTS_TABLE, "true");
         configuration.setProperty(PROPERTY_SCHEMANAMES, "PUBLIC, SCHEMA_A, SCHEMA_B");
 
-        reinitializeUnitils(configuration);
+        Unitils.getInstance().init(configuration);
         versionTableName = configuration.getProperty(PROPERTY_EXECUTED_SCRIPTS_TABLE_NAME);
         defaultDatabase = getDefaultDatabase();
         dataSource = defaultDatabase.getDataSource();
@@ -80,7 +81,7 @@ public class DefaultDBClearerMultiSchemaTest {
         if (disabled) {
             return;
         }
-        resetUnitils();
+        Unitils.getInstance().init(null);
         dropTestDatabase();
     }
 

@@ -21,6 +21,7 @@ import org.dbmaintain.database.Database;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.core.Unitils;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -32,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.database.DbMaintainUnitils.cleanDatabase;
 import static org.unitils.database.SQLUnitils.*;
-import static org.unitils.testutil.TestUnitilsConfiguration.*;
+import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfiguration;
 
 /**
  * Test class for the DBCleaner with multiple schemas with configuration to preserve all tables. <p/> Currently this is
@@ -69,7 +70,7 @@ public class DefaultDBCleanerMultiSchemaPreserveTest {
         configuration.setProperty(PROPERTY_PRESERVE_DATA_SCHEMAS, "schema_c");
         configuration.setProperty(PROPERTY_PRESERVE_DATA_TABLES, "test, " + defaultDatabase.quoted("SCHEMA_A") + "." + defaultDatabase.quoted("TEST"));
 
-        reinitializeUnitils(configuration);
+        Unitils.getInstance().init(configuration);
         defaultDatabase = getDefaultDatabase();
         dataSource = defaultDatabase.getDataSource();
 
@@ -86,7 +87,7 @@ public class DefaultDBCleanerMultiSchemaPreserveTest {
         if (disabled) {
             return;
         }
-        resetUnitils();
+        Unitils.getInstance().init(null);
         dropTestTables();
     }
 

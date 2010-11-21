@@ -19,6 +19,7 @@ import org.dbmaintain.database.Database;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.core.Unitils;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -33,7 +34,7 @@ import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.database.DbMaintainUnitils.cleanDatabase;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.isEmpty;
-import static org.unitils.testutil.TestUnitilsConfiguration.*;
+import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfiguration;
 
 /**
  * Test class for the DBCleaner.
@@ -66,7 +67,7 @@ public class DefaultDBCleanerTest {
         configuration.setProperty(PROPERTY_PRESERVE_DATA_TABLES, "Test_table_Preserve");
         configuration.setProperty(PROPERTY_PRESERVE_TABLES, defaultDatabase.quoted("Test_CASE_Table_Preserve"));
         versionTableName = configuration.getProperty(PROPERTY_EXECUTED_SCRIPTS_TABLE_NAME);
-        reinitializeUnitils(configuration);
+        Unitils.getInstance().init(configuration);
 
         defaultDatabase = getDefaultDatabase();
         dataSource = defaultDatabase.getDataSource();
@@ -82,7 +83,7 @@ public class DefaultDBCleanerTest {
      */
     @After
     public void tearDown() throws Exception {
-        resetUnitils();
+        Unitils.getInstance().init(null);
         cleanupTestDatabase();
     }
 
