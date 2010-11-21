@@ -20,6 +20,8 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.core.Unitils;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -32,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 import static org.unitils.database.DatabaseUnitils.getDataSource;
 import static org.unitils.database.DbMaintainUnitils.cleanDatabase;
 import static org.unitils.database.SQLUnitils.*;
-import static org.unitils.testutil.TestUnitilsConfiguration.*;
+import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfiguration;
 
 /**
  * Test class for the cleaning all tables in multiple schema's.
@@ -42,7 +44,7 @@ import static org.unitils.testutil.TestUnitilsConfiguration.*;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DefaultDBCleanerMultiSchemaTest {
+public class DefaultDBCleanerMultiSchemaTest extends UnitilsJUnit4 {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DefaultDBCleanerMultiSchemaTest.class);
@@ -64,7 +66,7 @@ public class DefaultDBCleanerMultiSchemaTest {
 
         // configure 3 schema"s
         configuration.setProperty(PROPERTY_SCHEMANAMES, "PUBLIC, SCHEMA_A, SCHEMA_B");
-        reinitializeUnitils(configuration);
+        Unitils.getInstance().init(configuration);
 
         dataSource = getDataSource();
         dropTestTables();
@@ -76,7 +78,7 @@ public class DefaultDBCleanerMultiSchemaTest {
         if (disabled) {
             return;
         }
-        resetUnitils();
+        Unitils.getInstance().init(null);
         dropTestTables();
     }
 

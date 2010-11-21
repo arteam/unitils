@@ -22,6 +22,7 @@ import org.hsqldb.Trigger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.core.Unitils;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -33,7 +34,7 @@ import static org.unitils.core.util.SQLTestUtils.*;
 import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
 import static org.unitils.database.DbMaintainUnitils.clearDatabase;
 import static org.unitils.database.SQLUnitils.executeUpdate;
-import static org.unitils.testutil.TestUnitilsConfiguration.*;
+import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfiguration;
 
 /**
  * Test class for the clearing the database.
@@ -58,7 +59,7 @@ public class DefaultDBClearerTest {
         versionTableName = configuration.getProperty(PROPERTY_EXECUTED_SCRIPTS_TABLE_NAME);
 
         configuration.setProperty(PROPERTY_AUTO_CREATE_DBMAINTAIN_SCRIPTS_TABLE, "true");
-        reinitializeUnitils(configuration);
+        Unitils.getInstance().init(configuration);
 
         defaultDatabase = getDefaultDatabase();
         dataSource = defaultDatabase.getDataSource();
@@ -69,7 +70,7 @@ public class DefaultDBClearerTest {
 
     @After
     public void cleanUp() throws Exception {
-        resetUnitils();
+        Unitils.getInstance().init(null);
         cleanupTestDatabase();
     }
 

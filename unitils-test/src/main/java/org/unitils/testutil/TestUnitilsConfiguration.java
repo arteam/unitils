@@ -16,7 +16,6 @@
 package org.unitils.testutil;
 
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.Unitils;
 
 import java.util.Properties;
 
@@ -29,17 +28,5 @@ public class TestUnitilsConfiguration {
     public static Properties getUnitilsConfiguration() {
         return new ConfigurationLoader().loadConfiguration();
     }
-
-    public static void reinitializeUnitils(Properties configuration) {
-        Unitils unitils = new Unitils();
-        unitils.init(configuration);
-        Unitils.setInstance(unitils);
-    }
-
-    public static void resetUnitils() {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        reinitializeUnitils(configuration);
-    }
-
 
 }

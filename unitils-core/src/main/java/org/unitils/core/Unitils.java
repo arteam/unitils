@@ -26,8 +26,6 @@ import java.util.Properties;
  * <p/>
  * An instance of Unitils is configured with a certain configuration using the {@link #init(Properties)} method. Normally,
  * only one instance of Unitils exists at any time. The default instance can be obtained using the {@link #getInstance()} method.
- * This default instance can be set to a custom initialized instance or instance of a custom subclass using
- * {@link #setInstance(Unitils)}.
  * <p/>
  * Unitils itself is also implemented as a module. In fact, an instance of Unitils behaves like a module who's behaviour
  * is defined by the added behaviour of all modules.
@@ -49,18 +47,9 @@ public class Unitils {
         if (unitils == null) {
             unitils = new Unitils();
             unitilsThreadLocal.set(unitils);
-            unitils.init();
+            unitils.init(null);
         }
         return unitils;
-    }
-
-    /**
-     * Sets the singleton instance to the given object
-     *
-     * @param unitils the singleton instance
-     */
-    public static void setInstance(Unitils unitils) {
-        unitilsThreadLocal.set(unitils);
     }
 
 
@@ -75,22 +64,16 @@ public class Unitils {
 
 
     /**
-     * Initializes unitils with the configuration files.
-     */
-    public void init() {
-        ConfigurationLoader configurationLoader = new ConfigurationLoader();
-        Properties properties = configurationLoader.loadConfiguration();
-        init(properties);
-    }
-
-    /**
      * Initializes Unitils with the given configuration. All the modules that are configured in the given configuration
-     * are also created and initialized with this configuration.
+     * are also created and initialized with this configuration. If the configuration is null, the default config is loaded.
      *
-     * @param configuration The config, not null
+     * @param configuration The config, null for the default config
      */
     public void init(Properties configuration) {
-        //verifyPackaging(configuration);
+        if (configuration == null) {
+            ConfigurationLoader configurationLoader = new ConfigurationLoader();
+            configuration = configurationLoader.loadConfiguration();
+        }
         this.configuration = configuration;
         modulesRepository = createModulesRepository(configuration);
         afterInitModules();
