@@ -101,7 +101,7 @@ public class UnitilsDataSourceManagerGetDataSourceFromApplicationContext extends
     @Test
     public void unknownDefaultDatabase() throws Exception {
         try {
-            unitilsDataSourceManager.getDataSourceFromApplicationContext(null, staticApplicationContext);
+            unitilsDataSourceManager.getUnitilsDataSourceFromApplicationContext(null, staticApplicationContext);
             fail("NoSuchBeanDefinitionException expected");
         } catch (NoSuchBeanDefinitionException e) {
             assertEquals("No unique bean of type [org.unitils.database.UnitilsDataSource] is defined: expected single bean but found 0: ", e.getMessage());

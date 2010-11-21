@@ -17,9 +17,7 @@ package org.unitils;
 
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
-import org.unitils.core.Module;
-import org.unitils.core.ModulesRepository;
-import org.unitils.core.Unitils;
+import org.unitils.core.*;
 
 /**
  * Test execution listener implementation that delegates the called test method to the test execution listeners
@@ -31,38 +29,54 @@ import org.unitils.core.Unitils;
 public class UnitilsTestExecutionListener implements TestExecutionListener {
 
     public void beforeTestClass(TestContext testContext) throws Exception {
+        CurrentTestClass currentTestClass = new CurrentTestClass(testContext);
+        setCurrentTestClass(currentTestClass);
+
         ModulesRepository modulesRepository = getModulesRepository();
         for (Module module : modulesRepository.getModules()) {
-            modulesRepository.getTestListener(module).beforeTestClass(testContext);
+            modulesRepository.getTestListener(module).beforeTestClass(currentTestClass);
         }
     }
 
     public void prepareTestInstance(TestContext testContext) throws Exception {
+        CurrentTestInstance currentTestInstance = new CurrentTestInstance(testContext);
+        setCurrentTestClass(currentTestInstance);
+        setCurrentTestInstance(currentTestInstance);
+
         ModulesRepository modulesRepository = getModulesRepository();
         for (Module module : modulesRepository.getModules()) {
-            modulesRepository.getTestListener(module).prepareTestInstance(testContext);
+            modulesRepository.getTestListener(module).prepareTestInstance(currentTestInstance);
         }
     }
 
     public void beforeTestMethod(TestContext testContext) throws Exception {
+        CurrentTestInstance currentTestInstance = new CurrentTestInstance(testContext);
+        setCurrentTestClass(currentTestInstance);
+        setCurrentTestInstance(currentTestInstance);
+
         ModulesRepository modulesRepository = getModulesRepository();
         for (Module module : modulesRepository.getModules()) {
-            modulesRepository.getTestListener(module).beforeTestMethod(testContext);
+            modulesRepository.getTestListener(module).beforeTestMethod(currentTestInstance);
         }
     }
 
     public void afterTestMethod(TestContext testContext) throws Exception {
-        ModulesRepository modulesRepository = getModulesRepository();
-        for (Module module : modulesRepository.getModules()) {
-            modulesRepository.getTestListener(module).afterTestMethod(testContext);
+        CurrentTestInstance currentTestInstance = new CurrentTestInstance(testContext);
+        setCurrentTestClass(currentTestInstance);
+        setCurrentTestInstance(currentTestInstance);
+        try {
+            ModulesRepository modulesRepository = getModulesRepository();
+            for (Module module : modulesRepository.getModules()) {
+                modulesRepository.getTestListener(module).afterTestMethod(currentTestInstance);
+            }
+        } finally {
+            setCurrentTestInstance(null);
         }
     }
 
     public void afterTestClass(TestContext testContext) throws Exception {
-        ModulesRepository modulesRepository = getModulesRepository();
-        for (Module module : modulesRepository.getModules()) {
-            modulesRepository.getTestListener(module).afterTestClass(testContext);
-        }
+        setCurrentTestClass(null);
+        // ignored, not always called
     }
 
     /**
@@ -74,4 +88,12 @@ public class UnitilsTestExecutionListener implements TestExecutionListener {
         return Unitils.getInstance().getModulesRepository();
     }
 
+
+    private void setCurrentTestClass(CurrentTestClass currentTestClass) {
+        Unitils.getInstance().setCurrentTestClass(currentTestClass);
+    }
+
+    private void setCurrentTestInstance(CurrentTestInstance currentTestInstance) {
+        Unitils.getInstance().setCurrentTestInstance(currentTestInstance);
+    }
 }

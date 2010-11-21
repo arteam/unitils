@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.unitils.mock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.test.context.TestContext;
+import org.unitils.core.CurrentTestInstance;
 import org.unitils.core.Module;
 import org.unitils.core.TestExecutionListenerAdapter;
 import org.unitils.core.UnitilsException;
@@ -178,7 +178,7 @@ public class MockModule implements Module {
     /**
      * checks for the {@link Dummy} annotation on the testObject. If so it is created by the DummyObjectUtil. The two aproaches possible are
      * stuffed or normal depending on the value in the {@link Dummy} annotation.
-     * 
+     *
      * @param testObject
      */
     protected void createAndInjectDummiesIntoTest(Object testObject) {
@@ -239,14 +239,16 @@ public class MockModule implements Module {
     protected class MockTestListener extends TestExecutionListenerAdapter {
 
         @Override
-        public void prepareTestInstance(Object testObject, TestContext testContext) throws Exception {
+        public void prepareTestInstance(CurrentTestInstance currentTestInstance) throws Exception {
+            Object testObject = currentTestInstance.getTestObject();
+
             createAndInjectPartialMocksIntoTest(testObject);
             createAndInjectMocksIntoTest(testObject);
             createAndInjectDummiesIntoTest(testObject);
         }
 
         @Override
-        public void afterTestMethod(Object testObject, Method testMethod, Throwable testThrowable, TestContext testContext) throws Exception {
+        public void afterTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
             if (logFullScenarioReport) {
                 logFullScenarioReport();
                 return;

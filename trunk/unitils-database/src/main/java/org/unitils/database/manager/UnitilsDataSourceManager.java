@@ -16,6 +16,7 @@
 package org.unitils.database.manager;
 
 import org.dbmaintain.database.DatabaseConnection;
+import org.dbmaintain.database.DatabaseInfo;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.unitils.database.UnitilsDataSource;
@@ -71,7 +72,7 @@ public class UnitilsDataSourceManager {
         if (applicationContext == null) {
             unitilsDataSource = getDataSourceFromDbMaintain(databaseName);
         } else {
-            unitilsDataSource = getDataSourceFromApplicationContext(databaseName, applicationContext);
+            unitilsDataSource = getUnitilsDataSourceFromApplicationContext(databaseName, applicationContext);
         }
         wrapDataSourceIfNeeded(unitilsDataSource);
         return unitilsDataSource;
@@ -93,19 +94,22 @@ public class UnitilsDataSourceManager {
         if (unitilsDataSource == null) {
             DatabaseConnection databaseConnection = dbMaintainManager.getDatabaseConnection(databaseName);
             DataSource dataSource = databaseConnection.getDataSource();
-            Set<String> schemaNames = databaseConnection.getDatabaseInfo().getSchemaNames();
+            DatabaseInfo databaseInfo = databaseConnection.getDatabaseInfo();
+            String dialect = databaseInfo.getDialect();
+            Set<String> schemaNames = databaseInfo.getSchemaNames();
+
             unitilsDataSource = new UnitilsDataSource(dataSource, schemaNames);
+            unitilsDataSource.setDialect(dialect);
             dbMaintainDataSources.put(databaseName, unitilsDataSource);
         }
         return unitilsDataSource;
     }
 
-    protected UnitilsDataSource getDataSourceFromApplicationContext(String databaseName, ApplicationContext applicationContext) {
+    protected UnitilsDataSource getUnitilsDataSourceFromApplicationContext(String databaseName, ApplicationContext applicationContext) {
         if (databaseName == null) {
             return applicationContext.getBean(UnitilsDataSource.class);
         }
         return applicationContext.getBean(databaseName, UnitilsDataSource.class);
     }
-
 
 }

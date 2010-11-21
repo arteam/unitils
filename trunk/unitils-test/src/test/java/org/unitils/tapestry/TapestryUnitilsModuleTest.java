@@ -1,3 +1,18 @@
+/*
+ * Copyright Unitils.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils.tapestry;
 
 import org.apache.tapestry5.ioc.Registry;
@@ -24,7 +39,7 @@ public class TapestryUnitilsModuleTest {
     private TapestryUnitilsModule module = new TapestryUnitilsModule();
 
     private void runBeforeClass(Class<?> testClass) throws Exception {
-        module.getTestListener().beforeTestClass(testClass, null);
+        //module.getTestListener().beforeTestClass(testClass, null);
     }
 
     @SuppressWarnings("unchecked")
@@ -40,8 +55,8 @@ public class TapestryUnitilsModuleTest {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
-        module.getTestListener().beforeTestMethod(testObject, testMethod, null);
-        module.getTestListener().afterTestMethod(testObject, testMethod, null, null);
+        //module.getTestListener().beforeTestMethod(testObject, testMethod, null);
+        //module.getTestListener().afterTestMethod(testObject, testMethod, null, null);
         return (T) testObject;
     }
 
@@ -56,8 +71,8 @@ public class TapestryUnitilsModuleTest {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
-        module.getTestListener().beforeTestMethod(testObject, testMethod, null);
-        module.getTestListener().afterTestMethod(testObject, testMethod, null, null);
+        //module.getTestListener().beforeTestMethod(testObject, testMethod, null);
+        // module.getTestListener().afterTestMethod(testObject, testMethod, null, null);
         return (T) testObject;
     }
 

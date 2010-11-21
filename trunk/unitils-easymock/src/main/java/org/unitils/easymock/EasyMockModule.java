@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.unitils.easymock;
 import org.easymock.classextension.internal.MocksClassControl;
 import org.easymock.internal.MocksControl;
 import org.easymock.internal.ReplayState;
-import org.springframework.test.context.TestContext;
+import org.unitils.core.CurrentTestInstance;
 import org.unitils.core.Module;
 import org.unitils.core.TestExecutionListenerAdapter;
 import org.unitils.core.UnitilsException;
@@ -302,7 +302,9 @@ public class EasyMockModule implements Module {
          * create and inject all mocks on the class.
          */
         @Override
-        public void prepareTestInstance(Object testObject, TestContext testContext) throws Exception {
+        public void prepareTestInstance(CurrentTestInstance currentTestInstance) throws Exception {
+            Object testObject = currentTestInstance.getTestObject();
+
             // Clear all previously created mocks controls
             mocksControls.clear();
 
@@ -315,12 +317,13 @@ public class EasyMockModule implements Module {
          * of all created mocks.
          */
         @Override
-        public void afterTestMethod(Object testObject, Method testMethod, Throwable testThrowable, TestContext testContext) throws Exception {
+        public void afterTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+            Throwable testThrowable = currentTestInstance.getTestThrowable();
+
             if (autoVerifyAfterTestEnabled && testThrowable == null) {
                 verify();
             }
         }
     }
-
 }
 

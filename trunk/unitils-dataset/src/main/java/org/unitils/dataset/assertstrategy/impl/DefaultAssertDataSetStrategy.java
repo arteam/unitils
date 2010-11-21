@@ -17,7 +17,6 @@ package org.unitils.dataset.assertstrategy.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.database.IdentifierProcessor;
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.DataSetModuleFactory;
 import org.unitils.dataset.assertstrategy.AssertDataSetStrategy;
@@ -27,13 +26,9 @@ import org.unitils.dataset.assertstrategy.model.ColumnDifference;
 import org.unitils.dataset.assertstrategy.model.DataSetComparison;
 import org.unitils.dataset.assertstrategy.model.RowComparison;
 import org.unitils.dataset.assertstrategy.model.TableComparison;
-import org.unitils.dataset.database.DataSetDatabaseHelper;
-import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.loadstrategy.impl.BaseLoadDataSetStrategy;
-import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
 import org.unitils.dataset.model.database.Row;
 import org.unitils.dataset.rowsource.DataSetRowSource;
-import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import java.util.List;
 import java.util.Properties;
@@ -54,17 +49,9 @@ public class DefaultAssertDataSetStrategy implements AssertDataSetStrategy {
     protected DatabaseContentLogger databaseContentLogger;
 
 
-    public void init(Properties configuration, DataSourceWrapper dataSourceWrapper, IdentifierProcessor identifierProcessor) {
-        // todo move out
-        DataSetModuleFactory dataSetModuleFactory = new DataSetModuleFactory(configuration, dataSourceWrapper, identifierProcessor);
-
-        DataSetDatabaseHelper dataSetDatabaseHelper = new DataSetDatabaseHelper(dataSourceWrapper, identifierProcessor);
-        SqlTypeHandlerRepository sqlTypeHandlerRepository = dataSetModuleFactory.createSqlTypeHandlerRepository();
-        DataSetRowProcessor dataSetRowProcessor = new DataSetRowProcessor(dataSetDatabaseHelper, sqlTypeHandlerRepository, dataSourceWrapper);
-        TableContentRetriever tableContentRetriever = new TableContentRetriever(dataSourceWrapper, sqlTypeHandlerRepository);
-
-        this.dataSetComparator = dataSetModuleFactory.createDataSetComparator(dataSetRowProcessor, tableContentRetriever);
-        this.databaseContentLogger = dataSetModuleFactory.createDatabaseContentLogger(tableContentRetriever);
+    public void init(Properties configuration, DataSetModuleFactory dataSetModuleFactory) {
+        this.dataSetComparator = dataSetModuleFactory.getDataSetComparator();
+        this.databaseContentLogger = dataSetModuleFactory.getDatabaseContentLogger();
     }
 
     /**

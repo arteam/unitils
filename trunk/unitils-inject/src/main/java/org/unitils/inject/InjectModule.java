@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.unitils.inject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.test.context.TestContext;
+import org.unitils.core.CurrentTestInstance;
 import org.unitils.core.Module;
 import org.unitils.core.TestExecutionListenerAdapter;
 import org.unitils.core.UnitilsException;
@@ -32,7 +32,6 @@ import org.unitils.util.PropertyUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -483,7 +482,9 @@ public class InjectModule implements Module {
          * objects to inject or targets are possibly instantiated during the fixture.
          */
         @Override
-        public void prepareTestInstance(Object testObject, TestContext testContext) throws Exception {
+        public void prepareTestInstance(CurrentTestInstance currentTestInstance) throws Exception {
+            Object testObject = currentTestInstance.getTestObject();
+
             if (createTestedObjectsIfNullEnabled) {
                 createTestedObjectsIfNull(testObject);
             }
@@ -494,7 +495,7 @@ public class InjectModule implements Module {
          * After test execution, if requested restore all values that were replaced in the static injection.
          */
         @Override
-        public void afterTestMethod(Object testObject, Method testMethod, Throwable testThrowable, TestContext testContext) throws Exception {
+        public void afterTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
             restoreStaticInjectedObjects();
         }
     }
