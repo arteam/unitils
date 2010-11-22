@@ -28,7 +28,14 @@ import org.unitils.core.*;
  */
 public class UnitilsTestExecutionListener implements TestExecutionListener {
 
+    private boolean supportsBeforeAndAfterTestClass = false;
+
     public void beforeTestClass(TestContext testContext) throws Exception {
+        supportsBeforeAndAfterTestClass = true;
+        performBeforeTestClass(testContext);
+    }
+
+    protected void performBeforeTestClass(TestContext testContext) throws Exception {
         CurrentTestClass currentTestClass = new CurrentTestClass(testContext);
         setCurrentTestClass(currentTestClass);
 
@@ -38,7 +45,13 @@ public class UnitilsTestExecutionListener implements TestExecutionListener {
         }
     }
 
+    @Override
     public void prepareTestInstance(TestContext testContext) throws Exception {
+        if (!supportsBeforeAndAfterTestClass) {
+            // work-around for junit-3 and spring 2.5.6: these don't have a before or after test class
+            performBeforeTestClass(testContext);
+        }
+
         CurrentTestInstance currentTestInstance = new CurrentTestInstance(testContext);
         setCurrentTestClass(currentTestInstance);
         setCurrentTestInstance(currentTestInstance);
@@ -49,6 +62,7 @@ public class UnitilsTestExecutionListener implements TestExecutionListener {
         }
     }
 
+    @Override
     public void beforeTestMethod(TestContext testContext) throws Exception {
         CurrentTestInstance currentTestInstance = new CurrentTestInstance(testContext);
         setCurrentTestClass(currentTestInstance);
@@ -60,6 +74,7 @@ public class UnitilsTestExecutionListener implements TestExecutionListener {
         }
     }
 
+    @Override
     public void afterTestMethod(TestContext testContext) throws Exception {
         CurrentTestInstance currentTestInstance = new CurrentTestInstance(testContext);
         setCurrentTestClass(currentTestInstance);
@@ -71,6 +86,10 @@ public class UnitilsTestExecutionListener implements TestExecutionListener {
             }
         } finally {
             setCurrentTestInstance(null);
+            if (!supportsBeforeAndAfterTestClass) {
+                // work-around for junit-3 and spring 2.5.6: these don't have a before or after test class
+                afterTestClass(testContext);
+            }
         }
     }
 

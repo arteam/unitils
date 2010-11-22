@@ -20,7 +20,7 @@ import org.easymock.internal.MocksControl;
 import org.easymock.internal.ReplayState;
 import org.unitils.core.CurrentTestInstance;
 import org.unitils.core.Module;
-import org.unitils.core.TestExecutionListenerAdapter;
+import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
 import org.unitils.easymock.annotation.AfterCreateMock;
 import org.unitils.easymock.annotation.Mock;
@@ -103,7 +103,7 @@ public class EasyMockModule implements Module {
      *
      * @return the listener
      */
-    public TestExecutionListenerAdapter getTestListener() {
+    public TestListener getTestListener() {
         return new EasyMockTestListener();
     }
 
@@ -295,7 +295,7 @@ public class EasyMockModule implements Module {
     /**
      * Test listener that handles the mock creation and injection.
      */
-    protected class EasyMockTestListener extends TestExecutionListenerAdapter {
+    protected class EasyMockTestListener extends TestListener {
 
         /**
          * Before the test is executed this calls {@link EasyMockModule#createAndInjectRegularMocksIntoTest(Object)} to

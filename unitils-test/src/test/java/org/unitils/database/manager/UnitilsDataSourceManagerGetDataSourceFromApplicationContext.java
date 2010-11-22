@@ -21,6 +21,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.support.StaticApplicationContext;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.core.UnitilsException;
 import org.unitils.database.UnitilsDataSource;
 import org.unitils.mock.annotation.Dummy;
 
@@ -82,9 +83,9 @@ public class UnitilsDataSourceManagerGetDataSourceFromApplicationContext extends
 
         try {
             unitilsDataSourceManager.getUnitilsDataSource(null, staticApplicationContext);
-            fail("NoSuchBeanDefinitionException expected");
-        } catch (NoSuchBeanDefinitionException e) {
-            assertEquals("No unique bean of type [org.unitils.database.UnitilsDataSource] is defined: expected single bean but found 2: database1,database2", e.getMessage());
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to determine default unitils data source: more than one bean of type UnitilsDataSource found in test application context. Please specify the id or name of the bean.", e.getMessage());
         }
     }
 
@@ -102,9 +103,9 @@ public class UnitilsDataSourceManagerGetDataSourceFromApplicationContext extends
     public void unknownDefaultDatabase() throws Exception {
         try {
             unitilsDataSourceManager.getUnitilsDataSourceFromApplicationContext(null, staticApplicationContext);
-            fail("NoSuchBeanDefinitionException expected");
-        } catch (NoSuchBeanDefinitionException e) {
-            assertEquals("No unique bean of type [org.unitils.database.UnitilsDataSource] is defined: expected single bean but found 0: ", e.getMessage());
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to determine default unitils data source: no bean of type UnitilsDataSource found in test application context.", e.getMessage());
         }
     }
 

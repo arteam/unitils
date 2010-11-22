@@ -21,7 +21,7 @@ import org.dbmaintain.database.IdentifierProcessor;
 import org.dbmaintain.database.IdentifierProcessorFactory;
 import org.unitils.core.CurrentTestInstance;
 import org.unitils.core.Module;
-import org.unitils.core.TestExecutionListenerAdapter;
+import org.unitils.core.TestListener;
 import org.unitils.database.DatabaseUnitils;
 import org.unitils.database.DatabaseUpdateListener;
 import org.unitils.database.UnitilsDataSource;
@@ -166,7 +166,7 @@ public class DataSetModule implements Module {
     /**
      * @return The TestListener object that implements Unitils' data set support
      */
-    public TestExecutionListenerAdapter getTestListener() {
+    public TestListener getTestListener() {
         return new DataSetListener();
     }
 
@@ -174,7 +174,7 @@ public class DataSetModule implements Module {
     /**
      * Test listener that is called while the test framework is running tests
      */
-    protected class DataSetListener extends TestExecutionListenerAdapter {
+    protected class DataSetListener extends TestListener {
 
         @Override
         public void beforeTestMethod(CurrentTestInstance currentTestInstance) throws Exception {

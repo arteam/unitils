@@ -21,11 +21,9 @@ package org.unitils.core;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public abstract class TestExecutionListenerAdapter {
+public abstract class TestListener {
 
-    /**
-     * warning: this method is not called for JUnit 3
-     */
+
     public void beforeTestClass(CurrentTestClass currentTestClass) throws Exception {
     }
 

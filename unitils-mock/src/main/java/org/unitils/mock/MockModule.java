@@ -19,7 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.CurrentTestInstance;
 import org.unitils.core.Module;
-import org.unitils.core.TestExecutionListenerAdapter;
+import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.annotation.AfterCreateMock;
 import org.unitils.mock.annotation.Dummy;
@@ -227,7 +227,7 @@ public class MockModule implements Module {
      *
      * @return the listener
      */
-    public TestExecutionListenerAdapter getTestListener() {
+    public TestListener getTestListener() {
         return new MockTestListener();
     }
 
@@ -236,7 +236,7 @@ public class MockModule implements Module {
      * Test listener that handles the scenario and mock creation, and makes sure a final syntax check
      * is performed after each test and that scenario reports are logged if required.
      */
-    protected class MockTestListener extends TestExecutionListenerAdapter {
+    protected class MockTestListener extends TestListener {
 
         @Override
         public void prepareTestInstance(CurrentTestInstance currentTestInstance) throws Exception {

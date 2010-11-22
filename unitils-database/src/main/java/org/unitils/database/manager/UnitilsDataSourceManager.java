@@ -19,6 +19,7 @@ import org.dbmaintain.database.DatabaseConnection;
 import org.dbmaintain.database.DatabaseInfo;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
+import org.unitils.core.UnitilsException;
 import org.unitils.database.UnitilsDataSource;
 
 import javax.sql.DataSource;
@@ -105,11 +106,20 @@ public class UnitilsDataSourceManager {
         return unitilsDataSource;
     }
 
+    @SuppressWarnings({"unchecked", "RedundantCast"})
     protected UnitilsDataSource getUnitilsDataSourceFromApplicationContext(String databaseName, ApplicationContext applicationContext) {
         if (databaseName == null) {
-            return applicationContext.getBean(UnitilsDataSource.class);
+            // implemented like this to be compatible with spring 2.5.6
+            Map<String, UnitilsDataSource> unitilsDataSources = applicationContext.getBeansOfType(UnitilsDataSource.class);
+            if (unitilsDataSources.isEmpty()) {
+                throw new UnitilsException("Unable to determine default unitils data source: no bean of type UnitilsDataSource found in test application context.");
+            }
+            if (unitilsDataSources.size() > 1) {
+                throw new UnitilsException("Unable to determine default unitils data source: more than one bean of type UnitilsDataSource found in test application context. Please specify the id or name of the bean.");
+            }
+            return unitilsDataSources.values().iterator().next();
         }
-        return applicationContext.getBean(databaseName, UnitilsDataSource.class);
+        return (UnitilsDataSource) applicationContext.getBean(databaseName, UnitilsDataSource.class);
     }
 
 }
