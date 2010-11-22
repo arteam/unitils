@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.unitils.util;
 
 import junit.framework.TestCase;
 import org.unitils.core.Module;
-import org.unitils.core.TestExecutionListenerAdapter;
+import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
 
 import java.lang.annotation.Annotation;
@@ -202,7 +202,7 @@ public class ModuleUtilsTest extends TestCase {
         public void afterInit() {
         }
 
-        public TestExecutionListenerAdapter getTestListener() {
+        public TestListener getTestListener() {
             return null;
         }
 

@@ -17,11 +17,6 @@
             <artifactId>unitils-database</artifactId>
             <version>${pom.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.sun.xml.stream</groupId>
-            <artifactId>sjsxp</artifactId>
-            <version>1.0.1</version>
-        </dependency>
     </dependencies>
 
 </project>

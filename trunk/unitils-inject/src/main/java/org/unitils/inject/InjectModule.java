@@ -20,7 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.CurrentTestInstance;
 import org.unitils.core.Module;
-import org.unitils.core.TestExecutionListenerAdapter;
+import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.ObjectToInjectHolder;
 import org.unitils.inject.annotation.*;
@@ -465,17 +465,17 @@ public class InjectModule implements Module {
 
 
     /**
-     * @return The {@link org.unitils.core.TestExecutionListenerAdapter} for this module
+     * @return The {@link org.unitils.core.TestListener} for this module
      */
-    public TestExecutionListenerAdapter getTestListener() {
+    public TestListener getTestListener() {
         return new InjectTestListener();
     }
 
 
     /**
-     * The {@link org.unitils.core.TestExecutionListenerAdapter} for this module
+     * The {@link org.unitils.core.TestListener} for this module
      */
-    protected class InjectTestListener extends TestExecutionListenerAdapter {
+    protected class InjectTestListener extends TestListener {
 
         /**
          * Before executing a test method (i.e. after the fixture methods), the injection is performed, since

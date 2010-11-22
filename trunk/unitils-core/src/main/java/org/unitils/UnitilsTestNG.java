@@ -20,7 +20,7 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 
 /**
  * Base test class that will Unitils-enable your test. This base class will make sure that the
- * core unitils test listener methods are invoked in the expected order. See {@link org.unitils.core.TestExecutionListenerAdapter} for
+ * core unitils test listener methods are invoked in the expected order. See {@link org.unitils.core.TestListener} for
  * more information on the listener invocation order.
  *
  * @author Tim Ducheyne

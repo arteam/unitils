@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,15 @@
  */
 package org.unitils.core;
 
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import static org.unitils.core.ModulesLoader.*;
 
 import java.util.List;
 import java.util.Properties;
+
+import static org.junit.Assert.*;
+import static org.unitils.core.ModulesLoader.*;
 
 /**
  * Test for {@link ModulesLoader}.
@@ -227,7 +228,7 @@ public class ModulesLoaderTest extends UnitilsJUnit4 {
         public void afterInit() {
         }
 
-        public TestExecutionListenerAdapter getTestListener() {
+        public TestListener getTestListener() {
             return null;
         }
 
@@ -244,7 +245,7 @@ public class ModulesLoaderTest extends UnitilsJUnit4 {
         public void afterInit() {
         }
 
-        public TestExecutionListenerAdapter getTestListener() {
+        public TestListener getTestListener() {
             return null;
         }
 
@@ -261,7 +262,7 @@ public class ModulesLoaderTest extends UnitilsJUnit4 {
         public void afterInit() {
         }
 
-        public TestExecutionListenerAdapter getTestListener() {
+        public TestListener getTestListener() {
             return null;
         }
 
@@ -278,7 +279,7 @@ public class ModulesLoaderTest extends UnitilsJUnit4 {
         public void afterInit() {
         }
 
-        public TestExecutionListenerAdapter getTestListener() {
+        public TestListener getTestListener() {
             return null;
         }
 
@@ -299,7 +300,7 @@ public class ModulesLoaderTest extends UnitilsJUnit4 {
         private TestModulePrivate() {
         }
 
-        public TestExecutionListenerAdapter getTestListener() {
+        public TestListener getTestListener() {
             return null;
         }
     }
@@ -320,7 +321,7 @@ public class ModulesLoaderTest extends UnitilsJUnit4 {
         public void afterInit() {
         }
 
-        public TestExecutionListenerAdapter getTestListener() {
+        public TestListener getTestListener() {
             return null;
         }
     }

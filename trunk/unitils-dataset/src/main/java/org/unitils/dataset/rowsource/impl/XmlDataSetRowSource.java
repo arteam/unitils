@@ -123,7 +123,7 @@ public class XmlDataSetRowSource implements DataSetRowSource {
             closeQuietly(dataSetInputStream);
             throw new UnitilsException("Unable to open data set file " + dataSetFile.getName(), e);
         }
-        readDataSetSettings();
+        dataSetSettings = readDataSetSettings();
     }
 
     /**
@@ -172,19 +172,22 @@ public class XmlDataSetRowSource implements DataSetRowSource {
     }
 
 
-    protected void readDataSetSettings() {
+    protected DataSetSettings readDataSetSettings() {
         try {
-            if (xmlStreamReader.hasNext()) {
+            while (xmlStreamReader.hasNext()) {
                 int event = xmlStreamReader.next();
-                if (START_ELEMENT == event && isDataSetElement()) {
+                if (START_ELEMENT != event) {
+                    continue;
+                }
+                if (isDataSetElement()) {
                     unitilsDataSetNamespaceDeclared = isUnitilsDataSetNamespaceDeclared();
                     char literalToken = getLiteralToken();
                     char variableToken = getVariableToken();
                     boolean caseSensitive = getCaseSensitive();
                     String databaseName = getDatabaseName();
-                    dataSetSettings = new DataSetSettings(literalToken, variableToken, caseSensitive, databaseName);
-                    return;
+                    return new DataSetSettings(literalToken, variableToken, caseSensitive, databaseName);
                 }
+                break;
             }
             throw new UnitilsException("Invalid data set xml: data set should have a root 'dataset' element");
 

@@ -211,13 +211,13 @@ public class DatabaseModule implements Module {
 
 
     /**
-     * @return The {@link org.unitils.core.TestExecutionListenerAdapter} associated with this module
+     * @return The {@link org.unitils.core.TestListener} associated with this module
      */
-    public TestExecutionListenerAdapter getTestListener() {
+    public TestListener getTestListener() {
         return new DatabaseTestListener();
     }
 
-    protected class DatabaseTestListener extends TestExecutionListenerAdapter {
+    protected class DatabaseTestListener extends TestListener {
 
         @Override
         public void beforeTestClass(CurrentTestClass currentTestClass) throws Exception {

@@ -23,7 +23,7 @@ import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
 import org.unitils.core.CurrentTestInstance;
 import org.unitils.core.Module;
-import org.unitils.core.TestExecutionListenerAdapter;
+import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.ConfigUtils;
 import org.unitils.database.DatabaseModule;
@@ -520,7 +520,7 @@ public class DbUnitModule implements Module {
     /**
      * @return The TestListener object that implements Unitils' DbUnit support
      */
-    public TestExecutionListenerAdapter getTestListener() {
+    public TestListener getTestListener() {
         return new DbUnitListener();
     }
 
@@ -528,7 +528,7 @@ public class DbUnitModule implements Module {
     /**
      * Test listener that is called while the test framework is running tests
      */
-    protected class DbUnitListener extends TestExecutionListenerAdapter {
+    protected class DbUnitListener extends TestListener {
 
         @Override
         public void beforeTestMethod(CurrentTestInstance currentTestInstance) throws Exception {

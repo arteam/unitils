@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ public class ModulesRepository {
     private List<Module> modules;
 
     /* A map containing the test listeners of each module */
-    private Map<Module, TestExecutionListenerAdapter> testListeners;
+    private Map<Module, TestListener> testListeners;
 
 
     /**
@@ -63,7 +63,7 @@ public class ModulesRepository {
      *
      * @return the listeners per module, not null
      */
-    public Map<Module, TestExecutionListenerAdapter> getTestListeners() {
+    public Map<Module, TestListener> getTestListeners() {
         return testListeners;
     }
 
@@ -149,7 +149,7 @@ public class ModulesRepository {
      * @param module the module, not null
      * @return the listener, null if the module could not be found
      */
-    public TestExecutionListenerAdapter getTestListener(Module module) {
+    public TestListener getTestListener(Module module) {
         return testListeners.get(module);
     }
 
@@ -160,8 +160,8 @@ public class ModulesRepository {
      * @param moduleList the modules, not null
      * @return the listeners for each module, not null
      */
-    private Map<Module, TestExecutionListenerAdapter> createTestListeners(List<Module> moduleList) {
-        Map<Module, TestExecutionListenerAdapter> result = new HashMap<Module, TestExecutionListenerAdapter>(moduleList.size());
+    private Map<Module, TestListener> createTestListeners(List<Module> moduleList) {
+        Map<Module, TestListener> result = new HashMap<Module, TestListener>(moduleList.size());
         for (Module module : moduleList) {
             result.put(module, module.getTestListener());
         }

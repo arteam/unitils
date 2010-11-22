@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_5" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -23,7 +23,6 @@
     <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2" level="project" />
     <orderEntry type="library" name="Maven: ognl:ognl:2.6.9" level="project" />
     <orderEntry type="library" name="Maven: org.dbmaintain:dbmaintain:2.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: ant:ant:1.6.5" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate:hibernate:3.2.7.ga" level="project" />
     <orderEntry type="library" name="Maven: net.sf.ehcache:ehcache:1.2.3" level="project" />
     <orderEntry type="library" name="Maven: javax.transaction:jta:1.0.1B" level="project" />
