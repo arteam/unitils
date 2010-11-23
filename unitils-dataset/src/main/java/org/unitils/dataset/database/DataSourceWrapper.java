@@ -17,12 +17,14 @@ package org.unitils.dataset.database;
 
 import org.dbmaintain.database.IdentifierProcessor;
 import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.unitils.core.UnitilsException;
 import org.unitils.database.UnitilsDataSource;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.TableName;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -30,7 +32,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static org.unitils.core.util.DbUtils.close;
+import static org.unitils.database.util.DbUtils.close;
 
 
 /**
@@ -49,7 +51,6 @@ public class DataSourceWrapper {
     protected Map<String, Set<TableName>> tableNamesCache = new HashMap<String, Set<TableName>>();
     protected Map<TableName, Set<Column>> columnsCache = new HashMap<TableName, Set<Column>>();
     protected Map<TableName, Map<String, Integer>> tableColumnSqlTypesCache = new HashMap<TableName, Map<String, Integer>>();
-    protected Set<TableName> existingTableNames = new LinkedHashSet<TableName>();
 
 
     public DataSourceWrapper(UnitilsDataSource unitilsDataSource, IdentifierProcessor identifierProcessor) {
@@ -150,15 +151,31 @@ public class DataSourceWrapper {
         Connection connection = getConnection();
         ResultSet resultSet = null;
         try {
-            resultSet = connection.getMetaData().getPrimaryKeys(null, tableName.getSchemaName(), tableName.getTableName());
+            DatabaseMetaData databaseMetaData = connection.getMetaData();
+            resultSet = databaseMetaData.getPrimaryKeys(null, tableName.getSchemaName(), tableName.getTableName());
             while (resultSet.next()) {
                 primaryKeyColumnNames.add(resultSet.getString("COLUMN_NAME"));
+            }
+            if (primaryKeyColumnNames.isEmpty()) {
+                assertTableExists(tableName, databaseMetaData);
             }
             tablePrimaryKeysCache.put(tableName, primaryKeyColumnNames);
             return primaryKeyColumnNames;
 
         } finally {
             close(connection, null, resultSet);
+        }
+    }
+
+    private void assertTableExists(TableName tableName, DatabaseMetaData databaseMetaData) throws SQLException {
+        ResultSet resultSet = null;
+        try {
+            resultSet = databaseMetaData.getTables(null, tableName.getSchemaName(), tableName.getTableName(), null);
+            if (!resultSet.next()) {
+                throw new UnitilsException("Table does not exist: " + tableName);
+            }
+        } finally {
+            resultSet.close();
         }
     }
 

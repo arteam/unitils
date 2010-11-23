@@ -302,7 +302,7 @@ public class EasyMockModule implements Module {
          * create and inject all mocks on the class.
          */
         @Override
-        public void prepareTestInstance(CurrentTestInstance currentTestInstance) throws Exception {
+        public void beforeTest(CurrentTestInstance currentTestInstance) throws Exception {
             Object testObject = currentTestInstance.getTestObject();
 
             // Clear all previously created mocks controls
@@ -317,7 +317,7 @@ public class EasyMockModule implements Module {
          * of all created mocks.
          */
         @Override
-        public void afterTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+        public void afterTest(CurrentTestInstance currentTestInstance) throws Exception {
             Throwable testThrowable = currentTestInstance.getTestThrowable();
 
             if (autoVerifyAfterTestEnabled && testThrowable == null) {

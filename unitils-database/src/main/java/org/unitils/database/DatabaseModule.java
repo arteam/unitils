@@ -199,7 +199,7 @@ public class DatabaseModule implements Module {
 
     protected DbMaintainManager createDbMaintainMainManager(Properties configuration) {
         boolean updateDatabaseSchemaEnabled = PropertyUtils.getBoolean(PROPERTY_UPDATEDATABASESCHEMA_ENABLED, configuration);
-        DataSourceFactory dataSourceFactory = ConfigUtils.getConfiguredInstanceOf(DataSourceFactory.class, configuration);
+        DataSourceFactory dataSourceFactory = ConfigUtils.getInstanceOf(DataSourceFactory.class, configuration);
         dataSourceFactory.init(configuration);
         return new DbMaintainManager(configuration, updateDatabaseSchemaEnabled, dataSourceFactory);
     }
@@ -226,7 +226,7 @@ public class DatabaseModule implements Module {
         }
 
         @Override
-        public void beforeTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+        public void beforeTest(CurrentTestInstance currentTestInstance) throws Exception {
             Object testObject = currentTestInstance.getTestObject();
             Method testMethod = currentTestInstance.getTestMethod();
             ApplicationContext applicationContext = currentTestInstance.getApplicationContext();
@@ -236,7 +236,7 @@ public class DatabaseModule implements Module {
         }
 
         @Override
-        public void afterTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+        public void afterTest(CurrentTestInstance currentTestInstance) throws Exception {
             Object testObject = currentTestInstance.getTestObject();
             Method testMethod = currentTestInstance.getTestMethod();
             endTransactions(testObject, testMethod);

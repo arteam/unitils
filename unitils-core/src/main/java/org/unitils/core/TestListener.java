@@ -23,17 +23,32 @@ package org.unitils.core;
  */
 public abstract class TestListener {
 
-
+    /**
+     * Invoked before any BeforeClass method is called on the test. At this moment only the test class is known,
+     * the test instance and test method are not available.
+     * <br/><br/>
+     * Note: for JUnit 3 and also for spring 2.5.6 this method is called just before the {@link #beforeTest}
+     * method because these do not support the before/after test class behavior.
+     *
+     * @param currentTestClass The current test class, not null
+     */
     public void beforeTestClass(CurrentTestClass currentTestClass) throws Exception {
     }
 
-    public void prepareTestInstance(CurrentTestInstance currentTestInstance) throws Exception {
+    /**
+     * Invoked after the Before method but before the actual test method is called on the test.
+     *
+     * @param currentTestInstance The current test instance, not null
+     */
+    public void beforeTest(CurrentTestInstance currentTestInstance) throws Exception {
     }
 
-    public void beforeTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
-    }
-
-    public void afterTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+    /**
+     * Invoked after all After methods are called on the test.
+     *
+     * @param currentTestInstance The current test class, not null
+     */
+    public void afterTest(CurrentTestInstance currentTestInstance) throws Exception {
     }
 
 }

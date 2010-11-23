@@ -15,9 +15,8 @@
  */
 package org.unitils.dataset.resolver;
 
-import org.unitils.core.util.Configurable;
-
 import java.io.File;
+import java.util.Properties;
 
 /**
  * Resolves the location for a data set with a certain name.
@@ -26,8 +25,15 @@ import java.io.File;
  * @author Filip Neven
  * @author Tuomas Jormola
  */
-public interface DataSetResolver extends Configurable {
+public interface DataSetResolver {
 
+
+    /**
+     * Initializes the resolver with the given configuration.
+     *
+     * @param configuration The configuration, not null
+     */
+    void init(Properties configuration);
 
     /**
      * Resolves the location for a data set with a certain name.

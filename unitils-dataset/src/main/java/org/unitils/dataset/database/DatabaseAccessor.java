@@ -23,7 +23,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
 
-import static org.unitils.core.util.DbUtils.close;
+import static org.unitils.database.util.DbUtils.close;
 
 /**
  * @author Tim Ducheyne

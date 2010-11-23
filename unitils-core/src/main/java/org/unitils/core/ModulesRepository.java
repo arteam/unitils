@@ -20,8 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.unitils.util.ReflectionUtils.getClassWithName;
-
 /**
  * A class for holding and retrieving modules.
  *
@@ -104,42 +102,6 @@ public class ModulesRepository {
             }
         }
         return result;
-    }
-
-
-    /**
-     * Checks whether a module of a type with the given class name exists. The class name can also be
-     * the super-type of an existing module.
-     *
-     * @param fullyQualifiedClassName The class name, not null
-     * @return True if the module exists and is enabled
-     */
-    @SuppressWarnings("unchecked")
-    public boolean isModuleEnabled(String fullyQualifiedClassName) {
-        Class<? extends Module> moduleClass;
-        try {
-            moduleClass = getClassWithName(fullyQualifiedClassName);
-
-        } catch (UnitilsException e) {
-            // class could not be loaded
-            return false;
-        }
-        return isModuleEnabled(moduleClass);
-    }
-
-
-    /**
-     * Checks whether a module of a type exists. The class an also be the super-type of an existing module.
-     *
-     * @param moduleClass The class, not null
-     * @return True if the module exists and is enabled
-     */
-    public boolean isModuleEnabled(Class<? extends Module> moduleClass) {
-        List<? extends Module> modulesOfType = getModulesOfType(moduleClass);
-        if (modulesOfType.size() > 1) {
-            throw new UnitilsException("More than one module found of type " + moduleClass.getName());
-        }
-        return modulesOfType.size() == 1;
     }
 
 

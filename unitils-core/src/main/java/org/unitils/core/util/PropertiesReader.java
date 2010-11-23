@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,41 +15,38 @@
  */
 package org.unitils.core.util;
 
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.unitils.core.UnitilsException;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.UnitilsException;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
 /**
  * @author Fabian Krueger
- *
  */
 public class PropertiesReader {
-	
+
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(PropertiesReader.class);
 
     /**
      * Loads the properties file with the given name, which is available in the user home folder. If no
      * file with the given name is found, null is returned.
-     * 
+     *
      * @param propertiesFileName The name of the properties file
      * @return The Properties object, null if the properties file wasn't found.
      */
-	public Properties loadPropertiesFileFromUserHome(
-			String propertiesFileName) {
+    public Properties loadPropertiesFileFromUserHome(String propertiesFileName) {
         InputStream inputStream = null;
         try {
-        	if("".equals(propertiesFileName)){
-        		throw new IllegalArgumentException("Properties Filename must be given.");
-        	}
+            if ("".equals(propertiesFileName)) {
+                throw new IllegalArgumentException("Properties Filename must be given.");
+            }
             Properties properties = new Properties();
             String userHomeDir = System.getProperty("user.home");
             File localPropertiesFile = new File(userHomeDir, propertiesFileName);
@@ -66,21 +63,21 @@ public class PropertiesReader {
         } finally {
             closeQuietly(inputStream);
         }
-	}
+    }
 
-	/**
-	 * Loads the properties file with the given name, which is available in the classpath. If no
-	 * file with the given name is found, null is returned.
-	 * 
-	 * @param propertiesFileName The name of the properties file
-	 * @return The Properties object, null if the properties file wasn't found.
-	 */
-	public Properties loadPropertiesFileFromClasspath(String propertiesFileName) {
+    /**
+     * Loads the properties file with the given name, which is available in the classpath. If no
+     * file with the given name is found, null is returned.
+     *
+     * @param propertiesFileName The name of the properties file
+     * @return The Properties object, null if the properties file wasn't found.
+     */
+    public Properties loadPropertiesFileFromClasspath(String propertiesFileName) {
         InputStream inputStream = null;
         try {
-        	if("".equals(propertiesFileName)){
-        		throw new IllegalArgumentException("Properties Filename must be given.");
-        	}
+            if ("".equals(propertiesFileName)) {
+                throw new IllegalArgumentException("Properties Filename must be given.");
+            }
             Properties properties = new Properties();
             inputStream = getClass().getClassLoader().getResourceAsStream(propertiesFileName);
             if (inputStream == null) {

@@ -177,7 +177,7 @@ public class DataSetModule implements Module {
     protected class DataSetListener extends TestListener {
 
         @Override
-        public void beforeTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+        public void beforeTest(CurrentTestInstance currentTestInstance) throws Exception {
             Object testObject = currentTestInstance.getTestObject();
             Method testMethod = currentTestInstance.getTestMethod();
 
@@ -185,7 +185,7 @@ public class DataSetModule implements Module {
         }
 
         @Override
-        public void afterTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+        public void afterTest(CurrentTestInstance currentTestInstance) throws Exception {
             Object testObject = currentTestInstance.getTestObject();
             Method testMethod = currentTestInstance.getTestMethod();
             Throwable testThrowable = currentTestInstance.getTestThrowable();

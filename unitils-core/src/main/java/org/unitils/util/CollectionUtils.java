@@ -29,26 +29,6 @@ public class CollectionUtils {
 
 
     /**
-     * Gets a list containing all elements from the given index to the given index.
-     *
-     * @param list      The original list
-     * @param fromIndex The from index
-     * @param toIndex   The to index
-     * @return The sub-list, not null
-     */
-    public static <T> List<T> subList(List<T> list, int fromIndex, int toIndex) {
-        List<T> result = new ArrayList<T>();
-        if (list == null) {
-            return result;
-        }
-        for (int i = fromIndex; i < toIndex; i++) {
-            result.add(list.get(i));
-        }
-        return result;
-    }
-
-
-    /**
      * Converts the given array of elements to a set.
      *
      * @param elements The elements

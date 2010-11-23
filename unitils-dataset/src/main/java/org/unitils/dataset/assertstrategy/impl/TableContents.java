@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.assertstrategy.impl;
 
-import org.unitils.core.util.DbUtils;
+import org.unitils.database.util.DbUtils;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.Row;
 import org.unitils.dataset.model.database.TableName;
@@ -112,17 +112,11 @@ public class TableContents {
         return row;
     }
 
-    protected Object getValue(Column column, SqlTypeHandler sqlTypeHandler) throws Exception {
-        // todo not correct
-        int index = new ArrayList<Column>(columns).indexOf(column) + 1;
-
-        int sqlType = column.getSqlType();
-        return sqlTypeHandler.getResultSetValue(resultSet, index, sqlType);
-    }
 
     public int getNrOfColumns() throws SQLException {
         return columns.size();
     }
+
 
     public List<String> getColumnNames() throws SQLException {
         int nrOfColumns = getNrOfColumns();
@@ -132,6 +126,7 @@ public class TableContents {
         }
         return columnNames;
     }
+
 
     public String getColumnName(int columnIndex) throws SQLException {
         return resultSet.getMetaData().getColumnName(columnIndex + 1);

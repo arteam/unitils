@@ -30,7 +30,7 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static org.unitils.core.util.DbUtils.close;
+import static org.unitils.database.util.DbUtils.close;
 
 /**
  * Handles correct casing of database identifier, e.g. table names.

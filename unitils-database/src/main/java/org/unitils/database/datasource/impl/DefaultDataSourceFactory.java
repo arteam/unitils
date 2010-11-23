@@ -29,7 +29,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
+import static org.unitils.database.util.DbUtils.closeQuietly;
 
 /**
  * A data source factory that creates a commons DBCP BasicDataSource.
@@ -43,6 +43,11 @@ public class DefaultDataSourceFactory implements DataSourceFactory {
     private static Log logger = LogFactory.getLog(DatabaseModule.class);
 
 
+    /**
+     * Initializes the data source factory with the given configuration.
+     *
+     * @param configuration The configuration, not null
+     */
     public void init(Properties configuration) {
     }
 

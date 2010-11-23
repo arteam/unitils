@@ -513,7 +513,9 @@ public class DbUnitModule implements Module {
      * @return The data set resolver, as configured in the Unitils configuration
      */
     protected DataSetResolver getDataSetResolver() {
-        return ConfigUtils.getConfiguredInstanceOf(DataSetResolver.class, configuration);
+        DataSetResolver dataSetResolver = ConfigUtils.getInstanceOf(DataSetResolver.class, configuration);
+        dataSetResolver.init(configuration);
+        return dataSetResolver;
     }
 
 
@@ -531,7 +533,7 @@ public class DbUnitModule implements Module {
     protected class DbUnitListener extends TestListener {
 
         @Override
-        public void beforeTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+        public void beforeTest(CurrentTestInstance currentTestInstance) throws Exception {
             Object testObject = currentTestInstance.getTestObject();
             Method testMethod = currentTestInstance.getTestMethod();
 
@@ -539,7 +541,7 @@ public class DbUnitModule implements Module {
         }
 
         @Override
-        public void afterTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+        public void afterTest(CurrentTestInstance currentTestInstance) throws Exception {
             Object testObject = currentTestInstance.getTestObject();
             Method testMethod = currentTestInstance.getTestMethod();
             Throwable testThrowable = currentTestInstance.getTestThrowable();

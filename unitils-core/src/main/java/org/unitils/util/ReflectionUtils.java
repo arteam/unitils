@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -211,26 +211,6 @@ public class ReflectionUtils {
 
 
     /**
-     * Invoke the given method with the given parameters on the given target object. Doesn't throw
-     * any checked exception
-     *
-     * @param target    The object containing the method, not null
-     * @param method    The method, not null
-     * @param arguments The method arguments
-     * @return The result of the invocation, null if void
-     * @throws UnitilsException if the method could not be invoked, or the called method throwed an exception
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> T invokeMethodSilent(Object target, Method method, Object... arguments) {
-        try {
-            return (T) invokeMethod(target, method, arguments);
-        } catch (InvocationTargetException e) {
-            throw new UnitilsException(e);
-        }
-    }
-
-
-    /**
      * Returns all declared fields of the given class that are assignable from the given type.
      *
      * @param clazz    The class to get fields from, not null
@@ -337,7 +317,7 @@ public class ReflectionUtils {
 
 
     /**
-     * From the given class, returns the getter for the given propertyname. If isStatic == true,
+     * From the given class, returns the getter for the given property name. If isStatic == true,
      * a static getter is searched. If no such getter exists in the given class, null is returned.
      *
      * @param clazz        The class to get the setter from, not null
