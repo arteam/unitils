@@ -25,8 +25,8 @@ import org.dbunit.dataset.filter.IncludeTableFilter;
 import org.dbunit.dataset.xml.FlatDtdWriter;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.unitils.core.UnitilsException;
+import org.unitils.database.util.DbUtils;
 import org.unitils.dbunit.structure.DataSetStructureGenerator;
-import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -134,7 +134,7 @@ public class DtdDataSetStructureGenerator implements DataSetStructureGenerator {
         } catch (Exception e) {
             throw new UnitilsException("Error generating content for DTD file.", e);
         } finally {
-            DbUtils.closeQuietly(connection);
+            DbUtils.closeQuietly(connection, null, null);
         }
     }
 }

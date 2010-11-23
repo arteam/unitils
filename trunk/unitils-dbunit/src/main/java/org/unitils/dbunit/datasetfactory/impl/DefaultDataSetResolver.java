@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
 package org.unitils.dbunit.datasetfactory.impl;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.core.util.BaseConfigurable;
 import org.unitils.dbunit.datasetfactory.DataSetResolver;
-import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.toFile;
-import static org.unitils.util.PropertyUtils.getBoolean;
-import static org.unitils.util.PropertyUtils.getString;
 
 import java.io.File;
 import java.net.URL;
 import java.util.Properties;
+
+import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.toFile;
+import static org.unitils.util.PropertyUtils.getBoolean;
+import static org.unitils.util.PropertyUtils.getString;
 
 /**
  * Resolves the location for a data set with a certain name.

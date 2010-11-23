@@ -482,7 +482,7 @@ public class InjectModule implements Module {
          * objects to inject or targets are possibly instantiated during the fixture.
          */
         @Override
-        public void prepareTestInstance(CurrentTestInstance currentTestInstance) throws Exception {
+        public void beforeTest(CurrentTestInstance currentTestInstance) throws Exception {
             Object testObject = currentTestInstance.getTestObject();
 
             if (createTestedObjectsIfNullEnabled) {
@@ -495,7 +495,7 @@ public class InjectModule implements Module {
          * After test execution, if requested restore all values that were replaced in the static injection.
          */
         @Override
-        public void afterTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+        public void afterTest(CurrentTestInstance currentTestInstance) throws Exception {
             restoreStaticInjectedObjects();
         }
     }

@@ -39,7 +39,6 @@ public class AssertExpectedDataSetNotExistsTest extends DataSetTestBase {
             cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-simple.xml");
             DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataNotExistsTest-rowFound.xml");
         } catch (AssertionError e) {
-            e.printStackTrace();
             assertMessageContains("Expected not to find a match for data set row: PUBLIC.TEST [COL1=value1, COL2=1]", e);
             assertMessageContains("Actual database content", e);
             return;

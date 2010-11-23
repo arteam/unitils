@@ -27,7 +27,8 @@ import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
+import static org.unitils.database.util.DbUtils.closeQuietly;
+
 
 /**
  * Utilities for executing statements and queries.
@@ -71,7 +72,7 @@ public class SQLUnitils {
      *
      * @param sql        The sql string for retrieving the items
      * @param dataSource The data source, not null
-     * @return The nr of updates, -1 if not succesful
+     * @return The nr of updates, -1 if not successful
      */
     public static int executeUpdateQuietly(String sql, DataSource dataSource) {
         try {

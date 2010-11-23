@@ -20,6 +20,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.core.UnitilsException;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.model.database.Column;
@@ -93,7 +94,10 @@ public class DataSourceWrapperGetColumnNamesTest extends UnitilsJUnit4 {
 
     @Test
     public void tableNotFound() throws Exception {
-        Set<Column> columnNames = dataSourceWrapper.getColumns(createTableName("xxxx", "xxxx"));
-        assertTrue(columnNames.isEmpty());
+        try {
+            dataSourceWrapper.getColumns(createTableName("xxxx", "xxxx"));
+        } catch (UnitilsException e) {
+            assertTrue(e.getMessage().contains("Table does not exist: xxxx.xxxx"));
+        }
     }
 }

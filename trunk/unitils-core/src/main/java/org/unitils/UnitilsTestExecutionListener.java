@@ -51,15 +51,10 @@ public class UnitilsTestExecutionListener implements TestExecutionListener {
             // work-around for junit-3 and spring 2.5.6: these don't have a before or after test class
             performBeforeTestClass(testContext);
         }
-
         CurrentTestInstance currentTestInstance = new CurrentTestInstance(testContext);
         setCurrentTestClass(currentTestInstance);
         setCurrentTestInstance(currentTestInstance);
-
-        ModulesRepository modulesRepository = getModulesRepository();
-        for (Module module : modulesRepository.getModules()) {
-            modulesRepository.getTestListener(module).prepareTestInstance(currentTestInstance);
-        }
+        // ignored, do behavior in before test method
     }
 
     @Override
@@ -70,7 +65,7 @@ public class UnitilsTestExecutionListener implements TestExecutionListener {
 
         ModulesRepository modulesRepository = getModulesRepository();
         for (Module module : modulesRepository.getModules()) {
-            modulesRepository.getTestListener(module).beforeTestMethod(currentTestInstance);
+            modulesRepository.getTestListener(module).beforeTest(currentTestInstance);
         }
     }
 
@@ -82,7 +77,7 @@ public class UnitilsTestExecutionListener implements TestExecutionListener {
         try {
             ModulesRepository modulesRepository = getModulesRepository();
             for (Module module : modulesRepository.getModules()) {
-                modulesRepository.getTestListener(module).afterTestMethod(currentTestInstance);
+                modulesRepository.getTestListener(module).afterTest(currentTestInstance);
             }
         } finally {
             setCurrentTestInstance(null);

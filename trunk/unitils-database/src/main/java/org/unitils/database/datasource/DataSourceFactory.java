@@ -16,9 +16,9 @@
 package org.unitils.database.datasource;
 
 import org.dbmaintain.database.DatabaseInfo;
-import org.unitils.core.util.Configurable;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * Defines the contract of a factory that can provide an instance of a test <code>DataSource</code>.
@@ -26,7 +26,15 @@ import javax.sql.DataSource;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface DataSourceFactory extends Configurable, org.dbmaintain.datasource.DataSourceFactory {
+public interface DataSourceFactory extends org.dbmaintain.datasource.DataSourceFactory {
+
+
+    /**
+     * Initializes the data source factory with the given configuration.
+     *
+     * @param configuration The configuration, not null
+     */
+    void init(Properties configuration);
 
     /**
      * Creates a new <code>DataSource</code>

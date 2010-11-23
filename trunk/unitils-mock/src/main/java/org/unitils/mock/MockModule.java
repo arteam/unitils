@@ -239,7 +239,7 @@ public class MockModule implements Module {
     protected class MockTestListener extends TestListener {
 
         @Override
-        public void prepareTestInstance(CurrentTestInstance currentTestInstance) throws Exception {
+        public void beforeTest(CurrentTestInstance currentTestInstance) throws Exception {
             Object testObject = currentTestInstance.getTestObject();
 
             createAndInjectPartialMocksIntoTest(testObject);
@@ -248,7 +248,7 @@ public class MockModule implements Module {
         }
 
         @Override
-        public void afterTestMethod(CurrentTestInstance currentTestInstance) throws Exception {
+        public void afterTest(CurrentTestInstance currentTestInstance) throws Exception {
             if (logFullScenarioReport) {
                 logFullScenarioReport();
                 return;

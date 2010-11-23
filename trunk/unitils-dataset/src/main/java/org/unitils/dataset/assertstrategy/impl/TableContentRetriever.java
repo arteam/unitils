@@ -27,7 +27,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
 
-import static org.unitils.core.util.DbUtils.closeQuietly;
+import static org.unitils.database.util.DbUtils.closeQuietly;
 
 /**
  * @author Tim Ducheyne
@@ -44,8 +44,6 @@ public class TableContentRetriever {
         this.sqlTypeHandlerRepository = sqlTypeHandlerRepository;
     }
 
-
-    // todo remove primary key column names  (implicit in database columns)
 
     public TableContents getTableContents(TableName tableName, Set<Column> columns, Set<String> primaryKeyColumnNames) throws SQLException {
         String sql = createStatement(tableName, columns, primaryKeyColumnNames);

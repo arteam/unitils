@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,26 +66,6 @@ public class AnnotationUtils {
      */
     public static <T extends Annotation> Set<Method> getMethodsAnnotatedWith(Class<?> clazz, Class<T> annotation) {
         return getMethodsAnnotatedWith(clazz, annotation, true);
-    }
-
-
-    public static <T extends Annotation> Set<T> getMethodLevelAnnotations(Class<?> clazz, Class<T> annotation) {
-        Set<T> result = new HashSet<T>();
-        Set<Method> annotatedMethods = getMethodsAnnotatedWith(clazz, annotation);
-        for (Method annotatedMethod : annotatedMethods) {
-            result.add(annotatedMethod.getAnnotation(annotation));
-        }
-        return result;
-    }
-
-
-    public static <T extends Annotation> Set<T> getFieldLevelAnnotations(Class<?> clazz, Class<T> annotation) {
-        Set<T> result = new HashSet<T>();
-        Set<Field> annotatedFields = getFieldsAnnotatedWith(clazz, annotation);
-        for (Field annotatedField : annotatedFields) {
-            result.add(annotatedField.getAnnotation(annotation));
-        }
-        return result;
     }
 
 
@@ -213,11 +193,6 @@ public class AnnotationUtils {
         } catch (InvocationTargetException e) {
             throw new UnitilsException("Error retrieving value of property " + annotationProperty.getName() + " of annotation of type " + annotation.getClass().getSimpleName(), e);
         }
-    }
-
-
-    public static boolean hasClassMethodOrFieldLevelAnnotation(Class<?> clazz, Class<? extends Annotation> annotation) {
-        return getClassLevelAnnotation(annotation, clazz) != null || !getFieldsAnnotatedWith(clazz, annotation).isEmpty() || !getMethodsAnnotatedWith(clazz, annotation).isEmpty();
     }
 
 }

@@ -92,7 +92,7 @@ public class InsertDataSetTest extends DataSetTestBase {
             insertDataSetFile(this, "DataSetModuleDataSetTest-tableDoesNotExist.xml");
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertTrue(e.getMessage().contains("Table not found in statement [insert into \"PUBLIC\".\"XXXX\" (XXX) values (?)]"));
+            assertTrue(e.getMessage().contains("Table does not exist: PUBLIC.XXXX"));
         }
     }
 }
