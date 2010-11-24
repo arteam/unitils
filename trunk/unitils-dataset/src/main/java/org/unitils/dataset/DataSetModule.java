@@ -27,7 +27,6 @@ import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 import org.unitils.dataset.annotation.handler.MarkerForAssertDataSetAnnotation;
 import org.unitils.dataset.annotation.handler.MarkerForLoadDataSetAnnotation;
 import org.unitils.dataset.database.DataSourceWrapper;
-import org.unitils.dataset.structure.DataSetStructureGenerator;
 
 import javax.sql.DataSource;
 import java.lang.annotation.Annotation;
@@ -214,8 +213,9 @@ public class DataSetModule implements Module {
     protected class DataSetXSDsGeneratingDatabaseUpdateListener implements DatabaseUpdateListener {
 
         public void databaseWasUpdated() {
-            DataSetStructureGenerator dataSetStructureGenerator = getDataSetStructureGeneratorFactory().getDataSetStructureGenerator();
-            dataSetStructureGenerator.generateDataSetStructureAndTemplate();
+            //todo implement
+//            DataSetStructureGenerator dataSetStructureGenerator = getDataSetStructureGeneratorFactory().getDataSetStructureGenerator();
+//            dataSetStructureGenerator.generateDataSetStructureAndTemplate();
         }
     }
 

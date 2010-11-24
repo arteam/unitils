@@ -158,11 +158,11 @@ public class DataSetLoader {
 
 
     private LoadDataSetStrategyHandler getLoadDataSetStrategyHandler(String databaseName) {
-        return getDataSetStrategyHandlerFactory().getLoadDataSetStrategyHandler(databaseName);
+        return getDataSetStrategyHandlerFactory().createLoadDataSetStrategyHandler(databaseName);
     }
 
     private InlineLoadDataSetStrategyHandler getInlineLoadDataSetStrategyHandler(String databaseName) {
-        return getDataSetStrategyHandlerFactory().getInlineLoadDataSetStrategyHandler(databaseName);
+        return getDataSetStrategyHandlerFactory().createInlineLoadDataSetStrategyHandler(databaseName);
     }
 
 

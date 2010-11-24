@@ -41,7 +41,7 @@ public class CleanInsertDataSetAnnotationHandler implements DataSetAnnotationHan
         String databaseName = annotation.databaseName();
 
         DataSetStrategyHandlerFactory dataSetStrategyHandlerFactory = dataSetModule.getDataSetStrategyHandlerFactory();
-        LoadDataSetStrategyHandler loadDataSetStrategyHandler = dataSetStrategyHandlerFactory.getLoadDataSetStrategyHandler(databaseName);
+        LoadDataSetStrategyHandler loadDataSetStrategyHandler = dataSetStrategyHandlerFactory.createLoadDataSetStrategyHandler(databaseName);
         loadDataSetStrategyHandler.cleanInsertDataSetFiles(testInstance, fileNames, readOnly, variables);
     }
 

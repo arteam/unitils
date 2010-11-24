@@ -45,11 +45,6 @@ public class DataSetStrategyHandlerFactory {
     protected InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory;
     protected FileDataSetRowSourceFactory fileDataSetRowSourceFactory;
 
-    protected LoadDataSetStrategyHandler loadDataSetStrategyHandler;
-    protected InlineLoadDataSetStrategyHandler inlineLoadDataSetStrategyHandler;
-    protected AssertDataSetStrategyHandler assertDataSetStrategyHandler;
-    protected InlineAssertDataSetStrategyHandler inlineAssertDataSetStrategyHandler;
-
     protected Map<String, DataSetStrategyFactory> dataSetStrategyFactoriesPerDatabaseName = new HashMap<String, DataSetStrategyFactory>();
 
     public DataSetStrategyHandlerFactory(Properties configuration, DataSourceWrapperFactory dataSourceWrapperFactory) {
@@ -58,46 +53,34 @@ public class DataSetStrategyHandlerFactory {
     }
 
 
-    public LoadDataSetStrategyHandler getLoadDataSetStrategyHandler(String databaseName) {
-        if (loadDataSetStrategyHandler == null) {
-            DataSetStrategyFactory dataSetStrategyFactory = getDataSetStrategyFactory(databaseName);
-            FileDataSetRowSourceFactory fileDataSetRowSourceFactory = getFileDataSetRowSourceFactory();
-            DataSetResolver dataSetResolver = getDataSetResolver();
-            loadDataSetStrategyHandler = new LoadDataSetStrategyHandler(fileDataSetRowSourceFactory, dataSetResolver, dataSetStrategyFactory);
-        }
-        return loadDataSetStrategyHandler;
+    public LoadDataSetStrategyHandler createLoadDataSetStrategyHandler(String databaseName) {
+        DataSetStrategyFactory dataSetStrategyFactory = getDataSetStrategyFactory(databaseName);
+        FileDataSetRowSourceFactory fileDataSetRowSourceFactory = getFileDataSetRowSourceFactory();
+        DataSetResolver dataSetResolver = getDataSetResolver();
+        return new LoadDataSetStrategyHandler(fileDataSetRowSourceFactory, dataSetResolver, dataSetStrategyFactory);
     }
 
-    public InlineLoadDataSetStrategyHandler getInlineLoadDataSetStrategyHandler(String databaseName) {
-        if (inlineLoadDataSetStrategyHandler == null) {
-            DataSetStrategyFactory dataSetStrategyFactory = getDataSetStrategyFactory(databaseName);
-            InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = getInlineDataSetRowSourceFactory();
-            inlineLoadDataSetStrategyHandler = new InlineLoadDataSetStrategyHandler(inlineDataSetRowSourceFactory, dataSetStrategyFactory);
-        }
-        return inlineLoadDataSetStrategyHandler;
+    public InlineLoadDataSetStrategyHandler createInlineLoadDataSetStrategyHandler(String databaseName) {
+        DataSetStrategyFactory dataSetStrategyFactory = getDataSetStrategyFactory(databaseName);
+        InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = getInlineDataSetRowSourceFactory();
+        return new InlineLoadDataSetStrategyHandler(inlineDataSetRowSourceFactory, dataSetStrategyFactory);
     }
 
-    public AssertDataSetStrategyHandler getAssertDataSetStrategyHandler(String databaseName) {
-        if (assertDataSetStrategyHandler == null) {
-            DataSetStrategyFactory dataSetStrategyFactory = getDataSetStrategyFactory(databaseName);
-            FileDataSetRowSourceFactory fileDataSetRowSourceFactory = getFileDataSetRowSourceFactory();
-            DataSetResolver dataSetResolver = getDataSetResolver();
-            assertDataSetStrategyHandler = new AssertDataSetStrategyHandler(fileDataSetRowSourceFactory, dataSetResolver, dataSetStrategyFactory);
-        }
-        return assertDataSetStrategyHandler;
+    public AssertDataSetStrategyHandler createAssertDataSetStrategyHandler(String databaseName) {
+        DataSetStrategyFactory dataSetStrategyFactory = getDataSetStrategyFactory(databaseName);
+        FileDataSetRowSourceFactory fileDataSetRowSourceFactory = getFileDataSetRowSourceFactory();
+        DataSetResolver dataSetResolver = getDataSetResolver();
+        return new AssertDataSetStrategyHandler(fileDataSetRowSourceFactory, dataSetResolver, dataSetStrategyFactory);
     }
 
-    public InlineAssertDataSetStrategyHandler getInlineAssertDataSetStrategyHandler(String databaseName) {
-        if (inlineAssertDataSetStrategyHandler == null) {
-            DataSetStrategyFactory dataSetStrategyFactory = getDataSetStrategyFactory(databaseName);
-            InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = getInlineDataSetRowSourceFactory();
-            inlineAssertDataSetStrategyHandler = new InlineAssertDataSetStrategyHandler(inlineDataSetRowSourceFactory, dataSetStrategyFactory);
-        }
-        return inlineAssertDataSetStrategyHandler;
+    public InlineAssertDataSetStrategyHandler createInlineAssertDataSetStrategyHandler(String databaseName) {
+        DataSetStrategyFactory dataSetStrategyFactory = getDataSetStrategyFactory(databaseName);
+        InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory = getInlineDataSetRowSourceFactory();
+        return new InlineAssertDataSetStrategyHandler(inlineDataSetRowSourceFactory, dataSetStrategyFactory);
     }
 
 
-    public FileDataSetRowSourceFactory getFileDataSetRowSourceFactory() {
+    protected FileDataSetRowSourceFactory getFileDataSetRowSourceFactory() {
         if (fileDataSetRowSourceFactory == null) {
             fileDataSetRowSourceFactory = getInstanceOf(FileDataSetRowSourceFactory.class, configuration);
             fileDataSetRowSourceFactory.init(configuration);
@@ -105,7 +88,7 @@ public class DataSetStrategyHandlerFactory {
         return fileDataSetRowSourceFactory;
     }
 
-    public InlineDataSetRowSourceFactory getInlineDataSetRowSourceFactory() {
+    protected InlineDataSetRowSourceFactory getInlineDataSetRowSourceFactory() {
         if (inlineDataSetRowSourceFactory == null) {
             inlineDataSetRowSourceFactory = getInstanceOf(InlineDataSetRowSourceFactory.class, configuration);
             inlineDataSetRowSourceFactory.init(configuration);
@@ -113,7 +96,7 @@ public class DataSetStrategyHandlerFactory {
         return inlineDataSetRowSourceFactory;
     }
 
-    public DataSetResolver getDataSetResolver() {
+    protected DataSetResolver getDataSetResolver() {
         if (dataSetResolver == null) {
             dataSetResolver = getInstanceOf(DataSetResolver.class, configuration);
             dataSetResolver.init(configuration);

@@ -42,7 +42,7 @@ public class RefreshDataSetAnnotationHandler implements DataSetAnnotationHandler
         String databaseName = annotation.databaseName();
 
         DataSetStrategyHandlerFactory dataSetStrategyHandlerFactory = dataSetModule.getDataSetStrategyHandlerFactory();
-        LoadDataSetStrategyHandler loadDataSetStrategyHandler = dataSetStrategyHandlerFactory.getLoadDataSetStrategyHandler(databaseName);
+        LoadDataSetStrategyHandler loadDataSetStrategyHandler = dataSetStrategyHandlerFactory.createLoadDataSetStrategyHandler(databaseName);
         loadDataSetStrategyHandler.refreshDataSetFiles(testInstance, fileNames, readOnly, variables);
     }
 

@@ -42,7 +42,7 @@ public class UpdateDataSetAnnotationHandler implements DataSetAnnotationHandler<
         String databaseName = annotation.databaseName();
 
         DataSetStrategyHandlerFactory dataSetStrategyHandlerFactory = dataSetModule.getDataSetStrategyHandlerFactory();
-        LoadDataSetStrategyHandler loadDataSetStrategyHandler = dataSetStrategyHandlerFactory.getLoadDataSetStrategyHandler(databaseName);
+        LoadDataSetStrategyHandler loadDataSetStrategyHandler = dataSetStrategyHandlerFactory.createLoadDataSetStrategyHandler(databaseName);
         loadDataSetStrategyHandler.updateDataSetFiles(testInstance, fileNames, readOnly, variables);
     }
 }
