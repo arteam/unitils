@@ -15,12 +15,13 @@
  */
 package org.unitils.dataset.loadstrategy;
 
-import org.dbmaintain.database.IdentifierProcessor;
-import org.unitils.dataset.database.DataSourceWrapper;
+import org.unitils.dataset.database.DataSetDatabaseHelper;
+import org.unitils.dataset.database.DatabaseAccessor;
+import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
+import org.unitils.dataset.loadstrategy.impl.TableContentDeleter;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 
 import java.util.List;
-import java.util.Properties;
 
 /**
  * @author Tim Ducheyne
@@ -28,7 +29,7 @@ import java.util.Properties;
  */
 public interface LoadDataSetStrategy {
 
-    void init(Properties configuration, DataSourceWrapper dataSourceWrapper, IdentifierProcessor identifierProcessor);
+    void init(DatabaseAccessor databaseAccessor, DataSetDatabaseHelper dataSetDatabaseHelper, DataSetRowProcessor dataSetRowProcessor, TableContentDeleter tableContentDeleter);
 
     void perform(DataSetRowSource dataSetRowSource, List<String> variables);
 

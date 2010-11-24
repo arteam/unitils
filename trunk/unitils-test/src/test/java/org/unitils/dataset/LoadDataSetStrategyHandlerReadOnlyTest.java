@@ -44,7 +44,7 @@ public class LoadDataSetStrategyHandlerReadOnlyTest extends UnitilsJUnit4 {
 
     protected Mock<FileDataSetRowSourceFactory> fileDataSetRowSourceFactory;
     protected Mock<DataSetResolver> dataSetResolver;
-    protected Mock<DataSetModuleFactory> dataSetModuleFactory;
+    protected Mock<DataSetStrategyFactory> dataSetStrategyFactory;
     protected Mock<LoadDataSetStrategy> loadDataSetStrategy;
 
     protected List<String> emptyVariables = new ArrayList<String>();
@@ -52,7 +52,7 @@ public class LoadDataSetStrategyHandlerReadOnlyTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        loadDataSetStrategyHandler = new LoadDataSetStrategyHandler(fileDataSetRowSourceFactory.getMock(), dataSetResolver.getMock(), dataSetModuleFactory.getMock());
+        loadDataSetStrategyHandler = new LoadDataSetStrategyHandler(fileDataSetRowSourceFactory.getMock(), dataSetResolver.getMock(), dataSetStrategyFactory.getMock());
 
         dataSetResolver.returns(new File("dataset.xml")).resolve(getClass(), "dataset.xml");
         dataSetResolver.returns(new File("other-dataset.xml")).resolve(getClass(), "other-dataset.xml");

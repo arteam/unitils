@@ -38,8 +38,8 @@ public class DataSetXSDGenerator {
 
     private static DataSetStructureGenerator getDataSetStructureGenerator() {
         DataSetModule dataSetModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DataSetModule.class);
-        DataSetModuleFactory dataSetModuleFactory = dataSetModule.getDataSetModuleFactory();
-        return dataSetModuleFactory.getDataSetStructureGenerator();
+        DataSetStructureGeneratorFactory dataSetStructureGeneratorFactory = dataSetModule.getDataSetStructureGeneratorFactory();
+        return dataSetStructureGeneratorFactory.getDataSetStructureGenerator();
     }
 
 }

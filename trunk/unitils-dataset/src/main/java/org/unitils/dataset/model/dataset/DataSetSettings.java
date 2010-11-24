@@ -29,8 +29,6 @@ public class DataSetSettings {
     protected char variableToken;
     /* True if the schema name is case sensitive */
     protected boolean caseSensitive;
-    /* The name of the database in which the data set will be loaded, null for the default database */
-    protected String databaseName;
 
 
     /**
@@ -39,13 +37,11 @@ public class DataSetSettings {
      * @param literalToken  The token that identifies a literal, e.g. for '=literal value'
      * @param variableToken The token that identifies a variable, e.g. $ for $0 $1 etc
      * @param caseSensitive True if the name of the schema is case sensitive
-     * @param databaseName  The name of the database in which the data set will be loaded, null for the default database
      */
-    public DataSetSettings(char literalToken, char variableToken, boolean caseSensitive, String databaseName) {
+    public DataSetSettings(char literalToken, char variableToken, boolean caseSensitive) {
         this.literalToken = literalToken;
         this.variableToken = variableToken;
         this.caseSensitive = caseSensitive;
-        this.databaseName = databaseName;
     }
 
     /**
@@ -67,9 +63,5 @@ public class DataSetSettings {
      */
     public boolean isCaseSensitive() {
         return caseSensitive;
-    }
-
-    public String getDatabaseName() {
-        return databaseName;
     }
 }

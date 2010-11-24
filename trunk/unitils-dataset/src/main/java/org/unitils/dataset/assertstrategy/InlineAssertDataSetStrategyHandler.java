@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.assertstrategy;
 
-import org.unitils.dataset.DataSetModuleFactory;
+import org.unitils.dataset.DataSetStrategyFactory;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.dataset.rowsource.InlineDataSetRowSourceFactory;
 
@@ -31,17 +31,17 @@ import static org.unitils.util.CollectionUtils.asList;
 public class InlineAssertDataSetStrategyHandler {
 
     protected InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory;
-    protected DataSetModuleFactory dataSetModuleFactory;
+    protected DataSetStrategyFactory dataSetStrategyFactory;
 
 
-    public InlineAssertDataSetStrategyHandler(InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory, DataSetModuleFactory dataSetModuleFactory) {
+    public InlineAssertDataSetStrategyHandler(InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory, DataSetStrategyFactory dataSetStrategyFactory) {
         this.inlineDataSetRowSourceFactory = inlineDataSetRowSourceFactory;
-        this.dataSetModuleFactory = dataSetModuleFactory;
+        this.dataSetStrategyFactory = dataSetStrategyFactory;
     }
 
 
     public void assertExpectedDataSet(boolean logDatabaseContentOnAssertionError, String... dataSetRows) {
-        AssertDataSetStrategy defaultAssertDataSetStrategy = dataSetModuleFactory.createAssertDataSetStrategy();
+        AssertDataSetStrategy defaultAssertDataSetStrategy = dataSetStrategyFactory.createAssertDataSetStrategy();
         performInlineAssertDataSetStrategy(defaultAssertDataSetStrategy, asList(dataSetRows), logDatabaseContentOnAssertionError);
     }
 

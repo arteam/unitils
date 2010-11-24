@@ -18,7 +18,6 @@ package org.unitils.dataset.assertstrategy.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.DataSetModuleFactory;
 import org.unitils.dataset.assertstrategy.AssertDataSetStrategy;
 import org.unitils.dataset.assertstrategy.DataSetComparator;
 import org.unitils.dataset.assertstrategy.DatabaseContentLogger;
@@ -31,7 +30,6 @@ import org.unitils.dataset.model.database.Row;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 
 import java.util.List;
-import java.util.Properties;
 
 import static java.lang.Math.max;
 import static org.apache.commons.lang.StringUtils.rightPad;
@@ -49,9 +47,9 @@ public class DefaultAssertDataSetStrategy implements AssertDataSetStrategy {
     protected DatabaseContentLogger databaseContentLogger;
 
 
-    public void init(Properties configuration, DataSetModuleFactory dataSetModuleFactory) {
-        this.dataSetComparator = dataSetModuleFactory.getDataSetComparator();
-        this.databaseContentLogger = dataSetModuleFactory.getDatabaseContentLogger();
+    public void init(DataSetComparator dataSetComparator, DatabaseContentLogger databaseContentLogger) {
+        this.dataSetComparator = dataSetComparator;
+        this.databaseContentLogger = databaseContentLogger;
     }
 
     /**

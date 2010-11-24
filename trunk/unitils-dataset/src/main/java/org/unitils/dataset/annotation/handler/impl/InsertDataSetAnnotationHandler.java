@@ -16,7 +16,7 @@
 package org.unitils.dataset.annotation.handler.impl;
 
 import org.unitils.dataset.DataSetModule;
-import org.unitils.dataset.DataSetModuleFactory;
+import org.unitils.dataset.DataSetStrategyHandlerFactory;
 import org.unitils.dataset.annotation.InsertDataSet;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 import org.unitils.dataset.loadstrategy.LoadDataSetStrategyHandler;
@@ -39,9 +39,10 @@ public class InsertDataSetAnnotationHandler implements DataSetAnnotationHandler<
         List<String> fileNames = asList(annotation.value());
         String[] variables = annotation.variables();
         boolean readOnly = annotation.readOnly();
+        String databaseName = annotation.databaseName();
 
-        DataSetModuleFactory dataSetModuleFactory = dataSetModule.getDataSetModuleFactory();
-        LoadDataSetStrategyHandler loadDataSetStrategyHandler = dataSetModuleFactory.getLoadDataSetStrategyHandler();
+        DataSetStrategyHandlerFactory dataSetStrategyHandlerFactory = dataSetModule.getDataSetStrategyHandlerFactory();
+        LoadDataSetStrategyHandler loadDataSetStrategyHandler = dataSetStrategyHandlerFactory.getLoadDataSetStrategyHandler(databaseName);
         loadDataSetStrategyHandler.insertDataSetFiles(testInstance, fileNames, readOnly, variables);
     }
 }

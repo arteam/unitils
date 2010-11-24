@@ -17,19 +17,14 @@ package org.unitils.dataset.loadstrategy.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.database.IdentifierProcessor;
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.DataSetModuleFactory;
 import org.unitils.dataset.database.DataSetDatabaseHelper;
-import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.database.DatabaseAccessor;
 import org.unitils.dataset.loadstrategy.LoadDataSetStrategy;
 import org.unitils.dataset.loadstrategy.loader.DataSetLoader;
 import org.unitils.dataset.rowsource.DataSetRowSource;
-import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
 import java.util.List;
-import java.util.Properties;
 
 import static org.unitils.util.ExceptionUtils.getAllMessages;
 
@@ -45,16 +40,14 @@ public abstract class BaseLoadDataSetStrategy implements LoadDataSetStrategy {
     protected DatabaseAccessor databaseAccessor;
     protected DataSetDatabaseHelper dataSetDatabaseHelper;
     protected DataSetRowProcessor dataSetRowProcessor;
+    protected TableContentDeleter tableContentDeleter;
 
 
-    public void init(Properties configuration, DataSourceWrapper dataSourceWrapper, IdentifierProcessor identifierProcessor) {
-        this.databaseAccessor = new DatabaseAccessor(dataSourceWrapper);
-        this.dataSetDatabaseHelper = new DataSetDatabaseHelper(dataSourceWrapper, identifierProcessor);
-
-        // todo move out
-        DataSetModuleFactory dataSetModuleFactory = new DataSetModuleFactory(configuration, dataSourceWrapper, identifierProcessor);
-        SqlTypeHandlerRepository sqlTypeHandlerRepository = dataSetModuleFactory.getSqlTypeHandlerRepository();
-        this.dataSetRowProcessor = new DataSetRowProcessor(dataSetDatabaseHelper, sqlTypeHandlerRepository, dataSourceWrapper);
+    public void init(DatabaseAccessor databaseAccessor, DataSetDatabaseHelper dataSetDatabaseHelper, DataSetRowProcessor dataSetRowProcessor, TableContentDeleter tableContentDeleter) {
+        this.databaseAccessor = databaseAccessor;
+        this.dataSetDatabaseHelper = dataSetDatabaseHelper;
+        this.dataSetRowProcessor = dataSetRowProcessor;
+        this.tableContentDeleter = tableContentDeleter;
     }
 
 

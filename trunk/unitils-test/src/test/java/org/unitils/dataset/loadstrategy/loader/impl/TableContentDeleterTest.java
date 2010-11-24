@@ -53,8 +53,8 @@ public class TableContentDeleterTest extends UnitilsJUnit4 {
     public void initialize() throws Exception {
         tableContentDeleter = new TableContentDeleter(databaseAccessor.getMock(), dataSourceWrapper.getMock());
 
-        DataSetSettings dataSetSettings = new DataSetSettings('\'', '$', false, null);
-        DataSetSettings dataSetSettingsCaseSensitive = new DataSetSettings('\'', '$', true, null);
+        DataSetSettings dataSetSettings = new DataSetSettings('\'', '$', false);
+        DataSetSettings dataSetSettingsCaseSensitive = new DataSetSettings('\'', '$', true);
 
         dataSetRowTableA = new DataSetRow("schema_a", "table_a", null, false, dataSetSettings);
         dataSetRowTableB = new DataSetRow("schema_b", "table_b", null, false, dataSetSettings);

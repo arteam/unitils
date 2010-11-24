@@ -44,7 +44,7 @@ public class XmlDataSetRowSourceMultiSchemaTest extends UnitilsJUnit4 {
 
     @Before
     public void setUp() throws Exception {
-        defaultDataSetSettings = new DataSetSettings('=', '$', false, null);
+        defaultDataSetSettings = new DataSetSettings('=', '$', false);
     }
 
     @After

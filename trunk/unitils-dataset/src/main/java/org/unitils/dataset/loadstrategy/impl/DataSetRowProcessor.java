@@ -72,7 +72,7 @@ public class DataSetRowProcessor {
     }
 
     protected Column createColumn(TableName tableName, DataSetValue dataSetValue, DataSetSettings dataSetSettings, Set<String> allPrimaryKeyColumnNames, Set<String> remainingPrimaryKeyColumnNames) throws Exception {
-        String columnName = dataSetDatabaseHelper.getCorrectCaseColumnName(dataSetValue.getColumnName(), dataSetSettings);
+        String columnName = dataSourceWrapper.getCorrectCaseColumnName(dataSetValue.getColumnName(), dataSetSettings);
         int sqlType = dataSourceWrapper.getColumnSqlType(tableName, columnName);
         boolean primaryKey = isPrimaryKeyColumn(columnName, allPrimaryKeyColumnNames, remainingPrimaryKeyColumnNames);
 
@@ -175,7 +175,7 @@ public class DataSetRowProcessor {
     }
 
     protected boolean isPrimaryKeyColumn(String columnName, Set<String> allPrimaryKeyColumnNames, Set<String> remainingPrimaryKeyColumnNames) {
-        String columnNameWithoutQuotes = dataSetDatabaseHelper.removeIdentifierQuotes(columnName);
+        String columnNameWithoutQuotes = dataSourceWrapper.removeIdentifierQuotes(columnName);
         String matchedPrimaryKeyColumnName = null;
         for (String primaryKeyColumnName : allPrimaryKeyColumnNames) {
             if (primaryKeyColumnName.equals(columnNameWithoutQuotes)) {

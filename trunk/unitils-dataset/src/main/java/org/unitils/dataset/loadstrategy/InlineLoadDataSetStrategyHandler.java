@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.loadstrategy;
 
-import org.unitils.dataset.DataSetModuleFactory;
+import org.unitils.dataset.DataSetStrategyFactory;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.dataset.rowsource.InlineDataSetRowSourceFactory;
 
@@ -31,32 +31,32 @@ import static org.unitils.util.CollectionUtils.asList;
 public class InlineLoadDataSetStrategyHandler {
 
     protected InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory;
-    protected DataSetModuleFactory dataSetModuleFactory;
+    protected DataSetStrategyFactory dataSetStrategyFactory;
 
 
-    public InlineLoadDataSetStrategyHandler(InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory, DataSetModuleFactory dataSetModuleFactory) {
+    public InlineLoadDataSetStrategyHandler(InlineDataSetRowSourceFactory inlineDataSetRowSourceFactory, DataSetStrategyFactory dataSetStrategyFactory) {
         this.inlineDataSetRowSourceFactory = inlineDataSetRowSourceFactory;
-        this.dataSetModuleFactory = dataSetModuleFactory;
+        this.dataSetStrategyFactory = dataSetStrategyFactory;
     }
 
 
     public void insertDataSet(String... dataSetRows) {
-        LoadDataSetStrategy insertDataSetStrategy = dataSetModuleFactory.createInsertDataSetStrategy();
+        LoadDataSetStrategy insertDataSetStrategy = dataSetStrategyFactory.createInsertDataSetStrategy();
         performInlineLoadDataSetStrategy(insertDataSetStrategy, asList(dataSetRows));
     }
 
     public void cleanInsertDataSet(String... dataSetRows) {
-        LoadDataSetStrategy cleanInsertDataSetStrategy = dataSetModuleFactory.createCleanInsertDataSetStrategy();
+        LoadDataSetStrategy cleanInsertDataSetStrategy = dataSetStrategyFactory.createCleanInsertDataSetStrategy();
         performInlineLoadDataSetStrategy(cleanInsertDataSetStrategy, asList(dataSetRows));
     }
 
     public void refreshDataSet(String... dataSetRows) {
-        LoadDataSetStrategy refreshDataSetStrategy = dataSetModuleFactory.createRefreshDataSetStrategy();
+        LoadDataSetStrategy refreshDataSetStrategy = dataSetStrategyFactory.createRefreshDataSetStrategy();
         performInlineLoadDataSetStrategy(refreshDataSetStrategy, asList(dataSetRows));
     }
 
     public void updateDataSet(String... dataSetRows) {
-        LoadDataSetStrategy updateDataSetStrategy = dataSetModuleFactory.createUpdateDataSetStrategy();
+        LoadDataSetStrategy updateDataSetStrategy = dataSetStrategyFactory.createUpdateDataSetStrategy();
         performInlineLoadDataSetStrategy(updateDataSetStrategy, asList(dataSetRows));
     }
 

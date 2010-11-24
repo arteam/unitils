@@ -42,7 +42,8 @@ public class DataSetAssert {
                     "A method call to the given test instance should be on the call stack.\nThe assertDefaultDataSet method should typically be called from within a test method, passing 'this' as test instance.", e);
         }
 
-        String defaultExpectedDataSetFileName = getDataSetModule().getDefaultExpectedDataSetFileName(testMethod, testInstance.getClass());
+        DataSetModule dataSetModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DataSetModule.class);
+        String defaultExpectedDataSetFileName = dataSetModule.getDefaultExpectedDataSetFileName(testMethod, testInstance.getClass());
         assertDataSet(testInstance, asList(defaultExpectedDataSetFileName), variables);
     }
 
@@ -50,46 +51,51 @@ public class DataSetAssert {
         assertDataSet(testInstance, asList(expectedDataSetFileName), variables);
     }
 
-    public static void assertDataSet(Object testInstance, String expectedDataSetFileName, boolean logDatabaseContentOnAssertionError, String... variables) {
-        assertDataSet(testInstance, asList(expectedDataSetFileName), logDatabaseContentOnAssertionError, variables);
-    }
-
     public static void assertDataSet(Object testInstance, List<String> expectedDataSetFileNames, String... variables) {
-        assertDataSet(testInstance, expectedDataSetFileNames, true, variables);
-    }
-
-    public static void assertDataSet(Object testInstance, List<String> expectedDataSetFileNames, boolean logDatabaseContentOnAssertionError, String... variables) {
-        getAssertDataSetStrategyHandler().assertDataSetFiles(testInstance, expectedDataSetFileNames, logDatabaseContentOnAssertionError, variables);
+        DataSetAssert dataSetAssert = new DataSetAssert();
+        dataSetAssert.doAssertDataSet(testInstance, expectedDataSetFileNames, variables);
     }
 
 
     public static void assertInlineDataSet(String... dataSetRows) {
-        assertInlineDataSet(true, dataSetRows);
-    }
-
-    public static void assertInlineDataSet(boolean logDatabaseContentOnAssertionError, String... dataSetRows) {
-        getInlineAssertDataSetStrategyHandler().assertExpectedDataSet(logDatabaseContentOnAssertionError, dataSetRows);
+        DataSetAssert dataSetAssert = new DataSetAssert();
+        dataSetAssert.doAssertInlineDataSet(dataSetRows);
     }
 
 
-    private static AssertDataSetStrategyHandler getAssertDataSetStrategyHandler() {
-        DataSetModuleFactory dataSetModuleFactory = getDataSetModule().getDataSetModuleFactory();
-        return dataSetModuleFactory.getAssertDataSetStrategyHandler();
+    private boolean logDatabaseContentOnAssertionError;
+    private String databaseName;
+
+
+    public DataSetAssert() {
+        this(null, true);
     }
 
-    private static InlineAssertDataSetStrategyHandler getInlineAssertDataSetStrategyHandler() {
-        DataSetModuleFactory dataSetModuleFactory = getDataSetModule().getDataSetModuleFactory();
-        return dataSetModuleFactory.getInlineAssertDataSetStrategyHandler();
+    public DataSetAssert(String databaseName, boolean logDatabaseContentOnAssertionError) {
+        this.logDatabaseContentOnAssertionError = logDatabaseContentOnAssertionError;
+        this.databaseName = databaseName;
     }
 
-    /**
-     * Gets the instance DataSetModule that is registered in the modules repository.
-     * This instance implements the actual behavior of the static methods in this class.
-     * This way, other implementations can be plugged in, while keeping the simplicity of using static methods.
-     *
-     * @return the instance, not null
-     */
-    private static DataSetModule getDataSetModule() {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(DataSetModule.class);
+
+    public void doAssertDataSet(Object testInstance, List<String> expectedDataSetFileNames, String... variables) {
+        getAssertDataSetStrategyHandler(databaseName).assertDataSetFiles(testInstance, expectedDataSetFileNames, logDatabaseContentOnAssertionError, variables);
+    }
+
+    public void doAssertInlineDataSet(String... dataSetRows) {
+        getInlineAssertDataSetStrategyHandler(databaseName).assertExpectedDataSet(logDatabaseContentOnAssertionError, dataSetRows);
+    }
+
+
+    private AssertDataSetStrategyHandler getAssertDataSetStrategyHandler(String databaseName) {
+        return getDataSetStrategyHandlerFactory().getAssertDataSetStrategyHandler(databaseName);
+    }
+
+    private InlineAssertDataSetStrategyHandler getInlineAssertDataSetStrategyHandler(String databaseName) {
+        return getDataSetStrategyHandlerFactory().getInlineAssertDataSetStrategyHandler(databaseName);
+    }
+
+    private DataSetStrategyHandlerFactory getDataSetStrategyHandlerFactory() {
+        DataSetModule dataSetModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DataSetModule.class);
+        return dataSetModule.getDataSetStrategyHandlerFactory();
     }
 }

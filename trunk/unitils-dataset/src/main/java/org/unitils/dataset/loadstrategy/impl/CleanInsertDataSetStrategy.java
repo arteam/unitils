@@ -15,13 +15,10 @@
  */
 package org.unitils.dataset.loadstrategy.impl;
 
-import org.dbmaintain.database.IdentifierProcessor;
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 
 import java.util.List;
-import java.util.Properties;
 
 import static org.unitils.util.ExceptionUtils.getAllMessages;
 
@@ -33,16 +30,6 @@ import static org.unitils.util.ExceptionUtils.getAllMessages;
  * @author Filip Neven
  */
 public class CleanInsertDataSetStrategy extends InsertDataSetStrategy {
-
-    protected TableContentDeleter tableContentDeleter;
-
-
-    @Override
-    public void init(Properties configuration, DataSourceWrapper dataSourceWrapper, IdentifierProcessor identifierProcessor) {
-        super.init(configuration, dataSourceWrapper, identifierProcessor);
-        // todo move out
-        tableContentDeleter = new TableContentDeleter(databaseAccessor, dataSourceWrapper);
-    }
 
 
     @Override

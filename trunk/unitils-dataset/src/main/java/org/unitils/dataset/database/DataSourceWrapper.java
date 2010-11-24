@@ -21,6 +21,7 @@ import org.unitils.core.UnitilsException;
 import org.unitils.database.UnitilsDataSource;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.TableName;
+import org.unitils.dataset.model.dataset.DataSetSettings;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -63,6 +64,44 @@ public class DataSourceWrapper {
         DataSource dataSource = unitilsDataSource.getDataSource();
         return DataSourceUtils.getConnection(dataSource);
     }
+
+
+    public String removeIdentifierQuotes(String columnName) {
+        return identifierProcessor.removeIdentifierQuotes(columnName);
+    }
+
+    /**
+     * Gets the table name prefixed with the schema name and quoted if it is a case-sensitive name.
+     *
+     * @param schemaName    The schema name in the correct case, not null
+     * @param tableName     The table name in the correct case, not null
+     * @param caseSensitive True if the names are case sensitive and should be quoted
+     * @return The qualified table name, not null
+     */
+    public String getQualifiedTableName(String schemaName, String tableName, boolean caseSensitive) {
+        if (caseSensitive) {
+            schemaName = identifierProcessor.quoted(schemaName);
+            tableName = identifierProcessor.quoted(tableName);
+        }
+        return schemaName + "." + tableName;
+    }
+
+    /**
+     * Gets the column name in the correct case and quoted if it's a case-sensitive name.
+     *
+     * @param columnName      The column name, not null
+     * @param dataSetSettings The data set settings, not null
+     * @return The column name in the correct case, not null
+     */
+    public String getCorrectCaseColumnName(String columnName, DataSetSettings dataSetSettings) {
+        boolean caseSensitive = dataSetSettings.isCaseSensitive();
+        if (caseSensitive) {
+            return identifierProcessor.quoted(columnName);
+        } else {
+            return identifierProcessor.toCorrectCaseIdentifier(columnName);
+        }
+    }
+
 
     public String getDefaultSchemaName() {
         return identifierProcessor.getDefaultSchemaName();
