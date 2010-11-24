@@ -16,7 +16,7 @@
 package org.unitils.dataset.annotation.handler.impl;
 
 import org.unitils.dataset.DataSetModule;
-import org.unitils.dataset.DataSetModuleFactory;
+import org.unitils.dataset.DataSetStrategyHandlerFactory;
 import org.unitils.dataset.annotation.InlineAssertDataSet;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 import org.unitils.dataset.assertstrategy.InlineAssertDataSetStrategyHandler;
@@ -35,9 +35,10 @@ public class InlineAssertDataSetAnnotationHandler implements DataSetAnnotationHa
     public void handle(InlineAssertDataSet annotation, Method testMethod, Object testInstance, DataSetModule dataSetModule) {
         String[] dataSetRows = annotation.value();
         boolean logDatabaseContentOnAssertionError = annotation.logDatabaseContentOnAssertionError();
+        String databaseName = annotation.databaseName();
 
-        DataSetModuleFactory dataSetModuleFactory = dataSetModule.getDataSetModuleFactory();
-        InlineAssertDataSetStrategyHandler inlineAssertDataSetStrategyHandler = dataSetModuleFactory.getInlineAssertDataSetStrategyHandler();
+        DataSetStrategyHandlerFactory dataSetStrategyHandlerFactory = dataSetModule.getDataSetStrategyHandlerFactory();
+        InlineAssertDataSetStrategyHandler inlineAssertDataSetStrategyHandler = dataSetStrategyHandlerFactory.getInlineAssertDataSetStrategyHandler(databaseName);
         inlineAssertDataSetStrategyHandler.assertExpectedDataSet(logDatabaseContentOnAssertionError, dataSetRows);
     }
 

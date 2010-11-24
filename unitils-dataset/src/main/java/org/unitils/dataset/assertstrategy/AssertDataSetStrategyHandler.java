@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.assertstrategy;
 
-import org.unitils.dataset.DataSetModuleFactory;
+import org.unitils.dataset.DataSetStrategyFactory;
 import org.unitils.dataset.resolver.DataSetResolver;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.dataset.rowsource.FileDataSetRowSourceFactory;
@@ -34,17 +34,17 @@ public class AssertDataSetStrategyHandler {
 
     protected FileDataSetRowSourceFactory fileDataSetRowSourceFactory;
     protected DataSetResolver dataSetResolver;
-    protected DataSetModuleFactory dataSetModuleFactory;
+    protected DataSetStrategyFactory dataSetStrategyFactory;
 
-    public AssertDataSetStrategyHandler(FileDataSetRowSourceFactory fileDataSetRowSourceFactory, DataSetResolver dataSetResolver, DataSetModuleFactory dataSetModuleFactory) {
+    public AssertDataSetStrategyHandler(FileDataSetRowSourceFactory fileDataSetRowSourceFactory, DataSetResolver dataSetResolver, DataSetStrategyFactory dataSetStrategyFactory) {
         this.fileDataSetRowSourceFactory = fileDataSetRowSourceFactory;
         this.dataSetResolver = dataSetResolver;
-        this.dataSetModuleFactory = dataSetModuleFactory;
-
+        this.dataSetStrategyFactory = dataSetStrategyFactory;
     }
 
+
     public void assertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean logDatabaseContentOnAssertionError, String... variables) {
-        AssertDataSetStrategy defaultAssertDataSetStrategy = dataSetModuleFactory.createAssertDataSetStrategy();
+        AssertDataSetStrategy defaultAssertDataSetStrategy = dataSetStrategyFactory.createAssertDataSetStrategy();
         performAssertDataSetStrategy(defaultAssertDataSetStrategy, dataSetFileNames, asList(variables), logDatabaseContentOnAssertionError, testInstance.getClass());
     }
 
@@ -67,5 +67,4 @@ public class AssertDataSetStrategyHandler {
         }
         return dataSetFiles;
     }
-
 }

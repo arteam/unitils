@@ -53,7 +53,7 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
     /* Tested object */
     private DataSetRowProcessor dataSetRowProcessor;
 
-    protected Mock<DataSetDatabaseHelper> identifierNameProcessor;
+    protected Mock<DataSetDatabaseHelper> dataSetDatabaseHelper;
     protected Mock<DataSourceWrapper> dataSourceWrapper;
     protected Mock<SqlTypeHandlerRepository> sqlTypeHandlerRepository;
 
@@ -65,26 +65,26 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() throws SQLException {
-        dataSetRowProcessor = new DataSetRowProcessor(identifierNameProcessor.getMock(), sqlTypeHandlerRepository.getMock(), dataSourceWrapper.getMock());
+        dataSetRowProcessor = new DataSetRowProcessor(dataSetDatabaseHelper.getMock(), sqlTypeHandlerRepository.getMock(), dataSourceWrapper.getMock());
 
-        identifierNameProcessor.returns("\"PK\"").getCorrectCaseColumnName("PK", null);
-        identifierNameProcessor.returns("\"pk\"").getCorrectCaseColumnName("pk", null);
-        identifierNameProcessor.returns("PK1").getCorrectCaseColumnName("pk1", null);
-        identifierNameProcessor.returns("PK2").getCorrectCaseColumnName("pk2", null);
-        identifierNameProcessor.returns("COLUMN").getCorrectCaseColumnName("column", null);
-        identifierNameProcessor.returns("PK").removeIdentifierQuotes("\"PK\"");
-        identifierNameProcessor.returns("pk").removeIdentifierQuotes("\"pk\"");
-        identifierNameProcessor.returns("PK1").removeIdentifierQuotes("PK1");
-        identifierNameProcessor.returns("PK2").removeIdentifierQuotes("PK2");
-        identifierNameProcessor.returns("COLUMN").removeIdentifierQuotes("COLUMN");
+        dataSourceWrapper.returns("\"PK\"").getCorrectCaseColumnName("PK", null);
+        dataSourceWrapper.returns("\"pk\"").getCorrectCaseColumnName("pk", null);
+        dataSourceWrapper.returns("PK1").getCorrectCaseColumnName("pk1", null);
+        dataSourceWrapper.returns("PK2").getCorrectCaseColumnName("pk2", null);
+        dataSourceWrapper.returns("COLUMN").getCorrectCaseColumnName("column", null);
+        dataSourceWrapper.returns("PK").removeIdentifierQuotes("\"PK\"");
+        dataSourceWrapper.returns("pk").removeIdentifierQuotes("\"pk\"");
+        dataSourceWrapper.returns("PK1").removeIdentifierQuotes("PK1");
+        dataSourceWrapper.returns("PK2").removeIdentifierQuotes("PK2");
+        dataSourceWrapper.returns("COLUMN").removeIdentifierQuotes("COLUMN");
 
         sqlTypeHandlerRepository.returns(new TextSqlTypeHandler()).getSqlTypeHandler(0);
 
         dataSourceWrapper.returns(createTableName()).getTableName("schema", "table", false);
         dataSourceWrapper.returns(createTableName()).getTableName("schema", "table", true);
 
-        dataSetRow = new DataSetRow("schema", "table", null, false, new DataSetSettings('=', '$', false, null));
-        dataSetRowCaseSensitive = new DataSetRow("schema", "table", null, false, new DataSetSettings('=', '$', true, null));
+        dataSetRow = new DataSetRow("schema", "table", null, false, new DataSetSettings('=', '$', false));
+        dataSetRowCaseSensitive = new DataSetRow("schema", "table", null, false, new DataSetSettings('=', '$', true));
     }
 
 

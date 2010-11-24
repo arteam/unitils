@@ -16,7 +16,7 @@
 package org.unitils.dataset.annotation.handler.impl;
 
 import org.unitils.dataset.DataSetModule;
-import org.unitils.dataset.DataSetModuleFactory;
+import org.unitils.dataset.DataSetStrategyHandlerFactory;
 import org.unitils.dataset.annotation.InlineRefreshDataSet;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 import org.unitils.dataset.loadstrategy.InlineLoadDataSetStrategyHandler;
@@ -34,9 +34,10 @@ public class InlineRefreshDataSetAnnotationHandler implements DataSetAnnotationH
 
     public void handle(InlineRefreshDataSet annotation, Method testMethod, Object testInstance, DataSetModule dataSetModule) {
         String[] dataSetRows = annotation.value();
+        String databaseName = annotation.databaseName();
 
-        DataSetModuleFactory dataSetModuleFactory = dataSetModule.getDataSetModuleFactory();
-        InlineLoadDataSetStrategyHandler inlineLoadDataSetStrategyHandler = dataSetModuleFactory.getInlineLoadDataSetStrategyHandler();
+        DataSetStrategyHandlerFactory dataSetStrategyHandlerFactory = dataSetModule.getDataSetStrategyHandlerFactory();
+        InlineLoadDataSetStrategyHandler inlineLoadDataSetStrategyHandler = dataSetStrategyHandlerFactory.getInlineLoadDataSetStrategyHandler(databaseName);
         inlineLoadDataSetStrategyHandler.refreshDataSet(dataSetRows);
     }
 

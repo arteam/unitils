@@ -16,7 +16,7 @@
 package org.unitils.dataset.annotation.handler.impl;
 
 import org.unitils.dataset.DataSetModule;
-import org.unitils.dataset.DataSetModuleFactory;
+import org.unitils.dataset.DataSetStrategyHandlerFactory;
 import org.unitils.dataset.annotation.AssertDataSet;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 import org.unitils.dataset.assertstrategy.AssertDataSetStrategyHandler;
@@ -39,14 +39,15 @@ public class AssertDataSetAnnotationHandler implements DataSetAnnotationHandler<
         List<String> fileNames = asList(annotation.value());
         String[] variables = annotation.variables();
         boolean logDatabaseContentOnAssertionError = annotation.logDatabaseContentOnAssertionError();
+        String databaseName = annotation.databaseName();
 
         if (fileNames.isEmpty()) {
             // empty means use default file name
             fileNames.add(dataSetModule.getDefaultExpectedDataSetFileName(testMethod, testInstance.getClass()));
         }
 
-        DataSetModuleFactory dataSetModuleFactory = dataSetModule.getDataSetModuleFactory();
-        AssertDataSetStrategyHandler assertDataSetStrategyHandler = dataSetModuleFactory.getAssertDataSetStrategyHandler();
+        DataSetStrategyHandlerFactory dataSetStrategyHandlerFactory = dataSetModule.getDataSetStrategyHandlerFactory();
+        AssertDataSetStrategyHandler assertDataSetStrategyHandler = dataSetStrategyHandlerFactory.getAssertDataSetStrategyHandler(databaseName);
         assertDataSetStrategyHandler.assertDataSetFiles(testInstance, fileNames, logDatabaseContentOnAssertionError, variables);
     }
 

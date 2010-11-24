@@ -45,6 +45,6 @@ public abstract class BaseDataSetRowSourceFactory {
         char defaultLiteralToken = PropertyUtils.getString(DEFAULT_LITERAL_TOKEN_PROPERTY, configuration).charAt(0);
         char defaultVariableToken = PropertyUtils.getString(DEFAULT_VARIABLE_TOKEN_PROPERTY, configuration).charAt(0);
         boolean defaultCaseSensitive = PropertyUtils.getBoolean(DEFAULT_CASE_SENSITIVE_PROPERTY, configuration);
-        return new DataSetSettings(defaultLiteralToken, defaultVariableToken, defaultCaseSensitive, null);
+        return new DataSetSettings(defaultLiteralToken, defaultVariableToken, defaultCaseSensitive);
     }
 }

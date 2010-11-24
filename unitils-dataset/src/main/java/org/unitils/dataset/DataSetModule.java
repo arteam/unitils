@@ -15,8 +15,6 @@
  */
 package org.unitils.dataset;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbmaintain.database.IdentifierProcessor;
 import org.dbmaintain.database.IdentifierProcessorFactory;
 import org.unitils.core.CurrentTestInstance;
@@ -59,12 +57,11 @@ import static org.unitils.util.ReflectionUtils.createInstanceOfType;
  */
 public class DataSetModule implements Module {
 
-    /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(DataSetModule.class);
-
     /* The unitils configuration */
     protected Properties configuration;
-    protected DataSetModuleFactory dataSetModuleFactory;
+    protected DataSetStructureGeneratorFactory dataSetStructureGeneratorFactory;
+    protected DataSetStrategyHandlerFactory dataSetStrategyHandlerFactory;
+    protected DataSourceWrapperFactory dataSourceWrapperFactory;
 
 
     /**
@@ -83,20 +80,36 @@ public class DataSetModule implements Module {
     }
 
 
-    public DataSetModuleFactory getDataSetModuleFactory() {
-        if (dataSetModuleFactory == null) {
-            dataSetModuleFactory = createDataSetModuleFactory();
+    public DataSetStrategyHandlerFactory getDataSetStrategyHandlerFactory() {
+        if (dataSetStrategyHandlerFactory == null) {
+            DataSourceWrapperFactory dataSourceWrapperFactory = getDataSourceWrapperFactory();
+            dataSetStrategyHandlerFactory = new DataSetStrategyHandlerFactory(configuration, dataSourceWrapperFactory);
         }
-        return dataSetModuleFactory;
+        return dataSetStrategyHandlerFactory;
     }
 
-    protected DataSetModuleFactory createDataSetModuleFactory() {
-        // todo database name
+    public DataSourceWrapperFactory getDataSourceWrapperFactory() {
+        if (dataSourceWrapperFactory == null) {
+            dataSourceWrapperFactory = new DataSourceWrapperFactory(configuration);
+        }
+        return dataSourceWrapperFactory;
+    }
+
+
+    public DataSetStructureGeneratorFactory getDataSetStructureGeneratorFactory() {
+        if (dataSetStructureGeneratorFactory == null) {
+            dataSetStructureGeneratorFactory = createDataSetStructureGeneratorFactory();
+        }
+        return dataSetStructureGeneratorFactory;
+    }
+
+    protected DataSetStructureGeneratorFactory createDataSetStructureGeneratorFactory() {
+        // todo multiple databases
         UnitilsDataSource unitilsDataSource = DatabaseUnitils.getUnitilsDataSource(null);
 
         IdentifierProcessor identifierProcessor = createIdentifierProcessor(unitilsDataSource);
         DataSourceWrapper dataSourceWrapper = createDataSourceWrapper(identifierProcessor, unitilsDataSource);
-        return new DataSetModuleFactory(configuration, dataSourceWrapper, identifierProcessor);
+        return new DataSetStructureGeneratorFactory(configuration, dataSourceWrapper);
     }
 
 
@@ -201,7 +214,7 @@ public class DataSetModule implements Module {
     protected class DataSetXSDsGeneratingDatabaseUpdateListener implements DatabaseUpdateListener {
 
         public void databaseWasUpdated() {
-            DataSetStructureGenerator dataSetStructureGenerator = getDataSetModuleFactory().getDataSetStructureGenerator();
+            DataSetStructureGenerator dataSetStructureGenerator = getDataSetStructureGeneratorFactory().getDataSetStructureGenerator();
             dataSetStructureGenerator.generateDataSetStructureAndTemplate();
         }
     }

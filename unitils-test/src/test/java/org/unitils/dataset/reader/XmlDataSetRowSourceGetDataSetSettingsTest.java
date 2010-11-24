@@ -45,7 +45,7 @@ public class XmlDataSetRowSourceGetDataSetSettingsTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() throws Exception {
-        defaultDataSetSettings = new DataSetSettings('=', '$', false, null);
+        defaultDataSetSettings = new DataSetSettings('=', '$', false);
     }
 
     @After

@@ -65,7 +65,7 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
         sqlTypeHandlerRepository.returns(new TextSqlTypeHandler()).getSqlTypeHandler(0);
         dataSetRowProcessor = new DataSetRowProcessor(identifierNameProcessor.getMock(), sqlTypeHandlerRepository.getMock(), dataSourceWrapper.getMock());
 
-        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false, null);
+        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
         dataSetRow = new DataSetRow("schema", "table", null, false, dataSetSettings);
     }
 

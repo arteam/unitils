@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.loadstrategy;
 
-import org.unitils.dataset.DataSetModuleFactory;
+import org.unitils.dataset.DataSetStrategyFactory;
 import org.unitils.dataset.resolver.DataSetResolver;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.dataset.rowsource.FileDataSetRowSourceFactory;
@@ -34,35 +34,35 @@ public class LoadDataSetStrategyHandler {
 
     protected FileDataSetRowSourceFactory fileDataSetRowSourceFactory;
     protected DataSetResolver dataSetResolver;
-    protected DataSetModuleFactory dataSetModuleFactory;
+    protected DataSetStrategyFactory dataSetStrategyFactory;
 
     protected List<File> lastLoadedReadOnlyFiles = new ArrayList<File>();
 
 
-    public LoadDataSetStrategyHandler(FileDataSetRowSourceFactory fileDataSetRowSourceFactory, DataSetResolver dataSetResolver, DataSetModuleFactory dataSetModuleFactory) {
+    public LoadDataSetStrategyHandler(FileDataSetRowSourceFactory fileDataSetRowSourceFactory, DataSetResolver dataSetResolver, DataSetStrategyFactory dataSetStrategyFactory) {
         this.fileDataSetRowSourceFactory = fileDataSetRowSourceFactory;
         this.dataSetResolver = dataSetResolver;
-        this.dataSetModuleFactory = dataSetModuleFactory;
+        this.dataSetStrategyFactory = dataSetStrategyFactory;
     }
 
 
     public void insertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        LoadDataSetStrategy insertDataSetStrategy = dataSetModuleFactory.createInsertDataSetStrategy();
+        LoadDataSetStrategy insertDataSetStrategy = dataSetStrategyFactory.createInsertDataSetStrategy();
         performLoadDataSetStrategy(insertDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
     }
 
     public void cleanInsertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        LoadDataSetStrategy cleanInsertDataSetStrategy = dataSetModuleFactory.createCleanInsertDataSetStrategy();
+        LoadDataSetStrategy cleanInsertDataSetStrategy = dataSetStrategyFactory.createCleanInsertDataSetStrategy();
         performLoadDataSetStrategy(cleanInsertDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
     }
 
     public void refreshDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        LoadDataSetStrategy refreshDataSetStrategy = dataSetModuleFactory.createRefreshDataSetStrategy();
+        LoadDataSetStrategy refreshDataSetStrategy = dataSetStrategyFactory.createRefreshDataSetStrategy();
         performLoadDataSetStrategy(refreshDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
     }
 
     public void updateDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        LoadDataSetStrategy updateDataSetStrategy = dataSetModuleFactory.createUpdateDataSetStrategy();
+        LoadDataSetStrategy updateDataSetStrategy = dataSetStrategyFactory.createUpdateDataSetStrategy();
         performLoadDataSetStrategy(updateDataSetStrategy, dataSetFileNames, asList(variables), readOnly, testInstance.getClass());
     }
 
@@ -109,6 +109,4 @@ public class LoadDataSetStrategyHandler {
         String className = testClass.getName();
         return className.substring(className.lastIndexOf(".") + 1) + ".xml";
     }
-
-
 }

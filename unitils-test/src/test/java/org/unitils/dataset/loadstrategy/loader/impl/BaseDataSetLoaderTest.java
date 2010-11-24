@@ -123,7 +123,7 @@ public class BaseDataSetLoaderTest extends UnitilsJUnit4 {
 
 
     private DataSetRow createDataSetRow() {
-        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false, null);
+        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
         DataSetRow dataSetRow = new DataSetRow("schema", "table", null, false, dataSetSettings);
         dataSetRow.addDataSetValue(new DataSetValue("column", "value"));
         return dataSetRow;

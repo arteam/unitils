@@ -15,11 +15,9 @@
  */
 package org.unitils.dataset.assertstrategy;
 
-import org.unitils.dataset.DataSetModuleFactory;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 
 import java.util.List;
-import java.util.Properties;
 
 /**
  * @author Tim Ducheyne
@@ -28,7 +26,7 @@ import java.util.Properties;
 public interface AssertDataSetStrategy {
 
 
-    void init(Properties configuration, DataSetModuleFactory dataSetModuleFactory);
+    void init(DataSetComparator dataSetComparator, DatabaseContentLogger databaseContentLogger);
 
     /**
      * Asserts that the given expected schema is equal to the actual schema.

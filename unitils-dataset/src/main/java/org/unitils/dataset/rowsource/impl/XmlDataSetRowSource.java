@@ -64,16 +64,6 @@ import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
  * The 'first_table' table has no namespce and is therefore linked to SCHEMA_A. The 'second_table' table is prefixed
  * with namespace b which is linked to SCHEMA_B. If no default namespace is defined, the schema that is
  * passed as constructor argument is taken as default schema.
- * <p/>
- * You can also specify the database for which the data set must be loaded. You can set this by using the databaseName
- * attribute on the data set root element. This is a logical name that will be used to get the data source.
- * If you are using properties to configure unitils, this will be the database name that was used in the properties.
- * If you are using spring, this will be the id/name of the data source bean.
- * Example:
- * <code><pre>
- * &lt;dataset databaseName="myDatabase"&gt;
- * &lt;/dataset&gt;
- * </pre></code>
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -184,8 +174,7 @@ public class XmlDataSetRowSource implements DataSetRowSource {
                     char literalToken = getLiteralToken();
                     char variableToken = getVariableToken();
                     boolean caseSensitive = getCaseSensitive();
-                    String databaseName = getDatabaseName();
-                    return new DataSetSettings(literalToken, variableToken, caseSensitive, databaseName);
+                    return new DataSetSettings(literalToken, variableToken, caseSensitive);
                 }
                 break;
             }
@@ -258,14 +247,6 @@ public class XmlDataSetRowSource implements DataSetRowSource {
             return false;
         }
         throw new UnitilsException("Invalid case sensitive attribute value " + caseSensitiveAttribute + ". The value should be 'true' or 'false'.");
-    }
-
-    protected String getDatabaseName() {
-        String databaseName = xmlStreamReader.getAttributeValue(null, "caseSensitive");
-        if (databaseName == null) {
-            return defaultDataSetSettings.getDatabaseName();
-        }
-        return databaseName;
     }
 
     protected char getLiteralToken() {

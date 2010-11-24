@@ -289,14 +289,14 @@ public class DefaultDataSetComparatorRowsTest extends UnitilsJUnit4 {
 
 
     private DataSetRow createDataSetRow() {
-        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false, null);
+        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
         DataSetRow dataSetRow = new DataSetRow("schema", "table", null, false, dataSetSettings);
         dataSetRow.addDataSetValue(new DataSetValue("column", "value"));
         return dataSetRow;
     }
 
     private DataSetRow createEmptyDataSetRow() {
-        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false, null);
+        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
         return new DataSetRow("schema", "table", null, false, dataSetSettings);
     }
 

@@ -64,17 +64,16 @@ public class Unitils {
 
 
     /**
-     * Initializes Unitils with the given configuration. All the modules that are configured in the given configuration
-     * are also created and initialized with this configuration. If the configuration is null, the default config is loaded.
+     * Initializes Unitils with the given custom configuration. The custom config will override the default configuration.
      *
-     * @param configuration The config, null for the default config
+     * @param customConfiguration The custom config, null if there is no custom config
      */
-    public void init(Properties configuration) {
-        if (configuration == null) {
-            ConfigurationLoader configurationLoader = new ConfigurationLoader();
-            configuration = configurationLoader.loadConfiguration();
+    public void init(Properties customConfiguration) {
+        ConfigurationLoader configurationLoader = new ConfigurationLoader();
+        this.configuration = configurationLoader.loadConfiguration();
+        if (customConfiguration != null) {
+            configuration.putAll(customConfiguration);
         }
-        this.configuration = configuration;
         modulesRepository = createModulesRepository(configuration);
         afterInitModules();
     }

@@ -117,4 +117,9 @@ public @interface AssertDataSet {
      */
     boolean logDatabaseContentOnAssertionError() default true;
 
+    /**
+     * @return The name of the database on which the data set(s) need to be asserted, defaults to the default database
+     */
+    String databaseName() default "";
+
 }

@@ -59,7 +59,7 @@ public class DataSetDatabaseHelperAddExtraParentColumnsForChildTest extends Unit
         IdentifierProcessor identifierProcessor = createIdentifierProcessor();
         DataSourceWrapper dataSourceWrapper = new DataSourceWrapper(getUnitilsDataSource(), identifierProcessor);
 
-        dataSetDatabaseHelper = new DataSetDatabaseHelper(dataSourceWrapper, identifierProcessor);
+        dataSetDatabaseHelper = new DataSetDatabaseHelper(dataSourceWrapper);
 
         dropTestTables();
         createTestTables();
@@ -67,12 +67,12 @@ public class DataSetDatabaseHelperAddExtraParentColumnsForChildTest extends Unit
 
     @Before
     public void initializeTestData() {
-        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false, null);
+        DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
         parentDataSetRow = new DataSetRow("public", "parent", null, false, dataSetSettings);
         childDataSetRow = new DataSetRow("public", "child", parentDataSetRow, false, dataSetSettings);
         parentToParentDataSetRow = new DataSetRow("public", "parent", parentDataSetRow, false, dataSetSettings);
 
-        DataSetSettings caseSensitiveDataSetSettings = new DataSetSettings('=', '$', true, null);
+        DataSetSettings caseSensitiveDataSetSettings = new DataSetSettings('=', '$', true);
         caseSensitiveParentDataSetRow = new DataSetRow("PUBLIC", "ParentCase", null, false, caseSensitiveDataSetSettings);
         caseSensitiveChildDataSetRow = new DataSetRow("PUBLIC", "ChildCase", caseSensitiveParentDataSetRow, false, caseSensitiveDataSetSettings);
     }

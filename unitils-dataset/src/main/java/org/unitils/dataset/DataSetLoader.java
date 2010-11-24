@@ -39,15 +39,14 @@ public class DataSetLoader {
     }
 
     public static void insertDataSetFiles(Object testInstance, List<String> dataSetFileNames, String... variables) {
-        insertDataSetFiles(testInstance, dataSetFileNames, false, variables);
+        DataSetLoader dataSetLoader = new DataSetLoader();
+        dataSetLoader.doInsertDataSetFile(testInstance, dataSetFileNames, variables);
     }
 
-    public static void insertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        getLoadDataSetStrategyHandler().insertDataSetFiles(testInstance, dataSetFileNames, readOnly, variables);
-    }
 
     public static void insertDataSet(String... dataSetRows) {
-        getInlineLoadDataSetStrategyHandler().insertDataSet(dataSetRows);
+        DataSetLoader dataSetLoader = new DataSetLoader();
+        dataSetLoader.doInsertDataSet(dataSetRows);
     }
 
 
@@ -60,15 +59,14 @@ public class DataSetLoader {
     }
 
     public static void cleanInsertDataSetFiles(Object testInstance, List<String> dataSetFileNames, String... variables) {
-        cleanInsertDataSetFiles(testInstance, dataSetFileNames, false, variables);
+        DataSetLoader dataSetLoader = new DataSetLoader();
+        dataSetLoader.doCleanInsertDataSetFiles(testInstance, dataSetFileNames, variables);
     }
 
-    public static void cleanInsertDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        getLoadDataSetStrategyHandler().cleanInsertDataSetFiles(testInstance, dataSetFileNames, readOnly, variables);
-    }
 
     public static void cleanInsertDataSet(String... dataSetRows) {
-        getInlineLoadDataSetStrategyHandler().cleanInsertDataSet(dataSetRows);
+        DataSetLoader dataSetLoader = new DataSetLoader();
+        dataSetLoader.doCleanInsertDataSet(dataSetRows);
     }
 
 
@@ -81,36 +79,95 @@ public class DataSetLoader {
     }
 
     public static void refreshDataSetFiles(Object testInstance, List<String> dataSetFileNames, String... variables) {
-        refreshDataSetFiles(testInstance, dataSetFileNames, false, variables);
+        DataSetLoader dataSetLoader = new DataSetLoader();
+        dataSetLoader.doRefreshDataSetFiles(testInstance, dataSetFileNames, variables);
     }
 
-    public static void refreshDataSetFiles(Object testInstance, List<String> dataSetFileNames, boolean readOnly, String... variables) {
-        getLoadDataSetStrategyHandler().refreshDataSetFiles(testInstance, dataSetFileNames, readOnly, variables);
-    }
 
     public static void refreshDataSet(String... dataSetRows) {
-        getInlineLoadDataSetStrategyHandler().refreshDataSet(dataSetRows);
+        DataSetLoader dataSetLoader = new DataSetLoader();
+        dataSetLoader.doRefreshDataSet(dataSetRows);
     }
 
 
-    private static LoadDataSetStrategyHandler getLoadDataSetStrategyHandler() {
-        DataSetModuleFactory dataSetModuleFactory = getDataSetModule().getDataSetModuleFactory();
-        return dataSetModuleFactory.getLoadDataSetStrategyHandler();
+    public static void updateDefaultDataSetFile(Object testInstance, String... variables) {
+        updateDataSetFiles(testInstance, new ArrayList<String>(), variables);
     }
 
-    private static InlineLoadDataSetStrategyHandler getInlineLoadDataSetStrategyHandler() {
-        DataSetModuleFactory dataSetModuleFactory = getDataSetModule().getDataSetModuleFactory();
-        return dataSetModuleFactory.getInlineLoadDataSetStrategyHandler();
+    public static void updateDataSetFile(Object testInstance, String dataSetFileName, String... variables) {
+        updateDataSetFiles(testInstance, asList(dataSetFileName), variables);
     }
 
-    /**
-     * Gets the instance DataSetModule that is registered in the modules repository.
-     * This instance implements the actual behavior of the static methods in this class.
-     * This way, other implementations can be plugged in, while keeping the simplicity of using static methods.
-     *
-     * @return the instance, not null
-     */
-    private static DataSetModule getDataSetModule() {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(DataSetModule.class);
+    public static void updateDataSetFiles(Object testInstance, List<String> dataSetFileNames, String... variables) {
+        DataSetLoader dataSetLoader = new DataSetLoader();
+        dataSetLoader.doUpdateDataSetFiles(testInstance, dataSetFileNames, variables);
+    }
+
+
+    public static void updateDataSet(String... dataSetRows) {
+        DataSetLoader dataSetLoader = new DataSetLoader();
+        dataSetLoader.doUpdateDataSet(dataSetRows);
+    }
+
+
+    private String databaseName;
+    private boolean readOnly;
+
+
+    public DataSetLoader() {
+        this(null, false);
+    }
+
+    public DataSetLoader(String databaseName, boolean readOnly) {
+        this.databaseName = databaseName;
+        this.readOnly = readOnly;
+    }
+
+
+    public void doInsertDataSetFile(Object testInstance, List<String> dataSetFileNames, String... variables) {
+        getLoadDataSetStrategyHandler(databaseName).insertDataSetFiles(testInstance, dataSetFileNames, readOnly, variables);
+    }
+
+    public void doInsertDataSet(String... dataSetRows) {
+        getInlineLoadDataSetStrategyHandler(databaseName).insertDataSet(dataSetRows);
+    }
+
+    public void doCleanInsertDataSetFiles(Object testInstance, List<String> dataSetFileNames, String... variables) {
+        getLoadDataSetStrategyHandler(databaseName).cleanInsertDataSetFiles(testInstance, dataSetFileNames, readOnly, variables);
+    }
+
+    public void doCleanInsertDataSet(String... dataSetRows) {
+        getInlineLoadDataSetStrategyHandler(databaseName).cleanInsertDataSet(dataSetRows);
+    }
+
+    public void doRefreshDataSetFiles(Object testInstance, List<String> dataSetFileNames, String... variables) {
+        getLoadDataSetStrategyHandler(databaseName).refreshDataSetFiles(testInstance, dataSetFileNames, readOnly, variables);
+    }
+
+    public void doRefreshDataSet(String... dataSetRows) {
+        getInlineLoadDataSetStrategyHandler(databaseName).refreshDataSet(dataSetRows);
+    }
+
+    public void doUpdateDataSetFiles(Object testInstance, List<String> dataSetFileNames, String... variables) {
+        getLoadDataSetStrategyHandler(databaseName).updateDataSetFiles(testInstance, dataSetFileNames, readOnly, variables);
+    }
+
+    public void doUpdateDataSet(String... dataSetRows) {
+        getInlineLoadDataSetStrategyHandler(databaseName).updateDataSet(dataSetRows);
+    }
+
+
+    private LoadDataSetStrategyHandler getLoadDataSetStrategyHandler(String databaseName) {
+        return getDataSetStrategyHandlerFactory().getLoadDataSetStrategyHandler(databaseName);
+    }
+
+    private InlineLoadDataSetStrategyHandler getInlineLoadDataSetStrategyHandler(String databaseName) {
+        return getDataSetStrategyHandlerFactory().getInlineLoadDataSetStrategyHandler(databaseName);
+    }
+
+
+    private DataSetStrategyHandlerFactory getDataSetStrategyHandlerFactory() {
+        DataSetModule dataSetModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DataSetModule.class);
+        return dataSetModule.getDataSetStrategyHandlerFactory();
     }
 }
