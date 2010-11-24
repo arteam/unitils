@@ -47,7 +47,7 @@ public class AssertDataSetAnnotationHandler implements DataSetAnnotationHandler<
         }
 
         DataSetStrategyHandlerFactory dataSetStrategyHandlerFactory = dataSetModule.getDataSetStrategyHandlerFactory();
-        AssertDataSetStrategyHandler assertDataSetStrategyHandler = dataSetStrategyHandlerFactory.getAssertDataSetStrategyHandler(databaseName);
+        AssertDataSetStrategyHandler assertDataSetStrategyHandler = dataSetStrategyHandlerFactory.createAssertDataSetStrategyHandler(databaseName);
         assertDataSetStrategyHandler.assertDataSetFiles(testInstance, fileNames, logDatabaseContentOnAssertionError, variables);
     }
 

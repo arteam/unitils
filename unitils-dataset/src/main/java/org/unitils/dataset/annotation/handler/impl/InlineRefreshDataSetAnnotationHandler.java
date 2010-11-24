@@ -37,7 +37,7 @@ public class InlineRefreshDataSetAnnotationHandler implements DataSetAnnotationH
         String databaseName = annotation.databaseName();
 
         DataSetStrategyHandlerFactory dataSetStrategyHandlerFactory = dataSetModule.getDataSetStrategyHandlerFactory();
-        InlineLoadDataSetStrategyHandler inlineLoadDataSetStrategyHandler = dataSetStrategyHandlerFactory.getInlineLoadDataSetStrategyHandler(databaseName);
+        InlineLoadDataSetStrategyHandler inlineLoadDataSetStrategyHandler = dataSetStrategyHandlerFactory.createInlineLoadDataSetStrategyHandler(databaseName);
         inlineLoadDataSetStrategyHandler.refreshDataSet(dataSetRows);
     }
 

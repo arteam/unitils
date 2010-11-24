@@ -38,7 +38,7 @@ public class InlineAssertDataSetAnnotationHandler implements DataSetAnnotationHa
         String databaseName = annotation.databaseName();
 
         DataSetStrategyHandlerFactory dataSetStrategyHandlerFactory = dataSetModule.getDataSetStrategyHandlerFactory();
-        InlineAssertDataSetStrategyHandler inlineAssertDataSetStrategyHandler = dataSetStrategyHandlerFactory.getInlineAssertDataSetStrategyHandler(databaseName);
+        InlineAssertDataSetStrategyHandler inlineAssertDataSetStrategyHandler = dataSetStrategyHandlerFactory.createInlineAssertDataSetStrategyHandler(databaseName);
         inlineAssertDataSetStrategyHandler.assertExpectedDataSet(logDatabaseContentOnAssertionError, dataSetRows);
     }
 

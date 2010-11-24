@@ -87,11 +87,11 @@ public class DataSetAssert {
 
 
     private AssertDataSetStrategyHandler getAssertDataSetStrategyHandler(String databaseName) {
-        return getDataSetStrategyHandlerFactory().getAssertDataSetStrategyHandler(databaseName);
+        return getDataSetStrategyHandlerFactory().createAssertDataSetStrategyHandler(databaseName);
     }
 
     private InlineAssertDataSetStrategyHandler getInlineAssertDataSetStrategyHandler(String databaseName) {
-        return getDataSetStrategyHandlerFactory().getInlineAssertDataSetStrategyHandler(databaseName);
+        return getDataSetStrategyHandlerFactory().createInlineAssertDataSetStrategyHandler(databaseName);
     }
 
     private DataSetStrategyHandlerFactory getDataSetStrategyHandlerFactory() {
