@@ -16,7 +16,7 @@
 package org.unitils.dataset.annotation;
 
 import org.unitils.dataset.annotation.handler.MarkerForLoadDataSetAnnotation;
-import org.unitils.dataset.annotation.handler.impl.CleanInsertDataSetAnnotationHandler;
+import org.unitils.dataset.annotation.handler.impl.DataSetAnnotationHandler;
 
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -91,7 +91,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({TYPE, METHOD})
 @Retention(RUNTIME)
 @Inherited
-@MarkerForLoadDataSetAnnotation(CleanInsertDataSetAnnotationHandler.class)
+@MarkerForLoadDataSetAnnotation(DataSetAnnotationHandler.class)
 public @interface DataSet {
 
     /**
@@ -129,4 +129,8 @@ public @interface DataSet {
      */
     boolean readOnly() default false;
 
+    /**
+     * @return The name of the database on which the data set(s) need to be asserted, defaults to the default database
+     */
+    String databaseName() default "";
 }

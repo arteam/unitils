@@ -19,7 +19,6 @@ import org.unitils.core.UnitilsException;
 import org.unitils.dataset.assertstrategy.DatabaseContentLogger;
 import org.unitils.dataset.assertstrategy.model.DataSetComparison;
 import org.unitils.dataset.assertstrategy.model.TableComparison;
-import org.unitils.dataset.database.DataSetDatabaseHelper;
 import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.Row;
@@ -33,6 +32,8 @@ import java.util.Set;
 import static org.apache.commons.lang.StringUtils.rightPad;
 
 /**
+ * todo limit the nr of outputted rows
+ *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
@@ -40,13 +41,11 @@ public class DefaultDatabaseContentLogger implements DatabaseContentLogger {
 
     protected DataSourceWrapper dataSourceWrapper;
     protected TableContentRetriever tableContentRetriever;
-    protected DataSetDatabaseHelper dataSetDatabaseHelper;
 
 
-    public void init(DataSourceWrapper dataSourceWrapper, TableContentRetriever tableContentRetriever, DataSetDatabaseHelper dataSetDatabaseHelper) {
+    public void init(DataSourceWrapper dataSourceWrapper, TableContentRetriever tableContentRetriever) {
         this.dataSourceWrapper = dataSourceWrapper;
         this.tableContentRetriever = tableContentRetriever;
-        this.dataSetDatabaseHelper = dataSetDatabaseHelper;
     }
 
 

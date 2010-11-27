@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset;
+package org.unitils.dataset.structure;
 
-import org.unitils.dataset.database.DataSourceWrapper;
-import org.unitils.dataset.structure.DataSetStructureGenerator;
+import org.unitils.dataset.database.DataSourceWrapperFactory;
 
 import java.util.Properties;
 
@@ -37,13 +36,14 @@ public class DataSetStructureGeneratorFactory {
 
     /* The unitils configuration */
     protected Properties configuration;
-    protected DataSourceWrapper dataSourceWrapper;
+    protected DataSourceWrapperFactory dataSourceWrapperFactory;
+
     protected DataSetStructureGenerator dataSetStructureGenerator;
 
 
-    public DataSetStructureGeneratorFactory(Properties configuration, DataSourceWrapper dataSourceWrapper) {
+    public DataSetStructureGeneratorFactory(Properties configuration, DataSourceWrapperFactory dataSourceWrapperFactory) {
         this.configuration = configuration;
-        this.dataSourceWrapper = dataSourceWrapper;
+        this.dataSourceWrapperFactory = dataSourceWrapperFactory;
     }
 
 
@@ -51,7 +51,7 @@ public class DataSetStructureGeneratorFactory {
         if (dataSetStructureGenerator == null) {
             String defaultTargetDirectory = configuration.getProperty(PROPKEY_XSD_TARGETDIRNAME);
             dataSetStructureGenerator = getInstanceOf(DataSetStructureGenerator.class, configuration);
-            dataSetStructureGenerator.init(dataSourceWrapper, defaultTargetDirectory);
+            dataSetStructureGenerator.init(dataSourceWrapperFactory, defaultTargetDirectory);
         }
         return dataSetStructureGenerator;
     }

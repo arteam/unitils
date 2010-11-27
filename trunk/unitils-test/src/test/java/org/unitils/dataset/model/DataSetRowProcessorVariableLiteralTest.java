@@ -18,7 +18,6 @@ package org.unitils.dataset.model;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.database.DataSetDatabaseHelper;
 import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
 import org.unitils.dataset.model.database.Row;
@@ -50,7 +49,6 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
     /* Tested object */
     private DataSetRowProcessor dataSetRowProcessor;
 
-    protected Mock<DataSetDatabaseHelper> identifierNameProcessor;
     protected Mock<SqlTypeHandlerRepository> sqlTypeHandlerRepository;
     protected Mock<DataSourceWrapper> dataSourceWrapper;
 
@@ -63,7 +61,7 @@ public class DataSetRowProcessorVariableLiteralTest extends UnitilsJUnit4 {
     @Before
     public void initialize() throws SQLException {
         sqlTypeHandlerRepository.returns(new TextSqlTypeHandler()).getSqlTypeHandler(0);
-        dataSetRowProcessor = new DataSetRowProcessor(identifierNameProcessor.getMock(), sqlTypeHandlerRepository.getMock(), dataSourceWrapper.getMock());
+        dataSetRowProcessor = new DataSetRowProcessor(sqlTypeHandlerRepository.getMock(), dataSourceWrapper.getMock());
 
         DataSetSettings dataSetSettings = new DataSetSettings('=', '$', false);
         dataSetRow = new DataSetRow("schema", "table", null, false, dataSetSettings);

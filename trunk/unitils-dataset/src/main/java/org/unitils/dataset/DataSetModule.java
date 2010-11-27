@@ -15,24 +15,23 @@
  */
 package org.unitils.dataset;
 
-import org.dbmaintain.database.IdentifierProcessor;
-import org.dbmaintain.database.IdentifierProcessorFactory;
 import org.unitils.core.CurrentTestInstance;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
-import org.unitils.database.DatabaseUnitils;
 import org.unitils.database.DatabaseUpdateListener;
-import org.unitils.database.UnitilsDataSource;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 import org.unitils.dataset.annotation.handler.MarkerForAssertDataSetAnnotation;
 import org.unitils.dataset.annotation.handler.MarkerForLoadDataSetAnnotation;
-import org.unitils.dataset.database.DataSourceWrapper;
+import org.unitils.dataset.database.DataSourceWrapperFactory;
+import org.unitils.dataset.factory.DataSetStrategyHandlerFactory;
+import org.unitils.dataset.structure.DataSetStructureGenerator;
+import org.unitils.dataset.structure.DataSetStructureGeneratorFactory;
 
-import javax.sql.DataSource;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Properties;
 
+import static org.unitils.database.DatabaseUnitils.getDatabaseNames;
 import static org.unitils.database.DatabaseUnitils.registerDatabaseUpdateListener;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
@@ -94,21 +93,12 @@ public class DataSetModule implements Module {
         return dataSourceWrapperFactory;
     }
 
-
     public DataSetStructureGeneratorFactory getDataSetStructureGeneratorFactory() {
         if (dataSetStructureGeneratorFactory == null) {
-            dataSetStructureGeneratorFactory = createDataSetStructureGeneratorFactory();
+            DataSourceWrapperFactory dataSourceWrapperFactory = getDataSourceWrapperFactory();
+            dataSetStructureGeneratorFactory = new DataSetStructureGeneratorFactory(configuration, dataSourceWrapperFactory);
         }
         return dataSetStructureGeneratorFactory;
-    }
-
-    protected DataSetStructureGeneratorFactory createDataSetStructureGeneratorFactory() {
-        // todo multiple databases
-        UnitilsDataSource unitilsDataSource = DatabaseUnitils.getUnitilsDataSource(null);
-
-        IdentifierProcessor identifierProcessor = createIdentifierProcessor(unitilsDataSource);
-        DataSourceWrapper dataSourceWrapper = createDataSourceWrapper(identifierProcessor, unitilsDataSource);
-        return new DataSetStructureGeneratorFactory(configuration, dataSourceWrapper);
     }
 
 
@@ -162,19 +152,6 @@ public class DataSetModule implements Module {
     }
 
 
-    protected DataSourceWrapper createDataSourceWrapper(IdentifierProcessor identifierProcessor, UnitilsDataSource unitilsDataSource) {
-        return new DataSourceWrapper(unitilsDataSource, identifierProcessor);
-    }
-
-    protected IdentifierProcessor createIdentifierProcessor(UnitilsDataSource unitilsDataSource) {
-        String databaseDialect = unitilsDataSource.getDialect();
-        String defaultSchemaName = unitilsDataSource.getDefaultSchemaName();
-        DataSource dataSource = unitilsDataSource.getDataSource();
-        IdentifierProcessorFactory identifierProcessorFactory = new IdentifierProcessorFactory(configuration);
-        return identifierProcessorFactory.createIdentifierProcessor(databaseDialect, defaultSchemaName, dataSource);
-    }
-
-
     /**
      * @return The TestListener object that implements Unitils' data set support
      */
@@ -213,9 +190,10 @@ public class DataSetModule implements Module {
     protected class DataSetXSDsGeneratingDatabaseUpdateListener implements DatabaseUpdateListener {
 
         public void databaseWasUpdated() {
-            //todo implement
-//            DataSetStructureGenerator dataSetStructureGenerator = getDataSetStructureGeneratorFactory().getDataSetStructureGenerator();
-//            dataSetStructureGenerator.generateDataSetStructureAndTemplate();
+            DataSetStructureGenerator dataSetStructureGenerator = getDataSetStructureGeneratorFactory().getDataSetStructureGenerator();
+            for (String databaseName : getDatabaseNames()) {
+                dataSetStructureGenerator.generateDataSetStructureAndTemplate(databaseName);
+            }
         }
     }
 

@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.assertstrategy;
 
-import org.unitils.dataset.DataSetStrategyFactory;
+import org.unitils.dataset.factory.DataSetStrategyFactory;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.dataset.rowsource.InlineDataSetRowSourceFactory;
 

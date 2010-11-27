@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dataset.database.DataSourceWrapper;
+import org.unitils.dataset.database.DataSourceWrapperFactory;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import org.unitils.util.PropertyUtils;
 
@@ -39,7 +39,6 @@ import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.util.DataSetTestUtils.createDataSourceWrapper;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
@@ -79,8 +78,8 @@ public class XsdDataSetStructureGeneratorGenerateDataSetStructureTest extends Un
             deleteDirectory(xsdDirectory);
         }
 
-        DataSourceWrapper dataSourceWrapper = createDataSourceWrapper();
-        xsdDataSetStructureGenerator.init(dataSourceWrapper, null);
+        DataSourceWrapperFactory dataSourceWrapperFactory = new DataSourceWrapperFactory(configuration);
+        xsdDataSetStructureGenerator.init(dataSourceWrapperFactory, null);
 
         dropTestTables();
         createTestTables();
@@ -106,7 +105,7 @@ public class XsdDataSetStructureGeneratorGenerateDataSetStructureTest extends Un
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        xsdDataSetStructureGenerator.generateDataSetStructure(xsdDirectory);
+        xsdDataSetStructureGenerator.generateDataSetStructure(null, xsdDirectory);
 
         // check content of general dataset xsd
         File dataSetXsd = new File(xsdDirectory, "dataset.xsd");

@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dataset.database.DataSourceWrapper;
+import org.unitils.dataset.database.DataSourceWrapperFactory;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -35,7 +35,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.util.DataSetTestUtils.createDataSourceWrapper;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 
 /**
@@ -53,7 +52,7 @@ public class XsdDataSetStructureGeneratorGenerateDataSetStructureAndTemplateTest
     protected File xsdDirectory;
     @TestDataSource
     protected DataSource dataSource;
-    protected DataSourceWrapper dataSourceWrapper;
+    protected DataSourceWrapperFactory dataSourceWrapperFactory;
     protected boolean disabled;
 
 
@@ -70,7 +69,7 @@ public class XsdDataSetStructureGeneratorGenerateDataSetStructureAndTemplateTest
             deleteDirectory(xsdDirectory);
         }
 
-        dataSourceWrapper = createDataSourceWrapper();
+        dataSourceWrapperFactory = new DataSourceWrapperFactory(configuration);
 
         dropTestTables();
         createTestTables();
@@ -99,8 +98,8 @@ public class XsdDataSetStructureGeneratorGenerateDataSetStructureAndTemplateTest
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        xsdDataSetStructureGenerator.init(dataSourceWrapper, null);
-        xsdDataSetStructureGenerator.generateDataSetStructureAndTemplate(xsdDirectory);
+        xsdDataSetStructureGenerator.init(dataSourceWrapperFactory, null);
+        xsdDataSetStructureGenerator.generateDataSetStructureAndTemplate(null, xsdDirectory);
 
         File dataSetXsd = new File(xsdDirectory, "dataset.xsd");
         assertTrue(dataSetXsd.length() > 0);
@@ -112,8 +111,8 @@ public class XsdDataSetStructureGeneratorGenerateDataSetStructureAndTemplateTest
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        xsdDataSetStructureGenerator.init(dataSourceWrapper, xsdDirectory.getPath());
-        xsdDataSetStructureGenerator.generateDataSetStructureAndTemplate();
+        xsdDataSetStructureGenerator.init(dataSourceWrapperFactory, xsdDirectory.getPath());
+        xsdDataSetStructureGenerator.generateDataSetStructureAndTemplate(null);
 
         File dataSetXsd = new File(xsdDirectory, "dataset.xsd");
         assertTrue(dataSetXsd.length() > 0);
@@ -125,8 +124,8 @@ public class XsdDataSetStructureGeneratorGenerateDataSetStructureAndTemplateTest
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        xsdDataSetStructureGenerator.init(dataSourceWrapper, null);
-        xsdDataSetStructureGenerator.generateDataSetStructureAndTemplate();
+        xsdDataSetStructureGenerator.init(dataSourceWrapperFactory, null);
+        xsdDataSetStructureGenerator.generateDataSetStructureAndTemplate(null);
 
         File dataSetXsd = new File(xsdDirectory, "dataset.xsd");
         assertFalse(dataSetXsd.exists());

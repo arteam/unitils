@@ -24,6 +24,8 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dataset.database.DataSourceWrapper;
+import org.unitils.dataset.database.DataSourceWrapperFactory;
+import org.unitils.mock.Mock;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import org.unitils.util.PropertyUtils;
 
@@ -36,6 +38,7 @@ import java.util.Properties;
 
 import static org.apache.commons.lang.StringUtils.deleteWhitespace;
 import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
+import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_SCHEMANAMES;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
@@ -62,9 +65,9 @@ public class XsdDataSetStructureGeneratorTemplateXmlTest extends UnitilsJUnit4 {
     /* The target directory for the test xsd files */
     private File xsdDirectory;
 
-    /* DataSource for the test database. */
     @TestDataSource
-    private DataSource dataSource = null;
+    protected DataSource dataSource;
+    protected Mock<DataSourceWrapperFactory> dataSourceWrapperFactory;
 
     /* True if current test is not for the current dialect */
     private boolean disabled;
@@ -82,6 +85,7 @@ public class XsdDataSetStructureGeneratorTemplateXmlTest extends UnitilsJUnit4 {
         if (disabled) {
             return;
         }
+        configuration.put(PROPERTY_SCHEMANAMES, "public, schema_a");
 
         xsdDirectory = new File(System.getProperty("java.io.tmpdir"), "XsdDataSetStructureGeneratorTemplateXmlTest");
         if (xsdDirectory.exists()) {
@@ -89,7 +93,9 @@ public class XsdDataSetStructureGeneratorTemplateXmlTest extends UnitilsJUnit4 {
         }
 
         DataSourceWrapper dataSourceWrapper = createDataSourceWrapper("public", "schema_a");
-        xsdDataSetStructureGenerator.init(dataSourceWrapper, null);
+        dataSourceWrapperFactory.returns(dataSourceWrapper).getDataSourceWrapper(null);
+
+        xsdDataSetStructureGenerator.init(dataSourceWrapperFactory.getMock(), null);
 
         dropTestTables();
         createTestTables();
@@ -119,7 +125,7 @@ public class XsdDataSetStructureGeneratorTemplateXmlTest extends UnitilsJUnit4 {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        xsdDataSetStructureGenerator.generateDataSetTemplateXmlFile(xsdDirectory);
+        xsdDataSetStructureGenerator.generateDataSetTemplateXmlFile(null, xsdDirectory);
 
         // check content of general dataset xsd
         File dataSetTemplateXml = new File(xsdDirectory, "dataset-template.xml");

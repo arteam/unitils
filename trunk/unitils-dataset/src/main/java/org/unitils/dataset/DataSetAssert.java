@@ -19,6 +19,7 @@ import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.assertstrategy.AssertDataSetStrategyHandler;
 import org.unitils.dataset.assertstrategy.InlineAssertDataSetStrategyHandler;
+import org.unitils.dataset.factory.DataSetStrategyHandlerFactory;
 import org.unitils.util.TestMethodFinder;
 
 import java.lang.reflect.Method;

@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.dataset.database.DataSourceWrapper;
+import org.unitils.dataset.database.DataSourceWrapperFactory;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.TableName;
 import org.unitils.dataset.structure.DataSetStructureGenerator;
@@ -51,53 +52,71 @@ public class XsdDataSetStructureGenerator implements DataSetStructureGenerator {
     /* The suffix to use when defining complex types for the table definitions */
     protected static final String complexTypeSuffix = "__type";
 
-    /* The meta data for the database */
-    protected DataSourceWrapper dataSourceWrapper;
+    /* The factory for the database wrappers */
+    protected DataSourceWrapperFactory dataSourceWrapperFactory;
     /* The default target directory, null if generation should be skipped*/
     protected String defaultTargetDirectory;
 
 
     /**
-     * @param dataSourceWrapper The database meta data, not null
+     * @param dataSourceWrapperFactory The factory for the database wrappers, not null
      */
-    public void init(DataSourceWrapper dataSourceWrapper, String defaultTargetDirectory) {
-        this.dataSourceWrapper = dataSourceWrapper;
+    public void init(DataSourceWrapperFactory dataSourceWrapperFactory, String defaultTargetDirectory) {
+        this.dataSourceWrapperFactory = dataSourceWrapperFactory;
         this.defaultTargetDirectory = defaultTargetDirectory;
     }
 
 
-    public void generateDataSetStructureAndTemplate() {
+    /**
+     * Generates both the XSDs or DTDs and the template xml using the default target directory.
+     * If the default target directory is null, generation will be skipped.
+     *
+     * The files will be created in a folder   targetDirectory/databaseName  (targetDirectory if database name is null)
+     * Make sure that the database name does not contain any invalid directory name characters.
+     *
+     * @param databaseName The name of the database to generate the schemas for, null for the default
+     */
+    public void generateDataSetStructureAndTemplate(String databaseName) {
         if (isBlank(defaultTargetDirectory)) {
             logger.info("No target XSD path was defined in properties. Skipping data set XSD generation.");
             return;
         }
-        generateDataSetStructureAndTemplate(new File(defaultTargetDirectory));
+        generateDataSetStructureAndTemplate(databaseName, new File(defaultTargetDirectory));
     }
-
 
     /**
      * Generates both the XSDs or DTDs and the template xml.
      *
+     * The files will be created in a folder   targetDirectory/databaseName  (targetDirectory if database name is null)
+     * Make sure that the database name does not contain any invalid directory name characters.
+     *
+     * @param databaseName    The name of the database to generate the schemas for, null for the default
      * @param targetDirectory The target directory for the files, not null
      */
-    public void generateDataSetStructureAndTemplate(File targetDirectory) {
-        generateDataSetStructure(targetDirectory);
-        generateDataSetTemplateXmlFile(targetDirectory);
+    public void generateDataSetStructureAndTemplate(String databaseName, File targetDirectory) {
+        generateDataSetStructure(databaseName, targetDirectory);
+        generateDataSetTemplateXmlFile(databaseName, targetDirectory);
     }
 
     /**
      * Generates the XSDs that describe the structure of the database schemas.
      *
+     * The files will be created in a folder   targetDirectory/databaseName  (targetDirectory if database name is null)
+     * Make sure that the database name does not contain any invalid directory name characters.
+     *
+     * @param databaseName    The name of the database to generate the schemas for, null for the default
      * @param targetDirectory The target directory for the files, not null
      */
-    public void generateDataSetStructure(File targetDirectory) {
+    public void generateDataSetStructure(String databaseName, File targetDirectory) {
+        targetDirectory = getTargetDirectory(databaseName, targetDirectory);
         logger.info("Creating data set xsd files in directory: " + targetDirectory);
 
+        DataSourceWrapper dataSourceWrapper = dataSourceWrapperFactory.getDataSourceWrapper(databaseName);
         targetDirectory.mkdirs();
 
-        generateDataSetXsd(targetDirectory);
+        generateDataSetXsd(targetDirectory, dataSourceWrapper);
         for (String schemaName : dataSourceWrapper.getSchemaNames()) {
-            generateSchemaXsd(schemaName, targetDirectory);
+            generateSchemaXsd(schemaName, targetDirectory, dataSourceWrapper);
         }
     }
 
@@ -105,21 +124,29 @@ public class XsdDataSetStructureGenerator implements DataSetStructureGenerator {
      * Generates a sample template xml file that can be used as a starting point for writing a data set file.
      * This is an xml file with the correct namespace declarations for using the XSDs.
      *
+     * The files will be created in a folder   targetDirectory/databaseName  (targetDirectory if database name is null)
+     * Make sure that the database name does not contain any invalid directory name characters.
+     *
+     * @param databaseName    The name of the database to generate the schemas for, null for the default
      * @param targetDirectory The target directory for the files, not null
      */
-    public void generateDataSetTemplateXmlFile(File targetDirectory) {
+    public void generateDataSetTemplateXmlFile(String databaseName, File targetDirectory) {
+        targetDirectory = getTargetDirectory(databaseName, targetDirectory);
         logger.info("Creating sample data set xml files in directory: " + targetDirectory);
+
+        DataSourceWrapper dataSourceWrapper = dataSourceWrapperFactory.getDataSourceWrapper(databaseName);
         targetDirectory.mkdirs();
-        generateTemplateXml(targetDirectory);
+        generateTemplateXml(targetDirectory, dataSourceWrapper);
     }
 
 
     /**
      * Generates a general data set xsd that will refer to database schema specific data set XSDs.
      *
-     * @param targetDirectory The target directory for the files, not null
+     * @param targetDirectory   The target directory for the files, not null
+     * @param dataSourceWrapper The data source wrapper, not null
      */
-    protected void generateDataSetXsd(File targetDirectory) {
+    protected void generateDataSetXsd(File targetDirectory, DataSourceWrapper dataSourceWrapper) {
         Writer writer = null;
         try {
             writer = new BufferedWriter(new FileWriter(new File(targetDirectory, "dataset.xsd")));
@@ -162,14 +189,14 @@ public class XsdDataSetStructureGenerator implements DataSetStructureGenerator {
         }
     }
 
-
     /**
      * Generates an XSD for the database schema of the given db support.
      *
-     * @param schemaName      The name of the schema to generate an XSD for, not null
-     * @param targetDirectory The target directory, not null
+     * @param schemaName        The name of the schema to generate an XSD for, not null
+     * @param targetDirectory   The target directory, not null
+     * @param dataSourceWrapper The data source wrapper, not null
      */
-    protected void generateSchemaXsd(String schemaName, File targetDirectory) {
+    protected void generateSchemaXsd(String schemaName, File targetDirectory, DataSourceWrapper dataSourceWrapper) {
         Writer writer = null;
         try {
             writer = new BufferedWriter(new FileWriter(new File(targetDirectory, schemaName + ".xsd")));
@@ -202,13 +229,13 @@ public class XsdDataSetStructureGenerator implements DataSetStructureGenerator {
         }
     }
 
-
     /**
      * Generates a template xml file that uses the XSDs.
      *
-     * @param targetDirectory The target directory for the files, not null
+     * @param targetDirectory   The target directory for the files, not null
+     * @param dataSourceWrapper The data source wrapper, not null
      */
-    protected void generateTemplateXml(File targetDirectory) {
+    protected void generateTemplateXml(File targetDirectory, DataSourceWrapper dataSourceWrapper) {
         Writer writer = null;
         try {
             writer = new BufferedWriter(new FileWriter(new File(targetDirectory, "dataset-template.xml")));
@@ -236,4 +263,10 @@ public class XsdDataSetStructureGenerator implements DataSetStructureGenerator {
         }
     }
 
+    protected File getTargetDirectory(String databaseName, File targetDirectory) {
+        if (isBlank(databaseName)) {
+            return targetDirectory;
+        }
+        return new File(targetDirectory, databaseName);
+    }
 }

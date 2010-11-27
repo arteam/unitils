@@ -18,7 +18,6 @@ package org.unitils.dataset.loadstrategy.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
-import org.unitils.dataset.database.DataSetDatabaseHelper;
 import org.unitils.dataset.database.DatabaseAccessor;
 import org.unitils.dataset.loadstrategy.LoadDataSetStrategy;
 import org.unitils.dataset.loadstrategy.loader.DataSetLoader;
@@ -38,14 +37,12 @@ public abstract class BaseLoadDataSetStrategy implements LoadDataSetStrategy {
     private static Log logger = LogFactory.getLog(BaseLoadDataSetStrategy.class);
 
     protected DatabaseAccessor databaseAccessor;
-    protected DataSetDatabaseHelper dataSetDatabaseHelper;
     protected DataSetRowProcessor dataSetRowProcessor;
     protected TableContentDeleter tableContentDeleter;
 
 
-    public void init(DatabaseAccessor databaseAccessor, DataSetDatabaseHelper dataSetDatabaseHelper, DataSetRowProcessor dataSetRowProcessor, TableContentDeleter tableContentDeleter) {
+    public void init(DatabaseAccessor databaseAccessor, DataSetRowProcessor dataSetRowProcessor, TableContentDeleter tableContentDeleter) {
         this.databaseAccessor = databaseAccessor;
-        this.dataSetDatabaseHelper = dataSetDatabaseHelper;
         this.dataSetRowProcessor = dataSetRowProcessor;
         this.tableContentDeleter = tableContentDeleter;
     }

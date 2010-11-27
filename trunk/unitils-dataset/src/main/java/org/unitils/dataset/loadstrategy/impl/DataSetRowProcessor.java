@@ -15,7 +15,6 @@
  */
 package org.unitils.dataset.loadstrategy.impl;
 
-import org.unitils.dataset.database.DataSetDatabaseHelper;
 import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.Row;
@@ -38,13 +37,11 @@ import java.util.Set;
  */
 public class DataSetRowProcessor {
 
-    protected DataSetDatabaseHelper dataSetDatabaseHelper;
     protected SqlTypeHandlerRepository sqlTypeHandlerRepository;
     protected DataSourceWrapper dataSourceWrapper;
 
 
-    public DataSetRowProcessor(DataSetDatabaseHelper dataSetDatabaseHelper, SqlTypeHandlerRepository sqlTypeHandlerRepository, DataSourceWrapper dataSourceWrapper) {
-        this.dataSetDatabaseHelper = dataSetDatabaseHelper;
+    public DataSetRowProcessor(SqlTypeHandlerRepository sqlTypeHandlerRepository, DataSourceWrapper dataSourceWrapper) {
         this.sqlTypeHandlerRepository = sqlTypeHandlerRepository;
         this.dataSourceWrapper = dataSourceWrapper;
     }
@@ -54,7 +51,7 @@ public class DataSetRowProcessor {
         DataSetSettings dataSetSettings = dataSetRow.getDataSetSettings();
 
         TableName tableName = dataSourceWrapper.getTableName(dataSetRow.getSchemaName(), dataSetRow.getTableName(), dataSetSettings.isCaseSensitive());
-        dataSetDatabaseHelper.addExtraParentColumnsForChild(dataSetRow);
+        dataSourceWrapper.addExtraParentColumnsForChild(dataSetRow);
 
         Row row = new Row(tableName);
 

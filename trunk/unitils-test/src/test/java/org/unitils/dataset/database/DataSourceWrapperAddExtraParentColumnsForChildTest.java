@@ -39,10 +39,10 @@ import static org.unitils.dataset.util.DataSetTestUtils.createIdentifierProcesso
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DataSetDatabaseHelperAddExtraParentColumnsForChildTest extends UnitilsJUnit4 {
+public class DataSourceWrapperAddExtraParentColumnsForChildTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private DataSetDatabaseHelper dataSetDatabaseHelper;
+    private DataSourceWrapper dataSourceWrapper;
 
     @TestDataSource
     protected DataSource dataSource;
@@ -57,9 +57,7 @@ public class DataSetDatabaseHelperAddExtraParentColumnsForChildTest extends Unit
     @Before
     public void initialize() throws SQLException {
         IdentifierProcessor identifierProcessor = createIdentifierProcessor();
-        DataSourceWrapper dataSourceWrapper = new DataSourceWrapper(getUnitilsDataSource(), identifierProcessor);
-
-        dataSetDatabaseHelper = new DataSetDatabaseHelper(dataSourceWrapper);
+        this.dataSourceWrapper = new DataSourceWrapper(getUnitilsDataSource(), identifierProcessor);
 
         dropTestTables();
         createTestTables();
@@ -88,7 +86,7 @@ public class DataSetDatabaseHelperAddExtraParentColumnsForChildTest extends Unit
         parentDataSetRow.addDataSetValue(new DataSetValue("pk1", "1"));
         parentDataSetRow.addDataSetValue(new DataSetValue("pk2", "2"));
 
-        dataSetDatabaseHelper.addExtraParentColumnsForChild(childDataSetRow);
+        dataSourceWrapper.addExtraParentColumnsForChild(childDataSetRow);
         assertEquals("1", childDataSetRow.getDataSetColumn("FK1").getValue());
         assertEquals("2", childDataSetRow.getDataSetColumn("FK2").getValue());
     }
@@ -98,7 +96,7 @@ public class DataSetDatabaseHelperAddExtraParentColumnsForChildTest extends Unit
         caseSensitiveParentDataSetRow.addDataSetValue(new DataSetValue("pk1", "1"));
         caseSensitiveParentDataSetRow.addDataSetValue(new DataSetValue("Pk2", "2"));
 
-        dataSetDatabaseHelper.addExtraParentColumnsForChild(caseSensitiveChildDataSetRow);
+        dataSourceWrapper.addExtraParentColumnsForChild(caseSensitiveChildDataSetRow);
         assertEquals("1", caseSensitiveChildDataSetRow.getDataSetColumn("fk1").getValue());
         assertEquals("2", caseSensitiveChildDataSetRow.getDataSetColumn("FK2").getValue());
     }
@@ -108,7 +106,7 @@ public class DataSetDatabaseHelperAddExtraParentColumnsForChildTest extends Unit
         try {
             parentDataSetRow.addDataSetValue(new DataSetValue("pk2", "2"));
 
-            dataSetDatabaseHelper.addExtraParentColumnsForChild(childDataSetRow);
+            dataSourceWrapper.addExtraParentColumnsForChild(childDataSetRow);
             fail("Expected UnitilsException");
 
         } catch (UnitilsException e) {
@@ -122,7 +120,7 @@ public class DataSetDatabaseHelperAddExtraParentColumnsForChildTest extends Unit
         parentDataSetRow.addDataSetValue(new DataSetValue("pk2", "2"));
         childDataSetRow.addDataSetValue(new DataSetValue("fk1", "9999"));
 
-        dataSetDatabaseHelper.addExtraParentColumnsForChild(childDataSetRow);
+        dataSourceWrapper.addExtraParentColumnsForChild(childDataSetRow);
         assertEquals("1", childDataSetRow.getDataSetColumn("FK1").getValue());
         assertEquals("2", childDataSetRow.getDataSetColumn("FK2").getValue());
     }
@@ -130,7 +128,7 @@ public class DataSetDatabaseHelperAddExtraParentColumnsForChildTest extends Unit
     @Test
     public void noForeignKeysFound() throws Exception {
         try {
-            dataSetDatabaseHelper.addExtraParentColumnsForChild(parentToParentDataSetRow);
+            dataSourceWrapper.addExtraParentColumnsForChild(parentToParentDataSetRow);
             fail("Expected UnitilsException");
 
         } catch (UnitilsException e) {
