@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset;
+package org.unitils.dataset.factory;
 
 import org.unitils.dataset.assertstrategy.AssertDataSetStrategyHandler;
 import org.unitils.dataset.assertstrategy.InlineAssertDataSetStrategyHandler;
 import org.unitils.dataset.database.DataSourceWrapper;
+import org.unitils.dataset.database.DataSourceWrapperFactory;
 import org.unitils.dataset.loadstrategy.InlineLoadDataSetStrategyHandler;
 import org.unitils.dataset.loadstrategy.LoadDataSetStrategyHandler;
 import org.unitils.dataset.resolver.DataSetResolver;

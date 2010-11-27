@@ -16,10 +16,10 @@
 package org.unitils.dataset.annotation.handler.impl;
 
 import org.unitils.dataset.DataSetModule;
-import org.unitils.dataset.DataSetStrategyHandlerFactory;
 import org.unitils.dataset.annotation.InlineAssertDataSet;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
 import org.unitils.dataset.assertstrategy.InlineAssertDataSetStrategyHandler;
+import org.unitils.dataset.factory.DataSetStrategyHandlerFactory;
 
 import java.lang.reflect.Method;
 

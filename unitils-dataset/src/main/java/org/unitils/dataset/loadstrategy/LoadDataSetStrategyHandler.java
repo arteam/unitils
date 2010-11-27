@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.loadstrategy;
 
-import org.unitils.dataset.DataSetStrategyFactory;
+import org.unitils.dataset.factory.DataSetStrategyFactory;
 import org.unitils.dataset.resolver.DataSetResolver;
 import org.unitils.dataset.rowsource.DataSetRowSource;
 import org.unitils.dataset.rowsource.FileDataSetRowSourceFactory;

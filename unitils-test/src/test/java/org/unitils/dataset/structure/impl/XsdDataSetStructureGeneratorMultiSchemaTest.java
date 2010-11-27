@@ -24,6 +24,8 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dataset.database.DataSourceWrapper;
+import org.unitils.dataset.database.DataSourceWrapperFactory;
+import org.unitils.mock.Mock;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import org.unitils.util.PropertyUtils;
 
@@ -62,19 +64,16 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
     /* The target directory for the test xsd files */
     private File xsdDirectory;
 
-    /* DataSource for the test database. */
     @TestDataSource
-    private DataSource dataSource = null;
+    protected DataSource dataSource;
+    protected Mock<DataSourceWrapperFactory> dataSourceWrapperFactory;
 
     /* True if current test is not for the current dialect */
     private boolean disabled;
 
 
-    /**
-     * Initializes the test fixture.
-     */
     @Before
-    public void setUp() throws Exception {
+    public void initialize() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPERTY_DIALECT, configuration));
         if (disabled) {
@@ -88,18 +87,16 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
         xsdDirectory.mkdirs();
 
         DataSourceWrapper dataSourceWrapper = createDataSourceWrapper("public", "schema_a");
-        xsdDataSetStructureGenerator.init(dataSourceWrapper, null);
+        dataSourceWrapperFactory.returns(dataSourceWrapper).getDataSourceWrapper(null);
+
+        xsdDataSetStructureGenerator.init(dataSourceWrapperFactory.getMock(), null);
 
         dropTestTables();
         createTestTables();
     }
 
-
-    /**
-     * Clean-up test database.
-     */
     @After
-    public void tearDown() throws Exception {
+    public void cleanUp() throws Exception {
         if (disabled) {
             return;
         }
@@ -121,7 +118,7 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        xsdDataSetStructureGenerator.generateDataSetStructure(xsdDirectory);
+        xsdDataSetStructureGenerator.generateDataSetStructure(null, xsdDirectory);
 
         // check content of general dataset xsd
         File dataSetXsd = new File(xsdDirectory, "dataset.xsd");

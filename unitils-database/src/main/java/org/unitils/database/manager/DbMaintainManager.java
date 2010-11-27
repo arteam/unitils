@@ -68,6 +68,10 @@ public class DbMaintainManager {
         return databaseConnectionManager.getDatabaseConnection(databaseName);
     }
 
+    public List<DatabaseConnection> getDatabaseConnections() {
+        return databaseConnectionManager.getDatabaseConnections();
+    }
+
 
     public Database getDatabase(String databaseName) {
         Databases databases = getDatabases();

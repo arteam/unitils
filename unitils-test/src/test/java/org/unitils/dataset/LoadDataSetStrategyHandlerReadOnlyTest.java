@@ -18,6 +18,7 @@ package org.unitils.dataset;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.dataset.factory.DataSetStrategyFactory;
 import org.unitils.dataset.loadstrategy.LoadDataSetStrategy;
 import org.unitils.dataset.loadstrategy.LoadDataSetStrategyHandler;
 import org.unitils.dataset.resolver.DataSetResolver;

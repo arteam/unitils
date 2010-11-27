@@ -24,6 +24,7 @@ import org.unitils.database.manager.UnitilsDataSourceManager;
 import org.unitils.database.manager.UnitilsTransactionManager;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 /**
  * Class providing access to the functionality of the database module using static methods. Meant
@@ -89,6 +90,14 @@ public class DatabaseUnitils {
     public static UnitilsDataSource getUnitilsDataSource(String databaseName) {
         ApplicationContext applicationContext = getApplicationContext();
         return getUnitilsDataSourceManager().getUnitilsDataSource(databaseName, applicationContext);
+    }
+
+    /**
+     * @return The the database names, not null
+     */
+    public static List<String> getDatabaseNames() {
+        ApplicationContext applicationContext = getApplicationContext();
+        return getUnitilsDataSourceManager().getDatabaseNames(applicationContext);
     }
 
 

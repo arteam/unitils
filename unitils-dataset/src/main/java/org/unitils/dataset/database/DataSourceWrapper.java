@@ -15,23 +15,24 @@
  */
 package org.unitils.dataset.database;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dbmaintain.database.IdentifierProcessor;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.UnitilsDataSource;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.TableName;
+import org.unitils.dataset.model.dataset.DataSetRow;
 import org.unitils.dataset.model.dataset.DataSetSettings;
+import org.unitils.dataset.model.dataset.DataSetValue;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.unitils.database.util.DbUtils.close;
 
@@ -43,6 +44,9 @@ import static org.unitils.database.util.DbUtils.close;
 public class DataSourceWrapper {
 
     public static final int SQL_TYPE_UNKNOWN = -1;
+
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(DataSourceWrapper.class);
 
     protected UnitilsDataSource unitilsDataSource;
     protected IdentifierProcessor identifierProcessor;
@@ -195,26 +199,21 @@ public class DataSourceWrapper {
             while (resultSet.next()) {
                 primaryKeyColumnNames.add(resultSet.getString("COLUMN_NAME"));
             }
-            if (primaryKeyColumnNames.isEmpty()) {
-                assertTableExists(tableName, databaseMetaData);
-            }
             tablePrimaryKeysCache.put(tableName, primaryKeyColumnNames);
-            return primaryKeyColumnNames;
 
         } finally {
             close(connection, null, resultSet);
         }
+        if (primaryKeyColumnNames.isEmpty()) {
+            assertTableExists(tableName);
+        }
+        return primaryKeyColumnNames;
     }
 
-    private void assertTableExists(TableName tableName, DatabaseMetaData databaseMetaData) throws SQLException {
-        ResultSet resultSet = null;
-        try {
-            resultSet = databaseMetaData.getTables(null, tableName.getSchemaName(), tableName.getTableName(), null);
-            if (!resultSet.next()) {
-                throw new UnitilsException("Table does not exist: " + tableName);
-            }
-        } finally {
-            resultSet.close();
+    protected void assertTableExists(TableName tableName) throws SQLException {
+        Set<TableName> tableNames = getTableNames(tableName.getSchemaName());
+        if (!tableNames.contains(tableName)) {
+            throw new UnitilsException("Table does not exist: " + tableName);
         }
     }
 
@@ -254,4 +253,61 @@ public class DataSourceWrapper {
     }
 
 
+    public void addExtraParentColumnsForChild(DataSetRow childRow) throws SQLException {
+        DataSetRow parentRow = childRow.getParentRow();
+        if (parentRow == null) {
+            return;
+        }
+
+        boolean caseSensitive = childRow.getDataSetSettings().isCaseSensitive();
+        Map<String, String> parentChildColumnNames = getChildForeignKeyColumns(parentRow, childRow, caseSensitive);
+
+        for (Map.Entry<String, String> entry : parentChildColumnNames.entrySet()) {
+            String parentColumnName = entry.getKey();
+            String childColumnName = entry.getValue();
+
+            DataSetValue parentDataSetValue = parentRow.getDataSetColumn(parentColumnName);
+            if (parentDataSetValue == null) {
+                throw new UnitilsException("Unable to add parent columns to child row. No value found in parent for column " + parentColumnName + ". This value is needed for child column " + childColumnName);
+            }
+
+            DataSetValue existingChildDataSetValue = childRow.removeColumn(childColumnName);
+            if (existingChildDataSetValue != null) {
+                logger.warn("Child row contained a value for a parent foreign key column: " + existingChildDataSetValue + ". This value will be ignored and overridden by the actual value of the parent row: " + parentDataSetValue);
+            }
+
+            String parentValue = parentDataSetValue.getValue();
+            DataSetValue parentChildValue = new DataSetValue(childColumnName, parentValue);
+            childRow.addDataSetValue(parentChildValue);
+        }
+    }
+
+    protected Map<String, String> getChildForeignKeyColumns(DataSetRow parentRow, DataSetRow childRow, boolean caseSensitive) throws SQLException {
+        Map<String, String> result = new LinkedHashMap<String, String>();
+
+        Connection connection = getConnection();
+        ResultSet resultSet = null;
+        try {
+            TableName parentTableName = getTableName(parentRow.getSchemaName(), parentRow.getTableName(), caseSensitive);
+            TableName childTableName = getTableName(childRow.getSchemaName(), childRow.getTableName(), caseSensitive);
+
+            resultSet = connection.getMetaData().getImportedKeys(null, childTableName.getSchemaName(), childTableName.getTableName());
+            while (resultSet.next()) {
+                String parentForeignKeySchemaName = resultSet.getString("PKTABLE_SCHEM");
+                String parentForeignKeyTableName = resultSet.getString("PKTABLE_NAME");
+                if (!parentTableName.getSchemaName().equals(parentForeignKeySchemaName) || !parentTableName.getTableName().equals(parentForeignKeyTableName)) {
+                    continue;
+                }
+                String parentForeignKeyColumnName = resultSet.getString("PKCOLUMN_NAME");
+                String childForeignKeyColumnName = resultSet.getString("FKCOLUMN_NAME");
+                result.put(parentForeignKeyColumnName, childForeignKeyColumnName);
+            }
+            if (result.isEmpty()) {
+                throw new UnitilsException("Unable to get foreign key columns for child table: " + childRow + ". No foreign key relationship found with parent table: " + parentRow);
+            }
+            return result;
+        } finally {
+            close(connection, null, resultSet);
+        }
+    }
 }

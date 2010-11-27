@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.structure;
 
-import org.unitils.dataset.database.DataSourceWrapper;
+import org.unitils.dataset.database.DataSourceWrapperFactory;
 
 import java.io.File;
 
@@ -28,37 +28,54 @@ import java.io.File;
 public interface DataSetStructureGenerator {
 
     /**
-     * @param dataSourceWrapper      The database meta data, not null
-     * @param defaultTargetDirectory The default target directory, null if generation should be skipped
+     * @param dataSourceWrapperFactory The factory for the data source wrappers, not null
+     * @param defaultTargetDirectory   The default target directory, null if generation should be skipped
      */
-    void init(DataSourceWrapper dataSourceWrapper, String defaultTargetDirectory);
+    void init(DataSourceWrapperFactory dataSourceWrapperFactory, String defaultTargetDirectory);
 
     /**
      * Generates both the XSDs or DTDs and the template xml using the default target directory.
      * If the default target directory is null, generation will be skipped.
+     *
+     * The files will be created in a folder   targetDirectory/databaseName  (targetDirectory if database name is null)
+     * Make sure that the database name does not contain any invalid directory name characters.
+     *
+     * @param databaseName The name of the database to generate the schemas for, null for the default
      */
-    void generateDataSetStructureAndTemplate();
+    void generateDataSetStructureAndTemplate(String databaseName);
 
     /**
      * Generates both the XSDs or DTDs and the template xml.
      *
+     * The files will be created in a folder   targetDirectory/databaseName  (targetDirectory if database name is null)
+     * Make sure that the database name does not contain any invalid directory name characters.
+     *
+     * @param databaseName    The name of the database to generate the schemas for, null for the default
      * @param targetDirectory The target directory for the files, not null
      */
-    void generateDataSetStructureAndTemplate(File targetDirectory);
+    void generateDataSetStructureAndTemplate(String databaseName, File targetDirectory);
 
     /**
-     * Generates the XSDs or DTDs.
+     * Generates the XSDs that describe the structure of the database schemas.
      *
+     * The files will be created in a folder   targetDirectory/databaseName  (targetDirectory if database name is null)
+     * Make sure that the database name does not contain any invalid directory name characters.
+     *
+     * @param databaseName    The name of the database to generate the schemas for, null for the default
      * @param targetDirectory The target directory for the files, not null
      */
-    void generateDataSetStructure(File targetDirectory);
+    void generateDataSetStructure(String databaseName, File targetDirectory);
 
     /**
      * Generates a sample template xml file that can be used as a starting point for writing a data set file.
-     * E.g. an xml file with the name spaces already filled in correctly.
+     * This is an xml file with the correct namespace declarations for using the XSDs.
      *
+     * The files will be created in a folder   targetDirectory/databaseName  (targetDirectory if database name is null)
+     * Make sure that the database name does not contain any invalid directory name characters.
+     *
+     * @param databaseName    The name of the database to generate the schemas for, null for the default
      * @param targetDirectory The target directory for the files, not null
      */
-    void generateDataSetTemplateXmlFile(File targetDirectory);
+    void generateDataSetTemplateXmlFile(String databaseName, File targetDirectory);
 
 }

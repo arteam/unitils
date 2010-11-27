@@ -24,7 +24,6 @@ import org.unitils.dataset.assertstrategy.impl.TableContents;
 import org.unitils.dataset.assertstrategy.model.DataSetComparison;
 import org.unitils.dataset.assertstrategy.model.RowComparison;
 import org.unitils.dataset.assertstrategy.model.TableComparison;
-import org.unitils.dataset.database.DataSetDatabaseHelper;
 import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.Row;
@@ -48,7 +47,6 @@ public class DefaultDatabaseContentLoggerTest extends UnitilsJUnit4 {
 
     protected Mock<DataSourceWrapper> dataSourceWrapper;
     protected Mock<TableContentRetriever> tableContentRetriever;
-    protected Mock<DataSetDatabaseHelper> dataSetDatabaseHelper;
     protected Mock<TableContents> tableContent;
 
     protected DataSetComparison dataSetComparison;
@@ -68,7 +66,7 @@ public class DefaultDatabaseContentLoggerTest extends UnitilsJUnit4 {
         tableContent.returns(2).getNrOfColumns();
         tableContent.returns(asList("column1", "column2")).getColumnNames();
 
-        defaultDatabaseContentRetriever.init(dataSourceWrapper.getMock(), tableContentRetriever.getMock(), dataSetDatabaseHelper.getMock());
+        defaultDatabaseContentRetriever.init(dataSourceWrapper.getMock(), tableContentRetriever.getMock());
 
         tableComparison = new TableComparison(createTableName());
         dataSetComparison = createDataSetComparison(tableComparison);

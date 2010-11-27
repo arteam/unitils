@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset;
+package org.unitils.dataset.factory;
 
 import org.unitils.dataset.assertstrategy.AssertDataSetStrategy;
 import org.unitils.dataset.assertstrategy.DataSetComparator;
 import org.unitils.dataset.assertstrategy.DatabaseContentLogger;
 import org.unitils.dataset.assertstrategy.impl.TableContentRetriever;
-import org.unitils.dataset.database.DataSetDatabaseHelper;
 import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.database.DatabaseAccessor;
 import org.unitils.dataset.loadstrategy.LoadDataSetStrategy;
@@ -48,7 +47,6 @@ public class DataSetStrategyFactory {
     protected DatabaseContentLogger databaseContentLogger;
     protected TableContentDeleter tableContentDeleter;
     protected DatabaseAccessor databaseAccessor;
-    protected DataSetDatabaseHelper dataSetDatabaseHelper;
 
 
     public DataSetStrategyFactory(Properties configuration, DataSourceWrapper dataSourceWrapper) {
@@ -85,28 +83,18 @@ public class DataSetStrategyFactory {
 
     protected LoadDataSetStrategy createLoadDataSetStrategy(String type) {
         DatabaseAccessor databaseAccessor = getDatabaseAccessor();
-        DataSetDatabaseHelper dataSetDatabaseHelper = getDataSetDatabaseHelper();
         DataSetRowProcessor dataSetRowProcessor = getDataSetRowProcessor();
         TableContentDeleter tableContentDeleter = getTableContentDeleter();
 
         LoadDataSetStrategy loadDataSetStrategy = getInstanceOf(LoadDataSetStrategy.class, configuration, type);
-        loadDataSetStrategy.init(databaseAccessor, dataSetDatabaseHelper, dataSetRowProcessor, tableContentDeleter);
+        loadDataSetStrategy.init(databaseAccessor, dataSetRowProcessor, tableContentDeleter);
         return loadDataSetStrategy;
-    }
-
-
-    protected DataSetDatabaseHelper getDataSetDatabaseHelper() {
-        if (dataSetDatabaseHelper == null) {
-            dataSetDatabaseHelper = new DataSetDatabaseHelper(dataSourceWrapper);
-        }
-        return dataSetDatabaseHelper;
     }
 
     protected DataSetRowProcessor getDataSetRowProcessor() {
         if (dataSetRowProcessor == null) {
-            DataSetDatabaseHelper dataSetDatabaseHelper = getDataSetDatabaseHelper();
             SqlTypeHandlerRepository sqlTypeHandlerRepository = getSqlTypeHandlerRepository();
-            dataSetRowProcessor = new DataSetRowProcessor(dataSetDatabaseHelper, sqlTypeHandlerRepository, dataSourceWrapper);
+            dataSetRowProcessor = new DataSetRowProcessor(sqlTypeHandlerRepository, dataSourceWrapper);
         }
         return dataSetRowProcessor;
     }
@@ -131,10 +119,9 @@ public class DataSetStrategyFactory {
 
     protected DatabaseContentLogger getDatabaseContentLogger() {
         if (databaseContentLogger == null) {
-            DataSetDatabaseHelper dataSetDatabaseHelper = getDataSetDatabaseHelper();
             TableContentRetriever tableContentRetriever = getTableContentRetriever();
             databaseContentLogger = getInstanceOf(DatabaseContentLogger.class, configuration);
-            databaseContentLogger.init(dataSourceWrapper, tableContentRetriever, dataSetDatabaseHelper);
+            databaseContentLogger.init(dataSourceWrapper, tableContentRetriever);
         }
         return databaseContentLogger;
     }

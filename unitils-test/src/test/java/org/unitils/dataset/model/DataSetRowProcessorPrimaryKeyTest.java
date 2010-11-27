@@ -18,7 +18,6 @@ package org.unitils.dataset.model;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.dataset.database.DataSetDatabaseHelper;
 import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
 import org.unitils.dataset.model.database.Row;
@@ -53,7 +52,6 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
     /* Tested object */
     private DataSetRowProcessor dataSetRowProcessor;
 
-    protected Mock<DataSetDatabaseHelper> dataSetDatabaseHelper;
     protected Mock<DataSourceWrapper> dataSourceWrapper;
     protected Mock<SqlTypeHandlerRepository> sqlTypeHandlerRepository;
 
@@ -65,7 +63,7 @@ public class DataSetRowProcessorPrimaryKeyTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() throws SQLException {
-        dataSetRowProcessor = new DataSetRowProcessor(dataSetDatabaseHelper.getMock(), sqlTypeHandlerRepository.getMock(), dataSourceWrapper.getMock());
+        dataSetRowProcessor = new DataSetRowProcessor(sqlTypeHandlerRepository.getMock(), dataSourceWrapper.getMock());
 
         dataSourceWrapper.returns("\"PK\"").getCorrectCaseColumnName("PK", null);
         dataSourceWrapper.returns("\"pk\"").getCorrectCaseColumnName("pk", null);

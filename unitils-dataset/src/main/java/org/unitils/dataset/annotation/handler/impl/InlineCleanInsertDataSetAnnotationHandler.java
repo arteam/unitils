@@ -16,9 +16,9 @@
 package org.unitils.dataset.annotation.handler.impl;
 
 import org.unitils.dataset.DataSetModule;
-import org.unitils.dataset.DataSetStrategyHandlerFactory;
 import org.unitils.dataset.annotation.InlineCleanInsertDataSet;
 import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
+import org.unitils.dataset.factory.DataSetStrategyHandlerFactory;
 import org.unitils.dataset.loadstrategy.InlineLoadDataSetStrategyHandler;
 
 import java.lang.reflect.Method;

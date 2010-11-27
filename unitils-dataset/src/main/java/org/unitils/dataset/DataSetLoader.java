@@ -16,6 +16,7 @@
 package org.unitils.dataset;
 
 import org.unitils.core.Unitils;
+import org.unitils.dataset.factory.DataSetStrategyHandlerFactory;
 import org.unitils.dataset.loadstrategy.InlineLoadDataSetStrategyHandler;
 import org.unitils.dataset.loadstrategy.LoadDataSetStrategyHandler;
 

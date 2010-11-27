@@ -15,7 +15,6 @@
  */
 package org.unitils.dataset.loadstrategy;
 
-import org.unitils.dataset.database.DataSetDatabaseHelper;
 import org.unitils.dataset.database.DatabaseAccessor;
 import org.unitils.dataset.loadstrategy.impl.DataSetRowProcessor;
 import org.unitils.dataset.loadstrategy.impl.TableContentDeleter;
@@ -29,7 +28,7 @@ import java.util.List;
  */
 public interface LoadDataSetStrategy {
 
-    void init(DatabaseAccessor databaseAccessor, DataSetDatabaseHelper dataSetDatabaseHelper, DataSetRowProcessor dataSetRowProcessor, TableContentDeleter tableContentDeleter);
+    void init(DatabaseAccessor databaseAccessor, DataSetRowProcessor dataSetRowProcessor, TableContentDeleter tableContentDeleter);
 
     void perform(DataSetRowSource dataSetRowSource, List<String> variables);
 

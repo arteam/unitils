@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dataset;
+package org.unitils.dataset.database;
 
 import org.dbmaintain.database.IdentifierProcessor;
 import org.dbmaintain.database.IdentifierProcessorFactory;
 import org.unitils.database.DatabaseUnitils;
 import org.unitils.database.UnitilsDataSource;
-import org.unitils.dataset.database.DataSourceWrapper;
 
 import javax.sql.DataSource;
 import java.util.HashMap;

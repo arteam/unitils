@@ -16,8 +16,7 @@
 package org.unitils.dataset.annotation.handler.impl;
 
 import org.unitils.dataset.DataSetModule;
-import org.unitils.dataset.annotation.RefreshDataSet;
-import org.unitils.dataset.annotation.handler.DataSetAnnotationHandler;
+import org.unitils.dataset.annotation.DataSet;
 import org.unitils.dataset.factory.DataSetStrategyHandlerFactory;
 import org.unitils.dataset.loadstrategy.LoadDataSetStrategyHandler;
 
@@ -27,15 +26,14 @@ import java.util.List;
 import static org.unitils.util.CollectionUtils.asList;
 
 /**
- * Handles the execution of the {@link org.unitils.dataset.annotation.RefreshDataSet} annotation.
+ * Handles the execution of the {@link org.unitils.dataset.annotation.DataSet} annotation.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class RefreshDataSetAnnotationHandler implements DataSetAnnotationHandler<RefreshDataSet> {
+public class DataSetAnnotationHandler implements org.unitils.dataset.annotation.handler.DataSetAnnotationHandler<DataSet> {
 
-
-    public void handle(RefreshDataSet annotation, Method testMethod, Object testInstance, DataSetModule dataSetModule) {
+    public void handle(DataSet annotation, Method testMethod, Object testInstance, DataSetModule dataSetModule) {
         List<String> fileNames = asList(annotation.value());
         String[] variables = annotation.variables();
         boolean readOnly = annotation.readOnly();
@@ -43,7 +41,7 @@ public class RefreshDataSetAnnotationHandler implements DataSetAnnotationHandler
 
         DataSetStrategyHandlerFactory dataSetStrategyHandlerFactory = dataSetModule.getDataSetStrategyHandlerFactory();
         LoadDataSetStrategyHandler loadDataSetStrategyHandler = dataSetStrategyHandlerFactory.createLoadDataSetStrategyHandler(databaseName);
-        loadDataSetStrategyHandler.refreshDataSetFiles(testInstance, fileNames, readOnly, variables);
+        loadDataSetStrategyHandler.cleanInsertDataSetFiles(testInstance, fileNames, readOnly, variables);
     }
 
 }
