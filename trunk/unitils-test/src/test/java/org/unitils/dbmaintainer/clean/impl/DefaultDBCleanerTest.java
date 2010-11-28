@@ -15,11 +15,17 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
-import org.dbmaintain.database.Database;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dbmaintain.structure.clean.DBCleaner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.core.Unitils;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.database.annotations.TestDataSource;
+import org.unitils.database.datasource.DataSourceFactory;
+import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
+import org.unitils.database.manager.DbMaintainManager;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -28,12 +34,7 @@ import java.util.Properties;
 import static org.dbmaintain.config.DbMaintainProperties.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.core.util.SQLTestUtils.dropTestTables;
-import static org.unitils.core.util.SQLTestUtils.dropTestViews;
-import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
-import static org.unitils.database.DbMaintainUnitils.cleanDatabase;
-import static org.unitils.database.SQLUnitils.executeUpdate;
-import static org.unitils.database.SQLUnitils.isEmpty;
+import static org.unitils.database.SQLUnitils.*;
 import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfiguration;
 
 /**
@@ -42,18 +43,20 @@ import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfigurat
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DefaultDBCleanerTest {
+public class DefaultDBCleanerTest extends UnitilsJUnit4 {
 
-    private DataSource dataSource;
-    private Database defaultDatabase;
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(DefaultDBCleanerTest.class);
+
+    private DBCleaner dbCleaner;
+
+    @TestDataSource
+    protected DataSource dataSource;
+
     private String versionTableName;
     private boolean disabled;
 
 
-    /**
-     * Test fixture. The DefaultDBCleaner is instantiated and configured. Test tables are created and filled with test
-     * data. One of these tables is configured as 'tabletopreserve'.
-     */
     @Before
     public void setUp() throws Exception {
         Properties configuration = getUnitilsConfiguration();
@@ -61,102 +64,94 @@ public class DefaultDBCleanerTest {
         if (disabled) {
             return;
         }
-
-        // items to preserve
-        defaultDatabase = getDefaultDatabase();
-        configuration.setProperty(PROPERTY_PRESERVE_DATA_TABLES, "Test_table_Preserve");
-        configuration.setProperty(PROPERTY_PRESERVE_TABLES, defaultDatabase.quoted("Test_CASE_Table_Preserve"));
         versionTableName = configuration.getProperty(PROPERTY_EXECUTED_SCRIPTS_TABLE_NAME);
-        Unitils.getInstance().init(configuration);
-
-        defaultDatabase = getDefaultDatabase();
-        dataSource = defaultDatabase.getDataSource();
 
         cleanupTestDatabase();
         createTestDatabase();
         insertTestData();
+
+        // items to preserve
+        configuration.setProperty(PROPERTY_PRESERVE_DATA_TABLES, "Test_table_Preserve");
+        configuration.setProperty(PROPERTY_PRESERVE_TABLES, "\"Test_CASE_Table_Preserve\"");
+
+        DataSourceFactory dataSourceFactory = new DefaultDataSourceFactory();
+        dataSourceFactory.init(configuration);
+        DbMaintainManager dbMaintainManager = new DbMaintainManager(configuration, false, dataSourceFactory);
+
+        dbCleaner = dbMaintainManager.getDbMaintainMainFactory().createDBCleaner();
     }
 
-
-    /**
-     * Removes the test database tables from the test database, to avoid inference with other tests
-     */
     @After
     public void tearDown() throws Exception {
-        Unitils.getInstance().init(null);
+        if (disabled) {
+            return;
+        }
         cleanupTestDatabase();
     }
 
 
-    /**
-     * Tests if the tables that are not configured as tables to preserve are correctly cleaned
-     */
     @Test
     public void testCleanDatabase() throws Exception {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         assertFalse(isEmpty("TEST_TABLE", dataSource));
-        assertFalse(isEmpty(defaultDatabase.quoted("Test_CASE_Table"), dataSource));
-        cleanDatabase();
+        assertFalse(isEmpty("\"Test_CASE_Table\"", dataSource));
+        dbCleaner.cleanDatabase();
         assertTrue(isEmpty("TEST_TABLE", dataSource));
-        assertTrue(isEmpty(defaultDatabase.quoted("Test_CASE_Table"), dataSource));
+        assertTrue(isEmpty("\"Test_CASE_Table\"", dataSource));
     }
 
-
-    /**
-     * Tests if the tables that are configured as tables to preserve are left untouched
-     */
     @Test
     public void testCleanDatabase_preserveDbVersionTable() throws Exception {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         assertFalse(isEmpty(versionTableName, dataSource));
-        cleanDatabase();
+        dbCleaner.cleanDatabase();
         assertFalse(isEmpty(versionTableName, dataSource));
     }
 
-
-    /**
-     * Tests if the tables to preserve are left untouched
-     */
     @Test
     public void testCleanDatabase_preserveTablesToPreserve() throws Exception {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         assertFalse(isEmpty("TEST_TABLE_PRESERVE", dataSource));
-        assertFalse(isEmpty(defaultDatabase.quoted("Test_CASE_Table_Preserve"), dataSource));
-        cleanDatabase();
+        assertFalse(isEmpty("\"Test_CASE_Table_Preserve\"", dataSource));
+        dbCleaner.cleanDatabase();
         assertFalse(isEmpty("TEST_TABLE_PRESERVE", dataSource));
-        assertFalse(isEmpty(defaultDatabase.quoted("Test_CASE_Table_Preserve"), dataSource));
+        assertFalse(isEmpty("\"Test_CASE_Table_Preserve\"", dataSource));
     }
 
 
-    /**
-     * Creates the test tables
-     */
     private void createTestDatabase() throws Exception {
         executeUpdate("create table " + versionTableName + "(testcolumn varchar(10))", dataSource);
         executeUpdate("create table TEST_TABLE(testcolumn varchar(10))", dataSource);
         executeUpdate("create table TEST_TABLE_PRESERVE(testcolumn varchar(10))", dataSource);
-        executeUpdate("create table " + defaultDatabase.quoted("Test_CASE_Table") + " (col1 varchar(10))", dataSource);
-        executeUpdate("create table " + defaultDatabase.quoted("Test_CASE_Table_Preserve") + " (col1 varchar(10))", dataSource);
+        executeUpdate("create table \"Test_CASE_Table\" (col1 varchar(10))", dataSource);
+        executeUpdate("create table \"Test_CASE_Table_Preserve\" (col1 varchar(10))", dataSource);
         // Also create a view, to see if the DBCleaner doesn't crash on views
         executeUpdate("create view TEST_VIEW as (select * from TEST_TABLE_PRESERVE)", dataSource);
     }
 
-
-    /**
-     * Removes the test database tables
-     */
     private void cleanupTestDatabase() {
-        dropTestViews(defaultDatabase, "TEST_VIEW");
-        dropTestTables(defaultDatabase, "TEST_TABLE", "TEST_TABLE_PRESERVE", defaultDatabase.quoted("Test_CASE_Table"), defaultDatabase.quoted("Test_CASE_Table_Preserve"), versionTableName);
+        executeUpdateQuietly("drop view TEST_VIEW", dataSource);
+        executeUpdateQuietly("drop table " + versionTableName, dataSource);
+        executeUpdateQuietly("drop table TEST_TABLE", dataSource);
+        executeUpdateQuietly("drop table TEST_TABLE_PRESERVE", dataSource);
+        executeUpdateQuietly("drop table \"Test_CASE_Table\"", dataSource);
+        executeUpdateQuietly("drop table \"Test_CASE_Table_Preserve\"", dataSource);
     }
 
-
-    /**
-     * Inserts a test record in each test table
-     */
     private void insertTestData() throws Exception {
         executeUpdate("insert into " + versionTableName + " values('test')", dataSource);
         executeUpdate("insert into TEST_TABLE values('test')", dataSource);
         executeUpdate("insert into TEST_TABLE_PRESERVE values('test')", dataSource);
-        executeUpdate("insert into " + defaultDatabase.quoted("Test_CASE_Table") + " values('test')", dataSource);
-        executeUpdate("insert into " + defaultDatabase.quoted("Test_CASE_Table_Preserve") + " values('test')", dataSource);
+        executeUpdate("insert into \"Test_CASE_Table\" values('test')", dataSource);
+        executeUpdate("insert into \"Test_CASE_Table_Preserve\" values('test')", dataSource);
     }
-
 }

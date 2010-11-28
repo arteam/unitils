@@ -20,6 +20,8 @@ import static thirdparty.org.apache.commons.lang.StringUtils.isBlank;
 /**
  * The name of a table.
  *
+ * todo rename to table
+ *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
@@ -91,12 +93,15 @@ public class TableName {
             return false;
         }
 
-        TableName tableName = (TableName) object;
-        return qualifiedTableName.equals(tableName.qualifiedTableName);
+        TableName other = (TableName) object;
+        if (!schemaName.equals(other.schemaName)) {
+            return false;
+        }
+        return tableName.equals(other.tableName);
     }
 
     @Override
     public int hashCode() {
-        return qualifiedTableName.hashCode();
+        return (schemaName + tableName).hashCode();
     }
 }

@@ -18,6 +18,8 @@ package org.unitils.database;
 import org.unitils.core.UnitilsException;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Set;
 
 import static org.unitils.util.CollectionUtils.asSet;
@@ -66,6 +68,13 @@ public class UnitilsDataSource {
      */
     public DataSource getDataSource() {
         return dataSource;
+    }
+
+    /**
+     * @return A connection from the data source, not null
+     */
+    public Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
     }
 
     /**

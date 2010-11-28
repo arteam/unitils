@@ -18,10 +18,15 @@ package org.unitils.dbmaintainer.clean.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbmaintain.database.Database;
+import org.dbmaintain.structure.clear.DBClearer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.core.Unitils;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.database.annotations.TestDataSource;
+import org.unitils.database.datasource.DataSourceFactory;
+import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
+import org.unitils.database.manager.DbMaintainManager;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -29,8 +34,6 @@ import java.util.Properties;
 
 import static org.dbmaintain.config.DbMaintainProperties.*;
 import static org.junit.Assert.assertEquals;
-import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
-import static org.unitils.database.DbMaintainUnitils.clearDatabase;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfiguration;
@@ -42,15 +45,18 @@ import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfigurat
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DefaultDBClearerMultiSchemaPreserveTest {
+public class DefaultDBClearerMultiSchemaPreserveTest extends UnitilsJUnit4 {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DefaultDBClearerMultiSchemaPreserveTest.class);
 
-    private DataSource dataSource;
-    private Database defaultDatabase;
-    private String versionTableName;
-    private boolean disabled;
+    private DBClearer dbClearer;
+
+    @TestDataSource
+    protected DataSource dataSource;
+    protected Database defaultDatabase;
+    protected String versionTableName;
+    protected boolean disabled;
 
 
     @Before
@@ -60,25 +66,26 @@ public class DefaultDBClearerMultiSchemaPreserveTest {
         if (disabled) {
             return;
         }
+        versionTableName = configuration.getProperty(PROPERTY_EXECUTED_SCRIPTS_TABLE_NAME);
+
+        cleanupTestDatabase();
+        createTestDatabase();
 
         // configure 3 schemas
         configuration.setProperty(PROPERTY_SCHEMANAMES, "PUBLIC, SCHEMA_A, \"SCHEMA_B\", schema_c");
 
-        // configure items to preserve
-        defaultDatabase = getDefaultDatabase();
         configuration.setProperty(PROPERTY_AUTO_CREATE_DBMAINTAIN_SCRIPTS_TABLE, "true");
         configuration.setProperty(PROPERTY_PRESERVE_SCHEMAS, "schema_c");
-        configuration.setProperty(PROPERTY_PRESERVE_TABLES, "test_table, " + defaultDatabase.quoted("SCHEMA_A") + "." + defaultDatabase.quoted("TEST_TABLE"));
-        configuration.setProperty(PROPERTY_PRESERVE_VIEWS, "test_view, " + "schema_a." + defaultDatabase.quoted("TEST_VIEW"));
-        configuration.setProperty(PROPERTY_PRESERVE_SEQUENCES, "test_sequence, " + defaultDatabase.quoted("SCHEMA_A") + ".test_sequence");
+        configuration.setProperty(PROPERTY_PRESERVE_TABLES, "test_table, \"SCHEMA_A\".\"TEST_TABLE\"");
+        configuration.setProperty(PROPERTY_PRESERVE_VIEWS, "test_view, " + "schema_a.\"TEST_VIEW\"");
+        configuration.setProperty(PROPERTY_PRESERVE_SEQUENCES, "test_sequence, \"SCHEMA_A\".test_sequence");
 
-        Unitils.getInstance().init(configuration);
-        versionTableName = configuration.getProperty(PROPERTY_EXECUTED_SCRIPTS_TABLE_NAME);
-        defaultDatabase = getDefaultDatabase();
-        dataSource = defaultDatabase.getDataSource();
+        DataSourceFactory dataSourceFactory = new DefaultDataSourceFactory();
+        dataSourceFactory.init(configuration);
+        DbMaintainManager dbMaintainManager = new DbMaintainManager(configuration, false, dataSourceFactory);
+        defaultDatabase = dbMaintainManager.getDatabase(null);
 
-        cleanupTestDatabase();
-        createTestDatabase();
+        dbClearer = dbMaintainManager.getDbMaintainMainFactory().createDBClearer();
     }
 
     @After
@@ -86,7 +93,6 @@ public class DefaultDBClearerMultiSchemaPreserveTest {
         if (disabled) {
             return;
         }
-        Unitils.getInstance().init(null);
         cleanupTestDatabase();
     }
 
@@ -101,7 +107,7 @@ public class DefaultDBClearerMultiSchemaPreserveTest {
         assertEquals(1, defaultDatabase.getTableNames("SCHEMA_A").size());
         assertEquals(1, defaultDatabase.getTableNames("SCHEMA_B").size());
         assertEquals(1, defaultDatabase.getTableNames("SCHEMA_C").size());
-        clearDatabase();
+        dbClearer.clearDatabase();
         assertEquals(2, defaultDatabase.getTableNames("PUBLIC").size()); // version table was created
         assertEquals(1, defaultDatabase.getTableNames("SCHEMA_A").size());
         assertEquals(0, defaultDatabase.getTableNames("SCHEMA_B").size());
@@ -118,7 +124,7 @@ public class DefaultDBClearerMultiSchemaPreserveTest {
         assertEquals(1, defaultDatabase.getViewNames("SCHEMA_A").size());
         assertEquals(1, defaultDatabase.getViewNames("SCHEMA_B").size());
         assertEquals(1, defaultDatabase.getViewNames("SCHEMA_C").size());
-        clearDatabase();
+        dbClearer.clearDatabase();
         assertEquals(1, defaultDatabase.getViewNames("PUBLIC").size());
         assertEquals(1, defaultDatabase.getViewNames("SCHEMA_A").size());
         assertEquals(0, defaultDatabase.getViewNames("SCHEMA_B").size());
@@ -135,7 +141,7 @@ public class DefaultDBClearerMultiSchemaPreserveTest {
         assertEquals(1, defaultDatabase.getSequenceNames("SCHEMA_A").size());
         assertEquals(1, defaultDatabase.getSequenceNames("SCHEMA_B").size());
         assertEquals(1, defaultDatabase.getSequenceNames("SCHEMA_C").size());
-        clearDatabase();
+        dbClearer.clearDatabase();
         assertEquals(1, defaultDatabase.getSequenceNames("PUBLIC").size());
         assertEquals(1, defaultDatabase.getSequenceNames("SCHEMA_A").size());
         assertEquals(0, defaultDatabase.getSequenceNames("SCHEMA_B").size());

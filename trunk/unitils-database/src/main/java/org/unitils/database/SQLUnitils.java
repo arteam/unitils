@@ -17,7 +17,6 @@ package org.unitils.database;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.unitils.core.UnitilsException;
 
 import javax.sql.DataSource;
@@ -56,7 +55,7 @@ public class SQLUnitils {
         Connection connection = null;
         Statement statement = null;
         try {
-            connection = DataSourceUtils.getConnection(dataSource);
+            connection = dataSource.getConnection();
             statement = connection.createStatement();
             return statement.executeUpdate(sql);
         } catch (Exception e) {
@@ -99,7 +98,7 @@ public class SQLUnitils {
         Statement statement = null;
         ResultSet resultSet = null;
         try {
-            connection = DataSourceUtils.getConnection(dataSource);
+            connection = dataSource.getConnection();
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
             if (resultSet.next()) {
@@ -131,7 +130,7 @@ public class SQLUnitils {
         Statement statement = null;
         ResultSet resultSet = null;
         try {
-            connection = DataSourceUtils.getConnection(dataSource);
+            connection = dataSource.getConnection();
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
             if (resultSet.next()) {
@@ -162,7 +161,7 @@ public class SQLUnitils {
         Statement statement = null;
         ResultSet resultSet = null;
         try {
-            connection = DataSourceUtils.getConnection(dataSource);
+            connection = dataSource.getConnection();
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
             Set<String> result = new HashSet<String>();
