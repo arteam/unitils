@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,19 @@
  */
 package org.unitils.reflectionassert;
 
+import junit.framework.AssertionFailedError;
 import org.junit.Test;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 import java.util.List;
-import static java.util.Arrays.asList;
 
-import junit.framework.AssertionFailedError;
+import static java.util.Arrays.asList;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 /**
  * This test class is intended to be used while tuning the error messages of reflection assert. These tests
  * don't fail but they print out the reflection assert error messages on the console.
+ *
+ * todo convert to real test => implement assertions
  *
  * @author Filip Neven
  */
@@ -88,7 +90,7 @@ public class ReflectionAssertErrorMessagesTest {
         try {
             assertLenientEquals(message, expected, actual);
         } catch (AssertionFailedError e) {
-            System.err.println(e);
+            System.out.println(e);
         }
     }
 

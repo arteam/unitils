@@ -18,7 +18,6 @@ package org.unitils.dataset.database;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbmaintain.database.IdentifierProcessor;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.UnitilsDataSource;
 import org.unitils.dataset.model.database.Column;
@@ -27,7 +26,6 @@ import org.unitils.dataset.model.dataset.DataSetRow;
 import org.unitils.dataset.model.dataset.DataSetSettings;
 import org.unitils.dataset.model.dataset.DataSetValue;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -65,10 +63,8 @@ public class DataSourceWrapper {
 
 
     public Connection getConnection() throws SQLException {
-        DataSource dataSource = unitilsDataSource.getDataSource();
-        return DataSourceUtils.getConnection(dataSource);
+        return unitilsDataSource.getConnection();
     }
-
 
     public String removeIdentifierQuotes(String columnName) {
         return identifierProcessor.removeIdentifierQuotes(columnName);

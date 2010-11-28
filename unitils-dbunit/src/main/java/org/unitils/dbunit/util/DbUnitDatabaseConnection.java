@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
      */
     public Connection getConnection() throws SQLException {
         if (currentlyUsedConnection == null) {
-            currentlyUsedConnection = DataSourceUtils.getConnection(dataSource);
+            currentlyUsedConnection = dataSource.getConnection();
             currentlyUsedNativeConnection = getNativeConnection(currentlyUsedConnection);
         }
         return currentlyUsedNativeConnection;

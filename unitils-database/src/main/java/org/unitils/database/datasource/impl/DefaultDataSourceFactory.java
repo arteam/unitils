@@ -20,7 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbmaintain.database.DatabaseException;
 import org.dbmaintain.database.DatabaseInfo;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.unitils.database.DatabaseModule;
 import org.unitils.database.datasource.DataSourceFactory;
 
@@ -86,7 +85,7 @@ public class DefaultDataSourceFactory implements DataSourceFactory {
     protected void testConnection(DataSource dataSource) throws SQLException {
         Connection connection = null;
         try {
-            connection = DataSourceUtils.getConnection(dataSource);
+            connection = dataSource.getConnection();
 
         } finally {
             closeQuietly(connection, null, null);

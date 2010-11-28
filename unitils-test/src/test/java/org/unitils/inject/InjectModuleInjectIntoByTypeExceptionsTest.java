@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,6 @@
  */
 package org.unitils.inject;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
@@ -28,13 +25,13 @@ import org.unitils.inject.util.PropertyAccess;
 
 import java.util.Properties;
 
+import static org.junit.Assert.fail;
+
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit4 {
-
-    private static final Log logger = LogFactory.getLog(InjectModuleInjectIntoByTypeExceptionsTest.class);
 
     private TestInjectIntoByType_TargetIsNull testInjectIntoByType_targetIsNull = new TestInjectIntoByType_TargetIsNull();
     private TestInjectIntoByType_TargetDoesntExist testInjectIntoByType_targetDoesntExist = new TestInjectIntoByType_TargetDoesntExist();
@@ -62,7 +59,6 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit4 {
             fail("UnitilsException should have been thrown");
         } catch (UnitilsException e) {
             // Expected flow
-            logger.debug(this, e);
         }
     }
 
@@ -74,7 +70,6 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit4 {
             fail("UnitilsException should have been thrown");
         } catch (UnitilsException e) {
             // Expected flow
-            logger.debug(this, e);
         }
     }
 
@@ -86,7 +81,6 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit4 {
             fail("UnitilsException should have been thrown");
         } catch (UnitilsException e) {
             // Expected flow
-            logger.debug(this, e);
         }
     }
 
@@ -98,7 +92,6 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit4 {
             fail("UnitilsException should have been thrown");
         } catch (UnitilsException e) {
             // Expected flow
-            logger.debug(this, e);
         }
     }
 
@@ -110,7 +103,6 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit4 {
             fail("UnitilsException should have been thrown");
         } catch (UnitilsException e) {
             // Expected flow
-            logger.debug(this, e);
         }
     }
 
@@ -122,7 +114,6 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit4 {
             fail("UnitilsException should have been thrown");
         } catch (UnitilsException e) {
             // Expected flow
-            logger.debug(this, e);
         }
     }
 
@@ -134,7 +125,6 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit4 {
             fail("UnitilsException should have been thrown");
         } catch (UnitilsException e) {
             // Expected flow
-            logger.debug(this, e);
         }
     }
 
@@ -146,7 +136,6 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit4 {
             fail("UnitilsException should have been thrown");
         } catch (UnitilsException e) {
             // Expected flow
-            logger.debug(this, e);
         }
     }
 
@@ -246,6 +235,7 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit4 {
 
     }
 
+    @SuppressWarnings({"UnusedDeclaration"})
     public class InjectOn_MoreThanOneSetterOfType {
 
         public void setToInject1(ToInject toInject1) {
@@ -265,6 +255,7 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit4 {
 
     }
 
+    @SuppressWarnings({"UnusedDeclaration"})
     public class InjectOn_MoreThanOneSetterOfSuperType {
 
         public void setToInject1(ToInjectSuper toInject1) {

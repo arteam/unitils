@@ -17,11 +17,15 @@ package org.unitils.dbmaintainer.clean.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dbmaintain.structure.clean.DBCleaner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.core.Unitils;
+import org.unitils.database.annotations.TestDataSource;
+import org.unitils.database.datasource.DataSourceFactory;
+import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
+import org.unitils.database.manager.DbMaintainManager;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -31,8 +35,6 @@ import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
 import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_SCHEMANAMES;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.database.DatabaseUnitils.getDataSource;
-import static org.unitils.database.DbMaintainUnitils.cleanDatabase;
 import static org.unitils.database.SQLUnitils.*;
 import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfiguration;
 
@@ -49,11 +51,11 @@ public class DefaultDBCleanerMultiSchemaTest extends UnitilsJUnit4 {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DefaultDBCleanerMultiSchemaTest.class);
 
-    /* DataSource for the test database, is injected */
-    private DataSource dataSource;
+    private DBCleaner dbCleaner;
 
-    /* True if current test is not for the current dialect */
-    private boolean disabled;
+    @TestDataSource
+    protected DataSource dataSource;
+    protected boolean disabled;
 
 
     @Before
@@ -64,13 +66,17 @@ public class DefaultDBCleanerMultiSchemaTest extends UnitilsJUnit4 {
             return;
         }
 
-        // configure 3 schema"s
-        configuration.setProperty(PROPERTY_SCHEMANAMES, "PUBLIC, SCHEMA_A, SCHEMA_B");
-        Unitils.getInstance().init(configuration);
-
-        dataSource = getDataSource();
         dropTestTables();
         createTestTables();
+
+        // configure 3 schema"s
+        configuration.setProperty(PROPERTY_SCHEMANAMES, "PUBLIC, SCHEMA_A, SCHEMA_B");
+
+        DataSourceFactory dataSourceFactory = new DefaultDataSourceFactory();
+        dataSourceFactory.init(configuration);
+        DbMaintainManager dbMaintainManager = new DbMaintainManager(configuration, false, dataSourceFactory);
+
+        dbCleaner = dbMaintainManager.getDbMaintainMainFactory().createDBCleaner();
     }
 
     @After
@@ -78,7 +84,6 @@ public class DefaultDBCleanerMultiSchemaTest extends UnitilsJUnit4 {
         if (disabled) {
             return;
         }
-        Unitils.getInstance().init(null);
         dropTestTables();
     }
 
@@ -92,7 +97,7 @@ public class DefaultDBCleanerMultiSchemaTest extends UnitilsJUnit4 {
         assertFalse(isEmpty("TEST", dataSource));
         assertFalse(isEmpty("SCHEMA_A.TEST", dataSource));
         assertFalse(isEmpty("SCHEMA_B.TEST", dataSource));
-        cleanDatabase();
+        dbCleaner.cleanDatabase();
         assertTrue(isEmpty("TEST", dataSource));
         assertTrue(isEmpty("SCHEMA_A.TEST", dataSource));
         assertTrue(isEmpty("SCHEMA_B.TEST", dataSource));

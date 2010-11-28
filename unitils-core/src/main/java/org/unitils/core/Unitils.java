@@ -15,20 +15,15 @@
  */
 package org.unitils.core;
 
-import org.springframework.test.context.TestContext;
-
 import java.util.List;
 import java.util.Properties;
 
 /**
- * Core class of the Unitils library, and the main entry point that gives access to the {@link TestContext} and the
- * different {@link Module}s.
- * <p/>
- * An instance of Unitils is configured with a certain configuration using the {@link #init(Properties)} method. Normally,
- * only one instance of Unitils exists at any time. The default instance can be obtained using the {@link #getInstance()} method.
- * <p/>
- * Unitils itself is also implemented as a module. In fact, an instance of Unitils behaves like a module who's behaviour
- * is defined by the added behaviour of all modules.
+ * Core class of the Unitils library, and the main entry point that gives access to the test context and the
+ * different {@link Module}s. There is only 1 instance of unitils per thread.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class Unitils {
 
@@ -47,7 +42,7 @@ public class Unitils {
         if (unitils == null) {
             unitils = new Unitils();
             unitilsThreadLocal.set(unitils);
-            unitils.init(null);
+            unitils.init();
         }
         return unitils;
     }
@@ -64,17 +59,12 @@ public class Unitils {
 
 
     /**
-     * Initializes Unitils with the given custom configuration. The custom config will override the default configuration.
-     *
-     * @param customConfiguration The custom config, null if there is no custom config
+     * Initializes Unitils.
      */
-    public void init(Properties customConfiguration) {
+    protected void init() {
         ConfigurationLoader configurationLoader = new ConfigurationLoader();
         this.configuration = configurationLoader.loadConfiguration();
-        if (customConfiguration != null) {
-            configuration.putAll(customConfiguration);
-        }
-        modulesRepository = createModulesRepository(configuration);
+        this.modulesRepository = createModulesRepository(configuration);
         afterInitModules();
     }
 
