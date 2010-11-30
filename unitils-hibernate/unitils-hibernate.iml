@@ -23,17 +23,16 @@
     <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2" level="project" />
     <orderEntry type="library" name="Maven: ognl:ognl:2.6.9" level="project" />
     <orderEntry type="library" name="Maven: org.dbmaintain:dbmaintain:2.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-orm:3.0.2.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-jdbc:3.0.2.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-tx:3.0.2.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate:hibernate:3.2.7.ga" level="project" />
     <orderEntry type="library" name="Maven: net.sf.ehcache:ehcache:1.2.3" level="project" />
-    <orderEntry type="library" name="Maven: javax.transaction:jta:1.0.1B" level="project" />
     <orderEntry type="library" name="Maven: asm:asm-attrs:1.5.3" level="project" />
     <orderEntry type="library" name="Maven: dom4j:dom4j:1.6.1" level="project" />
     <orderEntry type="library" name="Maven: antlr:antlr:2.7.6" level="project" />
     <orderEntry type="library" name="Maven: cglib:cglib:2.1_3" level="project" />
     <orderEntry type="library" name="Maven: asm:asm:1.5.3" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-orm:3.0.2.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-jdbc:3.0.2.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-tx:3.0.2.RELEASE" level="project" />
   </component>
 </module>
 

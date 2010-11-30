@@ -5,7 +5,7 @@
     <parent>
         <artifactId>unitils</artifactId>
         <groupId>org.unitils</groupId>
-        <version>3.2-SNAPSHOT</version>
+        <version>4.0-SNAPSHOT</version>
     </parent>
     <artifactId>unitils-dataset</artifactId>
     <packaging>jar</packaging>
