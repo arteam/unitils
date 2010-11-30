@@ -101,6 +101,12 @@ public class DataSetModule implements Module {
         return dataSetStructureGeneratorFactory;
     }
 
+    public void invalidateCachedDatabaseMetaData() {
+        if (dataSourceWrapperFactory != null) {
+            dataSourceWrapperFactory.invalidateCachedDatabaseMetaData();
+        }
+    }
+
 
     /**
      * Gets the name of the expected dataset file. The default name of this file is constructed as

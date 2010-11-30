@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import net.sf.cglib.proxy.Factory;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.core.MockObject;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -55,6 +56,17 @@ public class ProxyUtils {
         return null;
     }
 
+    /**
+     * @param instance The instance to check, not null
+     * @return True if the given instance is a jdk or cglib proxy
+     */
+    public static boolean isProxy(Object instance) {
+        if (instance == null) {
+            return false;
+        }
+        Class<?> clazz = instance.getClass();
+        return isProxyClassName(clazz.getName()) || Proxy.isProxyClass(clazz);
+    }
 
     /**
      * @param className The class name to check, not null

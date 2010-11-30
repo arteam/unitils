@@ -21,8 +21,8 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
+import org.unitils.database.TestDataSourceFactory;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -75,15 +75,15 @@ public class DbMaintainManagerUpdateDatabaseFromPropertiesTest extends UnitilsJU
 
     @Test
     public void updateDatabase() throws Exception {
-        dbMaintainManager = new DbMaintainManager(configuration, true, new DefaultDataSourceFactory());
+        dbMaintainManager = new DbMaintainManager(configuration, true, new TestDataSourceFactory(), new UnitilsTransactionManager());
 
         dbMaintainManager.updateDatabaseIfNeeded(null);
         assertTestTableExists();
     }
 
     @Test
-    public void updateDatabaseDisabledDisabled() throws Exception {
-        dbMaintainManager = new DbMaintainManager(configuration, false, new DefaultDataSourceFactory());
+    public void updateDatabaseDisabled() throws Exception {
+        dbMaintainManager = new DbMaintainManager(configuration, false, new TestDataSourceFactory(), new UnitilsTransactionManager());
 
         dbMaintainManager.updateDatabaseIfNeeded(null);
         assertTestTableNotExists();

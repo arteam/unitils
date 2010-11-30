@@ -85,9 +85,9 @@ public class DatabaseModule implements Module {
      */
     public void init(Properties configuration) {
         this.databaseAnnotationHelper = createDatabaseAnnotationHelper(configuration);
-        this.dbMaintainManager = createDbMaintainMainManager(configuration);
-        this.unitilsDataSourceManager = createUnitilsDatabaseManager(configuration, dbMaintainManager);
         this.unitilsTransactionManager = new UnitilsTransactionManager();
+        this.dbMaintainManager = createDbMaintainMainManager(configuration, unitilsTransactionManager);
+        this.unitilsDataSourceManager = createUnitilsDatabaseManager(configuration, dbMaintainManager);
     }
 
 
@@ -197,11 +197,11 @@ public class DatabaseModule implements Module {
         return new DatabaseAnnotationHelper(defaultTransactionMode);
     }
 
-    protected DbMaintainManager createDbMaintainMainManager(Properties configuration) {
+    protected DbMaintainManager createDbMaintainMainManager(Properties configuration, UnitilsTransactionManager unitilsTransactionManager) {
         boolean updateDatabaseSchemaEnabled = PropertyUtils.getBoolean(PROPERTY_UPDATEDATABASESCHEMA_ENABLED, configuration);
         DataSourceFactory dataSourceFactory = ConfigUtils.getInstanceOf(DataSourceFactory.class, configuration);
         dataSourceFactory.init(configuration);
-        return new DbMaintainManager(configuration, updateDatabaseSchemaEnabled, dataSourceFactory);
+        return new DbMaintainManager(configuration, updateDatabaseSchemaEnabled, dataSourceFactory, unitilsTransactionManager);
     }
 
     protected UnitilsDataSourceManager createUnitilsDatabaseManager(Properties configuration, DbMaintainManager dbMaintainManager) {

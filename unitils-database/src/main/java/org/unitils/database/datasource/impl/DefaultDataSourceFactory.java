@@ -73,7 +73,7 @@ public class DefaultDataSourceFactory implements DataSourceFactory {
     }
 
 
-    protected BasicDataSource createDataSource(String driverClassName, String url, String userName, String password) {
+    protected DataSource createDataSource(String driverClassName, String url, String userName, String password) {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName(driverClassName);
         dataSource.setUsername(userName);

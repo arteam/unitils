@@ -15,17 +15,9 @@
  */
 package org.unitils.dataset.util;
 
-import org.dbmaintain.database.DatabaseConnectionManager;
-import org.dbmaintain.database.Databases;
-import org.dbmaintain.database.DatabasesFactory;
 import org.dbmaintain.database.IdentifierProcessor;
-import org.dbmaintain.database.impl.DefaultDatabaseConnectionManager;
-import org.dbmaintain.database.impl.DefaultSQLHandler;
-import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.DatabaseUnitils;
 import org.unitils.database.UnitilsDataSource;
-import org.unitils.database.datasource.DataSourceFactory;
-import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
 import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.Row;
@@ -33,12 +25,9 @@ import org.unitils.dataset.model.database.TableName;
 import org.unitils.dataset.model.database.Value;
 
 import javax.sql.DataSource;
-import java.util.Properties;
 
 import static java.sql.Types.INTEGER;
-import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_SCHEMANAMES;
 import static org.dbmaintain.database.StoredIdentifierCase.UPPER_CASE;
-import static org.unitils.database.DatabaseUnitils.getUnitilsDataSource;
 import static org.unitils.util.CollectionUtils.asSet;
 
 
@@ -92,27 +81,10 @@ public class DataSetTestUtils {
         return new IdentifierProcessor(UPPER_CASE, "\"", "public");
     }
 
-    public static DataSourceWrapper createDataSourceWrapper() {
-        IdentifierProcessor identifierProcessor = createIdentifierProcessor();
-        return new DataSourceWrapper(getUnitilsDataSource(), identifierProcessor);
-    }
-
     public static DataSourceWrapper createDataSourceWrapper(String... schemaNames) {
         IdentifierProcessor identifierProcessor = createIdentifierProcessor();
         DataSource dataSource = DatabaseUnitils.getDataSource();
         UnitilsDataSource unitilsDataSource = new UnitilsDataSource(dataSource, asSet(schemaNames));
         return new DataSourceWrapper(unitilsDataSource, identifierProcessor);
-    }
-
-    // todo remove
-
-    public static Databases createDatabases(String schemaNames) {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        configuration.setProperty(PROPERTY_SCHEMANAMES, schemaNames);
-
-        DataSourceFactory dataSourceFactory = new DefaultDataSourceFactory();
-        DatabaseConnectionManager databaseConnectionManager = new DefaultDatabaseConnectionManager(configuration, new DefaultSQLHandler(), dataSourceFactory);
-        DatabasesFactory databasesFactory = new DatabasesFactory(configuration, databaseConnectionManager);
-        return databasesFactory.createDatabases();
     }
 }

@@ -26,6 +26,7 @@ import java.util.Set;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.database.SQLUnitils.*;
+import static org.unitils.dataset.DataSetUnitils.invalidateCachedDatabaseMetaData;
 
 /**
  * @author Tim Ducheyne
@@ -42,12 +43,14 @@ public abstract class DataSetTestBase extends UnitilsJUnit4 {
         dropTestTables();
         executeUpdate("create table test (col1 varchar(100) not null primary key, col2 integer, col3 timestamp, col4 varchar(100))", dataSource);
         executeUpdate("create table dependent (col1 varchar(100), foreign key (col1) references test(col1))", dataSource);
+        invalidateCachedDatabaseMetaData();
     }
 
     @After
     public void dropTestTables() {
         executeUpdateQuietly("drop table dependent", dataSource);
         executeUpdateQuietly("drop table test", dataSource);
+        invalidateCachedDatabaseMetaData();
     }
 
 

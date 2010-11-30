@@ -21,8 +21,8 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.DatabaseUpdateListener;
+import org.unitils.database.TestDataSourceFactory;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
 import org.unitils.mock.Mock;
 
 import javax.sql.DataSource;
@@ -61,7 +61,7 @@ public class DbMaintainManagerUpdateDatabaseListenerTest extends UnitilsJUnit4 {
         configuration.setProperty(PROPERTY_SCRIPT_LOCATIONS, scriptLocation.getPath());
         configuration.setProperty(PROPERTY_AUTO_CREATE_DBMAINTAIN_SCRIPTS_TABLE, "true");
 
-        dbMaintainManager = new DbMaintainManager(configuration, true, new DefaultDataSourceFactory());
+        dbMaintainManager = new DbMaintainManager(configuration, true, new TestDataSourceFactory(), new UnitilsTransactionManager());
     }
 
     @Before

@@ -21,7 +21,6 @@ import org.dbmaintain.DbMaintainer;
 import org.dbmaintain.MainFactory;
 import org.dbmaintain.database.*;
 import org.dbmaintain.database.impl.DefaultDatabaseConnectionManager;
-import org.dbmaintain.database.impl.DefaultSQLHandler;
 import org.dbmaintain.launch.task.UpdateDatabaseTask;
 import org.springframework.context.ApplicationContext;
 import org.unitils.database.DatabaseUpdateListener;
@@ -57,10 +56,10 @@ public class DbMaintainManager {
     protected List<DatabaseUpdateListener> databaseUpdateListeners = new ArrayList<DatabaseUpdateListener>();
 
 
-    public DbMaintainManager(Properties configuration, boolean updateDatabaseSchemaEnabled, DataSourceFactory dataSourceFactory) {
+    public DbMaintainManager(Properties configuration, boolean updateDatabaseSchemaEnabled, DataSourceFactory dataSourceFactory, UnitilsTransactionManager unitilsTransactionManager) {
         this.configuration = configuration;
         this.updateDatabaseSchemaEnabled = updateDatabaseSchemaEnabled;
-        this.databaseConnectionManager = createDatabaseConnectionManager(configuration, dataSourceFactory);
+        this.databaseConnectionManager = createDatabaseConnectionManager(configuration, dataSourceFactory, unitilsTransactionManager);
     }
 
 
@@ -162,8 +161,8 @@ public class DbMaintainManager {
     }
 
 
-    protected DatabaseConnectionManager createDatabaseConnectionManager(Properties configuration, DataSourceFactory dataSourceFactory) {
-        SQLHandler sqlHandler = new DefaultSQLHandler();
+    protected DatabaseConnectionManager createDatabaseConnectionManager(Properties configuration, DataSourceFactory dataSourceFactory, UnitilsTransactionManager unitilsTransactionManager) {
+        SQLHandler sqlHandler = new UnitilsSQLHandler(unitilsTransactionManager);
         return new DefaultDatabaseConnectionManager(configuration, sqlHandler, dataSourceFactory);
     }
 }

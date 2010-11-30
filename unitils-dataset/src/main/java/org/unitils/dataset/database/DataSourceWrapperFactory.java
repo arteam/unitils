@@ -51,6 +51,12 @@ public class DataSourceWrapperFactory {
         return dataSourceWrapper;
     }
 
+    public void invalidateCachedDatabaseMetaData() {
+        for (DataSourceWrapper dataSourceWrapper : dataSourceWrappersPerDatabaseName.values()) {
+            dataSourceWrapper.reset();
+        }
+    }
+
 
     protected DataSourceWrapper createDataSourceWrapper(String databaseName) {
         UnitilsDataSource unitilsDataSource = DatabaseUnitils.getUnitilsDataSource(databaseName);

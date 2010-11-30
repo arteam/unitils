@@ -21,10 +21,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.database.TestDataSourceFactory;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.database.datasource.DataSourceFactory;
-import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
 import org.unitils.database.manager.DbMaintainManager;
+import org.unitils.database.manager.UnitilsTransactionManager;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -58,9 +58,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
         cleanupTestDatabase();
         createTestDatabase();
 
-        DataSourceFactory dataSourceFactory = new DefaultDataSourceFactory();
-        dataSourceFactory.init(configuration);
-        DbMaintainManager dbMaintainManager = new DbMaintainManager(configuration, false, dataSourceFactory);
+        DbMaintainManager dbMaintainManager = new DbMaintainManager(configuration, false, new TestDataSourceFactory(), new UnitilsTransactionManager());
         defaultDatabase = dbMaintainManager.getDatabase(null);
 
         sequenceUpdater = dbMaintainManager.getDbMaintainMainFactory().createSequenceUpdater();

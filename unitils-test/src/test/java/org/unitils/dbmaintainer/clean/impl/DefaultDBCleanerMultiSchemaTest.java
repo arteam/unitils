@@ -22,10 +22,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.database.TestDataSourceFactory;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.database.datasource.DataSourceFactory;
-import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
 import org.unitils.database.manager.DbMaintainManager;
+import org.unitils.database.manager.UnitilsTransactionManager;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -72,10 +72,7 @@ public class DefaultDBCleanerMultiSchemaTest extends UnitilsJUnit4 {
         // configure 3 schema"s
         configuration.setProperty(PROPERTY_SCHEMANAMES, "PUBLIC, SCHEMA_A, SCHEMA_B");
 
-        DataSourceFactory dataSourceFactory = new DefaultDataSourceFactory();
-        dataSourceFactory.init(configuration);
-        DbMaintainManager dbMaintainManager = new DbMaintainManager(configuration, false, dataSourceFactory);
-
+        DbMaintainManager dbMaintainManager = new DbMaintainManager(configuration, false, new TestDataSourceFactory(), new UnitilsTransactionManager());
         dbCleaner = dbMaintainManager.getDbMaintainMainFactory().createDBCleaner();
     }
 

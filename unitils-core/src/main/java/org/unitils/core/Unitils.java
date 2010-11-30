@@ -41,8 +41,9 @@ public class Unitils {
         Unitils unitils = unitilsThreadLocal.get();
         if (unitils == null) {
             unitils = new Unitils();
-            unitilsThreadLocal.set(unitils);
             unitils.init();
+            unitilsThreadLocal.set(unitils);
+            unitils.afterInitModules();
         }
         return unitils;
     }
@@ -65,7 +66,6 @@ public class Unitils {
         ConfigurationLoader configurationLoader = new ConfigurationLoader();
         this.configuration = configurationLoader.loadConfiguration();
         this.modulesRepository = createModulesRepository(configuration);
-        afterInitModules();
     }
 
 

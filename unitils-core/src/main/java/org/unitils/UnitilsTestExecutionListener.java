@@ -31,28 +31,18 @@ public class UnitilsTestExecutionListener implements TestExecutionListener {
     private boolean supportsBeforeAndAfterTestClass = false;
 
     public void beforeTestClass(TestContext testContext) throws Exception {
-        System.out.println("**** UnitilsTestExecutionListener.beforeTestClass before");
         supportsBeforeAndAfterTestClass = true;
         performBeforeTestClass(testContext);
-        System.out.println("**** UnitilsTestExecutionListener.beforeTestClass after");
     }
 
     protected void performBeforeTestClass(TestContext testContext) throws Exception {
-        System.out.println("**** UnitilsTestExecutionListener.performBeforeTestClass before");
-        try {
-            CurrentTestClass currentTestClass = new CurrentTestClass(testContext);
-            setCurrentTestClass(currentTestClass);
+        CurrentTestClass currentTestClass = new CurrentTestClass(testContext);
+        setCurrentTestClass(currentTestClass);
 
-            ModulesRepository modulesRepository = getModulesRepository();
-            for (Module module : modulesRepository.getModules()) {
-                modulesRepository.getTestListener(module).beforeTestClass(currentTestClass);
-            }
-        } catch (Exception e) {
-            System.out.println("**** UnitilsTestExecutionListener.performBeforeTestClass exception");
-            e.printStackTrace();
-            throw e;
+        ModulesRepository modulesRepository = getModulesRepository();
+        for (Module module : modulesRepository.getModules()) {
+            modulesRepository.getTestListener(module).beforeTestClass(currentTestClass);
         }
-        System.out.println("UnitilsTestExecutionListener.performBeforeTestClass after");
     }
 
     @Override
@@ -61,43 +51,26 @@ public class UnitilsTestExecutionListener implements TestExecutionListener {
             // work-around for junit-3 and spring 2.5.6: these don't have a before or after test class
             performBeforeTestClass(testContext);
         }
-        System.out.println("**** UnitilsTestExecutionListener.prepareTestInstance before");
-        try {
-            CurrentTestInstance currentTestInstance = new CurrentTestInstance(testContext);
-            setCurrentTestClass(currentTestInstance);
-            setCurrentTestInstance(currentTestInstance);
-            // ignored, do behavior in before test method
-        } catch (Exception e) {
-            System.out.println("**** UnitilsTestExecutionListener.prepareTestInstance exception");
-            e.printStackTrace();
-            throw e;
-        }
-        System.out.println("UnitilsTestExecutionListener.prepareTestInstance after");
+        CurrentTestInstance currentTestInstance = new CurrentTestInstance(testContext);
+        setCurrentTestClass(currentTestInstance);
+        setCurrentTestInstance(currentTestInstance);
+        // ignored, do behavior in before test method
     }
 
     @Override
     public void beforeTestMethod(TestContext testContext) throws Exception {
-        System.out.println("**** UnitilsTestExecutionListener.beforeTestMethod before");
-        try {
-            CurrentTestInstance currentTestInstance = new CurrentTestInstance(testContext);
-            setCurrentTestClass(currentTestInstance);
-            setCurrentTestInstance(currentTestInstance);
+        CurrentTestInstance currentTestInstance = new CurrentTestInstance(testContext);
+        setCurrentTestClass(currentTestInstance);
+        setCurrentTestInstance(currentTestInstance);
 
-            ModulesRepository modulesRepository = getModulesRepository();
-            for (Module module : modulesRepository.getModules()) {
-                modulesRepository.getTestListener(module).beforeTest(currentTestInstance);
-            }
-        } catch (Exception e) {
-            System.out.println("**** UnitilsTestExecutionListener.beforeTestMethod exception ");
-            e.printStackTrace();
-            throw e;
+        ModulesRepository modulesRepository = getModulesRepository();
+        for (Module module : modulesRepository.getModules()) {
+            modulesRepository.getTestListener(module).beforeTest(currentTestInstance);
         }
-        System.out.println("UnitilsTestExecutionListener.beforeTestMethod after");
     }
 
     @Override
     public void afterTestMethod(TestContext testContext) throws Exception {
-        System.out.println("**** UnitilsTestExecutionListener.afterTestMethod before");
         try {
             CurrentTestInstance currentTestInstance = new CurrentTestInstance(testContext);
             setCurrentTestClass(currentTestInstance);
@@ -107,11 +80,6 @@ public class UnitilsTestExecutionListener implements TestExecutionListener {
             for (Module module : modulesRepository.getModules()) {
                 modulesRepository.getTestListener(module).afterTest(currentTestInstance);
             }
-            System.out.println("UnitilsTestExecutionListener.afterTestMethod after");
-        } catch (Exception e) {
-            System.out.println("**** UnitilsTestExecutionListener.afterTestMethod exception");
-            e.printStackTrace();
-            throw e;
         } finally {
             setCurrentTestInstance(null);
             if (!supportsBeforeAndAfterTestClass) {
@@ -119,20 +87,11 @@ public class UnitilsTestExecutionListener implements TestExecutionListener {
                 afterTestClass(testContext);
             }
         }
-
     }
 
     public void afterTestClass(TestContext testContext) throws Exception {
-        try {
-            System.out.println("**** UnitilsTestExecutionListener.afterTestClass before");
-            setCurrentTestClass(null);
-            // ignored, not always called
-        } catch (Exception e) {
-            System.out.println("**** UnitilsTestExecutionListener.afterTestClass exception");
-            e.printStackTrace();
-            throw e;
-        }
-        System.out.println("UnitilsTestExecutionListener.afterTestClass after");
+        setCurrentTestClass(null);
+        // ignored, not always called
     }
 
     /**

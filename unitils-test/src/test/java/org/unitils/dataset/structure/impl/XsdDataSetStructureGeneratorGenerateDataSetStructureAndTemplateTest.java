@@ -35,6 +35,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import static org.unitils.dataset.DataSetUnitils.invalidateCachedDatabaseMetaData;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 
 /**
@@ -73,13 +74,11 @@ public class XsdDataSetStructureGeneratorGenerateDataSetStructureAndTemplateTest
 
         dropTestTables();
         createTestTables();
+        invalidateCachedDatabaseMetaData();
     }
 
-    /**
-     * Clean-up test database.
-     */
     @After
-    public void tearDown() throws Exception {
+    public void cleanUp() throws Exception {
         if (disabled) {
             return;
         }
@@ -89,6 +88,7 @@ public class XsdDataSetStructureGeneratorGenerateDataSetStructureAndTemplateTest
         } catch (Exception e) {
             // ignore
         }
+        invalidateCachedDatabaseMetaData();
     }
 
 
@@ -132,16 +132,10 @@ public class XsdDataSetStructureGeneratorGenerateDataSetStructureAndTemplateTest
     }
 
 
-    /**
-     * Creates the test tables.
-     */
     private void createTestTables() {
         executeUpdate("create table TABLE_1(columnA int not null identity, columnB varchar(1) not null, columnC varchar(1))", dataSource);
     }
 
-    /**
-     * Removes the test database tables
-     */
     private void dropTestTables() {
         executeUpdateQuietly("drop table TABLE_1", dataSource);
     }

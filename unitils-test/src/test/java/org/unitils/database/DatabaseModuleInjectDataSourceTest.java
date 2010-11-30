@@ -22,7 +22,6 @@ import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
 
 import javax.sql.DataSource;
-import java.lang.reflect.Method;
 import java.util.Properties;
 
 import static org.junit.Assert.assertNotNull;
@@ -54,7 +53,6 @@ public class DatabaseModuleInjectDataSourceTest extends UnitilsJUnit4 {
     @Test
     public void testInjectDataSource() throws Exception {
         TestTarget testTarget = new TestTarget();
-        Method method = TestTarget.class.getMethod("testMethod");
         databaseModule.injectDataSources(testTarget, null);
 
         assertNotNull(testTarget.dataSourceFromField);
@@ -68,7 +66,7 @@ public class DatabaseModuleInjectDataSourceTest extends UnitilsJUnit4 {
         private DataSource dataSourceFromMethod;
 
         @TestDataSource
-        private DataSource dataSourceFromField = null;
+        private DataSource dataSourceFromField;
 
         @TestDataSource
         public void setDataSource(DataSource dataSource) {
