@@ -15,8 +15,6 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbmaintain.database.Database;
 import org.dbmaintain.structure.clear.DBClearer;
 import org.hsqldb.Trigger;
@@ -24,10 +22,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.database.TestDataSourceFactory;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.database.datasource.DataSourceFactory;
-import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
 import org.unitils.database.manager.DbMaintainManager;
+import org.unitils.database.manager.UnitilsTransactionManager;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -47,9 +45,6 @@ import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfigurat
  * @author Scott Prater
  */
 public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
-
-    /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(DefaultDBClearerPreserveTest.class);
 
     private DBClearer dbClearer;
 
@@ -81,9 +76,7 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
             configuration.setProperty(PROPERTY_PRESERVE_SYNONYMS, "Test_Synonym, " + defaultDatabase.quoted("Test_CASE_Synonym"));
         }
 
-        DataSourceFactory dataSourceFactory = new DefaultDataSourceFactory();
-        dataSourceFactory.init(configuration);
-        DbMaintainManager dbMaintainManager = new DbMaintainManager(configuration, false, dataSourceFactory);
+        DbMaintainManager dbMaintainManager = new DbMaintainManager(configuration, false, new TestDataSourceFactory(), new UnitilsTransactionManager());
         defaultDatabase = dbMaintainManager.getDatabase(null);
 
         dbClearer = dbMaintainManager.getDbMaintainMainFactory().createDBClearer();
@@ -133,15 +126,15 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
     }
 
     private void cleanupTestDatabase() throws Exception {
+        executeUpdateQuietly("drop trigger test_trigger", dataSource);
+        executeUpdateQuietly("drop trigger \"Test_CASE_Trigger\"", dataSource);
+        executeUpdateQuietly("drop sequence test_sequence", dataSource);
+        executeUpdateQuietly("drop sequence \"Test_CASE_Sequence\"", dataSource);
+        executeUpdateQuietly("drop view test_view", dataSource);
+        executeUpdateQuietly("drop view \"Test_CASE_View\"", dataSource);
         executeUpdateQuietly("drop table " + versionTableName, dataSource);
         executeUpdateQuietly("drop table test_table", dataSource);
         executeUpdateQuietly("drop table \"Test_CASE_Table\"", dataSource);
-        executeUpdateQuietly("drop view test_view", dataSource);
-        executeUpdateQuietly("drop view \"Test_CASE_View\"", dataSource);
-        executeUpdateQuietly("drop sequence test_sequence", dataSource);
-        executeUpdateQuietly("drop sequence \"Test_CASE_Sequence\"", dataSource);
-        executeUpdateQuietly("drop trigger test_trigger", dataSource);
-        executeUpdateQuietly("drop trigger \"Test_CASE_Trigger\"", dataSource);
     }
 
     /**

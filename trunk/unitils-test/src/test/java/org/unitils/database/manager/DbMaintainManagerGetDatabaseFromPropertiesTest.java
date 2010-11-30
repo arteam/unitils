@@ -21,7 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
+import org.unitils.database.TestDataSourceFactory;
 
 import java.util.Properties;
 
@@ -48,7 +48,7 @@ public class DbMaintainManagerGetDatabaseFromPropertiesTest extends UnitilsJUnit
         configuration.setProperty(PROPERTY_SCHEMANAMES, "public");
         configuration.setProperty(PROPERTY_DATABASE_NAMES, "database1, database2");
 
-        dbMaintainManager = new DbMaintainManager(configuration, false, new DefaultDataSourceFactory());
+        dbMaintainManager = new DbMaintainManager(configuration, false, new TestDataSourceFactory(), new UnitilsTransactionManager());
     }
 
 

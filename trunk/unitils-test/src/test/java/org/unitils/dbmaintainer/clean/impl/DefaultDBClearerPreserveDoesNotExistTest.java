@@ -24,9 +24,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.database.datasource.DataSourceFactory;
-import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
+import org.unitils.database.TestDataSourceFactory;
 import org.unitils.database.manager.DbMaintainManager;
+import org.unitils.database.manager.UnitilsTransactionManager;
 
 import java.util.Properties;
 
@@ -129,10 +129,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest extends UnitilsJUnit4 {
 
 
     private DBClearer createDbClearer(Properties configuration) {
-        DataSourceFactory dataSourceFactory = new DefaultDataSourceFactory();
-        dataSourceFactory.init(configuration);
-        DbMaintainManager dbMaintainManager = new DbMaintainManager(configuration, false, dataSourceFactory);
-
+        DbMaintainManager dbMaintainManager = new DbMaintainManager(configuration, false, new TestDataSourceFactory(), new UnitilsTransactionManager());
         return dbMaintainManager.getDbMaintainMainFactory().createDBClearer();
     }
 }

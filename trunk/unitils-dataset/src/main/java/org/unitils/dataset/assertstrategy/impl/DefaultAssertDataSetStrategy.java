@@ -33,6 +33,7 @@ import java.util.List;
 
 import static java.lang.Math.max;
 import static org.apache.commons.lang.StringUtils.rightPad;
+import static org.unitils.util.ExceptionUtils.getAllMessages;
 
 /**
  * @author Tim Ducheyne
@@ -68,7 +69,8 @@ public class DefaultAssertDataSetStrategy implements AssertDataSetStrategy {
             }
 
         } catch (Exception e) {
-            throw new UnitilsException("Unable to load data set file: " + dataSetRowSource.getDataSetName(), e);
+            String message = getAllMessages(e);
+            throw new UnitilsException("Unable to load data set file: " + dataSetRowSource.getDataSetName() + "\n" + message, e);
         } finally {
             dataSetRowSource.close();
         }
@@ -76,8 +78,9 @@ public class DefaultAssertDataSetStrategy implements AssertDataSetStrategy {
 
 
     /**
-     * @param dataSetComparison The assertstrategy result, not null
-     * @return the assertion failed message for the given assertstrategy result, not null
+     * @param dataSetComparison  The comparison result, not null
+     * @param logDatabaseContent True to log the content of the tables that were not matched
+     * @return the assertion failed message for the given comparison result, not null
      */
     protected String generateErrorMessage(DataSetComparison dataSetComparison, boolean logDatabaseContent) {
         StringBuilder result = new StringBuilder("Assertion failed. Differences found between the expected data set and actual database content.\n\n");

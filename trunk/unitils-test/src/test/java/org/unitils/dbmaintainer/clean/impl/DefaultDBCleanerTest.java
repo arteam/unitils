@@ -22,10 +22,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.database.TestDataSourceFactory;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.database.datasource.DataSourceFactory;
-import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
 import org.unitils.database.manager.DbMaintainManager;
+import org.unitils.database.manager.UnitilsTransactionManager;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -74,9 +74,7 @@ public class DefaultDBCleanerTest extends UnitilsJUnit4 {
         configuration.setProperty(PROPERTY_PRESERVE_DATA_TABLES, "Test_table_Preserve");
         configuration.setProperty(PROPERTY_PRESERVE_TABLES, "\"Test_CASE_Table_Preserve\"");
 
-        DataSourceFactory dataSourceFactory = new DefaultDataSourceFactory();
-        dataSourceFactory.init(configuration);
-        DbMaintainManager dbMaintainManager = new DbMaintainManager(configuration, false, dataSourceFactory);
+        DbMaintainManager dbMaintainManager = new DbMaintainManager(configuration, false, new TestDataSourceFactory(), new UnitilsTransactionManager());
 
         dbCleaner = dbMaintainManager.getDbMaintainMainFactory().createDBCleaner();
     }

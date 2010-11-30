@@ -39,6 +39,7 @@ import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import static org.unitils.dataset.DataSetUnitils.invalidateCachedDatabaseMetaData;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
@@ -83,6 +84,7 @@ public class XsdDataSetStructureGeneratorGenerateDataSetStructureTest extends Un
 
         dropTestTables();
         createTestTables();
+        invalidateCachedDatabaseMetaData();
     }
 
     @After
@@ -96,6 +98,7 @@ public class XsdDataSetStructureGeneratorGenerateDataSetStructureTest extends Un
         } catch (Exception e) {
             // ignore
         }
+        invalidateCachedDatabaseMetaData();
     }
 
 

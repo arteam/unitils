@@ -66,6 +66,14 @@ public class DataSourceWrapper {
         return unitilsDataSource.getConnection();
     }
 
+    public void reset() {
+        schemaNames = null;
+        tablePrimaryKeysCache.clear();
+        tableNamesCache.clear();
+        columnsCache.clear();
+        tableColumnSqlTypesCache.clear();
+    }
+
     public String removeIdentifierQuotes(String columnName) {
         return identifierProcessor.removeIdentifierQuotes(columnName);
     }

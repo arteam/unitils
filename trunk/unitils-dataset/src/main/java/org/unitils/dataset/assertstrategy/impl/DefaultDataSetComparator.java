@@ -66,9 +66,7 @@ public class DefaultDataSetComparator implements DataSetComparator {
             return dataSetComparison;
 
         } catch (Exception e) {
-            //todo implement
-            e.printStackTrace();
-            throw new UnitilsException("todo", e);
+            throw new UnitilsException("Unable to perform data set comparison.", e);
         }
     }
 

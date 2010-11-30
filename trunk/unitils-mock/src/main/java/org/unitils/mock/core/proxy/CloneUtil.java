@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,11 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import static java.lang.reflect.Modifier.isStatic;
 import java.util.IdentityHashMap;
 import java.util.Map;
+
+import static java.lang.reflect.Modifier.isStatic;
+import static org.unitils.mock.core.proxy.ProxyUtils.isProxy;
 
 /**
  * Utility class for deep cloning objects.
@@ -92,6 +94,9 @@ public class CloneUtil {
         if (isImmutable(instanceToClone)) {
             return instanceToClone;
         }
+        if (shouldNotClone(instanceToClone)) {
+            return instanceToClone;
+        }
         // check for arrays
         if (instanceToClone.getClass().isArray()) {
             return cloneArray(instanceToClone, cloneCache);
@@ -118,10 +123,8 @@ public class CloneUtil {
 
 
     /**
-     * Returns the given value if it is immutable, else null is returned.
-     *
      * @param instanceToClone The instance, not null
-     * @return The instance if it is immutable, else null
+     * @return True if the instance is immutable, e.g. a primitive
      */
     protected static boolean isImmutable(Object instanceToClone) {
         Class<?> clazz = instanceToClone.getClass();
@@ -130,6 +133,28 @@ public class CloneUtil {
             return true;
         }
         if (instanceToClone instanceof Number || instanceToClone instanceof String || instanceToClone instanceof Character || instanceToClone instanceof Boolean) {
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * @param instanceToClone The instance, not null
+     * @return True if the instance is should not be cloned, e.g. a java lang class or a data source
+     */
+    protected static boolean shouldNotClone(Object instanceToClone) {
+        Class<?> clazz = instanceToClone.getClass();
+
+        // todo implement using regexp
+
+        // don't clone java classes
+        String className = clazz.getName();
+        if (className.startsWith("java.lang.") || className.startsWith("java.io.") || className.startsWith("javax.sql.")) {
+            return true;
+        }
+        // don't clone proxies
+        if (isProxy(instanceToClone)) {
             return true;
         }
         return false;

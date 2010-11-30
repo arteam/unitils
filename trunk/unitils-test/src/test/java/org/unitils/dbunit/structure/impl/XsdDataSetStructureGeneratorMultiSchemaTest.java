@@ -21,6 +21,10 @@ import org.dbmaintain.database.Database;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.database.TestDataSourceFactory;
+import org.unitils.database.manager.DbMaintainManager;
+import org.unitils.database.manager.UnitilsTransactionManager;
 import org.unitils.dbunit.structure.DataSetStructureGenerator;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import org.unitils.util.PropertyUtils;
@@ -34,10 +38,10 @@ import java.util.Properties;
 
 import static org.apache.commons.lang.StringUtils.deleteWhitespace;
 import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
+import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_SCHEMANAMES;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.dataset.util.DataSetTestUtils.createDatabases;
 import static org.unitils.dbunit.structure.impl.XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME;
 import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfiguration;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
@@ -51,7 +55,7 @@ import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class XsdDataSetStructureGeneratorMultiSchemaTest {
+public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(XsdDataSetStructureGeneratorMultiSchemaTest.class);
@@ -78,7 +82,10 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest {
         }
         xsdDirectory.mkdirs();
 
-        Database defaultDatabase = createDatabases("PUBLIC, SCHEMA_A").getDefaultDatabase();
+        configuration.setProperty(PROPERTY_SCHEMANAMES, "PUBLIC, SCHEMA_A");
+
+        DbMaintainManager dbMaintainManager = new DbMaintainManager(configuration, false, new TestDataSourceFactory(), new UnitilsTransactionManager());
+        Database defaultDatabase = dbMaintainManager.getDatabase(null);
         dataSource = defaultDatabase.getDataSource();
 
         configuration.setProperty(PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());

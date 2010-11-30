@@ -23,10 +23,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.database.TestDataSourceFactory;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.database.datasource.DataSourceFactory;
-import org.unitils.database.datasource.impl.DefaultDataSourceFactory;
 import org.unitils.database.manager.DbMaintainManager;
+import org.unitils.database.manager.UnitilsTransactionManager;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -80,9 +80,7 @@ public class DefaultDBClearerMultiSchemaPreserveTest extends UnitilsJUnit4 {
         configuration.setProperty(PROPERTY_PRESERVE_VIEWS, "test_view, " + "schema_a.\"TEST_VIEW\"");
         configuration.setProperty(PROPERTY_PRESERVE_SEQUENCES, "test_sequence, \"SCHEMA_A\".test_sequence");
 
-        DataSourceFactory dataSourceFactory = new DefaultDataSourceFactory();
-        dataSourceFactory.init(configuration);
-        DbMaintainManager dbMaintainManager = new DbMaintainManager(configuration, false, dataSourceFactory);
+        DbMaintainManager dbMaintainManager = new DbMaintainManager(configuration, false, new TestDataSourceFactory(), new UnitilsTransactionManager());
         defaultDatabase = dbMaintainManager.getDatabase(null);
 
         dbClearer = dbMaintainManager.getDbMaintainMainFactory().createDBClearer();
@@ -103,7 +101,7 @@ public class DefaultDBClearerMultiSchemaPreserveTest extends UnitilsJUnit4 {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        assertEquals(1, defaultDatabase.getTableNames("PUBLIC").size());
+        assertEquals("" + defaultDatabase.getTableNames("PUBLIC"), 1, defaultDatabase.getTableNames("PUBLIC").size());
         assertEquals(1, defaultDatabase.getTableNames("SCHEMA_A").size());
         assertEquals(1, defaultDatabase.getTableNames("SCHEMA_B").size());
         assertEquals(1, defaultDatabase.getTableNames("SCHEMA_C").size());
