@@ -55,7 +55,7 @@
     <scm>
         <connection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/trunk</connection>
         <developerConnection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/trunk</developerConnection>
-        <url>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/trunk</url>
+        <url>http://unitils.svn.sourceforge.net/viewvc/unitils/</url>
     </scm>
 
     <!-- Build Settings -->
