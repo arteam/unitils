@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.model.database;
 
-import static thirdparty.org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * The name of a table.

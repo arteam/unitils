@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,19 @@
  */
 package org.unitils.mock.core;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
-import static org.unitils.mock.ArgumentMatchers.notNull;
-import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
 
 import java.util.List;
 import java.util.Map;
+
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.unitils.mock.ArgumentMatchers.notNull;
+import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
 
 /**
  * Tests the mock object functionality.
@@ -123,11 +124,10 @@ public class MockObjectTest {
         mockObject.returns("value").get(0);  //raises classcast
     }
 
-
-    private void assertTopOfStackTracePointsToCurrentTest(Throwable e, Object testMethodName) {
-        StackTraceElement topOfStackTrace = e.getStackTrace()[0];
-        assertEquals(MockObjectTest.class.getName(), topOfStackTrace.getClassName());
-        assertEquals(testMethodName, topOfStackTrace.getMethodName());
+    @Test
+    public void defaultMockName() {
+        MockObject<TestClass> mockObject = new MockObject<TestClass>(TestClass.class, this);
+        assertEquals("testClassMock", mockObject.getName());
     }
 
 

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static thirdparty.org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * A data set row.
