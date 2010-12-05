@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package org.unitils.mock.core.proxy;
 
-import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
-
 import java.lang.reflect.Method;
 import java.util.List;
+
+import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
 
 /**
  * An invocation of a proxy method.
@@ -90,9 +90,10 @@ public abstract class ProxyInvocation {
     /**
      * Calls the actual method that was proxied using the same arguments.
      *
+     * @param mockedInstance the instance to invoke the behavior on, null for the proxied class
      * @return The result value
      */
-    public Object invokeOriginalBehavior() throws Throwable {
+    public Object invokeOriginalBehavior(Object mockedInstance) throws Throwable {
         throw new UnsupportedOperationException("Invoking of original behavior not implemented.");
     }
 

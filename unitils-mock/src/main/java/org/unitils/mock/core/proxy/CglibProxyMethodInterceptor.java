@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,14 @@ package org.unitils.mock.core.proxy;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.unitils.core.UnitilsException;
-import static org.unitils.mock.core.proxy.ProxyUtils.getProxiedMethodStackTrace;
-import static org.unitils.util.MethodUtils.*;
 
 import java.lang.reflect.Method;
+import java.util.List;
+
 import static java.lang.reflect.Modifier.isAbstract;
 import static java.util.Arrays.asList;
-import java.util.List;
+import static org.unitils.mock.core.proxy.ProxyUtils.getProxiedMethodStackTrace;
+import static org.unitils.util.MethodUtils.*;
 
 /**
  * A cglib method intercepter that will delegate the invocations to the given invocation hanlder.
@@ -121,14 +122,20 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
          * Invokes the original behavior by calling the method proxy.
          * If there is no original behavior, e.g. an interface or abstract method, an exception is raised.
          *
+         * @param mockedInstance the instance to invoke the behavior on, null for the proxied class
          * @return The result value
          */
         @Override
-        public Object invokeOriginalBehavior() throws Throwable {
-            if (isAbstract(getMethod().getModifiers())) {
+        public Object invokeOriginalBehavior(Object mockedInstance) throws Throwable {
+            Method method = getMethod();
+            if (isAbstract(method.getModifiers())) {
                 throw new UnitilsException("Unable to invoke original behavior. The method is abstract, it does not have any behavior defined: " + getMethod());
             }
-            return methodProxy.invokeSuper(getProxy(), getArguments().toArray());
+            if (mockedInstance == null) {
+                return methodProxy.invokeSuper(getProxy(), getArguments().toArray());
+            }
+            method.setAccessible(true);
+            return method.invoke(mockedInstance, getArguments().toArray());
         }
     }
 }

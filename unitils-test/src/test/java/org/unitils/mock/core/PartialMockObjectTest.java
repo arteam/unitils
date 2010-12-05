@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,14 @@
  */
 package org.unitils.mock.core;
 
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 /**
@@ -29,10 +31,10 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class MockObjectPartialMockTest {
+public class PartialMockObjectTest {
 
     /* Class under test */
-    private MockObject<TestClass> mockObject;
+    private PartialMockObject<TestClass> mockObject;
 
 
     /**
@@ -89,7 +91,7 @@ public class MockObjectPartialMockTest {
 
 
     /**
-     * Tests setting a peforms behavior for the mock. The behavior of the test class should not have been invoked.
+     * Tests setting a performs behavior for the mock. The behavior of the test class should not have been invoked.
      */
     @Test
     public void testPerforms() {
@@ -106,7 +108,7 @@ public class MockObjectPartialMockTest {
      * Tests invoking a method for with no behavior was defined. The behavior of the test class should have been invoked.
      */
     @Test
-    public void testOriginalBehavior() {
+    public void originalBehavior() {
         String result = mockObject.getMock().testMethod();
         assertLenientEquals("original", result);
         assertLenientEquals(1, TestClass.invocationCount);
@@ -118,8 +120,14 @@ public class MockObjectPartialMockTest {
      * An exception should have been raised
      */
     @Test(expected = UnitilsException.class)
-    public void testOriginalBehavior_abstractMethod() {
+    public void originalBehavior_abstractMethod() {
         mockObject.getMock().abstractMethod();
+    }
+
+    @Test
+    public void originalBehavior_methodWithArguments() {
+        int result = mockObject.getMock().methodWithArguments(3, 4);
+        assertEquals(7, result);
     }
 
 
@@ -133,6 +141,10 @@ public class MockObjectPartialMockTest {
         public String testMethod() {
             invocationCount++;
             return "original";
+        }
+
+        public int methodWithArguments(int a, int b) {
+            return a + b;
         }
 
         public abstract void abstractMethod();

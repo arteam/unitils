@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 package org.unitils.mock.mockbehavior.impl;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
 import org.unitils.mock.core.proxy.ProxyInvocation;
+import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
 
 import static java.lang.reflect.Modifier.isAbstract;
 
@@ -33,6 +33,17 @@ import static java.lang.reflect.Modifier.isAbstract;
  */
 public class OriginalBehaviorInvokingMockBehavior implements ValidatableMockBehavior {
 
+    /* The instance to invoke the behavior on, null for the proxied class */
+    protected Object mockedInstance;
+
+
+    /**
+     * @param mockedInstance the instance to invoke the behavior on, null for the proxied class
+     */
+    public OriginalBehaviorInvokingMockBehavior(Object mockedInstance) {
+        this.mockedInstance = mockedInstance;
+    }
+
 
     /**
      * Checks whether the mock behavior can be executed for the given invocation.
@@ -42,7 +53,7 @@ public class OriginalBehaviorInvokingMockBehavior implements ValidatableMockBeha
      */
     public void assertCanExecute(ProxyInvocation proxyInvocation) throws UnitilsException {
         if (isAbstract(proxyInvocation.getMethod().getModifiers())) {
-            throw new UnitilsException("Trying to define mock behavior that invokes the original method behavior for an abstract method.");
+            throw new UnitilsException("Unable to invoke the original method behavior: the method is an abstract method.");
         }
     }
 
@@ -54,7 +65,7 @@ public class OriginalBehaviorInvokingMockBehavior implements ValidatableMockBeha
      * @return The result value
      */
     public Object execute(ProxyInvocation proxyInvocation) throws Throwable {
-        return proxyInvocation.invokeOriginalBehavior();
+        return proxyInvocation.invokeOriginalBehavior(mockedInstance);
     }
 
 }
