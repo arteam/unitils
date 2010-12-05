@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,14 @@
  */
 package org.unitils.mock;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Unitils;
 import org.unitils.mock.core.MockObject;
-import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationStackTrace;
+import org.unitils.mock.core.Scenario;
 import org.unitils.mock.dummy.DummyObjectUtil;
+
+import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationStackTrace;
 
 /**
  * @author Filip Neven
@@ -26,6 +30,9 @@ import org.unitils.mock.dummy.DummyObjectUtil;
  * @author Kenny Claes
  */
 public class MockUnitils {
+
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(MockModule.class);
 
 
     public static void assertNoMoreInvocations() {
@@ -39,22 +46,36 @@ public class MockUnitils {
 
 
     public static void logFullScenarioReport() {
-        getMockModule().logFullScenarioReport();
+        Scenario scenario = getScenario();
+        if (scenario != null) {
+            logger.info("\n\n" + scenario.createFullReport());
+        }
     }
-
 
     public void logObservedScenario() {
-        getMockModule().logObservedScenario();
+        Scenario scenario = getScenario();
+        if (scenario != null) {
+            logger.info("\n\nObserved scenario:\n\n" + scenario.createObservedInvocationsReport());
+        }
     }
-
 
     public void logDetailedObservedScenario() {
-        getMockModule().logDetailedObservedScenario();
+        Scenario scenario = getScenario();
+        if (scenario != null) {
+            logger.info("\n\nDetailed observed scenario:\n\n" + scenario.createDetailedObservedInvocationsReport());
+        }
+    }
+
+    public void logSuggestedAsserts() {
+        Scenario scenario = getScenario();
+        if (scenario != null) {
+            logger.info("\n\nSuggested assert statements:\n\n" + scenario.createSuggestedAssertsReport());
+        }
     }
 
 
-    public void logSuggestedAsserts() {
-        getMockModule().logSuggestedAsserts();
+    private static Scenario getScenario() {
+        return MockObject.getCurrentScenario();
     }
 
     private static MockModule getMockModule() {

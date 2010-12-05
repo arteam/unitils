@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,18 @@
  */
 package org.unitils.mock.dummy;
 
-import static org.unitils.mock.core.proxy.ProxyFactory.createProxy;
-
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.proxy.ProxyInvocationHandler;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
 import org.unitils.mock.mockbehavior.impl.DummyValueReturningMockBehavior;
 
+import static org.unitils.mock.core.proxy.ProxyFactory.createProxy;
+
 /**
  * Class for handling the dummy object behavior. A dummy object is a proxy that will return default values for every method. This can be
  * used to quickly create test objects without having to worry about correctly filling in every field.
- * 
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
@@ -34,7 +34,7 @@ public class DummyObjectUtil {
 
     /**
      * Creates the dummy proxy object.
-     * 
+     *
      * @param type The type for the proxy, not null
      * @return The proxy, not null
      */
@@ -47,7 +47,8 @@ public class DummyObjectUtil {
     }
 
     public static <T> T createDummy(Class<T> type, MockBehavior mockBehaviour) {
-        return createProxy(type.getSimpleName(), new DummyObjectInvocationHandler(type, mockBehaviour), type, DummyObject.class, Cloneable.class);
+        String dummyName = type.getSimpleName();
+        return createProxy(dummyName, new DummyObjectInvocationHandler(type, mockBehaviour), type, DummyObject.class, Cloneable.class);
     }
 
 
@@ -73,7 +74,7 @@ public class DummyObjectUtil {
 
         /**
          * Handles the given method invocation of the dummy object.
-         * 
+         *
          * @param invocation The method invocation, not null
          * @return The result value for the method invocation
          */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
  */
 package org.unitils.mock.mockbehavior.impl;
 
+import org.unitils.mock.core.proxy.ProxyInvocation;
+import org.unitils.mock.dummy.DummyObjectUtil;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.unitils.mock.core.proxy.ProxyInvocation;
-import org.unitils.mock.dummy.DummyObjectUtil;
 
 /**
  * Mock behavior that returns a default value. The default value for an object will be a proxy object with the same behaviour. When doing
@@ -38,7 +38,7 @@ import org.unitils.mock.dummy.DummyObjectUtil;
  * <li>arrays etc: empty values</li>
  * </ul>
  * <p/>
- * 
+ *
  * @author Jeroen Horemans
  */
 public class DummyValueReturningMockBehavior extends DefaultValueReturningMockBehavior {
@@ -50,7 +50,7 @@ public class DummyValueReturningMockBehavior extends DefaultValueReturningMockBe
 
     /**
      * Executes the mock behavior.
-     * 
+     *
      * @param proxyInvocation The proxy method invocation, not null
      * @return The default value defined by this behavior
      */

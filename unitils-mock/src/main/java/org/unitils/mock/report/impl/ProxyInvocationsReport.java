@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,19 @@
  */
 package org.unitils.mock.report.impl;
 
-import static org.apache.commons.lang.StringUtils.rightPad;
-import static org.apache.commons.lang.StringUtils.uncapitalize;
 import org.unitils.core.util.ObjectFormatter;
 import org.unitils.mock.core.proxy.ProxyInvocation;
-import static org.unitils.util.ReflectionUtils.getAllFields;
-import static org.unitils.util.ReflectionUtils.getFieldValue;
 
 import java.lang.reflect.Field;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.apache.commons.lang.StringUtils.rightPad;
+import static org.apache.commons.lang.StringUtils.uncapitalize;
+import static org.unitils.util.ReflectionUtils.getAllFields;
+import static org.unitils.util.ReflectionUtils.getFieldValue;
 
 /**
  * A base class for reports about proxy invocations.
@@ -38,9 +39,13 @@ import java.util.Set;
 public abstract class ProxyInvocationsReport {
 
     /**
-     * The maxium depth for the object formatter that will format the values
+     * The maximum depth (child objects) of objects to display in the reports.
      */
-    public static int OBJECT_FORMATTER_MAX_RECURSION_DEPT = 10;
+    public static int OBJECT_FORMATTER_MAX_RECURSION_DEPT = 3;
+    /**
+     * The maximum nr of elements for arrays and collections to display in the reports
+     */
+    public static int OBJECT_FORMATTER_MAX_NR_ARRAY_OR_COLLECTION_ELEMENTS = 15;
 
     /**
      * The maximum length of an inline value
@@ -48,7 +53,7 @@ public abstract class ProxyInvocationsReport {
     public static int MAX_INLINE_PARAMETER_LENGTH = 20;
 
 
-    protected ObjectFormatter objectFormatter = new ObjectFormatter(OBJECT_FORMATTER_MAX_RECURSION_DEPT);
+    protected ObjectFormatter objectFormatter = new ObjectFormatter(OBJECT_FORMATTER_MAX_RECURSION_DEPT, OBJECT_FORMATTER_MAX_NR_ARRAY_OR_COLLECTION_ELEMENTS);
 
     protected Map<Object, String> testedObjectFieldValuesAndNames;
 

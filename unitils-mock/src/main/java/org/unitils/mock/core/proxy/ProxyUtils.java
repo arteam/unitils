@@ -43,7 +43,6 @@ public class ProxyUtils {
         if (object == null) {
             return null;
         }
-        Class<?> type = object.getClass();
         if (object instanceof Factory) {
             Callback[] callbacks = ((Factory) object).getCallbacks();
             if (callbacks == null || callbacks.length == 0) {
@@ -78,9 +77,12 @@ public class ProxyUtils {
 
 
     /**
+     * note: don't remove, used through reflection from {@link org.unitils.core.util.ObjectFormatter}
+     *
      * @param object The object to check
      * @return The proxied type, null if the object is not a proxy or mock
      */
+    @SuppressWarnings({"UnusedDeclaration"})
     public static String getMockName(Object object) {
         if (object == null) {
             return null;
@@ -88,7 +90,6 @@ public class ProxyUtils {
         if (object instanceof MockObject) {
             return ((MockObject) object).getName();
         }
-        Class<?> type = object.getClass();
         if (object instanceof Factory) {
             Callback callback = ((Factory) object).getCallback(0);
             if (callback instanceof CglibProxyMethodInterceptor) {

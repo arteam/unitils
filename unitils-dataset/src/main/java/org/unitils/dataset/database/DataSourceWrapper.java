@@ -32,6 +32,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.unitils.database.util.DbUtils.close;
 
 
@@ -146,12 +147,18 @@ public class DataSourceWrapper {
         }
         tableNames = new LinkedHashSet<TableName>();
 
+        boolean oracle = isOracle();
+
         Connection connection = getConnection();
         ResultSet resultSet = null;
         try {
             resultSet = connection.getMetaData().getTables(null, schemaName, null, null);
             while (resultSet.next()) {
                 String tableName = resultSet.getString("TABLE_NAME");
+                if (oracle && tableName.startsWith("BIN$")) {
+                    // filter out oracle's recycle tables 
+                    continue;
+                }
                 tableNames.add(getTableName(schemaName, tableName, true));
             }
             tableNamesCache.put(schemaName, tableNames);
@@ -312,6 +319,24 @@ public class DataSourceWrapper {
             return result;
         } finally {
             close(connection, null, resultSet);
+        }
+    }
+
+
+    protected boolean isOracle() throws SQLException {
+        String dialect = unitilsDataSource.getDialect();
+        if (!isBlank(dialect)) {
+            return "oracle".equalsIgnoreCase(dialect.trim());
+        }
+        Connection connection = getConnection();
+        try {
+            String jdbcUrl = connection.getMetaData().getURL();
+            if (isBlank(jdbcUrl)) {
+                return false;
+            }
+            return jdbcUrl.toLowerCase().contains(":oracle:");
+        } finally {
+            close(connection, null, null);
         }
     }
 }

@@ -15,8 +15,6 @@
  */
 package org.unitils.mock;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.unitils.core.CurrentTestInstance;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
@@ -25,10 +23,8 @@ import org.unitils.mock.annotation.AfterCreateMock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.core.MockObject;
 import org.unitils.mock.core.PartialMockObject;
-import org.unitils.mock.core.Scenario;
 import org.unitils.mock.dummy.DummyObjectUtil;
 import org.unitils.util.AnnotationUtils;
-import org.unitils.util.PropertyUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -49,95 +45,11 @@ import static org.unitils.util.ReflectionUtils.*;
  */
 public class MockModule implements Module {
 
-    /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(MockModule.class);
 
-    public static final String PROPERTY_LOG_FULL_SCENARIO_REPORT = "mockModule.logFullScenarioReport";
-
-    public static final String PROPERTY_LOG_OBSERVED_SCENARIO = "mockModule.logObservedScenario";
-
-    public static final String PROPERTY_LOG_DETAILED_OBSERVED_SCENARIO = "mockModule.logDetailedObservedScenario";
-
-    public static final String PROPERTY_LOG_SUGGESTED_ASSERTS = "mockModule.logSuggestedAsserts";
-
-    protected boolean logFullScenarioReport;
-
-    protected boolean logObservedScenario;
-
-    protected boolean logDetailedObservedScenario;
-
-    protected boolean logSuggestedAsserts;
-
-
-    /**
-     * No initialization needed for this module
-     */
     public void init(Properties configuration) {
-        logFullScenarioReport = PropertyUtils.getBoolean(PROPERTY_LOG_FULL_SCENARIO_REPORT, configuration);
-        logObservedScenario = PropertyUtils.getBoolean(PROPERTY_LOG_OBSERVED_SCENARIO, configuration);
-        logDetailedObservedScenario = PropertyUtils.getBoolean(PROPERTY_LOG_DETAILED_OBSERVED_SCENARIO, configuration);
-        logSuggestedAsserts = PropertyUtils.getBoolean(PROPERTY_LOG_SUGGESTED_ASSERTS, configuration);
     }
 
-
-    /**
-     * No after initialization needed for this module
-     */
     public void afterInit() {
-    }
-
-
-    public Scenario getScenario() {
-        return MockObject.getCurrentScenario();
-    }
-
-
-    public void logFullScenarioReport() {
-        Scenario scenario = getScenario();
-        if (scenario != null) {
-            logger.info("\n\n" + scenario.createFullReport());
-        }
-    }
-
-    public void logObservedScenario() {
-        Scenario scenario = getScenario();
-        if (scenario != null) {
-            logger.info("\n\nObserved scenario:\n\n" + scenario.createObservedInvocationsReport());
-        }
-    }
-
-    public void logDetailedObservedScenario() {
-        Scenario scenario = getScenario();
-        if (scenario != null) {
-            logger.info("\n\nDetailed observed scenario:\n\n" + scenario.createDetailedObservedInvocationsReport());
-        }
-    }
-
-    public void logSuggestedAsserts() {
-        Scenario scenario = getScenario();
-        if (scenario != null) {
-            logger.info("\n\nSuggested assert statements:\n\n" + scenario.createSuggestedAssertsReport());
-        }
-    }
-
-
-    public <T> Mock<T> createMock(Object testObject, String name, Class<?> type) {
-        return new MockObject<T>(name, type, testObject);
-    }
-
-
-    public <T> Mock<T> createPartialMock(Object testObject, String name, Class<?> type) {
-        return new PartialMockObject<T>(name, type, testObject);
-    }
-
-
-    protected Class<?> getMockedClass(Field field) {
-        try {
-            Type type = getGenericType(field);
-            return getClassForType(type);
-        } catch (UnitilsException e) {
-            throw new UnitilsException("Unable to determine type of mock. A mock should be declared using the generic Mock<YourTypeToMock> or PartialMock<YourTypeToMock> types. Field: " + field, e);
-        }
     }
 
 
@@ -154,7 +66,6 @@ public class MockModule implements Module {
         }
     }
 
-
     protected void createAndInjectPartialMocksIntoTest(Object testObject) {
         Set<Field> partialMockFields = getFieldsOfType(testObject.getClass(), PartialMock.class, false);
         for (Field field : partialMockFields) {
@@ -168,10 +79,27 @@ public class MockModule implements Module {
         }
     }
 
+    protected <T> Mock<T> createMock(Object testObject, String name, Class<?> type) {
+        return new MockObject<T>(name, type, testObject);
+    }
+
+    protected <T> Mock<T> createPartialMock(Object testObject, String name, Class<?> type) {
+        return new PartialMockObject<T>(name, type, testObject);
+    }
+
+    protected Class<?> getMockedClass(Field field) {
+        try {
+            Type type = getGenericType(field);
+            return getClassForType(type);
+        } catch (UnitilsException e) {
+            throw new UnitilsException("Unable to determine type of mock. A mock should be declared using the generic Mock<YourTypeToMock> or PartialMock<YourTypeToMock> types. Field: " + field, e);
+        }
+    }
+
 
     protected void injectMock(Object testObject, Field field, Mock<?> mock) {
         setFieldValue(testObject, field, mock);
-        callAfterCreateMockMethods(testObject, mock, field.getName(), field.getType());
+        callAfterCreateMockMethods(testObject, mock, field.getName());
     }
 
 
@@ -179,19 +107,19 @@ public class MockModule implements Module {
      * checks for the {@link Dummy} annotation on the testObject. If so it is created by the DummyObjectUtil. The two aproaches possible are
      * stuffed or normal depending on the value in the {@link Dummy} annotation.
      *
-     * @param testObject
+     * @param testObject The tested object not null
      */
     protected void createAndInjectDummiesIntoTest(Object testObject) {
-        Set<Field> dummyFields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), Dummy.class);
-        for (Field dummyField : dummyFields) {
-            Dummy dummyAnnotation = dummyField.getAnnotation(Dummy.class);
-            Object dummy = null;
+        Set<Field> fields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), Dummy.class);
+        for (Field field : fields) {
+            Dummy dummyAnnotation = field.getAnnotation(Dummy.class);
+            Object dummy;
             if (dummyAnnotation.stuffed()) {
-                dummy = DummyObjectUtil.createStuffedDummy(dummyField.getType());
+                dummy = DummyObjectUtil.createStuffedDummy(field.getType());
             } else {
-                dummy = DummyObjectUtil.createDummy(dummyField.getType());
+                dummy = DummyObjectUtil.createDummy(field.getType());
             }
-            setFieldValue(testObject, dummyField, dummy);
+            setFieldValue(testObject, field, dummy);
         }
     }
 
@@ -204,14 +132,12 @@ public class MockModule implements Module {
      * @param testObject the test, not null
      * @param mockObject the mock, not null
      * @param name       the field(=mock) name, not null
-     * @param type       the field(=mock) type
      */
-    // todo should we inject the mock or the proxy??
-    protected void callAfterCreateMockMethods(Object testObject, Mock<?> mockObject, String name, Class<?> type) {
+    protected void callAfterCreateMockMethods(Object testObject, Mock<?> mockObject, String name) {
         Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), AfterCreateMock.class);
         for (Method method : methods) {
             try {
-                invokeMethod(testObject, method, mockObject.getMock(), name, ((MockObject<?>) mockObject).getMockedType());
+                invokeMethod(testObject, method, mockObject, name, ((MockObject<?>) mockObject).getMockedType());
 
             } catch (InvocationTargetException e) {
                 throw new UnitilsException("An exception occurred while invoking an after create mock method.", e);
@@ -245,23 +171,6 @@ public class MockModule implements Module {
             createAndInjectPartialMocksIntoTest(testObject);
             createAndInjectMocksIntoTest(testObject);
             createAndInjectDummiesIntoTest(testObject);
-        }
-
-        @Override
-        public void afterTest(CurrentTestInstance currentTestInstance) throws Exception {
-            if (logFullScenarioReport) {
-                logFullScenarioReport();
-                return;
-            }
-            if (logObservedScenario) {
-                logObservedScenario();
-            }
-            if (logDetailedObservedScenario) {
-                logDetailedObservedScenario();
-            }
-            if (logSuggestedAsserts) {
-                logSuggestedAsserts();
-            }
         }
     }
 }

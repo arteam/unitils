@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.unitils.mock.report.impl;
 
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import org.unitils.mock.core.ObservedInvocation;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.report.ScenarioReport;
@@ -49,13 +48,6 @@ public class DefaultScenarioReport implements ScenarioReport {
         result.append("Observed scenario:\n\n");
         result.append(new ObservedInvocationsReport(scenario.getTestObject()).createReport(observedInvocations));
         result.append("\n");
-
-        String suggestedAssertsReport = new SuggestedAssertsReport().createReport(scenario.getTestObject(), observedInvocations);
-        if (isNotEmpty(suggestedAssertsReport)) {
-            result.append("\nSuggested assert statements:\n\n");
-            result.append(suggestedAssertsReport);
-            result.append("\n");
-        }
 
         result.append("\nDetailed scenario:\n\n");
         result.append(new DetailedObservedInvocationsReport(scenario.getTestObject()).createReport(observedInvocations));
