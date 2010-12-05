@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,17 @@ import org.unitils.mock.core.matching.impl.AssertInvokedInSequenceVerifyingMatch
 import org.unitils.mock.core.matching.impl.AssertInvokedVerifyingMatchingInvocationHandler;
 import org.unitils.mock.core.matching.impl.AssertNotInvokedVerifyingMatchingInvocationHandler;
 import org.unitils.mock.core.matching.impl.BehaviorDefiningMatchingInvocationHandler;
-import static org.unitils.mock.core.proxy.ProxyFactory.createInitializedOrUnitializedInstanceOfType;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.ExceptionThrowingMockBehavior;
 import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
-import static org.unitils.util.ReflectionUtils.getGenericType;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.uncapitalize;
+import static org.unitils.mock.core.proxy.ProxyFactory.createInitializedOrUnitializedInstanceOfType;
+import static org.unitils.util.ReflectionUtils.getGenericType;
 
 /**
  * Implementation of a Mock.
@@ -69,7 +72,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
 
 
     /**
-     * Creates a mock of the given type for the given scenario.
+     * Creates a mock of the given type with un-capitalized type name + Mock as name, e.g. myServiceMock.
      *
      * There is no .class literal for generic types. Therefore you need to pass the raw type when mocking generic types.
      * E.g. Mock&lt;List&lt;String&gt;&gt; myMock = new MockObject("myMock", List.class, this);
@@ -77,13 +80,35 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
      * If the mocked type does not correspond to the declared type, a ClassCastException will occur when the mock
      * is used.
      *
-     * @param name       The name of the mock, e.g. the field-name, not null
+     * @param mockedType The mock type that will be proxied, use the raw type when mocking generic types, not null
+     * @param testObject The test object, not null
+     */
+    public MockObject(Class<?> mockedType, Object testObject) {
+        this(null, mockedType, testObject);
+    }
+
+    /**
+     * Creates a mock of the given type.
+     *
+     * There is no .class literal for generic types. Therefore you need to pass the raw type when mocking generic types.
+     * E.g. Mock&lt;List&lt;String&gt;&gt; myMock = new MockObject("myMock", List.class, this);
+     *
+     * If the mocked type does not correspond to the declared type, a ClassCastException will occur when the mock
+     * is used.
+     *
+     * If no name is given the un-capitalized type name + Mock is used, e.g. myServiceMock
+     *
+     * @param name       The name of the mock, e.g. the field-name, null for the default
      * @param mockedType The mock type that will be proxied, use the raw type when mocking generic types, not null
      * @param testObject The test object, not null
      */
     @SuppressWarnings({"unchecked"})
     public MockObject(String name, Class<?> mockedType, Object testObject) {
-        this.name = name;
+        if (isBlank(name)) {
+            this.name = uncapitalize(mockedType.getSimpleName()) + "Mock";
+        } else {
+            this.name = name;
+        }
         this.mockedType = (Class<T>) mockedType;
         this.oneTimeMatchingBehaviorDefiningInvocations = createOneTimeMatchingBehaviorDefiningInvocations();
         this.alwaysMatchingBehaviorDefiningInvocations = createAlwaysMatchingBehaviorDefiningInvocations();
