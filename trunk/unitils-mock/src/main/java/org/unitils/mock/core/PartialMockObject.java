@@ -27,6 +27,35 @@ import org.unitils.mock.PartialMock;
  */
 public class PartialMockObject<T> extends MockObject<T> implements PartialMock<T> {
 
+    /**
+     * Creates a mock around the given instance with un-capitalized type name + Mock as name, e.g. myServiceMock.
+     *
+     * If the type mocked instance does not correspond to the declared type, a ClassCastException will occur when the mock
+     * is used.
+     *
+     * @param mockedInstance The instance that will be wrapped with a proxy, use the raw type when mocking generic types, not null
+     * @param testObject     The test object, not null
+     */
+    public PartialMockObject(Object mockedInstance, Object testObject) {
+        this(null, mockedInstance, testObject);
+    }
+
+    /**
+     * Creates a mock around the given instance with un-capitalized type name + Mock as name, e.g. myServiceMock.
+     *
+     * If the type mocked instance does not correspond to the declared type, a ClassCastException will occur when the mock
+     * is used.
+     *
+     * If no name is given the un-capitalized type name + Mock is used, e.g. myServiceMock
+     *
+     * @param name           The name of the mock, e.g. the field-name, null for the default
+     * @param mockedInstance The instance that will be wrapped with a proxy, use the raw type when mocking generic types, not null
+     * @param testObject     The test object, not null
+     */
+    public PartialMockObject(String name, Object mockedInstance, Object testObject) {
+        super(name, mockedInstance.getClass(), mockedInstance, testObject);
+    }
+
 
     /**
      * Creates a mock of the given type with un-capitalized type name + Mock as name, e.g. myServiceMock.
@@ -60,13 +89,13 @@ public class PartialMockObject<T> extends MockObject<T> implements PartialMock<T
      * @param testObject  The test object, not null
      */
     public PartialMockObject(String name, Class<?> mockedClass, Object testObject) {
-        super(name, mockedClass, testObject);
+        super(name, mockedClass, null, testObject);
     }
 
 
     @Override
-    protected MockProxy<T> createMockProxy() {
-        return new PartialMockProxy<T>(name, mockedType, oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, getCurrentScenario(), getMatchingInvocationBuilder());
+    protected MockProxy<T> createMockProxy(Object mockedInstance) {
+        return new PartialMockProxy<T>(name, mockedType, mockedInstance, oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, getCurrentScenario(), getMatchingInvocationBuilder());
     }
 
 }

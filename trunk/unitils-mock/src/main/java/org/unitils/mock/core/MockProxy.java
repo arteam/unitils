@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,13 @@ package org.unitils.mock.core;
 
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.core.matching.MatchingInvocationBuilder;
-import static org.unitils.mock.core.proxy.ProxyFactory.createProxy;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.proxy.ProxyInvocationHandler;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
+
+import static org.unitils.mock.core.proxy.ProxyFactory.createProxy;
 
 public class MockProxy<T> {
 

@@ -34,7 +34,7 @@ import java.lang.reflect.Type;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.uncapitalize;
-import static org.unitils.mock.core.proxy.ProxyFactory.createInitializedOrUnitializedInstanceOfType;
+import static org.unitils.mock.core.proxy.ProxyFactory.createInitializedOrUninitializedInstanceOfType;
 import static org.unitils.util.ReflectionUtils.getGenericType;
 
 /**
@@ -102,8 +102,13 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
      * @param mockedType The mock type that will be proxied, use the raw type when mocking generic types, not null
      * @param testObject The test object, not null
      */
-    @SuppressWarnings({"unchecked"})
     public MockObject(String name, Class<?> mockedType, Object testObject) {
+        this(name, mockedType, null, testObject);
+    }
+
+
+    @SuppressWarnings({"unchecked"})
+    protected MockObject(String name, Class<?> mockedType, Object mockedInstance, Object testObject) {
         if (isBlank(name)) {
             this.name = uncapitalize(mockedType.getSimpleName()) + "Mock";
         } else {
@@ -119,7 +124,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
             getMatchingInvocationBuilder().reset();
             scenario.setTestObject(testObject);
         }
-        this.mockProxy = createMockProxy();
+        this.mockProxy = createMockProxy(mockedInstance);
     }
 
 
@@ -232,7 +237,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
      */
     @MatchStatement
     public T raises(Class<? extends Throwable> exceptionClass) {
-        Throwable exception = createInitializedOrUnitializedInstanceOfType(exceptionClass);
+        Throwable exception = createInitializedOrUninitializedInstanceOfType(exceptionClass);
         exception.fillInStackTrace();
         MatchingInvocationHandler matchingInvocationHandler = createAlwaysMatchingBehaviorDefiningMatchingInvocationHandler(new ExceptionThrowingMockBehavior(exception));
         return startMatchingInvocation(matchingInvocationHandler);
@@ -321,7 +326,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
      */
     @MatchStatement
     public T onceRaises(Class<? extends Throwable> exceptionClass) {
-        Throwable exception = createInitializedOrUnitializedInstanceOfType(exceptionClass);
+        Throwable exception = createInitializedOrUninitializedInstanceOfType(exceptionClass);
         MatchingInvocationHandler matchingInvocationHandler = createOneTimeMatchingBehaviorDefiningMatchingInvocationHandler(new ExceptionThrowingMockBehavior(exception));
         return startMatchingInvocation(matchingInvocationHandler);
     }
@@ -442,7 +447,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
         return scenario;
     }
 
-    protected MockProxy<T> createMockProxy() {
+    protected MockProxy<T> createMockProxy(Object mockedInstance) {
         return new MockProxy<T>(name, mockedType, oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, getCurrentScenario(), getMatchingInvocationBuilder());
     }
 
