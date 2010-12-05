@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,18 @@ package org.unitils.core.util;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.NoOp;
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
+import org.unitils.mock.MockUnitils;
 import org.unitils.mock.core.MockObject;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Collection;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -32,7 +37,7 @@ import java.util.Collection;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class MockAndProxyObjectFormatterTest extends UnitilsJUnit4 {
+public class ObjectFormatterMockAndProxyTest extends UnitilsJUnit4 {
 
     private ObjectFormatter objectFormatter = new ObjectFormatter();
 
@@ -42,6 +47,13 @@ public class MockAndProxyObjectFormatterTest extends UnitilsJUnit4 {
         Object proxy = createCgLibProxy();
         String result = objectFormatter.format(proxy);
         assertEquals("Proxy<Collection>", result);
+    }
+
+    @Test
+    public void formatJdkProxy() {
+        Object proxy = createJdkProxy();
+        String result = objectFormatter.format(proxy);
+        assertEquals("Proxy<?>", result);
     }
 
     @Test
@@ -58,6 +70,13 @@ public class MockAndProxyObjectFormatterTest extends UnitilsJUnit4 {
         assertEquals("Mock<mockName>", result);
     }
 
+    @Test
+    public void formatDummy() {
+        Object dummy = MockUnitils.createDummy(Collection.class);
+        String result = objectFormatter.format(dummy);
+        assertEquals("Dummy<Collection>", result);
+    }
+
 
     private Object createCgLibProxy() {
         Enhancer enhancer = new Enhancer();
@@ -65,5 +84,14 @@ public class MockAndProxyObjectFormatterTest extends UnitilsJUnit4 {
         enhancer.setCallback(new NoOp() {
         });
         return enhancer.create();
+    }
+
+    private Object createJdkProxy() {
+        return Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[]{Collection.class}, new InvocationHandler() {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                return null;
+            }
+        });
     }
 }

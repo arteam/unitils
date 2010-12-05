@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,9 @@
  */
 package org.unitils.mock.dummy;
 
-import static junit.framework.Assert.*;
+import junit.framework.Assert;
+import org.junit.Test;
+import org.unitils.mock.core.proxy.CloneUtil;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -23,10 +25,7 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
-import org.unitils.mock.core.proxy.CloneUtil;
+import static junit.framework.Assert.*;
 
 /**
  * @author Filip Neven
@@ -186,7 +185,7 @@ public class DummyObjectUtilTest {
 
         public Object[] getArray() {
             return new TestClass[]{
-                new TestClass("test 123")
+                    new TestClass("test 123")
             };
         }
 

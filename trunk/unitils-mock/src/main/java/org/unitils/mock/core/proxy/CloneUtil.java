@@ -25,6 +25,7 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -94,9 +95,6 @@ public class CloneUtil {
         if (isImmutable(instanceToClone)) {
             return instanceToClone;
         }
-        if (shouldNotClone(instanceToClone)) {
-            return instanceToClone;
-        }
         // check for arrays
         if (instanceToClone.getClass().isArray()) {
             return cloneArray(instanceToClone, cloneCache);
@@ -104,6 +102,14 @@ public class CloneUtil {
         // if the instance is cloneable, try to clone it
         if (instanceToClone instanceof Cloneable) {
             return createInstanceUsingClone(instanceToClone);
+        }
+        // don't clone java classes (unless they are cloneable)
+        if (isJdkClass(instanceToClone)) {
+            return instanceToClone;
+        }
+        // don't clone proxies
+        if (isProxy(instanceToClone)) {
+            return instanceToClone;
         }
         // try to clone it ourselves
         Object clonedInstance = createInstanceUsingObjenesis(instanceToClone);
@@ -138,23 +144,17 @@ public class CloneUtil {
         return false;
     }
 
-
     /**
      * @param instanceToClone The instance, not null
      * @return True if the instance is should not be cloned, e.g. a java lang class or a data source
      */
-    protected static boolean shouldNotClone(Object instanceToClone) {
-        Class<?> clazz = instanceToClone.getClass();
-
-        // todo implement using regexp
-
-        // don't clone java classes
-        String className = clazz.getName();
-        if (className.startsWith("java.lang.") || className.startsWith("java.io.") || className.startsWith("javax.sql.")) {
-            return true;
+    protected static boolean isJdkClass(Object instanceToClone) {
+        if (instanceToClone instanceof Collection || instanceToClone instanceof Map) {
+            // make sure to clone collections
+            return false;
         }
-        // don't clone proxies
-        if (isProxy(instanceToClone)) {
+        String className = instanceToClone.getClass().getName();
+        if (className.startsWith("java.")) {
             return true;
         }
         return false;

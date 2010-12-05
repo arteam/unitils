@@ -80,7 +80,6 @@ public class InjectModule implements Module {
      *
      * @param configuration The configuration, not null
      */
-    @SuppressWarnings("unchecked")
     public void init(Properties configuration) {
         defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(InjectModule.class, configuration, InjectInto.class, InjectIntoStatic.class, InjectIntoByType.class, InjectIntoStaticByType.class);
         createTestedObjectsIfNullEnabled = PropertyUtils.getBoolean(PROPKEY_CREATE_TESTEDOBJECTS_IF_NULL_ENABLED, configuration);
