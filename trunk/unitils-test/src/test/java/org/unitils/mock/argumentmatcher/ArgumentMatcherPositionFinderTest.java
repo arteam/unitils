@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,22 @@
  */
 package org.unitils.mock.argumentmatcher;
 
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
-import static org.unitils.mock.ArgumentMatchers.notNull;
-import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
+import org.unitils.mock.MockUnitils;
 import org.unitils.mock.core.MockObject;
-import org.unitils.mock.dummy.DummyObjectUtil;
 import org.unitils.mock.mockbehavior.MockBehavior;
-import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
-import static org.unitils.util.ReflectionUtils.getMethod;
 
 import java.lang.reflect.Method;
-import static java.util.Arrays.asList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertTrue;
+import static org.unitils.mock.ArgumentMatchers.notNull;
+import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
+import static org.unitils.util.ReflectionUtils.getMethod;
 
 /**
  * Tests the finding of the argument matchers in a proxy method invocation.
@@ -48,8 +49,7 @@ public class ArgumentMatcherPositionFinderTest {
     private int multiLineInvocationLineNrFrom = invocationLineNr + 8;
     private int multiLineInvocationLineNrTo = invocationLineNr + 10;
     private int noArgumentsInvocationLineNr = invocationLineNr + 12;
-    private int nestedArgumentMatcherLineNr = invocationLineNr + 14;
-    private int nestedMethodInvocationLineNr = invocationLineNr + 16;
+    private int nestedMethodInvocationLineNr = invocationLineNr + 14;
 
     /* A regular target method on the proxy */
     private Method proxyMethod;
@@ -162,9 +162,9 @@ public class ArgumentMatcherPositionFinderTest {
      */
     public static class TestClass {
 
-        MockObject<MockedClass> mockObject = new MockObject<MockedClass>("testMock", MockedClass.class, this);
+        private MockObject<MockedClass> mockObject = new MockObject<MockedClass>("testMock", MockedClass.class, this);
 
-        MockBehavior dummyBehavior = DummyObjectUtil.createDummy(MockBehavior.class);
+        private MockBehavior dummyBehavior = MockUnitils.createDummy(MockBehavior.class);
 
         public void test() {
             // regular invocation
@@ -181,8 +181,6 @@ public class ArgumentMatcherPositionFinderTest {
                     notNull(String.class));
             // no arguments invocation
             mockObject.performs(dummyBehavior).someMethod();
-            // nested argument matcher
-            mockObject.performs(dummyBehavior).someMethod(notNull(String.class), "aValue", "aValue");
             // method also used inside argument expression
             mockObject.performs(dummyBehavior).valueReturningMethod(notNull(String.class), new MockedClass().valueReturningMethod(null, null, null), "aValue");
         }
