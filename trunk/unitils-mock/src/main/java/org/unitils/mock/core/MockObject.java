@@ -48,15 +48,12 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
 
     /* The name of the mock (e.g. the name of the field) */
     protected String name;
-
     /* The class type that is mocked */
     protected Class<T> mockedType;
-
     protected MockProxy<T> mockProxy;
 
     /* Mock behaviors that are removed once they have been matched */
     protected BehaviorDefiningInvocations oneTimeMatchingBehaviorDefiningInvocations;
-
     /* Mock behaviors that can be matched and re-used for several invocation */
     protected BehaviorDefiningInvocations alwaysMatchingBehaviorDefiningInvocations;
 
@@ -102,13 +99,8 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
      * @param mockedType The mock type that will be proxied, use the raw type when mocking generic types, not null
      * @param testObject The test object, not null
      */
-    public MockObject(String name, Class<?> mockedType, Object testObject) {
-        this(name, mockedType, null, testObject);
-    }
-
-
     @SuppressWarnings({"unchecked"})
-    protected MockObject(String name, Class<?> mockedType, Object mockedInstance, Object testObject) {
+    public MockObject(String name, Class<?> mockedType, Object testObject) {
         if (isBlank(name)) {
             this.name = uncapitalize(mockedType.getSimpleName()) + "Mock";
         } else {
@@ -124,7 +116,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
             getMatchingInvocationBuilder().reset();
             scenario.setTestObject(testObject);
         }
-        this.mockProxy = createMockProxy(mockedInstance);
+        this.mockProxy = createMockProxy();
     }
 
 
@@ -447,7 +439,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
         return scenario;
     }
 
-    protected MockProxy<T> createMockProxy(Object mockedInstance) {
+    protected MockProxy<T> createMockProxy() {
         return new MockProxy<T>(name, mockedType, oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, getCurrentScenario(), getMatchingInvocationBuilder());
     }
 

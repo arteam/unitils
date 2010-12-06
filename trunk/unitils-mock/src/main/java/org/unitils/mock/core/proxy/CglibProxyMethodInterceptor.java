@@ -122,20 +122,15 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
          * Invokes the original behavior by calling the method proxy.
          * If there is no original behavior, e.g. an interface or abstract method, an exception is raised.
          *
-         * @param mockedInstance the instance to invoke the behavior on, null for the proxied class
          * @return The result value
          */
         @Override
-        public Object invokeOriginalBehavior(Object mockedInstance) throws Throwable {
+        public Object invokeOriginalBehavior() throws Throwable {
             Method method = getMethod();
             if (isAbstract(method.getModifiers())) {
                 throw new UnitilsException("Unable to invoke original behavior. The method is abstract, it does not have any behavior defined: " + getMethod());
             }
-            if (mockedInstance == null) {
-                return methodProxy.invokeSuper(getProxy(), getArguments().toArray());
-            }
-            method.setAccessible(true);
-            return method.invoke(mockedInstance, getArguments().toArray());
+            return methodProxy.invokeSuper(getProxy(), getArguments().toArray());
         }
     }
 }

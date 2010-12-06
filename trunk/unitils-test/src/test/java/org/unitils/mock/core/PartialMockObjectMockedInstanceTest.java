@@ -59,6 +59,14 @@ public class PartialMockObjectMockedInstanceTest {
         assertEquals(17, result);
     }
 
+    @Test
+    public void overridingMethodCalledFromOtherMethod() {
+        mockObject.returns(999).methodWithArguments(3, 4);
+
+        int result = mockObject.getMock().methodThatCallsOtherMethod(3, 4);
+        assertEquals(999, result);
+    }
+
 
     private static class TestClass {
 
@@ -73,8 +81,12 @@ public class PartialMockObjectMockedInstanceTest {
             return someValue;
         }
 
-        public int methodWithArguments(int a, int b) {
+        protected int methodWithArguments(int a, int b) {
             return a + b + c;
+        }
+
+        public int methodThatCallsOtherMethod(int a, int b) {
+            return methodWithArguments(a, b);
         }
 
     }

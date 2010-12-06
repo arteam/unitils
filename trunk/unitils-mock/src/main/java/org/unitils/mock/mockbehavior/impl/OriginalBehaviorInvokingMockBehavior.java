@@ -33,17 +33,6 @@ import static java.lang.reflect.Modifier.isAbstract;
  */
 public class OriginalBehaviorInvokingMockBehavior implements ValidatableMockBehavior {
 
-    /* The instance to invoke the behavior on, null for the proxied class */
-    protected Object mockedInstance;
-
-
-    /**
-     * @param mockedInstance the instance to invoke the behavior on, null for the proxied class
-     */
-    public OriginalBehaviorInvokingMockBehavior(Object mockedInstance) {
-        this.mockedInstance = mockedInstance;
-    }
-
 
     /**
      * Checks whether the mock behavior can be executed for the given invocation.
@@ -65,7 +54,7 @@ public class OriginalBehaviorInvokingMockBehavior implements ValidatableMockBeha
      * @return The result value
      */
     public Object execute(ProxyInvocation proxyInvocation) throws Throwable {
-        return proxyInvocation.invokeOriginalBehavior(mockedInstance);
+        return proxyInvocation.invokeOriginalBehavior();
     }
 
 }
