@@ -90,10 +90,9 @@ public abstract class ProxyInvocation {
     /**
      * Calls the actual method that was proxied using the same arguments.
      *
-     * @param mockedInstance the instance to invoke the behavior on, null for the proxied class
      * @return The result value
      */
-    public Object invokeOriginalBehavior(Object mockedInstance) throws Throwable {
+    public Object invokeOriginalBehavior() throws Throwable {
         throw new UnsupportedOperationException("Invoking of original behavior not implemented.");
     }
 

@@ -621,4 +621,25 @@ public class ReflectionUtils {
         throw new UnitilsException("Unable to convert Type instance " + type + " to a Class instance.");
     }
 
+
+    public static void copyFields(Object fromObject, Object toObject) {
+        try {
+            copyFields(fromObject.getClass(), fromObject, toObject);
+        } catch (Exception e) {
+            throw new UnitilsException("Unable to copy fields.", e);
+        }
+    }
+
+    private static void copyFields(Class<?> clazz, Object fromObject, Object toObject) throws IllegalAccessException {
+        if (clazz == null) {
+            return;
+        }
+        for (Field field : clazz.getDeclaredFields()) {
+            field.setAccessible(true);
+            Object fromValue = field.get(fromObject);
+            field.set(toObject, fromValue);
+        }
+        copyFields(clazz.getSuperclass(), fromObject, toObject);
+    }
+
 }

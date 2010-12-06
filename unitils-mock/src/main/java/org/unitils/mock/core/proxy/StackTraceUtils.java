@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 package org.unitils.mock.core.proxy;
 
 import org.unitils.core.UnitilsException;
-import static org.unitils.mock.core.proxy.ProxyUtils.isProxyClassName;
-import static org.unitils.util.ReflectionUtils.getClassWithName;
 
 import static java.lang.System.arraycopy;
+import static org.unitils.mock.core.proxy.ProxyUtils.isProxyClassName;
+import static org.unitils.util.ReflectionUtils.getClassWithName;
 
 /**
  * Class offering utilities involving the call stack
@@ -45,7 +45,7 @@ public class StackTraceUtils {
 
     /**
      * @param invokedInterface Class/interface to which an invocation can be found in the current call stack
-     * @return Stacktrace that indicates the most recent method call in the stack that calls a method from the given class, null if not found
+     * @return Stack trace that indicates the most recent method call in the stack that calls a method from the given class, null if not found
      */
     public static StackTraceElement[] getInvocationStackTrace(Class<?> invokedInterface) {
         return getInvocationStackTrace(invokedInterface, true);

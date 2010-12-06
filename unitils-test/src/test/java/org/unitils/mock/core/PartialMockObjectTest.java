@@ -130,6 +130,14 @@ public class PartialMockObjectTest {
         assertEquals(7, result);
     }
 
+    @Test
+    public void overridingMethodCalledFromOtherMethod() {
+        mockObject.returns(999).methodWithArguments(3, 4);
+
+        int result = mockObject.getMock().methodThatCallsOtherMethod(3, 4);
+        assertEquals(999, result);
+    }
+
 
     /**
      * Class that is mocked during the tests. The test method counts how many times it was invoked.
@@ -145,6 +153,10 @@ public class PartialMockObjectTest {
 
         public int methodWithArguments(int a, int b) {
             return a + b;
+        }
+
+        public int methodThatCallsOtherMethod(int a, int b) {
+            return methodWithArguments(a, b);
         }
 
         public abstract void abstractMethod();
