@@ -18,7 +18,6 @@ package org.unitils.mock.dummy;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.proxy.ProxyInvocationHandler;
 import org.unitils.mock.mockbehavior.MockBehavior;
-import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
 import org.unitils.mock.mockbehavior.impl.DummyValueReturningMockBehavior;
 
 import static org.unitils.mock.core.proxy.ProxyFactory.createProxy;
@@ -39,10 +38,6 @@ public class DummyObjectUtil {
      * @return The proxy, not null
      */
     public static <T> T createDummy(Class<T> type) {
-        return createDummy(type, new DefaultValueReturningMockBehavior());
-    }
-
-    public static <T> T createStuffedDummy(Class<T> type) {
         return createDummy(type, new DummyValueReturningMockBehavior());
     }
 

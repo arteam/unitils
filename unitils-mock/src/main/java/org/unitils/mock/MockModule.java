@@ -23,7 +23,6 @@ import org.unitils.mock.annotation.AfterCreateMock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.core.MockObject;
 import org.unitils.mock.core.PartialMockObject;
-import org.unitils.mock.dummy.DummyObjectUtil;
 import org.unitils.util.AnnotationUtils;
 
 import java.lang.reflect.Field;
@@ -33,6 +32,7 @@ import java.lang.reflect.Type;
 import java.util.Properties;
 import java.util.Set;
 
+import static org.unitils.mock.dummy.DummyObjectUtil.createDummy;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.*;
 
@@ -112,13 +112,7 @@ public class MockModule implements Module {
     protected void createAndInjectDummiesIntoTest(Object testObject) {
         Set<Field> fields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), Dummy.class);
         for (Field field : fields) {
-            Dummy dummyAnnotation = field.getAnnotation(Dummy.class);
-            Object dummy;
-            if (dummyAnnotation.stuffed()) {
-                dummy = DummyObjectUtil.createStuffedDummy(field.getType());
-            } else {
-                dummy = DummyObjectUtil.createDummy(field.getType());
-            }
+            Object dummy = createDummy(field.getType());
             setFieldValue(testObject, field, dummy);
         }
     }
