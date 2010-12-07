@@ -20,12 +20,17 @@ import org.junit.Test;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.unitils.mock.ArgumentMatchers.notNull;
 import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
 
@@ -130,6 +135,22 @@ public class MockObjectTest {
         assertEquals("testClassMock", mockObject.getName());
     }
 
+    @Test
+    public void proxyArgumentsAndResult() {
+        Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[]{Collection.class}, new InvocationHandler() {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                return null;
+            }
+        });
+
+        MockObject<TestClass> mockObject = new MockObject<TestClass>(TestClass.class, this);
+        mockObject.returns(proxy).doSomething(proxy);
+
+        Object result = mockObject.getMock().doSomething(proxy);
+        assertSame(proxy, result);
+    }
+
 
     /**
      * Interface that is mocked during the tests
@@ -141,6 +162,8 @@ public class MockObjectTest {
         public int[] testMethodArray();
 
         public Object clone() throws CloneNotSupportedException;
+
+        public Object doSomething(Object proxy);
     }
 
 

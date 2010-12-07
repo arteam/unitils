@@ -105,10 +105,17 @@ public abstract class ProxyInvocationsReport {
                 return objectRepresentation;
             }
             // The object representation is to large to be shown inline. Generate a name for it, which can be shown as a replacement.
-            valueName = createLargeValueName(type, largeObjectNameIndexes);
+            if (allLargeObjects.containsKey(value)) {
+                // reuse the same value name for the same instance 
+                FormattedObject formattedObject = allLargeObjects.get(value);
+                valueName = formattedObject.getName();
+            } else {
+                valueName = createLargeValueName(type, largeObjectNameIndexes);
+            }
         }
         FormattedObject formattedObject = new FormattedObject(valueName, objectRepresentation);
         allLargeObjects.put(valueAtInvocationTime, formattedObject);
+        allLargeObjects.put(value, formattedObject);
         currentLargeObjects.add(formattedObject);
         return valueName;
     }
