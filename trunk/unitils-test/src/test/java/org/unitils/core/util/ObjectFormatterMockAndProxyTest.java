@@ -29,6 +29,7 @@ import java.lang.reflect.Proxy;
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
+import static org.unitils.core.util.ObjectFormatter.MOCK_NAME_CHAIN_SEPARATOR;
 
 
 /**
@@ -68,6 +69,13 @@ public class ObjectFormatterMockAndProxyTest extends UnitilsJUnit4 {
         Object mockProxy = new MockObject<Collection>("mockName", Collection.class, this).getMock();
         String result = objectFormatter.format(mockProxy);
         assertEquals("Mock<mockName>", result);
+    }
+
+    @Test
+    public void formatChainedMockProxy() {
+        Object mockProxy = new MockObject<Collection>("mock1" + MOCK_NAME_CHAIN_SEPARATOR + "mock2" + MOCK_NAME_CHAIN_SEPARATOR + "mock3", Collection.class, this).getMock();
+        String result = objectFormatter.format(mockProxy);
+        assertEquals("Mock<mock1.mock2.mock3>", result);
     }
 
     @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,12 @@ import org.unitils.mock.core.ObservedInvocation;
 import java.lang.reflect.Method;
 import java.util.*;
 
+import static org.unitils.core.util.ObjectFormatter.MOCK_NAME_CHAIN_SEPARATOR;
+
+
 /**
  * A view that displays the observed invocations and the location where they were invoked.
- * The arguments are shown inline when the lenght is small enough, else the argument is named using the
+ * The arguments are shown inline when the length is small enough, else the argument is named using the
  * type (eg Person => person1).
  * <p/>
  * Example: <pre><code>
@@ -36,7 +39,6 @@ import java.util.*;
  * @author Tim Ducheyne
  */
 public class ObservedInvocationsReport extends ProxyInvocationsReport {
-
 
 
     public ObservedInvocationsReport(Object testedObject) {
@@ -85,7 +87,7 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
         Method method = observedInvocation.getMethod();
 
         // append the mock and method name
-        result.append(observedInvocation.getMockName());
+        result.append(formatMockName(observedInvocation));
         result.append('.');
         result.append(method.getName());
 
@@ -113,6 +115,11 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
             result.append(formatValue(resultAtInvocationTime, resultValue, resultType, currentLargeObjects, allLargeObjects, largeObjectNameIndexes));
         }
         return result.toString();
+    }
+
+    protected String formatMockName(ObservedInvocation observedInvocation) {
+        String mockName = observedInvocation.getMockName();
+        return mockName.replaceAll(MOCK_NAME_CHAIN_SEPARATOR, ".");
     }
 
 }

@@ -31,19 +31,14 @@ public abstract class ProxyInvocation {
 
     /* The name of the mock, e.g. the field name */
     private String mockName;
-
     /* The proxy on which the method was called */
     private Object proxy;
-
     /* The method that was called */
     private Method method;
-
     /* The arguments that were used */
     private List<Object> arguments;
-
     /* The arguments at the time that they were used */
     private List<Object> argumentsAtInvocationTime;
-
     /* The trace of the invocation */
     private StackTraceElement[] invokedAtTrace;
 
@@ -121,7 +116,6 @@ public abstract class ProxyInvocation {
         return mockName;
     }
 
-
     /**
      * @return The proxy on which the method was called, not null
      */
@@ -129,14 +123,12 @@ public abstract class ProxyInvocation {
         return proxy;
     }
 
-
     /**
      * @return The method that was called, not null
      */
     public Method getMethod() {
         return method;
     }
-
 
     /**
      * @return The arguments that were used, not null

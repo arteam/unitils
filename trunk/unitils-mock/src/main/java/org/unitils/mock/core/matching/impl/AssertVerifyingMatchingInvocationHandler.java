@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,16 @@ import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.util.List;
 
+import static org.unitils.core.util.ObjectFormatter.MOCK_NAME_CHAIN_SEPARATOR;
+
+
 /**
- * todo javadoc
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public abstract class AssertVerifyingMatchingInvocationHandler implements MatchingInvocationHandler {
 
     protected Scenario scenario;
-
     protected MockFactory mockFactory;
 
 
@@ -47,17 +50,17 @@ public abstract class AssertVerifyingMatchingInvocationHandler implements Matchi
         return createChainedMock(proxyInvocation);
     }
 
+
     protected Object createChainedMock(ProxyInvocation proxyInvocation) {
         Class<?> innerMockType = proxyInvocation.getMethod().getReturnType();
-        String innerMockName = proxyInvocation.getMockName() + "." + proxyInvocation.getMethod().getName();
+        String innerMockName = proxyInvocation.getMockName() + MOCK_NAME_CHAIN_SEPARATOR + proxyInvocation.getMethod().getName();
 
-        Mock<?> mock = mockFactory.createMock(innerMockName, innerMockType);
+        Mock<?> mock = mockFactory.createChainedMock(innerMockName, innerMockType);
         if (mock == null) {
             return null;
         }
         return performChainedAssertion(mock);
     }
-
 
     protected abstract void performAssertion(Scenario scenario, BehaviorDefiningInvocation behaviorDefiningInvocation);
 

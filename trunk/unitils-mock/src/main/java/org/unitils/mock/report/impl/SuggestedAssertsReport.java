@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,15 @@
  */
 package org.unitils.mock.report.impl;
 
-import static org.unitils.util.ReflectionUtils.getAllFields;
-import static org.unitils.util.ReflectionUtils.getFieldValue;
+import org.unitils.mock.core.ObservedInvocation;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
 
-import org.unitils.mock.core.ObservedInvocation;
+import static org.unitils.core.util.ObjectFormatter.MOCK_NAME_CHAIN_SEPARATOR;
+import static org.unitils.util.ReflectionUtils.getAllFields;
+import static org.unitils.util.ReflectionUtils.getFieldValue;
 
 /**
  * A view that will return a list of suggested assert statements that one can use in a test for the given scenario.
@@ -35,10 +36,10 @@ public class SuggestedAssertsReport {
 
 
     /**
-     * Creates a string representation of the given scenario.
-     * @param testObject 
-     * @param scenario The sceneario, not null
+     * Creates a string representation of the given invocations.
      *
+     * @param testObject          The test instance, not null
+     * @param observedInvocations The invocations, not null
      * @return The string representation, not null
      */
     public String createReport(Object testObject, List<ObservedInvocation> observedInvocations) {
@@ -66,7 +67,7 @@ public class SuggestedAssertsReport {
     protected String getSuggestedAssertStatement(Object testObject, ObservedInvocation observedInvocation) {
         StringBuilder result = new StringBuilder();
 
-        result.append(observedInvocation.getMockName());
+        result.append(formatMockName(observedInvocation));
         result.append(".assertInvoked().");
         result.append(observedInvocation.getMethod().getName());
         result.append("(");
@@ -87,7 +88,6 @@ public class SuggestedAssertsReport {
         result.append(");");
         return result.toString();
     }
-
 
     /**
      * Creates an appropriate value so that the assert statement will be able to match the given argument value
@@ -113,7 +113,6 @@ public class SuggestedAssertsReport {
         return "null";
     }
 
-
     /**
      * Checks whether the given argument value is a value of a field in the test object and, if so, returns the
      * name of that field.
@@ -134,5 +133,10 @@ public class SuggestedAssertsReport {
             }
         }
         return null;
+    }
+
+    protected String formatMockName(ObservedInvocation observedInvocation) {
+        String mockName = observedInvocation.getMockName();
+        return mockName.replaceAll(MOCK_NAME_CHAIN_SEPARATOR, ".");
     }
 }

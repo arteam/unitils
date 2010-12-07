@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.unitils.mock.Mock;
 import org.unitils.mock.core.MockObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -41,8 +40,6 @@ public class DetailedObservedInvocationsReportTest {
     private DetailedObservedInvocationsReport detailedObservedInvocationsReport;
 
     private Mock<TestInterface> testMock;
-
-    private List<String> myTestField = new ArrayList<String>();
 
 
     @Before
