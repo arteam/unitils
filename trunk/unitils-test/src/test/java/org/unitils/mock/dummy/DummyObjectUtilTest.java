@@ -125,14 +125,13 @@ public class DummyObjectUtilTest {
         assertEquals(new Integer(0), dummy.getInteger());
         assertEquals(Long.valueOf(0), dummy.getLong());
         assertEquals(new Integer(0), dummy.getInteger());
-        assertEquals(new Float(0), dummy.getFloat());
+        assertEquals((float) 0, dummy.getFloat());
         assertEquals(new BigInteger("0"), dummy.getBigInteger());
-        assertEquals(new Double(0), dummy.getDouble());
+        assertEquals((double) 0, dummy.getDouble());
         assertEquals(new Short("0"), dummy.getShort());
         assertEquals(new BigDecimal("0"), dummy.getBigDecimal());
         assertEquals(new Byte("0"), dummy.getByte());
-        assertEquals(null, dummy.getArray());
-
+        assertTrue(dummy.getArray() instanceof Object[]);
     }
 
     @Test
@@ -144,13 +143,13 @@ public class DummyObjectUtilTest {
         assertEquals(0, dummy.getInt());
         assertEquals(Long.valueOf(0), dummy.getLong());
         assertEquals(new Integer(0), dummy.getInteger());
-        assertEquals(new Float(0), dummy.getFloat());
+        assertEquals((float) 0, dummy.getFloat());
         assertEquals(new BigInteger("0"), dummy.getBigInteger());
-        assertEquals(new Double(0), dummy.getDouble());
+        assertEquals((double) 0, dummy.getDouble());
         assertEquals(new Short("0"), dummy.getShort());
         assertEquals(new BigDecimal("0"), dummy.getBigDecimal());
         assertEquals(new Byte("0"), dummy.getByte());
-        assertEquals(null, dummy.getArray());
+        assertTrue(dummy.getArray() instanceof Object[]);
     }
 
     @Test
@@ -174,6 +173,7 @@ public class DummyObjectUtilTest {
         assertEquals(dummy, clone);
     }
 
+    @SuppressWarnings({"UnusedDeclaration"})
     private class TestClass {
 
         public TestClass(String someValue) {

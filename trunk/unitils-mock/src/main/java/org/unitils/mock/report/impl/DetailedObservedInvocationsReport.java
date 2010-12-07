@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -145,12 +145,20 @@ public class DetailedObservedInvocationsReport extends ObservedInvocationsReport
     protected String formatLargeObjects(List<FormattedObject> largeObjects) {
         StringBuilder result = new StringBuilder();
 
+        List<String> usedNames = new ArrayList<String>();
         if (!largeObjects.isEmpty()) {
             for (FormattedObject largeObject : largeObjects) {
+                String name = largeObject.getName();
+                if (usedNames.contains(name)) {
+                    // skip doubles
+                    continue;
+                }
+                usedNames.add(name);
+                String representation = largeObject.getRepresentation();
                 result.append("- ");
-                result.append(largeObject.getName());
+                result.append(name);
                 result.append(" -> ");
-                result.append(largeObject.getRepresentation());
+                result.append(representation);
                 result.append("\n");
             }
         }
