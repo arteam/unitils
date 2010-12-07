@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,18 +18,20 @@ package org.unitils.mock.core.matching;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
-import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
 import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
 import org.unitils.mock.argumentmatcher.impl.DefaultArgumentMatcher;
-import static org.unitils.mock.core.proxy.ProxyFactory.createUninitializedProxy;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.proxy.ProxyInvocationHandler;
-import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationStackTrace;
-import static org.unitils.mock.core.proxy.StackTraceUtils.getStackTraceStartingFrom;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import static org.unitils.core.util.ObjectFormatter.MOCK_NAME_CHAIN_SEPARATOR;
+import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
+import static org.unitils.mock.core.proxy.ProxyFactory.createUninitializedProxy;
+import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationStackTrace;
+import static org.unitils.mock.core.proxy.StackTraceUtils.getStackTraceStartingFrom;
 
 /**
  * @author Filip Neven
@@ -38,15 +40,15 @@ import java.util.List;
 public class MatchingInvocationBuilder {
 
     protected String currentMockName;
-
     protected String definingMethodName;
-
     protected StackTraceElement[] invokedAt;
+    protected MatchingInvocationHandler matchingInvocationHandler;
 
 
     public synchronized <T> T startMatchingInvocation(String mockName, Class<T> mockedType, MatchingInvocationHandler matchingInvocationHandler) {
         assertNotExpectingInvocation();
         this.currentMockName = mockName;
+        this.matchingInvocationHandler = matchingInvocationHandler;
 
         this.invokedAt = getInvocationStackTrace(Mock.class);
         this.definingMethodName = invokedAt[0].getMethodName();
@@ -54,16 +56,14 @@ public class MatchingInvocationBuilder {
         return createUninitializedProxy(mockName, new InvocationHandler(matchingInvocationHandler), mockedType);
     }
 
-
     public synchronized void reset() {
         this.currentMockName = null;
         this.invokedAt = null;
         this.definingMethodName = null;
     }
 
-
     public synchronized void assertNotExpectingInvocation() {
-        if (currentMockName != null && !isChainedMock(currentMockName)) {
+        if (currentMockName != null && !isChainedMock()) {
             UnitilsException exception = new UnitilsException("Invalid syntax. " + currentMockName + "." + definingMethodName + "() must be followed by a method invocation on the returned proxy. E.g. " + currentMockName + "." + definingMethodName + "().myMethod();");
             exception.setStackTrace(getStackTraceStartingFrom(invokedAt, 1));
             reset();
@@ -73,10 +73,9 @@ public class MatchingInvocationBuilder {
     }
 
 
-    protected boolean isChainedMock(String mockName) {
-        return currentMockName.contains(".");
+    protected boolean isChainedMock() {
+        return currentMockName.contains(MOCK_NAME_CHAIN_SEPARATOR);
     }
-
 
     protected Object handleProxyInvocation(ProxyInvocation proxyInvocation, MatchingInvocationHandler matchingInvocationHandler) throws Throwable {
         ArgumentMatcherRepository.getInstance().registerEndOfMatchingInvocation(proxyInvocation.getLineNumber(), proxyInvocation.getMethod().getName());
@@ -87,7 +86,6 @@ public class MatchingInvocationBuilder {
         ArgumentMatcherRepository.getInstance().reset();
         return result;
     }
-
 
     protected List<ArgumentMatcher> createArgumentMatchers(ProxyInvocation proxyInvocation) {
         List<ArgumentMatcher> result = new ArrayList<ArgumentMatcher>();
@@ -110,6 +108,7 @@ public class MatchingInvocationBuilder {
         argumentMatcherRepository.reset();
         return result;
     }
+
 
     protected class InvocationHandler implements ProxyInvocationHandler {
 

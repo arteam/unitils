@@ -31,6 +31,8 @@ import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.uncapitalize;
@@ -56,6 +58,8 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
     protected BehaviorDefiningInvocations oneTimeMatchingBehaviorDefiningInvocations;
     /* Mock behaviors that can be matched and re-used for several invocation */
     protected BehaviorDefiningInvocations alwaysMatchingBehaviorDefiningInvocations;
+    /* Created chained mocks per mock name */
+    protected Map<String, Mock<?>> chainedMocksPerName;
 
     /* The scenario that will record all observed invocations */
     protected static ThreadLocal<Scenario> scenarioThreadLocal = new ThreadLocal<Scenario>();
@@ -109,6 +113,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
         this.mockedType = (Class<T>) mockedType;
         this.oneTimeMatchingBehaviorDefiningInvocations = createOneTimeMatchingBehaviorDefiningInvocations();
         this.alwaysMatchingBehaviorDefiningInvocations = createAlwaysMatchingBehaviorDefiningInvocations();
+        this.chainedMocksPerName = new HashMap<String, Mock<?>>();
 
         Scenario scenario = getScenario(testObject);
         if (scenario.getTestObject() != testObject) {
@@ -219,7 +224,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
      * <p/>
      * mock.raises(MyException.class).method1();
      * <p/>
-     * will throw an instance of the given exception classwhen method1 is called.
+     * will throw an instance of the given exception class when method1 is called.
      * <p/>
      * Note that this behavior is executed each time a match is found. So the exception will be raised
      * each time method1() is called. If you only want to raise the exception once, use the {@link #onceRaises} method.
@@ -396,17 +401,26 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
     public void resetBehavior() {
         oneTimeMatchingBehaviorDefiningInvocations.clear();
         alwaysMatchingBehaviorDefiningInvocations.clear();
+        chainedMocksPerName.clear();
         getMatchingInvocationBuilder().reset();
         ArgumentMatcherRepository.getInstance().reset();
     }
 
 
-    public <M> Mock<M> createMock(String name, Class<M> mockedType) {
+    @SuppressWarnings({"unchecked"})
+    public <M> Mock<M> createChainedMock(String name, Class<M> mockedType) {
+        Mock<?> chainedMock = chainedMocksPerName.get(name);
+        if (chainedMock != null) {
+            return (Mock<M>) chainedMock;
+        }
         try {
             if (Void.class.equals(mockedType) || mockedType.isPrimitive() || mockedType.isArray()) {
                 return null;
             }
-            return new MockObject<M>(name, mockedType, getCurrentScenario().getTestObject());
+            chainedMock = new MockObject<M>(name, mockedType, getCurrentScenario().getTestObject());
+            chainedMocksPerName.put(name, chainedMock);
+            return (Mock<M>) chainedMock;
+
         } catch (Throwable t) {
             return null;
         }

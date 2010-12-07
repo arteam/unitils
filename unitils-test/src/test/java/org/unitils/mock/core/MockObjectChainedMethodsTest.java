@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,10 @@
  */
 package org.unitils.mock.core;
 
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests chaining of methods when defining behavior and assertions (UNI-153).
@@ -45,7 +46,6 @@ public class MockObjectChainedMethodsTest {
         assertEquals("value", result);
     }
 
-
     @Test
     public void doubleChainedBehavior() {
         mockObject.returns("value").getTestClass().getTestClass().getValue();
@@ -53,7 +53,6 @@ public class MockObjectChainedMethodsTest {
         String result = mockObject.getMock().getTestClass().getTestClass().getValue();
         assertEquals("value", result);
     }
-
 
     @Test
     public void chainedAssertInvoked() {
@@ -63,7 +62,6 @@ public class MockObjectChainedMethodsTest {
         mockObject.assertInvoked().getTestClass().getValue();
     }
 
-
     @Test
     public void multipleAssertInvoked() {
         mockObject.getMock().getTestClass();
@@ -72,12 +70,10 @@ public class MockObjectChainedMethodsTest {
         mockObject.assertInvoked().getTestClass();
     }
 
-
     @Test
     public void chainedAssertNotInvoked() {
         mockObject.assertNotInvoked().getTestClass().getValue();
     }
-
 
     @Test(expected = AssertionError.class)
     public void chainedAssertNotInvokedButInvoked() {
@@ -86,7 +82,6 @@ public class MockObjectChainedMethodsTest {
         mockObject.getMock().getTestClass().getValue();
         mockObject.assertNotInvoked().getTestClass().getValue();
     }
-
 
     @Test
     public void chainedAssertInvokedInSequence() {
@@ -98,7 +93,6 @@ public class MockObjectChainedMethodsTest {
         mockObject.assertInvokedInSequence().getTestClass().getValue();
     }
 
-
     @Test(expected = AssertionError.class)
     public void chainedAssertInvokedInSequenceButNotInvoked() {
         mockObject.returns("value").getTestClass().getValue();
@@ -108,15 +102,28 @@ public class MockObjectChainedMethodsTest {
         mockObject.assertInvokedInSequence().getTestClass().getValue();
     }
 
+    @Test
+    public void multipleOperationsOnSameChainedMock() {
+        mockObject.returns("value1").getTestClass().getValue();
+        mockObject.returns("value2").getTestClass().getOtherValue();
 
-    /**
-     * Interface that is mocked during the tests
-     */
+        String result1 = mockObject.getMock().getTestClass().getValue();
+        String result2 = mockObject.getMock().getTestClass().getOtherValue();
+
+        assertEquals("value1", result1);
+        assertEquals("value2", result2);
+        mockObject.assertInvoked().getTestClass().getValue();
+        mockObject.assertInvoked().getTestClass().getOtherValue();
+    }
+
+
     private static interface TestClass {
 
-        public String getValue();
+        String getValue();
 
-        public TestClass getTestClass();
+        String getOtherValue();
+
+        TestClass getTestClass();
 
     }
 

@@ -46,7 +46,6 @@ public abstract class ProxyInvocationsReport {
      * The maximum nr of elements for arrays and collections to display in the reports
      */
     public static int OBJECT_FORMATTER_MAX_NR_ARRAY_OR_COLLECTION_ELEMENTS = 15;
-
     /**
      * The maximum length of an inline value
      */
@@ -193,7 +192,6 @@ public abstract class ProxyInvocationsReport {
 
         /* The name used as inline replacement */
         private String name;
-
         /* The actual string representation of the value */
         private String representation;
 
@@ -215,7 +213,6 @@ public abstract class ProxyInvocationsReport {
         public String getName() {
             return name;
         }
-
 
         /**
          * @return The actual string representation of the value, not null
