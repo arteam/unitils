@@ -40,20 +40,8 @@ public class DummyObjectUtilTest {
     }
 
     @Test
-    public void createStuffedDummyConcreteClass() {
-        ArrayList<?> list = DummyObjectUtil.createStuffedDummy(ArrayList.class);
-        assertNotNull(list);
-    }
-
-    @Test
     public void createDummyAbstractClass() {
         AbstractList<?> list = DummyObjectUtil.createDummy(AbstractList.class);
-        assertNotNull(list);
-    }
-
-    @Test
-    public void createStuffedDummyAbstractClass() {
-        AbstractList<?> list = DummyObjectUtil.createStuffedDummy(AbstractList.class);
         assertNotNull(list);
     }
 
@@ -76,37 +64,23 @@ public class DummyObjectUtilTest {
     }
 
     @Test
-    public void stuffedDummyEqualsHashcode() {
-        ArrayList<?> list1 = DummyObjectUtil.createStuffedDummy(ArrayList.class);
-
-        assertTrue(list1.equals(list1));
-        assertTrue(list1.hashCode() == list1.hashCode());
-
-        ArrayList<?> list2 = DummyObjectUtil.createStuffedDummy(ArrayList.class);
-        assertFalse(list1.equals(list2));
-        assertFalse(list1.hashCode() == list2.hashCode());
-    }
-
-    @Test
-    public void stuffedDummySameValueReturn() {
-        TestClass testClass = DummyObjectUtil.createStuffedDummy(TestClass.class);
+    public void dummySameValueReturn() {
+        TestClass testClass = DummyObjectUtil.createDummy(TestClass.class);
         TestClass result1 = testClass.getTestClass();
         TestClass result2 = testClass.getTestClass();
 
-        Assert.assertNotNull(result1);
-        Assert.assertNotNull(result2);
+        assertNotNull(result1);
+        assertNotNull(result2);
 
         Assert.assertEquals(result1, result2);
 
         TestClass result3 = result1.getTestClass();
-        Assert.assertNotNull(result3);
+        assertNotNull(result3);
 
-        Assert.assertFalse(result1.equals(result3));
+        assertFalse(result1.equals(result3));
 
         TestClass result4 = result3.getTestClass();
-        Assert.assertNotNull(result4);
-
-
+        assertNotNull(result4);
     }
 
     @Test
@@ -119,28 +93,10 @@ public class DummyObjectUtilTest {
     public void defaultBehavior() {
         TestClass dummy = DummyObjectUtil.createDummy(TestClass.class);
         assertTrue(dummy.getList().isEmpty());
-        assertNull(dummy.getString());
-        assertNull(dummy.getTestClass());
+        assertEquals("", dummy.getString());
+        assertTrue(dummy.getTestClass() instanceof TestClass);
         assertEquals(0, dummy.getInt());
         assertEquals(new Integer(0), dummy.getInteger());
-        assertEquals(Long.valueOf(0), dummy.getLong());
-        assertEquals(new Integer(0), dummy.getInteger());
-        assertEquals((float) 0, dummy.getFloat());
-        assertEquals(new BigInteger("0"), dummy.getBigInteger());
-        assertEquals((double) 0, dummy.getDouble());
-        assertEquals(new Short("0"), dummy.getShort());
-        assertEquals(new BigDecimal("0"), dummy.getBigDecimal());
-        assertEquals(new Byte("0"), dummy.getByte());
-        assertTrue(dummy.getArray() instanceof Object[]);
-    }
-
-    @Test
-    public void stuffedBehavior() {
-        TestClass dummy = DummyObjectUtil.createStuffedDummy(TestClass.class);
-        assertTrue(dummy.getList().isEmpty());
-        assertNotNull(dummy.getString());
-        assertNotNull(dummy.getTestClass());
-        assertEquals(0, dummy.getInt());
         assertEquals(Long.valueOf(0), dummy.getLong());
         assertEquals(new Integer(0), dummy.getInteger());
         assertEquals((float) 0, dummy.getFloat());
