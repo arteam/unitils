@@ -49,28 +49,6 @@
             </binaries>
         </moduleSet>
 
-        <!-- unitils-dbmaintainer -->
-        <moduleSet>
-            <includes>
-                <include>org.unitils:unitils-dbmaintainer</include>
-            </includes>
-            <sources>
-                <fileSets>
-                    <fileSet>
-                        <includes>
-                            <include>pom.xml</include>
-                            <include>src/main/**</include>
-                        </includes>
-                    </fileSet>
-                </fileSets>
-            </sources>
-            <binaries>
-                <includeDependencies>false</includeDependencies>
-                <outputDirectory>unitils-dbmaintainer</outputDirectory>
-                <unpack>false</unpack>
-            </binaries>
-        </moduleSet>
-
         <!-- unitils-dbunit -->
         <moduleSet>
             <includes>
@@ -115,28 +93,6 @@
             </binaries>
         </moduleSet>
 
-        <!-- unitils-inject -->
-        <moduleSet>
-            <includes>
-                <include>org.unitils:unitils-inject</include>
-            </includes>
-            <sources>
-                <fileSets>
-                    <fileSet>
-                        <includes>
-                            <include>pom.xml</include>
-                            <include>src/main/**</include>
-                        </includes>
-                    </fileSet>
-                </fileSets>
-            </sources>
-            <binaries>
-                <includeDependencies>false</includeDependencies>
-                <outputDirectory>unitils-inject</outputDirectory>
-                <unpack>false</unpack>
-            </binaries>
-        </moduleSet>
-
         <!-- unitils-mock -->
         <moduleSet>
             <includes>
@@ -159,10 +115,10 @@
             </binaries>
         </moduleSet>
 
-        <!-- unitils-orm -->
+        <!-- unitils-hibernate -->
         <moduleSet>
             <includes>
-                <include>org.unitils:unitils-orm</include>
+                <include>org.unitils:unitils-hibernate</include>
             </includes>
             <sources>
                 <fileSets>
@@ -176,73 +132,7 @@
             </sources>
             <binaries>
                 <includeDependencies>false</includeDependencies>
-                <outputDirectory>unitils-orm</outputDirectory>
-                <unpack>false</unpack>
-            </binaries>
-        </moduleSet>
-
-        <!-- unitils-spring -->
-        <moduleSet>
-            <includes>
-                <include>org.unitils:unitils-spring</include>
-            </includes>
-            <sources>
-                <fileSets>
-                    <fileSet>
-                        <includes>
-                            <include>pom.xml</include>
-                            <include>src/main/**</include>
-                        </includes>
-                    </fileSet>
-                </fileSets>
-            </sources>
-            <binaries>
-                <includeDependencies>false</includeDependencies>
-                <outputDirectory>unitils-spring</outputDirectory>
-                <unpack>false</unpack>
-            </binaries>
-        </moduleSet>
-
-        <!-- unitils-testng -->
-        <moduleSet>
-            <includes>
-                <include>org.unitils:unitils-testng</include>
-            </includes>
-            <sources>
-                <fileSets>
-                    <fileSet>
-                        <includes>
-                            <include>pom.xml</include>
-                            <include>src/main/**</include>
-                        </includes>
-                    </fileSet>
-                </fileSets>
-            </sources>
-            <binaries>
-                <includeDependencies>false</includeDependencies>
-                <outputDirectory>unitils-testng</outputDirectory>
-                <unpack>false</unpack>
-            </binaries>
-        </moduleSet>
-
-        <!-- unitils-tapestry -->
-        <moduleSet>
-            <includes>
-                <include>org.unitils:unitils-tapestry</include>
-            </includes>
-            <sources>
-                <fileSets>
-                    <fileSet>
-                        <includes>
-                            <include>pom.xml</include>
-                            <include>src/main/**</include>
-                        </includes>
-                    </fileSet>
-                </fileSets>
-            </sources>
-            <binaries>
-                <includeDependencies>false</includeDependencies>
-                <outputDirectory>unitils-tapestry</outputDirectory>
+                <outputDirectory>unitils-hibernate</outputDirectory>
                 <unpack>false</unpack>
             </binaries>
         </moduleSet>
