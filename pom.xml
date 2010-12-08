@@ -13,7 +13,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>unitils-core</module>
+        <module>unitils</module>
         <module>unitils-database</module>
         <module>unitils-dbunit</module>
         <module>unitils-easymock</module>
@@ -24,7 +24,7 @@
     </modules>
 
     <!-- Project information -->
-    <name>Unitils</name>
+    <name>Unitils parent pom</name>
     <url>http://www.unitils.org/</url>
     <description>
         Unitils provides utilities to further simplify unit-testing with JUnit, DBUnit, EasyMock
