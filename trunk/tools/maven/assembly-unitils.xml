@@ -25,7 +25,7 @@
                 <outputDirectory>unitils-core</outputDirectory>
                 <unpack>false</unpack>
             </binaries>
-        </moduleSet>
+        </moduleSet>        
 
         <!-- unitils-database -->
         <moduleSet>
@@ -89,28 +89,6 @@
             <binaries>
                 <includeDependencies>false</includeDependencies>
                 <outputDirectory>unitils-easymock</outputDirectory>
-                <unpack>false</unpack>
-            </binaries>
-        </moduleSet>
-
-        <!-- unitils-mock -->
-        <moduleSet>
-            <includes>
-                <include>org.unitils:unitils-mock</include>
-            </includes>
-            <sources>
-                <fileSets>
-                    <fileSet>
-                        <includes>
-                            <include>pom.xml</include>
-                            <include>src/main/**</include>
-                        </includes>
-                    </fileSet>
-                </fileSets>
-            </sources>
-            <binaries>
-                <includeDependencies>false</includeDependencies>
-                <outputDirectory>unitils-mock</outputDirectory>
                 <unpack>false</unpack>
             </binaries>
         </moduleSet>

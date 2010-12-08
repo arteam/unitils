@@ -8,7 +8,7 @@
     </parent>
 
     <groupId>org.unitils</groupId>
-    <artifactId>unitils</artifactId>
+    <artifactId>unitils-parent</artifactId>
     <version>4.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -16,8 +16,7 @@
         <module>unitils-core</module>
         <module>unitils-database</module>
         <module>unitils-dbunit</module>
-        <module>unitils-easymock</module>        
-        <module>unitils-mock</module>
+        <module>unitils-easymock</module>
         <module>unitils-hibernate</module>
         <module>unitils-dataset</module>
 
