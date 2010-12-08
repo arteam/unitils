@@ -16,8 +16,7 @@
         <module>unitils-core</module>
         <module>unitils-database</module>
         <module>unitils-dbunit</module>
-        <module>unitils-easymock</module>
-        <module>unitils-inject</module>
+        <module>unitils-easymock</module>        
         <module>unitils-mock</module>
         <module>unitils-hibernate</module>
         <module>unitils-dataset</module>
