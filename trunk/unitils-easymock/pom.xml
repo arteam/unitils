@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>org.unitils</groupId>
-            <artifactId>unitils-core</artifactId>
+            <artifactId>unitils</artifactId>
             <version>${pom.version}</version>
         </dependency>
         <dependency>

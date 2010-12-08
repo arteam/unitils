@@ -8,9 +8,9 @@
         <version>4.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>unitils-core</artifactId>
+    <artifactId>unitils</artifactId>
     <packaging>jar</packaging>
-    <name>Unitils core module</name>
+    <name>Unitils module</name>
 
     <build>
         <plugins>

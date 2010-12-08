@@ -5,10 +5,10 @@
     </formats>
 
     <moduleSets>
-        <!-- unitils-core -->
+        <!-- unitils -->
         <moduleSet>
             <includes>
-                <include>org.unitils:unitils-core</include>
+                <include>org.unitils:unitils</include>
             </includes>
             <sources>
                 <fileSets>
@@ -21,11 +21,11 @@
                 </fileSets>
             </sources>
             <binaries>
-                <outputDirectory>unitils-core</outputDirectory>
+                <outputDirectory>unitils</outputDirectory>
                 <dependencySets>
                     <dependencySet>
                         <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>unitils-core/lib</outputDirectory>
+                        <outputDirectory>unitils/lib</outputDirectory>
                         <useTransitiveFiltering>true</useTransitiveFiltering>
                         <excludes>
                             <exclude>cglib:cglib</exclude>
