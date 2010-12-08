@@ -4,7 +4,7 @@
 
     <parent>
         <groupId>org.unitils</groupId>
-        <artifactId>unitils</artifactId>
+        <artifactId>unitils-parent</artifactId>
         <version>4.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -14,9 +14,9 @@
 
     <dependencies>
 
-        <!-- There is a mismatch in the version of cglib that hibernate and unitils-mock uses. -->
-        <!-- Make sure we use the same version as the unitils-mock module -->
-        <!-- In the final artifacts this mismatch is resolved by bundling and repackaging cglib into unitils-mock -->
+        <!-- There is a mismatch in the version of cglib that hibernate and unitils uses. -->
+        <!-- Make sure we use the same version as the unitils module -->
+        <!-- In the final artifacts this mismatch is resolved by bundling and repackaging cglib into unitils -->
         <dependency>
             <groupId>asm</groupId>
             <artifactId>asm</artifactId>
@@ -61,11 +61,6 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-easymock</artifactId>
-            <version>${pom.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.unitils</groupId>
-            <artifactId>unitils-mock</artifactId>
             <version>${pom.version}</version>
         </dependency>
         <dependency>

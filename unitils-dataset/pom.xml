@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>unitils</artifactId>
         <groupId>org.unitils</groupId>
+        <artifactId>unitils-parent</artifactId>
         <version>4.0-SNAPSHOT</version>
     </parent>
     <artifactId>unitils-dataset</artifactId>
