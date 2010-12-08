@@ -47,10 +47,10 @@ public class BehaviorDefiningInvocations {
 
 
     /**
-     * First we find all behavior defining invocations that have matching argument matchers. From these matching
-     * invocations, we then count the nr of not-null (default) arguments. The result will be the
-     * invocation with the lowest number of not-null arguments. If there are multiple invocations with the same
-     * number, the first one is returned. E.g.
+     * First we find all behavior defining invocations that have matching argument matchers and take the one with the highest
+     * matching score (identity match scores higher than an equals match). If there are 2 invocations with the same score,
+     * we take the invocation with the lowest nr of not-null (default) arguments. If both have the same nr of not-null
+     * arguments, the first one is returned. E.g.
      *
      * myMethod(null, null);
      * myMethod("a", null);
@@ -62,16 +62,32 @@ public class BehaviorDefiningInvocations {
      */
     public BehaviorDefiningInvocation getMatchingBehaviorDefiningInvocation(ProxyInvocation proxyInvocation) {
         BehaviorDefiningInvocation bestMatchingBehaviorDefiningInvocation = null;
-        int bestMatchingNrOfNotNullArguments = -1;
+        int bestMatchingScore = -1;
 
         for (BehaviorDefiningInvocation behaviorDefiningInvocation : behaviorDefiningInvocations) {
-            if (!behaviorDefiningInvocation.matches(proxyInvocation)) {
+            int matchingScore = behaviorDefiningInvocation.matches(proxyInvocation);
+            if (matchingScore == -1) {
+                // no match
                 continue;
             }
-            int nrOfNotNullArguments = behaviorDefiningInvocation.getNrOfNotNullArguments();
-            if (nrOfNotNullArguments > bestMatchingNrOfNotNullArguments) {
+            if (matchingScore < bestMatchingScore) {
+                // there is a better match
+                continue;
+            }
+            if (matchingScore > bestMatchingScore) {
+                // better match
+                bestMatchingScore = matchingScore;
                 bestMatchingBehaviorDefiningInvocation = behaviorDefiningInvocation;
-                bestMatchingNrOfNotNullArguments = nrOfNotNullArguments;
+                continue;
+            }
+            if (matchingScore == bestMatchingScore) {
+                // same score, nr of not-null values determines the best match
+                int nrOfNotNullArguments = behaviorDefiningInvocation.getNrOfNotNullArguments();
+                int bestMatchingNrOfNotNullArguments = bestMatchingBehaviorDefiningInvocation.getNrOfNotNullArguments();
+                if (nrOfNotNullArguments > bestMatchingNrOfNotNullArguments) {
+                    bestMatchingScore = matchingScore;
+                    bestMatchingBehaviorDefiningInvocation = behaviorDefiningInvocation;
+                }
             }
         }
         if (removeWhenUsed && bestMatchingBehaviorDefiningInvocation != null) {
@@ -79,6 +95,4 @@ public class BehaviorDefiningInvocations {
         }
         return bestMatchingBehaviorDefiningInvocation;
     }
-
-
 }

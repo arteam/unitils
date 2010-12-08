@@ -18,6 +18,8 @@ package org.unitils.mock.core;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -65,6 +67,11 @@ public class PartialMockObjectMockedInstanceTest {
 
         int result = mockObject.getMock().methodThatCallsOtherMethod(3, 4);
         assertEquals(999, result);
+
+        // make sure the order of the invocations is recorded correctly
+        List<ObservedInvocation> observedInvocations = mockObject.getScenario(this).getObservedInvocations();
+        assertEquals("methodThatCallsOtherMethod", observedInvocations.get(0).getMethod().getName());
+        assertEquals("methodWithArguments", observedInvocations.get(1).getMethod().getName());
     }
 
 

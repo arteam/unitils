@@ -61,6 +61,9 @@ public class MockProxy<T> {
         BehaviorDefiningInvocation behaviorDefiningInvocation = getMatchingBehaviorDefiningInvocation(proxyInvocation);
         MockBehavior mockBehavior = getValidMockBehavior(proxyInvocation, behaviorDefiningInvocation);
 
+        ObservedInvocation observedInvocation = new ObservedInvocation(proxyInvocation, behaviorDefiningInvocation, mockBehavior);
+        scenario.addObservedMockInvocation(observedInvocation);
+
         Throwable throwable = null;
         Object result = null;
         if (mockBehavior != null) {
@@ -70,8 +73,8 @@ public class MockProxy<T> {
                 throwable = t;
             }
         }
+        observedInvocation.setResult(result);
 
-        scenario.addObservedMockInvocation(new ObservedInvocation(result, proxyInvocation, behaviorDefiningInvocation, mockBehavior));
         if (throwable != null) {
             throw throwable;
         }

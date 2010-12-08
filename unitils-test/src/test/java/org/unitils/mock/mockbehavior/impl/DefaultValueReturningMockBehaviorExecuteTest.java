@@ -16,7 +16,6 @@
 package org.unitils.mock.mockbehavior.impl;
 
 import org.junit.Test;
-import org.unitils.mock.core.proxy.CglibProxyMethodInterceptor;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import javax.sql.DataSource;
@@ -104,7 +103,7 @@ public class DefaultValueReturningMockBehaviorExecuteTest {
 
 
     private ProxyInvocation createProxyInvocation(Method method) {
-        return new CglibProxyMethodInterceptor.CglibProxyInvocation(null, method, null, null, null, null);
+        return new ProxyInvocation(null, null, method, null, null);
     }
 
 

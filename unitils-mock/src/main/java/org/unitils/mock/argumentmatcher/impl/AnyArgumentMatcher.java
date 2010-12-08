@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 package org.unitils.mock.argumentmatcher.impl;
 
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+
+import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.MATCH;
+import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.NO_MATCH;
 
 /**
  * A matcher for checking whether an argument value is of a certain type.
@@ -44,10 +47,13 @@ public class AnyArgumentMatcher implements ArgumentMatcher {
      *
      * @param argument                 The argument that were used by reference, not null
      * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed, not null
-     * @return True when passed object is of the correct type, false otherwise.
+     * @return The match result, not null
      */
-    public boolean matches(Object argument, Object argumentAtInvocationTime) {
-        return argument != null && argument.getClass().equals(type);
+    public MatchResult matches(Object argument, Object argumentAtInvocationTime) {
+        if (argument != null && argument.getClass().equals(type)) {
+            return MATCH;
+        }
+        return NO_MATCH;
     }
 
 }

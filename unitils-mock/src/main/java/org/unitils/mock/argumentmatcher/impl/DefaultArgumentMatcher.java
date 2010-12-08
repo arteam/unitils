@@ -1,8 +1,25 @@
+/*
+ * Copyright Unitils.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils.mock.argumentmatcher.impl;
 
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
-import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
 import org.unitils.reflectionassert.ReflectionComparator;
+
+import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.*;
+import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
@@ -22,7 +39,7 @@ public class DefaultArgumentMatcher implements ArgumentMatcher {
     private final Object value;
 
     /* Copy of the original value */
-    private final Object copyOfValue;
+    private final Object valueAtInvocationTime;
 
     /**
      * Creates a matcher for the given value. The original value is stored and a copy of the value is taken so that it
@@ -32,7 +49,7 @@ public class DefaultArgumentMatcher implements ArgumentMatcher {
      */
     public DefaultArgumentMatcher(Object value) {
         this.value = value;
-        this.copyOfValue = createDeepClone(value);
+        this.valueAtInvocationTime = createDeepClone(value);
     }
 
     /**
@@ -43,19 +60,21 @@ public class DefaultArgumentMatcher implements ArgumentMatcher {
      *
      * @param argument                 The argument that was used by reference, not null
      * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed, not null
-     * @return true if the given object matches the expected argument, false otherwise
+     * @return The match result, not null
      */
-    public boolean matches(Object argument, Object argumentAtInvocationTime) {
+    public MatchResult matches(Object argument, Object argumentAtInvocationTime) {
         if (value == argument) {
-            return true;
-        } else {
-            ReflectionComparator reflectionComparator;
-            if (copyOfValue instanceof Character || copyOfValue instanceof Number || copyOfValue instanceof Boolean) {
-                reflectionComparator = createRefectionComparator();
-            } else {
-                reflectionComparator = createRefectionComparator(LENIENT_ORDER, IGNORE_DEFAULTS);
-            }
-            return reflectionComparator.isEqual(this.copyOfValue, argumentAtInvocationTime);
+            return SAME;
         }
+        ReflectionComparator reflectionComparator;
+        if (valueAtInvocationTime instanceof Character || valueAtInvocationTime instanceof Number || valueAtInvocationTime instanceof Boolean) {
+            reflectionComparator = createRefectionComparator();
+        } else {
+            reflectionComparator = createRefectionComparator(LENIENT_ORDER, IGNORE_DEFAULTS);
+        }
+        if (reflectionComparator.isEqual(valueAtInvocationTime, argumentAtInvocationTime)) {
+            return MATCH;
+        }
+        return NO_MATCH;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,10 @@
  */
 package org.unitils.mock.core;
 
-import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
+
+import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
 
 /**
  * @author Filip Neven
@@ -27,11 +28,8 @@ import org.unitils.mock.mockbehavior.MockBehavior;
 public class ObservedInvocation extends ProxyInvocation {
 
     private Object result;
-
     private Object resultAtInvocationTime;
-
     private BehaviorDefiningInvocation behaviorDefiningInvocation;
-
     private MockBehavior mockBehavior;
 
 
@@ -42,19 +40,27 @@ public class ObservedInvocation extends ProxyInvocation {
      * the invocation. This way the original values can still be used later-on even when changes
      * occur to the original values (pass-by-value vs pass-by-reference).
      *
-     * @param result                     The result of the invocation
      * @param proxyInvocation            The proxy invocation, not null
      * @param behaviorDefiningInvocation The invocation that defined the behavior, null if there is no behavior
      * @param mockBehavior               The executed behavior, not null
      */
-    public ObservedInvocation(Object result, ProxyInvocation proxyInvocation, BehaviorDefiningInvocation behaviorDefiningInvocation, MockBehavior mockBehavior) {
+    public ObservedInvocation(ProxyInvocation proxyInvocation, BehaviorDefiningInvocation behaviorDefiningInvocation, MockBehavior mockBehavior) {
         super(proxyInvocation);
         this.behaviorDefiningInvocation = behaviorDefiningInvocation;
         this.mockBehavior = mockBehavior;
+    }
+
+    /**
+     * Sets the result of the invocation.
+     * This is set afterwards to make it possible to get the correct sequence in the report when there are nested mock
+     * invocations.
+     *
+     * @param result The result of the invocation
+     */
+    public void setResult(Object result) {
         this.result = result;
         this.resultAtInvocationTime = createDeepClone(result);
     }
-
 
     public Object getResult() {
         return result;

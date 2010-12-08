@@ -103,6 +103,22 @@ public class PartialMockObject<T> extends MockObject<T> implements PartialMock<T
     }
 
 
+    /**
+     * Stubs out (removes) the behavior of the method when the invocation following
+     * this call matches the observed behavior. E.g.
+     * <p/>
+     * mock.stub().method1();
+     * <p/>
+     * will not invoke the actual behavior of method1.
+     * <p/>
+     * If the method has a return type, a default value will be returned.
+     * <p/>
+     * Note: stubbed methods can still be asserted afterwards: e.g.
+     * <p/>
+     * mock.assertInvoked().method1();
+     *
+     * @return The proxy instance that will record the method call, not null
+     */
     @MatchStatement
     public T stub() {
         MatchingInvocationHandler matchingInvocationHandler = createAlwaysMatchingBehaviorDefiningMatchingInvocationHandler(new StubMockBehavior());

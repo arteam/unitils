@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,24 @@
  */
 package org.unitils.inject;
 
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
+import org.unitils.inject.annotation.InjectInto;
 import org.unitils.inject.annotation.InjectIntoByType;
 import org.unitils.inject.annotation.InjectIntoStaticByType;
 import org.unitils.inject.annotation.TestedObject;
 import org.unitils.mock.Mock;
+import org.unitils.mock.PartialMock;
 import org.unitils.mock.core.MockObject;
+import org.unitils.mock.core.PartialMockObject;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for the auto injection behavior when using Mock instances
@@ -58,7 +62,6 @@ public class InjectIntoByTypeWithMocksTest {
         assertSame(injectIntoByTypeWithMock.mockedProperties.getMock(), injectIntoByTypeWithMock.injectTarget.properties);
     }
 
-
     @Test
     public void injectIntoByTypeWithGenericTypeMock() {
         InjectIntoByTypeWithGenericTypeMock injectIntoByTypeWithGenericTypeMock = new InjectIntoByTypeWithGenericTypeMock();
@@ -67,7 +70,6 @@ public class InjectIntoByTypeWithMocksTest {
         assertSame(injectIntoByTypeWithGenericTypeMock.mockedList.getMock(), injectIntoByTypeWithGenericTypeMock.injectTarget.genericType);
     }
 
-
     @Test
     public void injectIntoStaticByTypeWithMock() {
         InjectIntoStaticByTypeWithMock injectIntoStaticByTypeWithMock = new InjectIntoStaticByTypeWithMock();
@@ -75,7 +77,6 @@ public class InjectIntoByTypeWithMocksTest {
 
         assertSame(injectIntoStaticByTypeWithMock.mockedProperties.getMock(), InjectStaticTarget.properties);
     }
-
 
     @Test
     public void noFieldOfMockedTypeFound() {
@@ -90,6 +91,23 @@ public class InjectIntoByTypeWithMocksTest {
     }
 
 
+    @Test
+    public void injectIntoWithPartialMockAsTarget() {
+        InjectIntoWithPartialMockAsTarget injectIntoWithPartialMockAsTarget = new InjectIntoWithPartialMockAsTarget();
+        injectModule.injectObjects(injectIntoWithPartialMockAsTarget);
+
+        assertSame(injectIntoWithPartialMockAsTarget.mockedProperties.getMock(), injectIntoWithPartialMockAsTarget.injectTarget.getMock().getProperties());
+    }
+
+    @Test
+    public void injectIntoByTypeWithPartialMockAsTarget() {
+        InjectIntoByTypeWithPartialMockAsTarget injectIntoByTypeWithPartialMockAsTarget = new InjectIntoByTypeWithPartialMockAsTarget();
+        injectModule.injectObjects(injectIntoByTypeWithPartialMockAsTarget);
+
+        assertSame(injectIntoByTypeWithPartialMockAsTarget.mockedProperties.getMock(), injectIntoByTypeWithPartialMockAsTarget.injectTarget.getMock().getProperties());
+    }
+
+
     public static class InjectIntoByTypeWithMock {
 
         @TestedObject
@@ -98,7 +116,6 @@ public class InjectIntoByTypeWithMocksTest {
         @InjectIntoByType
         public Mock<Properties> mockedProperties = new MockObject<Properties>("test", Properties.class, this);
     }
-
 
     public static class InjectIntoByTypeWithGenericTypeMock {
 
@@ -116,14 +133,34 @@ public class InjectIntoByTypeWithMocksTest {
         public Mock<Properties> mockedProperties = new MockObject<Properties>("test", Properties.class, this);
     }
 
-
+    @SuppressWarnings({"UnusedDeclaration"})
     public static class NoFieldOfMockedTypeFound {
 
         @InjectIntoStaticByType(target = InjectStaticTarget.class)
         public Mock<Map> mockedProperties = new MockObject<Map>("test", Map.class, this);
     }
 
+    public static class InjectIntoWithPartialMockAsTarget {
 
+        @TestedObject
+        public PartialMock<InjectTarget> injectTarget = new PartialMockObject<InjectTarget>(InjectTarget.class, this);
+
+        @InjectInto(property = "properties")
+        public Mock<Properties> mockedProperties = new MockObject<Properties>(Properties.class, this);
+
+    }
+
+    public static class InjectIntoByTypeWithPartialMockAsTarget {
+
+        @TestedObject
+        public PartialMock<InjectTarget> injectTarget = new PartialMockObject<InjectTarget>(InjectTarget.class, this);
+
+        @InjectIntoByType
+        public Mock<Properties> mockedProperties = new MockObject<Properties>(Properties.class, this);
+    }
+
+
+    @SuppressWarnings({"UnusedDeclaration"})
     public static class InjectTarget {
 
         public Properties properties;
@@ -132,6 +169,10 @@ public class InjectIntoByTypeWithMocksTest {
 
         public Map<String, String> genericTypeWithSameRawType;
 
+
+        public Properties getProperties() {
+            return properties;
+        }
     }
 
 

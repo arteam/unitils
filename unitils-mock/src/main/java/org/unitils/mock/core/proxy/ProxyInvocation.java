@@ -27,7 +27,7 @@ import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
-public abstract class ProxyInvocation {
+public class ProxyInvocation {
 
     /* The name of the mock, e.g. the field name */
     private String mockName;
