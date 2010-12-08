@@ -10,8 +10,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="unitils-database" />
-    <orderEntry type="module" module-name="unitils" />
     <orderEntry type="library" name="Maven: org.springframework:spring-test:3.0.2.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-context:3.0.2.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-aop:3.0.2.RELEASE" level="project" />
@@ -21,6 +19,11 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-core:3.0.2.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.1" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-expression:3.0.2.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: junit:junit:4.8.1" level="project" />
+    <orderEntry type="library" name="Maven: org.testng:testng:5.14.1" level="project" />
+    <orderEntry type="library" name="Maven: org.beanshell:bsh:2.0b4" level="project" />
+    <orderEntry type="library" name="Maven: com.google.inject:guice:2.0" level="project" />
+    <orderEntry type="library" name="Maven: com.beust:jcommander:1.7" level="project" />
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.3" level="project" />
     <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2" level="project" />
     <orderEntry type="library" name="Maven: ognl:ognl:2.6.9" level="project" />
@@ -30,10 +33,6 @@
     <orderEntry type="library" name="Maven: asm:asm-analysis:3.1" level="project" />
     <orderEntry type="library" name="Maven: asm:asm-tree:3.1" level="project" />
     <orderEntry type="library" name="Maven: org.objenesis:objenesis:1.1" level="project" />
-    <orderEntry type="library" name="Maven: commons-dbcp:commons-dbcp:1.2.2" level="project" />
-    <orderEntry type="library" name="Maven: commons-pool:commons-pool:1.3" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-jdbc:3.0.2.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-tx:3.0.2.RELEASE" level="project" />
   </component>
 </module>
 
