@@ -102,7 +102,10 @@ public class InlineDataSetRowSource implements DataSetRowSource {
     protected int parseQualifiedTableName(String row, StringBuilder qualifiedTableName) {
         int index = row.indexOf(' ');
         if (index == -1) {
-            throw new UnitilsException("Table name could not be found. A row should begin with (schema_name.)table_name followed by a space. Data set row: " + row);
+            if (row.indexOf('=') != -1) {
+                throw new UnitilsException("Table name could not be found. A row should begin with (schema_name.)table_name followed by a space. Data set row: " + row);
+            }
+            index = row.length();
         }
         qualifiedTableName.append(row.substring(0, index));
         return index;
