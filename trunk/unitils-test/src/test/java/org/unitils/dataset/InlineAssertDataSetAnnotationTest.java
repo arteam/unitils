@@ -28,7 +28,7 @@ import java.util.Properties;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class InlineAssertExpectedDataSetAnnotationTest extends DataSetTestBase {
+public class InlineAssertDataSetAnnotationTest extends DataSetTestBase {
 
     /* Tested object */
     protected DataSetModule dataSetModule;

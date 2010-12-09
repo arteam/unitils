@@ -82,8 +82,10 @@ public class DataSetRowProcessor {
      * If there are not enough variable values, the remaining declaration will not be replaced.
      * If the value is an escaped literal, the escaped token is replaced.
      *
-     * @param dataSetValue The column to process, not null
-     * @param variables    The variable values, not null
+     * @param dataSetValue    The value to process, not null
+     * @param column          The column to process, not null
+     * @param variables       The variable values, not null
+     * @param dataSetSettings The data set meta data, not null
      * @return the processed value, not null
      */
     protected Value createValue(DataSetValue dataSetValue, Column column, List<String> variables, DataSetSettings dataSetSettings) throws Exception {
@@ -113,8 +115,9 @@ public class DataSetRowProcessor {
 
 
     /**
-     * @param value     The value, not null
-     * @param variables The variable values to fill in, not null
+     * @param value         The value, not null
+     * @param variables     The variable values to fill in, not null
+     * @param variableToken The character that is the variable token, e.g. $ for $1, $2
      * @return The value with the variable declarations replaced by the given variables, not null
      */
     protected String getValueWithVariablesFilledIn(String value, List<String> variables, char variableToken) {

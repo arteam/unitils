@@ -114,9 +114,9 @@ public class XsdDataSetStructureGenerator implements DataSetStructureGenerator {
         DataSourceWrapper dataSourceWrapper = dataSourceWrapperFactory.getDataSourceWrapper(databaseName);
         targetDirectory.mkdirs();
 
-        generateDataSetXsd(targetDirectory, dataSourceWrapper);
+        generateDataSetXsd(databaseName, targetDirectory, dataSourceWrapper);
         for (String schemaName : dataSourceWrapper.getSchemaNames()) {
-            generateSchemaXsd(schemaName, targetDirectory, dataSourceWrapper);
+            generateSchemaXsd(databaseName, schemaName, targetDirectory, dataSourceWrapper);
         }
     }
 
@@ -136,26 +136,29 @@ public class XsdDataSetStructureGenerator implements DataSetStructureGenerator {
 
         DataSourceWrapper dataSourceWrapper = dataSourceWrapperFactory.getDataSourceWrapper(databaseName);
         targetDirectory.mkdirs();
-        generateTemplateXml(targetDirectory, dataSourceWrapper);
+        generateTemplateXml(databaseName, targetDirectory, dataSourceWrapper);
     }
 
 
     /**
      * Generates a general data set xsd that will refer to database schema specific data set XSDs.
      *
+     * @param databaseName      The name of the database to generate the schemas for, null for the default
      * @param targetDirectory   The target directory for the files, not null
      * @param dataSourceWrapper The data source wrapper, not null
      */
-    protected void generateDataSetXsd(File targetDirectory, DataSourceWrapper dataSourceWrapper) {
+    protected void generateDataSetXsd(String databaseName, File targetDirectory, DataSourceWrapper dataSourceWrapper) {
         Writer writer = null;
         try {
             writer = new BufferedWriter(new FileWriter(new File(targetDirectory, "dataset.xsd")));
 
             writer.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
-            writer.write("<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" targetNamespace=\"unitils-dataset\">\n");
+            String targetNamespace = getNamespace(databaseName, "unitils-dataset");
+            writer.write("<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" targetNamespace=\"" + targetNamespace + "\">\n");
 
             for (String schemaName : dataSourceWrapper.getSchemaNames()) {
-                writer.write("\t<xsd:import namespace=\"" + schemaName + "\" schemaLocation=\"" + schemaName + ".xsd\"/>\n");
+                String namespace = getNamespace(databaseName, schemaName);
+                writer.write("\t<xsd:import namespace=\"" + namespace + "\" schemaLocation=\"" + schemaName + ".xsd\"/>\n");
             }
 
             writer.write("\t<xsd:element name=\"dataset\">\n");
@@ -164,7 +167,8 @@ public class XsdDataSetStructureGenerator implements DataSetStructureGenerator {
             writer.write("\t\t\t<xsd:choice minOccurs=\"0\" maxOccurs=\"unbounded\">\n");
             writer.write("\t\t\t\t<xsd:element name=\"notExists\" type=\"notExists__type\"/>\n");
             for (String schemaName : dataSourceWrapper.getSchemaNames()) {
-                writer.write("\t\t\t\t<xsd:any namespace=\"" + schemaName + "\"/>\n");
+                String namespace = getNamespace(databaseName, schemaName);
+                writer.write("\t\t\t\t<xsd:any namespace=\"" + namespace + "\"/>\n");
             }
             writer.write("\t\t\t</xsd:choice>\n");
 
@@ -176,7 +180,8 @@ public class XsdDataSetStructureGenerator implements DataSetStructureGenerator {
             writer.write("\t<xsd:complexType name=\"notExists__type\">\n");
             writer.write("\t\t<xsd:choice minOccurs=\"0\" maxOccurs=\"unbounded\">\n");
             for (String schemaName : dataSourceWrapper.getSchemaNames()) {
-                writer.write("\t\t\t<xsd:any namespace=\"" + schemaName + "\"/>\n");
+                String namespace = getNamespace(databaseName, schemaName);
+                writer.write("\t\t\t<xsd:any namespace=\"" + namespace + "\"/>\n");
             }
             writer.write("\t\t</xsd:choice>\n");
             writer.write("\t</xsd:complexType>\n");
@@ -192,16 +197,18 @@ public class XsdDataSetStructureGenerator implements DataSetStructureGenerator {
     /**
      * Generates an XSD for the database schema of the given db support.
      *
+     * @param databaseName      The name of the database to generate the schemas for, null for the default
      * @param schemaName        The name of the schema to generate an XSD for, not null
      * @param targetDirectory   The target directory, not null
      * @param dataSourceWrapper The data source wrapper, not null
      */
-    protected void generateSchemaXsd(String schemaName, File targetDirectory, DataSourceWrapper dataSourceWrapper) {
+    protected void generateSchemaXsd(String databaseName, String schemaName, File targetDirectory, DataSourceWrapper dataSourceWrapper) {
         Writer writer = null;
         try {
             writer = new BufferedWriter(new FileWriter(new File(targetDirectory, schemaName + ".xsd")));
             writer.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
-            writer.write("<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" xmlns=\"" + schemaName + "\" targetNamespace=\"" + schemaName + "\">\n");
+            String targetNamespace = getNamespace(databaseName, schemaName);
+            writer.write("<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" xmlns=\"" + targetNamespace + "\" targetNamespace=\"" + targetNamespace + "\">\n");
 
             Set<TableName> tableNames = dataSourceWrapper.getTableNames(schemaName);
             for (TableName tableName : tableNames) {
@@ -211,7 +218,8 @@ public class XsdDataSetStructureGenerator implements DataSetStructureGenerator {
             for (TableName tableName : tableNames) {
                 writer.write("\t<xsd:complexType name=\"" + tableName.getTableName() + complexTypeSuffix + "\">\n");
                 writer.write("\t\t<xsd:choice minOccurs=\"0\" maxOccurs=\"unbounded\">\n");
-                writer.write("\t\t\t<xsd:any namespace=\"" + schemaName + "\"/>\n");
+                String namespace = getNamespace(databaseName, schemaName);
+                writer.write("\t\t\t<xsd:any namespace=\"" + namespace + "\"/>\n");
                 writer.write("\t\t</xsd:choice>\n");
 
                 Set<Column> columns = dataSourceWrapper.getColumns(tableName);
@@ -232,10 +240,11 @@ public class XsdDataSetStructureGenerator implements DataSetStructureGenerator {
     /**
      * Generates a template xml file that uses the XSDs.
      *
+     * @param databaseName      The name of the database to generate the schemas for, null for the default
      * @param targetDirectory   The target directory for the files, not null
      * @param dataSourceWrapper The data source wrapper, not null
      */
-    protected void generateTemplateXml(File targetDirectory, DataSourceWrapper dataSourceWrapper) {
+    protected void generateTemplateXml(String databaseName, File targetDirectory, DataSourceWrapper dataSourceWrapper) {
         Writer writer = null;
         try {
             writer = new BufferedWriter(new FileWriter(new File(targetDirectory, "dataset-template.xml")));
@@ -243,17 +252,15 @@ public class XsdDataSetStructureGenerator implements DataSetStructureGenerator {
             String defaultSchemaName = dataSourceWrapper.getDefaultSchemaName();
             writer.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
             writer.write("<uni:dataset xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
-            writer.write("\t\t\txmlns=\"" + defaultSchemaName + "\"");
+            String defaultNamespace = getNamespace(databaseName, defaultSchemaName);
+            writer.write("\t\t\txmlns=\"" + defaultNamespace + "\"");
 
             for (String schemaName : dataSourceWrapper.getSchemaNames()) {
-                writer.write(" xmlns:" + schemaName + "=\"" + schemaName + "\"");
+                String schemaNamespace = getNamespace(databaseName, schemaName);
+                writer.write(" xmlns:" + schemaName + "=\"" + schemaNamespace + "\"");
             }
-            writer.write(" xmlns:uni=\"unitils-dataset\"\n");
-            writer.write("\t\t\txsi:schemaLocation=\"");
-            for (String schemaName : dataSourceWrapper.getSchemaNames()) {
-                writer.write(schemaName + " " + schemaName + ".xsd ");
-            }
-            writer.write("unitils-dataset dataset.xsd\">\n\n\n");
+            String unitilsDataSetNamespace = getNamespace(databaseName, "unitils-dataset");
+            writer.write(" xmlns:uni=\"" + unitilsDataSetNamespace + "\">\n\n\n");
             writer.write("</uni:dataset>\n");
 
         } catch (Exception e) {
@@ -261,6 +268,14 @@ public class XsdDataSetStructureGenerator implements DataSetStructureGenerator {
         } finally {
             closeQuietly(writer);
         }
+    }
+
+
+    protected String getNamespace(String databaseName, String namespace) {
+        if (databaseName == null) {
+            return namespace;
+        }
+        return databaseName + "/" + namespace;
     }
 
     protected File getTargetDirectory(String databaseName, File targetDirectory) {
