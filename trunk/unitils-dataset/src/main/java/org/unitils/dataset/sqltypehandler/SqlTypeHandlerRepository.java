@@ -16,13 +16,10 @@
 package org.unitils.dataset.sqltypehandler;
 
 import org.unitils.core.util.ConfigUtils;
-import org.unitils.dataset.sqltypehandler.impl.TextSqlTypeHandler;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import static java.sql.Types.*;
 
 /**
  * @author Tim Ducheyne
@@ -31,14 +28,12 @@ import static java.sql.Types.*;
 public class SqlTypeHandlerRepository {
 
     protected Properties configuration;
-    private SqlTypeHandler<?> defaultSqlTypeHandler;
 
-    private Map<Integer, SqlTypeHandler<?>> sqlTypeHandlers = new HashMap<Integer, SqlTypeHandler<?>>();
+    protected Map<Integer, SqlTypeHandler<?>> sqlTypeHandlers = new HashMap<Integer, SqlTypeHandler<?>>();
 
 
     public void init(Properties configuration) {
         this.configuration = configuration;
-        this.defaultSqlTypeHandler = new TextSqlTypeHandler();
     }
 
 
@@ -53,86 +48,7 @@ public class SqlTypeHandlerRepository {
 
 
     protected SqlTypeHandler<?> createConfiguredSqlTypeHandler(int sqlType) {
-        switch (sqlType) {
-            case BIT:
-                return createConfiguredSqlTypeHandler("BIT");
-            case TINYINT:
-                return createConfiguredSqlTypeHandler("TINYINT");
-            case SMALLINT:
-                return createConfiguredSqlTypeHandler("SMALLINT");
-            case INTEGER:
-                return createConfiguredSqlTypeHandler("INTEGER");
-            case BIGINT:
-                return createConfiguredSqlTypeHandler("BIGINT");
-            case FLOAT:
-                return createConfiguredSqlTypeHandler("FLOAT");
-            case REAL:
-                return createConfiguredSqlTypeHandler("REAL");
-            case DOUBLE:
-                return createConfiguredSqlTypeHandler("DOUBLE");
-            case NUMERIC:
-                return createConfiguredSqlTypeHandler("NUMERIC");
-            case DECIMAL:
-                return createConfiguredSqlTypeHandler("DECIMAL");
-            case CHAR:
-                return createConfiguredSqlTypeHandler("CHAR");
-            case VARCHAR:
-                return createConfiguredSqlTypeHandler("VARCHAR");
-            case LONGVARCHAR:
-                return createConfiguredSqlTypeHandler("LONGVARCHAR");
-            case DATE:
-                return createConfiguredSqlTypeHandler("DATE");
-            case TIME:
-                return createConfiguredSqlTypeHandler("TIME");
-            case TIMESTAMP:
-                return createConfiguredSqlTypeHandler("TIMESTAMP");
-            case BINARY:
-                return createConfiguredSqlTypeHandler("BINARY");
-            case VARBINARY:
-                return createConfiguredSqlTypeHandler("VARBINARY");
-            case LONGVARBINARY:
-                return createConfiguredSqlTypeHandler("LONGVARBINARY");
-            case NULL:
-                return createConfiguredSqlTypeHandler("NULL");
-            case OTHER:
-                return createConfiguredSqlTypeHandler("OTHER");
-            case JAVA_OBJECT:
-                return createConfiguredSqlTypeHandler("JAVA_OBJECT");
-            case DISTINCT:
-                return createConfiguredSqlTypeHandler("DISTINCT");
-            case STRUCT:
-                return createConfiguredSqlTypeHandler("STRUCT");
-            case ARRAY:
-                return createConfiguredSqlTypeHandler("ARRAY");
-            case BLOB:
-                return createConfiguredSqlTypeHandler("BLOB");
-            case CLOB:
-                return createConfiguredSqlTypeHandler("CLOB");
-            case REF:
-                return createConfiguredSqlTypeHandler("REF");
-            case DATALINK:
-                return createConfiguredSqlTypeHandler("DATALINK");
-            case BOOLEAN:
-                return createConfiguredSqlTypeHandler("BOOLEAN");
-            case ROWID:
-                return createConfiguredSqlTypeHandler("ROWID");
-            case NCHAR:
-                return createConfiguredSqlTypeHandler("NCHAR");
-            case NVARCHAR:
-                return createConfiguredSqlTypeHandler("NVARCHAR");
-            case LONGNVARCHAR:
-                return createConfiguredSqlTypeHandler("LONGNVARCHAR");
-            case NCLOB:
-                return createConfiguredSqlTypeHandler("NCLOB");
-            case SQLXML:
-                return createConfiguredSqlTypeHandler("SQLXML");
-        }
-        return defaultSqlTypeHandler;
-
-    }
-
-    protected SqlTypeHandler<?> createConfiguredSqlTypeHandler(String name) {
-        SqlTypeHandler<?> sqlTypeHandler = ConfigUtils.getInstanceOf(SqlTypeHandler.class, configuration, name);
+        SqlTypeHandler<?> sqlTypeHandler = ConfigUtils.getInstanceOf(SqlTypeHandler.class, configuration, "" + sqlType);
         sqlTypeHandler.init(configuration);
         return sqlTypeHandler;
     }
