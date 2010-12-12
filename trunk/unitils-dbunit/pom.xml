@@ -10,18 +10,18 @@
     </parent>
     <artifactId>unitils-dbunit</artifactId>
     <packaging>jar</packaging>
-    <name>Unitils DbUnit module</name>
+    <name>Unitils dbunit module</name>
 
     <dependencies>
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-database</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.dbunit</groupId>

@@ -16,7 +16,7 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>

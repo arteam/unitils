@@ -10,13 +10,13 @@
     </parent>
     <artifactId>unitils-hibernate</artifactId>
     <packaging>jar</packaging>
-    <name>Unitils orm module</name>
+    <name>Unitils hibernate module</name>
 
     <dependencies>
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
