@@ -10,7 +10,7 @@
     </parent>
     <artifactId>unitils-test</artifactId>
     <packaging>jar</packaging>
-    <name>JUnit tests for Unitils</name>
+    <name>Unit tests for Unitils</name>
 
     <dependencies>
 
