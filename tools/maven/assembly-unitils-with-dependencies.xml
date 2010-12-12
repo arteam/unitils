@@ -26,20 +26,12 @@
                     <dependencySet>
                         <useProjectArtifact>false</useProjectArtifact>
                         <outputDirectory>unitils/lib</outputDirectory>
-                        <useTransitiveFiltering>true</useTransitiveFiltering>
-                        <excludes>
-                            <exclude>cglib:cglib</exclude>
-                            <exclude>asm:asm</exclude>
-                            <exclude>asm:asm-analysis</exclude>
-                            <exclude>asm:asm-tree</exclude>
-                            <exclude>org.objenesis:objenesis</exclude>
-                        </excludes>
                     </dependencySet>
                 </dependencySets>
                 <unpack>false</unpack>
             </binaries>
         </moduleSet>
-       
+
         <!-- unitils-database -->
         <moduleSet>
             <includes>
@@ -61,6 +53,33 @@
                     <dependencySet>
                         <useProjectArtifact>false</useProjectArtifact>
                         <outputDirectory>unitils-database/lib</outputDirectory>
+                    </dependencySet>
+                </dependencySets>
+                <unpack>false</unpack>
+            </binaries>
+        </moduleSet>
+
+        <!-- unitils-dataset -->
+        <moduleSet>
+            <includes>
+                <include>org.unitils:unitils-dataset</include>
+            </includes>
+            <sources>
+                <fileSets>
+                    <fileSet>
+                        <includes>
+                            <include>pom.xml</include>
+                            <include>src/main/**</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <outputDirectory>unitils-dataset</outputDirectory>
+                <dependencySets>
+                    <dependencySet>
+                        <useProjectArtifact>false</useProjectArtifact>
+                        <outputDirectory>unitils-dataset/lib</outputDirectory>
                     </dependencySet>
                 </dependencySets>
                 <unpack>false</unpack>
@@ -142,6 +161,68 @@
                     <dependencySet>
                         <useProjectArtifact>false</useProjectArtifact>
                         <outputDirectory>unitils-hibernate/lib</outputDirectory>
+                    </dependencySet>
+                </dependencySets>
+                <unpack>false</unpack>
+            </binaries>
+        </moduleSet>
+
+        <!-- unitils-inject -->
+        <moduleSet>
+            <includes>
+                <include>org.unitils:unitils-inject</include>
+            </includes>
+            <sources>
+                <fileSets>
+                    <fileSet>
+                        <includes>
+                            <include>pom.xml</include>
+                            <include>src/main/**</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <outputDirectory>unitils-inject</outputDirectory>
+                <dependencySets>
+                    <dependencySet>
+                        <useProjectArtifact>false</useProjectArtifact>
+                        <outputDirectory>unitils-inject/lib</outputDirectory>
+                    </dependencySet>
+                </dependencySets>
+                <unpack>false</unpack>
+            </binaries>
+        </moduleSet>
+
+        <!-- unitils-mock -->
+        <moduleSet>
+            <includes>
+                <include>org.unitils:unitils-mock</include>
+            </includes>
+            <sources>
+                <fileSets>
+                    <fileSet>
+                        <includes>
+                            <include>pom.xml</include>
+                            <include>src/main/**</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <outputDirectory>unitils-mock</outputDirectory>
+                <dependencySets>
+                    <dependencySet>
+                        <useProjectArtifact>false</useProjectArtifact>
+                        <outputDirectory>unitils-mock/lib</outputDirectory>
+                        <useTransitiveFiltering>true</useTransitiveFiltering>
+                        <excludes>
+                            <exclude>cglib:cglib</exclude>
+                            <exclude>asm:asm</exclude>
+                            <exclude>asm:asm-analysis</exclude>
+                            <exclude>asm:asm-tree</exclude>
+                            <exclude>org.objenesis:objenesis</exclude>
+                        </excludes>
                     </dependencySet>
                 </dependencySets>
                 <unpack>false</unpack>
