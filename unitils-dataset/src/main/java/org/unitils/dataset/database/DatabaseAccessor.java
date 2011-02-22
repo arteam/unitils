@@ -17,13 +17,14 @@ package org.unitils.dataset.database;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.unitils.core.UnitilsException;
 import org.unitils.dataset.model.database.Value;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
+import java.sql.*;
+import java.util.HashSet;
 import java.util.List;
-
-import static org.unitils.database.util.DbUtils.close;
+import java.util.Set;
 
 /**
  * @author Tim Ducheyne
@@ -41,16 +42,78 @@ public class DatabaseAccessor {
         this.dataSourceWrapper = dataSourceWrapper;
     }
 
-    public int executeUpdate(String sql, List<Value> statementValues) throws Exception {
-        PreparedStatement preparedStatement = null;
+    public int executeUpdates(List<DatabaseStatement> updates) throws Exception {
         Connection connection = dataSourceWrapper.getConnection();
         try {
-            logStatement(sql, statementValues);
-            preparedStatement = connection.prepareStatement(sql);
-            setStatementValues(preparedStatement, statementValues);
-            return preparedStatement.executeUpdate();
+            int nbUpdatedRows = 0;
+            for (DatabaseStatement update : updates) {
+                nbUpdatedRows += executeUpdate(update, connection);
+            }
+            return nbUpdatedRows;
         } finally {
-            close(connection, preparedStatement, null);
+            close(connection);
+        }
+    }
+
+    protected int executeUpdate(DatabaseStatement update, Connection connection) throws Exception {
+        return executeUpdate(update.getSql(), update.getParameters(), connection);
+    }
+
+    public int executeUpdate(String sql, List<Value> statementValues) throws Exception {
+        Connection connection = dataSourceWrapper.getConnection();
+        try {
+            return executeUpdate(sql, statementValues, connection);
+        } finally {
+            close(connection);
+        }
+    }
+
+    protected int executeUpdate(String sql, List<Value> statementValues, Connection connection) throws Exception {
+        logStatement(sql, statementValues);
+        if (statementValues.isEmpty()) {
+            Statement statement = connection.createStatement();
+            try {
+                return statement.executeUpdate(sql);
+            } finally {
+                close(statement);
+            }
+        } else {
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            try {
+                setStatementValues(preparedStatement, statementValues);
+                return preparedStatement.executeUpdate();
+            } finally {
+                close(preparedStatement);
+            }
+        }
+    }
+
+    /**
+     * Returns the items extracted from the result of the given query.
+     *
+     * @param sql the sql string for retrieving the items
+     * @return The items, not null
+     */
+    public Set<String> getItemsAsStringSet(String sql) {
+        logger.debug(sql);
+
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        try {
+            connection = dataSourceWrapper.getConnection();
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+            Set<String> result = new HashSet<String>();
+            while (resultSet.next()) {
+                result.add(resultSet.getString(1));
+            }
+            return result;
+
+        } catch (Exception e) {
+            throw new UnitilsException("Error while executing statement: " + sql, e);
+        } finally {
+            close(connection, statement, resultSet);
         }
     }
 
@@ -80,6 +143,36 @@ public class DatabaseAccessor {
                 message.setLength(message.length() - 2);
             }
             logger.debug(message);
+        }
+    }
+
+    protected void close(Connection connection) {
+        DataSourceUtils.releaseConnection(connection, dataSourceWrapper.unitilsDataSource.getDataSource());
+    }
+
+    protected void close(Connection connection, Statement statement, ResultSet resultSet) {
+        close(statement);
+        close(resultSet);
+        close(connection);
+    }
+
+    protected void close(ResultSet resultSet) {
+        if (resultSet != null) {
+            try {
+                resultSet.close();
+            } catch (SQLException e) {
+                logger.warn("Unable to close resultset. Ignoring exception.");
+            }
+        }
+    }
+
+    protected void close(Statement statement) {
+        if (statement != null) {
+            try {
+                statement.close();
+            } catch (SQLException e) {
+                logger.warn("Unable to close statement. Ignoring exception.");
+            }
         }
     }
 }
