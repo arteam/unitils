@@ -64,7 +64,7 @@ public class DefaultAssertDataSetStrategy implements AssertDataSetStrategy {
             dataSetRowSource.open();
             DataSetComparison dataSetComparison = dataSetComparator.compare(dataSetRowSource, variables);
             if (!dataSetComparison.isMatch()) {
-                String message = generateErrorMessage(dataSetComparison, logDatabaseContentOnAssertionError);
+                String message = generateErrorMessage(dataSetRowSource.getDataSetName(), dataSetComparison, logDatabaseContentOnAssertionError);
                 throw new AssertionError(message);
             }
 
@@ -78,12 +78,14 @@ public class DefaultAssertDataSetStrategy implements AssertDataSetStrategy {
 
 
     /**
+     *
+     * @param dataSetName
      * @param dataSetComparison  The comparison result, not null
      * @param logDatabaseContent True to log the content of the tables that were not matched
      * @return the assertion failed message for the given comparison result, not null
      */
-    protected String generateErrorMessage(DataSetComparison dataSetComparison, boolean logDatabaseContent) {
-        StringBuilder result = new StringBuilder("Assertion failed. Differences found between the expected data set and actual database content.\n\n");
+    protected String generateErrorMessage(String dataSetName, DataSetComparison dataSetComparison, boolean logDatabaseContent) {
+        StringBuilder result = new StringBuilder("Assertion failed. Differences found between the expected data set and actual database content. (using dataset file " + dataSetName + ")\n\n");
         for (TableComparison tableComparison : dataSetComparison.getTableComparisons()) {
             if (tableComparison.isExpectedNoMoreRecordsButFoundMore()) {
                 appendExpectedToBeEmptyButWasNotTableComparison(tableComparison, result);
