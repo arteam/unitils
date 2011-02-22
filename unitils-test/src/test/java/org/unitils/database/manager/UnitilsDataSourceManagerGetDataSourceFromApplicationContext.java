@@ -16,6 +16,7 @@
 package org.unitils.database.manager;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.support.StaticApplicationContext;
@@ -33,6 +34,7 @@ import static org.junit.Assert.*;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
+@Ignore
 public class UnitilsDataSourceManagerGetDataSourceFromApplicationContext extends UnitilsJUnit4 {
 
     /* Tested object */

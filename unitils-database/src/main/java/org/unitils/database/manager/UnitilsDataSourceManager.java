@@ -65,11 +65,11 @@ public class UnitilsDataSourceManager {
             databaseName = null;
         }
         UnitilsDataSource unitilsDataSource;
-        if (applicationContext == null) {
+        //if (applicationContext == null) {
             unitilsDataSource = getUnitilsDataSourceFromDbMaintain(databaseName);
-        } else {
-            unitilsDataSource = getUnitilsDataSourceFromApplicationContext(databaseName, applicationContext);
-        }
+        //} else {
+        //    unitilsDataSource = getUnitilsDataSourceFromApplicationContext(databaseName, applicationContext);
+        //}
         wrapDataSourceIfNeeded(unitilsDataSource);
         return unitilsDataSource;
     }
@@ -114,7 +114,7 @@ public class UnitilsDataSourceManager {
     }
 
 
-    @SuppressWarnings({"unchecked", "RedundantCast"})
+    @SuppressWarnings({"unchecked"})
     protected UnitilsDataSource getUnitilsDataSourceFromApplicationContext(String databaseName, ApplicationContext applicationContext) {
         if (databaseName == null) {
             // implemented like this to be compatible with spring 2.5.6
