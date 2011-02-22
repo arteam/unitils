@@ -62,7 +62,7 @@ public class Unitils {
     /**
      * Initializes Unitils.
      */
-    protected void init() {
+    public void init() {
         ConfigurationLoader configurationLoader = new ConfigurationLoader();
         this.configuration = configurationLoader.loadConfiguration();
         this.modulesRepository = createModulesRepository(configuration);
