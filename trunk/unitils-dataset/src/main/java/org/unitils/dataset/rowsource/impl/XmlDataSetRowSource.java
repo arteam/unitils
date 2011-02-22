@@ -220,8 +220,8 @@ public class XmlDataSetRowSource implements DataSetRowSource {
     }
 
     protected boolean isUnitilsDataSetNamespaceDeclared() {
-        String uri = xmlStreamReader.getNamespaceURI();
-        return "unitils-dataset".equals(uri);
+        String namespace = xmlStreamReader.getNamespaceURI();
+        return "unitils-dataset".equals(namespace);
     }
 
     protected boolean isUnitilsDataSetNamespace(String uri) {

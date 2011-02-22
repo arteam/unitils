@@ -90,6 +90,6 @@ public class DateSqlTypeHandler implements SqlTypeHandler<Date> {
         } catch (ParseException e) {
             // ignore
         }
-        throw new UnitilsException("Unable to parse date value. Tried following patterns: '" + dateTimePattern + "', '" + datePattern + "' and '" + timePattern + "'");
+        throw new UnitilsException("Unable to parse date value " + dateAsString + ". Tried following patterns: '" + dateTimePattern + "', '" + datePattern + "' and '" + timePattern + "'");
     }
 }

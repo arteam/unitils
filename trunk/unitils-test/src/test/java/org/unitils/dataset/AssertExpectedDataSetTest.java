@@ -19,13 +19,14 @@ import org.junit.Test;
 import org.unitils.core.UnitilsException;
 
 import static org.junit.Assert.fail;
+import static org.unitils.dataset.DataSetLoader.cleanInsertDataSet;
 import static org.unitils.dataset.DataSetLoader.cleanInsertDataSetFile;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class AssertExpectedDataSetTest extends DataSetTestBase {
+public class AssertExpectedDataSetTest extends OneDbDataSetTestBase {
 
 
     @Test
@@ -109,4 +110,31 @@ public class AssertExpectedDataSetTest extends DataSetTestBase {
         DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetTest-emptyDataSet.xml");
     }
 
+    @Test
+    public void dateCheck() throws Exception {
+        cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-date.xml");
+        DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetTest-date.xml");
+    }
+
+    @Test
+    public void timestampCheck() throws Exception {
+        cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-timestamp.xml");
+        DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetTest-timestamp.xml");
+    }
+
+    /**
+     * Verify that if the actual timestamp is null, an AssertionError is raised to indicate there is a dataset difference,
+     * not a NullPointerException
+     */
+    @Test(expected = AssertionError.class)
+    public void timestampCheck_NullTimestamp() throws Exception {
+        cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-nulltimestamp.xml");
+        DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetTest-timestamp.xml");
+    }
+
+    @Test
+    public void timeCheck() throws Exception {
+        cleanInsertDataSetFile(this, "DataSetModuleExpectedDataSetTest-time.xml");
+        DataSetAssert.assertDataSet(this, "DataSetModuleExpectedDataSetTest-time.xml");
+    }
 }

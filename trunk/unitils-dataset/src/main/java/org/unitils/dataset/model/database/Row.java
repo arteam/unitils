@@ -15,10 +15,7 @@
  */
 package org.unitils.dataset.model.database;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A database row.
@@ -69,6 +66,10 @@ public class Row {
      */
     public TableName getTableName() {
         return tableName;
+    }
+
+    public Set<String> getColumnNames() {
+        return valuesPerColumnName.keySet();
     }
 
     /**

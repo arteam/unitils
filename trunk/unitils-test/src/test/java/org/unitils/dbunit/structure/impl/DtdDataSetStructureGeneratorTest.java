@@ -34,9 +34,9 @@ import java.util.Properties;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
-import static org.unitils.database.util.DbUtils.closeQuietly;
 import static org.unitils.dbunit.structure.impl.DtdDataSetStructureGenerator.PROPKEY_DTD_FILENAME;
 import static org.unitils.testutil.TestUnitilsConfiguration.getUnitilsConfiguration;
+import static thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 /**
  * Test class for the FlatXmlDataSetDtdGenerator

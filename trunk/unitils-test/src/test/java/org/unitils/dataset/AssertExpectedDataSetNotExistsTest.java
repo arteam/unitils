@@ -24,7 +24,7 @@ import static org.unitils.dataset.DataSetLoader.cleanInsertDataSetFile;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class AssertExpectedDataSetNotExistsTest extends DataSetTestBase {
+public class AssertExpectedDataSetNotExistsTest extends OneDbDataSetTestBase {
 
 
     @Test

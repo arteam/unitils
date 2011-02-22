@@ -23,6 +23,7 @@ import org.unitils.dataset.model.database.Value;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandler;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,6 +41,7 @@ public class TableContents {
     protected TableName tableName;
     protected Set<Column> columns;
 
+    protected DataSource dataSource;
     protected Connection connection;
     protected PreparedStatement preparedStatement;
     protected ResultSet resultSet;
@@ -52,7 +54,7 @@ public class TableContents {
     protected boolean useRowIndexAsIdentifier = false;
 
 
-    public TableContents(TableName tableName, Set<Column> columns, SqlTypeHandlerRepository sqlTypeHandlerRepository, Set<String> primaryKeyColumnNames, Connection connection, PreparedStatement preparedStatement, ResultSet resultSet) {
+    public TableContents(TableName tableName, Set<Column> columns, SqlTypeHandlerRepository sqlTypeHandlerRepository, Set<String> primaryKeyColumnNames, Connection connection, PreparedStatement preparedStatement, ResultSet resultSet, DataSource dataSource) {
         this.tableName = tableName;
         this.columns = columns;
         this.sqlTypeHandlerRepository = sqlTypeHandlerRepository;
@@ -61,6 +63,7 @@ public class TableContents {
         this.connection = connection;
         this.preparedStatement = preparedStatement;
         this.resultSet = resultSet;
+        this.dataSource = dataSource;
 
         this.rowIndex = 0;
         if (primaryKeyColumnNames.isEmpty()) {
@@ -69,7 +72,7 @@ public class TableContents {
     }
 
     public void close() throws SQLException {
-        DbUtils.close(connection, preparedStatement, resultSet);
+        DbUtils.close(connection, preparedStatement, resultSet, dataSource);
     }
 
 

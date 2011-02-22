@@ -133,7 +133,7 @@ public class DtdDataSetStructureGenerator implements DataSetStructureGenerator {
         } catch (Exception e) {
             throw new UnitilsException("Error generating content for DTD file.", e);
         } finally {
-            DbUtils.closeQuietly(connection, null, null);
+            DbUtils.closeQuietly(connection, null, null, defaultDatabase.getDataSource());
         }
     }
 }

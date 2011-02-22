@@ -18,7 +18,6 @@ package org.unitils.dataset;
 import org.junit.After;
 import org.junit.Before;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.database.annotations.TestDataSource;
 
 import javax.sql.DataSource;
 import java.util.Set;
@@ -34,45 +33,39 @@ import static org.unitils.dataset.DataSetUnitils.invalidateCachedDatabaseMetaDat
  */
 public abstract class DataSetTestBase extends UnitilsJUnit4 {
 
-    @TestDataSource
-    protected DataSource dataSource;
-
-
-    @Before
-    public void createTestTables() {
-        dropTestTables();
+    protected void createTestTables(DataSource dataSource) {
+        dropTestTables(dataSource);
         executeUpdate("create table test (col1 varchar(100) not null primary key, col2 integer, col3 timestamp, col4 varchar(100))", dataSource);
         executeUpdate("create table dependent (col1 varchar(100), foreign key (col1) references test(col1))", dataSource);
         invalidateCachedDatabaseMetaData();
     }
 
-    @After
-    public void dropTestTables() {
+    protected void dropTestTables(DataSource dataSource) {
         executeUpdateQuietly("drop table dependent", dataSource);
         executeUpdateQuietly("drop table test", dataSource);
         invalidateCachedDatabaseMetaData();
     }
 
 
-    protected void assertValueInTable(String tableName, String columnName, String expectedValue) {
-        Set<String> values = getValues(columnName, tableName);
+    protected void assertValueInTable(String tableName, String columnName, String expectedValue, DataSource dataSource) {
+        Set<String> values = getValues(columnName, tableName, dataSource);
         assertTrue("Expected value " + expectedValue + " in table " + tableName + ", but found " + values, values.contains(expectedValue));
     }
 
-    protected void assertValueNotInTable(String tableName, String columnName, String notExpectedValue) throws Exception {
-        Set<String> values = getValues(columnName, tableName);
+    protected void assertValueNotInTable(String tableName, String columnName, String notExpectedValue, DataSource dataSource) {
+        Set<String> values = getValues(columnName, tableName, dataSource);
         assertFalse("Value " + notExpectedValue + " not expected in table " + tableName + ", but found ", values.contains(notExpectedValue));
     }
 
-    protected Set<String> getValues(String columnName, String table) {
+    protected Set<String> getValues(String columnName, String table, DataSource dataSource) {
         return getItemsAsStringSet("select " + columnName + " from " + table, dataSource);
     }
 
-    protected void insertValueInTableTest(String value) {
+    protected void insertValueInTableTest(String value, DataSource dataSource) {
         executeUpdate("insert into test (col1) values ('" + value + "')", dataSource);
     }
 
-    protected void insertValueInTableDependent(String value) {
+    protected void insertValueInTableDependent(String value, DataSource dataSource) {
         executeUpdate("insert into dependent (col1) values ('" + value + "')", dataSource);
     }
 
