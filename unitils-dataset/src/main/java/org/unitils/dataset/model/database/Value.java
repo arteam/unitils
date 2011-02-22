@@ -15,6 +15,11 @@
  */
 package org.unitils.dataset.model.database;
 
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.Date;
+
 /**
  * A value of a data set column for which all variables and literal tokens were processed.
  *
@@ -46,6 +51,10 @@ public class Value {
     public boolean isEqualValue(Value otherValue) {
         if (value == otherValue.getValue()) {
             return true;
+        }
+        if (column.getSqlType() == Types.TIMESTAMP && otherValue.getValue() != null && (!(otherValue.getValue() instanceof Timestamp))) {
+            Timestamp otherValueAsTimestamp = new Timestamp(((Date) otherValue.getValue()).getTime());
+            return value != null && value.equals(otherValueAsTimestamp);
         }
         return value != null && value.equals(otherValue.getValue());
     }

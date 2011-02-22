@@ -34,7 +34,7 @@ import static org.unitils.dataset.DataSetLoader.cleanInsertDataSetFile;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class AssertDataSetDefaultDataSetNameTest extends DataSetTestBase {
+public class AssertDataSetDefaultDataSetNameTest extends OneDbDataSetTestBase {
 
     @TestedObject
     private DataSetModule dataSetModule = new DataSetModule();

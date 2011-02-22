@@ -17,6 +17,7 @@ package org.unitils.database;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.unitils.core.UnitilsException;
 
 import javax.sql.DataSource;
@@ -55,13 +56,13 @@ public class SQLUnitils {
         Connection connection = null;
         Statement statement = null;
         try {
-            connection = dataSource.getConnection();
+            connection = DataSourceUtils.getConnection(dataSource);
             statement = connection.createStatement();
             return statement.executeUpdate(sql);
         } catch (Exception e) {
             throw new UnitilsException("Error while executing statement: " + sql, e);
         } finally {
-            closeQuietly(connection, statement, null);
+            closeQuietly(connection, statement, null, dataSource);
         }
     }
 
@@ -98,7 +99,7 @@ public class SQLUnitils {
         Statement statement = null;
         ResultSet resultSet = null;
         try {
-            connection = dataSource.getConnection();
+            connection = DataSourceUtils.getConnection(dataSource);
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
             if (resultSet.next()) {
@@ -107,7 +108,7 @@ public class SQLUnitils {
         } catch (Exception e) {
             throw new UnitilsException("Error while executing statement: " + sql, e);
         } finally {
-            closeQuietly(connection, statement, resultSet);
+            closeQuietly(connection, statement, resultSet, dataSource);
         }
 
         // in case no value was found, throw an exception
@@ -130,7 +131,7 @@ public class SQLUnitils {
         Statement statement = null;
         ResultSet resultSet = null;
         try {
-            connection = dataSource.getConnection();
+            connection = DataSourceUtils.getConnection(dataSource);
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
             if (resultSet.next()) {
@@ -139,7 +140,7 @@ public class SQLUnitils {
         } catch (Exception e) {
             throw new UnitilsException("Error while executing statement: " + sql, e);
         } finally {
-            closeQuietly(connection, statement, resultSet);
+            closeQuietly(connection, statement, resultSet, dataSource);
         }
 
         // in case no value was found, throw an exception
@@ -161,7 +162,7 @@ public class SQLUnitils {
         Statement statement = null;
         ResultSet resultSet = null;
         try {
-            connection = dataSource.getConnection();
+            connection = DataSourceUtils.getConnection(dataSource);
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
             Set<String> result = new HashSet<String>();
@@ -173,7 +174,7 @@ public class SQLUnitils {
         } catch (Exception e) {
             throw new UnitilsException("Error while executing statement: " + sql, e);
         } finally {
-            closeQuietly(connection, statement, resultSet);
+            closeQuietly(connection, statement, resultSet, dataSource);
         }
     }
 

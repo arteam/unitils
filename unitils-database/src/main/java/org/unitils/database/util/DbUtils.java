@@ -17,7 +17,9 @@ package org.unitils.database.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,9 +35,9 @@ public final class DbUtils {
     private static Log logger = LogFactory.getLog(DbUtils.class);
 
 
-    public static void close(Connection connection) throws SQLException {
+    public static void close(Connection connection, DataSource dataSource) throws SQLException {
         if (connection != null) {
-            connection.close();
+            DataSourceUtils.releaseConnection(connection, dataSource);
         }
     }
 
@@ -51,23 +53,23 @@ public final class DbUtils {
         }
     }
 
-    public static void close(Connection connection, Statement statement, ResultSet resultSet) throws SQLException {
+    public static void close(Connection connection, Statement statement, ResultSet resultSet, DataSource dataSource) throws SQLException {
         try {
             close(resultSet);
         } finally {
             try {
                 close(statement);
             } finally {
-                close(connection);
+                close(connection, dataSource);
             }
         }
     }
 
-    public static void closeQuietly(Connection connection, Statement statement, ResultSet resultSet) {
+    public static void closeQuietly(Connection connection, Statement statement, ResultSet resultSet, DataSource dataSource) {
         try {
-            close(connection, statement, resultSet);
-        } catch (Throwable t) {
-            logger.warn("Unable to close connection, statement or result set. Ignoring exception.", t);
+            close(connection, statement, resultSet, dataSource);
+        } catch (SQLException e) {
+            logger.warn("Unable to close connection, statement or result set. Ignoring exception.", e);
         }
     }
 

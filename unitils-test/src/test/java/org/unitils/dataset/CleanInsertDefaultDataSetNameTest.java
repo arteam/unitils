@@ -32,7 +32,7 @@ import static org.unitils.dataset.DataSetLoader.cleanInsertDefaultDataSetFile;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class CleanInsertDefaultDataSetNameTest extends DataSetTestBase {
+public class CleanInsertDefaultDataSetNameTest extends OneDbDataSetTestBase {
 
     @TestedObject
     private DataSetModule dataSetModule = new DataSetModule();

@@ -28,7 +28,7 @@ import static org.unitils.dataset.DataSetLoader.cleanInsertDataSetFile;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class CleanInsertDataSetTest extends DataSetTestBase {
+public class CleanInsertDataSetTest extends OneDbDataSetTestBase {
 
     @Test
     public void cleanInsertDataSet() throws Exception {

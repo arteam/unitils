@@ -88,7 +88,7 @@ public class DefaultDataSourceFactory implements DataSourceFactory {
             connection = dataSource.getConnection();
 
         } finally {
-            closeQuietly(connection, null, null);
+            if (connection != null) connection.close();
         }
     }
 

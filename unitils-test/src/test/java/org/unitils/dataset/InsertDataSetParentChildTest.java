@@ -28,7 +28,7 @@ import static org.unitils.dataset.DataSetLoader.insertDataSetFile;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class InsertDataSetParentChildTest extends DataSetTestBase {
+public class InsertDataSetParentChildTest extends OneDbDataSetTestBase {
 
 
     @Before

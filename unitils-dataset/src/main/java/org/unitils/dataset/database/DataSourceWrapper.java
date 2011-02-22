@@ -18,6 +18,7 @@ package org.unitils.dataset.database;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbmaintain.database.IdentifierProcessor;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.UnitilsDataSource;
 import org.unitils.dataset.model.database.Column;
@@ -26,10 +27,8 @@ import org.unitils.dataset.model.dataset.DataSetRow;
 import org.unitils.dataset.model.dataset.DataSetSettings;
 import org.unitils.dataset.model.dataset.DataSetValue;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import javax.sql.DataSource;
+import java.sql.*;
 import java.util.*;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -164,7 +163,7 @@ public class DataSourceWrapper {
             tableNamesCache.put(schemaName, tableNames);
             return tableNames;
         } finally {
-            close(connection, null, resultSet);
+            close(connection, null, resultSet, unitilsDataSource.getDataSource());
         }
     }
 
@@ -191,7 +190,7 @@ public class DataSourceWrapper {
             columnsCache.put(tableName, columns);
             return columns;
         } finally {
-            close(connection, null, resultSet);
+            close(connection, null, resultSet, unitilsDataSource.getDataSource());
         }
     }
 
@@ -213,7 +212,7 @@ public class DataSourceWrapper {
             tablePrimaryKeysCache.put(tableName, primaryKeyColumnNames);
 
         } finally {
-            close(connection, null, resultSet);
+            close(connection, null, resultSet, unitilsDataSource.getDataSource());
         }
         if (primaryKeyColumnNames.isEmpty()) {
             assertTableExists(tableName);
@@ -259,7 +258,7 @@ public class DataSourceWrapper {
             tableColumnSqlTypesCache.put(tableName, columnSqlTypes);
             return columnSqlTypes;
         } finally {
-            close(connection, null, resultSet);
+            close(connection, null, resultSet, unitilsDataSource.getDataSource());
         }
     }
 
@@ -318,7 +317,7 @@ public class DataSourceWrapper {
             }
             return result;
         } finally {
-            close(connection, null, resultSet);
+            close(connection, null, resultSet, unitilsDataSource.getDataSource());
         }
     }
 
@@ -336,7 +335,41 @@ public class DataSourceWrapper {
             }
             return jdbcUrl.toLowerCase().contains(":oracle:");
         } finally {
-            close(connection, null, null);
+            close(connection, null, null, unitilsDataSource.getDataSource());
         }
+    }
+
+    protected void close(Connection connection, DataSource dataSource) {
+        DataSourceUtils.releaseConnection(connection, dataSource);
+    }
+
+    protected void close(Connection connection, Statement statement, ResultSet resultSet, DataSource dataSource) {
+        close(statement);
+        close(resultSet);
+        close(connection, dataSource);
+    }
+
+    protected void close(ResultSet resultSet) {
+        if (resultSet != null) {
+            try {
+                resultSet.close();
+            } catch (SQLException e) {
+                logger.warn("Unable to close resultset. Ignoring exception.");
+            }
+        }
+    }
+
+    protected void close(Statement statement) {
+        if (statement != null) {
+            try {
+                statement.close();
+            } catch (SQLException e) {
+                logger.warn("Unable to close statement. Ignoring exception.");
+            }
+        }
+    }
+
+    public DataSource getDataSource() {
+        return unitilsDataSource.getDataSource();
     }
 }

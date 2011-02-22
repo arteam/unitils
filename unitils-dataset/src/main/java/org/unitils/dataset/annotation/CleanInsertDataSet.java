@@ -129,7 +129,7 @@ public @interface CleanInsertDataSet {
     boolean readOnly() default false;
 
     /**
-     * @return The name of the database on which the data set(s) need to be asserted, defaults to the default database
+     * @return The name of the database where the data set(s) need to be inserted, defaults to the default database
      */
     String databaseName() default "";
 }

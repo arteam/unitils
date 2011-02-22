@@ -76,11 +76,11 @@ public class TableContentDeleter {
 
 
     protected void deleteTableContent(TableName tableName) throws Exception {
-        String sql = createStatement(tableName);
-        databaseAccessor.executeUpdate(sql, new ArrayList<Value>());
+        String sql = createDeleteStatement(tableName);
+        databaseAccessor.executeUpdate(sql, Collections.<Value>emptyList());
     }
 
-    protected String createStatement(TableName tableName) {
+    protected String createDeleteStatement(TableName tableName) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("delete from ");
         stringBuilder.append(tableName.getQualifiedTableName());

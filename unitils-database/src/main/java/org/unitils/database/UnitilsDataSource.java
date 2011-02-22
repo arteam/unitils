@@ -15,6 +15,7 @@
  */
 package org.unitils.database;
 
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.unitils.core.UnitilsException;
 
 import javax.sql.DataSource;
@@ -74,7 +75,7 @@ public class UnitilsDataSource {
      * @return A connection from the data source, not null
      */
     public Connection getConnection() throws SQLException {
-        return dataSource.getConnection();
+        return DataSourceUtils.getConnection(dataSource);
     }
 
     /**

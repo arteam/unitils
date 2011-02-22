@@ -68,7 +68,7 @@ public class DateSqlTypeHandlerGetValueTest {
         try {
             dateSqlTypeHandler.getValue("xxx", TIMESTAMP);
         } catch (UnitilsException e) {
-            assertEquals("Unable to parse date value. Tried following patterns: 'yyyy-MM-dd HH:mm:ss', 'yyyy-MM-dd' and 'HH:mm:ss'", e.getMessage());
+            assertEquals("Unable to parse date value xxx. Tried following patterns: 'yyyy-MM-dd HH:mm:ss', 'yyyy-MM-dd' and 'HH:mm:ss'", e.getMessage());
         }
     }
 

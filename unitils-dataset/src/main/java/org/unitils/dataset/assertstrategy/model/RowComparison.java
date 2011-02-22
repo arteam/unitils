@@ -15,6 +15,9 @@
  */
 package org.unitils.dataset.assertstrategy.model;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.unitils.core.UnitilsException;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.Row;
 import org.unitils.dataset.model.database.Value;
@@ -106,12 +109,18 @@ public class RowComparison {
         List<ColumnDifference> columnDifferences = new ArrayList<ColumnDifference>();
 
         for (Value expectedValue : expectedRow.getValues()) {
-            Column column = expectedValue.getColumn();
-            Value actualValue = actualRow.getValue(column);
-            if (!expectedValue.isEqualValue(actualValue)) {
-                boolean primaryKey = column.isPrimaryKey();
-                String columnName = column.getName();
-                columnDifferences.add(new ColumnDifference(columnName, expectedValue.getValue(), actualValue.getValue(), primaryKey));
+            Value actualValue = null;
+            try {
+                Column column = expectedValue.getColumn();
+                actualValue = actualRow.getValue(column);
+                if (!expectedValue.isEqualValue(actualValue)) {
+                    boolean primaryKey = column.isPrimaryKey();
+                    String columnName = column.getName();
+                    columnDifferences.add(new ColumnDifference(columnName, expectedValue.getValue(), actualValue.getValue(), primaryKey));
+                }
+            } catch (RuntimeException e) {
+                throw new UnitilsException("Error while comparing column: " + expectedValue.getColumn().getName() +
+                        ", expectedvalue: " + expectedValue.getValue() + ", actual value: " + actualValue.getValue(), e);
             }
         }
         return columnDifferences;

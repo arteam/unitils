@@ -54,10 +54,10 @@ public class TableContentRetriever {
         try {
             preparedStatement = connection.prepareStatement(sql);
             resultSet = preparedStatement.executeQuery();
-            return new TableContents(tableName, columns, sqlTypeHandlerRepository, primaryKeyColumnNames, connection, preparedStatement, resultSet);
+            return new TableContents(tableName, columns, sqlTypeHandlerRepository, primaryKeyColumnNames, connection, preparedStatement, resultSet, dataSourceWrapper.getDataSource());
 
         } catch (Exception e) {
-            closeQuietly(connection, preparedStatement, resultSet);
+            closeQuietly(connection, preparedStatement, resultSet, dataSourceWrapper.getDataSource());
             throw new UnitilsException("Unable to execute query " + sql, e);
         }
     }

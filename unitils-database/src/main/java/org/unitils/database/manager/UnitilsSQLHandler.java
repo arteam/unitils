@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbmaintain.database.DatabaseException;
 import org.dbmaintain.database.SQLHandler;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -53,14 +54,14 @@ public class UnitilsSQLHandler implements SQLHandler {
         Statement statement = null;
         Connection connection = null;
         try {
-            connection = dataSource.getConnection();
+            connection = DataSourceUtils.getConnection(dataSource);
             statement = connection.createStatement();
             statement.execute(sql);
 
         } catch (Exception e) {
             throw new DatabaseException("Could not perform database statement: " + sql, e);
         } finally {
-            closeQuietly(connection, statement, null);
+            closeQuietly(connection, statement, null, dataSource);
         }
     }
 
@@ -71,7 +72,7 @@ public class UnitilsSQLHandler implements SQLHandler {
         Statement statement = null;
         Connection connection = null;
         try {
-            connection = dataSource.getConnection();
+            connection = DataSourceUtils.getConnection(dataSource);
             statement = connection.createStatement();
             int nbChanges = statement.executeUpdate(sql);
             if (!connection.getAutoCommit()) {
@@ -82,7 +83,7 @@ public class UnitilsSQLHandler implements SQLHandler {
         } catch (Exception e) {
             throw new DatabaseException("Error while performing database update:\n" + sql, e);
         } finally {
-            closeQuietly(connection, statement, null);
+            closeQuietly(connection, statement, null, dataSource);
         }
     }
 
@@ -94,7 +95,7 @@ public class UnitilsSQLHandler implements SQLHandler {
         ResultSet resultSet = null;
         Connection connection = null;
         try {
-            connection = dataSource.getConnection();
+            connection = DataSourceUtils.getConnection(dataSource);
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
             if (resultSet.next()) {
@@ -103,7 +104,7 @@ public class UnitilsSQLHandler implements SQLHandler {
         } catch (Exception e) {
             throw new DatabaseException("Error while executing statement: " + sql, e);
         } finally {
-            closeQuietly(connection, statement, resultSet);
+            closeQuietly(connection, statement, resultSet, dataSource);
         }
 
         // in case no value was found, throw an exception
@@ -118,7 +119,7 @@ public class UnitilsSQLHandler implements SQLHandler {
         ResultSet resultSet = null;
         Connection connection = null;
         try {
-            connection = dataSource.getConnection();
+            connection = DataSourceUtils.getConnection(dataSource);
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
             if (resultSet.next()) {
@@ -127,7 +128,7 @@ public class UnitilsSQLHandler implements SQLHandler {
         } catch (Exception e) {
             throw new DatabaseException("Error while executing statement: " + sql, e);
         } finally {
-            closeQuietly(connection, statement, resultSet);
+            closeQuietly(connection, statement, resultSet, dataSource);
         }
 
         // in case no value was found, throw an exception
@@ -142,7 +143,7 @@ public class UnitilsSQLHandler implements SQLHandler {
         ResultSet resultSet = null;
         Connection connection = null;
         try {
-            connection = dataSource.getConnection();
+            connection = DataSourceUtils.getConnection(dataSource);
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
             Set<String> result = new HashSet<String>();
@@ -154,11 +155,10 @@ public class UnitilsSQLHandler implements SQLHandler {
         } catch (Exception e) {
             throw new DatabaseException("Error while executing statement: " + sql, e);
         } finally {
-            closeQuietly(connection, statement, resultSet);
+            closeQuietly(connection, statement, resultSet, dataSource);
         }
     }
 
-    @Override
     public boolean exists(String sql, DataSource dataSource) {
         logger.debug(sql);
 
@@ -166,7 +166,7 @@ public class UnitilsSQLHandler implements SQLHandler {
         ResultSet resultSet = null;
         Connection connection = null;
         try {
-            connection = dataSource.getConnection();
+            connection = DataSourceUtils.getConnection(dataSource);
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
             return resultSet.next();
@@ -174,7 +174,7 @@ public class UnitilsSQLHandler implements SQLHandler {
         } catch (Exception e) {
             throw new DatabaseException("Error while executing statement: " + sql, e);
         } finally {
-            closeQuietly(connection, statement, resultSet);
+            closeQuietly(connection, statement, resultSet, dataSource);
         }
     }
 
