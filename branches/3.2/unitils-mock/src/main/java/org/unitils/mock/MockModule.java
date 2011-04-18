@@ -40,7 +40,7 @@ import java.util.Set;
 
 /**
  * Module for testing with mock objects.
- *
+ * 
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
@@ -168,24 +168,35 @@ public class MockModule implements Module {
     }
 
 
+    /**
+     * checks for the {@link Dummy} annotation on the testObject. If so it is created by the DummyObjectUtil. The two aproaches possible are
+     * stuffed or normal depending on the value in the {@link Dummy} annotation.
+     * 
+     * @param testObject
+     */
     protected void createAndInjectDummiesIntoTest(Object testObject) {
         Set<Field> dummyFields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), Dummy.class);
         for (Field dummyField : dummyFields) {
-            Object dummy = DummyObjectUtil.createDummy(dummyField.getType());
+            Dummy dummyAnnotation = dummyField.getAnnotation(Dummy.class);
+            Object dummy = null;
+            if (dummyAnnotation.stuffed()) {
+                dummy = DummyObjectUtil.createStuffedDummy(dummyField.getType());
+            } else {
+                dummy = DummyObjectUtil.createDummy(dummyField.getType());
+            }
             setFieldValue(testObject, dummyField, dummy);
         }
     }
 
 
     /**
-     * Calls all {@link AfterCreateMock} annotated methods on the test, passing the given mock.
-     * These annotated methods must have following signature <code>void myMethod(Object mock, String name, Class type)</code>.
-     * If this is not the case, a runtime exception is called.
-     *
+     * Calls all {@link AfterCreateMock} annotated methods on the test, passing the given mock. These annotated methods must have following
+     * signature <code>void myMethod(Object mock, String name, Class type)</code>. If this is not the case, a runtime exception is called.
+     * 
      * @param testObject the test, not null
      * @param mockObject the mock, not null
-     * @param name       the field(=mock) name, not null
-     * @param type       the field(=mock) type
+     * @param name the field(=mock) name, not null
+     * @param type the field(=mock) type
      */
     // todo should we inject the mock or the proxy??
     protected void callAfterCreateMockMethods(Object testObject, Mock<?> mockObject, String name, Class<?> type) {
@@ -205,7 +216,7 @@ public class MockModule implements Module {
 
     /**
      * Creates the listener for plugging in the behavior of this module into the test runs.
-     *
+     * 
      * @return the listener
      */
     public TestListener getTestListener() {
@@ -214,8 +225,8 @@ public class MockModule implements Module {
 
 
     /**
-     * Test listener that handles the scenario and mock creation, and makes sure a final syntax check
-     * is performed after each test and that scenario reports are logged if required.
+     * Test listener that handles the scenario and mock creation, and makes sure a final syntax check is performed after each test and that
+     * scenario reports are logged if required.
      */
     protected class MockTestListener extends TestListener {
 
