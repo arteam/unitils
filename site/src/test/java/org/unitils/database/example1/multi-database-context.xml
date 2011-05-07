@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="hsqldbDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
+        <property name="url" value="jdbc:hsqldb:mem:test"/>
+        <property name="username" value="sa"/>
+        <property name="password" value=""/>
+    </bean>
+    <bean id="oracleDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+        <property name="url" value="jdbc:oracle:thin:@localhost:1521:XE"/>
+        <property name="username" value="test_user"/>
+        <property name="password" value="test"/>
+    </bean>
+
+    <bean id="hsqldb" class="org.unitils.database.UnitilsDataSource">
+        <property name="dataSource" ref="hsqldbDataSource"/>
+        <property name="schemaName" value="public"/>
+    </bean>
+    <bean id="oracle" class="org.unitils.database.UnitilsDataSource">
+        <property name="dataSource" ref="oracleDataSource"/>
+        <property name="schemaName" value="TEST_USER"/>
+    </bean>
+
+</beans>

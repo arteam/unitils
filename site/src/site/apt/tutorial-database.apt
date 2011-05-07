@@ -1,0 +1,184 @@
+Database
+
+* {Installation}
+~~~~~~~~~~~~~~~~
+    If you are using maven, you can add following dependency to your project.
+
+%{include|source=pom.xml|id=database|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    If you are not using maven you can download the unitils-with-dependencies.zip. The required jar, unitils-database.jar, can be
+    found in the unitils-database folder, the required dependencies, in the unitils-database/lib folder.
+
+    Unitils offers two ways to setup a test that uses a database: without spring, using the unitils properties or with spring
+    using a spring context. We'll start with the setup in unitils properties. If you're using spring, you can
+    skip this section.
+
+
+* {Setting up a database test without using spring}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+** Setting up a test data source
+
+    Following properties can be defined in the unitils properties to define a test data source:
+
+%{include|source=example.properties|id=database|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    These can be defined in any unitils property file or as a system property. Unitils will first look for a <unitils.properties> file on the
+    class path and then look for a unitils-local.properties in the <user.home> folder. Both files are optional. Properties found in the
+    local properties override properties of the unitils.properties. If a system property is set, it will override the other properties.
+    This is just a short overview of the process, more details can be found in the properties section.
+
+*** {One test schema per developer}
+
+    Using the different property files we can easily setup an environment in which each developer has it's own separate unit
+    test schema in the database. Just add the general config like driver class and url in a unitils.properties file somewhere
+    in the classpath and add the schema, user name and password in a unitils-local.properties in each of the developer's home
+    folders.
+
+%{include|source=example2.properties|id=unitils.properties|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+%{include|source=example2.properties|id=unitils-local.properties|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    Using one schema per developer allows developers to develop code and tests without interfering with each other.
+    You can for example commit changes in the database without fearing that another developer's test-run will fail.
+
+    There are of course other options to achieve the same result: you could for example run the tests in a
+    transaction and do a rollback at the end. This approach however has the drawback that you don't see the data or
+    actual result in the database (it will be rolled back), making it harder to debug and write your tests.
+
+*** {Configuring multiple data sources}
+
+    Multiple databases can be defined by providing a name for each database:
+
+%{include|source=example3.properties|id=multi-database|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    This will define 2 data sources: a data source for hsqldb and a data source for oracle. If you use named databases,
+    the unnamed database (like in the first example) is used as a fallback: if no value was specified for the database,
+    the value of the unnamed database is taken. The unnamed config will then not be used to create a data source.
+
+
+** {Getting the test data source}
+
+    Getting the data source is easy. If your test is unitils-enabled, just put a <TestDataSource> annotation on a field
+    of type <DataSource> and unitils will inject the data source in that field.
+
+%{include|source=org/unitils/database/example1/MyDaoTest.java|id=get|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    If there are multiple databases, you need to specify the name of the database in the annotation:
+
+%{include|source=org/unitils/database/example3/MyDaoTest.java|id=get|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    If you don't want to unitils-enable your test you can also get the data source programmatically by calling the
+    <DatabaseUnitils.getDataSource()> method.
+
+%{include|source=org/unitils/database/example2/MyDaoTest.java|id=get|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+   If there are multiple databases, you have to specify the name of the database:
+
+%{include|source=org/unitils/database/example4/MyDaoTest.java|id=get|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+
+** {Making the test transactional}
+
+    By default, no transaction is started for a test. Some functionality can only be tested when a transaction is active.
+    A test that for example uses Hibernate or JPA has to run in the scope of a transaction.
+
+    If your test is unitils-enabled, you can make your test transactional by setting a <Transactional> annotation on
+    the class, one of it's super-classes or on the test method itself. Test method annotations override class
+    annotations and class annotations override super-class annotations.
+
+%{include|source=org/unitils/database/example6/MyDaoTest.java|id=transactional|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    A transaction will be started before the before-methods of the test and ended after the after-methods of the test.
+    By default, the transaction will be committed. Other behavior can be specified as an argument of the annotation.
+
+%{include|source=org/unitils/database/example5/MyDaoTest.java|id=transactional|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    You can change the default behavior by setting following property
+
+%{include|source=example.properties|id=default-transaction|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    <<Note:>> unitils does not support transactions spanning multiple data sources. An exception will be raised if you
+    try to use more than 1 data source in the same test class. It is however possible to use a certain data source in one test
+    class and another data source in another test class. They just can't be used at the same time. If you really need to use XA
+    transactions in your test, you will have to set up the test in a spring context (see below) and define an XA
+    capable transaction manager (e.g. JOTM) to do the transaction management.
+
+
+* {Setting up a database test using spring}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+** Defining a data source in a spring context
+
+    If you are using a spring context for your tests, you can configure the data source directly in this context. Just
+    define a <UnitilsDataSource> bean that references the data source you want to use and specify the schema names that
+    are applicable for the data source.
+
+%{include|source=org/unitils/database/example1/single-database-context.xml|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+*** {Configuring multiple data sources}
+
+    You can configure more than 1 database by providing an id for all <UnitilsDataSource> beans.
+
+%{include|source=org/unitils/database/example1/multi-database-context.xml|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    This will define 2 data sources: a data source for hsqldb and a data source for oracle.
+
+
+*** {Defining a data source in properties and using it in a spring context}
+
+    It's also possible to define the data sources in the unitils properties (as discussed above) and then use the
+    data source in the spring context. Just define a <UnitilsDataSourceFactoryBean> in your context and give it an id.
+    The bean will then fetch the data source from unitils and place the data source in the spring context under the given id.
+
+%{include|source=org/unitils/database/example1/datasourcefactory-context.xml|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+
+*** {Configuring multiple data sources}
+
+    You can configure more than 1 database by providing the database name to the <UnitilsDataSourceFactoryBean>.
+
+%{include|source=org/unitils/database/example1/multi-datasourcefactory-context.xml|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+
+** {Using the test data source}
+
+    The unitils data sources are only needed to link a data source to unitils code that needs it. For example, when
+    loading a data set using the data set module, unitils needs to know which data source to use.
+
+    In your normal test code you don't need to use the unitils data source. You can just use the data source it references
+    directly. For example, following test defines a jdbc template that uses the data source and uses DI to get the
+    jdbc template in the test.
+
+%{include|source=org/unitils/database/example7/MyDaoTest-context.xml|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+%{include|source=org/unitils/database/example7/MyDaoTest.java|id=test|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    In this test, we set up a unitils data source to configure the test for the loading of a data set (using the data set module).
+    The rest of the code uses the configured data source and jdbc template directly.
+
+
+** {Making the test transactional}
+
+    There are 2 options: you can use the standard spring way of making a test transactional or using the unitils
+    <Transactional> annotation as described above.
+
+*** Using spring
+
+    The standard way of making a test transactional in spring is to extend from a base class like
+    <AbstractTransactionalJUnit4SpringContextTests> and to add <<spring's>> <Transactional> annotation to your test-class
+    or method. You also have to declare a transaction manager in your test spring-context.
+
+%{include|source=org/unitils/database/example8/MyDaoTest-context.xml|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+%{include|source=org/unitils/database/example8/MyDaoTest.java|id=test|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+*** Using unitils
+
+    Just add a <<unitils'>> <Transactional> annotation to your test (as described above). You do not have to create a
+    transaction manager in your test spring-context. A transaction manager (an instance of <DataSourceTransactionManager>) will
+    automatically be created for the unitils data source when the transaction is started.
+
+%{include|source=org/unitils/database/example9/MyDaoTest-context.xml|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+%{include|source=org/unitils/database/example9/MyDaoTest.java|id=test|verbatim=true|set-first-line=1|pad-line-numbers=2}
