@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.unitils.mock;
 import org.unitils.mock.annotation.ArgumentMatcher;
 import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
 import org.unitils.mock.argumentmatcher.impl.*;
+
 import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationLineNr;
 
 /**
@@ -71,6 +72,11 @@ public class ArgumentMatchers {
         return null;
     }
 
+    @ArgumentMatcher
+    public static <T> T any(Class<T> type) {
+        registerArgumentMatcher(new AnyArgumentMatcher(type));
+        return null;
+    }
 
     @ArgumentMatcher
     public static boolean anyBoolean() {
