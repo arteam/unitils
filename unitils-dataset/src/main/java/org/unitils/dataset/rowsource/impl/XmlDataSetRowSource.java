@@ -204,7 +204,12 @@ public class XmlDataSetRowSource implements DataSetRowSource {
         if (isEmpty(uri)) {
             return null;
         }
-        return uri;
+        // strip off database name
+        int index = uri.indexOf('/');
+        if (index == -1) {
+            return uri;
+        }
+        return uri.substring(index + 1);
     }
 
 
