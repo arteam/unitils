@@ -251,9 +251,9 @@ public class XsdDataSetStructureGenerator implements DataSetStructureGenerator {
 
             String defaultSchemaName = dataSourceWrapper.getDefaultSchemaName();
             writer.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
-            writer.write("<uni:dataset xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
+            writer.write("<uni:dataset xmlns=\"");
             String defaultNamespace = getNamespace(databaseName, defaultSchemaName);
-            writer.write("\t\t\txmlns=\"" + defaultNamespace + "\"");
+            writer.write(defaultNamespace + "\"");
 
             for (String schemaName : dataSourceWrapper.getSchemaNames()) {
                 String schemaNamespace = getNamespace(databaseName, schemaName);
