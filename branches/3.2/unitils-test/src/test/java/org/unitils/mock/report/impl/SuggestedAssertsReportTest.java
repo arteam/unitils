@@ -1,31 +1,33 @@
 /*
- * Copyright 2006-2007,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock.report.impl;
 
-import static junit.framework.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
 import org.unitils.mock.core.MockObject;
-import static org.unitils.mock.core.MockObject.getCurrentScenario;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static junit.framework.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.unitils.mock.core.MockObject.getCurrentScenario;
 
 /**
  * Test for the report that shows the suggested assert statements.
@@ -111,36 +113,18 @@ public class SuggestedAssertsReportTest {
         assertFalse(report.contains("testMock.assertInvoked().testMethodReturnsString()"));
     }
 
-    /**
-     * Methods which have been stubbed are not included in the report
-     */
-    @Test
-    public void dontSuggestAssertsForStubbedMethods() {
-        testMock.raises(UnitilsException.class).testMethodString("someValue");
-        try {
-            testProxy.testMethodString("someValue");
-        } catch (UnitilsException e) {
-            // Expected flow
-        }
-        testProxy.testMethodString("otherValue");
-
-        String report = suggestedAssertsReport.createReport(this, getCurrentScenario().getObservedInvocations());
-
-        assertFalse(report.contains("testMock.assertInvoked().testMethodString(\"someValue\");"));
-        assertTrue(report.contains("testMock.assertInvoked().testMethodString(\"otherValue\");"));
-    }
 
     public static interface TestInterface {
 
-        public String testMethodReturnsString();
+        String testMethodReturnsString();
 
-        public void testMethodString(String arg1);
+        void testMethodString(String arg1);
 
-        public void testMethodInt(int arg1);
+        void testMethodInt(int arg1);
 
-        public void testMethodInteger(Integer arg1);
+        void testMethodInteger(Integer arg1);
 
-        public void testMethodObject(List<String> arg1);
+        void testMethodObject(List<String> arg1);
     }
 
 }

@@ -1,17 +1,19 @@
 /*
- * Copyright 2008,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock.core;
 
@@ -25,14 +27,19 @@ import org.unitils.mock.core.matching.impl.AssertInvokedInSequenceVerifyingMatch
 import org.unitils.mock.core.matching.impl.AssertInvokedVerifyingMatchingInvocationHandler;
 import org.unitils.mock.core.matching.impl.AssertNotInvokedVerifyingMatchingInvocationHandler;
 import org.unitils.mock.core.matching.impl.BehaviorDefiningMatchingInvocationHandler;
-import static org.unitils.mock.core.proxy.ProxyFactory.createInitializedOrUnitializedInstanceOfType;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.ExceptionThrowingMockBehavior;
 import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
-import static org.unitils.util.ReflectionUtils.getGenericType;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.uncapitalize;
+import static org.unitils.mock.core.proxy.ProxyFactory.createInitializedOrUninitializedInstanceOfType;
+import static org.unitils.util.ReflectionUtils.getGenericType;
 
 /**
  * Implementation of a Mock.
@@ -45,17 +52,16 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
 
     /* The name of the mock (e.g. the name of the field) */
     protected String name;
-
     /* The class type that is mocked */
     protected Class<T> mockedType;
-
     protected MockProxy<T> mockProxy;
 
     /* Mock behaviors that are removed once they have been matched */
     protected BehaviorDefiningInvocations oneTimeMatchingBehaviorDefiningInvocations;
-
     /* Mock behaviors that can be matched and re-used for several invocation */
     protected BehaviorDefiningInvocations alwaysMatchingBehaviorDefiningInvocations;
+    /* Created chained mocks per mock name */
+    protected Map<String, Mock<?>> chainedMocksPerName;
 
     /* The scenario that will record all observed invocations */
     protected static ThreadLocal<Scenario> scenarioThreadLocal = new ThreadLocal<Scenario>();
@@ -69,7 +75,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
 
 
     /**
-     * Creates a mock of the given type for the given scenario.
+     * Creates a mock of the given type with un-capitalized type name + Mock as name, e.g. myServiceMock.
      *
      * There is no .class literal for generic types. Therefore you need to pass the raw type when mocking generic types.
      * E.g. Mock&lt;List&lt;String&gt;&gt; myMock = new MockObject("myMock", List.class, this);
@@ -77,16 +83,39 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
      * If the mocked type does not correspond to the declared type, a ClassCastException will occur when the mock
      * is used.
      *
-     * @param name       The name of the mock, e.g. the field-name, not null
+     * @param mockedType The mock type that will be proxied, use the raw type when mocking generic types, not null
+     * @param testObject The test object, not null
+     */
+    public MockObject(Class<?> mockedType, Object testObject) {
+        this(null, mockedType, testObject);
+    }
+
+    /**
+     * Creates a mock of the given type.
+     *
+     * There is no .class literal for generic types. Therefore you need to pass the raw type when mocking generic types.
+     * E.g. Mock&lt;List&lt;String&gt;&gt; myMock = new MockObject("myMock", List.class, this);
+     *
+     * If the mocked type does not correspond to the declared type, a ClassCastException will occur when the mock
+     * is used.
+     *
+     * If no name is given the un-capitalized type name + Mock is used, e.g. myServiceMock
+     *
+     * @param name       The name of the mock, e.g. the field-name, null for the default
      * @param mockedType The mock type that will be proxied, use the raw type when mocking generic types, not null
      * @param testObject The test object, not null
      */
     @SuppressWarnings({"unchecked"})
     public MockObject(String name, Class<?> mockedType, Object testObject) {
-        this.name = name;
+        if (isBlank(name)) {
+            this.name = uncapitalize(mockedType.getSimpleName()) + "Mock";
+        } else {
+            this.name = name;
+        }
         this.mockedType = (Class<T>) mockedType;
         this.oneTimeMatchingBehaviorDefiningInvocations = createOneTimeMatchingBehaviorDefiningInvocations();
         this.alwaysMatchingBehaviorDefiningInvocations = createAlwaysMatchingBehaviorDefiningInvocations();
+        this.chainedMocksPerName = new HashMap<String, Mock<?>>();
 
         Scenario scenario = getScenario(testObject);
         if (scenario.getTestObject() != testObject) {
@@ -197,7 +226,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
      * <p/>
      * mock.raises(MyException.class).method1();
      * <p/>
-     * will throw an instance of the given exception classwhen method1 is called.
+     * will throw an instance of the given exception class when method1 is called.
      * <p/>
      * Note that this behavior is executed each time a match is found. So the exception will be raised
      * each time method1() is called. If you only want to raise the exception once, use the {@link #onceRaises} method.
@@ -207,7 +236,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
      */
     @MatchStatement
     public T raises(Class<? extends Throwable> exceptionClass) {
-        Throwable exception = createInitializedOrUnitializedInstanceOfType(exceptionClass);
+        Throwable exception = createInitializedOrUninitializedInstanceOfType(exceptionClass);
         exception.fillInStackTrace();
         MatchingInvocationHandler matchingInvocationHandler = createAlwaysMatchingBehaviorDefiningMatchingInvocationHandler(new ExceptionThrowingMockBehavior(exception));
         return startMatchingInvocation(matchingInvocationHandler);
@@ -296,7 +325,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
      */
     @MatchStatement
     public T onceRaises(Class<? extends Throwable> exceptionClass) {
-        Throwable exception = createInitializedOrUnitializedInstanceOfType(exceptionClass);
+        Throwable exception = createInitializedOrUninitializedInstanceOfType(exceptionClass);
         MatchingInvocationHandler matchingInvocationHandler = createOneTimeMatchingBehaviorDefiningMatchingInvocationHandler(new ExceptionThrowingMockBehavior(exception));
         return startMatchingInvocation(matchingInvocationHandler);
     }
@@ -374,17 +403,26 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
     public void resetBehavior() {
         oneTimeMatchingBehaviorDefiningInvocations.clear();
         alwaysMatchingBehaviorDefiningInvocations.clear();
+        chainedMocksPerName.clear();
         getMatchingInvocationBuilder().reset();
         ArgumentMatcherRepository.getInstance().reset();
     }
 
 
-    public <M> Mock<M> createMock(String name, Class<M> mockedType) {
+    @SuppressWarnings({"unchecked"})
+    public <M> Mock<M> createChainedMock(String name, Class<M> mockedType) {
+        Mock<?> chainedMock = chainedMocksPerName.get(name);
+        if (chainedMock != null) {
+            return (Mock<M>) chainedMock;
+        }
         try {
             if (Void.class.equals(mockedType) || mockedType.isPrimitive() || mockedType.isArray()) {
                 return null;
             }
-            return new MockObject<M>(name, mockedType, getCurrentScenario().getTestObject());
+            chainedMock = new MockObject<M>(name, mockedType, getCurrentScenario().getTestObject());
+            chainedMocksPerName.put(name, chainedMock);
+            return (Mock<M>) chainedMock;
+
         } catch (Throwable t) {
             return null;
         }

@@ -1,17 +1,19 @@
 /*
- * Copyright 2008,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock.core.proxy;
 
@@ -25,9 +27,12 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import static java.lang.reflect.Modifier.isStatic;
+import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Map;
+
+import static java.lang.reflect.Modifier.isStatic;
+import static org.unitils.mock.core.proxy.ProxyUtils.isProxy;
 
 /**
  * Utility class for deep cloning objects.
@@ -100,6 +105,14 @@ public class CloneUtil {
         if (instanceToClone instanceof Cloneable) {
             return createInstanceUsingClone(instanceToClone);
         }
+        // don't clone java classes (unless they are cloneable)
+        if (isJdkClass(instanceToClone)) {
+            return instanceToClone;
+        }
+        // don't clone proxies
+        if (isProxy(instanceToClone)) {
+            return instanceToClone;
+        }
         // try to clone it ourselves
         Object clonedInstance = createInstanceUsingObjenesis(instanceToClone);
 
@@ -118,10 +131,8 @@ public class CloneUtil {
 
 
     /**
-     * Returns the given value if it is immutable, else null is returned.
-     *
      * @param instanceToClone The instance, not null
-     * @return The instance if it is immutable, else null
+     * @return True if the instance is immutable, e.g. a primitive
      */
     protected static boolean isImmutable(Object instanceToClone) {
         Class<?> clazz = instanceToClone.getClass();
@@ -130,6 +141,22 @@ public class CloneUtil {
             return true;
         }
         if (instanceToClone instanceof Number || instanceToClone instanceof String || instanceToClone instanceof Character || instanceToClone instanceof Boolean) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param instanceToClone The instance, not null
+     * @return True if the instance is should not be cloned, e.g. a java lang class or a data source
+     */
+    protected static boolean isJdkClass(Object instanceToClone) {
+        if (instanceToClone instanceof Collection || instanceToClone instanceof Map) {
+            // make sure to clone collections
+            return false;
+        }
+        String className = instanceToClone.getClass().getName();
+        if (className.startsWith("java.")) {
             return true;
         }
         return false;

@@ -1,17 +1,19 @@
 /*
- * Copyright 2006-2009,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock.core;
 
@@ -22,15 +24,12 @@ import java.util.List;
 
 
 /**
- * todo javadoc
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public class BehaviorDefiningInvocations {
 
     protected boolean removeWhenUsed;
-
     protected List<BehaviorDefiningInvocation> behaviorDefiningInvocations = new ArrayList<BehaviorDefiningInvocation>();
 
 
@@ -50,10 +49,10 @@ public class BehaviorDefiningInvocations {
 
 
     /**
-     * First we find all behavior defining invocations that have matching argument matchers. From these matching
-     * invocations, we then count the nr of not-null (default) arguments. The result will be the
-     * invocation with the lowest number of not-null arguments. If there are multiple invocations with the same
-     * number, the first one is returned. E.g.
+     * First we find all behavior defining invocations that have matching argument matchers and take the one with the highest
+     * matching score (identity match scores higher than an equals match). If there are 2 invocations with the same score,
+     * we take the invocation with the lowest nr of not-null (default) arguments. If both have the same nr of not-null
+     * arguments, the first one is returned. E.g.
      *
      * myMethod(null, null);
      * myMethod("a", null);
@@ -65,16 +64,32 @@ public class BehaviorDefiningInvocations {
      */
     public BehaviorDefiningInvocation getMatchingBehaviorDefiningInvocation(ProxyInvocation proxyInvocation) {
         BehaviorDefiningInvocation bestMatchingBehaviorDefiningInvocation = null;
-        int bestMatchingNrOfNotNullArguments = -1;
+        int bestMatchingScore = -1;
 
         for (BehaviorDefiningInvocation behaviorDefiningInvocation : behaviorDefiningInvocations) {
-            if (!behaviorDefiningInvocation.matches(proxyInvocation)) {
+            int matchingScore = behaviorDefiningInvocation.matches(proxyInvocation);
+            if (matchingScore == -1) {
+                // no match
                 continue;
             }
-            int nrOfNotNullArguments = behaviorDefiningInvocation.getNrOfNotNullArguments();
-            if (nrOfNotNullArguments > bestMatchingNrOfNotNullArguments) {
+            if (matchingScore < bestMatchingScore) {
+                // there is a better match
+                continue;
+            }
+            if (matchingScore > bestMatchingScore) {
+                // better match
+                bestMatchingScore = matchingScore;
                 bestMatchingBehaviorDefiningInvocation = behaviorDefiningInvocation;
-                bestMatchingNrOfNotNullArguments = nrOfNotNullArguments;
+                continue;
+            }
+            if (matchingScore == bestMatchingScore) {
+                // same score, nr of not-null values determines the best match
+                int nrOfNotNullArguments = behaviorDefiningInvocation.getNrOfNotNullArguments();
+                int bestMatchingNrOfNotNullArguments = bestMatchingBehaviorDefiningInvocation.getNrOfNotNullArguments();
+                if (nrOfNotNullArguments > bestMatchingNrOfNotNullArguments) {
+                    bestMatchingScore = matchingScore;
+                    bestMatchingBehaviorDefiningInvocation = behaviorDefiningInvocation;
+                }
             }
         }
         if (removeWhenUsed && bestMatchingBehaviorDefiningInvocation != null) {
@@ -82,6 +97,4 @@ public class BehaviorDefiningInvocations {
         }
         return bestMatchingBehaviorDefiningInvocation;
     }
-
-
 }

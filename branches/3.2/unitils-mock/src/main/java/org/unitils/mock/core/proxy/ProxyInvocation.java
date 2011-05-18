@@ -1,24 +1,26 @@
 /*
- * Copyright 2008,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock.core.proxy;
 
-import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
-
 import java.lang.reflect.Method;
 import java.util.List;
+
+import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
 
 /**
  * An invocation of a proxy method.
@@ -27,23 +29,18 @@ import java.util.List;
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
-public abstract class ProxyInvocation {
+public class ProxyInvocation {
 
     /* The name of the mock, e.g. the field name */
     private String mockName;
-
     /* The proxy on which the method was called */
     private Object proxy;
-
     /* The method that was called */
     private Method method;
-
     /* The arguments that were used */
     private List<Object> arguments;
-
     /* The arguments at the time that they were used */
     private List<Object> argumentsAtInvocationTime;
-
     /* The trace of the invocation */
     private StackTraceElement[] invokedAtTrace;
 
@@ -121,7 +118,6 @@ public abstract class ProxyInvocation {
         return mockName;
     }
 
-
     /**
      * @return The proxy on which the method was called, not null
      */
@@ -129,14 +125,12 @@ public abstract class ProxyInvocation {
         return proxy;
     }
 
-
     /**
      * @return The method that was called, not null
      */
     public Method getMethod() {
         return method;
     }
-
 
     /**
      * @return The arguments that were used, not null

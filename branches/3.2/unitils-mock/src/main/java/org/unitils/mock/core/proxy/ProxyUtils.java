@@ -1,17 +1,19 @@
 /*
- * Copyright 2008,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock.core.proxy;
 
@@ -20,6 +22,7 @@ import net.sf.cglib.proxy.Factory;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.core.MockObject;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,7 +45,6 @@ public class ProxyUtils {
         if (object == null) {
             return null;
         }
-        Class<?> type = object.getClass();
         if (object instanceof Factory) {
             Callback[] callbacks = ((Factory) object).getCallbacks();
             if (callbacks == null || callbacks.length == 0) {
@@ -55,6 +57,17 @@ public class ProxyUtils {
         return null;
     }
 
+    /**
+     * @param instance The instance to check, not null
+     * @return True if the given instance is a jdk or cglib proxy
+     */
+    public static boolean isProxy(Object instance) {
+        if (instance == null) {
+            return false;
+        }
+        Class<?> clazz = instance.getClass();
+        return isProxyClassName(clazz.getName()) || Proxy.isProxyClass(clazz);
+    }
 
     /**
      * @param className The class name to check, not null
@@ -66,9 +79,12 @@ public class ProxyUtils {
 
 
     /**
+     * note: don't remove, used through reflection from {@link org.unitils.core.util.ObjectFormatter}
+     *
      * @param object The object to check
      * @return The proxied type, null if the object is not a proxy or mock
      */
+    @SuppressWarnings({"UnusedDeclaration"})
     public static String getMockName(Object object) {
         if (object == null) {
             return null;
@@ -76,7 +92,6 @@ public class ProxyUtils {
         if (object instanceof MockObject) {
             return ((MockObject) object).getName();
         }
-        Class<?> type = object.getClass();
         if (object instanceof Factory) {
             Callback callback = ((Factory) object).getCallback(0);
             if (callback instanceof CglibProxyMethodInterceptor) {

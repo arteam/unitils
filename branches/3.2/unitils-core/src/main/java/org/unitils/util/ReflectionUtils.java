@@ -1,29 +1,32 @@
 /*
- * Copyright 2008,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.util;
 
-import static org.apache.commons.lang.StringUtils.capitalize;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.TypeUtils;
 
 import java.lang.reflect.*;
-import static java.lang.reflect.Modifier.isStatic;
-import static java.util.Arrays.asList;
 import java.util.HashSet;
 import java.util.Set;
+
+import static java.lang.reflect.Modifier.isStatic;
+import static java.util.Arrays.asList;
+import static org.apache.commons.lang.StringUtils.capitalize;
 
 /**
  * Utility methods that use reflection for instance creation or class inspection.
@@ -221,26 +224,6 @@ public class ReflectionUtils {
 
 
     /**
-     * Invoke the given method with the given parameters on the given target object. Doesn't throw
-     * any checked exception
-     *
-     * @param target    The object containing the method, not null
-     * @param method    The method, not null
-     * @param arguments The method arguments
-     * @return The result of the invocation, null if void
-     * @throws UnitilsException if the method could not be invoked, or the called method throwed an exception
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> T invokeMethodSilent(Object target, Method method, Object... arguments) {
-        try {
-            return (T) invokeMethod(target, method, arguments);
-        } catch (InvocationTargetException e) {
-            throw new UnitilsException(e);
-        }
-    }
-
-
-    /**
      * Returns all declared fields of the given class that are assignable from the given type.
      *
      * @param clazz    The class to get fields from, not null
@@ -347,7 +330,7 @@ public class ReflectionUtils {
 
 
     /**
-     * From the given class, returns the getter for the given propertyname. If isStatic == true,
+     * From the given class, returns the getter for the given property name. If isStatic == true,
      * a static getter is searched. If no such getter exists in the given class, null is returned.
      *
      * @param clazz        The class to get the setter from, not null
@@ -649,6 +632,27 @@ public class ReflectionUtils {
             return (Class<T>) ((ParameterizedType) type).getRawType();
         }
         throw new UnitilsException("Unable to convert Type instance " + type + " to a Class instance.");
+    }
+
+
+    public static void copyFields(Object fromObject, Object toObject) {
+        try {
+            copyFields(fromObject.getClass(), fromObject, toObject);
+        } catch (Exception e) {
+            throw new UnitilsException("Unable to copy fields.", e);
+        }
+    }
+
+    private static void copyFields(Class<?> clazz, Object fromObject, Object toObject) throws IllegalAccessException {
+        if (clazz == null) {
+            return;
+        }
+        for (Field field : clazz.getDeclaredFields()) {
+            field.setAccessible(true);
+            Object fromValue = field.get(fromObject);
+            field.set(toObject, fromValue);
+        }
+        copyFields(clazz.getSuperclass(), fromObject, toObject);
     }
 
 }

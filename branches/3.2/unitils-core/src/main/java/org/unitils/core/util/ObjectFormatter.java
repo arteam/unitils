@@ -1,31 +1,34 @@
 /*
- * Copyright 2008,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.core.util;
 
-import static org.apache.commons.lang.ClassUtils.getShortClassName;
-import static org.unitils.reflectionassert.util.HibernateUtil.getUnproxiedValue;
-
+import java.io.File;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
-import static java.lang.reflect.Modifier.isStatic;
-import static java.lang.reflect.Modifier.isTransient;
-import java.util.Arrays;
+import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
+
+import static java.lang.reflect.Modifier.isStatic;
+import static java.lang.reflect.Modifier.isTransient;
+import static org.apache.commons.lang.ClassUtils.getShortClassName;
+import static org.unitils.reflectionassert.util.HibernateUtil.getUnproxiedValue;
 
 
 /**
@@ -39,17 +42,20 @@ import java.util.Map;
  */
 public class ObjectFormatter {
 
-    /**
-     * The maximum recursion depth
-     */
+    public static final String MOCK_NAME_CHAIN_SEPARATOR = "##chained##";
+
+    /* The maximum recursion depth */
     protected int maxDepth;
+    /* The maximum nr of elements for arrays and collections to display */
+    protected int maxNrArrayOrCollectionElements;
 
+    protected ArrayAndCollectionFormatter arrayAndCollectionFormatter;
 
     /**
-     * Creates a formatter with a maximum recursion depth of 5.
+     * Creates a formatter with a maximum recursion depth of 3.
      */
     public ObjectFormatter() {
-        this(5);
+        this(3, 15);
     }
 
 
@@ -58,10 +64,13 @@ public class ObjectFormatter {
      * <p/>
      * NOTE: there is no cycle detection. A large max depth value can cause lots of output in case of a cycle.
      *
-     * @param maxDepth The max depth > 0
+     * @param maxDepth                       The max depth > 0
+     * @param maxNrArrayOrCollectionElements The maximum nr of elements for arrays and collections to display  > 0
      */
-    public ObjectFormatter(int maxDepth) {
+    public ObjectFormatter(int maxDepth, int maxNrArrayOrCollectionElements) {
         this.maxDepth = maxDepth;
+        this.maxNrArrayOrCollectionElements = maxNrArrayOrCollectionElements;
+        this.arrayAndCollectionFormatter = new ArrayAndCollectionFormatter(maxNrArrayOrCollectionElements, this);
     }
 
 
@@ -93,54 +102,38 @@ public class ObjectFormatter {
             result.append(String.valueOf(object));
             return;
         }
-        if (object instanceof String) {
-            result.append('"');
-            result.append(object);
-            result.append('"');
+        if (formatString(object, result)) {
             return;
         }
-        if (object instanceof Number || object instanceof Date) {
-            result.append(String.valueOf(object));
-            return;
-        }
-        if (object instanceof Character) {
-            result.append('\'');
-            result.append(String.valueOf(object));
-            result.append('\'');
-            return;
-        }
-        Class<?> dummyObjectClass = getDummyObjectClass();
-        if (dummyObjectClass != null && dummyObjectClass.isAssignableFrom(object.getClass())) {
-            result.append("Dummy<");
-            result.append(object.toString());
-            result.append(">");
+        if (formatNumberOrDate(object, result)) {
             return;
         }
         Class<?> type = object.getClass();
-        if (type.isPrimitive() || type.isEnum()) {
-            result.append(String.valueOf(object));
+        if (formatCharacter(object, type, result)) {
+            return;
+        }
+        if (formatPrimitiveOrEnum(object, type, result)) {
             return;
         }
         if (formatMock(object, result)) {
             return;
         }
-        if (formatProxy(object, result)) {
+        if (formatProxy(object, type, result)) {
             return;
         }
-        if (type.getName().startsWith("java.lang")) {
-            result.append(String.valueOf(object));
+        if (formatJavaLang(object, result, type)) {
             return;
         }
         if (type.isArray()) {
-            formatArray(object, currentDepth, result);
+            arrayAndCollectionFormatter.formatArray(object, currentDepth, result);
             return;
         }
         if (object instanceof Collection) {
-            formatCollection((Collection<?>) object, currentDepth, result);
+            arrayAndCollectionFormatter.formatCollection((Collection<?>) object, currentDepth, result);
             return;
         }
         if (object instanceof Map) {
-            formatMap((Map<?, ?>) object, currentDepth, result);
+            arrayAndCollectionFormatter.formatMap((Map<?, ?>) object, currentDepth, result);
             return;
         }
         if (currentDepth >= maxDepth) {
@@ -148,109 +141,55 @@ public class ObjectFormatter {
             result.append("<...>");
             return;
         }
+        if (formatFile(object, result)) {
+            return;
+        }
         formatObject(object, currentDepth, result);
     }
 
 
-    /**
-     * Formats the given array.
-     *
-     * @param array        The array, not null
-     * @param currentDepth The current recursion depth
-     * @param result       The builder to append the result to, not null
-     */
-    protected void formatArray(Object array, int currentDepth, StringBuilder result) {
-        if (array instanceof byte[]) {
-            result.append(Arrays.toString((byte[]) array));
-            return;
+    protected boolean formatJavaLang(Object object, StringBuilder result, Class<?> type) {
+        if (type.getName().startsWith("java.lang")) {
+            result.append(String.valueOf(object));
+            return true;
         }
-        if (array instanceof short[]) {
-            result.append(Arrays.toString((short[]) array));
-            return;
-        }
-        if (array instanceof int[]) {
-            result.append(Arrays.toString((int[]) array));
-            return;
-        }
-        if (array instanceof long[]) {
-            result.append(Arrays.toString((long[]) array));
-            return;
-        }
-        if (array instanceof char[]) {
-            result.append(Arrays.toString((char[]) array));
-            return;
-        }
-        if (array instanceof float[]) {
-            result.append(Arrays.toString((float[]) array));
-            return;
-        }
-        if (array instanceof double[]) {
-            result.append(Arrays.toString((double[]) array));
-            return;
-        }
-        if (array instanceof boolean[]) {
-            result.append(Arrays.toString((boolean[]) array));
-            return;
-        }
-
-        // format an object array
-        result.append("[");
-        boolean notFirst = false;
-        for (Object element : (Object[]) array) {
-            if (notFirst) {
-                result.append(", ");
-            } else {
-                notFirst = true;
-            }
-            formatImpl(element, currentDepth + 1, result);
-        }
-        result.append("]");
+        return false;
     }
 
-
-    /**
-     * Formats the given collection.
-     *
-     * @param collection   The collection, not null
-     * @param currentDepth The current recursion depth
-     * @param result       The builder to append the result to, not null
-     */
-    protected void formatCollection(Collection<?> collection, int currentDepth, StringBuilder result) {
-        result.append("[");
-        boolean notFirst = false;
-        for (Object element : collection) {
-            if (notFirst) {
-                result.append(", ");
-            } else {
-                notFirst = true;
-            }
-            formatImpl(element, currentDepth + 1, result);
+    protected boolean formatPrimitiveOrEnum(Object object, Class<?> type, StringBuilder result) {
+        if (type.isPrimitive() || type.isEnum()) {
+            result.append(String.valueOf(object));
+            return true;
         }
-        result.append("]");
+        return false;
     }
 
-
-    /**
-     * Formats the given map.
-     *
-     * @param map          The map, not null
-     * @param currentDepth The current recursion depth
-     * @param result       The builder to append the result to, not null
-     */
-    protected void formatMap(Map<?, ?> map, int currentDepth, StringBuilder result) {
-        result.append("{");
-        boolean notFirst = false;
-        for (Map.Entry<?, ?> element : map.entrySet()) {
-            if (notFirst) {
-                result.append(", ");
-            } else {
-                notFirst = true;
-            }
-            formatImpl(element.getKey(), currentDepth, result);
-            result.append("=");
-            formatImpl(element.getValue(), currentDepth + 1, result);
+    protected boolean formatCharacter(Object object, Class<?> type, StringBuilder result) {
+        if (object instanceof Character || Character.TYPE.equals(type)) {
+            result.append('\'');
+            result.append(String.valueOf(object));
+            result.append('\'');
+            return true;
         }
-        result.append("}");
+        return false;
+    }
+
+    protected boolean formatNumberOrDate(Object object, StringBuilder result) {
+        if (object instanceof Number || object instanceof Date) {
+            result.append(String.valueOf(object));
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean formatString(Object object, StringBuilder result) {
+        if (object instanceof String) {
+            result.append('"');
+            result.append(object);
+            result.append('"');
+            return true;
+        }
+        return false;
     }
 
 
@@ -322,7 +261,12 @@ public class ObjectFormatter {
             if (mockName == null) {
                 return false;
             }
-            result.append("Mock<");
+            mockName = mockName.replaceAll(MOCK_NAME_CHAIN_SEPARATOR, ".");
+            if (isDummy(object)) {
+                result.append("Dummy<");
+            } else {
+                result.append("Mock<");
+            }
             result.append(mockName);
             result.append(">");
             return true;
@@ -331,8 +275,18 @@ public class ObjectFormatter {
         }
     }
 
+    protected boolean isDummy(Object object) {
+        Class<?> clazz = object.getClass();
+        Class<?> dummyObjectClass = getDummyObjectClass();
+        return dummyObjectClass != null && dummyObjectClass.isAssignableFrom(clazz);
+    }
 
-    protected boolean formatProxy(Object object, StringBuilder result) {
+
+    protected boolean formatProxy(Object object, Class<?> type, StringBuilder result) {
+        if (Proxy.isProxyClass(type)) {
+            result.append("Proxy<?>");
+            return true;
+        }
         String className = getShortClassName(object.getClass());
         int index = className.indexOf("..EnhancerByCGLIB..");
         if (index > 0) {
@@ -344,6 +298,15 @@ public class ObjectFormatter {
         return false;
     }
 
+    protected boolean formatFile(Object object, StringBuilder result) {
+        if (object instanceof File) {
+            result.append("File<");
+            result.append(((File) object).getPath());
+            result.append(">");
+            return true;
+        }
+        return false;
+    }
 
     /**
      * @return The interface that represents a dummy object. If the DummyObject interface is not in the
@@ -363,7 +326,6 @@ public class ObjectFormatter {
      */
     protected Class<?> getProxyUtilsClass() {
         try {
-
             return Class.forName("org.unitils.mock.core.proxy.ProxyUtils");
         } catch (ClassNotFoundException e) {
             return null;

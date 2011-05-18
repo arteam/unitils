@@ -1,32 +1,35 @@
 /*
- * Copyright 2006-2007,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock.report.impl;
 
-import static org.apache.commons.lang.StringUtils.rightPad;
-import static org.apache.commons.lang.StringUtils.uncapitalize;
 import org.unitils.core.util.ObjectFormatter;
 import org.unitils.mock.core.proxy.ProxyInvocation;
-import static org.unitils.util.ReflectionUtils.getAllFields;
-import static org.unitils.util.ReflectionUtils.getFieldValue;
 
 import java.lang.reflect.Field;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.apache.commons.lang.StringUtils.rightPad;
+import static org.apache.commons.lang.StringUtils.uncapitalize;
+import static org.unitils.util.ReflectionUtils.getAllFields;
+import static org.unitils.util.ReflectionUtils.getFieldValue;
 
 /**
  * A base class for reports about proxy invocations.
@@ -38,17 +41,20 @@ import java.util.Set;
 public abstract class ProxyInvocationsReport {
 
     /**
-     * The maxium depth for the object formatter that will format the values
+     * The maximum depth (child objects) of objects to display in the reports.
      */
-    public static int OBJECT_FORMATTER_MAX_RECURSION_DEPT = 10;
-
+    public static int OBJECT_FORMATTER_MAX_RECURSION_DEPT = 3;
+    /**
+     * The maximum nr of elements for arrays and collections to display in the reports
+     */
+    public static int OBJECT_FORMATTER_MAX_NR_ARRAY_OR_COLLECTION_ELEMENTS = 15;
     /**
      * The maximum length of an inline value
      */
     public static int MAX_INLINE_PARAMETER_LENGTH = 20;
 
 
-    protected ObjectFormatter objectFormatter = new ObjectFormatter(OBJECT_FORMATTER_MAX_RECURSION_DEPT);
+    protected ObjectFormatter objectFormatter = new ObjectFormatter(OBJECT_FORMATTER_MAX_RECURSION_DEPT, OBJECT_FORMATTER_MAX_NR_ARRAY_OR_COLLECTION_ELEMENTS);
 
     protected Map<Object, String> testedObjectFieldValuesAndNames;
 
@@ -100,10 +106,17 @@ public abstract class ProxyInvocationsReport {
                 return objectRepresentation;
             }
             // The object representation is to large to be shown inline. Generate a name for it, which can be shown as a replacement.
-            valueName = createLargeValueName(type, largeObjectNameIndexes);
+            if (allLargeObjects.containsKey(value)) {
+                // reuse the same value name for the same instance 
+                FormattedObject formattedObject = allLargeObjects.get(value);
+                valueName = formattedObject.getName();
+            } else {
+                valueName = createLargeValueName(type, largeObjectNameIndexes);
+            }
         }
         FormattedObject formattedObject = new FormattedObject(valueName, objectRepresentation);
         allLargeObjects.put(valueAtInvocationTime, formattedObject);
+        allLargeObjects.put(value, formattedObject);
         currentLargeObjects.add(formattedObject);
         return valueName;
     }
@@ -181,7 +194,6 @@ public abstract class ProxyInvocationsReport {
 
         /* The name used as inline replacement */
         private String name;
-
         /* The actual string representation of the value */
         private String representation;
 
@@ -203,7 +215,6 @@ public abstract class ProxyInvocationsReport {
         public String getName() {
             return name;
         }
-
 
         /**
          * @return The actual string representation of the value, not null

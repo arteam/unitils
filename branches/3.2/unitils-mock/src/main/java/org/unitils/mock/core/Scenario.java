@@ -1,35 +1,36 @@
 /*
- * Copyright 2008,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock.core;
 
-import static org.unitils.mock.core.Scenario.VerificationStatus.*;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.report.ScenarioReport;
 import org.unitils.mock.report.impl.DefaultScenarioReport;
 import org.unitils.mock.report.impl.DetailedObservedInvocationsReport;
 import org.unitils.mock.report.impl.ObservedInvocationsReport;
 import org.unitils.mock.report.impl.SuggestedAssertsReport;
-import static org.unitils.util.ReflectionUtils.getSimpleMethodName;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.unitils.mock.core.Scenario.VerificationStatus.*;
+import static org.unitils.util.ReflectionUtils.getSimpleMethodName;
+
 /**
- * todo javadoc
- *
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
@@ -99,7 +100,7 @@ public class Scenario {
         for (int i = 0; i < observedInvocations.size(); i++) {
             ObservedInvocation observedInvocation = observedInvocations.get(i);
             VerificationStatus invocationVerificationStatus = invocationVerificationStatuses.get(i);
-            if (invocationVerificationStatus == UNVERIFIED && assertInvocation.matches(observedInvocation)) {
+            if (invocationVerificationStatus == UNVERIFIED && assertInvocation.matches(observedInvocation) != -1) {
                 // Found a match that's not verified yet. Mark as verified and proceed.
                 invocationVerificationStatuses.set(i, VERIFIED);
                 return;
@@ -116,7 +117,7 @@ public class Scenario {
         for (int i = 0; i < observedInvocations.size(); i++) {
             ObservedInvocation observedInvocation = observedInvocations.get(i);
             VerificationStatus invocationVerificationStatus = invocationVerificationStatuses.get(i);
-            if (matchingInvocation == null && invocationVerificationStatus == UNVERIFIED && assertInvocation.matches(observedInvocation)) {
+            if (matchingInvocation == null && invocationVerificationStatus == UNVERIFIED && assertInvocation.matches(observedInvocation) != -1) {
                 // Found a match that's not verified yet. Mark as verified in order.
                 invocationVerificationStatuses.set(i, VERIFIED_IN_ORDER);
                 matchingInvocation = observedInvocation;
@@ -124,7 +125,7 @@ public class Scenario {
             }
             // If we found a match, then check if there's no subsequent observed invocation that's already verified using assertInvokedInOrder()
             if (matchingInvocation != null && invocationVerificationStatus == VERIFIED_IN_ORDER) {
-                AssertionError assertionError = new AssertionError(getInvokedOutOfOrderErrorMessage(assertInvocation, matchingInvocation, observedInvocation, assertInvocation.getInvokedAt()));
+                AssertionError assertionError = new AssertionError(getInvokedOutOfOrderErrorMessage(matchingInvocation, observedInvocation, assertInvocation.getInvokedAt()));
                 assertionError.setStackTrace(assertInvocation.getInvokedAtTrace());
                 throw assertionError;
             }
@@ -141,7 +142,7 @@ public class Scenario {
         for (int i = 0; i < observedInvocations.size(); i++) {
             ObservedInvocation observedInvocation = observedInvocations.get(i);
             VerificationStatus invocationVerificationStatus = invocationVerificationStatuses.get(i);
-            if (invocationVerificationStatus == UNVERIFIED && assertInvocation.matches(observedInvocation)) {
+            if (invocationVerificationStatus == UNVERIFIED && assertInvocation.matches(observedInvocation) != -1) {
                 AssertionError assertionError = new AssertionError(getAssertNotInvokedErrorMessage(assertInvocation, observedInvocation, assertInvocation.getInvokedAtTrace()));
                 assertionError.setStackTrace(assertInvocation.getInvokedAtTrace());
                 throw assertionError;
@@ -198,7 +199,7 @@ public class Scenario {
         return message.toString();
     }
 
-    protected String getInvokedOutOfOrderErrorMessage(BehaviorDefiningInvocation behaviorDefiningInvocation, ObservedInvocation matchingInvocation, ObservedInvocation outOfOrderInvocation, StackTraceElement assertedAt) {
+    protected String getInvokedOutOfOrderErrorMessage(ObservedInvocation matchingInvocation, ObservedInvocation outOfOrderInvocation, StackTraceElement assertedAt) {
         StringBuilder message = new StringBuilder();
         message.append("Invocation of ");
         message.append(getSimpleMethodName(matchingInvocation.getMethod()));

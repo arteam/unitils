@@ -1,26 +1,29 @@
 /*
- * Copyright 2006-2007,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock.argumentmatcher;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-import static org.unitils.mock.ArgumentMatchers.*;
 import org.unitils.mock.core.MockObject;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.unitils.mock.ArgumentMatchers.*;
 
 /**
  * Tests the usage of anyInt, anyLong, etc argment matchers.
@@ -37,6 +40,25 @@ public class ArgumentMatcherAnyTest {
     @Before
     public void setUp() {
         mockObject = new MockObject<TestClass>("testMock", TestClass.class, this);
+    }
+
+
+    @Test
+    public void testAny() {
+        mockObject.returns(true).testMethodString(any(String.class));
+
+        boolean result = mockObject.getMock().testMethodString("test");
+        assertTrue(result);
+        mockObject.assertInvoked().testMethodString(any(String.class));
+    }
+
+    @Test
+    public void testAny_noMatchForNull() {
+        mockObject.returns(true).testMethodString(any(String.class));
+
+        boolean result = mockObject.getMock().testMethodString(null);
+        assertFalse(result);
+        mockObject.assertNotInvoked().testMethodString(any(String.class));
     }
 
 
@@ -134,6 +156,8 @@ public class ArgumentMatcherAnyTest {
      * Interface that is mocked during the tests
      */
     private static interface TestClass {
+
+        boolean testMethodString(String arg1);
 
         boolean testMethodBoolean(boolean arg1);
 

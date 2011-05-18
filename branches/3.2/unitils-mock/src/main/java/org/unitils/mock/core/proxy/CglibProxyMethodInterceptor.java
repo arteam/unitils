@@ -1,30 +1,33 @@
 /*
- * Copyright 2006-2009,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock.core.proxy;
 
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.unitils.core.UnitilsException;
-import static org.unitils.mock.core.proxy.ProxyUtils.getProxiedMethodStackTrace;
-import static org.unitils.util.MethodUtils.*;
 
 import java.lang.reflect.Method;
+import java.util.List;
+
 import static java.lang.reflect.Modifier.isAbstract;
 import static java.util.Arrays.asList;
-import java.util.List;
+import static org.unitils.mock.core.proxy.ProxyUtils.getProxiedMethodStackTrace;
+import static org.unitils.util.MethodUtils.*;
 
 /**
  * A cglib method intercepter that will delegate the invocations to the given invocation hanlder.
@@ -125,7 +128,8 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
          */
         @Override
         public Object invokeOriginalBehavior() throws Throwable {
-            if (isAbstract(getMethod().getModifiers())) {
+            Method method = getMethod();
+            if (isAbstract(method.getModifiers())) {
                 throw new UnitilsException("Unable to invoke original behavior. The method is abstract, it does not have any behavior defined: " + getMethod());
             }
             return methodProxy.invokeSuper(getProxy(), getArguments().toArray());

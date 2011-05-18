@@ -1,21 +1,25 @@
 /*
- * Copyright 2006-2007,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock.dummy;
 
-import static junit.framework.Assert.*;
+import junit.framework.Assert;
+import org.junit.Test;
+import org.unitils.mock.core.proxy.CloneUtil;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -23,10 +27,7 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
-import org.unitils.mock.core.proxy.CloneUtil;
+import static junit.framework.Assert.*;
 
 /**
  * @author Filip Neven
@@ -41,20 +42,8 @@ public class DummyObjectUtilTest {
     }
 
     @Test
-    public void createStuffedDummyConcreteClass() {
-        ArrayList<?> list = DummyObjectUtil.createStuffedDummy(ArrayList.class);
-        assertNotNull(list);
-    }
-
-    @Test
     public void createDummyAbstractClass() {
         AbstractList<?> list = DummyObjectUtil.createDummy(AbstractList.class);
-        assertNotNull(list);
-    }
-
-    @Test
-    public void createStuffedDummyAbstractClass() {
-        AbstractList<?> list = DummyObjectUtil.createStuffedDummy(AbstractList.class);
         assertNotNull(list);
     }
 
@@ -77,37 +66,23 @@ public class DummyObjectUtilTest {
     }
 
     @Test
-    public void stuffedDummyEqualsHashcode() {
-        ArrayList<?> list1 = DummyObjectUtil.createStuffedDummy(ArrayList.class);
-
-        assertTrue(list1.equals(list1));
-        assertTrue(list1.hashCode() == list1.hashCode());
-
-        ArrayList<?> list2 = DummyObjectUtil.createStuffedDummy(ArrayList.class);
-        assertFalse(list1.equals(list2));
-        assertFalse(list1.hashCode() == list2.hashCode());
-    }
-
-    @Test
-    public void stuffedDummySameValueReturn() {
-        TestClass testClass = DummyObjectUtil.createStuffedDummy(TestClass.class);
+    public void dummySameValueReturn() {
+        TestClass testClass = DummyObjectUtil.createDummy(TestClass.class);
         TestClass result1 = testClass.getTestClass();
         TestClass result2 = testClass.getTestClass();
 
-        Assert.assertNotNull(result1);
-        Assert.assertNotNull(result2);
+        assertNotNull(result1);
+        assertNotNull(result2);
 
         Assert.assertEquals(result1, result2);
 
         TestClass result3 = result1.getTestClass();
-        Assert.assertNotNull(result3);
+        assertNotNull(result3);
 
-        Assert.assertFalse(result1.equals(result3));
+        assertFalse(result1.equals(result3));
 
         TestClass result4 = result3.getTestClass();
-        Assert.assertNotNull(result4);
-
-
+        assertNotNull(result4);
     }
 
     @Test
@@ -120,38 +95,19 @@ public class DummyObjectUtilTest {
     public void defaultBehavior() {
         TestClass dummy = DummyObjectUtil.createDummy(TestClass.class);
         assertTrue(dummy.getList().isEmpty());
-        assertNull(dummy.getString());
-        assertNull(dummy.getTestClass());
+        assertEquals("", dummy.getString());
+        assertTrue(dummy.getTestClass() instanceof TestClass);
         assertEquals(0, dummy.getInt());
         assertEquals(new Integer(0), dummy.getInteger());
         assertEquals(Long.valueOf(0), dummy.getLong());
         assertEquals(new Integer(0), dummy.getInteger());
-        assertEquals(new Float(0), dummy.getFloat());
+        assertEquals((float) 0, dummy.getFloat());
         assertEquals(new BigInteger("0"), dummy.getBigInteger());
-        assertEquals(new Double(0), dummy.getDouble());
+        assertEquals((double) 0, dummy.getDouble());
         assertEquals(new Short("0"), dummy.getShort());
         assertEquals(new BigDecimal("0"), dummy.getBigDecimal());
         assertEquals(new Byte("0"), dummy.getByte());
-        assertEquals(null, dummy.getArray());
-
-    }
-
-    @Test
-    public void stuffedBehavior() {
-        TestClass dummy = DummyObjectUtil.createStuffedDummy(TestClass.class);
-        assertTrue(dummy.getList().isEmpty());
-        assertNotNull(dummy.getString());
-        assertNotNull(dummy.getTestClass());
-        assertEquals(0, dummy.getInt());
-        assertEquals(Long.valueOf(0), dummy.getLong());
-        assertEquals(new Integer(0), dummy.getInteger());
-        assertEquals(new Float(0), dummy.getFloat());
-        assertEquals(new BigInteger("0"), dummy.getBigInteger());
-        assertEquals(new Double(0), dummy.getDouble());
-        assertEquals(new Short("0"), dummy.getShort());
-        assertEquals(new BigDecimal("0"), dummy.getBigDecimal());
-        assertEquals(new Byte("0"), dummy.getByte());
-        assertEquals(null, dummy.getArray());
+        assertTrue(dummy.getArray() instanceof Object[]);
     }
 
     @Test
@@ -175,6 +131,7 @@ public class DummyObjectUtilTest {
         assertEquals(dummy, clone);
     }
 
+    @SuppressWarnings({"UnusedDeclaration"})
     private class TestClass {
 
         public TestClass(String someValue) {
@@ -186,7 +143,7 @@ public class DummyObjectUtilTest {
 
         public Object[] getArray() {
             return new TestClass[]{
-                new TestClass("test 123")
+                    new TestClass("test 123")
             };
         }
 

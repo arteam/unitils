@@ -1,32 +1,40 @@
 /*
- * Copyright 2006-2007,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock.core;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.mock.core.proxy.ProxyInvocation;
+import org.unitils.mock.mockbehavior.MockBehavior;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertSame;
 import static org.unitils.mock.ArgumentMatchers.notNull;
 import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
-import org.unitils.mock.core.proxy.ProxyInvocation;
-import org.unitils.mock.mockbehavior.MockBehavior;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Tests the mock object functionality.
@@ -123,11 +131,26 @@ public class MockObjectTest {
         mockObject.returns("value").get(0);  //raises classcast
     }
 
+    @Test
+    public void defaultMockName() {
+        MockObject<TestClass> mockObject = new MockObject<TestClass>(TestClass.class, this);
+        assertEquals("testClassMock", mockObject.getName());
+    }
 
-    private void assertTopOfStackTracePointsToCurrentTest(Throwable e, Object testMethodName) {
-        StackTraceElement topOfStackTrace = e.getStackTrace()[0];
-        assertEquals(MockObjectTest.class.getName(), topOfStackTrace.getClassName());
-        assertEquals(testMethodName, topOfStackTrace.getMethodName());
+    @Test
+    public void proxyArgumentsAndResult() {
+        Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[]{Collection.class}, new InvocationHandler() {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                return null;
+            }
+        });
+
+        MockObject<TestClass> mockObject = new MockObject<TestClass>(TestClass.class, this);
+        mockObject.returns(proxy).doSomething(proxy);
+
+        Object result = mockObject.getMock().doSomething(proxy);
+        assertSame(proxy, result);
     }
 
 
@@ -141,6 +164,8 @@ public class MockObjectTest {
         public int[] testMethodArray();
 
         public Object clone() throws CloneNotSupportedException;
+
+        public Object doSomething(Object proxy);
     }
 
 

@@ -1,17 +1,19 @@
 /*
- * Copyright 2006-2009,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock.core.matching.impl;
 
@@ -21,24 +23,29 @@ import org.unitils.mock.core.BehaviorDefiningInvocation;
 import org.unitils.mock.core.BehaviorDefiningInvocations;
 import org.unitils.mock.core.MockFactory;
 import org.unitils.mock.core.matching.MatchingInvocationHandler;
+import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
-import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.util.List;
 
+import static org.unitils.core.util.ObjectFormatter.MOCK_NAME_CHAIN_SEPARATOR;
+
+
+/**
+ * @author Tim Ducheyne
+ * @author Filip Neven
+ */
 public class BehaviorDefiningMatchingInvocationHandler implements MatchingInvocationHandler {
 
     protected MockBehavior mockBehavior;
-
     protected MockFactory mockFactory;
+    protected BehaviorDefiningInvocations behaviorDefiningInvocations;
 
-    protected BehaviorDefiningInvocations behaviorDefinition;
 
-
-    public BehaviorDefiningMatchingInvocationHandler(MockBehavior mockBehavior, BehaviorDefiningInvocations behaviorDefinition, MockFactory mockFactory) {
+    public BehaviorDefiningMatchingInvocationHandler(MockBehavior mockBehavior, BehaviorDefiningInvocations behaviorDefiningInvocations, MockFactory mockFactory) {
         this.mockBehavior = mockBehavior;
-        this.behaviorDefinition = behaviorDefinition;
+        this.behaviorDefiningInvocations = behaviorDefiningInvocations;
         this.mockFactory = mockFactory;
     }
 
@@ -48,7 +55,7 @@ public class BehaviorDefiningMatchingInvocationHandler implements MatchingInvoca
             ((ChainedMockBehavior) mockBehavior).installChain();
         }
         BehaviorDefiningInvocation behaviorDefiningInvocation = new BehaviorDefiningInvocation(proxyInvocation, mockBehavior, argumentMatchers);
-        addBehaviorDefiningInvocation(behaviorDefiningInvocation, behaviorDefinition);
+        addBehaviorDefiningInvocation(behaviorDefiningInvocation, behaviorDefiningInvocations);
         return createChainedMock(proxyInvocation, behaviorDefiningInvocation);
     }
 
@@ -60,9 +67,9 @@ public class BehaviorDefiningMatchingInvocationHandler implements MatchingInvoca
 
     protected Object createChainedMock(ProxyInvocation proxyInvocation, BehaviorDefiningInvocation behaviorDefiningInvocation) {
         Class<?> innerMockType = proxyInvocation.getMethod().getReturnType();
-        String innerMockName = proxyInvocation.getMockName() + "." + proxyInvocation.getMethod().getName();
+        String innerMockName = proxyInvocation.getMockName() + MOCK_NAME_CHAIN_SEPARATOR + proxyInvocation.getMethod().getName();
 
-        Mock<?> mock = mockFactory.createMock(innerMockName, innerMockType);
+        Mock<?> mock = mockFactory.createChainedMock(innerMockName, innerMockType);
         if (mock == null) {
             return null;
         }
@@ -72,11 +79,9 @@ public class BehaviorDefiningMatchingInvocationHandler implements MatchingInvoca
 
     public static class ChainedMockBehavior implements MockBehavior {
 
-        private Mock<?> mock;
-
-        private BehaviorDefiningInvocation behaviorDefiningInvocation;
-
-        private MockBehavior originalMockBehavior;
+        protected Mock<?> mock;
+        protected BehaviorDefiningInvocation behaviorDefiningInvocation;
+        protected MockBehavior originalMockBehavior;
 
 
         public ChainedMockBehavior(Mock<?> mock, BehaviorDefiningInvocation behaviorDefiningInvocation) {
