@@ -47,8 +47,7 @@ public class SuggestedAssertsReport {
 
         for (ObservedInvocation mockInvocation : observedInvocations) {
             // do not output mocked methods (methods that return values)
-            if (Void.TYPE.equals(mockInvocation.getMethod().getReturnType()) &&
-                    !mockInvocation.hasMockBehavior()) {
+            if (Void.TYPE.equals(mockInvocation.getMethod().getReturnType())) {
                 result.append(getSuggestedAssertStatement(testObject, mockInvocation));
                 result.append("\n");
             }
