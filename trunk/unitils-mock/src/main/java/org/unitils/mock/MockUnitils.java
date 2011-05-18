@@ -52,21 +52,21 @@ public class MockUnitils {
         }
     }
 
-    public void logObservedScenario() {
+    public static void logObservedScenario() {
         Scenario scenario = getScenario();
         if (scenario != null) {
             logger.info("\n\nObserved scenario:\n\n" + scenario.createObservedInvocationsReport());
         }
     }
 
-    public void logDetailedObservedScenario() {
+    public static void logDetailedObservedScenario() {
         Scenario scenario = getScenario();
         if (scenario != null) {
             logger.info("\n\nDetailed observed scenario:\n\n" + scenario.createDetailedObservedInvocationsReport());
         }
     }
 
-    public void logSuggestedAsserts() {
+    public static void logSuggestedAsserts() {
         Scenario scenario = getScenario();
         if (scenario != null) {
             logger.info("\n\nSuggested assert statements:\n\n" + scenario.createSuggestedAssertsReport());
