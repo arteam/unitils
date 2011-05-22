@@ -41,13 +41,13 @@ import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDE
  * objects/collections using reflection.
  * <p/>
  * The (combination of) comparator modes specify how strict the comparison must be:<ul>
- * <li>ignore defaults: compare only arguments (and inner values) that have a non default value (eg null) as exepected value</li>
+ * <li>ignore defaults: compare only arguments (and inner values) that have a non default value (eg null) as expected value</li>
  * <li>lenient dates: do not compare actual date values, just that they both have a value or not</li>
  * <li>lenient order: order is not important when comparing collections or arrays</li>
  * </ul>
  * <p/>
  * There are 2 versions of each method: a lenient and a reflection version.
- * With the ref versions you can set the comparator modes explicitly (note: no modes means strict comparisson). The len
+ * With the ref versions you can set the comparator modes explicitly (note: no modes means strict comparison). The len
  * versions are the same as the ref versions but have lenient order and ignore defaults set by default.
  * <p/>
  * The name assert..ReflectionEquals is chosen instead of assert..Equals so it can be added as a static import
@@ -65,7 +65,7 @@ public class ReflectionAssert {
      * Asserts that two objects are equal. Reflection is used to compare all fields of these values.
      * If they are not equal an AssertionFailedError is thrown.
      * <p/>
-     * This is identical to {@link #assertReflectionEquals} with
+     * This is identical to assertReflectionEquals with
      * lenient order and ignore defaults set as comparator modes.
      *
      * @param expected the expected object
@@ -97,7 +97,7 @@ public class ReflectionAssert {
      * Asserts that two objects are equal. Reflection is used to compare all fields of these values.
      * If they are not equal an AssertionFailedError is thrown.
      * <p/>
-     * This is identical to {@link #assertReflectionEquals} with
+     * This is identical to assertReflectionEquals with
      * lenient order and ignore defaults set as comparator modes.
      *
      * @param message  a message for when the assertion fails
@@ -148,9 +148,9 @@ public class ReflectionAssert {
      * Asserts that the value of a property of an object is equal to the given value.
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertReflectionEquals} is used to check whether both values are equal.
+     * assertLenientEquals is used to check whether both values are equal.
      * <p/>
-     * This is identical to {@link #assertPropertyReflectionEquals} with
+     * This is identical to assertPropertyReflectionEquals with
      * lenient order and ignore defaults set as comparator modes.
      *
      * @param propertyName          the property, not null
@@ -167,7 +167,7 @@ public class ReflectionAssert {
      * Asserts that the value of a property of an object is equal to the given value.
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertReflectionEquals} is used to check whether both values are equal.
+     * assertReflectionEquals is used to check whether both values are equal.
      * <p/>
      * The comparator modes determine how strict to compare the values.
      *
@@ -186,9 +186,9 @@ public class ReflectionAssert {
      * Asserts that the value of a property of an object is equal to the given value.
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertReflectionEquals} is used to check whether both values are equal.
+     * assertReflectionEquals is used to check whether both values are equal.
      * <p/>
-     * This is identical to {@link #assertPropertyReflectionEquals} with
+     * This is identical to assertPropertyReflectionEquals with
      * lenient order and ignore defaults set as comparator modes.
      *
      * @param message               a message for when the assertion fails
@@ -206,7 +206,7 @@ public class ReflectionAssert {
      * Asserts that the value of a property of an object is equal to the given value.
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertReflectionEquals} is used to check whether both values are equal.
+     * assertReflectionEquals is used to check whether both values are equal.
      * <p/>
      * The comparator modes determine how strict to compare the values.
      *
@@ -232,9 +232,9 @@ public class ReflectionAssert {
      * id field of the myObjectCollection elements matches the values in the myIdCollection
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertReflectionEquals} is used to check whether both values are equal.
+     * assertReflectionEquals is used to check whether both values are equal.
      * <p/>
-     * This is identical to {@link #assertPropertyReflectionEquals} with
+     * This is identical to assertPropertyReflectionEquals with
      * lenient order and ignore defaults set as comparator modes.
      *
      * @param propertyName           the property, not null
@@ -254,7 +254,7 @@ public class ReflectionAssert {
      * id field of the myObjectCollection elements matches the values in the myIdCollection
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertReflectionEquals} is used to check whether both values are equal.
+     * assertReflectionEquals is used to check whether both values are equal.
      * <p/>
      * The comparator modes determine how strict to compare the values.
      *
@@ -276,9 +276,9 @@ public class ReflectionAssert {
      * id field of the myObjectCollection elements matches the values in the myIdCollection
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertReflectionEquals} is used to check whether both values are equal.
+     * assertReflectionEquals is used to check whether both values are equal.
      * <p/>
-     * This is identical to {@link #assertPropertyReflectionEquals} with
+     * This is identical to assertPropertyReflectionEquals with
      * lenient order and ignore defaults set as comparator modes.
      *
      * @param message                a message for when the assertion fails
@@ -299,7 +299,7 @@ public class ReflectionAssert {
      * id field of the myObjectCollection elements matches the values in the myIdCollection
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertReflectionEquals} is used to check whether both values are equal.
+     * assertReflectionEquals is used to check whether both values are equal.
      * <p/>
      * The comparator modes determine how strict to compare the values.
      *
