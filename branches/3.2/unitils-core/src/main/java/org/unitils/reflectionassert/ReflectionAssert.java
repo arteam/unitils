@@ -17,6 +17,7 @@
  */
 package org.unitils.reflectionassert;
 
+
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
 import ognl.DefaultMemberAccess;
@@ -29,8 +30,12 @@ import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.reflectionassert.difference.Difference;
 import org.unitils.reflectionassert.report.impl.DefaultDifferenceReport;
+import org.unitils.util.ReflectionUtils;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
+import java.util.Set;
 
 import static junit.framework.Assert.assertNotNull;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
@@ -293,7 +298,27 @@ public class ReflectionAssert {
         assertPropertyReflectionEquals(message, propertyName, expectedPropertyValues, actualObjects, LENIENT_ORDER, IGNORE_DEFAULTS);
     }
 
+    /**
+     * All fields are checked for null values (except the static ones).
+     * Private fields are also checked.
+     * This is NOT recursive, only the values of the first object will be checked.
+     * An assertion error will be thrown when a property is null.
+     * 
+     * @param message    a message for when the assertion fails
+     * @param object     the object that will be checked for null values.
+     */
+    public static void assertPropertiesNotNull(String message, Object object) {
+        Set<Field> fields = ReflectionUtils.getAllFields(object.getClass());
+        for (Field field : fields) {
+            if (!Modifier.isStatic(field.getModifiers())) {
+                String formattedMessage = formatMessage(message, "Property '" + field.getName() + "' in object '" + object.toString() + "' is null ");
+                assertNotNull(formattedMessage, ReflectionUtils.getFieldValue(object, field));
+            }
+        }
 
+    }
+    
+    
     /**
      * Asserts that a property of all objects in the collection are equal to the given values.
      * <p/>

@@ -287,6 +287,18 @@ public class ReflectionUtilsTest extends TestCase {
         String result = getSimpleMethodName(fieldSetterMethod);
         assertEquals("TestObject.setField()", result);
     }
+    
+    public void testGetGetter(){
+    	Method result = getGetter(TestObject.class, "field", false);
+    	assertEquals("getField", result.getName());
+    	
+    }
+    
+    public void testGetGetterBooleanVersion(){
+    	Method result = getGetter(TestObject.class, "boolField", false);
+    	assertEquals("isBoolField", result.getName());
+    	
+    }
 
 
     /**
@@ -295,6 +307,8 @@ public class ReflectionUtilsTest extends TestCase {
     private static class TestObject {
 
         private String field = "testValue";
+        
+        private boolean boolField = true;
 
         public String getField() {
             return field;
@@ -303,5 +317,9 @@ public class ReflectionUtilsTest extends TestCase {
         public void setField(String field) {
             this.field = field;
         }
+
+		public boolean isBoolField() {
+			return boolField;
+		}
     }
 }
