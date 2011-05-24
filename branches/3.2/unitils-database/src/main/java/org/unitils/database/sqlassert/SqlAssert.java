@@ -34,12 +34,9 @@ import org.unitils.reflectionassert.ReflectionAssert;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
 
 /**
- * 
  * Assertion class to verify content in the database, by specifying your own SQL and checking the result.
  * 
  * @author Jeroen Horemans
- * 
- * 
  */
 public abstract class SqlAssert {
 
