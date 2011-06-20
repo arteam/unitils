@@ -30,7 +30,7 @@ import java.util.Properties;
 /**
  * Base class for tests that verify the transactional behavior of the database module
  *
- * @author Flip Neven
+ * @author Filip Neven
  * @author Tim Ducheyne
  */
 abstract public class DatabaseModuleTransactionalTestBase {

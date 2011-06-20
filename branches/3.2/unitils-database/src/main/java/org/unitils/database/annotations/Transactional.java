@@ -57,4 +57,6 @@ public @interface Transactional {
      * @return The TransactionMode
      */
     TransactionMode value() default DEFAULT;
+
+    String transactionManagerName() default "";
 }

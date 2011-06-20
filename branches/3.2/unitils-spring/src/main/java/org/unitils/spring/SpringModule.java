@@ -15,7 +15,10 @@
  */
 package org.unitils.spring;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.unitils.database.util.TransactionMode.DEFAULT;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.PropertyUtils.getInstance;
 import static org.unitils.util.ReflectionUtils.getPropertyName;
@@ -38,6 +41,7 @@ import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.DatabaseModule;
+import org.unitils.database.annotations.Transactional;
 import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 import org.unitils.spring.annotation.SpringApplicationContext;
 import org.unitils.spring.annotation.SpringBean;
@@ -115,8 +119,17 @@ public class SpringModule implements Module {
                                 + " in the spring ApplicationContext for this class");
                     }
                     if (platformTransactionManagers.size() > 1) {
-                        throw new UnitilsException("Found more than one bean of type " + platformTransactionManagerClass.getSimpleName()
-                                + " in the spring ApplicationContext for this class");
+                        Method testMethod = Unitils.getInstance().getTestContext().getTestMethod();
+                        String transactionManagerName = getMethodOrClassLevelAnnotationProperty(Transactional.class, "transactionManagerName", "",
+                                testMethod, testObject.getClass());
+                        if (isEmpty(transactionManagerName))
+                            throw new UnitilsException("Found more than one bean of type " + platformTransactionManagerClass.getSimpleName()
+                                    + " in the spring ApplicationContext for this class. Use the transactionManagerName on the @Transactional"
+                                    + " annotation to select the correct one.");
+                        if (!platformTransactionManagers.containsKey(transactionManagerName))
+                            throw new UnitilsException("No bean of type " + platformTransactionManagerClass.getSimpleName()
+                                    + " found in the spring ApplicationContext with the name " + transactionManagerName);
+                        return platformTransactionManagers.get(transactionManagerName);
                     }
                     return platformTransactionManagers.values().iterator().next();
                 }
