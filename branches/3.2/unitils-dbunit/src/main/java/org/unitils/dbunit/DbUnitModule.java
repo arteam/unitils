@@ -410,7 +410,8 @@ public class DbUnitModule implements Module {
         IDataTypeFactory dataTypeFactory = getInstanceOf(IDataTypeFactory.class, configuration, dbSupport.getDatabaseDialect());
         config.setProperty(PROPERTY_DATATYPE_FACTORY, dataTypeFactory);
         // Make sure that table and column names are escaped using the dbms-specific identifier quote string
-        config.setProperty(PROPERTY_ESCAPE_PATTERN, dbSupport.getIdentifierQuoteString() + '?' + dbSupport.getIdentifierQuoteString());
+		if (dbSupport.getIdentifierQuoteString() != null)
+			config.setProperty(PROPERTY_ESCAPE_PATTERN, dbSupport.getIdentifierQuoteString() + '?' + dbSupport.getIdentifierQuoteString());
         // Make sure that batched statements are used to insert the data into the database
         config.setProperty(FEATURE_BATCHED_STATEMENTS, "true");
         // Make sure that Oracle's recycled tables (BIN$) are ignored (value is used to ensure dbunit-2.2 compliancy)

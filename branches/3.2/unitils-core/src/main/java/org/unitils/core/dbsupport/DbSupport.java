@@ -436,7 +436,7 @@ abstract public class DbSupport {
             return toCorrectCaseIdentifier(schemaNamePart) + "." + toCorrectCaseIdentifier(identifierPart);
         }
 
-        if (identifier.startsWith(identifierQuoteString) && identifier.endsWith(identifierQuoteString)) {
+        if (identifierQuoteString != null && identifier.startsWith(identifierQuoteString) && identifier.endsWith(identifierQuoteString)) {
             return identifier.substring(1, identifier.length() - 1);
         }
         if (storedIdentifierCase == UPPER_CASE) {
