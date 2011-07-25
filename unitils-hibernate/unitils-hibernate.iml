@@ -22,7 +22,7 @@
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.3" level="project" />
     <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2" level="project" />
     <orderEntry type="library" name="Maven: ognl:ognl:2.6.9" level="project" />
-    <orderEntry type="library" name="Maven: org.dbmaintain:dbmaintain:2.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.dbmaintain:dbmaintain:2.4" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-orm:3.0.2.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-jdbc:3.0.2.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-tx:3.0.2.RELEASE" level="project" />
