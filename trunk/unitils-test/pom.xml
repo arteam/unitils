@@ -40,7 +40,7 @@
 
         <dependency>
             <groupId>org.unitils</groupId>
-            <artifactId>unitils</artifactId>
+            <artifactId>unitils-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

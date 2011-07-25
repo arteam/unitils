@@ -13,7 +13,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>unitils</module>
+        <module>unitils-core</module>
         <module>unitils-inject</module>
         <module>unitils-mock</module>
         <module>unitils-database</module>
