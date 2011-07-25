@@ -82,7 +82,7 @@
         <dependency>
             <groupId>org.dbmaintain</groupId>
             <artifactId>dbmaintain</artifactId>
-            <version>2.2-SNAPSHOT</version>
+            <version>2.4</version>
             <exclusions>
                 <exclusion>
                     <groupId>ant</groupId>
