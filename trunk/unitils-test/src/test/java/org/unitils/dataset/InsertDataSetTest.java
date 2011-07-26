@@ -17,8 +17,6 @@ package org.unitils.dataset;
 
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
-import org.unitils.database.annotations.Transactional;
-import org.unitils.database.util.TransactionMode;
 
 import static org.junit.Assert.*;
 import static org.unitils.dataset.DataSetLoader.insertDataSetFile;
@@ -29,7 +27,6 @@ import static org.unitils.dataset.DataSetLoader.insertDataSetFile;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-@Transactional(TransactionMode.COMMIT)
 public class InsertDataSetTest extends OneDbDataSetTestBase {
 
 
