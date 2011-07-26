@@ -20,6 +20,7 @@ import org.dbmaintain.database.Database;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.unitils.dbunit.structure.DataSetStructureGenerator;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 
@@ -114,7 +115,7 @@ public class DtdDataSetStructureGeneratorTest {
         Connection connection = null;
         Statement statement = null;
         try {
-            connection = dataSource.getConnection();
+            connection = DataSourceUtils.getConnection(dataSource);
             statement = connection.createStatement();
             statement.execute("create table tableOne(columnA varchar(1) not null, columnB varchar(1) not null, columnC varchar(1))");
             statement.execute("create table tableTwo(column1 varchar(1), column2 varchar(1))");
@@ -132,7 +133,7 @@ public class DtdDataSetStructureGeneratorTest {
         Connection connection = null;
         Statement statement = null;
         try {
-            connection = dataSource.getConnection();
+            connection = DataSourceUtils.getConnection(dataSource);
             statement = connection.createStatement();
             try {
                 statement.executeUpdate("drop table TABLEONE");

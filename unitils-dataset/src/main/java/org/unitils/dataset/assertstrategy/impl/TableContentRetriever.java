@@ -27,8 +27,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
 
-import static org.unitils.database.util.DbUtils.closeQuietly;
-
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -54,10 +52,10 @@ public class TableContentRetriever {
         try {
             preparedStatement = connection.prepareStatement(sql);
             resultSet = preparedStatement.executeQuery();
-            return new TableContents(tableName, columns, sqlTypeHandlerRepository, primaryKeyColumnNames, connection, preparedStatement, resultSet, dataSourceWrapper.getDataSource());
+            return new TableContents(tableName, columns, sqlTypeHandlerRepository, primaryKeyColumnNames, connection, preparedStatement, resultSet, dataSourceWrapper);
 
         } catch (Exception e) {
-            closeQuietly(connection, preparedStatement, resultSet, dataSourceWrapper.getDataSource());
+            dataSourceWrapper.closeQuietly(connection, preparedStatement, resultSet);
             throw new UnitilsException("Unable to execute query " + sql, e);
         }
     }

@@ -68,6 +68,9 @@ public class Row {
         return tableName;
     }
 
+    /**
+     * @return The columns, not null
+     */
     public Set<String> getColumnNames() {
         return valuesPerColumnName.keySet();
     }

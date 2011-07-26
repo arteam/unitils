@@ -82,7 +82,7 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
      */
     public Connection getConnection() throws SQLException {
         if (currentlyUsedConnection == null) {
-            currentlyUsedConnection = dataSource.getConnection();
+            currentlyUsedConnection = DataSourceUtils.getConnection(dataSource);
             currentlyUsedNativeConnection = getNativeConnection(currentlyUsedConnection);
         }
         return currentlyUsedNativeConnection;

@@ -23,6 +23,7 @@ import org.dbunit.dataset.FilteredDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.filter.IncludeTableFilter;
 import org.dbunit.dataset.xml.FlatDtdWriter;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.util.DbUtils;
 import org.unitils.dbunit.structure.DataSetStructureGenerator;
@@ -113,7 +114,7 @@ public class DtdDataSetStructureGenerator implements DataSetStructureGenerator {
         Connection connection = null;
         try {
             DataSource dataSource = defaultDatabase.getDataSource();
-            connection = dataSource.getConnection();
+            connection = DataSourceUtils.getConnection(dataSource);
             IDatabaseConnection dbUnitDatabaseConnection = new DatabaseConnection(connection, defaultDatabase.getDefaultSchemaName());
 
             StringWriter stringWriter = new StringWriter();

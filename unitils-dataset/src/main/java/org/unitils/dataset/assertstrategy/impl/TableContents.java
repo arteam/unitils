@@ -15,7 +15,7 @@
  */
 package org.unitils.dataset.assertstrategy.impl;
 
-import org.unitils.database.util.DbUtils;
+import org.unitils.dataset.database.DataSourceWrapper;
 import org.unitils.dataset.model.database.Column;
 import org.unitils.dataset.model.database.Row;
 import org.unitils.dataset.model.database.TableName;
@@ -23,7 +23,6 @@ import org.unitils.dataset.model.database.Value;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandler;
 import org.unitils.dataset.sqltypehandler.SqlTypeHandlerRepository;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -41,20 +40,18 @@ public class TableContents {
     protected TableName tableName;
     protected Set<Column> columns;
 
-    protected DataSource dataSource;
+    protected DataSourceWrapper dataSourceWrapper;
     protected Connection connection;
     protected PreparedStatement preparedStatement;
     protected ResultSet resultSet;
 
     protected SqlTypeHandlerRepository sqlTypeHandlerRepository;
     protected Set<String> primaryKeyColumnNames;
-
     protected int rowIndex;
-
     protected boolean useRowIndexAsIdentifier = false;
 
 
-    public TableContents(TableName tableName, Set<Column> columns, SqlTypeHandlerRepository sqlTypeHandlerRepository, Set<String> primaryKeyColumnNames, Connection connection, PreparedStatement preparedStatement, ResultSet resultSet, DataSource dataSource) {
+    public TableContents(TableName tableName, Set<Column> columns, SqlTypeHandlerRepository sqlTypeHandlerRepository, Set<String> primaryKeyColumnNames, Connection connection, PreparedStatement preparedStatement, ResultSet resultSet, DataSourceWrapper dataSourceWrapper) {
         this.tableName = tableName;
         this.columns = columns;
         this.sqlTypeHandlerRepository = sqlTypeHandlerRepository;
@@ -63,7 +60,7 @@ public class TableContents {
         this.connection = connection;
         this.preparedStatement = preparedStatement;
         this.resultSet = resultSet;
-        this.dataSource = dataSource;
+        this.dataSourceWrapper = dataSourceWrapper;
 
         this.rowIndex = 0;
         if (primaryKeyColumnNames.isEmpty()) {
@@ -72,7 +69,7 @@ public class TableContents {
     }
 
     public void close() throws SQLException {
-        DbUtils.close(connection, preparedStatement, resultSet, dataSource);
+        dataSourceWrapper.closeQuietly(connection, preparedStatement, resultSet);
     }
 
 
