@@ -32,7 +32,6 @@ import java.sql.*;
 import java.util.*;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.unitils.database.util.DbUtils.close;
 
 
 /**
@@ -163,7 +162,7 @@ public class DataSourceWrapper {
             tableNamesCache.put(schemaName, tableNames);
             return tableNames;
         } finally {
-            close(connection, null, resultSet, unitilsDataSource.getDataSource());
+            closeQuietly(connection, null, resultSet);
         }
     }
 
@@ -190,7 +189,7 @@ public class DataSourceWrapper {
             columnsCache.put(tableName, columns);
             return columns;
         } finally {
-            close(connection, null, resultSet, unitilsDataSource.getDataSource());
+            closeQuietly(connection, null, resultSet);
         }
     }
 
@@ -212,7 +211,7 @@ public class DataSourceWrapper {
             tablePrimaryKeysCache.put(tableName, primaryKeyColumnNames);
 
         } finally {
-            close(connection, null, resultSet, unitilsDataSource.getDataSource());
+            closeQuietly(connection, null, resultSet);
         }
         if (primaryKeyColumnNames.isEmpty()) {
             assertTableExists(tableName);
@@ -258,7 +257,7 @@ public class DataSourceWrapper {
             tableColumnSqlTypesCache.put(tableName, columnSqlTypes);
             return columnSqlTypes;
         } finally {
-            close(connection, null, resultSet, unitilsDataSource.getDataSource());
+            closeQuietly(connection, null, resultSet);
         }
     }
 
@@ -317,7 +316,7 @@ public class DataSourceWrapper {
             }
             return result;
         } finally {
-            close(connection, null, resultSet, unitilsDataSource.getDataSource());
+            closeQuietly(connection, null, resultSet);
         }
     }
 
@@ -335,21 +334,22 @@ public class DataSourceWrapper {
             }
             return jdbcUrl.toLowerCase().contains(":oracle:");
         } finally {
-            close(connection, null, null, unitilsDataSource.getDataSource());
+            closeQuietly(connection, null, null);
         }
     }
 
-    protected void close(Connection connection, DataSource dataSource) {
+    public void closeQuietly(Connection connection) {
+        DataSource dataSource = unitilsDataSource.getDataSource();
         DataSourceUtils.releaseConnection(connection, dataSource);
     }
 
-    protected void close(Connection connection, Statement statement, ResultSet resultSet, DataSource dataSource) {
-        close(statement);
-        close(resultSet);
-        close(connection, dataSource);
+    public void closeQuietly(Connection connection, Statement statement, ResultSet resultSet) {
+        closeQuietly(statement);
+        closeQuietly(resultSet);
+        closeQuietly(connection);
     }
 
-    protected void close(ResultSet resultSet) {
+    protected void closeQuietly(ResultSet resultSet) {
         if (resultSet != null) {
             try {
                 resultSet.close();
@@ -359,7 +359,7 @@ public class DataSourceWrapper {
         }
     }
 
-    protected void close(Statement statement) {
+    protected void closeQuietly(Statement statement) {
         if (statement != null) {
             try {
                 statement.close();

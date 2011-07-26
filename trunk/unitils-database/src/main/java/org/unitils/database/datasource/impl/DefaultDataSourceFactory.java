@@ -28,8 +28,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import static org.unitils.database.util.DbUtils.closeQuietly;
-
 /**
  * A data source factory that creates a commons DBCP BasicDataSource.
  *
@@ -88,7 +86,9 @@ public class DefaultDataSourceFactory implements DataSourceFactory {
             connection = dataSource.getConnection();
 
         } finally {
-            if (connection != null) connection.close();
+            if (connection != null) {
+                connection.close();
+            }
         }
     }
 

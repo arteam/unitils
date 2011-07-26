@@ -59,8 +59,8 @@ public class DatabaseUnitils {
      * @return The DataSource that connects to the test database, not null
      */
     public static DataSource getDataSource(String databaseName) {
-        //ApplicationContext applicationContext = getApplicationContext();
-        return getUnitilsDataSourceManager().getDataSource(databaseName, null);
+        ApplicationContext applicationContext = getApplicationContext();
+        return getUnitilsDataSourceManager().getDataSource(databaseName, applicationContext);
     }
 
     public static DataSource getDataSourceAndStartTransaction(String databaseName) {
