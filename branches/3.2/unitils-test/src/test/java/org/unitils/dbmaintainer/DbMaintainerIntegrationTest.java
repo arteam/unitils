@@ -88,6 +88,9 @@ public class DbMaintainerIntegrationTest extends UnitilsJUnit4 {
         scriptsLocation2 = new File(System.getProperty("java.io.tmpdir") + "/dbmaintain-integrationtest/scripts2");
         scriptsLocation1 = new File(System.getProperty("java.io.tmpdir") + "/dbmaintain-integrationtest/scripts1");
 
+        logger.debug("temp dir created as script location1 : " + scriptsLocation1);        
+        logger.debug("temp dir created as script location2 : " + scriptsLocation2);        
+        
         configuration.put(PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE, "true");
         configuration.put(PROPKEY_SCRIPT_LOCATIONS, scriptsLocation1.getAbsolutePath());
         configuration.put(PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED, "false");
