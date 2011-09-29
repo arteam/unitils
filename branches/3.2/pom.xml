@@ -27,7 +27,7 @@
 
     <groupId>org.unitils</groupId>
     <artifactId>unitils</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.2</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -74,9 +74,9 @@
         <url>http://jira.unitils.org/browse/UNI</url>
     </issueManagement>
     <scm>
-        <connection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/branches/3.2</connection>
-        <developerConnection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/branches/3.2</developerConnection>
-        <url>https://unitils.svn.sourceforge.net/svnroot/unitils/branches/3.2</url>
+        <connection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases/unitils-3.2</connection>
+        <developerConnection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases/unitils-3.2</developerConnection>
+        <url>https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases/unitils-3.2</url>
     </scm>
     <mailingLists>
         <mailingList>
