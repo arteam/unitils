@@ -129,7 +129,7 @@
             <plugin>
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
-                    <goals>deploy package assembly:assembly</goals>
+                    <goals>deploy package assembly:assembly javadoc:aggregate</goals>
                     <tagBase>https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases</tagBase>
                     <mavenExecutorId>forked-path</mavenExecutorId>
                 </configuration>
