@@ -123,7 +123,7 @@ Mocking
     This will verify that <someMethod> was invoked and that it was the only invocation on any of the mocks.
 
 
-** When to defined mock behavior
+** When to define mock behavior
 
     Mock behavior can be defined anywhere in your test. It only has to be there when the mock is actually used. You can
     for example define default behavior in your setup method. Using argument matching you can then even override
@@ -189,7 +189,19 @@ Mocking
     into the object marked as <TestedObject>. The tested object will automatically be created.
 
     This is not the only way you can inject mocks. You can, for example, also use injection without a <TestedObject> or
-    inject mocks into static fields (like singletons). See the inject tutorial for more information.
+    inject mocks into static fields (like singletons). See the {{{tutorial-inject.html}unitils-inject tutorial}} for more information.
+
+
+** Intercepting mock creation
+
+    The above way of injecting mocks is very powerful and easy, but sometimes applications are not coded in such a way that this is possible. It could be for example, that
+    an application uses a service locator instead of dependency injection.
+
+    To help with this, an <@AfterCreateMock> annotation is provided that allows intercepting a mock immediately after its creation. The mock instance can then be used to
+    register the mock in the service locator or perform some other task of configuration. For example:
+
+%{include|source=org/unitils/mock/example7/AfterMockCreateTest.java|id=afterMockCreate|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
 
 
 ** Scenario report
@@ -343,6 +355,36 @@ mailServiceMock.assertInvoked().sendMail("jane@organization.org", "subject", "bo
     use argument matchers when you really need them. For example:
 
 %{include|source=org/unitils/mock/example1/UserServiceTest.java|id=someArgumentMatchers|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+*** Creating your own argument matchers
+
+    It's not difficult to create a custom argument matcher. Just create a class that implements <ArgumentMatcher> and provide a static
+    method somewhere that is annotated with <@ArgumentMatcher>.
+
+    The annotation will enable unitils to identify the method as argument matching method. It has to have a return value of the correct type
+    so you can use it instead of an actual method argument. When the argument matcher method is called it should then register the argument matcher
+    implementation in the <ArgumentMatcherRepository>.
+
+    Following is an example of a custom <lessThan> implementation that will match when a parameter is less than a given value. E.g
+    <method(lessThan(5))> will match for <method(4)> and not for <method(6)>
+
+%{include|source=org/unitils/mock/example5/CustomArgumentMatchers.java|id=argumentMatcher|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+%{include|source=org/unitils/mock/example5/LessThanArgumentMatcher.java|id=argumentMatcher|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+
+** Dummy objects
+~~~~~~~~~~~~~~~~
+    To be able to do a test you sometimes just need an instance of a class where the actual data or implementation is not of importance for your test.
+    For example, you need a <User> instance that will be passed during invocations, but the actual values of the <User> instance are not used
+    in your test. You just need a dummy implementation.
+
+    You can create a dummy object by annotating a field with the <@Dummy> annotation or by calling <MockUnitils.createDummy>. This will create a
+    stub of the correct type that will ignore all method calls on it and will return default values for methods with return values.
+    There doesn't have to be a default constructor. If your class does not have a no-argument constructor, you can still create an
+    instance without having to provide all kinds of unnecessary values.
+
+%{include|source=org/unitils/mock/example6/DummyTest.java|id=dummy|verbatim=true|set-first-line=1|pad-line-numbers=2}
 
 
 

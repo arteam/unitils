@@ -4,7 +4,7 @@
 
     <groupId>org.unitils</groupId>
     <artifactId>unitils-site</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.2</version>
     <packaging>pom</packaging>
 
     <name>Unitils</name>
@@ -41,29 +41,29 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.8.1</version>
-	  <scope>test</scope>
+            <scope>test</scope>
         </dependency>
         <!-- START SNIPPET: core -->
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-core</artifactId>
-            <version>3.2-SNAPSHOT</version>
-	  <scope>test</scope>
+            <version>3.2</version>
+            <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: core -->
         <!-- START SNIPPET: mock -->
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-mock</artifactId>
-            <version>3.2-SNAPSHOT</version>
-	  <scope>test</scope>
+            <version>3.2</version>
+            <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: mock -->
         <!-- START SNIPPET: inject -->
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-inject</artifactId>
-            <version>3.2-SNAPSHOT</version>
+            <version>3.2</version>
             <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: inject -->
@@ -71,10 +71,42 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-database</artifactId>
-            <version>3.2-SNAPSHOT</version>
-	  <scope>test</scope>
+            <version>3.2</version>
+            <scope>test</scope>
         </dependency>
-        <!-- END SNIPPET: database -->        
+        <!-- END SNIPPET: database -->
+        <!-- START SNIPPET: dbunit -->
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-dbunit</artifactId>
+            <version>3.2</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- END SNIPPET: dbunit -->
+        <!-- START SNIPPET: spring -->
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-spring</artifactId>
+            <version>3.2</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- END SNIPPET: spring -->
+        <!-- START SNIPPET: orm -->
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-orm</artifactId>
+            <version>3.2</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- END SNIPPET: orm -->
+        <!-- START SNIPPET: easy -->
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-easymock</artifactId>
+            <version>3.2</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- END SNIPPET: easy -->
     </dependencies>
 
     <!-- Report generation -->

@@ -7,8 +7,8 @@ Reflection Assert
 
 %{include|source=pom.xml|id=core|verbatim=true|set-first-line=1|pad-line-numbers=2}
 
-    If you are not using maven you can download the unitils-with-dependencies.zip. The required jar, unitils.jar, can be
-    found in the unitils folder, the required dependencies, in the unitils/lib folder.
+    If you are not using maven you can download the unitils-with-dependencies.zip. The required jar, unitils-core.jar, can be
+    found in the unitils-core folder, the required dependencies, in the unitils-core/lib folder.
 
 
 * {Using reflection for assertion}

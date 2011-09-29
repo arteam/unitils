@@ -1,161 +1,111 @@
- -----
- Summary
- -----
- -----
-
 Summary
 ~~~~~~~
-    Unitils is an open source library aimed at making unit testing easy and maintainable. Unitils builds further on existing libraries like {{{http://www.dbunit.org}dbunit}} and integrates with {{{http://www.junit.org}JUnit}} and {{{http://testng.org}TestNG}}.
- 
-    Unitils provides general assertion utilities, support for database testing, support for testing with mock objects and offers integration with 
-    {{{http://www.springframework.org}Spring}}, {{{http://www.hibernate.org}Hibernate}} and the Java Persistence API (JPA). It has been designed to 
-	offer these services to unit tests in a very configurable and loosely coupled way. As a result, services can be added and extended very easily.
-    
-    Unitils offers following features:
+    Unitils is an open source library aimed at making unit and integration testing easy and maintainable.
 
-    * <General testing utilities>
+    It is divided into several modules, each of them providing extra support for a certain aspect of your unit and
+    integration tests. If you for example need mocking for your tests, just include unitils-mock as a dependency. If you
+    would also want to load DbUnit data sets, just include unitils-dbunit.
 
-        * Equality assertion through reflection, with different options like ignoring Java default/null values and ignoring order of collections
+    Below you can find a list of the modules and their features. Click on the title to go to the corresponding
+    tutorial and examples.
 
-    []
-	
-    * <Mock objects support>
-	
-        * Dynamically define stub behavior of and verify invocations on mock object using a simple syntax.
-        
-        * Optimal feedback including a simple and extended execution scenario report and suggested assert statements.
-        
-        * Use argument matchers for relaxing method parameter constraints and mix them with concrete objects. Use null when the actual argument 
-        value is not important.
-        
-        * Use dummy objects when stub data objects without any required behavior are needed.
 
-    []
+* {Features}
+~~~~~~~~~~~~
 
-    * <Persistence layer testing support>
+    {{{tutorial-reflectionassert.html} Reflection assert}}
 
-        * Automatic maintenance of databases, with support for incremental, repeatable and post processing scripts
-        
-        * Automatically disable constraints and set sequences to a minimum value
-        
-           * Support for Oracle, Hsqldb, MySql, DB2, Postgresql, MsSql and Derby
+        * Equality assertion through reflection
+
+        * Possibility to ignore order of collections and Java default/null values
+
+        []
+
+    {{{tutorial-mock.html} Mock module}} - <Makes mocking easy and maintainable>
+
+        * Simple syntax for defining and asserting invoked behavior
+
+        * Gives you the best possible feedback so you can easily find out why a test is failing
+
+        * Argument matchers, partial mocking, stubbing behavior, dummy objects...
+
+        []
+
+
+    {{{tutorial-inject.html} Inject module}} - <Easily inject test artifacts into classes and instances>
+
+        * Inject values by type and name
+
+        * Inject into static fields, e.g. singletons, and automatically reset the old value after the test
+
+        []
+
+    {{{tutorial-database.html} Database testing}} - <Support for testing with databases and loading of DbUnit data sets>
 
         * Simplify test database connection setup
 
-        * Simple insertion of test data with DBUnit
-		
-		    * Run tests in a transaction
-		
-		    * JPA entity manager creation and injection for hibernate, toplink and openjpa
+        * Support for setting up a separate schema/database per developer
+
+        * Transactional testing
+
+        * Easy loading of data sets
+
+        * Multi-schema data sets
+
+        * Expected data set assertions
+
+        []
+
+    {{{tutorial-dbmaintain.html} Automatic test database maintenance}} - <Use DbMaintain to automatically bring your unit test databases up to date before running your tests>
+
+        * Automatic maintenance of databases with support for incremental, repeatable and post processing scripts
+
+        * Automatically disable constraints and set sequences to a minimum value
+
+        * Generating an XSD of the database structure for dataset xml files
+
+        []
+
+
+    {{{tutorial-hibernate.html} Hibernate module}} - <Support for Hibernate database testing>
 
         * Hibernate SessionFactory creation and session management
 
         * Automatically test the mapping of JPA entities / hibernate mapped objects with the database
 
-    []
+        []
 
-    * <EasyMock integration support>
+
+    {{{tutorial-spring.html} Spring module}} - <Support for testing when your project uses Spring>
+
+        * ApplicationContext configuration and easy injection of spring managed beans into a unit test
+
+        * Support for using a Spring-configured Hibernate SessionFactory in unit tests.
+
+        []
+
+
+    {{{tutorial-easymock.html} EasyMock module}} - <Helps you set up tests that use EasyMock as a mocking framework>
 
         * Simplify EasyMock mock object creation
 
-        * Simplify mock object injection
-
         * EasyMock argument matching using reflection equality
 
-    []
-    
-    * <Spring integration>
-    
-        * ApplicationContext configuration and easy injection of spring managed beans into a unit test
-        
-        * Support for using a Spring-configured Hibernate SessionFactory in unit tests.
-
-    []
+        []
 
 
-* Documentation
-~~~~~~~~~~~~~~~
-    * An overview of the features and how to configure and use them is available as a {{{tutorial.html} tutorial}}. 
-    
-    * To get started with quickly, there is also a {{{cookbook.html} cookbook}} available, containing step-by-step
-      instructions on how to configure your tests.
 
-    * We're starting up a {{{http://sourceforge.net/apps/mediawiki/unitils/index.php?title=Main_Page}wiki}} on which
-      you can find extra information and code samples.
-      
-    []
-    
 
 * News
 ~~~~~~
+  <<2011-09-29 - Release of Unitils 3.2>>
 
-  <<2009-11-14 - Release of Unitils 3.1>>
-  
-    This release contains some important fixes for the mock module. 
-    
-    The cglib, asm and objenesis dependencies are now also repackaged into the unitils-mock.jar. This will avoid version problems when your own project also uses versions of these libs, e.g. because you're using hibernate (which uses cglib).    
-    
+    It's been a while since our last release, but now we're back. There's a new team, we're completely redoing the website and
+    there are a lot of new features in the pipeline.
+
+    This first release contains an update of the mocking and inject module and some minor fixes to the reflection assert.
+
+    A 3.3 release is planned for the end of October, a new major release is planned for the beginning of next year.
+
     Check the {{{http://jira.unitils.org/secure/ReleaseNote.jspa?projectId=10000&styleName=Html&version=10030}release notes}} for more details.
-  
-  <<2009-10-12 - Release of Unitils 3.0>>
 
-    The unitils modules are now split up in separate applications and artifacts:
-
-    * unitils-mock contains the mocking framework
-    
-    * unitils-inject contains the injection support
-
-    * unitils-dbunit contains db-unit dataset support
-
-    * unitils-orm contains hibernate and JPA functionality
-
-    * unitils-spring contains spring support
-
-    * unitils-dbmaintainer contains the database maintenance
-
-    * unitils-easymock contains support for easymock
-
-    * unitils-testng contains the base classes for TestNG
-
-    []
-
-    This makes it easier to setup everything and to manage the dependencies: just include the desired module as a test dependency. For example
-
-+-----+
-<dependency>
-    <groupId>org.unitils</groupId>
-    <artifactId>unitils-mock</artifactId>
-    <version>3.0</version>
-    <scope>test</scope>
-</dependency>
-+-----+
-
-    There is a new version of the mock framework, unitils-mock, containing lots of improvements. E.g. better support for partial mocking, better reports and some bug fixes.
-
-    We're starting up a {{{http://sourceforge.net/apps/mediawiki/unitils/index.php?title=Main_Page}wiki}} on which you can find extra information and code samples. 
-    
-    Check the {{{http://jira.unitils.org/secure/ReleaseNote.jspa?projectId=10000&styleName=Html&version=10020}release notes}} for more details.
-
-  <<2009-06-02 - Release of Unitils 2.3>>
-  
-    This minor release contains a new implementation of the expected dataset behavior, new argument matchers for the mock mock framework
-    and some other small features. It also contains important bug fixes for the mock framework.
-    Check the {{{http://jira.unitils.org/secure/ReleaseNote.jspa?projectId=10000&styleName=Html&version=10010}release notes}} for more details.
-
-  <<2008-12-19 - Release of Unitils 2.1 and 2.2>>
-  
-    Unitils 2.1 and 2.2 only contain bugfixes. The release of Unitils 2.1 was immediately followed by a release of version 2.2, because we found an important bug in the 2.1 release,
-    and we had to bring out a new release since version 2.1 was already published in maven.
-    Check the {{{http://jira.unitils.org/secure/ReleaseNote.jspa?projectId=10000&styleName=Html&version=10011}release notes}} for more details.
-
-  <<2008-10-28 - Release of Unitils 2.0>>
-
-    We're proud to announce the new major version! In this version adds a new module has been added for writing tests with mock objects. 
-    The DbMaintainer has been extended with a number of new features and several bugs were fixed. Take a look at the {{{migration.html} 
-    migration page}} to know what must be done to migrate to version 2.0.
-	
-  <<2008-06-25 - Release of Unitils 1.1>>
-  
-    This release includes support for MsSql, some bug fixes and a few small improvements.
-	
-	

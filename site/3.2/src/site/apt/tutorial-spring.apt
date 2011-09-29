@@ -1,0 +1,208 @@
+Spring support
+
+    Unitils offers features for unit testing when working with {{{http://www.springframework.org}Spring}}. One of the basic principles of Spring is that
+    your objects are designed in such way that they are easily testable without Spring or any other container. There are times however, when it can be useful to
+    work with object structures that are wired by the Spring container.
+
+    The features Unitils offers for Spring are:
+
+    * Management of <ApplicationContext> configuration
+
+    * Injection of Spring beans in unit tests
+
+    * Make use of a Hibernate <SessionFactory> configured in Spring
+
+    * Reference the Unitils DataSource in Spring configuration
+
+    []
+
+
+* {Installation}
+~~~~~~~~~~~~~~~~
+    If you are using maven, you can add following dependency to your project.
+
+%{include|source=pom.xml|id=spring|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    If you are not using maven you can download the unitils-with-dependencies.zip. The required jar, unitils-spring.jar, can be
+    found in the unitils-spring folder, the required dependencies, in the unitils-spring/lib folder.
+
+
+* ApplicationContext configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Loading an application context can easily be achieved by annotating a class, method or field with a <@SpringApplicationContext> annotation,
+    and specifying the spring config files as attribute. The resulting application context is injected into fields or methods annotated with <@SpringApplicationContext>. For example:
+
++-----+
+public class UserServiceTest extends UnitilsJUnit4 {
+
+    @SpringApplicationContext({"spring-config.xml", "spring-test-config.xml"})
+    private ApplicationContext applicationContext;
+
+}
++-----+
+
+    This will create a new <ApplicationContext> loading the config files <spring-config.xml> and <spring-test-config.xml> and will inject it into the annotated field.
+    Setter injection is also supported by annotating the setter method instead of the field.
+
+    Superclasses are also scanned for the presence of <@SpringApplicationContext> annotations. If found, these configuration files are loaded before the
+    configuration files specified in subclasses. This makes it possible to override configuration settings or to add extra configuration specific for the test.
+    For example:
+
++-----+
+@SpringApplicationContext("spring-beans.xml")
+public class BaseServiceTest extends UnitilsJUnit4 {
+}
+
+public class UserServiceTest extends BaseServiceTest {
+
+    @SpringApplicationContext("extra-spring-beans.xml")
+    private ApplicationContext applicationContext;
+}
++-----+
+
+    As in the previous example, this will create a new ApplicationContext, first loading the <spring-beans.xml> followed by the <extra-spring-beans.xml>
+    configuration files. The application context is then injected into the annotated field.
+
+    Note that in this example, a new application context was created. This was needed because an extra configuration file was specified for the test.
+    Unitils will try to reuse the application context whenever possible. In the following example, no extra files need to be loaded, so the same instance
+    will be reused:
+
++-----+
+@SpringApplicationContext("spring-beans.xml")
+public class BaseServiceTest extends UnitilsJUnit4 {
+}
+
+public class UserServiceTest extends BaseServiceTest {
+
+    @SpringApplicationContext
+    private ApplicationContext applicationContext;
+}
+
+public class UserGroupServiceTest extends BaseServiceTest {
+
+    @SpringApplicationContext
+    private ApplicationContext applicationContext;
+}
++-----+
+
+    By specifying the configuration on a common superclass <BaseServiceTest>, the <ApplicationContext> will only be created once and then reused for the
+    <UserServiceTest> and <UserGroupServiceTest>. Since loading an application context can be a heavy operation, reusing the context will greatly improve the
+    performance of your tests.
+
+
+** Programmatic configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Programmatic configuration is also possible. You can do this by annotating a method that takes no or a <List\<String\>> as parameter and returns an instance
+    of <ConfigurableApplicationContext>. If a <List\<String\>> parameter is specified, all locations of the <@SpringApplicationContext> annotations that would
+    otherwise be used to create a new instance will be passed to the method.
+
+    The result of this method should be an instance of an application context for which the refresh() method was not yet invoked. This important, since it
+    allows Unitils to perform extra configuration such as adding some BeanPostProcessors, which is no longer possible once refresh is invoked. In case of
+    a <ClassPathXmlApplicationContext> this can easily be achieved by passing <false> as value for the refresh parameter of the constructor:
+
++-----+
+@SpringApplicationContext
+public ConfigurableApplicationContext createApplicationContext(List<String> locations) {
+    return new ClassPathXmlApplicationContext(Arrays.asList(locations), false);
+}
+
+@SpringApplicationContext
+public ConfigurableApplicationContext createApplicationContext() {
+    return new ClassPathXmlApplicationContext(Arrays.asList("spring-beans.xml","extra-spring-beans.xml"), false);
+}
++-----+
+
+
+
+
+* Injection of Spring beans
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Once you've configured an ApplicationContext, Spring beans are injected into fields / setters annotated with <@SpringBean>, <@SpringBeanByType> or <@SpringBeanByName>.
+	Following example shows 3 ways to get a <UserService> bean instance from the application context:
+
++-----+
+@SpringBean("userService")
+private UserService userService;
+
+@SpringBeanByName
+private UserService userService;
+
+@SpringBeanByType
+private UserService userService;
++-----+
+
+    With <@SpringBean>, you can get a Spring bean from the application context by explicitly specifying the name of the bean. <@SpringBeanByName>, has the same effect,
+    but now the name of the field is used to identify the bean.
+
+    When using <@SpringBeanByType>, the application context is queried for a bean having a type assignable to the field. In this case, this is
+    a bean of type <UserService> or one of its sub-types. If no such bean exists or if there is more than one possible candidate, an exception is thrown.
+
+    The same annotations can be used on setter methods. For example:
+
++-----+
+@SpringBeanByType
+public void setUserService(UserService userService) {
+    this.userService = userService;
+}
++-----+
+
+
+
+
+* Connecting to the test database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    In the {{{#Database testing}Database testing}} section we explained you how to obtain and install a datasource for your test. The
+    {{{#Testing with Hibernate}Testing with Hibernate}} section describes how to setup hibernate for your test. In Spring all this wiring is typically done in a Spring
+    config file. Suppose, for example, that your application contains following <application-config.xml> file:
+
++-----+
+<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
+    <property name="url" value="jdbc:hsqldb:hsql://localhost/sample"/>
+    <property name="username" value="sa"/>
+    <property name="password" value=""/>
+</bean>
+
+<bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+    <property name="dataSource" ref="dataSource"/>
+    <property name="annotatedClasses">
+        <list>
+            <value>org.unitils.sample.User</value>
+        </list>
+    </property>
+    <property name="hibernateProperties">
+        <value>
+            hibernate.dialect=org.hibernate.dialect.HSQLDialect
+            hibernate.show_sql=true
+        </value>
+    </property>
+</bean>
++-----+
+
+    The first bean defines the data source that connects to the application database. The second bean configures a hibernate <SessionFactory> that
+	connects with this <DataSource>.
+
+    In our tests we need a connection to the test database. Typically, a test-specific spring configuration file is written with for example following contents:
+
++-----+
+<bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean" />
++-----+
+
+    With this configuration, Spring will make use of the DataSource configured in Unitils. Refer to {{{Configuration}the configuration chapter}} for more information
+	on how to configure a test DataSource.
+
+
+    Unitils automatically detects the SessionFactory configured in Spring: all integration features Unitils offers for Hibernate also work when using Spring. The
+	{{{Hibernate mapping test}hibernate mapping test}} will therefore also work as follows:
+
++-----+
+@SpringApplicationContext({"application-config.xml", "test-ds-config.xml"})
+public class HibernateMappingTest extends UnitilsJUnit4 {
+
+    @Test
+    public void testMappingToDatabase() {
+        HibernateUnitils.assertMappingWithDatabaseConsistent();
+    }
+}
++-----+
+

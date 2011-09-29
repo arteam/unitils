@@ -38,7 +38,8 @@ Injection
 %{include|source=org/unitils/inject/example1/MyServiceTest.java|id=injectInto|verbatim=true|set-first-line=1|pad-line-numbers=2}
 
     This will inject the <myDao> value into a field named <myDaoField> of the tested object, <myService>. Unitils injects
-    the value directly in the field, there does not have to be a setter and the field can be private.
+    the value directly in the field, there does not have to be a setter and the field can be private. The value for the attribute property of <@Inject> can be
+    an arbitrary {{{http://www.ognl.org/}OGNL}} expression.
 
     Instead of using a tested object, you can also specify the target object explicitly:
 
