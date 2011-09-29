@@ -1,0 +1,41 @@
+Maven release tasks:
+
+mvn release:prepare
+mvn release:perform
+mvn release:clean
+
+
+Step 1: Actual run  	
+
+Command:	mvn release:prepare
+
+This will:	check whether everything is ready to be release
+		update version 
+		create release tag
+
+	
+	
+
+Step 2: Create release 
+
+Command:	mvn release:perform	
+
+This will:	download clean release
+		build unitils 	
+		create distribution
+		upload the unitils jar to the repository on SourceForge 
+
+
+
+Note: to set-up the FTP connection to SourceForge, you need to add following settings.xml to <user.home>/.m2
+
+<settings>
+	<servers>
+      	<server>
+            	<id>sourceforge-repository</id>
+                  <username>your_username</username>
+            </server>
+	</servers>
+</settings>
+	
+ 
