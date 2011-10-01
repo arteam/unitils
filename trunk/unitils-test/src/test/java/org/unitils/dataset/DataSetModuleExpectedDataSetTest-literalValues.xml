@@ -1,6 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<dataset>
-
-    <TEST col1="='text'" col2="=2" col4="==escaped token"/>
-
-</dataset>

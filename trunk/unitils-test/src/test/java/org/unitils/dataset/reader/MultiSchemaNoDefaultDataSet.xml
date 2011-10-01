@@ -1,9 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<dataset xmlns:b="SCHEMA_B" xmlns:c="SCHEMA_C">
-
-    <TABLE_A />
-    <b:TABLE_A />
-    <TABLE_A />
-    <c:TABLE_A />
-
-</dataset>
