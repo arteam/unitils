@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+
+    <TEST col1="value1" col2="1"/>
+    <TEST col1="value2" col2="2"/>
+    <TEST col1="value3" col2="3"/>
+
+</dataset>
