@@ -17,9 +17,11 @@ package org.unitils.core;
 
 import org.apache.commons.logging.Log;
 import org.junit.After;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import static org.unitils.core.ConfigurationLoader.*;
 import org.unitils.core.util.PropertiesReader;
 import org.unitils.inject.annotation.InjectIntoByType;
 import org.unitils.inject.annotation.InjectIntoStaticByType;
@@ -27,9 +29,6 @@ import org.unitils.inject.annotation.TestedObject;
 import org.unitils.mock.Mock;
 
 import java.util.Properties;
-
-import static org.junit.Assert.*;
-import static org.unitils.core.ConfigurationLoader.*;
 
 /**
  * Test for {@link ConfigurationLoader}.
@@ -42,15 +41,15 @@ public class ConfigurationLoaderTest extends UnitilsJUnit4 {
 
     /* System under Test */
     @TestedObject
-    protected ConfigurationLoader configurationLoader;
+    private ConfigurationLoader configurationLoader;
 
     /* PropertiesReader used by sut */
     @InjectIntoByType
-    protected Mock<PropertiesReader> propertiesReader;
+    private Mock<PropertiesReader> propertiesReader;
 
     /* Logger used by sut */
     @InjectIntoStaticByType(target = ConfigurationLoader.class)
-    protected Mock<Log> usedLogger;
+    private Mock<Log> usedLogger;
 
     /* Faked default Properties (unitils.properties) */
     private Properties unitilsDefaultProperties;
@@ -70,6 +69,8 @@ public class ConfigurationLoaderTest extends UnitilsJUnit4 {
 
     @Before
     public void setUp() {
+        configurationLoader = new ConfigurationLoader();
+
         localProperties = new Properties();
         localProperties.put("local", "value");
 

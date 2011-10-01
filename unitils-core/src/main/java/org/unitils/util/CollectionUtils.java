@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.unitils.util;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.util.*;
+import static java.util.Arrays.asList;
 
 /**
  * Class containing collection related utilities
@@ -29,33 +30,37 @@ public class CollectionUtils {
 
 
     /**
+     * Gets a list containing all elements from the given index to the given index.
+     *
+     * @param list      The original list
+     * @param fromIndex The from index
+     * @param toIndex   The to index
+     * @return The sub-list, not null
+     */
+    public static <T> List<T> subList(List<T> list, int fromIndex, int toIndex) {
+        List<T> result = new ArrayList<T>();
+        if (list == null) {
+            return result;
+        }
+        for (int i = fromIndex; i < toIndex; i++) {
+            result.add(list.get(i));
+        }
+        return result;
+    }
+
+
+    /**
      * Converts the given array of elements to a set.
      *
      * @param elements The elements
      * @return The elements as a set, empty if elements was null
      */
     public static <T> Set<T> asSet(T... elements) {
-        Set<T> result = new LinkedHashSet<T>();
+        Set<T> result = new HashSet<T>();
         if (elements == null) {
             return result;
         }
-        result.addAll(Arrays.asList(elements));
-        return result;
-    }
-
-
-    /**
-     * Converts the given array of elements to a list.
-     *
-     * @param elements The elements
-     * @return The elements as a set, empty if elements was null
-     */
-    public static <T> List<T> asList(T... elements) {
-        List<T> result = new ArrayList<T>();
-        if (elements == null) {
-            return result;
-        }
-        result.addAll(Arrays.asList(elements));
+        result.addAll(asList(elements));
         return result;
     }
 

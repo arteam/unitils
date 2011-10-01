@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,31 @@
  */
 package org.unitils.core;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Properties;
 
 /**
- * Core class of the Unitils library, and the main entry point that gives access to the test context and the
- * different {@link Module}s. There is only 1 instance of unitils per thread.
- *
- * @author Tim Ducheyne
- * @author Filip Neven
+ * Core class of the Unitils library, and the main entry point that gives access to the {@link TestContext} and the
+ * different {@link Module}s.
+ * <p/>
+ * An instance of Unitils is configured with a certain configuration using the {@link #init(Properties)} method. Normally,
+ * only one instance of Unitils exists at any time. The default instance can be obtained using the {@link #getInstance()} method.
+ * This default instance can be set to a custom initialized instance or instance of a custom subclass using
+ * {@link #setInstance(Unitils)}.
+ * <p/>
+ * If not set, the singleton instance is initialized by default using {@link #initSingletonInstance()}. This method uses
+ * the {@link ConfigurationLoader} to load the configuration. An instance of {@link ModulesRepository} is used to
+ * initialize and maintain the modules.
+ * <p/>
+ * Unitils itself is also implemented as a module. In fact, an instance of Unitils behaves like a module who's behaviour
+ * is defined by the added behaviour of all modules.
  */
 public class Unitils {
 
 
     /* The singleton instance */
-    private static ThreadLocal<Unitils> unitilsThreadLocal = new ThreadLocal<Unitils>();
+    private static Unitils unitils;
 
 
     /**
@@ -38,34 +48,76 @@ public class Unitils {
      * @return the singleton instance, not null
      */
     public static synchronized Unitils getInstance() {
-        Unitils unitils = unitilsThreadLocal.get();
         if (unitils == null) {
-            unitils = new Unitils();
-            unitils.init();
-            unitilsThreadLocal.set(unitils);
-            unitils.afterInitModules();
+            initSingletonInstance();
         }
         return unitils;
     }
 
 
-    /* Repository for all modules that are currently active in Unitils */
-    protected ModulesRepository modulesRepository;
-    /* Configuration of Unitils, made up of different properties files */
-    protected Properties configuration;
-    /* The current test class, null if not known */
-    protected CurrentTestClass currentTestClass;
-    /* The current test instance, null if not known  */
-    protected CurrentTestInstance currentTestInstance;
+    /**
+     * Sets the singleton instance to the given object
+     *
+     * @param unitils the singleton instance
+     */
+    public static void setInstance(Unitils unitils) {
+        Unitils.unitils = unitils;
+    }
 
 
     /**
-     * Initializes Unitils.
+     * Initializes the singleton instance to the default value, loading the configuration using the {@link
+     * ConfigurationLoader}
+     */
+    public static void initSingletonInstance() {
+        unitils = new Unitils();
+        unitils.init();
+    }
+
+
+    /* Listener that observes the execution of tests */
+    private TestListener testListener;
+
+    /* Repository for all modules that are currently active in Unitils */
+    private ModulesRepository modulesRepository;
+
+    /* Configuration of Unitils, made up of different properties files */
+    private Properties configuration;
+
+    /* Object keeping track of the unit test that is currently running */
+    private TestContext testContext;
+
+
+    /**
+     * Creates a new instance.
+     */
+    public Unitils() {
+        testContext = new TestContext();
+    }
+
+
+    /**
+     * Initializes unitils with the configuration files.
      */
     public void init() {
         ConfigurationLoader configurationLoader = new ConfigurationLoader();
-        this.configuration = configurationLoader.loadConfiguration();
-        this.modulesRepository = createModulesRepository(configuration);
+        Properties properties = configurationLoader.loadConfiguration();
+        init(properties);
+    }
+
+
+    /**
+     * Initializes Unitils with the given configuration. All the modules that are configured in the given configuration
+     * are also created and initialized with this configuration.
+     *
+     * @param configuration The config, not null
+     */
+    public void init(Properties configuration) {
+        //verifyPackaging(configuration);
+        this.configuration = configuration;
+        modulesRepository = createModulesRepository(configuration);
+        testListener = new UnitilsTestListener();
+        afterInitModules();
     }
 
 
@@ -81,6 +133,53 @@ public class Unitils {
 
 
     /**
+     * Verifies that we're not working with a distribution that includes the necessary classes from spring,
+     * while spring is in the classpath anyway.
+     *
+     * @param configuration The configuration
+     */
+    protected void verifyPackaging(Properties configuration) {
+        String springCoreClassName = configuration.getProperty("spring.core.someClass.name");
+        String unitilsPackagedWithSpring = "org.unitils.includeddeps." + springCoreClassName;
+
+        if (isClassAvailable(springCoreClassName) && isClassAvailable(unitilsPackagedWithSpring)) {
+            throw new IllegalStateException("It appears that you're using the unitils distribution that is packaged with " +
+                    "its dependency to spring, while spring is also in your classpath. This is not supported. The spring-packaged " +
+                    "distribution can only be used when you're not using spring at all. Please replace unitils-spring-included-version.jar " +
+                    "with unitils-version.jar");
+        }
+    }
+
+
+    /**
+     * Utility method that verifies whether the class with the given fully qualified classname is available
+     * in the classpath.
+     *
+     * @param className The name of the class
+     * @return True if the class with the given name is available
+     */
+    protected boolean isClassAvailable(String className) {
+        try {
+            Thread.currentThread().getContextClassLoader().loadClass(className);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+
+    /**
+     * Returns the single instance of {@link TestListener}. This instance provides hook callback methods that enable intervening
+     * during the execution of unit tests.
+     *
+     * @return The single {@link TestListener}
+     */
+    public TestListener getTestListener() {
+        return testListener;
+    }
+
+
+    /**
      * Returns the {@link ModulesRepository} that provides access to the modules that are configured in unitils.
      *
      * @return the {@link ModulesRepository}
@@ -89,6 +188,18 @@ public class Unitils {
         return modulesRepository;
     }
 
+
+    /**
+     * Returns the {@link TestContext} that, during the execution of the test suite, keeps track of the current test
+     * object, class and test method that are executing.
+     *
+     * @return the {@link TestContext}
+     */
+    public TestContext getTestContext() {
+        return testContext;
+    }
+
+
     /**
      * Returns all properties that are used to configure unitils and the different modules.
      *
@@ -96,43 +207,6 @@ public class Unitils {
      */
     public Properties getConfiguration() {
         return configuration;
-    }
-
-
-    /**
-     * @return The current test class, null if not known
-     */
-    public CurrentTestClass getCurrentTestClass() {
-        if (currentTestClass == null) {
-            throw new UnitilsException("Current test class is not known. Make sure your test class is Unitils enabled, i.e. extends a base class or uses the Spring test execution listener.");
-        }
-        return currentTestClass;
-    }
-
-    /**
-     * @param currentTestClass The current test class, null if not known
-     */
-    public void setCurrentTestClass(CurrentTestClass currentTestClass) {
-        this.currentTestClass = currentTestClass;
-    }
-
-    /**
-     * @return The current test instance, null if not known
-     */
-    public CurrentTestInstance getCurrentTestInstance() {
-        if (currentTestClass == null) {
-            throw new UnitilsException("Current test instance is not known. Possible causes:\n" +
-                    "- Your test class is not Unitils enabled, i.e. it does not extend one of the base classes or does not use the Spring test execution listener.\n" +
-                    "- Your calling a method that needs the test instance from a test method where the test instance is not known, e.g. a before class or static method.");
-        }
-        return currentTestInstance;
-    }
-
-    /**
-     * @param currentTestInstance The current test instance, null if not known
-     */
-    public void setCurrentTestInstance(CurrentTestInstance currentTestInstance) {
-        this.currentTestInstance = currentTestInstance;
     }
 
 
@@ -148,4 +222,100 @@ public class Unitils {
         List<Module> modules = modulesLoader.loadModules(configuration);
         return new ModulesRepository(modules);
     }
+
+
+    /**
+     * Implementation of {@link TestListener} that ensures that at every point during the run of a test, every {@link
+     * Module} gets the chance of performing some behavior, by calling the {@link TestListener} of each module in turn.
+     * Also makes sure that the state of the instance of {@link TestContext} returned by {@link Unitils#getTestContext()}
+     * is correctly set to the current test class, test object and test method.
+     */
+    private class UnitilsTestListener extends TestListener {
+
+
+        @Override
+        public void beforeTestClass(Class<?> testClass) {
+            TestContext testContext = getTestContext();
+            testContext.setTestClass(testClass);
+            testContext.setTestObject(null);
+            testContext.setTestMethod(null);
+
+            List<Module> modules = modulesRepository.getModules();
+            for (Module module : modules) {
+                modulesRepository.getTestListener(module).beforeTestClass(testClass);
+            }
+        }
+
+
+        @Override
+        public void afterCreateTestObject(Object testObject) {
+            TestContext testContext = getTestContext();
+            testContext.setTestClass(testObject.getClass());
+            testContext.setTestObject(testObject);
+            testContext.setTestMethod(null);
+
+            List<Module> modules = modulesRepository.getModules();
+            for (Module module : modules) {
+                modulesRepository.getTestListener(module).afterCreateTestObject(testObject);
+            }
+        }
+
+
+        @Override
+        public void beforeTestSetUp(Object testObject, Method testMethod) {
+            TestContext testContext = getTestContext();
+            testContext.setTestClass(testObject.getClass());
+            testContext.setTestObject(testObject);
+            testContext.setTestMethod(testMethod);
+
+            List<Module> modules = modulesRepository.getModules();
+            for (Module module : modules) {
+                modulesRepository.getTestListener(module).beforeTestSetUp(testObject, testMethod);
+            }
+        }
+
+
+        @Override
+        public void beforeTestMethod(Object testObject, Method testMethod) {
+            TestContext testContext = getTestContext();
+            testContext.setTestClass(testObject.getClass());
+            testContext.setTestObject(testObject);
+            testContext.setTestMethod(testMethod);
+
+            List<Module> modules = modulesRepository.getModules();
+            for (Module module : modules) {
+                modulesRepository.getTestListener(module).beforeTestMethod(testObject, testMethod);
+            }
+        }
+
+
+        @Override
+        public void afterTestMethod(Object testObject, Method testMethod, Throwable throwable) {
+            TestContext testContext = getTestContext();
+            testContext.setTestClass(testObject.getClass());
+            testContext.setTestObject(testObject);
+            testContext.setTestMethod(testMethod);
+
+            List<Module> modules = modulesRepository.getModules();
+            for (Module module : modules) {
+                modulesRepository.getTestListener(module).afterTestMethod(testObject, testMethod, throwable);
+            }
+        }
+
+
+        @Override
+        public void afterTestTearDown(Object testObject, Method testMethod) {
+            TestContext testContext = getTestContext();
+            testContext.setTestClass(testObject.getClass());
+            testContext.setTestObject(testObject);
+            testContext.setTestMethod(null);
+
+            List<Module> modules = modulesRepository.getModules();
+            for (Module module : modules) {
+                modulesRepository.getTestListener(module).afterTestTearDown(testObject, testMethod);
+            }
+        }
+
+    }
+
 }

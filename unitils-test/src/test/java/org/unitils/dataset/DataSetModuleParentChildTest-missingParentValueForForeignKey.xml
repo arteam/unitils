@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<dataset>
-
-    <PARENT pk1="1">
-        <CHILD pk1="2"/>
-    </PARENT>
-
-</dataset>

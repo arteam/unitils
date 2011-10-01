@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,14 @@
  */
 package org.unitils.core.util;
 
-import org.unitils.core.UnitilsException;
-import org.unitils.util.PropertyUtils;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
 import java.util.Properties;
 
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.unitils.core.UnitilsException;
+import org.unitils.util.PropertyUtils;
 
 /**
  * Class containing configuration related utilities
@@ -30,6 +32,28 @@ import static org.unitils.util.ReflectionUtils.createInstanceOfType;
  */
 public class ConfigUtils {
 
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(ConfigUtils.class);
+
+    
+    /**
+     * Retrieves the concrete instance of the class with the given type as configured by the given <code>Configuration</code>.
+     * Tries to retrieve a specific implementation first (propery key = fully qualified name of the interface
+     * type + '.impl.className.' + implementationDiscriminatorValue). If this key does not exist, the generally configured
+     * instance is retrieved (same property key without the implementationDiscriminatorValue).
+     *
+     * @param type          The type of the instance
+     * @param configuration The configuration containing the necessary properties for configuring the instance
+     * @param implementationDiscriminatorValues
+     *                      The values that define which specific implementation class should be used.
+     *                      This is typically an environment specific property, like the DBMS that is used.
+     * @return The configured instance
+     */
+    public static <T extends Configurable> T getConfiguredInstanceOf(Class<? extends T> type, Properties configuration, String... implementationDiscriminatorValues) {
+        T result = getInstanceOf(type, configuration, implementationDiscriminatorValues);
+        result.init(configuration);
+        return result;
+    }
 
     /**
      * Retrieves the concrete instance of the class with the given type as configured by the given <code>Configuration</code>.
@@ -47,6 +71,7 @@ public class ConfigUtils {
     @SuppressWarnings({"unchecked"})
     public static <T> T getInstanceOf(Class<? extends T> type, Properties configuration, String... implementationDiscriminatorValues) {
         String implClassName = getConfiguredClassName(type, configuration, implementationDiscriminatorValues);
+        logger.debug("Creating instance of " + type + ". Implementation class " + implClassName);
         return (T) createInstanceOfType(implClassName, false);
     }
 

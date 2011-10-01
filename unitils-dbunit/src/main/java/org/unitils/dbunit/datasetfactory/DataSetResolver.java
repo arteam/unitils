@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 package org.unitils.dbunit.datasetfactory;
 
 import java.io.File;
-import java.util.Properties;
+
+import org.unitils.core.util.Configurable;
 
 /**
  * Resolves the location for a data set with a certain name.
@@ -25,14 +26,8 @@ import java.util.Properties;
  * @author Filip Neven
  * @author Tuomas Jormola
  */
-public interface DataSetResolver {
+public interface DataSetResolver extends Configurable {
 
-    /**
-     * Initializes the resolver with the given configuration.
-     *
-     * @param configuration The configuration, not null
-     */
-    void init(Properties configuration);
 
     /**
      * Resolves the location for a data set with a certain name.

@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,10 @@
  */
 package org.unitils.database;
 
-import org.dbmaintain.database.Database;
-import org.springframework.context.ApplicationContext;
-import org.unitils.core.CurrentTestClass;
 import org.unitils.core.Unitils;
-import org.unitils.database.manager.DbMaintainManager;
-import org.unitils.database.manager.UnitilsDataSourceManager;
-import org.unitils.database.manager.UnitilsTransactionManager;
+import org.unitils.dbmaintainer.DBMaintainer;
 
 import javax.sql.DataSource;
-import java.util.List;
 
 /**
  * Class providing access to the functionality of the database module using static methods. Meant
@@ -37,130 +31,112 @@ public class DatabaseUnitils {
 
 
     /**
-     * Returns the DataSource that connects to the default test database
-     *
-     * NOTE: this will not retrieve a data source from a Spring context.
-     * Use injection or applicationContext.getBean() instead.
+     * Returns the DataSource that connects to the test database
      *
      * @return The DataSource that connects to the test database
      */
     public static DataSource getDataSource() {
-        return getDataSource(null);
+    	return getDatabaseModule().getTransactionalDataSourceAndActivateTransactionIfNeeded(getTestObject());
     }
-
-    public static DataSource getDataSourceAndStartTransaction() {
-        return getDataSourceAndStartTransaction(null);
-    }
-
+    
+    
     /**
-     * Returns the DataSource that connects to the test database
-     *
-     * @param databaseName The name of the database to get a data source for, null for the default database
-     * @return The DataSource that connects to the test database, not null
+     * Flushes all pending updates to the database. This method is useful when the effect of updates
+     * needs to be checked directly on the database.
+     * <p/>
+     * A typical usage of this method is, when updates were issues to the database using hibernate,
+     * making sure that these updates are flushed, to be able to check the effect of these updates
+     * using plain old JDBC.
      */
-    public static DataSource getDataSource(String databaseName) {
-        ApplicationContext applicationContext = getApplicationContext();
-        return getUnitilsDataSourceManager().getDataSource(databaseName, applicationContext);
-    }
-
-    public static DataSource getDataSourceAndStartTransaction(String databaseName) {
-        DataSource dataSource = getDataSource(databaseName);
-        getUnitilsTransactionManager().startTransactionForDataSource(dataSource);
-        return dataSource;
+    public static void flushDatabaseUpdates() {
+        getDatabaseModule().flushDatabaseUpdates(getTestObject());
     }
 
 
     /**
-     * Returns the default {@link UnitilsDataSource} that connects to the test database. This is a wrapper around the data source
-     * and adds some extra info like the schema names that the data source uses.
-     *
-     * @return The UnitilsDataSource that connects to the test database, not null
+     * Starts a new transaction on the transaction manager configured in unitils
      */
-    public static UnitilsDataSource getUnitilsDataSource() {
-        return getUnitilsDataSource(null);
+    public static void startTransaction() {
+        getDatabaseModule().startTransaction(getTestObject());
     }
-
+    
+    
     /**
-     * Returns the {@link UnitilsDataSource} that connects to the test database. This is a wrapper around the data source
-     * and adds some extra info like the schema names that the data source uses.
-     *
-     * @param databaseName The name of the database to get a data source for, null for the default database
-     * @return The UnitilsDataSource that connects to the test database, not null
-     */
-    public static UnitilsDataSource getUnitilsDataSource(String databaseName) {
-        ApplicationContext applicationContext = getApplicationContext();
-        return getUnitilsDataSourceManager().getUnitilsDataSource(databaseName, applicationContext);
-    }
-
-    /**
-     * @return The the database names, not null
-     */
-    public static List<String> getDatabaseNames() {
-        ApplicationContext applicationContext = getApplicationContext();
-        return getUnitilsDataSourceManager().getDatabaseNames(applicationContext);
-    }
-
-
-    /**
-     * @return The utility class for working with the default database. For example for getting all table names within a schema.
-     */
-    public static Database getDefaultDatabase() {
-        return getDatabase(null);
-    }
-
-    /**
-     * @param databaseName The name of the database to get the database support for, null for the default database
-     * @return The utility classes for working with the database. For example for getting all table names within a schema.
-     */
-    public static Database getDatabase(String databaseName) {
-        return getDbMaintainManager().getDatabase(databaseName);
-    }
-
-
-    /**
-     * Starts a transaction for the give data source using a {@link org.springframework.jdbc.datasource.DataSourceTransactionManager}.
-     * If a transaction is already started for the given data source, the start will be ignored.
-     * If a transaction is already started for another data source, an expception will be raised.
-     *
-     * @param dataSource The data source, not null
-     */
-    public static void startTransaction(DataSource dataSource) {
-        getUnitilsTransactionManager().startTransactionForDataSource(dataSource);
-    }
-
-    /**
-     * Commits the current transaction.
-     * An exception will be raised if no transaction is currently active.
+     * Commits the current unitils transaction
      */
     public static void commitTransaction() {
-        getUnitilsTransactionManager().commit();
+        getDatabaseModule().commitTransaction(getTestObject());
     }
-
+    
+    
     /**
-     * Rolls back the current transaction.
-     * An exception will be raised if no transaction is currently active.
+     * Performs a rollback of the current unitils transaction
+     *
      */
     public static void rollbackTransaction() {
-        getUnitilsTransactionManager().rollback();
+        getDatabaseModule().rollbackTransaction(getTestObject());
     }
 
 
     /**
      * Determines whether the test database is outdated and, if that is the case, updates the database with the
-     * latest changes. See {@link org.dbmaintain.DbMaintainer} for more information.
+     * latest changes. See {@link DBMaintainer} for more information.
      */
-    public static void updateDatabaseIfNeeded() {
-        ApplicationContext applicationContext = getApplicationContext();
-        getDbMaintainManager().updateDatabaseIfNeeded(applicationContext);
+    public static void updateDatabase() {
+        getDatabaseModule().updateDatabase();
     }
 
 
-    public static void registerDatabaseUpdateListener(DatabaseUpdateListener databaseUpdateListener) {
-        getDbMaintainManager().registerDatabaseUpdateListener(databaseUpdateListener);
+    /**
+     * Updates the database version to the current version, without issuing any other updates to the database.
+     * This method can be used for example after you've manually brought the database to the latest version, but
+     * the database version is not yet set to the current one. This method can also be useful for example for
+     * reinitializing the database after having reorganized the scripts folder.
+     */
+    public static void resetDatabaseState() {
+        getDatabaseModule().resetDatabaseState();
     }
 
-    public static void unregisterDatabaseUpdateListener(DatabaseUpdateListener databaseUpdateListener) {
-        getDbMaintainManager().unregisterDatabaseUpdateListener(databaseUpdateListener);
+
+    /**
+     * Clears all configured schema's. I.e. drops all tables, views and other database objects.
+     */
+    public static void clearSchemas() {
+        getDatabaseModule().clearSchemas();
+    }
+
+
+    /**
+     * Cleans all configured schema's. I.e. removes all data from its database tables.
+     */
+    public static void cleanSchemas() {
+        getDatabaseModule().cleanSchemas();
+    }
+
+
+    /**
+     * Disables all foreign key and not-null constraints on the configured schema's.
+     */
+    public static void disableConstraints() {
+        getDatabaseModule().disableConstraints();
+    }
+
+
+    /**
+     * Updates all sequences that have a value below a certain configurable treshold to become equal
+     * to this treshold
+     */
+    public static void updateSequences() {
+        getDatabaseModule().updateSequences();
+    }
+
+
+    /**
+     * Generates a definition file that defines the structure of dataset's, i.e. a XSD of DTD that
+     * describes the structure of the database.
+     */
+    public static void generateDatasetDefinition() {
+        getDatabaseModule().generateDatasetDefinition();
     }
 
 
@@ -174,21 +150,12 @@ public class DatabaseUnitils {
     private static DatabaseModule getDatabaseModule() {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
     }
-
-    private static UnitilsTransactionManager getUnitilsTransactionManager() {
-        return getDatabaseModule().getUnitilsTransactionManager();
-    }
-
-    private static UnitilsDataSourceManager getUnitilsDataSourceManager() {
-        return getDatabaseModule().getUnitilsDataSourceManager();
-    }
-
-    private static DbMaintainManager getDbMaintainManager() {
-        return getDatabaseModule().getDbMaintainManager();
-    }
-
-    private static ApplicationContext getApplicationContext() {
-        CurrentTestClass currentTestClass = Unitils.getInstance().getCurrentTestClass();
-        return currentTestClass.getApplicationContext();
+    
+    /**
+     * @return The current test object
+     */
+    private static Object getTestObject() {
+        Object testObject = Unitils.getInstance().getTestContext().getTestObject();
+        return testObject;
     }
 }

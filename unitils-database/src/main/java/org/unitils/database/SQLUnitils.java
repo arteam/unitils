@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ package org.unitils.database;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.unitils.core.UnitilsException;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -26,9 +26,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
-
-import static org.unitils.database.util.DbUtils.closeQuietly;
-
 
 /**
  * Utilities for executing statements and queries.
@@ -56,13 +53,13 @@ public class SQLUnitils {
         Connection connection = null;
         Statement statement = null;
         try {
-            connection = DataSourceUtils.getConnection(dataSource);
+            connection = dataSource.getConnection();
             statement = connection.createStatement();
             return statement.executeUpdate(sql);
         } catch (Exception e) {
             throw new UnitilsException("Error while executing statement: " + sql, e);
         } finally {
-            closeQuietly(connection, statement, null, dataSource);
+            closeQuietly(connection, statement, null);
         }
     }
 
@@ -72,7 +69,7 @@ public class SQLUnitils {
      *
      * @param sql        The sql string for retrieving the items
      * @param dataSource The data source, not null
-     * @return The nr of updates, -1 if not successful
+     * @return The nr of updates, -1 if not succesful
      */
     public static int executeUpdateQuietly(String sql, DataSource dataSource) {
         try {
@@ -99,7 +96,7 @@ public class SQLUnitils {
         Statement statement = null;
         ResultSet resultSet = null;
         try {
-            connection = DataSourceUtils.getConnection(dataSource);
+            connection = dataSource.getConnection();
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
             if (resultSet.next()) {
@@ -108,7 +105,7 @@ public class SQLUnitils {
         } catch (Exception e) {
             throw new UnitilsException("Error while executing statement: " + sql, e);
         } finally {
-            closeQuietly(connection, statement, resultSet, dataSource);
+            closeQuietly(connection, statement, resultSet);
         }
 
         // in case no value was found, throw an exception
@@ -131,7 +128,7 @@ public class SQLUnitils {
         Statement statement = null;
         ResultSet resultSet = null;
         try {
-            connection = DataSourceUtils.getConnection(dataSource);
+            connection = dataSource.getConnection();
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
             if (resultSet.next()) {
@@ -140,7 +137,7 @@ public class SQLUnitils {
         } catch (Exception e) {
             throw new UnitilsException("Error while executing statement: " + sql, e);
         } finally {
-            closeQuietly(connection, statement, resultSet, dataSource);
+            closeQuietly(connection, statement, resultSet);
         }
 
         // in case no value was found, throw an exception
@@ -162,7 +159,7 @@ public class SQLUnitils {
         Statement statement = null;
         ResultSet resultSet = null;
         try {
-            connection = DataSourceUtils.getConnection(dataSource);
+            connection = dataSource.getConnection();
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
             Set<String> result = new HashSet<String>();
@@ -174,7 +171,7 @@ public class SQLUnitils {
         } catch (Exception e) {
             throw new UnitilsException("Error while executing statement: " + sql, e);
         } finally {
-            closeQuietly(connection, statement, resultSet, dataSource);
+            closeQuietly(connection, statement, resultSet);
         }
     }
 

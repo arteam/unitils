@@ -5,10 +5,10 @@
     </formats>
 
     <moduleSets>
-        <!-- unitils -->
+        <!-- unitils-core -->
         <moduleSet>
             <includes>
-                <include>org.unitils:unitils</include>
+                <include>org.unitils:unitils-core</include>
             </includes>
             <sources>
                 <fileSets>
@@ -21,11 +21,11 @@
                 </fileSets>
             </sources>
             <binaries>
-                <outputDirectory>unitils</outputDirectory>
+                <outputDirectory>unitils-core</outputDirectory>
                 <dependencySets>
                     <dependencySet>
                         <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>unitils/lib</outputDirectory>
+                        <outputDirectory>unitils-core/lib</outputDirectory>
                     </dependencySet>
                 </dependencySets>
                 <unpack>false</unpack>
@@ -59,10 +59,10 @@
             </binaries>
         </moduleSet>
 
-        <!-- unitils-dataset -->
+        <!-- unitils-dbmaintainer -->
         <moduleSet>
             <includes>
-                <include>org.unitils:unitils-dataset</include>
+                <include>org.unitils:unitils-dbmaintainer</include>
             </includes>
             <sources>
                 <fileSets>
@@ -75,11 +75,11 @@
                 </fileSets>
             </sources>
             <binaries>
-                <outputDirectory>unitils-dataset</outputDirectory>
+                <outputDirectory>unitils-dbmaintainer</outputDirectory>
                 <dependencySets>
                     <dependencySet>
                         <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>unitils-dataset/lib</outputDirectory>
+                        <outputDirectory>unitils-dbmaintainer/lib</outputDirectory>
                     </dependencySet>
                 </dependencySets>
                 <unpack>false</unpack>
@@ -140,33 +140,6 @@
             </binaries>
         </moduleSet>
 
-        <!-- unitils-hibernate -->
-        <moduleSet>
-            <includes>
-                <include>org.unitils:unitils-hibernate</include>
-            </includes>
-            <sources>
-                <fileSets>
-                    <fileSet>
-                        <includes>
-                            <include>pom.xml</include>
-                            <include>src/main/**</include>
-                        </includes>
-                    </fileSet>
-                </fileSets>
-            </sources>
-            <binaries>
-                <outputDirectory>unitils-hibernate</outputDirectory>
-                <dependencySets>
-                    <dependencySet>
-                        <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>unitils-hibernate/lib</outputDirectory>
-                    </dependencySet>
-                </dependencySets>
-                <unpack>false</unpack>
-            </binaries>
-        </moduleSet>
-
         <!-- unitils-inject -->
         <moduleSet>
             <includes>
@@ -215,14 +188,95 @@
                     <dependencySet>
                         <useProjectArtifact>false</useProjectArtifact>
                         <outputDirectory>unitils-mock/lib</outputDirectory>
-                        <useTransitiveFiltering>true</useTransitiveFiltering>
-                        <excludes>
-                            <exclude>cglib:cglib</exclude>
-                            <exclude>asm:asm</exclude>
-                            <exclude>asm:asm-analysis</exclude>
-                            <exclude>asm:asm-tree</exclude>
-                            <exclude>org.objenesis:objenesis</exclude>
-                        </excludes>
+		    <useTransitiveFiltering>true</useTransitiveFiltering>
+		    <excludes>
+			<exclude>cglib:cglib</exclude>
+                              <exclude>asm:asm</exclude>
+                              <exclude>asm:asm-analysis</exclude>
+                              <exclude>asm:asm-tree</exclude>
+                              <exclude>org.objenesis:objenesis</exclude>
+		    </excludes>
+                    </dependencySet>
+                </dependencySets>
+                <unpack>false</unpack>
+            </binaries>
+        </moduleSet>
+
+        <!-- unitils-orm -->
+        <moduleSet>
+            <includes>
+                <include>org.unitils:unitils-orm</include>
+            </includes>
+            <sources>
+                <fileSets>
+                    <fileSet>
+                        <includes>
+                            <include>pom.xml</include>
+                            <include>src/main/**</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <outputDirectory>unitils-orm</outputDirectory>
+                <dependencySets>
+                    <dependencySet>
+                        <useProjectArtifact>false</useProjectArtifact>
+                        <outputDirectory>unitils-orm/lib</outputDirectory>
+                    </dependencySet>
+                </dependencySets>
+                <unpack>false</unpack>
+            </binaries>
+        </moduleSet>
+
+        <!-- unitils-spring -->
+        <moduleSet>
+            <includes>
+                <include>org.unitils:unitils-spring</include>
+            </includes>
+            <sources>
+                <fileSets>
+                    <fileSet>
+                        <includes>
+                            <include>pom.xml</include>
+                            <include>src/main/**</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <outputDirectory>unitils-spring</outputDirectory>
+                <dependencySets>
+                    <dependencySet>
+                        <useProjectArtifact>false</useProjectArtifact>
+                        <outputDirectory>unitils-spring/lib</outputDirectory>
+                    </dependencySet>
+                </dependencySets>
+                <unpack>false</unpack>
+            </binaries>
+        </moduleSet>
+
+        <!-- unitils-testng -->
+        <moduleSet>
+            <includes>
+                <include>org.unitils:unitils-testng</include>
+            </includes>
+            <sources>
+                <fileSets>
+                    <fileSet>
+                        <includes>
+                            <include>pom.xml</include>
+                            <include>src/main/**</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <outputDirectory>unitils-testng</outputDirectory>
+                <dependencySets>
+                    <dependencySet>
+                        <useProjectArtifact>false</useProjectArtifact>
+                        <outputDirectory>unitils-testng/lib</outputDirectory>
                     </dependencySet>
                 </dependencySets>
                 <unpack>false</unpack>

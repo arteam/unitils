@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,12 @@ import junit.framework.TestCase;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.Properties;
-
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 
 /**
  * Test for {@link ModuleUtils}.
@@ -55,6 +54,7 @@ public class ModuleUtilsTest extends TestCase {
     /**
      * Test the loading of the default values.
      */
+    @SuppressWarnings("unchecked")
     public void testGetAnnotationEnumDefaults() {
         Map<Class<? extends Annotation>, Map<String, String>> result = getAnnotationPropertyDefaults(TestModule.class, configuration, TestAnnotation1.class, TestAnnotation2.class);
 

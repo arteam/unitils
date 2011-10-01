@@ -15,6 +15,7 @@
  */
 package org.unitils.core.util;
 
+import static org.junit.Assert.*;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
@@ -24,8 +25,6 @@ import org.unitils.thirdparty.org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Fabian Krueger
@@ -41,7 +40,6 @@ public class PropertiesReaderTest extends UnitilsJUnit4 {
     private PropertiesReader sut = new PropertiesReader();
 
     private static final String TEST_FILE = "propertiesReaderTest.properties";
-    private static final String TEST_FILE_PATH = "org/unitils/core/util/" + TEST_FILE;
 
 
     @Test
@@ -124,7 +122,7 @@ public class PropertiesReaderTest extends UnitilsJUnit4 {
     @Test
     public void loadPropertiesFileFromClasspath_withExistingFile_shouldReturnProperties()
             throws IOException {
-        Properties returnedProperties = sut.loadPropertiesFileFromClasspath(TEST_FILE_PATH);
+        Properties returnedProperties = sut.loadPropertiesFileFromClasspath(TEST_FILE);
         assertNotNull(returnedProperties);
         assertEquals("some value", returnedProperties.getProperty("testprop"));
     }
@@ -132,11 +130,11 @@ public class PropertiesReaderTest extends UnitilsJUnit4 {
     //-----------------------------------------------------------------------------------
     // Helper
     //-----------------------------------------------------------------------------------
-
     private void copyDummyPropertiesFileToUserHome() throws IOException {
         String userHome = System.getProperty("user.home");
-        String fileToCopy = getClass().getClassLoader().getResource(TEST_FILE_PATH).getPath();
-        FileUtils.copyFileToDirectory(new File(fileToCopy), new File(userHome));
+        String classPath = this.getClass().getClassLoader().getResource(".").getPath();
+        File fileToCopy = new File(classPath + "/" + TEST_FILE);
+        FileUtils.copyFileToDirectory(fileToCopy, new File(userHome));
         File copiedFile = new File(userHome + "/" + TEST_FILE);
         assertTrue("File " + TEST_FILE + " should be in user home.", copiedFile.exists());
     }

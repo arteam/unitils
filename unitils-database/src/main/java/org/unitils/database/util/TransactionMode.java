@@ -45,6 +45,6 @@ public enum TransactionMode {
      * Value indicating that the default behavior is defined by the unitils property
      * <code>DatabaseModule.Transactional.value.default</code> is in use.
      */
-    DEFAULT
+    DEFAULT;
 
 }

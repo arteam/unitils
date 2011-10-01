@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<dataset>
-
-    <PARENT pk1="777" pk2="888" parentColumn="xxxx">
-        <CHILD pk="3" childColumn="child"/>
-    </PARENT>
-
-</dataset>

@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,21 @@ package org.unitils.dbunit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.database.Database;
 import org.dbunit.database.DatabaseConfig;
+import static org.dbunit.database.DatabaseConfig.*;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
-import org.unitils.core.CurrentTestInstance;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
+import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
+import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.DbSupportFactory;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
+import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.core.util.ConfigUtils;
+import static org.unitils.core.util.ConfigUtils.getInstanceOf;
 import org.unitils.database.DatabaseModule;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
@@ -35,6 +41,11 @@ import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import org.unitils.dbunit.util.DataSetAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
+import static org.unitils.util.ModuleUtils.*;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+import static org.unitils.util.ReflectionUtils.getClassWithName;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -42,15 +53,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.*;
-
-import static org.dbunit.database.DatabaseConfig.*;
-import static org.unitils.core.util.ConfigUtils.getInstanceOf;
-import static org.unitils.database.DatabaseUnitils.getDefaultDatabase;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
-import static org.unitils.util.ModuleUtils.*;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-import static org.unitils.util.ReflectionUtils.getClassWithName;
 
 /**
  * Module that provides support for managing database test data using DBUnit.
@@ -249,7 +251,7 @@ public class DbUnitModule implements Module {
                 return;
             }
             // first make sure every database update is flushed to the database
-//            getDatabaseModule().flushDatabaseUpdates(testObject);
+            getDatabaseModule().flushDatabaseUpdates(testObject);
 
             DataSetAssert dataSetAssert = new DataSetAssert();
             for (String schemaName : multiSchemaExpectedDataSet.getSchemaNames()) {
@@ -395,19 +397,21 @@ public class DbUnitModule implements Module {
      * @return A new instance of dbUnit's <code>IDatabaseConnection</code>
      */
     protected DbUnitDatabaseConnection createDbUnitConnection(String schemaName) {
-        Database defaultDatabase = getDefaultDatabase();
-        DataSource dataSource = defaultDatabase.getDataSource();
-        String correctCaseSchemaName = defaultDatabase.toCorrectCaseIdentifier(schemaName);
+        // A DbSupport instance is fetched in order to get the schema name in correct case
+        DataSource dataSource = getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded();
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
+        DbSupport dbSupport = getDbSupport(configuration, sqlHandler, schemaName);
 
         // Create connection
-        DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(dataSource, correctCaseSchemaName);
+        DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(dataSource, dbSupport.getSchemaName());
         DatabaseConfig config = connection.getConfig();
 
         // Make sure that dbunit's correct IDataTypeFactory, that handles dbms specific data type issues, is used
-        IDataTypeFactory dataTypeFactory = getInstanceOf(IDataTypeFactory.class, configuration, defaultDatabase.getDatabaseInfo().getDialect());
+        IDataTypeFactory dataTypeFactory = getInstanceOf(IDataTypeFactory.class, configuration, dbSupport.getDatabaseDialect());
         config.setProperty(PROPERTY_DATATYPE_FACTORY, dataTypeFactory);
         // Make sure that table and column names are escaped using the dbms-specific identifier quote string
-        config.setProperty(PROPERTY_ESCAPE_PATTERN, defaultDatabase.getIdentifierQuoteString() + '?' + defaultDatabase.getIdentifierQuoteString());
+		if (dbSupport.getIdentifierQuoteString() != null)
+			config.setProperty(PROPERTY_ESCAPE_PATTERN, dbSupport.getIdentifierQuoteString() + '?' + dbSupport.getIdentifierQuoteString());
         // Make sure that batched statements are used to insert the data into the database
         config.setProperty(FEATURE_BATCHED_STATEMENTS, "true");
         // Make sure that Oracle's recycled tables (BIN$) are ignored (value is used to ensure dbunit-2.2 compliancy)
@@ -494,7 +498,7 @@ public class DbUnitModule implements Module {
      */
     protected DataSetFactory getDataSetFactory(Class<? extends DataSetFactory> dataSetFactoryClass) {
         DataSetFactory dataSetFactory = createInstanceOfType(dataSetFactoryClass, false);
-        dataSetFactory.init(configuration, getDefaultDatabase().getDefaultSchemaName());
+        dataSetFactory.init(configuration, getDefaultDbSupport().getSchemaName());
         return dataSetFactory;
     }
 
@@ -513,9 +517,25 @@ public class DbUnitModule implements Module {
      * @return The data set resolver, as configured in the Unitils configuration
      */
     protected DataSetResolver getDataSetResolver() {
-        DataSetResolver dataSetResolver = ConfigUtils.getInstanceOf(DataSetResolver.class, configuration);
-        dataSetResolver.init(configuration);
-        return dataSetResolver;
+        return ConfigUtils.getConfiguredInstanceOf(DataSetResolver.class, configuration);
+    }
+
+
+    /**
+     * @return The default DbSupport (the one that connects to the default database schema)
+     */
+    protected DbSupport getDefaultDbSupport() {
+        DataSource dataSource = getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded();
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
+        return DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler);
+    }
+
+
+    /**
+     * @return Implementation of DatabaseModule, on which this module is dependent
+     */
+    protected DatabaseModule getDatabaseModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
     }
 
 
@@ -533,24 +553,17 @@ public class DbUnitModule implements Module {
     protected class DbUnitListener extends TestListener {
 
         @Override
-        public void beforeTest(CurrentTestInstance currentTestInstance) throws Exception {
-            Object testObject = currentTestInstance.getTestObject();
-            Method testMethod = currentTestInstance.getTestMethod();
-
+        public void beforeTestSetUp(Object testObject, Method testMethod) {
             insertDataSet(testMethod, testObject);
         }
 
         @Override
-        public void afterTest(CurrentTestInstance currentTestInstance) throws Exception {
-            Object testObject = currentTestInstance.getTestObject();
-            Method testMethod = currentTestInstance.getTestMethod();
-            Throwable testThrowable = currentTestInstance.getTestThrowable();
-
-            if (testThrowable != null) {
-                return;
+        public void afterTestMethod(Object testObject, Method testMethod, Throwable throwable) {
+            if (throwable == null) {
+                assertDbContentAsExpected(testMethod, testObject);
             }
-            assertDbContentAsExpected(testMethod, testObject);
         }
+
     }
 
 }

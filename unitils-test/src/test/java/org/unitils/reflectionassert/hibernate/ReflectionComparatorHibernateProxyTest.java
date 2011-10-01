@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,32 +19,28 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.SessionFactory;
 import org.junit.After;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
+import static org.unitils.database.SQLUnitils.executeUpdate;
+import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
+import static org.unitils.database.util.TransactionMode.COMMIT;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
+import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.unitils.reflectionassert.ReflectionComparator;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import org.unitils.reflectionassert.difference.Difference;
 import org.unitils.util.PropertyUtils;
 
-import javax.annotation.Resource;
 import javax.sql.DataSource;
-import java.util.Properties;
-
 import static java.util.Arrays.asList;
-import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.unitils.database.SQLUnitils.executeUpdate;
-import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.database.util.TransactionMode.COMMIT;
-import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
+import java.util.Properties;
 
 
 /**
@@ -56,8 +52,6 @@ import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRef
  * @author Filip Neven
  */
 @Transactional(COMMIT)
-@ContextConfiguration
-@TestExecutionListeners(DependencyInjectionTestExecutionListener.class)
 public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
 
     /* The logger instance for this class */
@@ -69,7 +63,7 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
     @TestDataSource
     protected DataSource dataSource;
 
-    @Resource
+    @HibernateSessionFactory("org/unitils/reflectionassert/hibernate/hibernate.cfg.xml")
     protected SessionFactory sessionFactory;
 
     /* Class under test */
@@ -85,7 +79,7 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPERTY_DIALECT, configuration));
+        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
         if (disabled) {
             return;
         }

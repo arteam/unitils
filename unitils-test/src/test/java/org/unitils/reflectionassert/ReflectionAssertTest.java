@@ -202,6 +202,17 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
             assertTrue(a.getMessage().contains("[1, 2]"));
         }
     }
+    
+    
+    @Test
+    public void assertPropertiesNotNullTest_fullySetObject() {
+        ReflectionAssert.assertPropertiesNotNull("properties parentObject ar not fully set", new TestObjectString("", ""));
+    }
+
+    @Test(expected = AssertionError.class)
+    public void assertPropertiesNotNullTestFail() {
+        ReflectionAssert.assertPropertiesNotNull("properties childobject ar not fully set", new TestObjectString(null, ""));
+    }
 
 
     /**
@@ -261,5 +272,4 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
             this.stringValue = stringValue;
         }
     }
-
 }

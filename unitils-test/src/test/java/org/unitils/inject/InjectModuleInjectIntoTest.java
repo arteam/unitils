@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
  */
 package org.unitils.inject;
 
+import static org.junit.Assert.assertSame;
+
+import java.util.Properties;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.inject.annotation.InjectInto;
 import org.unitils.inject.annotation.TestedObject;
-
-import java.util.Properties;
-
-import static org.junit.Assert.assertSame;
 
 /**
  * @author Filip Neven
@@ -111,6 +111,7 @@ public class InjectModuleInjectIntoTest {
     }
 
     public class ToInject {
+
     }
 
     public class InjectOn {

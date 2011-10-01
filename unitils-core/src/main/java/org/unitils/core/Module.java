@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,11 +35,11 @@ public interface Module {
      * @param configuration The config, not null
      */
     void init(Properties configuration);
-
-
+    
+    
     /**
      * Gives the module the opportunity to performs initialization that
-     * can only work after all other modules have been initialized
+     * can only work after all other modules have been initialized  
      */
     void afterInit();
 

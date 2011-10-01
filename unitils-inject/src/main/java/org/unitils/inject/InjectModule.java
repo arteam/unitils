@@ -1,24 +1,25 @@
 /*
- * Copyright Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.inject;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitils.core.CurrentTestInstance;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
@@ -32,6 +33,7 @@ import org.unitils.util.PropertyUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -196,7 +198,7 @@ public class InjectModule implements Module {
 
 
     /**
-     * Restores the values that were stored using {@link #storeValueToRestoreAfterTest}.
+     * Restores the values that were stored using {@link #storeValueToRestoreAfterTest(Class, String, Class, org.unitils.inject.util.PropertyAccess, Object, org.unitils.inject.util.Restore)}.
      */
     public void restoreStaticInjectedObjects() {
         for (ValueToRestore valueToRestore : valuesToRestoreAfterTest) {
@@ -400,7 +402,7 @@ public class InjectModule implements Module {
             valueToRestore = new ValueToRestore(targetClass, property, fieldType, propertyAccess, fieldType.isPrimitive() ? 0 : null);
 
         } else {
-            throw new RuntimeException("Unkown value for " + Restore.class.getSimpleName() + " " + restore);
+            throw new RuntimeException("Unknown value for " + Restore.class.getSimpleName() + " " + restore);
         }
         valuesToRestoreAfterTest.add(valueToRestore);
     }
@@ -420,7 +422,7 @@ public class InjectModule implements Module {
     protected List<Object> getTargets(Class<? extends Annotation> annotationClass, Field annotatedField, String targetName, Object test) {
         List<Object> targets;
         if ("".equals(targetName)) {
-            // Default targetName, so it is probably not specfied. Return all objects that are annotated with the TestedObject annotation.
+            // Default targetName, so it is probably not specified. Return all objects that are annotated with the TestedObject annotation.
             Set<Field> testedObjectFields = getFieldsAnnotatedWith(test.getClass(), TestedObject.class);
             targets = new ArrayList<Object>(testedObjectFields.size());
             for (Field testedObjectField : testedObjectFields) {
@@ -477,10 +479,12 @@ public class InjectModule implements Module {
         /**
          * Before executing a test method (i.e. after the fixture methods), the injection is performed, since
          * objects to inject or targets are possibly instantiated during the fixture.
+         *
+         * @param testObject The test object, not null
+         * @param testMethod The test method, not null
          */
         @Override
-        public void beforeTest(CurrentTestInstance currentTestInstance) throws Exception {
-            Object testObject = currentTestInstance.getTestObject();
+        public void beforeTestMethod(Object testObject, Method testMethod) {
 
             if (createTestedObjectsIfNullEnabled) {
                 createTestedObjectsIfNull(testObject);
@@ -490,9 +494,13 @@ public class InjectModule implements Module {
 
         /**
          * After test execution, if requested restore all values that were replaced in the static injection.
+         *
+         * @param testObject The test object, not null
+         * @param testMethod The test method, not null
+         * @param throwable  The throwable thrown during the test, null if none was thrown
          */
         @Override
-        public void afterTest(CurrentTestInstance currentTestInstance) throws Exception {
+        public void afterTestMethod(Object testObject, Method testMethod, Throwable throwable) {
             restoreStaticInjectedObjects();
         }
     }

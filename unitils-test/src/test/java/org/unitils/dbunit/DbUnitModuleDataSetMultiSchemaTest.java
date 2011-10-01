@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +18,19 @@ package org.unitils.dbunit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
+import static org.unitils.database.SQLUnitils.*;
 import org.unitils.database.annotations.TestDataSource;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
 import java.util.Properties;
-
-import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
-import static org.junit.Assert.assertEquals;
-import static org.unitils.database.SQLUnitils.*;
 
 /**
  * Test class for loading of data sets in mutliple database schemas.
@@ -45,11 +44,14 @@ public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit4 {
     private static Log logger = LogFactory.getLog(DbUnitModuleDataSetMultiSchemaTest.class);
 
     /* Tested object */
-    protected DbUnitModule dbUnitModule;
+    private DbUnitModule dbUnitModule;
 
+    /* The dataSource */
     @TestDataSource
-    protected DataSource dataSource;
-    protected boolean disabled;
+    private DataSource dataSource = null;
+
+    /* True if current test is not for the current dialect */
+    private boolean disabled;
 
 
     /**
@@ -58,7 +60,7 @@ public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPERTY_DIALECT, configuration));
+        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
         if (disabled) {
             return;
         }

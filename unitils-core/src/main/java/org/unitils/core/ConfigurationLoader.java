@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.unitils.core;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbmaintain.config.DbMaintainConfigurationLoader;
 import org.unitils.core.util.PropertiesReader;
 import org.unitils.util.PropertyUtils;
 
@@ -92,7 +91,6 @@ public class ConfigurationLoader {
     public Properties loadConfiguration() {
         Properties properties = new Properties();
 
-        loadDbMaintainConfiguration(properties);
         loadDefaultConfiguration(properties);
         loadCustomConfiguration(properties);
         loadLocalConfiguration(properties);
@@ -101,16 +99,6 @@ public class ConfigurationLoader {
         return properties;
     }
 
-
-    /**
-     * Load the db-maintain properties files.
-     *
-     * @param properties The instance to add to loaded properties to, not null
-     */
-    protected void loadDbMaintainConfiguration(Properties properties) {
-        Properties dbMaintainProperties = new DbMaintainConfigurationLoader().loadConfiguration();
-        properties.putAll(dbMaintainProperties);
-    }
 
     /**
      * Load the default properties file that is distributed with unitils (unitils-default.properties)
@@ -124,6 +112,7 @@ public class ConfigurationLoader {
         }
         properties.putAll(defaultProperties);
     }
+
 
     /**
      * Load the custom project level configuration file (unitils.properties)
@@ -139,6 +128,7 @@ public class ConfigurationLoader {
             properties.putAll(customProperties);
         }
     }
+
 
     /**
      * Load the local configuration file from the user home, or from the classpath
@@ -157,6 +147,7 @@ public class ConfigurationLoader {
             properties.putAll(localProperties);
         }
     }
+
 
     /**
      * Load the environment properties.

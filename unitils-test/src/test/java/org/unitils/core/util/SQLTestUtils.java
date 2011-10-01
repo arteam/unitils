@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package org.unitils.core.util;
 
-import org.dbmaintain.database.Database;
-import org.dbmaintain.util.DbMaintainException;
+import org.unitils.core.UnitilsException;
+import org.unitils.core.dbsupport.DbSupport;
 
 /**
  * Utilities for creating and dropping test tables, views....
@@ -30,16 +30,15 @@ public class SQLTestUtils {
     /**
      * Drops the test tables
      *
-     * @param database   The database, not null
+     * @param dbSupport  The db support, not null
      * @param tableNames The tables to drop
      */
-    public static void dropTestTables(Database database, String... tableNames) {
+    public static void dropTestTables(DbSupport dbSupport, String... tableNames) {
         for (String tableName : tableNames) {
             try {
-                String defaultSchemaName = database.getDefaultSchemaName();
-                String correctCaseTableName = database.toCorrectCaseIdentifier(tableName);
-                database.dropTable(defaultSchemaName, correctCaseTableName);
-            } catch (DbMaintainException e) {
+                String correctCaseTableName = dbSupport.toCorrectCaseIdentifier(tableName);
+                dbSupport.dropTable(correctCaseTableName);
+            } catch (UnitilsException e) {
                 // Ignored
             }
         }
@@ -49,16 +48,15 @@ public class SQLTestUtils {
     /**
      * Drops the test views
      *
-     * @param database  The db support, not null
+     * @param dbSupport The db support, not null
      * @param viewNames The views to drop
      */
-    public static void dropTestViews(Database database, String... viewNames) {
+    public static void dropTestViews(DbSupport dbSupport, String... viewNames) {
         for (String viewName : viewNames) {
             try {
-                String defaultSchemaName = database.getDefaultSchemaName();
-                String correctCaseViewName = database.toCorrectCaseIdentifier(viewName);
-                database.dropView(defaultSchemaName, correctCaseViewName);
-            } catch (DbMaintainException e) {
+                String correctCaseViewName = dbSupport.toCorrectCaseIdentifier(viewName);
+                dbSupport.dropView(correctCaseViewName);
+            } catch (UnitilsException e) {
                 // Ignored
             }
         }
@@ -68,16 +66,15 @@ public class SQLTestUtils {
     /**
      * Drops the test materialized views
      *
-     * @param database              The db support, not null
+     * @param dbSupport             The db support, not null
      * @param materializedViewNames The views to drop
      */
-    public static void dropTestMaterializedViews(Database database, String... materializedViewNames) {
+    public static void dropTestMaterializedViews(DbSupport dbSupport, String... materializedViewNames) {
         for (String materializedViewName : materializedViewNames) {
             try {
-                String defaultSchemaName = database.getDefaultSchemaName();
-                String correctCaseViewName = database.toCorrectCaseIdentifier(materializedViewName);
-                database.dropMaterializedView(defaultSchemaName, correctCaseViewName);
-            } catch (DbMaintainException e) {
+                String correctCaseViewName = dbSupport.toCorrectCaseIdentifier(materializedViewName);
+                dbSupport.dropMaterializedView(correctCaseViewName);
+            } catch (UnitilsException e) {
                 // Ignored
             }
         }
@@ -87,16 +84,15 @@ public class SQLTestUtils {
     /**
      * Drops the test synonyms
      *
-     * @param database     The db support, not null
+     * @param dbSupport    The db support, not null
      * @param synonymNames The views to drop
      */
-    public static void dropTestSynonyms(Database database, String... synonymNames) {
+    public static void dropTestSynonyms(DbSupport dbSupport, String... synonymNames) {
         for (String synonymName : synonymNames) {
             try {
-                String defaultSchemaName = database.getDefaultSchemaName();
-                String correctCaseSynonymName = database.toCorrectCaseIdentifier(synonymName);
-                database.dropSynonym(defaultSchemaName, correctCaseSynonymName);
-            } catch (DbMaintainException e) {
+                String correctCaseSynonymName = dbSupport.toCorrectCaseIdentifier(synonymName);
+                dbSupport.dropSynonym(correctCaseSynonymName);
+            } catch (UnitilsException e) {
                 // Ignored
             }
         }
@@ -106,16 +102,15 @@ public class SQLTestUtils {
     /**
      * Drops the test sequence
      *
-     * @param database      The db support, not null
+     * @param dbSupport     The db support, not null
      * @param sequenceNames The sequences to drop
      */
-    public static void dropTestSequences(Database database, String... sequenceNames) {
+    public static void dropTestSequences(DbSupport dbSupport, String... sequenceNames) {
         for (String sequenceName : sequenceNames) {
             try {
-                String defaultSchemaName = database.getDefaultSchemaName();
-                String correctCaseSequenceName = database.toCorrectCaseIdentifier(sequenceName);
-                database.dropSequence(defaultSchemaName, correctCaseSequenceName);
-            } catch (DbMaintainException e) {
+                String correctCaseSequenceName = dbSupport.toCorrectCaseIdentifier(sequenceName);
+                dbSupport.dropSequence(correctCaseSequenceName);
+            } catch (UnitilsException e) {
                 // Ignored
             }
         }
@@ -125,16 +120,15 @@ public class SQLTestUtils {
     /**
      * Drops the test triggers
      *
-     * @param database     The db support, not null
+     * @param dbSupport    The db support, not null
      * @param triggerNames The triggers to drop
      */
-    public static void dropTestTriggers(Database database, String... triggerNames) {
+    public static void dropTestTriggers(DbSupport dbSupport, String... triggerNames) {
         for (String triggerName : triggerNames) {
             try {
-                String defaultSchemaName = database.getDefaultSchemaName();
-                String correctCaseTriggerName = database.toCorrectCaseIdentifier(triggerName);
-                database.dropTrigger(defaultSchemaName, correctCaseTriggerName);
-            } catch (DbMaintainException e) {
+                String correctCaseTriggerName = dbSupport.toCorrectCaseIdentifier(triggerName);
+                dbSupport.dropTrigger(correctCaseTriggerName);
+            } catch (UnitilsException e) {
                 // Ignored
             }
         }
@@ -144,16 +138,15 @@ public class SQLTestUtils {
     /**
      * Drops the test types
      *
-     * @param database  The db support, not null
+     * @param dbSupport The db support, not null
      * @param typeNames The types to drop
      */
-    public static void dropTestTypes(Database database, String... typeNames) {
+    public static void dropTestTypes(DbSupport dbSupport, String... typeNames) {
         for (String typeName : typeNames) {
             try {
-                String defaultSchemaName = database.getDefaultSchemaName();
-                String correctCaseTypeName = database.toCorrectCaseIdentifier(typeName);
-                database.dropType(defaultSchemaName, correctCaseTypeName);
-            } catch (DbMaintainException e) {
+                String correctCaseTypeName = dbSupport.toCorrectCaseIdentifier(typeName);
+                dbSupport.dropType(correctCaseTypeName);
+            } catch (UnitilsException e) {
                 // Ignored
             }
         }
