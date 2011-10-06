@@ -41,6 +41,7 @@
         <module>unitils-mock</module>
         <module>unitils-orm</module>
         <module>unitils-spring</module>
+	<module>unitils-io</module>
 
         <module>unitils-test</module>
         <!--module>unitils-testng-test</module-->       <!-- todo convert tests to TestNG -->
