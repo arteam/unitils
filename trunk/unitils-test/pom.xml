@@ -90,6 +90,11 @@
             <artifactId>unitils-orm</artifactId>
             <version>${pom.version}</version>
         </dependency>
+         <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-io</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-spring</artifactId>
