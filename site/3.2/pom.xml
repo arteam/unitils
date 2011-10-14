@@ -31,6 +31,9 @@
                             <version>1.0</version>
                         </dependency>
                     </dependencies>
+			<configuration>
+				<templateFile>${basedir}/maven-site-unitils.mv</templateFile>
+			</configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
