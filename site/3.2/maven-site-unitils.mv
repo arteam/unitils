@@ -505,7 +505,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=${outputEncoding}" />
     <title>$title</title>
     <style type="text/css" media="all">
-	  @import url("relativePath/v1/css/screen.css")
+	  @import url("http://www.cleanjava.org/blog/wp-content/themes/Prestij/css/screen.css")
       @import url("$relativePath/css/maven-base.css");
       @import url("$relativePath/css/maven-theme.css");
       @import url("$relativePath/v1/css/topMenu.css");
