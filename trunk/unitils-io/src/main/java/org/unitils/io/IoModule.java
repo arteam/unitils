@@ -36,10 +36,12 @@ import org.unitils.util.ReflectionUtils;
  * specified in the annotation will be loaded in the property. A property
  * annotation with {@link FileContent} should always be a String
  * 
+ * 
+ * 
  * Example:
  * 
  * <pre>
- * &#064;FileContent(classPathLocation = &quot;be/smals/file.txt&quot;)
+ * &#064;FileContent(location = &quot;be/smals/file.txt&quot;)
  * private String fileContent;
  * </pre>
  * 
@@ -51,62 +53,38 @@ import org.unitils.util.ReflectionUtils;
  */
 public class IoModule implements Module {
 
-	private static final String CONVERSION_STRATEGY_KEY = "org.unitils.io.conversion";
-	private static final String READER_STRATEGY_KEY = "org.unitils.io.reader";
-
 	private FileContentTestListener testListener;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(FileContentTestListener.class);
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(FileContentTestListener.class);
 
 	public TestListener getTestListener() {
 		return testListener;
 	}
 
 	public void init(Properties properties) {
-		testListener = new FileContentTestListener();
-		HashMap<Object, ConversionStrategy<?>> conversionStrategiesMap = new HashMap<Object, ConversionStrategy<?>>();
+		testListener = initFileContentListener(properties);
 
-		List<ConversionStrategy<?>> strategies = resolveConverstionStrategies(properties);
-
-		for (ConversionStrategy<?> tmp : strategies) {
-			conversionStrategiesMap.put(tmp.getDefaultEndClass(), tmp);
-		}
-
-		testListener.setConversionStrategiesMap(conversionStrategiesMap);
-		testListener.setDefaultReadingStrategy(resolveReadingStrategy(properties));
-
-		LOGGER.debug("IoModule succesfully loaded. ");
 	}
 
-	private ReadingStrategy resolveReadingStrategy(Properties properties) {
-		String className = properties.getProperty(READER_STRATEGY_KEY);
-		return ReflectionUtils.createInstanceOfType(className.trim(), false);
-	}
+	private FileContentTestListener initFileContentListener(
+			Properties properties) {
+		return FileContentTestListenerFactory
+				.createFileContentTestListener(properties);
 
-	private List<ConversionStrategy<?>> resolveConverstionStrategies(Properties properties) {
-		String conversionStrategiesString = properties.getProperty(CONVERSION_STRATEGY_KEY);
-
-		String[] split = conversionStrategiesString.split(",");
-
-		List<ConversionStrategy<?>> result = new ArrayList<ConversionStrategy<?>>(split.length);
-
-		for (String className : split) {
-			ConversionStrategy<?> conversionStrategy = ReflectionUtils.createInstanceOfType(className.trim(), false);
-			result.add(conversionStrategy);
-		}
-
-		return result;
 	}
 
 	public void afterInit() {
-		// Nothing todo for now.
+		LOGGER.debug("IoModule succesfully loaded. ");
 	}
 
 	protected class FileUtilListener extends TestListener {
 
+		private FileContentTestListener fileContentListener = new FileContentTestListener();
+
 		@Override
 		public void beforeTestSetUp(Object testObject, Method testMethod) {
-			new FileContentTestListener().beforeTestSetUp(testObject, testMethod);
+			fileContentListener.beforeTestSetUp(testObject, testMethod);
 		}
 
 	}

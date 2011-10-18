@@ -22,6 +22,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.unitils.io.conversion.ConversionStrategy;
+
 /**
  * 
  * @author Jeroen Horemans
@@ -62,4 +64,8 @@ public @interface FileContent {
 	 */
 	String encoding() default "";
 
+    Class<? extends ConversionStrategy> conversionStrategy()  default ConversionStrategy.class ;
+    
+    
+	
 }
