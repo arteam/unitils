@@ -55,7 +55,9 @@ public class FileContentTestListener extends TestListener {
 	 */
 	public void executeActions(Object testObject, Method testMethod) {
 
-		Set<Field> fieldsAnnotatedWith = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), FileContent.class);
+		Set<Field> fieldsAnnotatedWith = AnnotationUtils
+				.getFieldsAnnotatedWith(testObject.getClass(),
+						FileContent.class);
 
 		for (Field field : fieldsAnnotatedWith) {
 			handleField(testObject, field);
@@ -69,13 +71,16 @@ public class FileContentTestListener extends TestListener {
 		String encoding = determineEncoding(field);
 
 		try {
-			InputStream inputStream = readingStrategy.handleFile(field, testObject, conversionStrategy.getDefaultPostFix());
+			InputStream inputStream = readingStrategy.handleFile(field,
+					testObject, conversionStrategy.getDefaultPostFix());
 
-			Object result = conversionStrategy.readContent(inputStream, encoding);
+			Object result = conversionStrategy.readContent(inputStream,
+					encoding);
 
 			ReflectionUtils.setFieldValue(testObject, field, result);
 		} catch (Exception e) {
-			throw new UnitilsException("Error reading file for  " + field.getName(), e);
+			throw new UnitilsException("Error reading file for  "
+					+ field.getName(), e);
 		}
 	}
 
@@ -84,10 +89,16 @@ public class FileContentTestListener extends TestListener {
 		return "UTF-8";
 	}
 
-	private ConversionStrategy<?> determineConversionStrategy(Field field) {
+	protected ConversionStrategy<?> determineConversionStrategy(Field field) {
 
-		ConversionStrategy<?> strategy = conversionStrategiesMap.get(field.getType());
-		return strategy;
+		FileContent annotation = field.getAnnotation(FileContent.class);
+		if (! annotation.conversionStrategy().isInterface()) {
+			return (ConversionStrategy<?>) ReflectionUtils.createInstanceOfType(
+					annotation.conversionStrategy(), true);
+		}
+
+		return conversionStrategiesMap.get(field.getType());
+
 	}
 
 	private ReadingStrategy determineReadingStrategy(Field field) {
@@ -98,7 +109,8 @@ public class FileContentTestListener extends TestListener {
 		this.defaultReadingStrategy = defaultReadingStrategy;
 	}
 
-	public void setConversionStrategiesMap(HashMap<Object, ConversionStrategy<?>> conversionStrategiesMap) {
+	public void setConversionStrategiesMap(
+			HashMap<Object, ConversionStrategy<?>> conversionStrategiesMap) {
 		this.conversionStrategiesMap = conversionStrategiesMap;
 	}
 

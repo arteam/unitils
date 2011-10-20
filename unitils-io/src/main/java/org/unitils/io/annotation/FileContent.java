@@ -37,7 +37,8 @@ import org.unitils.io.conversion.ConversionStrategy;
 public @interface FileContent {
 
 	/**
-	 * Classpath location of a file
+	 * File location of a file, this can be relative to the workspace, or an
+	 * absolute path.
 	 * 
 	 * @return
 	 */
@@ -64,8 +65,6 @@ public @interface FileContent {
 	 */
 	String encoding() default "";
 
-    Class<? extends ConversionStrategy> conversionStrategy()  default ConversionStrategy.class ;
-    
-    
-	
+	Class<? extends ConversionStrategy> conversionStrategy() default ConversionStrategy.class;
+
 }
