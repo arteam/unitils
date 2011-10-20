@@ -61,13 +61,16 @@ public class FileContentTestListenerTest {
 	public void testDefaultPropertyLoad() {
 		DefaultTestStub testObject = new DefaultTestStub();
 
-		Field field = ReflectionUtils.getFieldsOfType(DefaultTestStub.class, Properties.class, false).iterator().next();
+		Field field = ReflectionUtils
+				.getFieldsOfType(DefaultTestStub.class, Properties.class, false)
+				.iterator().next();
 
 		listener.handleField(testObject, field);
 
 		Properties result = testObject.defaultProperties;
 		Assert.assertNotNull(result);
-		Assert.assertEquals("text file", result.get("FileContentTestListenerTest"));
+		Assert.assertEquals("text file",
+				result.get("FileContentTestListenerTest"));
 
 	}
 
@@ -75,7 +78,9 @@ public class FileContentTestListenerTest {
 	public void testDefaultStringLoad() {
 		DefaultTestStub testObject = new DefaultTestStub();
 
-		Field field = ReflectionUtils.getFieldsOfType(DefaultTestStub.class, String.class, false).iterator().next();
+		Field field = ReflectionUtils
+				.getFieldsOfType(DefaultTestStub.class, String.class, false)
+				.iterator().next();
 
 		listener.handleField(testObject, field);
 
@@ -88,13 +93,16 @@ public class FileContentTestListenerTest {
 	public void testHardCodedPropertyLoad() {
 		HardCodeTestStub testObject = new HardCodeTestStub();
 
-		Field field = ReflectionUtils.getFieldsOfType(HardCodeTestStub.class, Properties.class, false).iterator().next();
+		Field field = ReflectionUtils
+				.getFieldsOfType(HardCodeTestStub.class, Properties.class,
+						false).iterator().next();
 
 		listener.handleField(testObject, field);
 
 		Properties result = testObject.defaultProperties;
 		Assert.assertNotNull(result);
-		Assert.assertEquals("pub file", result.get("FileContentTestListenerTest"));
+		Assert.assertEquals("pub file",
+				result.get("FileContentTestListenerTest"));
 
 	}
 
@@ -102,13 +110,26 @@ public class FileContentTestListenerTest {
 	public void testHardCodedStringLoad() {
 		HardCodeTestStub testObject = new HardCodeTestStub();
 
-		Field field = ReflectionUtils.getFieldsOfType(HardCodeTestStub.class, String.class, false).iterator().next();
+		Field field = ReflectionUtils
+				.getFieldsOfType(HardCodeTestStub.class, String.class, false)
+				.iterator().next();
 
 		listener.handleField(testObject, field);
 
 		String result = testObject.defaultString;
 		Assert.assertEquals("FileContentTestListenerTest=pub file", result);
 
+	}
+
+	@Test
+	public void testDetermineConversionStrategy() throws Exception {
+
+		Field field = ReflectionUtils
+				.getFieldsOfType(HardCodedDifferentConversionStrategyStub.class, Object.class, false)
+				.iterator().next();
+		ConversionStrategy<?> result = listener.determineConversionStrategy(field);
+		Assert.assertTrue(result instanceof DummyConversionStrategy);
+		
 	}
 
 	private class DefaultTestStub {
@@ -127,4 +148,10 @@ public class FileContentTestListenerTest {
 
 	}
 
+	public class HardCodedDifferentConversionStrategyStub{
+		
+		@FileContent(conversionStrategy=DummyConversionStrategy.class)
+		Object justSomeObject;
+	}
+	
 }
