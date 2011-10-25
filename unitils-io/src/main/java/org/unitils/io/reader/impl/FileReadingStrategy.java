@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package org.unitils.io.reader;
+package org.unitils.io.reader.impl;
 
 import org.unitils.core.UnitilsException;
 import org.unitils.io.annotation.FileContent;
+import org.unitils.io.reader.ReadingStrategy;
 
 import java.io.IOException;
 import java.io.InputStream;

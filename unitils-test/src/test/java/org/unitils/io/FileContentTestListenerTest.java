@@ -20,9 +20,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.io.annotation.FileContent;
 import org.unitils.io.conversion.ConversionStrategy;
-import org.unitils.io.conversion.PropertiesConversionStrategy;
-import org.unitils.io.conversion.StringConversionStrategy;
-import org.unitils.io.reader.FileReadingStrategy;
+import org.unitils.io.conversion.impl.PropertiesConversionStrategy;
+import org.unitils.io.conversion.impl.StringConversionStrategy;
+import org.unitils.io.reader.impl.FileReadingStrategy;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
