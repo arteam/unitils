@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2011,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,77 +16,44 @@
 
 package org.unitils.io;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
-import org.unitils.io.annotation.FileContent;
-import org.unitils.io.conversion.ConversionStrategy;
-import org.unitils.io.reader.ReadingStrategy;
-import org.unitils.util.ReflectionUtils;
+
+import java.util.Properties;
 
 /**
  * Will listen for the @FileContent annotation in tests. The content of the file
  * specified in the annotation will be loaded in the property. A property
- * annotation with {@link FileContent} should always be a String
- * 
- * 
- * 
+ * annotation with {@link @FileContent} should always be a String
+ * <br>
  * Example:
- * 
+ *
  * <pre>
  * &#064;FileContent(location = &quot;be/smals/file.txt&quot;)
  * private String fileContent;
  * </pre>
- * 
+ *
  * @author Jeroen Horema
  * @author Thomas De Rycke
- * 
  * @since 3.3
- * 
  */
 public class IoModule implements Module {
 
-	private FileContentTestListener testListener;
+    private FileContentTestListener testListener;
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(FileContentTestListener.class);
+    public TestListener getTestListener() {
+        return testListener;
+    }
 
-	public TestListener getTestListener() {
-		return testListener;
-	}
+    public void init(Properties properties) {
+        testListener = initFileContentListener(properties);
+    }
 
-	public void init(Properties properties) {
-		testListener = initFileContentListener(properties);
+    private FileContentTestListener initFileContentListener(Properties properties) {
+        return FileContentTestListenerFactory.createFileContentTestListener(properties);
+    }
 
-	}
-
-	private FileContentTestListener initFileContentListener(
-			Properties properties) {
-		return FileContentTestListenerFactory
-				.createFileContentTestListener(properties);
-
-	}
-
-	public void afterInit() {
-		LOGGER.debug("IoModule succesfully loaded. ");
-	}
-
-	protected class FileUtilListener extends TestListener {
-
-		private FileContentTestListener fileContentListener = new FileContentTestListener();
-
-		@Override
-		public void beforeTestSetUp(Object testObject, Method testMethod) {
-			fileContentListener.beforeTestSetUp(testObject, testMethod);
-		}
-
-	}
+    public void afterInit() {
+    }
 
 }

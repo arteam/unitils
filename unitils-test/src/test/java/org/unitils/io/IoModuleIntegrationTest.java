@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2011,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,34 +16,31 @@
 
 package org.unitils.io;
 
-import java.util.Properties;
-
-import junit.framework.Assert;
-
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.io.annotation.FileContent;
 
+import java.util.Properties;
+
+import static junit.framework.Assert.assertEquals;
+
 /**
- * 
  * @author Jeroen Horemans
  * @author Thomas De Rycke
- * 
  * @since 3.3
- * 
  */
 public class IoModuleIntegrationTest extends UnitilsJUnit4 {
 
-	@FileContent
-	public String fileContent;
+    @FileContent
+    public String fileContent;
 
-	@FileContent
-	public Properties propertiesContent;
+    @FileContent
+    public Properties propertiesContent;
 
-	@Test
-	public void filledUpValuesTest() {
-		Assert.assertEquals("testFile", fileContent);
-		Assert.assertEquals("testFile", propertiesContent.getProperty("testFile"));
-	}
+    @Test
+    public void filledUpValuesTest() {
+        assertEquals("testFile", fileContent);
+        assertEquals("testFile", propertiesContent.getProperty("testFile"));
+    }
 
 }

@@ -41,7 +41,7 @@
         <module>unitils-mock</module>
         <module>unitils-orm</module>
         <module>unitils-spring</module>
-	<module>unitils-io</module>
+        <module>unitils-io</module>
 
         <module>unitils-test</module>
         <!--module>unitils-testng-test</module-->       <!-- todo convert tests to TestNG -->
@@ -134,7 +134,7 @@
                     <tagBase>https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases</tagBase>
                     <mavenExecutorId>forked-path</mavenExecutorId>
                 </configuration>
-            </plugin>     
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>

@@ -17,11 +17,6 @@
             <artifactId>unitils-core</artifactId>
             <version>${pom.version}</version>
         </dependency>
-               <dependency>
-            <groupId>org.unitils</groupId>
-            <artifactId>unitils-database</artifactId>
-            <version>${pom.version}</version>
-        </dependency>
     </dependencies>
 
 </project>
