@@ -1,4 +1,5 @@
-/* Copyright 2008,  Unitils.org
+/*
+ * Copyright 2011,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,31 +16,27 @@
 
 package org.unitils.io;
 
+import org.unitils.io.conversion.ConversionStrategy;
+
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.unitils.io.conversion.ConversionStrategy;
-
 /**
- * 
  * @author Jeroen Horemans
  * @author Thomas De Rycke
- * 
  * @since 3.3
- * 
  */
 public class DummyConversionStrategy implements ConversionStrategy<Object> {
 
-	public Object readContent(InputStream inputStream, String encoding)
-			throws IOException {
-		return new Object();
-	}
+    public Object readContent(InputStream inputStream, String encoding) throws IOException {
+        return new Object();
+    }
 
-	public String getDefaultPostFix() {
-		return "dummy";
-	}
+    public String getDefaultPostFix() {
+        return "dummy";
+    }
 
-	public Class<Object> getDefaultEndClass() {
-		return Object.class;
-	}
+    public Class<Object> getDefaultEndClass() {
+        return Object.class;
+    }
 }

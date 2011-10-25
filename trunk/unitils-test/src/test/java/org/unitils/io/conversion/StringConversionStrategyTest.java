@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2011,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,59 +16,54 @@
 
 package org.unitils.io.conversion;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import static org.junit.Assert.assertEquals;
 
 /**
- * 
  * @author Jeroen Horemans
  * @author Thomas De Rycke
- * 
  * @since 3.3
- * 
  */
 @RunWith(Parameterized.class)
 public class StringConversionStrategyTest {
-	
-	private StringConversionStrategy conversion = new StringConversionStrategy();
 
-	private String input;
-	private String encoding;
+    private StringConversionStrategy conversion = new StringConversionStrategy();
 
-	public StringConversionStrategyTest(String input, String encoding) {
-		this.input = input;
-		this.encoding = encoding;
-	}
+    private String input;
+    private String encoding;
 
-	@Parameters
-	public static Collection<Object[]> getParameters() {
-		List<Object[]> l = new ArrayList<Object[]>();
-		l.add(new Object[] { "testtest", "utf-8" });
-		l.add(new Object[] { "test=€é*ù¨´ù]:~e;[=+", "Cp1252" });
-		l.add(new Object[] { "test=€é*ù¨´ù]:~e;[=+", "utf-16" });
-		// Apparently the ISO-8859-1 does not support the euro sign.
-		l.add(new Object[] { "test=é*ù¨´ù]:~e;[=+", "ISO8859_1" });
-		
+    public StringConversionStrategyTest(String input, String encoding) {
+        this.input = input;
+        this.encoding = encoding;
+    }
 
-		return l;
-	}
+    @Parameters
+    public static Collection<Object[]> getParameters() {
+        List<Object[]> l = new ArrayList<Object[]>();
+        l.add(new Object[]{"testtest", "utf-8"});
+        l.add(new Object[]{"test=€é*ù¨´ù]:~e;[=+", "Cp1252"});
+        l.add(new Object[]{"test=€é*ù¨´ù]:~e;[=+", "utf-16"});
+        // Apparently the ISO-8859-1 does not support the euro sign.
+        l.add(new Object[]{"test=é*ù¨´ù]:~e;[=+", "ISO8859_1"});
+        return l;
+    }
 
-	@Test
-	public void testSuccesWithoutEncoding() throws IOException {
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes(encoding));
+    @Test
+    public void testSuccesWithoutEncoding() throws IOException {
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes(encoding));
 
-		String result = conversion.readContent(inputStream, encoding);
-		
-		Assert.assertEquals(input, result.toString());
+        String result = conversion.readContent(inputStream, encoding);
 
-	}
+        assertEquals(input, result);
+    }
 }

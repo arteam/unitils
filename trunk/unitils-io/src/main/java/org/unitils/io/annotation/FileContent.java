@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2011,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,55 +16,49 @@
 
 package org.unitils.io.annotation;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import org.unitils.io.conversion.ConversionStrategy;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import org.unitils.io.conversion.ConversionStrategy;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * 
  * @author Jeroen Horemans
  * @author Thomas De Rycke
- * 
  * @since 3.3
- * 
  */
 @Target(FIELD)
 @Retention(RUNTIME)
 public @interface FileContent {
 
-	/**
-	 * File location of a file, this can be relative to the workspace, or an
-	 * absolute path.
-	 * 
-	 * @return
-	 */
-	String location() default "";
+    /**
+     * @return File location of a file, this can be relative to the workspace, or an absolute path.
+     */
+    String location() default "";
 
-	/**
-	 * Enconding to be used when reading the file. If no encoding is specified
-	 * the default JVM encoding will be used
-	 * 
-	 * Possible values:
-	 * 
-	 * <pre>
-	 *     Charset
-	 *      Description
-	 *         US-ASCII Seven-bit ASCII, a.k.a. ISO646-US, a.k.a. the Basic Latin block of the Unicode character set 
-	 *         ISO-8859-1   ISO Latin Alphabet No. 1, a.k.a. ISO-LATIN-1 
-	 *         UTF-8 Eight-bit UCS Transformation Format 
-	 *         UTF-16BE Sixteen-bit UCS Transformation Format, big-endian byte order 
-	 *         UTF-16LE Sixteen-bit UCS Transformation Format, little-endian byte order 
-	 *         UTF-16 Sixteen-bit UCS Transformation Format, byte order identified by an optional byte-order mark
-	 * </pre>
-	 * 
-	 * @return encoding
-	 */
-	String encoding() default "";
+    /**
+     * Enconding to be used when reading the file. If no encoding is specified
+     * the default JVM encoding will be used
+     *
+     * Possible values:
+     *
+     * <pre>
+     *     Charset
+     *      Description
+     *         US-ASCII Seven-bit ASCII, a.k.a. ISO646-US, a.k.a. the Basic Latin block of the Unicode character set
+     *         ISO-8859-1   ISO Latin Alphabet No. 1, a.k.a. ISO-LATIN-1
+     *         UTF-8 Eight-bit UCS Transformation Format
+     *         UTF-16BE Sixteen-bit UCS Transformation Format, big-endian byte order
+     *         UTF-16LE Sixteen-bit UCS Transformation Format, little-endian byte order
+     *         UTF-16 Sixteen-bit UCS Transformation Format, byte order identified by an optional byte-order mark
+     * </pre>
+     *
+     * @return encoding
+     */
+    String encoding() default "";
 
-	Class<? extends ConversionStrategy> conversionStrategy() default ConversionStrategy.class;
+    Class<? extends ConversionStrategy> conversionStrategy() default ConversionStrategy.class;
 
 }
