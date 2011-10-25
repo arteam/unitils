@@ -14,32 +14,37 @@
  * limitations under the License.
  */
 
-package org.unitils.io.conversion;
+package org.unitils.io.conversion.impl;
+
+import org.unitils.io.conversion.ConversionStrategy;
+import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Properties;
+import java.io.StringWriter;
 
 /**
  * @author Jeroen Horemans
  * @author Thomas De Rycke
  * @since 3.3
  */
-public class PropertiesConversionStrategy implements ConversionStrategy<Properties> {
+public class StringConversionStrategy implements ConversionStrategy<String> {
 
-    public Properties readContent(InputStream inputStream, String encoding) throws IOException {
-        Properties result = new Properties();
-        result.load(new InputStreamReader(inputStream, encoding));
-        return result;
+    public String readContent(InputStream inputStream, String encoding) throws IOException {
+        StringWriter writer = new StringWriter();
+        InputStreamReader in = new InputStreamReader(inputStream, encoding);
+
+        IOUtils.copy(in, writer);
+        return writer.toString();
     }
 
     public String getDefaultPostFix() {
-        return "properties";
+        return "txt";
     }
 
-    public Class<Properties> getDefaultEndClass() {
-        return Properties.class;
+    public Class<String> getDefaultEndClass() {
+        return String.class;
     }
 
 }

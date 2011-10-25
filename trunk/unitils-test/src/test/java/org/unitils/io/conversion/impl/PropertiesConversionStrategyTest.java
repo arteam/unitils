@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.unitils.io.conversion;
+package org.unitils.io.conversion.impl;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.unitils.io.conversion.impl.PropertiesConversionStrategy;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
