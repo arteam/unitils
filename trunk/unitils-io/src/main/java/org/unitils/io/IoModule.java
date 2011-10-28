@@ -27,7 +27,7 @@ import java.util.Properties;
  * annotation with {@link @FileContent} should always be a String
  * <br>
  * Example:
- *
+ * <p/>
  * <pre>
  * &#064;FileContent(location = &quot;be/smals/file.txt&quot;)
  * private String fileContent;
@@ -35,6 +35,7 @@ import java.util.Properties;
  *
  * @author Jeroen Horema
  * @author Thomas De Rycke
+ * @author Tim Ducheyne
  * @since 3.3
  */
 public class IoModule implements Module {

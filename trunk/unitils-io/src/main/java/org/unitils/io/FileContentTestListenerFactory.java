@@ -19,28 +19,27 @@ package org.unitils.io;
 import org.unitils.io.conversion.ConversionStrategy;
 import org.unitils.io.reader.ReadingStrategy;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
 public class FileContentTestListenerFactory {
 
-    private static final String CONVERSION_STRATEGY_KEY = "org.unitils.io.conversion";
-    private static final String READER_STRATEGY_KEY = "org.unitils.io.reader";
+    protected static final String DEFAULT_CONVERSION_STRATEGY_KEY = "IoModule.conversion.default";
+    protected static final String CUSTOM_CONVERSION_STRATEGY_KEY = "IoModule.conversion.custom";
+    protected static final String READER_STRATEGY_KEY = "IoModule.reader.default";
+    protected static final String DEFAULT_FILE_ENCODING = "IoModule.encoding.default";
 
     public static FileContentTestListener createFileContentTestListener(Properties properties) {
         FileContentTestListener result = new FileContentTestListener();
         HashMap<Object, ConversionStrategy<?>> conversionStrategiesMap = new HashMap<Object, ConversionStrategy<?>>();
 
-        List<ConversionStrategy<?>> strategies = resolveConversationStrategies(properties);
-        for (ConversionStrategy<?> tmp : strategies) {
-            conversionStrategiesMap.put(tmp.getDefaultEndClass(), tmp);
-        }
+        List<ConversionStrategy<?>> strategies = new LinkedList<ConversionStrategy<?>>();
+        strategies.addAll(resolveConversationStrategies(properties, DEFAULT_CONVERSION_STRATEGY_KEY));
+        strategies.addAll(resolveConversationStrategies(properties, CUSTOM_CONVERSION_STRATEGY_KEY));
 
-        result.setConversionStrategiesMap(conversionStrategiesMap);
+        result.setConversionStrategiesList(strategies);
+        result.setDefaultEncoding(properties.getProperty(DEFAULT_FILE_ENCODING));
         result.setDefaultReadingStrategy(resolveReadingStrategy(properties));
         return result;
     }
@@ -50,16 +49,19 @@ public class FileContentTestListenerFactory {
         return createInstanceOfType(className.trim(), false);
     }
 
-    private static List<ConversionStrategy<?>> resolveConversationStrategies(Properties properties) {
-        String conversionStrategiesString = properties.getProperty(CONVERSION_STRATEGY_KEY);
+
+    protected static List<ConversionStrategy<?>> resolveConversationStrategies(Properties properties, String key) {
+        String conversionStrategiesString = properties.getProperty(key);
 
         String[] split = conversionStrategiesString.split(",");
 
         List<ConversionStrategy<?>> result = new ArrayList<ConversionStrategy<?>>(split.length);
 
         for (String className : split) {
-            ConversionStrategy<?> conversionStrategy = createInstanceOfType(className.trim(), false);
-            result.add(conversionStrategy);
+            if (className != null && !className.trim().isEmpty()) {
+                ConversionStrategy<?> conversionStrategy = createInstanceOfType(className.trim(), false);
+                result.add(conversionStrategy);
+            }
         }
         return result;
     }

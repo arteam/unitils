@@ -25,7 +25,7 @@ import org.unitils.io.reader.ReadingStrategy;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
@@ -41,7 +41,9 @@ public class FileContentTestListener extends TestListener {
 
     private ReadingStrategy defaultReadingStrategy;
 
-    private HashMap<Object, ConversionStrategy<?>> conversionStrategiesMap;
+    private List<ConversionStrategy<?>> conversionStrategiesList;
+
+    private String defaultEncoding;
 
     @Override
     public void beforeTestSetUp(Object testObject, Method testMethod) {
@@ -61,7 +63,7 @@ public class FileContentTestListener extends TestListener {
         ConversionStrategy<?> conversionStrategy = determineConversionStrategy(field);
         String encoding = determineEncoding(field);
         try {
-            InputStream inputStream = readingStrategy.handleFile(field, testObject, conversionStrategy.getDefaultPostFix());
+            InputStream inputStream = readingStrategy.handleFile(field, testObject, conversionStrategy.getFileExtension());
             Object result = conversionStrategy.readContent(inputStream, encoding);
             setFieldValue(testObject, field, result);
 
@@ -71,8 +73,12 @@ public class FileContentTestListener extends TestListener {
     }
 
     private String determineEncoding(Field field) {
-        // TODO encoding should be found according to the known hierarchy.
-        return "UTF-8";
+        FileContent annotation = field.getAnnotation(FileContent.class);
+        if (annotation.encoding() != null && !annotation.encoding().isEmpty()) {
+            return annotation.encoding();
+        }
+
+        return defaultEncoding;
     }
 
     protected ConversionStrategy<?> determineConversionStrategy(Field field) {
@@ -80,7 +86,12 @@ public class FileContentTestListener extends TestListener {
         if (!annotation.conversionStrategy().isInterface()) {
             return (ConversionStrategy<?>) createInstanceOfType(annotation.conversionStrategy(), true);
         }
-        return conversionStrategiesMap.get(field.getType());
+        for (ConversionStrategy tmp : conversionStrategiesList) {
+            if (tmp.getDefaultEndClass().equals(field.getType())) {
+                return tmp;
+            }
+        }
+        throw new UnitilsException("Unable to determinate conversion strategy for field " + field.getType());
     }
 
     private ReadingStrategy determineReadingStrategy(Field field) {
@@ -91,8 +102,15 @@ public class FileContentTestListener extends TestListener {
         this.defaultReadingStrategy = defaultReadingStrategy;
     }
 
-    public void setConversionStrategiesMap(HashMap<Object, ConversionStrategy<?>> conversionStrategiesMap) {
-        this.conversionStrategiesMap = conversionStrategiesMap;
+    public void setConversionStrategiesList(List<ConversionStrategy<?>> conversionStrategiesList) {
+        this.conversionStrategiesList = conversionStrategiesList;
     }
 
+    protected List<ConversionStrategy<?>> getConversionStrategiesList() {
+        return conversionStrategiesList;
+    }
+
+    public void setDefaultEncoding(String defaultEncoding) {
+        this.defaultEncoding = defaultEncoding;
+    }
 }
