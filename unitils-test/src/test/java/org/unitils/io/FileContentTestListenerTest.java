@@ -25,7 +25,8 @@ import org.unitils.io.conversion.impl.StringConversionStrategy;
 import org.unitils.io.reader.impl.FileReadingStrategy;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import static junit.framework.Assert.*;
@@ -44,11 +45,12 @@ public class FileContentTestListenerTest {
     public void setUp() {
         listener = new FileContentTestListener();
 
-        HashMap<Object, ConversionStrategy<?>> conversions = new HashMap<Object, ConversionStrategy<?>>();
-        conversions.put(Properties.class, new PropertiesConversionStrategy());
-        conversions.put(String.class, new StringConversionStrategy());
+        List<ConversionStrategy<?>> conversions = new ArrayList<ConversionStrategy<?>>();
+        conversions.add(new PropertiesConversionStrategy());
+        conversions.add(new StringConversionStrategy());
 
-        listener.setConversionStrategiesMap(conversions);
+        listener.setConversionStrategiesList(conversions);
+        listener.setDefaultEncoding("Cp1252");
 
         FileReadingStrategy readingStrategy = new FileReadingStrategy();
         listener.setDefaultReadingStrategy(readingStrategy);
@@ -59,13 +61,16 @@ public class FileContentTestListenerTest {
         DefaultTestStub testObject = new DefaultTestStub();
 
         Field field = getFieldsOfType(DefaultTestStub.class, Properties.class, false).iterator().next();
+
         listener.handleField(testObject, field);
+
 
         Properties result = testObject.defaultProperties;
         assertNotNull(result);
         assertEquals("text file", result.get("FileContentTestListenerTest"));
 
     }
+
 
     @Test
     public void testDefaultStringLoad() {

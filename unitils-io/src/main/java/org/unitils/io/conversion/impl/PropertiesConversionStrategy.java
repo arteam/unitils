@@ -16,14 +16,18 @@
 
 package org.unitils.io.conversion.impl;
 
+import org.unitils.io.conversion.ConversionStrategy;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
 
-import org.unitils.io.conversion.ConversionStrategy;
-
 /**
+ * This conversion strategy will try to convert the inputstream into a Properties. The default file extension for this
+ * conversion strategy is txt. So when not overriding the default file when using the @FileContent the file should.
+ * end with '.txt' .
+ *
  * @author Jeroen Horemans
  * @author Thomas De Rycke
  * @since 3.3
@@ -36,7 +40,7 @@ public class PropertiesConversionStrategy implements ConversionStrategy<Properti
         return result;
     }
 
-    public String getDefaultPostFix() {
+    public String getFileExtension() {
         return "properties";
     }
 

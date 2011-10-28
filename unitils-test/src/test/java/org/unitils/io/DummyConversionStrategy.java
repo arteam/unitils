@@ -32,7 +32,7 @@ public class DummyConversionStrategy implements ConversionStrategy<Object> {
         return new Object();
     }
 
-    public String getDefaultPostFix() {
+    public String getFileExtension() {
         return "dummy";
     }
 

@@ -25,6 +25,29 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
+ * Annotation indication a file should be loaded into the annotated object.
+ * <p/>
+ * The @FileContent will try to load a file (or other resource depending on the ReadingStrategy) into the annotated object.
+ * When the location is left blank, the module will search for the file having the same filename and path as the test.
+ * <p/>
+ * so for example
+ * <pre><code>
+ * '
+ *      public class MyTestClass extends UnitilsJUnit4 {
+ *      @FileContent
+ *      String someContent;
+ * <p/>
+ *      ...
+ *      }
+ *    </code></pre>
+ * In this case the io module wil fill up the string someContent by the value in the file foudn in the path :
+ * org/unitils/io/MyTestClass.txt
+ * <p/>
+ * When filling in the location parameter in the FileContent will override the default and that file will be loaded
+ * into the variable.
+ * <p/>
+ * //TODO add an example for properties and check the syntax of the sentences
+ *
  * @author Jeroen Horemans
  * @author Thomas De Rycke
  * @since 3.3
@@ -41,9 +64,9 @@ public @interface FileContent {
     /**
      * Enconding to be used when reading the file. If no encoding is specified
      * the default JVM encoding will be used
-     *
+     * <p/>
      * Possible values:
-     *
+     * <p/>
      * <pre>
      *     Charset
      *      Description

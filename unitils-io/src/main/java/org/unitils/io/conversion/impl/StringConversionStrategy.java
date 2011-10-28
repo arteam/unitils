@@ -25,6 +25,10 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 
 /**
+ * This conversion strategy will try to convert the inputstream into a String. The default file extension for this
+ * conversion strategy is txt. So when not overriding the default file when using the @FileContent the file should
+ * end with '.txt' .
+ *
  * @author Jeroen Horemans
  * @author Thomas De Rycke
  * @since 3.3
@@ -39,7 +43,7 @@ public class StringConversionStrategy implements ConversionStrategy<String> {
         return writer.toString();
     }
 
-    public String getDefaultPostFix() {
+    public String getFileExtension() {
         return "txt";
     }
 
