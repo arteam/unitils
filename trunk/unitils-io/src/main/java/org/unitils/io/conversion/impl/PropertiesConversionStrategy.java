@@ -34,17 +34,19 @@ import java.util.Properties;
  */
 public class PropertiesConversionStrategy implements ConversionStrategy<Properties> {
 
+
     public Properties readContent(InputStream inputStream, String encoding) throws IOException {
         Properties result = new Properties();
         result.load(new InputStreamReader(inputStream, encoding));
         return result;
     }
 
-    public String getFileExtension() {
+
+    public String getDefaultFileExtension() {
         return "properties";
     }
 
-    public Class<Properties> getDefaultEndClass() {
+    public Class<Properties> getTargetType() {
         return Properties.class;
     }
 

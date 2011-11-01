@@ -14,25 +14,33 @@
  * limitations under the License.
  */
 
-package org.unitils.io.conversion;
+package org.unitils.io;
 
-import java.io.IOException;
-import java.io.InputStream;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.io.annotation.FileContent;
+
+import java.util.Properties;
+
+import static junit.framework.Assert.assertEquals;
 
 /**
- * A conversion strategy converts the given input stream to the object specified (T). It will consider the given
- * encoding doing the conversion.
- *
  * @author Jeroen Horemans
  * @author Thomas De Rycke
  * @since 3.3
  */
-public interface ConversionStrategy<T> {
+public class IOModuleIntegrationTest extends UnitilsJUnit4 {
 
-    T readContent(InputStream inputStream, String encoding) throws IOException;
+    @FileContent
+    protected String fileContent;
 
-    String getDefaultFileExtension();
+    @FileContent
+    protected Properties propertiesContent;
 
-    Class<T> getTargetType();
+    @Test
+    public void filledUpValuesTest() {
+        assertEquals("testFile", fileContent);
+        assertEquals("testFile", propertiesContent.getProperty("testFile"));
+    }
 
 }

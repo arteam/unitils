@@ -15,16 +15,14 @@
  */
 package org.unitils.dbunit.datasetfactory.impl;
 
-import org.unitils.core.UnitilsException;
-import org.unitils.core.util.BaseConfigurable;
+import org.unitils.core.util.FileResolver;
 import org.unitils.dbunit.datasetfactory.DataSetResolver;
-import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.toFile;
-import static org.unitils.util.PropertyUtils.getBoolean;
-import static org.unitils.util.PropertyUtils.getString;
 
 import java.io.File;
-import java.net.URL;
 import java.util.Properties;
+
+import static org.unitils.util.PropertyUtils.getBoolean;
+import static org.unitils.util.PropertyUtils.getString;
 
 /**
  * Resolves the location for a data set with a certain name.
@@ -50,8 +48,6 @@ import java.util.Properties;
  * <p/>
  * path prefix /c:/datasets  --> looks for c:/datasets/myDataSet.xml on the file system
  * path prefix datasets      --> looks for datasets/myDataSet.xml on the classpath
- * <p/>
- * Special thanks to Tuomas Jormola for the input and code contribution for resolving data sets.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -59,25 +55,13 @@ import java.util.Properties;
  */
 public class DefaultDataSetResolver implements DataSetResolver {
 
-    /**
-     * Property key for the path prefix
-     */
+    /* Property key for the path prefix */
     public static final String PROPKEY_PREFIX_WITH_PACKAGE_NAME = "dbUnit.datasetresolver.prefixWithPackageName";
-
-    /**
-     * Property key for the path prefix
-     */
+    /* Property key for the path prefix */
     public static final String PROPKEY_DATA_SET_PATH_PREFIX = "dbUnit.datasetresolver.pathPrefix";
 
-    /**
-     * True if the file name should be prefixed with the package name of the test class.
-     */
-    protected boolean prefixWithPackageName;
-
-    /**
-     * An optional path prefix for the file name.
-     */
-    protected String pathPrefix;
+    /* The actual file resolver */
+    protected FileResolver fileResolver;
 
 
     /**
@@ -86,10 +70,11 @@ public class DefaultDataSetResolver implements DataSetResolver {
      * @param configuration The configuration, not null
      */
     public void init(Properties configuration) {
-        this.prefixWithPackageName = getBoolean(PROPKEY_PREFIX_WITH_PACKAGE_NAME, configuration);
-        this.pathPrefix = getString(PROPKEY_DATA_SET_PATH_PREFIX, null, configuration);
-    }
+        boolean prefixWithPackageName = getBoolean(PROPKEY_PREFIX_WITH_PACKAGE_NAME, configuration);
+        String pathPrefix = getString(PROPKEY_DATA_SET_PATH_PREFIX, null, configuration);
 
+        this.fileResolver = new FileResolver(prefixWithPackageName, pathPrefix);
+    }
 
     /**
      * Resolves the location for a data set with a certain name.
@@ -100,67 +85,7 @@ public class DefaultDataSetResolver implements DataSetResolver {
      * @return The data set file, not null
      */
     public File resolve(Class<?> testClass, String dataSetName) {
-        // construct file name
-        String dataSetFileName = getDataSetFileName(testClass, dataSetName);
-
-        // if name starts with / treat it as absolute path
-        if (dataSetFileName.startsWith("/")) {
-            File dataSetFile = new File(dataSetFileName);
-            if (!dataSetFile.exists()) {
-                throw new UnitilsException("DataSet file with name " + dataSetFileName + " cannot be found");
-            }
-            return dataSetFile;
-        }
-
-        // find file in classpath
-        URL dataSetUrl = testClass.getResource('/' + dataSetFileName);
-        if (dataSetUrl == null) {
-            throw new UnitilsException("DataSet file with name " + dataSetFileName + " cannot be found");
-        }
-        return toFile(dataSetUrl);
-    }
-
-
-    /**
-     * Get the file name for the data set.
-     *
-     * @param testClass   The test class, not null
-     * @param dataSetName The data set name, not null
-     * @return The file name, not null
-     */
-    protected String getDataSetFileName(Class<?> testClass, String dataSetName) {
-        // prefix with package name if name does not start with /
-        if (prefixWithPackageName && !dataSetName.startsWith("/")) {
-            dataSetName = prefixPackageNameFilePath(testClass, dataSetName);
-        }
-        // remove first char if it's a /
-        if (dataSetName.startsWith("/")) {
-            dataSetName = dataSetName.substring(1);
-        }
-        // add configured prefix
-        if (pathPrefix != null) {
-            dataSetName = pathPrefix + '/' + dataSetName;
-        }
-        return dataSetName;
-    }
-
-
-    /**
-     * Prefix the package name of the test to the name of the data set (replacing . with /).
-     *
-     * @param testClass   The test, not null
-     * @param dataSetName The data set name, not null
-     * @return The data set name with the package name prefix, not null
-     */
-    protected String prefixPackageNameFilePath(Class<?> testClass, String dataSetName) {
-        String className = testClass.getName();
-        int indexOfLastDot = className.lastIndexOf('.');
-        if (indexOfLastDot == -1) {
-            return dataSetName;
-        }
-
-        String packageName = className.substring(0, indexOfLastDot).replace('.', '/');
-        return packageName + '/' + dataSetName;
+        return new File(fileResolver.resolveFileName(dataSetName, testClass));
     }
 
 }

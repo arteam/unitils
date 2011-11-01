@@ -18,7 +18,6 @@ package org.unitils.io.reader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 
 /**
  * @author Jeroen Horemans
@@ -27,5 +26,8 @@ import java.lang.reflect.Field;
  */
 public interface ReadingStrategy {
 
-    InputStream handleFile(Field field, Object testObject, String extension) throws IOException;
+    InputStream getDefaultInputStream(String extension, Class<?> testClass) throws IOException;
+
+    InputStream getInputStream(String fileName, Class<?> testClass) throws IOException;
+
 }
