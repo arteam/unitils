@@ -14,25 +14,15 @@
  * limitations under the License.
  */
 
-package org.unitils.io.conversion;
+package org.unitils.io.reader;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.Properties;
 
 /**
- * A conversion strategy converts the given input stream to the object specified (T). It will consider the given
- * encoding doing the conversion.
- *
- * @author Jeroen Horemans
- * @author Thomas De Rycke
- * @since 3.3
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
-public interface ConversionStrategy<T> {
+public interface FileResolvingStrategyFactory {
 
-    T readContent(InputStream inputStream, String encoding) throws IOException;
-
-    String getDefaultFileExtension();
-
-    Class<T> getTargetType();
-
+    FileResolvingStrategy createFileResolvingStrategy(Properties configuration);
 }

@@ -16,13 +16,12 @@
 
 package org.unitils.io.reader.impl;
 
-import org.unitils.core.UnitilsException;
-import org.unitils.io.annotation.FileContent;
+import org.unitils.io.reader.FileResolvingStrategy;
 import org.unitils.io.reader.ReadingStrategy;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
+import java.net.URI;
 
 /**
  * @author Jeroen Horemans
@@ -31,39 +30,21 @@ import java.lang.reflect.Field;
  */
 public class FileReadingStrategy implements ReadingStrategy {
 
-    public InputStream handleFile(Field field, Object testObject, String extension) throws IOException {
-        FileContent annotation = field.getAnnotation(FileContent.class);
+    protected FileResolvingStrategy fileResolvingStrategy;
 
-        String fileName;
-        if (annotation.location().isEmpty()) {
-            fileName = prefixPackageNameFilePath(testObject.getClass(), resolveFileName(testObject, extension));
 
-        } else {
-            fileName = annotation.location();
-        }
-
-        InputStream result = this.getClass().getClassLoader().getResourceAsStream(fileName);
-        if (result == null) {
-            throw new UnitilsException(fileName + " not found.");
-        }
-        return result;
+    public FileReadingStrategy(FileResolvingStrategy fileResolvingStrategy) {
+        this.fileResolvingStrategy = fileResolvingStrategy;
     }
 
-    protected String resolveFileName(Object testObject, String extension) {
-        // TODO code is almost the same as in the DbunitModule at line
-        // 448, so this should be refactored.
-        String className = testObject.getClass().getName();
-        return className.substring(className.lastIndexOf(".") + 1, className.length()) + '.' + extension;
+
+    public InputStream getDefaultInputStream(String extension, Class<?> testClass) throws IOException {
+        URI fileURI = fileResolvingStrategy.resolveDefaultFileName(extension, testClass);
+        return fileURI.toURL().openStream();
     }
 
-    protected String prefixPackageNameFilePath(Class<?> testClass, String fileName) {
-        String className = testClass.getName();
-        int indexOfLastDot = className.lastIndexOf('.');
-        if (indexOfLastDot == -1) {
-            return fileName;
-        }
-
-        String packageName = className.substring(0, indexOfLastDot).replace('.', '/');
-        return packageName + '/' + fileName;
+    public InputStream getInputStream(String fileName, Class<?> testClass) throws IOException {
+        URI fileURI = fileResolvingStrategy.resolveFileName(fileName, testClass);
+        return fileURI.toURL().openStream();
     }
 }

@@ -35,6 +35,7 @@ import java.io.StringWriter;
  */
 public class StringConversionStrategy implements ConversionStrategy<String> {
 
+
     public String readContent(InputStream inputStream, String encoding) throws IOException {
         StringWriter writer = new StringWriter();
         InputStreamReader in = new InputStreamReader(inputStream, encoding);
@@ -43,11 +44,12 @@ public class StringConversionStrategy implements ConversionStrategy<String> {
         return writer.toString();
     }
 
-    public String getFileExtension() {
+
+    public String getDefaultFileExtension() {
         return "txt";
     }
 
-    public Class<String> getDefaultEndClass() {
+    public Class<String> getTargetType() {
         return String.class;
     }
 

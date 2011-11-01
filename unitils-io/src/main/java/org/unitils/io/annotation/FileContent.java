@@ -40,7 +40,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *      ...
  *      }
  *    </code></pre>
- * In this case the io module wil fill up the string someContent by the value in the file foudn in the path :
+ * In this case the io module wil fill up the string someContent by the value in the file found in the path :
  * org/unitils/io/MyTestClass.txt
  * <p/>
  * When filling in the location parameter in the FileContent will override the default and that file will be loaded
@@ -59,7 +59,7 @@ public @interface FileContent {
     /**
      * @return File location of a file, this can be relative to the workspace, or an absolute path.
      */
-    String location() default "";
+    String value() default "";
 
     /**
      * Enconding to be used when reading the file. If no encoding is specified

@@ -32,11 +32,11 @@ public class DummyConversionStrategy implements ConversionStrategy<Object> {
         return new Object();
     }
 
-    public String getFileExtension() {
+    public String getDefaultFileExtension() {
         return "dummy";
     }
 
-    public Class<Object> getDefaultEndClass() {
+    public Class<Object> getTargetType() {
         return Object.class;
     }
 }
