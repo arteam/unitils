@@ -35,6 +35,7 @@
 			<item name="reflection assert" href="tutorial-reflectionassert.html" />
 			<item name="mock" href="tutorial-mock.html" />
 			<item name="inject" href="tutorial-inject.html" />
+            <item name="io" href="tutorial-io.html"/>
 			<item name="database" href="tutorial-database.html" />
 			<item name="dbmaintain" href="tutorial-dbmaintain.html" />
 			<item name="hibernate" href="tutorial-hibernate.html" />

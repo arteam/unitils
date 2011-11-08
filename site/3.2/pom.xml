@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -9,6 +10,7 @@
 
     <name>Unitils</name>
     <url>http://www.unitils.org/</url>
+
 
     <licenses>
         <license>
@@ -31,9 +33,9 @@
                             <version>1.0</version>
                         </dependency>
                     </dependencies>
-			<configuration>
-				<templateFile>${basedir}/maven-site-unitils.mv</templateFile>
-			</configuration>
+                    <configuration>
+                        <templateFile>${basedir}/maven-site-unitils.mv</templateFile>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -110,6 +112,13 @@
             <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: easy -->
+        <!-- START SNIPPET: io -->
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-io</artifactId>
+            <version>3.3-SNAPSHOT</version>
+        </dependency>
+        <!-- END SNIPPET: io-->
     </dependencies>
 
     <!-- Report generation -->

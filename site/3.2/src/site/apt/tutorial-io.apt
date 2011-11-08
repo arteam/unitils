@@ -1,0 +1,34 @@
+Injection
+
+* {Installation}
+~~~~~~~~~~~~~~~~
+    If you are using maven, you can add following dependency to your project.
+
+%{include|source=pom.xml|id=io|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    If you are not using maven you can download the unitils-with-dependencies.zip. The required jar, unitils-io.jar, can be
+    found in the unitils-io folder, the required dependencies, in the unitils-io/lib folder.
+
+
+* {Injecting objects}
+~~~~~~~~~~~~~~~~~~~~~
+    Unitils offers some utility methods to read files into object. The types currently supported are txt files to a
+    java.lang.String and Properties file to a java.util.Properties
+
+
+** {The defaults}
+
+   The String annotated with <FileContent> will be filled up with the file that can be found in the same filepath and
+   the same name as the test. Instead of *.java the extension should be *.txt .
+
+   The Property annotated with <FileContent> will be filled up with the file that can be found in the same filepath and
+   the same name as the test. Instead of *.java the extension should be *.properties .
+
+   The <FileContent> can take a encoding as input. All default java encoding can be used. If the jre supports it, so does
+   unitils.
+
+%{include|source=org/unitils/io/example1/MyFileTest.java|id=fileContent|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+   TODO
+
+%{include|source=org/unitils/io/example2/MyFileTest.java|id=fileContent|verbatim=true|set-first-line=1|pad-line-numbers=2}

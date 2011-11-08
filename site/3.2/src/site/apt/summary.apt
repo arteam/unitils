@@ -39,6 +39,12 @@ Summary
         * Inject into static fields, e.g. singletons, and automatically reset the old value after the test
 
         []
+    {{{tutorial-io.html} Io module}} - <Easily files in the variables of the test>
+
+        * Load files into objects
+
+        []
+
 
     {{{tutorial-database.html} Database testing}} - <Support for testing with databases and loading of DbUnit data sets>
 
