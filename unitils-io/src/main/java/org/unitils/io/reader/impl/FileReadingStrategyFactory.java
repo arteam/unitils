@@ -27,8 +27,11 @@ import static org.unitils.core.util.ConfigUtils.getInstanceOf;
 
 /**
  * @author Tim Ducheyne
+ * @author Jeroen Horemans
+ * @since 3.3
  */
 public class FileReadingStrategyFactory implements ReadingStrategyFactory {
+
 
     public ReadingStrategy createReadingStrategy(Properties configuration) {
         FileResolvingStrategyFactory fileResolvingStrategyFactory = getInstanceOf(FileResolvingStrategyFactory.class, configuration);

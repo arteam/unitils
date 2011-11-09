@@ -19,12 +19,19 @@ package org.unitils.io.annotation.handler;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.core.UnitilsException;
+import org.unitils.io.annotation.FileContent;
 import org.unitils.io.filecontent.FileContentReader;
 import org.unitils.mock.Mock;
 
+import java.util.Properties;
+
+import static org.junit.Assert.*;
+import static org.unitils.mock.ArgumentMatchers.isNull;
+
 /**
+ * @author Tim Ducheyne
  * @author Jeroen Horemans
- * @author Thomas De Rycke
  * @since 3.3
  */
 public class FileContentAnnotationHandlerTest extends UnitilsJUnit4 {
@@ -33,97 +40,87 @@ public class FileContentAnnotationHandlerTest extends UnitilsJUnit4 {
     private FileContentAnnotationHandler fileContentAnnotationHandler;
 
     private Mock<FileContentReader> fileContentReaderMock;
+    private Properties testProperties = new Properties();
+
 
     @Before
     public void initialize() {
         fileContentAnnotationHandler = new FileContentAnnotationHandler(fileContentReaderMock.getMock());
     }
 
-    @Test
-    public void todo() {
 
+    @Test
+    public void defaultValues() {
+        DefaultValuesTestClass testObject = new DefaultValuesTestClass();
+        fileContentReaderMock.returns(testProperties).readFileContent(isNull(String.class), Properties.class, isNull(String.class), DefaultValuesTestClass.class);
+
+        fileContentAnnotationHandler.beforeTestSetUp(testObject, null);
+        assertSame(testProperties, testObject.properties);
     }
 
-//    @Test
-//    public void testDefaultPropertyLoad() {
-//        DefaultTestStub testObject = new DefaultTestStub();
-//
-//        Field field = getFieldsOfType(DefaultTestStub.class, Properties.class, false).iterator().next();
-//
-//        fileContentAnnotationHandler.readFileContentForField(testObject, field);
-//
-//
-//        Properties result = testObject.defaultProperties;
-//        assertNotNull(result);
-//        assertEquals("text file", result.get("FileContentTestListenerTest"));
-//
-//    }
-//
-//
-//    @Test
-//    public void testDefaultStringLoad() {
-//        DefaultTestStub testObject = new DefaultTestStub();
-//
-//        Field field = getFieldsOfType(DefaultTestStub.class, String.class, false).iterator().next();
-//        fileContentAnnotationHandler.readFileContentForField(testObject, field);
-//
-//        String result = testObject.defaultString;
-//        assertEquals("The FileContentTestLisener txt test file", result);
-//
-//    }
-//
-//    @Test
-//    public void testHardCodedPropertyLoad() {
-//        HardCodeTestStub testObject = new HardCodeTestStub();
-//
-//        Field field = getFieldsOfType(HardCodeTestStub.class, Properties.class, false).iterator().next();
-//        fileContentAnnotationHandler.readFileContentForField(testObject, field);
-//
-//        Properties result = testObject.defaultProperties;
-//        assertNotNull(result);
-//        assertEquals("pub file", result.get("FileContentTestListenerTest"));
-//
-//    }
-//
-//    @Test
-//    public void testHardCodedStringLoad() {
-//        HardCodeTestStub testObject = new HardCodeTestStub();
-//
-//        Field field = getFieldsOfType(HardCodeTestStub.class, String.class, false).iterator().next();
-//        fileContentAnnotationHandler.readFileContentForField(testObject, field);
-//
-//        String result = testObject.defaultString;
-//        assertEquals("FileContentTestListenerTest=pub file", result);
-//    }
-//
-//    @Test
-//    public void testDetermineConversionStrategy() throws Exception {
-//
-//        Field field = getFieldsOfType(HardCodedDifferentConversionStrategyStub.class, Object.class, false).iterator().next();
-//        ConversionStrategy<?> result = fileContentAnnotationHandler.determineConversionStrategy(field);
-//        assertTrue(result instanceof DummyConversionStrategy);
-//    }
-//
-//    private class DefaultTestStub {
-//        @FileContent
-//        Properties defaultProperties;
-//        @FileContent
-//        String defaultString;
-//
-//    }
-//
-//    private class HardCodeTestStub {
-//        @FileContent("org/unitils/io/hardcodefile.pub")
-//        Properties defaultProperties;
-//        @FileContent("org/unitils/io/hardcodefile.pub")
-//        String defaultString;
-//
-//    }
-//
-//    public class HardCodedDifferentConversionStrategyStub {
-//
-//        @FileContent(conversionStrategy = DummyConversionStrategy.class)
-//        Object justSomeObject;
-//    }
+    @Test
+    public void fileNameSpecified() {
+        FileNameSpecifiedTestClass testObject = new FileNameSpecifiedTestClass();
+        fileContentReaderMock.returns(testProperties).readFileContent("fileName", Properties.class, isNull(String.class), FileNameSpecifiedTestClass.class);
 
+        fileContentAnnotationHandler.beforeTestSetUp(testObject, null);
+        assertSame(testProperties, testObject.properties);
+    }
+
+    @Test
+    public void encodingSpecified() {
+        EncodingSpecifiedTestClass testObject = new EncodingSpecifiedTestClass();
+        fileContentReaderMock.returns(testProperties).readFileContent(isNull(String.class), Properties.class, "encoding", EncodingSpecifiedTestClass.class);
+
+        fileContentAnnotationHandler.beforeTestSetUp(testObject, null);
+        assertSame(testProperties, testObject.properties);
+    }
+
+    @Test
+    public void noAnnotations() {
+        NoAnnotationTestClass testObject = new NoAnnotationTestClass();
+
+        fileContentAnnotationHandler.beforeTestSetUp(testObject, null);
+        fileContentReaderMock.assertNotInvoked().readFileContent(isNull(String.class), Properties.class, isNull(String.class), NoAnnotationTestClass.class);
+    }
+
+    @Test
+    public void exception() {
+        NullPointerException exception = new NullPointerException();
+        DefaultValuesTestClass testObject = new DefaultValuesTestClass();
+        fileContentReaderMock.raises(exception).readFileContent(null, Properties.class, null, DefaultValuesTestClass.class);
+
+        try {
+            fileContentAnnotationHandler.beforeTestSetUp(testObject, null);
+            fail("UnitilsException expected");
+
+        } catch (UnitilsException e) {
+            assertSame(exception, e.getCause());
+            assertNull(testObject.properties);
+        }
+    }
+
+
+    private static class DefaultValuesTestClass {
+
+        @FileContent
+        protected Properties properties;
+    }
+
+    private static class FileNameSpecifiedTestClass {
+
+        @FileContent("fileName")
+        protected Properties properties;
+    }
+
+    private static class EncodingSpecifiedTestClass {
+
+        @FileContent(encoding = "encoding")
+        protected Properties properties;
+    }
+
+    private static class NoAnnotationTestClass {
+
+        protected Properties properties;
+    }
 }

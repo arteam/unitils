@@ -17,56 +17,39 @@
 package org.unitils.io.conversion.impl;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-import org.unitils.io.conversion.impl.PropertiesConversionStrategy;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 
 /**
  * @author Jeroen Horemans
+ * @author Tim Ducheyne
  * @author Thomas De Rycke
  * @since 3.3
  */
-@RunWith(Parameterized.class)
 public class PropertiesConversionStrategyTest {
 
+    /* Tested object */
     private PropertiesConversionStrategy conversion = new PropertiesConversionStrategy();
 
-    private String input;
-    private String encoding;
+    private String input = "test=€é*ù¨´ù]:~e;[=+";
 
-    @Parameters
-    public static Collection<Object[]> getParameters() {
-        List<Object[]> l = new ArrayList<Object[]>();
-        l.add(new Object[]{"test=€é*ù¨´ù]:~e;[=+", "utf-8"});
-        l.add(new Object[]{"test=€é*ù¨´ù]:~e;[=+", "Cp1252"});
-        l.add(new Object[]{"test=€é*ù¨´ù]:~e;[=+", "utf-16"});
-        // Apparently the ISO-8859-1 does not support the euro sign.
-        l.add(new Object[]{"test=é*ù¨ù]:~e;[=+:", "ISO8859_1"});
-
-        return l;
-    }
-
-    public PropertiesConversionStrategyTest(String input, String encoding) {
-        this.input = input;
-        this.encoding = encoding;
-    }
 
     @Test
-    public void testSuccesWithoutEncoding() throws IOException {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes(encoding));
+    public void validEncoding() throws IOException {
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes("utf-8"));
 
-        Properties result = conversion.readContent(inputStream, encoding);
-
+        Properties result = conversion.convertContent(inputStream, "utf-8");
         assertEquals("{" + input + "}", result.toString());
+    }
+
+    @Test(expected = UnsupportedEncodingException.class)
+    public void invalidEncoding() throws IOException {
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
+        conversion.convertContent(inputStream, "xxxx");
     }
 }

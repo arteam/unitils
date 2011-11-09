@@ -36,7 +36,6 @@ import static org.unitils.util.ReflectionUtils.setFieldValue;
  * @author Jeroen Horemans
  * @author Tim Ducheyne
  * @author Thomas De Rycke
- * @author Filip Neven
  * @since 3.3
  */
 public class FileContentAnnotationHandler extends TestListener {

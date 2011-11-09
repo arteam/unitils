@@ -32,11 +32,16 @@ import static org.unitils.util.PropertyUtils.getString;
 import static org.unitils.util.PropertyUtils.getStringList;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
+/**
+ * @author Tim Ducheyne
+ * @author Jeroen Horemans
+ * @since 3.3
+ */
 public class DefaultFileContentReaderFactory implements FileContentReaderFactory {
 
-    public static final String DEFAULT_CONVERSION_STRATEGY_KEY = "IoModule.conversion.default";
-    public static final String CUSTOM_CONVERSION_STRATEGY_KEY = "IoModule.conversion.custom";
-    public static final String DEFAULT_FILE_ENCODING = "IoModule.encoding.default";
+    public static final String DEFAULT_CONVERSION_STRATEGY_KEY = "IOModule.conversion.default";
+    public static final String CUSTOM_CONVERSION_STRATEGY_KEY = "IOModule.conversion.custom";
+    public static final String DEFAULT_FILE_ENCODING = "IOModule.encoding.default";
 
 
     public FileContentReader createFileContentReader(Properties configuration) {

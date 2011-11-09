@@ -20,7 +20,8 @@ import java.net.URI;
 
 /**
  * @author Tim Ducheyne
- * @author Filip Neven
+ * @author Jeroen Horemans
+ * @since 3.3
  */
 public interface FileResolvingStrategy {
 

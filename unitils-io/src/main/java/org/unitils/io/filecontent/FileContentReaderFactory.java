@@ -18,6 +18,11 @@ package org.unitils.io.filecontent;
 
 import java.util.Properties;
 
+/**
+ * @author Tim Ducheyne
+ * @author Jeroen Horemans
+ * @since 3.3
+ */
 public interface FileContentReaderFactory {
 
     FileContentReader createFileContentReader(Properties configuration);

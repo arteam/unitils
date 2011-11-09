@@ -23,12 +23,13 @@ import java.io.InputStream;
 
 /**
  * @author Jeroen Horemans
+ * @author Tim Ducheyne
  * @author Thomas De Rycke
  * @since 3.3
  */
 public class DummyConversionStrategy implements ConversionStrategy<Object> {
 
-    public Object readContent(InputStream inputStream, String encoding) throws IOException {
+    public Object convertContent(InputStream inputStream, String encoding) throws IOException {
         return new Object();
     }
 

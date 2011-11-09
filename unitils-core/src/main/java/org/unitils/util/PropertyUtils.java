@@ -16,11 +16,12 @@
 package org.unitils.util;
 
 import org.unitils.core.UnitilsException;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
 /**
  * Utilities for working with property files.
@@ -125,7 +126,7 @@ public class PropertyUtils {
         if (value == null || "".equals(value.trim())) {
             throw new UnitilsException("No value found for property " + propertyName);
         }
-        return Boolean.valueOf(value.trim());
+        return toBoolean(propertyName, value);
     }
 
 
@@ -143,7 +144,18 @@ public class PropertyUtils {
         if (value == null || "".equals(value.trim())) {
             return defaultValue;
         }
-        return Boolean.valueOf(value.trim());
+        return toBoolean(propertyName, value);
+    }
+
+    private static boolean toBoolean(String propertyName, String value) {
+        value = value.trim();
+        if ("true".equalsIgnoreCase(value)) {
+            return true;
+        }
+        if ("false".equalsIgnoreCase(value)) {
+            return false;
+        }
+        throw new UnitilsException("Value " + value + " for property " + propertyName + " is not a boolean.");
     }
 
 

@@ -40,8 +40,8 @@ import static org.unitils.core.util.ConfigUtils.getInstanceOf;
  * </pre>
  *
  * @author Jeroen Horema
- * @author Thomas De Rycke
  * @author Tim Ducheyne
+ * @author Thomas De Rycke
  * @since 3.3
  */
 public class IOModule implements Module {
