@@ -17,54 +17,38 @@
 package org.unitils.io.conversion.impl;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-import org.unitils.io.conversion.impl.StringConversionStrategy;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.io.UnsupportedEncodingException;
 
 import static org.junit.Assert.assertEquals;
 
 /**
  * @author Jeroen Horemans
+ * @author Tim Ducheyne
  * @author Thomas De Rycke
  * @since 3.3
  */
-@RunWith(Parameterized.class)
 public class StringConversionStrategyTest {
 
+    /* Tested object */
     private StringConversionStrategy conversion = new StringConversionStrategy();
 
-    private String input;
-    private String encoding;
+    private String input = "€é*ù¨´ù]:~e;[=+";
 
-    public StringConversionStrategyTest(String input, String encoding) {
-        this.input = input;
-        this.encoding = encoding;
-    }
-
-    @Parameters
-    public static Collection<Object[]> getParameters() {
-        List<Object[]> l = new ArrayList<Object[]>();
-        l.add(new Object[]{"testtest", "utf-8"});
-        l.add(new Object[]{"test=€é*ù¨´ù]:~e;[=+", "Cp1252"});
-        l.add(new Object[]{"test=€é*ù¨´ù]:~e;[=+", "utf-16"});
-        // Apparently the ISO-8859-1 does not support the euro sign.
-        l.add(new Object[]{"test=é*ù¨´ù]:~e;[=+", "ISO8859_1"});
-        return l;
-    }
 
     @Test
-    public void testSuccesWithoutEncoding() throws IOException {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes(encoding));
+    public void validEncoding() throws IOException {
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes("utf-8"));
 
-        String result = conversion.readContent(inputStream, encoding);
-
+        String result = conversion.convertContent(inputStream, "utf-8");
         assertEquals(input, result);
+    }
+
+    @Test(expected = UnsupportedEncodingException.class)
+    public void invalidEncoding() throws IOException {
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
+        conversion.convertContent(inputStream, "xxxx");
     }
 }

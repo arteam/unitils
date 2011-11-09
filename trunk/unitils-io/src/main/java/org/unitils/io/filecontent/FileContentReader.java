@@ -18,6 +18,7 @@ package org.unitils.io.filecontent;
 
 /**
  * @author Jeroen Horemans
+ * @author Tim Ducheyne
  * @author Thomas De Rycke
  * @since 3.3
  */

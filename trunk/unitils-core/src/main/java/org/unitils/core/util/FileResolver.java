@@ -124,6 +124,13 @@ public class FileResolver {
         }
     }
 
+    public boolean isPrefixWithPackageName() {
+        return prefixWithPackageName;
+    }
+
+    public String getPathPrefix() {
+        return pathPrefix;
+    }
 
     /**
      * Get the full file name depending on the package prefixing and path prefix.

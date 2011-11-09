@@ -25,18 +25,19 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 
 /**
- * This conversion strategy will try to convert the inputstream into a String. The default file extension for this
+ * This conversion strategy will try to convert the input stream into a String. The default file extension for this
  * conversion strategy is txt. So when not overriding the default file when using the @FileContent the file should
  * end with '.txt' .
  *
  * @author Jeroen Horemans
+ * @author Tim Ducheyne
  * @author Thomas De Rycke
  * @since 3.3
  */
 public class StringConversionStrategy implements ConversionStrategy<String> {
 
 
-    public String readContent(InputStream inputStream, String encoding) throws IOException {
+    public String convertContent(InputStream inputStream, String encoding) throws IOException {
         StringWriter writer = new StringWriter();
         InputStreamReader in = new InputStreamReader(inputStream, encoding);
 

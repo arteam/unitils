@@ -21,6 +21,7 @@ import java.io.InputStream;
 
 /**
  * @author Jeroen Horemans
+ * @author Tim Ducheyne
  * @author Thomas De Rycke
  * @since 3.3
  */

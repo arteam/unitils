@@ -27,14 +27,15 @@ import static org.unitils.util.PropertyUtils.getString;
 
 /**
  * @author Tim Ducheyne
- * @author Filip Neven
+ * @author Jeroen Horemans
+ * @since 3.3
  */
 public class DefaultFileResolvingStrategyFactory implements FileResolvingStrategyFactory {
 
     /* Property key for the path prefix */
-    public static final String PREFIX_WITH_PACKAGE_NAME_PROPERTY = "IoModule.file.prefixWithPackageName";
+    public static final String PREFIX_WITH_PACKAGE_NAME_PROPERTY = "IOModule.file.prefixWithPackageName";
     /* Property key for the path prefix */
-    public static final String PATH_PREFIX_PROPERTY = "IoModule.file.pathPrefix";
+    public static final String PATH_PREFIX_PROPERTY = "IOModule.file.pathPrefix";
 
 
     public FileResolvingStrategy createFileResolvingStrategy(Properties configuration) {

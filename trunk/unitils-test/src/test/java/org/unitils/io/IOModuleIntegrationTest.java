@@ -26,6 +26,7 @@ import static junit.framework.Assert.assertEquals;
 
 /**
  * @author Jeroen Horemans
+ * @author Tim Ducheyne
  * @author Thomas De Rycke
  * @since 3.3
  */

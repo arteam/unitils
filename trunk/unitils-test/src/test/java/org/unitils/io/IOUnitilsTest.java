@@ -24,8 +24,8 @@ import static junit.framework.Assert.assertEquals;
 import static org.unitils.io.IOUnitils.readFileContent;
 
 /**
+ * @author Tim Ducheyne
  * @author Jeroen Horemans
- * @author Thomas De Rycke
  * @since 3.3
  */
 public class IOUnitilsTest {

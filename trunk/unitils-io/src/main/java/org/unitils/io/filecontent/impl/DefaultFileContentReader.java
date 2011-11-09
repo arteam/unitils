@@ -24,10 +24,12 @@ import org.unitils.io.reader.ReadingStrategy;
 import java.io.InputStream;
 import java.util.List;
 
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
 /**
  * @author Jeroen Horemans
+ * @author Tim Ducheyne
  * @author Thomas De Rycke
  * @since 3.3
  */
@@ -47,27 +49,29 @@ public class DefaultFileContentReader implements FileContentReader {
     @SuppressWarnings({"unchecked"})
     public <T> T readFileContent(String fileName, Class<T> targetType, String encoding, Class<?> testClass) {
         ConversionStrategy<?> conversionStrategy = determineConversionStrategy(targetType);
-        if (encoding == null) {
+        if (isBlank(encoding)) {
             encoding = defaultEncoding;
         }
+        InputStream inputStream = null;
         try {
-            InputStream inputStream;
-            if (isEmpty(fileName)) {
+            if (isBlank(fileName)) {
                 inputStream = readingStrategy.getDefaultInputStream(conversionStrategy.getDefaultFileExtension(), testClass);
             } else {
                 inputStream = readingStrategy.getInputStream(fileName, testClass);
             }
-            return (T) conversionStrategy.readContent(inputStream, encoding);
+            return (T) conversionStrategy.convertContent(inputStream, encoding);
 
         } catch (Exception e) {
             throw new UnitilsException("Unable to read file content for file " + fileName + " and target type " + targetType.getSimpleName(), e);
+        } finally {
+            closeQuietly(inputStream);
         }
     }
 
 
     protected ConversionStrategy<?> determineConversionStrategy(Class<?> targetType) {
         for (ConversionStrategy conversionStrategy : conversionStrategies) {
-            if (targetType.isAssignableFrom(conversionStrategy.getTargetType())) {
+            if (conversionStrategy.getTargetType().isAssignableFrom(targetType)) {
                 return conversionStrategy;
             }
         }

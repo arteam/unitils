@@ -24,18 +24,19 @@ import java.io.InputStreamReader;
 import java.util.Properties;
 
 /**
- * This conversion strategy will try to convert the inputstream into a Properties. The default file extension for this
- * conversion strategy is txt. So when not overriding the default file when using the @FileContent the file should.
- * end with '.txt' .
+ * This conversion strategy will try to convert the input stream into a Properties. The default file extension for this
+ * conversion strategy is properties. So when not overriding the default file when using the @FileContent the file should.
+ * end with '.properties' .
  *
  * @author Jeroen Horemans
+ * @author Tim Ducheyne
  * @author Thomas De Rycke
  * @since 3.3
  */
 public class PropertiesConversionStrategy implements ConversionStrategy<Properties> {
 
 
-    public Properties readContent(InputStream inputStream, String encoding) throws IOException {
+    public Properties convertContent(InputStream inputStream, String encoding) throws IOException {
         Properties result = new Properties();
         result.load(new InputStreamReader(inputStream, encoding));
         return result;
