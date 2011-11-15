@@ -20,10 +20,8 @@
 		</links>
 		<menu name="General" href="summary.html">
 			<item name="Overview" href="summary.html"/>
-			<item name="Downloads"
-				href="http://sourceforge.net/project/showfiles.php?group_id=167201" />
-			<item name="Forum"
-				href="https://sourceforge.net/projects/unitils/forums/forum/570578" />
+			<item name="Downloads" href="http://sourceforge.net/project/showfiles.php?group_id=167201" />
+			<item name="Forum" href="https://sourceforge.net/projects/unitils/forums/forum/570578" />
 		</menu>
 		<menu name="Documentation">
 		<item name="Cookbook" href="cookbook.html" />
@@ -35,7 +33,7 @@
 			<item name="reflection assert" href="tutorial-reflectionassert.html" />
 			<item name="mock" href="tutorial-mock.html" />
 			<item name="inject" href="tutorial-inject.html" />
-            <item name="io" href="tutorial-io.html"/>
+			<item name="io" href="tutorial-io.html"/>
 			<item name="database" href="tutorial-database.html" />
 			<item name="dbmaintain" href="tutorial-dbmaintain.html" />
 			<item name="hibernate" href="tutorial-hibernate.html" />
@@ -45,9 +43,8 @@
 
 		<menu name="Project info">
 			<item name="License" href="license.html" />
-			<item name="Team Members"
-				href="http://sourceforge.net/project/memberlist.php?group_id=167201" />
-			<item name="Issue Tracking" href="http://jira.unitils.org" />
+			<item name="Team Members" href="http://sourceforge.net/project/memberlist.php?group_id=167201" />
+			<item name="Issue Tracking" href="https://unitils.atlassian.net/secure/Dashboard.jspa" />
 			<item name="Source Repository" href="source-repository.html" />
 			<item name="Acknowledgements" href="acknowledgements.html" />
 		</menu>
