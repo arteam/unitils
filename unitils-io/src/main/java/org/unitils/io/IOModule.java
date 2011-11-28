@@ -18,7 +18,9 @@ package org.unitils.io;
 
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
+import org.unitils.io.annotation.handler.CompositeAnnotationHandler;
 import org.unitils.io.annotation.handler.FileContentAnnotationHandler;
+import org.unitils.io.annotation.handler.TemporaryFileAnnotationHandler;
 import org.unitils.io.filecontent.FileContentReader;
 import org.unitils.io.filecontent.FileContentReaderFactory;
 
@@ -61,7 +63,8 @@ public class IOModule implements Module {
 
     public TestListener getTestListener() {
         FileContentAnnotationHandler fileContentAnnotationHandler = new FileContentAnnotationHandler(fileContentReader);
-        return new IOTestListener(fileContentAnnotationHandler);
+        TemporaryFileAnnotationHandler temporaryFileAnnotationHandler = TemporaryFileListenerFactory.createTemporaryFileListener(configuration);
+        return new CompositeAnnotationHandler(fileContentAnnotationHandler, temporaryFileAnnotationHandler);
     }
 
 
