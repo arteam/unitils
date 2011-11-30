@@ -5,6 +5,9 @@ import org.unitils.core.TestListener;
 import java.lang.reflect.Method;
 
 /**
+ * The composite annotation handler makes it possible to combine multipele TestListeners into one.
+ * Since each module can only have one {@link TestListener} (for now), this class allows you to use multiple ones on.
+ *
  * @author Jeroen Horemans
  * @author Tim Ducheyne
  * @author Thomas De Rycke

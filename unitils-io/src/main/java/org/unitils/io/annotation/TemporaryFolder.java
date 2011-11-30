@@ -23,6 +23,18 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
+ * Annotation for creating a temporary folder. According to the setting the directory wil be deleted at the end, by default it will be removed.
+ * <p/>
+ * When adding a value then this value is used as name. The temporary directory where the folder is created can be set in the unitils.properties.
+ * If left open the default temporary value of the jvm is used (java.io.tmpdir).
+ * <p/>
+ * It can be overridden with following setting :
+ * <p/>
+ * <code>
+ * IOModule.temp.directory= "the temporary file location"
+ * </code><p/>
+ * When using maven adding <code>IOModule.temp.directory=target/test-classes/temp</code> could be a option.
+ *
  * @author Jeroen Horemans
  * @author Tim Ducheyne
  * @author Thomas De Rycke
@@ -31,5 +43,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(FIELD)
 @Retention(RUNTIME)
 public @interface TemporaryFolder {
+
+    /**
+     * @return The name of the file that will be created and afterward removed (when set correctly). If the file exists the work is considered done.
+     */
+
     String value() default "";
 }

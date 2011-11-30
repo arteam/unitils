@@ -27,9 +27,10 @@ public class TemporaryFileAnnotationHandler extends TestListener {
     /* The directory which unitils uses as temporary dir*/
     private File defaultRootDirectory;
 
-    /* Boolean to */
+    /* Boolean that is responsible for knowing if the files should be deleted after the test */
     private Boolean defaultRemoveAfterTest;
 
+    /*The file utility that will create the actual files considering the given data*/
     private TemporaryFileUtil fileUtil;
 
     public TemporaryFileAnnotationHandler(TemporaryFileUtil fileUtil, File defaultRootDirectory,
