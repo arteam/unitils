@@ -44,16 +44,12 @@ public class TemporaryFileAnnotationHandlerTest extends UnitilsJUnit4 {
 
     private Mock<TemporaryFileUtil> fileUtil;
 
-    private File rootDir;
-
     @Dummy
     private File returnDummy;
 
     @Before
     public void setUp() {
-        rootDir = new File("target/test-classes");
-
-        annotationHandler = new TemporaryFileAnnotationHandler(fileUtil.getMock(), rootDir, true);
+        annotationHandler = new TemporaryFileAnnotationHandler(fileUtil.getMock(), new File("target/test-classes"), true);
     }
 
     @Test
