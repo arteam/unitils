@@ -42,12 +42,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
-public @interface TemporaryFile {
+public @interface TempFile {
 
     /**
      * @return The name of the file that will be created and afterward removed (when set correctly). If the file exists the work is considered done.
      */
-
     String value() default "";
 
 }

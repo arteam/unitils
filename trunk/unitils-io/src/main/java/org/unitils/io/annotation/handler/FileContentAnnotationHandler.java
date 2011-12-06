@@ -86,7 +86,7 @@ public class FileContentAnnotationHandler extends TestListener {
             setFieldValue(testObject, field, result);
 
         } catch (Exception e) {
-            throw new UnitilsException("Error reading file content for  " + field.getName(), e);
+            throw new UnitilsException("Error reading file content for field " + field.getName(), e);
         }
     }
 

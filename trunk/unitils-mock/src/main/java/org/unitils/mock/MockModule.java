@@ -33,6 +33,7 @@ import java.lang.reflect.Type;
 import java.util.Properties;
 import java.util.Set;
 
+import static org.unitils.mock.MockUnitils.logFullScenarioReport;
 import static org.unitils.mock.dummy.DummyObjectUtil.createDummy;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.*;
@@ -164,6 +165,13 @@ public class MockModule implements Module {
             createAndInjectPartialMocksIntoTest(testObject);
             createAndInjectMocksIntoTest(testObject);
             createAndInjectDummiesIntoTest(testObject);
+        }
+
+        @Override
+        public void afterTestMethod(Object testObject, Method testMethod, Throwable testThrowable) {
+            if (testThrowable != null) {
+                logFullScenarioReport();
+            }
         }
     }
 }

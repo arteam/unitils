@@ -18,6 +18,8 @@ package org.unitils.io;
 
 import org.unitils.core.Unitils;
 
+import java.io.File;
+
 /**
  * @author Jeroen Horemans
  * @author Tim Ducheyne
@@ -97,6 +99,19 @@ public class IOUnitils {
     public static <T> T readFileContent(String fileName, Class<T> targetType, String encoding, Object testInstance) {
         Class<?> testClass = testInstance.getClass();
         return getIOModule().readFileContent(fileName, targetType, encoding, testClass);
+    }
+
+
+    public static File createTempFile(String fileName) {
+        return getIOModule().createTempFile(fileName);
+    }
+
+    public static File createTempDir(String dirName) {
+        return getIOModule().createTempDir(dirName);
+    }
+
+    public static void deleteTempFileOrDir(File fileOrDir) {
+        getIOModule().deleteTempFileOrDir(fileOrDir);
     }
 
 
