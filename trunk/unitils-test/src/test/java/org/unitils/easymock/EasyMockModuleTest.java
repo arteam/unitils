@@ -15,7 +15,7 @@
  */
 package org.unitils.easymock;
 
-import static org.junit.Assert.assertNotNull;
+import org.easymock.classextension.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
@@ -24,6 +24,8 @@ import org.unitils.easymock.annotation.Mock;
 
 import java.util.List;
 import java.util.Properties;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Test class for the creating mocks using the {@link EasyMockModule}
@@ -58,6 +60,16 @@ public class EasyMockModuleTest extends UnitilsJUnit4 {
         easyMockModule.createAndInjectMocksIntoTest(mockTest);
         assertNotNull(mockTest.testMock);
     }
+
+    @Test
+    public void testRest() throws Exception {
+        MockTest mockTest = new MockTest();
+        easyMockModule.createAndInjectMocksIntoTest(mockTest);
+        EasyMock.expect(mockTest.testMock.isEmpty()).andReturn(Boolean.TRUE);
+        easyMockModule.reset(); //without the reset the call would fail.
+        easyMockModule.verify();
+    }
+
 
     /**
      * Test class with a mock creation
