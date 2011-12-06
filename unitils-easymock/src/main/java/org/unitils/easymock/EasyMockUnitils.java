@@ -15,12 +15,13 @@
  */
 package org.unitils.easymock;
 
-import static org.easymock.EasyMock.reportMatcher;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.easymock.annotation.Mock;
 import org.unitils.easymock.util.*;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
+
+import static org.easymock.EasyMock.reportMatcher;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
@@ -68,7 +69,7 @@ public class EasyMockUnitils {
     /**
      * Creates a regular EasyMock mock object of the given type.
      * <p/>
-     * Same as {@link #createRegularMock(Class,InvocationOrder,Calls)} with a default invocation order
+     * Same as {@link #createRegularMock(Class, InvocationOrder, Calls)} with a default invocation order
      * and default calls value. These defaults can be set in the unitils configuration.
      * <p/>
      * An instance of the mock control is stored, so that it can be set to the replay/verify state when
@@ -104,7 +105,7 @@ public class EasyMockUnitils {
      * Creates a lenient mock object of the given type. The {@link org.unitils.easymock.util.LenientMocksControl} is used
      * for creating the mock.
      * <p/>
-     * Same as {@link #createMock(Class,InvocationOrder,Calls,Order,Dates,Defaults)} with a default invocation order,
+     * Same as {@link #createMock(Class, InvocationOrder, Calls, Order, Dates, Defaults)} with a default invocation order,
      * default calls, default order, default dates and default defaults value. These defaults can be set in the
      * unitils configuration.
      * <p/>
@@ -123,7 +124,7 @@ public class EasyMockUnitils {
      * Creates a lenient mock object of the given type. The {@link org.unitils.easymock.util.LenientMocksControl} is used
      * for creating the mock.
      * <p/>
-     * Same as {@link #createMock(Class,InvocationOrder,Calls,Order,Dates,Defaults)} with a default invocation order,
+     * Same as {@link #createMock(Class, InvocationOrder, Calls, Order, Dates, Defaults)} with a default invocation order,
      * default calls, default order, default dates and default defaults value. These defaults can be set in the
      * unitils configuration.
      * <p/>
@@ -148,8 +149,8 @@ public class EasyMockUnitils {
      * <p/>
      * This method makes sure EasyMock's replay method is called on every mock object that was supplied to the
      * fields annotated with {@link org.unitils.easymock.annotation.Mock}, or directly created by the
-     * {@link #createRegularMock(Class,InvocationOrder,Calls)} and
-     * {@link #createMock(Class,InvocationOrder,Calls,Order,Dates,Defaults)} methods.
+     * {@link #createRegularMock(Class, InvocationOrder, Calls)} and
+     * {@link #createMock(Class, InvocationOrder, Calls, Order, Dates, Defaults)} methods.
      * <p/>
      * After each test, the expected behavior is verified automatically, or explicitly by calling {@link #verify()}.
      */
@@ -158,14 +159,18 @@ public class EasyMockUnitils {
     }
 
 
+    public static void reset() {
+        getEasyMockModule().reset();
+    }
+
     /**
      * Unit tests can call this method to check whether all recorded expected behavior was actually observed during
      * the test.
      * <p/>
      * This method makes sure {@link org.easymock.internal.MocksControl#verify} method is called for every mock mock object
      * that was injected to a field annotated with {@link Mock}, or directly created by the
-     * {@link #createRegularMock(Class,InvocationOrder,Calls)} or
-     * {@link #createMock(Class,InvocationOrder,Calls,Order,Dates,Defaults)} methods.
+     * {@link #createRegularMock(Class, InvocationOrder, Calls)} or
+     * {@link #createMock(Class, InvocationOrder, Calls, Order, Dates, Defaults)} methods.
      * <p/>
      * By default, the expected behavior is verified automatically. This can be disabled however by setting the property
      * EasyMockModule.autoVerifyAfterTest.enabled to false. In that case, verification can also be performed explicitly
