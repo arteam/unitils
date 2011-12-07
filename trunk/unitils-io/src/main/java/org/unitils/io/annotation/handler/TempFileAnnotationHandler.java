@@ -31,7 +31,7 @@ import static org.unitils.util.ReflectionUtils.getFieldValue;
 import static org.unitils.util.ReflectionUtils.setFieldValue;
 
 /**
- * Implements the behavior of the {@link org.unitils.io.annotation.TempFile} annotation.<br/>
+ * Implements the behavior of the {@link TempFile} annotation.<br/>
  * See annotation javadoc for more info.
  *
  * @author Jeroen Horemans

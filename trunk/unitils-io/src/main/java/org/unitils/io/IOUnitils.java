@@ -123,7 +123,8 @@ public class IOUnitils {
      * specified by setting the {@link org.unitils.io.temp.impl.DefaultTempServiceFactory#ROOT_TEMP_DIR} property.
      * If no root temp dir is specified the default user temp dir will be used.
      * <p/>
-     * Watch out: if the directory already exists, it will first be deleted.
+     * Watch out: if the directory already exists, it will first be deleted. If the directory was not empty,
+     * all files in the directory will be deleted.
      * <p/>
      * The directory will not be removed after the test. You can use {@link #deleteTempFileOrDir(java.io.File)}, if
      * you want to perform cleanup after the test.
