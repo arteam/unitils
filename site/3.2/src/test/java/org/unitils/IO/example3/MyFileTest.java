@@ -31,5 +31,5 @@ public class MyFileTest extends UnitilsJUnit4 {
 
     @TemporaryFolder
     private File folder;
-}
+} 
 // END SNIPPET: temporaryFile
