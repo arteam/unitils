@@ -101,15 +101,49 @@ public class IOUnitils {
         return getIOModule().readFileContent(fileName, targetType, encoding, testClass);
     }
 
-
+    /**
+     * Creates a temporary file with the given name. The parent directory for this file can be
+     * specified by setting the {@link org.unitils.io.temp.impl.DefaultTempServiceFactory#ROOT_TEMP_DIR} property.
+     * If no root temp dir is specified the default user temp dir will be used.
+     * <p/>
+     * Watch out: if the file already exists, it will first be deleted.
+     * <p/>
+     * The file will not be removed after the test. You can use {@link #deleteTempFileOrDir(java.io.File)}, if you want
+     * to perform cleanup after the test.
+     *
+     * @param fileName The name of the temp file, not null
+     * @return The temp file, not null
+     */
     public static File createTempFile(String fileName) {
         return getIOModule().createTempFile(fileName);
     }
 
+    /**
+     * Creates a temporary directory with the given name. The parent directory for this directory can be
+     * specified by setting the {@link org.unitils.io.temp.impl.DefaultTempServiceFactory#ROOT_TEMP_DIR} property.
+     * If no root temp dir is specified the default user temp dir will be used.
+     * <p/>
+     * Watch out: if the directory already exists, it will first be deleted.
+     * <p/>
+     * The directory will not be removed after the test. You can use {@link #deleteTempFileOrDir(java.io.File)}, if
+     * you want to perform cleanup after the test.
+     *
+     * @param dirName The name of the temp dir, not null
+     * @return The temp dir, not null
+     */
     public static File createTempDir(String dirName) {
         return getIOModule().createTempDir(dirName);
     }
 
+    /**
+     * Deletes the given file or directory.
+     * <p/>
+     * Watch out: if the directory is not empty, all files in the directory will be deleted.
+     * <p/>
+     * Nothing will be done if the file or directory is null or does not exist.
+     *
+     * @param fileOrDir The file or directory to delete, can be null
+     */
     public static void deleteTempFileOrDir(File fileOrDir) {
         getIOModule().deleteTempFileOrDir(fileOrDir);
     }

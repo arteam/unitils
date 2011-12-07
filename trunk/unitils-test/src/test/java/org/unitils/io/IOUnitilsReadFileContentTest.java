@@ -28,7 +28,7 @@ import static org.unitils.io.IOUnitils.readFileContent;
  * @author Jeroen Horemans
  * @since 3.3
  */
-public class IOUnitilsTest {
+public class IOUnitilsReadFileContentTest {
 
 
     @Test
@@ -51,19 +51,19 @@ public class IOUnitilsTest {
 
     @Test
     public void specifiedFileName() {
-        Properties propertiesContent = readFileContent("IOUnitilsTest.properties", Properties.class, this);
+        Properties propertiesContent = readFileContent("IOUnitilsReadFileContentTest.properties", Properties.class, this);
         assertEquals("testFile", propertiesContent.getProperty("testFile"));
     }
 
     @Test
     public void specifiedFileNameWithEncoding() {
-        Properties propertiesContent = readFileContent("IOUnitilsTest.properties", Properties.class, "UTF8", this);
+        Properties propertiesContent = readFileContent("IOUnitilsReadFileContentTest.properties", Properties.class, "UTF8", this);
         assertEquals("testFile", propertiesContent.getProperty("testFile"));
     }
 
     @Test
     public void propertiesAsString() {
-        String stringContent = readFileContent("IOUnitilsTest.properties", String.class, this);
+        String stringContent = readFileContent("IOUnitilsReadFileContentTest.properties", String.class, this);
         assertEquals("testFile=testFile", stringContent);
     }
 
