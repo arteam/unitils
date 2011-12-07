@@ -34,17 +34,6 @@ import static org.unitils.core.util.ConfigUtils.getInstanceOf;
 import static org.unitils.util.PropertyUtils.getBoolean;
 
 /**
- * Will listen for the @FileContent annotation in tests. The content of the file
- * specified in the annotation will be loaded in the property. A property
- * annotation with {@link @FileContent} should always be a String
- * <br>
- * Example:
- * <p/>
- * <pre>
- * &#064;FileContent(location = &quot;be/smals/file.txt&quot;)
- * private String fileContent;
- * </pre>
- *
  * @author Jeroen Horema
  * @author Tim Ducheyne
  * @author Thomas De Rycke

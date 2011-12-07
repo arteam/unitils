@@ -23,17 +23,19 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Annotation for creating a temporary folder. According to the setting the directory wil be deleted at the end, by default it will be removed.
+ * Annotation for creating a temporary directory.
  * <p/>
- * When adding a value then this value is used as name. The temporary directory where the folder is created can be set in the unitils.properties.
- * If left open the default temporary value of the jvm is used (java.io.tmpdir).
+ * A optional name can be specified for directory. If no name is specified, a default name 'class-name'-'method-name' will be used.
  * <p/>
- * It can be overridden with following setting :
+ * The parent directory for this directory can be
+ * specified by setting the {@link org.unitils.io.temp.impl.DefaultTempServiceFactory#ROOT_TEMP_DIR} property.
+ * If no root temp dir is specified the default user temp dir will be used.
  * <p/>
- * <code>
- * IOModule.temp.directory= "the temporary file location"
- * </code><p/>
- * When using maven adding <code>IOModule.temp.directory=target/test-classes/temp</code> could be a option.
+ * Watch out: if the directory already exists, it will first be deleted. If the directory was not empty,
+ * all files in the directory will be deleted.
+ * <p/>
+ * By default, the directory will not be removed after the test. You can set the {@link org.unitils.io.IOModule#CLEANUP_AFTER_TEST}
+ * property to true if you want unitils to delete the directories automatically after each test.
  *
  * @author Jeroen Horemans
  * @author Tim Ducheyne
@@ -45,7 +47,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface TempDir {
 
     /**
-     * @return The name of the file that will be created and afterward removed (when set correctly). If the file exists the work is considered done.
+     * @return The name for the temp dir. If not specified, a default name 'class-name'-'method-name' will be used.
      */
     String value() default "";
 }
