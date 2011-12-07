@@ -10,13 +10,14 @@ Injection
     found in the unitils-io folder, the required dependencies, in the unitils-io/lib folder.
 
 
-* {Injecting objects}
-~~~~~~~~~~~~~~~~~~~~~
+* {File Content}
+~~~~~~~~~~~~~~~~
     Unitils offers some utility methods to read files into object. The types currently supported are txt files to a
     java.lang.String and Properties file to a java.util.Properties
 
 
 ** {The defaults}
+~~~~~~~~~~~~~~~~~
 
    The String annotated with <FileContent> will be filled up with the file that can be found in the same filepath and
    the same name as the test. Instead of *.java the extension should be *.txt .
@@ -29,6 +30,31 @@ Injection
 
 %{include|source=org/unitils/io/example1/MyFileTest.java|id=fileContent|verbatim=true|set-first-line=1|pad-line-numbers=2}
 
-   TODO
+** {Overriding the defaults}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    When defining the value, the IO module will not search for the default file location, but instead use the parameter
+    given to determine wich file to load. The default extension does not matter anymore. Without a leading '/' the file
+    path is relative tot the path of the test.
 
 %{include|source=org/unitils/io/example2/MyFileTest.java|id=fileContent|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+* {Temporary File}
+~~~~~~~~~~~~~~~~~~~~~~~
+   When annotation a java.io.file with the TemporaryFile Annotation unitils will fill up the File before the object
+   The File will have a name in line with the fully qualified name of the test plus the test method and .tmp to end with.
+
+%{include|source=org/unitils/io/example3/MyFileTest.java|id=temporaryFile|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    A file can also be annotated with the annotation TemporaryFolder. Its almost the same as the temporary file, only this
+    time a directory is created. The only difference is the name it will also be the fully qualified name and method name
+    but with node extension.
+    When filling in the value in the annotation a file with the given name will be created in the temporary directory.
+
+%{include|source=org/unitils/io/example4/MyFileTest.java|id=temporaryFile|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    The files will alwayst be created in the given temporary directory. By default the temporary directory set by the jvm will be used.
+    But it can be overriden in the unitils.properties with the setting : IOModule.temp.directory=
+    The setting will work as a normal java file considering absolute or relative file paths.
+
+
