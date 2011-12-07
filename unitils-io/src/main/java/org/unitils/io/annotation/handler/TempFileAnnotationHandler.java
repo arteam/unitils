@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package org.unitils.io.annotation.handler;
 
 import org.unitils.core.TestListener;
