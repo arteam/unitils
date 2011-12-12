@@ -46,7 +46,7 @@ Injection
 * {Temporary File}
 ~~~~~~~~~~~~~~~~~~
    When a file with type java.io.file is annotated with TempFile, unitils will fill up the File before the test is run
-   The File will have a name in line with the fully qualified name of the test plus the test method and .tmp to end with.
+   The File will have a name in line with the fully qualified name of the test plus - plus the test method and .tmp to end with.
 
 %{include|source=org/unitils/io/example3/MyFileTest.java|id=temporaryFile|verbatim=true|set-first-line=1|pad-line-numbers=2}
 
