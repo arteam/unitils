@@ -105,6 +105,7 @@ ul.topnav li ul.children {
 	-webkit-border-bottom-left-radius: 5px;
 	-webkit-border-bottom-right-radius: 5px;
 	border: 1px solid #111;
+	z-index:50;
 }
 ul.topnav li ul.children li{
 	margin: 0; padding: 0;
