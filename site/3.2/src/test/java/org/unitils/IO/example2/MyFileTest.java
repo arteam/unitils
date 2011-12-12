@@ -18,18 +18,19 @@
 
 package org.unitils.IO.example2;
 
+import java.util.Properties;
+
 import org.unitils.UnitilsJUnit4;
 import org.unitils.io.annotation.FileContent;
-
-import java.util.Properties;
 
 // START SNIPPET: fileContent
 public class MyFileTest extends UnitilsJUnit4 {
 
-    @FileContent(value = "SpecificContent.txt")
+    @FileContent(value = "SpecificContent.txt",encoding="ISO-8859-1")
     private String specificContent;
 
-    @FileContent(value = "SpecificContent.properties")
+    @FileContent(value = "SpecificContent.properties",encoding="UTF-8")
     private Properties specificProperties;
+    
 }
 // END SNIPPET: fileContent

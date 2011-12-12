@@ -19,11 +19,13 @@ Injection
 ** {The defaults}
 ~~~~~~~~~~~~~~~~~
 
-   The String annotated with <FileContent> will be filled up with the file that can be found in the same filepath and
-   the same name as the test. Instead of *.java the extension should be *.txt .
-
-   The Property annotated with <FileContent> will be filled up with the file that can be found in the same filepath and
+   The String, annotated with <FileContent>, will be filled up with the content of the file that can be found in the same filepath and
+   the same name as the test. Instead of *.java the extension should be *.txt . 
+   The Properties, annotated with <FileContent>, will be filled up with the properties  that can be found in the file which is located in same filepath and
    the same name as the test. Instead of *.java the extension should be *.properties .
+   
+   In both cases the default JVM encoding will be used while reading in the file.
+   
 
    The <FileContent> can take a encoding as input. All default java encoding can be used. If the jre supports it, so does
    unitils.
@@ -33,20 +35,22 @@ Injection
 ** {Overriding the defaults}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    When defining the value, the IO module will not search for the default file location, but instead use the parameter
-    given to determine which file to load. The default extension does not matter anymore. Without a leading '/' the file
+    When defining the value, the IO module will not search for the default file location, but instead use the given parameter
+    to determine which file to load. The default extension does not matter anymore. Without a leading '/' the file
     path is relative tot the path of the test.
+    
+    You can also override the encoding which has to be used to load in the files.
 
 %{include|source=org/unitils/io/example2/MyFileTest.java|id=fileContent|verbatim=true|set-first-line=1|pad-line-numbers=2}
 
 * {Temporary File}
 ~~~~~~~~~~~~~~~~~~
-   When a file with type java.io.file is annotated with TemporaryFile, unitils will fill up the File before the test is run
+   When a file with type java.io.file is annotated with TempFile, unitils will fill up the File before the test is run
    The File will have a name in line with the fully qualified name of the test plus the test method and .tmp to end with.
 
 %{include|source=org/unitils/io/example3/MyFileTest.java|id=temporaryFile|verbatim=true|set-first-line=1|pad-line-numbers=2}
 
-    A file can also be annotated with the annotation TemporaryFolder. Its almost the same as the temporary file, only this
+    A file can also be annotated with the annotation TempDir. Its almost the same as the temporary file, only this
     time a directory is created. The only difference is the name, it will also be the fully qualified name and method name
     but without extension.
     When filling in the value in the annotation a file with the given name will be created in the temporary directory.
@@ -54,8 +58,13 @@ Injection
 %{include|source=org/unitils/io/example4/MyFileTest.java|id=temporaryFile|verbatim=true|set-first-line=1|pad-line-numbers=2}
 
     The files will always be created in the given temporary directory. By default, the temporary directory set by the jvm will be used.
-    But it can be overriden in the unitils.properties with the setting : IOModule.temp.directory=
-    The setting will work as a normal java file considering absolute or relative file paths.
+    But it can be overriden in the unitils.properties with the setting : <IOModule.temp.directory=>    The setting will work as a normal java file considering absolute or relative file paths.
+    
+    If the file or directory already exists before the test is run it will first be deleted. If the directory was not empty, all files in the directory will be deleted.
+    After the test no cleaning will be done, created tempfiles or tempdirectories will not be deleted by default. This makes it easier to debug. 
+    You can set the <IOModule.temp.cleanupAfterTest=> to true if you want unitils to delete the tempfiles or tempdirectories automatically after each test.
+    
+    
 
 
 
