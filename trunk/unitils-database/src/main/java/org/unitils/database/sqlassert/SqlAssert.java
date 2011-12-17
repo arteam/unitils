@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2011,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.unitils.database.sqlassert;
-
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.ArrayList;
-
-import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,23 +25,33 @@ import org.unitils.database.SQLUnitils;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
+
 /**
  * Assertion class to verify content in the database, by specifying your own SQL and checking the result.
- * 
+ *
+ * todo td refactor
+ *
  * @author Jeroen Horemans
  */
 public abstract class SqlAssert {
 
-	 /* The logger instance for this class */
+    /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(SqlAssert.class);
 
 
     /**
      * To be succesfull the result of the SQL should only return one row, this row should be identical to the given parameter. The sequence
      * of the values is not important.
-     * 
+     *
      * The datasource will be fetched from the database module of unitils ({@link DatabaseModule}).
-     * 
+     *
      * @param sql
      * @param row
      */
@@ -60,9 +62,9 @@ public abstract class SqlAssert {
     /**
      * To be succesfull the result of the SQL should return as many rows as the two dimensional arrey has, each row should be identical to
      * the given parameter. The sequence of the values is not important nor is the order of the rows.
-     * 
+     *
      * The datasource will be fetched from the database module of unitils ({@link DatabaseModule}).
-     * 
+     *
      * @param sql
      * @param rows
      */
@@ -73,9 +75,9 @@ public abstract class SqlAssert {
     /**
      * The SQL given should only return one row with one column, this column should be a number (preferred a count(*)). The result is
      * asserted with the countResult parameter.
-     * 
+     *
      * The datasource will be fetched from the database module of unitils ({@link DatabaseModule}).
-     * 
+     *
      * @param sql
      * @param countResult
      */
@@ -86,21 +88,21 @@ public abstract class SqlAssert {
     /**
      * To be successful the result of the SQL should only return one row, this row should be identical to the given parameter. The sequence
      * of the values is not important.
-     * 
+     *
      * @param sql
      * @param dataSource
      * @param row
      */
     public static void assertSingleRowSqlResult(String sql, DataSource dataSource, String[] row) {
         assertMultipleRowSqlResult(sql, dataSource, new String[][]{
-            row
+                row
         });
     }
 
     /**
      * To be successful the result of the SQL should return as many rows as the two dimensional array has, each row should be identical to
      * the given parameter. The sequence of the values is not important nor the order of the rows.
-     * 
+     *
      * @param sql
      * @param dataSource
      * @param rows
@@ -113,7 +115,7 @@ public abstract class SqlAssert {
     /**
      * The SQL given should only return one row with one column, this column should be a number (preferred a count(*)). The result is
      * asserted with the countResult parameter.
-     * 
+     *
      * @param sql
      * @param dataSource
      * @param countResult
@@ -127,8 +129,8 @@ public abstract class SqlAssert {
 
     /**
      * Returns the value extracted from the result of the given query. If no value is found, a {@link UnitilsException} is thrown.
-     * 
-     * @param sql The sql string for retrieving the items
+     *
+     * @param sql        The sql string for retrieving the items
      * @param dataSource The data source, not null
      * @return The string item value
      */
@@ -152,7 +154,7 @@ public abstract class SqlAssert {
                 resultList.add(row);
             }
             return resultList.toArray(new String[][]{
-                {}
+                    {}
             });
 
         } catch (Exception e) {
@@ -161,11 +163,12 @@ public abstract class SqlAssert {
             closeQuietly(connection, statement, resultSet);
         }
     }
-/**
- * Returns the {@link DataSource} fetched from the unitils {@link DatabaseModule}
- * 
- * @return DataSource
- */
+
+    /**
+     * Returns the {@link DataSource} fetched from the unitils {@link DatabaseModule}
+     *
+     * @return DataSource
+     */
     private static DataSource getDataSourceFromUnitils() {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class).getDataSource();
     }
