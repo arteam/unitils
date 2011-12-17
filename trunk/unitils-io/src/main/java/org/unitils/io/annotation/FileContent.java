@@ -29,7 +29,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * type of the annotated field and inject the result into the field.
  * <p/>
  * A file name can be specified as value explicitly. If no file name is specified, a default file name will be used:
- * 'classname'.xml.
+ * 'classname'.'extension'. The extension depends on the target type: 'txt' for String and 'properties' for Properties.
  * <p/>
  * By default, the file name is prefixed with the package name (. replaced by /).<br/>
  * E.g. MyFile.xml becomes com/myPackage/MyFile.xml
@@ -40,7 +40,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Package name prefixing can be disabled using the IOModule.file.prefixWithPackageName property.<br/>
  * IOModule.file.prefixWithPackageName=false => MyFile.xml remains MyFile.xml
  * <p/>
- * If a path prefix is specified using the IOModule.file.pathPrefixproperty it is added to the file name.<br/>
+ * If a path prefix is specified using the IOModule.file.pathPrefix property it is added to the file name.<br/>
  * Examples:<br/>
  * <p/>
  * IOModule.file.pathPrefix=myPathPrefix: MyFile.xml becomes myPathPrefix/com/myPackage/MyFile.xml<br/>
