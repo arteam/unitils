@@ -13,9 +13,9 @@
 
 
     <scm>
-        <connection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/branches/3.2</connection>
-        <developerConnection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/branches/3.2</developerConnection>
-        <url>https://unitils.svn.sourceforge.net/svnroot/unitils/branches/3.2</url>
+        <connection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/branches/3.3</connection>
+        <developerConnection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/branches/3.3</developerConnection>
+        <url>https://unitils.svn.sourceforge.net/svnroot/unitils/branches/3.3</url>
     </scm>
     <licenses>
         <license>
@@ -57,7 +57,7 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-core</artifactId>
-            <version>3.3-SNAPSHOT</version>
+            <version>3.3</version>
             <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: core -->
@@ -65,7 +65,7 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-mock</artifactId>
-            <version>3.3-SNAPSHOT</version>
+            <version>3.3</version>
             <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: mock -->
@@ -73,7 +73,7 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-inject</artifactId>
-            <version>3.3-SNAPSHOT</version>
+            <version>3.3</version>
             <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: inject -->
@@ -81,7 +81,7 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-database</artifactId>
-            <version>3.3-SNAPSHOT</version>
+            <version>3.3</version>
             <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: database -->
@@ -89,7 +89,7 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-dbunit</artifactId>
-            <version>3.3-SNAPSHOT</version>
+            <version>3.3</version>
             <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: dbunit -->
@@ -97,7 +97,7 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-spring</artifactId>
-            <version>3.3-SNAPSHOT</version>
+            <version>3.3</version>
             <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: spring -->
@@ -105,7 +105,7 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-orm</artifactId>
-            <version>3.3-SNAPSHOT</version>
+            <version>3.3</version>
             <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: orm -->
@@ -113,7 +113,7 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-easymock</artifactId>
-            <version>3.3-SNAPSHOT</version>
+            <version>3.3</version>
             <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: easy -->
@@ -121,7 +121,7 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-io</artifactId>
-            <version>3.3-SNAPSHOT</version>
+            <version>3.3</version>
         </dependency>
         <!-- END SNIPPET: io-->
     </dependencies>
