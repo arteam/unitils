@@ -25,10 +25,11 @@ import java.util.Properties;
 
 // START SNIPPET: fileContent
 public class MyFileTest extends UnitilsJUnit4 {
-    @FileContent
-    private String defaultContent;
 
     @FileContent
-    private Properties specificProperties;
+    private String field1;
+
+    @FileContent
+    private Properties field2;
 }
 // END SNIPPET: fileContent

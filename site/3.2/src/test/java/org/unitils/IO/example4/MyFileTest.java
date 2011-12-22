@@ -18,18 +18,19 @@
 
 package org.unitils.IO.example4;
 
-import java.io.File;
-
 import org.unitils.UnitilsJUnit4;
 import org.unitils.io.annotation.TempDir;
 import org.unitils.io.annotation.TempFile;
 
+import java.io.File;
+
 // START SNIPPET: temporaryFile
 public class MyFileTest extends UnitilsJUnit4 {
-    @TempFile("customFileName.tmp")
+
+    @TempFile("myFile.txt")
     private File file;
 
-    @TempDir("customDirectoryName")
+    @TempDir("myDirectory")
     private File directory;
 }
 // END SNIPPET: temporaryFile

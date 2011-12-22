@@ -10,61 +10,150 @@ Injection
     found in the unitils-io folder, the required dependencies, in the unitils-io/lib folder.
 
 
-* {File Content}
-~~~~~~~~~~~~~~~~
-    Unitils offers some utility methods to read files into object. The types currently supported are txt files to a
-    java.lang.String and Properties file to a java.util.Properties
-
-
-** {The defaults}
-~~~~~~~~~~~~~~~~~
-
-   The String, annotated with <FileContent>, will be filled up with the content of the file that can be found in the same filepath and
-   the same name as the test. Instead of *.java the extension should be *.txt . 
-   The Properties, annotated with <FileContent>, will be filled up with the properties  that can be found in the file which is located in same filepath and
-   the same name as the test. Instead of *.java the extension should be *.properties .
-   
-   In both cases the default JVM encoding will be used while reading in the file.
-   
-
-   The <FileContent> can take a encoding as input. All default java encoding can be used. If the jre supports it, so does
-   unitils.
-
-%{include|source=org/unitils/io/example1/MyFileTest.java|id=fileContent|verbatim=true|set-first-line=1|pad-line-numbers=2}
-
-** {Overriding the defaults}
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    When defining the value, the IO module will not search for the default file location, but instead use the given parameter
-    to determine which file to load. The default extension does not matter anymore. Without a leading '/' the file
-    path is relative tot the path of the test.
-    
-    You can also override the encoding which has to be used to load in the files.
-
-%{include|source=org/unitils/io/example2/MyFileTest.java|id=fileContent|verbatim=true|set-first-line=1|pad-line-numbers=2}
-
-* {Temporary File}
-~~~~~~~~~~~~~~~~~~
-   When a file with type java.io.file is annotated with TempFile, unitils will fill up the File before the test is run
-   The File will have a name in line with the fully qualified name of the test plus - plus the test method and .tmp to end with.
+* {Creating files and directories for your tests}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    You can create a temporary file or directory in your test just by annotating a field of type <File> with an <@TempFile>
+    or <@TempDir> annotation.
 
 %{include|source=org/unitils/io/example3/MyFileTest.java|id=temporaryFile|verbatim=true|set-first-line=1|pad-line-numbers=2}
 
-    A file can also be annotated with the annotation TempDir. Its almost the same as the temporary file, only this
-    time a directory is created. The only difference is the name, it will also be the fully qualified name and method name
-    but without extension.
-    When filling in the value in the annotation a file with the given name will be created in the temporary directory.
+    In the above example a file will with name <org.mypackage.MyFileTest.tmp> and a directory with name
+    <org.mypackage.MyFileTest> will be created in the user temp dir.
+
+    You can also explicitly specify a name for the file or directory.
 
 %{include|source=org/unitils/io/example4/MyFileTest.java|id=temporaryFile|verbatim=true|set-first-line=1|pad-line-numbers=2}
 
-    The files will always be created in the given temporary directory. By default, the temporary directory set by the jvm will be used.
-    But it can be overriden in the unitils.properties with the setting : <IOModule.temp.directory=>    The setting will work as a normal java file considering absolute or relative file paths.
-    
-    If the file or directory already exists before the test is run it will first be deleted. If the directory was not empty, all files in the directory will be deleted.
-    After the test no cleaning will be done, created tempfiles or tempdirectories will not be deleted by default. This makes it easier to debug. 
-    You can set the <IOModule.temp.cleanupAfterTest=> to true if you want unitils to delete the tempfiles or tempdirectories automatically after each test.
-    
-    
+    If you want the files to be created in another directory than the user temp dir, you can specify a directory by setting
+    the <IOModule.temp.rootTempDir>. This can be an absolute directory name (starts with /) or a name relative
+    to the current working dir.
+
++----+
+    # Absolute temp dir
+    IOModule.temp.rootTempDir=/c:/temp
+
+    # Temp dir relative to the current working dir (e.g. target/classes)
+    IOModule.temp.rootTempDir=temp
++----+
+
+    Cleanup will be performed before the file or directory is created. If the file or directory already exists it
+    will first be deleted. If the directory was not empty, all files in the directory will be removed.
+
+    By default no cleanup is performed after the test. This allows you to more easily debug test failures, since the
+    files will then still be there. If you want automatic cleanup after a test, you can configure this by setting
+    the <IOModule.temp.cleanupAfterTest> property to true. This will delete the files and directories in the fields annotated with
+    <@TempFile> and <@TempDir>. Other files, that might have been created during the test, will not be deleted automatically.
+
+    Using annotations like the above examples only works when your test is Unitils-enabled, i.e. when it extends one of the base
+    classes (UnitilsJUnit4, UnitilsJUnit3 or UnitilsTestNG) or uses the UnitilsJUnit4TestClassRunner.
+    You can also create and delete temp files and directories programmatically by using one of the static methods in the IOUnitils
+    facade class.
+
+%{include|source=org/unitils/io/example7/MyFileTest.java|id=temporaryFile|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    As with the annotations, cleanup is performed before the creation: if the file or directory already exists, it will first
+    be deleted.
 
 
+* {Reading the contents of a file}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    If you want to load the contents of a file into a field, you can annotate the field with an <@FileContent> annotation.
+    Depending on the field type, Unitils will try to load the file, convert it to the requested type and inject the
+    result into the field.
 
+    Currently <String> and <Properties> target types are supported.
+
+    If no file name is specified, Unitils will look on the classpath for a file with name <'classname'>.<'extension'> in
+    the same package as the test class. The extension that is used depends on the target type: <txt> for <String> and
+    <properties> for <Properties>.
+
+    Example:
+
+%{include|source=org/unitils/io/example1/MyFileTest.java|id=fileContent|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    In the above example, the content of <org/package/MyFileTest.txt> will be injected into <field1> and the content of
+    <org/package/MyFileTest.properties> will be loaded into a Properties instance and injected into <field2>.
+
+    You can also specify a file name explicitly. Following example will load the same files as above:
+
+%{include|source=org/unitils/io/example6/MyFileTest.java|id=fileContent|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    Note that in order for the annotations to work, the test has to be unitils-enabled, i.e. it should extend one of the base-classes (in this case UnitilsJUnit4 was used).
+    Alternatively you can also invoke the behavior programmatically by using one of the static methods in the IOUnitils facade class.
+
+%{include|source=org/unitils/io/example8/MyFileTest.java|id=fileContent|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    The encoding to use for reading the file can be specified in the annotations and facade methods. If no encoding
+    is specified, the default <ISO-8859-1> will be used. If needed, this default can be overridden by setting
+    the <IOModule.encoding.default> property to required encoding.
+
+%{include|source=org/unitils/io/example9/MyFileTest.java|id=fileContent|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+
+** {File name resolution}
+~~~~~~~~~~~~~~~~~~~~~~~~~
+    By default, file names are prefixed with the package name (. replaced by /).
+
++----+
+    MyFile.xml  becomes org/myPackage/MyFile.xml
++----+
+
+    If you don't want this, you can let the file name start with a /.
+
++----+
+    /MyFile.xml remains MyFile.xml
++----+
+
+    If you like this to be the default, you can disable package name prefixing by setting
+    the <IOModule.file.prefixWithPackageName> property to false.
+
+    Optionally you can also specify a path prefix using the <IOModule.file.pathPrefix> property. This prefix will then be
+    pre-pended to all file names. E.g.
+
++----+
+    IOModule.file.pathPrefix=myPathPrefix  ->  MyFile.xml  becomes myPathPrefix/com/myPackage/MyFile.xml
+    IOModule.file.pathPrefix=myPathPrefix  ->  /MyFile.xml becomes myPathPrefix/MyFile.xml
++----+
+
+    If the path prefix itself starts with '/', the file name is absolute, else it will be treated relative to the classpath.
+
++----+
+    IOModule.file.pathPrefix=/c:/testfiles  looks for c:/testfiles/MyFile.xml on the file system
+    IOModule.file.pathPrefix=testfiles      looks for testfiles/MyFile.xml on the classpath
++----+
+
+
+** {Creating a custom conversion strategy}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Conversion strategies are responsible for mapping a file content to a target type. Currently there are 2
+    default conversion strategies: <PropertiesConversionStrategy> for converting the content to a <Properties> instance
+    and <StringConversionStrategy> for converting the content to a <String>.
+
+    If this is not sufficient, you can easily write your own conversion strategy as follows:
+
+    1. <Create an implementation of ConversionStrategy>
+
+%{include|source=org/unitils/io/example10/ConversionStrategy.java|id=fileContent|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    The <convertContent> receives the file content as a stream and should do the actual conversion.
+
+    The <getDefaultFileExtension> method should return the extension to use when no file name is explicitly specified (e.g. txt is used for String).
+
+    The <getTargetType> should return the type to which the content will be converted. This method determines when this
+    strategy will be applicable. Unitils will look for the first conversion strategy that has a target type that
+    is assignable to the requested type.
+
+    2. <Register the conversion strategy>
+
+    Following properties are used for setting up the conversion strategies:
+
++----+
+    IOModule.conversion.default=org.unitils.io.conversion.impl.PropertiesConversionStrategy,org.unitils.io.conversion.impl.StringConversionStrategy
+    IOModule.conversion.custom=
++----+
+
+    To enable your conversion strategy, just add the class name to the <custom> property. If really needed you can also override the defaults
+    by setting the <default> property to something else.
+
+    Since Unitils looks for the first applicable conversion strategy, the order is important: custom strategies will always
+    checked first, in the order specified, followed by the default strategies.
