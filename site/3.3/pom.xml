@@ -5,7 +5,7 @@
 
     <groupId>org.unitils</groupId>
     <artifactId>unitils-site</artifactId>
-    <version>3.2</version>
+    <version>3.3</version>
     <packaging>pom</packaging>
 
     <name>Unitils</name>
@@ -52,7 +52,7 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-core</artifactId>
-            <version>3.2</version>
+            <version>3.3-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: core -->
@@ -60,7 +60,7 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-mock</artifactId>
-            <version>3.2</version>
+            <version>3.3-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: mock -->
@@ -68,7 +68,7 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-inject</artifactId>
-            <version>3.2</version>
+            <version>3.3-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: inject -->
@@ -76,7 +76,7 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-database</artifactId>
-            <version>3.2</version>
+            <version>3.3-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: database -->
@@ -84,7 +84,7 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-dbunit</artifactId>
-            <version>3.2</version>
+            <version>3.3-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: dbunit -->
@@ -92,7 +92,7 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-spring</artifactId>
-            <version>3.2</version>
+            <version>3.3-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: spring -->
@@ -100,7 +100,7 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-orm</artifactId>
-            <version>3.2</version>
+            <version>3.3-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: orm -->
@@ -108,7 +108,7 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-easymock</artifactId>
-            <version>3.2</version>
+            <version>3.3-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <!-- END SNIPPET: easy -->
