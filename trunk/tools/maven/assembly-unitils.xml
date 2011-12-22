@@ -159,6 +159,28 @@
             </binaries>
         </moduleSet>
 
+        <!-- unitils-io -->
+        <moduleSet>
+            <includes>
+                <include>org.unitils:unitils-io</include>
+            </includes>
+            <sources>
+                <fileSets>
+                    <fileSet>
+                        <includes>
+                            <include>pom.xml</include>
+                            <include>src/main/**</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <includeDependencies>false</includeDependencies>
+                <outputDirectory>unitils-io</outputDirectory>
+                <unpack>false</unpack>
+            </binaries>
+        </moduleSet>
+
         <!-- unitils-orm -->
         <moduleSet>
             <includes>
