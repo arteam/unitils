@@ -12,6 +12,11 @@
     <url>http://www.unitils.org/</url>
 
 
+    <scm>
+        <connection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/branches/3.2</connection>
+        <developerConnection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/branches/3.2</developerConnection>
+        <url>https://unitils.svn.sourceforge.net/svnroot/unitils/branches/3.2</url>
+    </scm>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>

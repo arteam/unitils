@@ -31,7 +31,6 @@ Summary
 
         []
 
-
     {{{tutorial-inject.html} Inject module}} - <Easily inject test artifacts into classes and instances>
 
         * Inject values by type and name
@@ -39,12 +38,14 @@ Summary
         * Inject into static fields, e.g. singletons, and automatically reset the old value after the test
 
         []
-    {{{tutorial-io.html} Io module}} - <Easily files in the variables of the test>
 
-        * Load files into objects
+    {{{tutorial-io.html} IO module}} - <Support for performing IO in tests>
+
+        * Creating temporary files and directories
+
+        * Loading the contents of files into objects
 
         []
-
 
     {{{tutorial-database.html} Database testing}} - <Support for testing with databases and loading of DbUnit data sets>
 
@@ -104,6 +105,17 @@ Summary
 
 * News
 ~~~~~~
+  <<2011-12-22 - Release of Unitils 3.3>>
+
+    In this release a brand new module was added: io-unitils. This module adds support for creating temporary files
+    or directories and for the loading of a file contents into a field. Take a look at the {{{tutorial-io.html} tutorial}} for more info.
+
+    We've also rolled out a first version of our new site layout.
+
+    Check the {{{https://unitils.atlassian.net/secure/ReleaseNote.jspa?projectId=10000&version=10031}release notes}} for more details.
+
+
+
   <<2011-09-29 - Release of Unitils 3.2>>
 
     It's been a while since our last release, but now we're back. There's a new team, we're completely redoing the website and
