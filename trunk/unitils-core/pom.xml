@@ -15,12 +15,12 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.4</version>            
+            <version>4.4</version>
         </dependency>
-        <dependency>      
+        <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.1</version>
+            <version>1.1.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>avalon-framework</groupId>
@@ -54,7 +54,7 @@
             <groupId>ognl</groupId>
             <artifactId>ognl</artifactId>
             <version>2.6.9</version>
-        </dependency>        
+        </dependency>
     </dependencies>
 
 </project>
