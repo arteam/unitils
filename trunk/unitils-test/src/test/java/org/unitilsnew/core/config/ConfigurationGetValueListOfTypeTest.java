@@ -109,6 +109,19 @@ public class ConfigurationGetValueListOfTypeTest {
     }
 
     @Test
+    public void classTypes() {
+        List<Class> result = configuration.getValueListOfType(Class.class, "objects");
+        assertEquals(2, result.size());
+        assertEquals(TestClass1.class, result.get(0));
+        assertEquals(TestClass2.class, result.get(1));
+    }
+
+    @Test(expected = UnitilsException.class)
+    public void invalidClassName() {
+        configuration.getValueListOfType(Class.class, "invalid");
+    }
+
+    @Test
     public void objectTypes() {
         List<TestInterface> result = configuration.getValueListOfType(TestInterface.class, "objects");
         assertEquals(2, result.size());
@@ -117,7 +130,7 @@ public class ConfigurationGetValueListOfTypeTest {
     }
 
     @Test(expected = UnitilsException.class)
-    public void invalidObject() {
+    public void invalidObjectType() {
         configuration.getValueListOfType(List.class, "objects");
     }
 

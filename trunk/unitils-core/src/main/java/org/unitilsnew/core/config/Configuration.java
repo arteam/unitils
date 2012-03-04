@@ -42,8 +42,9 @@ import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 public class Configuration {
 
     /* All configuration properties, not null */
-    private Properties properties;
+    protected Properties properties;
 
+    protected Properties overridingProperties;
 
     /**
      * Creates a configuration for the given properties.
@@ -68,6 +69,14 @@ public class Configuration {
      */
     public Properties getProperties() {
         return properties;
+    }
+
+    public Properties getOverridingProperties() {
+        return overridingProperties;
+    }
+
+    public void setOverridingProperties(Properties overridingProperties) {
+        this.overridingProperties = overridingProperties;
     }
 
 
@@ -96,7 +105,7 @@ public class Configuration {
      * @return The trimmed string value, null if not found
      */
     public String getOptionalString(String propertyName, String... classifiers) {
-        String value = properties.getProperty(propertyName);
+        String value = getProperty(propertyName);
 
         if (classifiers != null && classifiers.length > 0) {
             StringBuilder propertyNameWithClassifiers = new StringBuilder(propertyName);
@@ -104,7 +113,7 @@ public class Configuration {
                 propertyNameWithClassifiers.append('.');
                 propertyNameWithClassifiers.append(classifier.trim());
 
-                String valueForClassifier = properties.getProperty(propertyNameWithClassifiers.toString());
+                String valueForClassifier = getProperty(propertyNameWithClassifiers.toString());
                 if (valueForClassifier != null) {
                     value = valueForClassifier;
                 }
@@ -206,6 +215,32 @@ public class Configuration {
         return toLong(value, propertyName, classifiers);
     }
 
+    /**
+     * Gets the class value for the property with the given name. If no such property is found, the value is empty
+     * or cannot be converted to a class, an exception will be raised.
+     *
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The class value, not null
+     */
+    public Class<?> getClass(String propertyName, String... classifiers) {
+        String value = getString(propertyName, classifiers);
+        return toClass(value, propertyName, classifiers);
+    }
+
+    /**
+     * Gets the class value for the property with the given name. If no such property is found or
+     * the value is empty, null is returned. An exception will be raised if the
+     * value cannot be converted to a class.
+     *
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The class value, null if not found
+     */
+    public Class<?> getOptionalClass(String propertyName, String... classifiers) {
+        String value = getOptionalString(propertyName, classifiers);
+        return toClass(value, propertyName, classifiers);
+    }
 
     /**
      * Gets the list of comma separated string values for the property with the given name. If no such property is found or
@@ -360,6 +395,13 @@ public class Configuration {
     }
 
 
+    protected String getProperty(String propertyName) {
+        if (overridingProperties != null && overridingProperties.containsKey(propertyName)) {
+            return overridingProperties.getProperty(propertyName);
+        }
+        return properties.getProperty(propertyName);
+    }
+
     protected Boolean toBoolean(String value, String propertyName, String... classifiers) {
         if (value == null) {
             return null;
@@ -424,7 +466,6 @@ public class Configuration {
         }
     }
 
-
     @SuppressWarnings({"unchecked"})
     protected <T> T toInstance(String value, String propertyName, String... classifiers) {
         if (value == null) {
@@ -438,6 +479,17 @@ public class Configuration {
             return instance;
         } catch (Exception e) {
             throw new UnitilsException("Value " + value + " of " + nameToString(propertyName, classifiers) + " is not a valid classname.", e);
+        }
+    }
+
+    protected Class<?> toClass(String value, String propertyName, String[] classifiers) {
+        if (value == null) {
+            return null;
+        }
+        try {
+            return Class.forName(value);
+        } catch (Exception e) {
+            throw new UnitilsException("Value " + value + " of " + nameToString(propertyName, classifiers) + " is not a valid class name.", e);
         }
     }
 
@@ -466,6 +518,9 @@ public class Configuration {
         }
         if (type.isEnum()) {
             return (T) toEnum((Class<Enum>) type, value, propertyName, classifiers);
+        }
+        if (Class.class.equals(type)) {
+            return (T) toClass(value, propertyName, classifiers);
         }
         return toInstance(type, value, propertyName, classifiers);
     }

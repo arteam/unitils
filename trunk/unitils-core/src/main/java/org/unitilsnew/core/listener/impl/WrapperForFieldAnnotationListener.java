@@ -16,27 +16,30 @@
 
 package org.unitilsnew.core.listener.impl;
 
-import org.unitilsnew.core.FieldAnnotation;
+import org.unitilsnew.core.Annotations;
+import org.unitilsnew.core.TestClass;
 import org.unitilsnew.core.TestInstance;
 import org.unitilsnew.core.TestPhase;
 import org.unitilsnew.core.listener.FieldAnnotationListener;
 import org.unitilsnew.core.listener.TestListener;
 
 import java.lang.annotation.Annotation;
-import java.util.List;
+import java.lang.reflect.Field;
 
 /**
  * @author Tim Ducheyne
  */
 public class WrapperForFieldAnnotationListener<A extends Annotation> extends TestListener {
 
-    private FieldAnnotationListener<A> fieldAnnotationListener;
-    private Class<A> annotationType;
+    protected Field field;
+    protected Annotations<A> annotations;
+    protected FieldAnnotationListener<A> fieldAnnotationListener;
 
 
-    public WrapperForFieldAnnotationListener(FieldAnnotationListener<A> fieldAnnotationListener) {
+    public WrapperForFieldAnnotationListener(Field field, Annotations<A> annotations, FieldAnnotationListener<A> fieldAnnotationListener) {
+        this.field = field;
+        this.annotations = annotations;
         this.fieldAnnotationListener = fieldAnnotationListener;
-        this.annotationType = getAnnotationType(fieldAnnotationListener);
     }
 
 
@@ -46,43 +49,27 @@ public class WrapperForFieldAnnotationListener<A extends Annotation> extends Tes
     }
 
     @Override
+    public void beforeTestClass(TestClass testClass) {
+        fieldAnnotationListener.beforeTestClass(testClass, field, annotations);
+    }
+
+    @Override
     public void beforeTestSetUp(TestInstance testInstance) {
-        List<FieldAnnotation<A>> fieldAnnotations = testInstance.getFieldAnnotations(annotationType);
-        for (FieldAnnotation<A> fieldAnnotation : fieldAnnotations) {
-            fieldAnnotationListener.beforeTestSetUp(testInstance, fieldAnnotation);
-        }
+        fieldAnnotationListener.beforeTestSetUp(testInstance, field, annotations);
     }
 
     @Override
     public void beforeTestMethod(TestInstance testInstance) {
-        List<FieldAnnotation<A>> fieldAnnotations = testInstance.getFieldAnnotations(annotationType);
-        for (FieldAnnotation<A> fieldAnnotation : fieldAnnotations) {
-            fieldAnnotationListener.beforeTestMethod(testInstance, fieldAnnotation);
-        }
+        fieldAnnotationListener.beforeTestMethod(testInstance, field, annotations);
     }
 
     @Override
     public void afterTestMethod(TestInstance testInstance, Throwable testThrowable) {
-        List<FieldAnnotation<A>> fieldAnnotations = testInstance.getFieldAnnotations(annotationType);
-        for (FieldAnnotation<A> fieldAnnotation : fieldAnnotations) {
-            fieldAnnotationListener.afterTestMethod(testInstance, testThrowable, fieldAnnotation);
-        }
+        fieldAnnotationListener.afterTestMethod(testInstance, field, annotations, testThrowable);
     }
 
     @Override
     public void afterTestTearDown(TestInstance testInstance) {
-        List<FieldAnnotation<A>> fieldAnnotations = testInstance.getFieldAnnotations(annotationType);
-        for (FieldAnnotation<A> fieldAnnotation : fieldAnnotations) {
-            fieldAnnotationListener.afterTestTearDown(testInstance, fieldAnnotation);
-        }
-    }
-
-
-    @SuppressWarnings("unchecked")
-    protected Class<A> getAnnotationType(FieldAnnotationListener<A> fieldAnnotationListener) {
-//        Map<TypeVariable<?>, Type> result = getTypeArguments(fieldAnnotationListener.getClass(), FieldAnnotationListener.class);
-//        return (Class<A>) result.values().iterator().next();
-        // todo td implement
-        return null;
+        fieldAnnotationListener.afterTestTearDown(testInstance, field, annotations);
     }
 }

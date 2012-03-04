@@ -14,32 +14,28 @@
  * limitations under the License.
  */
 
-package org.unitilsnew.core.config;
+package org.unitilsnew.core;
 
-import org.unitilsnew.core.Context;
-import org.unitilsnew.core.Factory;
+import org.unitilsnew.core.config.Configuration;
+import org.unitilsnew.core.listener.TestListener;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Tim Ducheyne
  */
-public class ModuleContextsFactory implements Factory<List<Context>> {
+public class UnitilsContext extends Context {
 
-    private List<Configuration> moduleConfigurations;
+    protected List<Class<? extends TestListener>> testListenerTypes;
 
 
-    public ModuleContextsFactory(List<Configuration> moduleConfigurations) {
-        this.moduleConfigurations = moduleConfigurations;
+    public UnitilsContext(Configuration configuration, List<Class<? extends TestListener>> testListenerTypes) {
+        super(configuration);
+        this.testListenerTypes = testListenerTypes;
     }
 
 
-    public List<Context> create() {
-        List<Context> contexts = new ArrayList<Context>();
-        for (Configuration moduleConfiguration : moduleConfigurations) {
-            contexts.add(new Context(moduleConfiguration));
-        }
-        return contexts;
+    public List<Class<? extends TestListener>> getTestListenerTypes() {
+        return testListenerTypes;
     }
 }

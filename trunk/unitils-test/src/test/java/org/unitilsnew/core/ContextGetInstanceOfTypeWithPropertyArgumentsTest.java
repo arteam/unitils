@@ -24,11 +24,16 @@ import org.unitils.mock.Mock;
 import org.unitilsnew.core.annotation.Property;
 import org.unitilsnew.core.config.Configuration;
 
+import java.lang.annotation.ElementType;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertSame;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 /**
@@ -49,7 +54,8 @@ public class ContextGetInstanceOfTypeWithPropertyArgumentsTest extends UnitilsJU
 
 
     @Test
-    public void simplePropertyTypes() {
+    public void propertyTypes() {
+        StringBuffer stringBuffer = new StringBuffer();
         configurationMock.returns("value").getValueOfType(String.class, "string", null);
         configurationMock.returns(true).getValueOfType(Boolean.class, "boolean", null);
         configurationMock.returns(true).getValueOfType(Boolean.TYPE, "boolean", null);
@@ -57,7 +63,9 @@ public class ContextGetInstanceOfTypeWithPropertyArgumentsTest extends UnitilsJU
         configurationMock.returns(5).getValueOfType(Integer.class, "integer", null);
         configurationMock.returns(6L).getValueOfType(Long.TYPE, "long", null);
         configurationMock.returns(6L).getValueOfType(Long.class, "long", null);
-        configurationMock.returns(new StringBuffer()).getValueOfType(StringBuffer.class, "object", null);
+        configurationMock.returns(stringBuffer).getValueOfType(StringBuffer.class, "object", null);
+        configurationMock.returns(FIELD).getValueOfType(ElementType.class, "enum", null);
+        configurationMock.returns(Map.class).getValueOfType(Class.class, "class", null);
 
         SimpleTypesClass result = context.getInstanceOfType(SimpleTypesClass.class);
         assertEquals("value", result.stringValue);
@@ -67,17 +75,22 @@ public class ContextGetInstanceOfTypeWithPropertyArgumentsTest extends UnitilsJU
         assertEquals(new Integer(5), result.integerWrapperValue);
         assertEquals(6, result.longSimpleValue);
         assertEquals(new Long(6), result.longWrapperValue);
+        assertSame(stringBuffer, result.objectValue);
+        assertEquals(FIELD, result.enumValue);
+        assertEquals(Map.class, result.classValue);
     }
 
     @Test
     public void listPropertyTypes() {
         StringBuffer stringBuffer1 = new StringBuffer();
         StringBuffer stringBuffer2 = new StringBuffer();
-        configurationMock.returns(asList("value1", "value2")).getValueOfType(List.class, "strings", null);
-        configurationMock.returns(asList(true, false)).getValueOfType(List.class, "booleans", null);
-        configurationMock.returns(asList(5, 6)).getValueOfType(List.class, "integers", null);
-        configurationMock.returns(asList(7L, 8L)).getValueOfType(List.class, "longs", null);
-        configurationMock.returns(asList(stringBuffer1, stringBuffer2)).getValueOfType(List.class, "objects", null);
+        configurationMock.returns(asList("value1", "value2")).getValueListOfType(String.class, "strings", null);
+        configurationMock.returns(asList(true, false)).getValueListOfType(Boolean.class, "booleans", null);
+        configurationMock.returns(asList(5, 6)).getValueListOfType(Integer.class, "integers", null);
+        configurationMock.returns(asList(7L, 8L)).getValueListOfType(Long.class, "longs", null);
+        configurationMock.returns(asList(stringBuffer1, stringBuffer2)).getValueListOfType(StringBuffer.class, "objects", null);
+        configurationMock.returns(asList(FIELD, METHOD)).getValueListOfType(ElementType.class, "enums", null);
+        configurationMock.returns(asList(Map.class, Set.class)).getValueListOfType(Class.class, "classes", null);
 
         ListTypesClass result = context.getInstanceOfType(ListTypesClass.class);
         assertReflectionEquals(asList("value1", "value2"), result.stringValues);
@@ -85,14 +98,8 @@ public class ContextGetInstanceOfTypeWithPropertyArgumentsTest extends UnitilsJU
         assertReflectionEquals(asList(5, 6), result.integerValues);
         assertReflectionEquals(asList(7L, 8L), result.longValues);
         assertReflectionEquals(asList(stringBuffer1, stringBuffer2), result.objectValues);
-    }
-
-    @Test
-    public void objectType() {
-        configurationMock.returns(new StringBuffer()).getValueOfType(StringBuffer.class, "object", null);
-
-        ObjectTypeClass result = context.getInstanceOfType(ObjectTypeClass.class);
-        assertTrue(result.objectValue instanceof StringBuffer);
+        assertReflectionEquals(asList(FIELD, METHOD), result.enumValues);
+        assertReflectionEquals(asList(Map.class, Set.class), result.classValues);
     }
 
     @Test(expected = UnitilsException.class)
@@ -100,6 +107,14 @@ public class ContextGetInstanceOfTypeWithPropertyArgumentsTest extends UnitilsJU
         configurationMock.raises(UnitilsException.class).getValueOfType(StringBuffer.class, "object", null);
 
         context.getInstanceOfType(ObjectTypeClass.class);
+    }
+
+    @Test
+    public void rawListTypeReturnsStringElements() {
+        configurationMock.returns(asList("value1", "value2")).getValueListOfType(String.class, "rawValues", null);
+
+        RawListClass result = context.getInstanceOfType(RawListClass.class);
+        assertReflectionEquals(asList("value1", "value2"), result.rawValues);
     }
 
 
@@ -112,11 +127,16 @@ public class ContextGetInstanceOfTypeWithPropertyArgumentsTest extends UnitilsJU
         protected Integer integerWrapperValue;
         protected long longSimpleValue;
         protected Long longWrapperValue;
+        protected StringBuffer objectValue;
+        protected ElementType enumValue;
+        protected Class<?> classValue;
 
         public SimpleTypesClass(@Property("string") String stringValue,
                                 @Property("boolean") boolean booleanSimpleValue, @Property("boolean") Boolean booleanWrapperValue,
                                 @Property("integer") int integerSimpleValue, @Property("integer") Integer integerWrapperValue,
-                                @Property("long") long longSimpleValue, @Property("long") Long longWrapperValue) {
+                                @Property("long") long longSimpleValue, @Property("long") Long longWrapperValue,
+                                @Property("object") StringBuffer objectValue, @Property("enum") ElementType enumValue,
+                                @Property("class") Class<?> classValue) {
             this.stringValue = stringValue;
             this.booleanSimpleValue = booleanSimpleValue;
             this.booleanWrapperValue = booleanWrapperValue;
@@ -124,6 +144,36 @@ public class ContextGetInstanceOfTypeWithPropertyArgumentsTest extends UnitilsJU
             this.integerWrapperValue = integerWrapperValue;
             this.longSimpleValue = longSimpleValue;
             this.longWrapperValue = longWrapperValue;
+            this.objectValue = objectValue;
+            this.enumValue = enumValue;
+            this.classValue = classValue;
+        }
+    }
+
+    protected static class ListTypesClass {
+
+        protected List<String> stringValues;
+        protected List<Boolean> booleanValues;
+        protected List<Integer> integerValues;
+        protected List<Long> longValues;
+        protected List<StringBuffer> objectValues;
+        protected List<ElementType> enumValues;
+        protected List<Class<?>> classValues;
+
+        public ListTypesClass(@Property("strings") List<String> stringValues,
+                              @Property("booleans") List<Boolean> booleanValues,
+                              @Property("integers") List<Integer> integerValues,
+                              @Property("longs") List<Long> longValues,
+                              @Property("objects") List<StringBuffer> objectValues,
+                              @Property("enums") List<ElementType> enumValues,
+                              @Property("classes") List<Class<?>> classValues) {
+            this.stringValues = stringValues;
+            this.booleanValues = booleanValues;
+            this.integerValues = integerValues;
+            this.longValues = longValues;
+            this.objectValues = objectValues;
+            this.enumValues = enumValues;
+            this.classValues = classValues;
         }
     }
 
@@ -136,24 +186,14 @@ public class ContextGetInstanceOfTypeWithPropertyArgumentsTest extends UnitilsJU
         }
     }
 
-    protected static class ListTypesClass {
+    protected static class RawListClass {
 
-        protected List<String> stringValues;
-        protected List<Boolean> booleanValues;
-        protected List<Integer> integerValues;
-        protected List<Long> longValues;
-        protected List<StringBuffer> objectValues;
+        protected List rawValues;
 
-        public ListTypesClass(@Property("strings") List<String> stringValues,
-                              @Property("booleans") List<Boolean> booleanValues,
-                              @Property("integers") List<Integer> integerValues,
-                              @Property("longs") List<Long> longValues,
-                              @Property("objects") List<StringBuffer> objectValues) {
-            this.stringValues = stringValues;
-            this.booleanValues = booleanValues;
-            this.integerValues = integerValues;
-            this.longValues = longValues;
-            this.objectValues = objectValues;
+
+        public RawListClass(@Property("rawValues") List rawValues) {
+            this.rawValues = rawValues;
         }
     }
+
 }

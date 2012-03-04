@@ -124,13 +124,24 @@ public class ConfigurationGetValueOfTypeTest {
     }
 
     @Test
+    public void classType() {
+        Class result = configuration.getValueOfType(Class.class, "object");
+        assertEquals(TestClass.class, result);
+    }
+
+    @Test(expected = UnitilsException.class)
+    public void invalidClassName() {
+        configuration.getValueOfType(Class.class, "invalid");
+    }
+
+    @Test
     public void objectType() {
         TestInterface result = configuration.getValueOfType(TestInterface.class, "object");
         assertTrue(result instanceof TestClass);
     }
 
     @Test(expected = UnitilsException.class)
-    public void invalidObject() {
+    public void invalidObjectType() {
         configuration.getValueOfType(List.class, "object");
     }
 

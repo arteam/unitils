@@ -16,23 +16,21 @@
 
 package org.unitilsnew.core;
 
-import org.unitilsnew.core.config.Configuration;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.List;
 
 /**
  * @author Tim Ducheyne
  */
-public class FieldAnnotation<A extends Annotation> extends TestAnnotation<A> {
+public class AnnotatedField<A extends Annotation> {
 
+    protected A annotation;
     protected Field field;
 
 
-    public FieldAnnotation(Field field, A annotation, List<A> classAnnotations, Configuration configuration) {
-        super(annotation, classAnnotations, configuration);
+    public AnnotatedField(Field field, A annotation) {
         this.field = field;
+        this.annotation = annotation;
     }
 
 
@@ -40,6 +38,10 @@ public class FieldAnnotation<A extends Annotation> extends TestAnnotation<A> {
         testInstance.setFieldValue(field, value);
     }
 
+
+    public A getAnnotation() {
+        return annotation;
+    }
 
     public Field getField() {
         return field;

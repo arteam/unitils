@@ -16,30 +16,34 @@
 
 package org.unitilsnew.core;
 
-import org.unitilsnew.core.listener.FieldAnnotationListener;
-import org.unitilsnew.core.listener.TestAnnotationListener;
-import org.unitilsnew.core.listener.TestListener;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.mock.annotation.Dummy;
+import org.unitilsnew.core.config.Configuration;
 
-import java.util.List;
+import static org.junit.Assert.assertSame;
 
 /**
  * @author Tim Ducheyne
  */
-public abstract class Module {
+public class ContextGetConfigurationTest extends UnitilsJUnit4 {
 
-    public List<Class<? extends TestListener>> getTestListenerTypes() {
-        return null;
+    /* Tested object */
+    private Context context;
+    @Dummy
+    private Configuration configuration;
+
+
+    @Before
+    public void initialize() {
+        context = new Context(configuration);
     }
 
-    public List<Class<? extends FieldAnnotationListener<?>>> getFieldAnnotationListenerTypes() {
-        return null;
-    }
 
-    public List<Class<? extends TestAnnotationListener<?>>> getTestAnnotationListenerTypes() {
-        return null;
-    }
-
-    public List<Class<?>> getFacadeTypes() {
-        return null;
+    @Test
+    public void getConfiguration() {
+        Configuration result = context.getConfiguration();
+        assertSame(configuration, result);
     }
 }
