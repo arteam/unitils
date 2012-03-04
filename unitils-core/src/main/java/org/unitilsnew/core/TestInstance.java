@@ -17,12 +17,11 @@
 package org.unitilsnew.core;
 
 import org.unitils.core.UnitilsException;
-import org.unitilsnew.core.config.Configuration;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Tim Ducheyne
@@ -33,14 +32,13 @@ public class TestInstance {
     protected Method testMethod;
     protected Object testObject;
 
-    protected Configuration configuration;
+    protected List<Annotation> methodAnnotations;
 
 
-    public TestInstance(TestClass testClass, Method testMethod, Object testObject, Configuration configuration) {
+    public TestInstance(TestClass testClass, Object testObject, Method testMethod) {
         this.testClass = testClass;
         this.testMethod = testMethod;
         this.testObject = testObject;
-        this.configuration = configuration;
     }
 
 
@@ -60,14 +58,34 @@ public class TestInstance {
         return testClass.getName() + "." + testMethod.getName();
     }
 
-    public <A extends Annotation> TestAnnotation<A> getTestAnnotation(Class<A> annotationClass) {
-        List<A> classAnnotations = testClass.getClassAnnotations(annotationClass);
-        A methodAnnotation = getMethodAnnotation(annotationClass);
-        return new TestAnnotation<A>(methodAnnotation, classAnnotations, configuration);
+    public List<Annotation> getMethodAnnotations() {
+        if (methodAnnotations != null) {
+            return methodAnnotations;
+        }
+        methodAnnotations = new ArrayList<Annotation>();
+        Collections.addAll(methodAnnotations, testMethod.getDeclaredAnnotations());
+        return methodAnnotations;
     }
 
-    public <A extends Annotation> List<FieldAnnotation<A>> getFieldAnnotations(Class<A> annotationClass) {
-        return testClass.getFieldAnnotations(annotationClass);
+    public Set<Class<? extends Annotation>> getAnnotationTypesAnnotatedWith(Class<? extends Annotation> annotationClass) {
+        Set<Class<? extends Annotation>> annotationTypes = new LinkedHashSet<Class<? extends Annotation>>();
+
+        List<Class<? extends Annotation>> classAnnotationTypes = testClass.getAnnotationTypesAnnotatedWith(annotationClass);
+        annotationTypes.addAll(classAnnotationTypes);
+
+        List<Annotation> methodAnnotations = getMethodAnnotations();
+        for (Annotation methodAnnotation : methodAnnotations) {
+            Class<? extends Annotation> annotationType = methodAnnotation.annotationType();
+            if (annotationType.getAnnotation(annotationClass) != null) {
+                annotationTypes.add(annotationType);
+            }
+        }
+        return annotationTypes;
+    }
+
+
+    public <A extends Annotation> List<AnnotatedField<A>> getFieldAnnotations(Class<A> annotationClass) {
+        return testClass.getAnnotatedFields(annotationClass);
     }
 
     public <A extends Annotation> A getMethodAnnotation(Class<A> annotationClass) {

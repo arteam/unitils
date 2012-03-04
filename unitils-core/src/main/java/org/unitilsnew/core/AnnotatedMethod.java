@@ -22,13 +22,23 @@ import java.lang.reflect.Method;
 /**
  * @author Tim Ducheyne
  */
-public class MethodAnnotation<A extends Annotation> {
+public class AnnotatedMethod<A extends Annotation> {
 
     private Method method;
     private A annotation;
 
-    public MethodAnnotation(Method method, A annotation) {
+
+    public AnnotatedMethod(Method method, A annotation) {
         this.method = method;
         this.annotation = annotation;
+    }
+
+
+    public Method getMethod() {
+        return method;
+    }
+
+    public A getAnnotation() {
+        return annotation;
     }
 }

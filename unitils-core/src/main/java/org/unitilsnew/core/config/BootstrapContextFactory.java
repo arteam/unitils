@@ -16,60 +16,37 @@
 
 package org.unitilsnew.core.config;
 
-import org.unitils.core.UnitilsException;
 import org.unitilsnew.core.Context;
 import org.unitilsnew.core.Factory;
+import org.unitilsnew.core.UnitilsContext;
+import org.unitilsnew.core.listener.impl.UnitilsTestListener;
+import org.unitilsnew.core.listener.impl.UnitilsTestListenerFactory;
 
-import java.io.InputStream;
 import java.util.Properties;
-
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
 /**
  * @author Tim Ducheyne
  */
 public class BootstrapContextFactory implements Factory<Context> {
 
-    public static final String UNITILS_CORE_PROPERTIES = "unitils-core.properties";
-
 
     public Context create() {
-        Properties systemProperties = loadSystemProperties();
-        Properties unitilsCoreProperties = loadUnitilsCoreProperties();
+        Configuration systemConfiguration = createSystemConfiguration();
 
-        Configuration bootstrapConfiguration = createBootstrapConfiguration(systemProperties, unitilsCoreProperties);
-        Context context = new Context(bootstrapConfiguration);
-        context.setInstanceOfType(Properties.class, systemProperties, "system");
+        Context context = new Context(systemConfiguration);
+        setDefaultImplementationTypes(context);
         return context;
     }
 
 
-    protected Configuration createBootstrapConfiguration(Properties systemProperties, Properties unitilsCoreProperties) {
-        Properties properties = new Properties();
-        properties.putAll(unitilsCoreProperties);
-        properties.putAll(systemProperties);
-        return new Configuration(properties);
+    protected void setDefaultImplementationTypes(Context context) {
+        context.setDefaultImplementationType(UnitilsTestListener.class, UnitilsTestListenerFactory.class);
+        context.setDefaultImplementationType(UnitilsContext.class, UnitilsContextFactory.class);
+        context.setDefaultImplementationType(Properties.class, UserPropertiesFactory.class);
     }
 
-
-    protected Properties loadSystemProperties() {
-        return System.getProperties();
+    protected Configuration createSystemConfiguration() {
+        Properties systemProperties = System.getProperties();
+        return new Configuration(systemProperties);
     }
-
-    protected Properties loadUnitilsCoreProperties() {
-        InputStream inputStream = null;
-        try {
-            inputStream = getClass().getResourceAsStream(UNITILS_CORE_PROPERTIES);
-
-            Properties properties = new Properties();
-            properties.load(inputStream);
-            return properties;
-
-        } catch (Exception e) {
-            throw new UnitilsException("Unable to load " + UNITILS_CORE_PROPERTIES, e);
-        } finally {
-            closeQuietly(inputStream);
-        }
-    }
-
 }

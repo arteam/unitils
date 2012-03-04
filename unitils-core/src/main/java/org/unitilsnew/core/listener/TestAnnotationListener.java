@@ -16,7 +16,7 @@
 
 package org.unitilsnew.core.listener;
 
-import org.unitilsnew.core.TestAnnotation;
+import org.unitilsnew.core.Annotations;
 import org.unitilsnew.core.TestInstance;
 import org.unitilsnew.core.TestPhase;
 
@@ -38,10 +38,10 @@ public abstract class TestAnnotationListener<A extends Annotation> {
      * Invoked before the test setup (eg @Before) is run.
      * This can be overridden to for example initialize the test-fixture.
      *
-     * @param testInstance   The test instance, not null
-     * @param testAnnotation The annotation, not null
+     * @param testInstance The test instance, not null
+     * @param annotations  The annotation, not null
      */
-    public void beforeTestSetUp(TestInstance testInstance, TestAnnotation<A> testAnnotation) {
+    public void beforeTestSetUp(TestInstance testInstance, Annotations<A> annotations) {
     }
 
     /**
@@ -49,10 +49,10 @@ public abstract class TestAnnotationListener<A extends Annotation> {
      * This can be overridden to for example further initialize the test-fixture using values that were set during
      * the test setup.
      *
-     * @param testInstance   The test instance, not null
-     * @param testAnnotation The annotation, not null
+     * @param testInstance The test instance, not null
+     * @param annotations  The annotation, not null
      */
-    public void beforeTestMethod(TestInstance testInstance, TestAnnotation<A> testAnnotation) {
+    public void beforeTestMethod(TestInstance testInstance, Annotations<A> annotations) {
     }
 
     /**
@@ -60,21 +60,21 @@ public abstract class TestAnnotationListener<A extends Annotation> {
      * This can be overridden to for example add assertions for testing the result of the test.
      * It the before method or the test raised an exception, this exception will be passed to the method.
      *
-     * @param testInstance   The test instance, not null
-     * @param testThrowable  The throwable thrown during the test or beforeTestMethod, null if none was thrown
-     * @param testAnnotation The annotation, not null
+     * @param testInstance  The test instance, not null
+     * @param annotations   The annotation, not null
+     * @param testThrowable The throwable thrown during the test or beforeTestMethod, null if none was thrown
      */
-    public void afterTestMethod(TestInstance testInstance, Throwable testThrowable, TestAnnotation<A> testAnnotation) {
+    public void afterTestMethod(TestInstance testInstance, Annotations<A> annotations, Throwable testThrowable) {
     }
 
     /**
      * Invoked after the test tear down (eg @After).
      * This can be overridden to for example perform extra cleanup after the test.
      *
-     * @param testInstance   The test instance, not null
-     * @param testAnnotation The annotation, not null
+     * @param testInstance The test instance, not null
+     * @param annotations  The annotation, not null
      */
-    public void afterTestTearDown(TestInstance testInstance, TestAnnotation<A> testAnnotation) {
+    public void afterTestTearDown(TestInstance testInstance, Annotations<A> annotations) {
     }
 
 }

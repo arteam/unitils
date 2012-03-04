@@ -16,7 +16,7 @@
 
 package org.unitilsnew.core.listener.impl;
 
-import org.unitilsnew.core.TestAnnotation;
+import org.unitilsnew.core.Annotations;
 import org.unitilsnew.core.TestInstance;
 import org.unitilsnew.core.TestPhase;
 import org.unitilsnew.core.listener.TestAnnotationListener;
@@ -29,13 +29,13 @@ import java.lang.annotation.Annotation;
  */
 public class WrapperForTestAnnotationListener<A extends Annotation> extends TestListener {
 
-    private TestAnnotationListener<A> testAnnotationListener;
-    private Class<A> annotationType;
+    protected Annotations<A> annotations;
+    protected TestAnnotationListener<A> testAnnotationListener;
 
 
-    public WrapperForTestAnnotationListener(TestAnnotationListener<A> testAnnotationListener) {
+    public WrapperForTestAnnotationListener(Annotations<A> annotations, TestAnnotationListener<A> testAnnotationListener) {
+        this.annotations = annotations;
         this.testAnnotationListener = testAnnotationListener;
-        this.annotationType = getAnnotationType(testAnnotationListener);
     }
 
 
@@ -46,42 +46,21 @@ public class WrapperForTestAnnotationListener<A extends Annotation> extends Test
 
     @Override
     public void beforeTestSetUp(TestInstance testInstance) {
-        TestAnnotation<A> testAnnotation = testInstance.getTestAnnotation(annotationType);
-        if (testAnnotation != null) {
-            testAnnotationListener.beforeTestSetUp(testInstance, testAnnotation);
-        }
+        testAnnotationListener.beforeTestSetUp(testInstance, annotations);
     }
 
     @Override
     public void beforeTestMethod(TestInstance testInstance) {
-        TestAnnotation<A> testAnnotation = testInstance.getTestAnnotation(annotationType);
-        if (testAnnotation != null) {
-            testAnnotationListener.beforeTestMethod(testInstance, testAnnotation);
-        }
+        testAnnotationListener.beforeTestMethod(testInstance, annotations);
     }
 
     @Override
     public void afterTestMethod(TestInstance testInstance, Throwable testThrowable) {
-        TestAnnotation<A> testAnnotation = testInstance.getTestAnnotation(annotationType);
-        if (testAnnotation != null) {
-            testAnnotationListener.afterTestMethod(testInstance, testThrowable, testAnnotation);
-        }
+        testAnnotationListener.afterTestMethod(testInstance, annotations, testThrowable);
     }
 
     @Override
     public void afterTestTearDown(TestInstance testInstance) {
-        TestAnnotation<A> testAnnotation = testInstance.getTestAnnotation(annotationType);
-        if (testAnnotation != null) {
-            testAnnotationListener.afterTestTearDown(testInstance, testAnnotation);
-        }
-    }
-
-
-    @SuppressWarnings("unchecked")
-    protected Class<A> getAnnotationType(TestAnnotationListener testAnnotationListener) {
-//        Map<TypeVariable<?>, Type> result = getTypeArguments(testAnnotationListener.getClass(), TestAnnotationListener.class);
-//        return (Class<A>) result.values().iterator().next();
-        // todo td implement
-        return null;
+        testAnnotationListener.afterTestTearDown(testInstance, annotations);
     }
 }

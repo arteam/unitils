@@ -26,8 +26,10 @@ import org.unitilsnew.core.config.Configuration;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,6 +42,7 @@ public class Context {
 
     protected Configuration configuration;
     protected Map<Key, Object> instances = new HashMap<Key, Object>();
+    protected Map<Key, Class<?>> defaultImplementationTypes = new HashMap<Key, Class<?>>();
 
 
     public Context(Configuration configuration) {
@@ -47,16 +50,25 @@ public class Context {
         setInstanceOfType(Configuration.class, configuration);
     }
 
-    public <T> void setInstanceOfType(Class<T> type, T implementationType, String... classifiers) {
-        Key key = new Key(type, classifiers);
-        instances.put(key, implementationType);
+
+    public Configuration getConfiguration() {
+        return configuration;
     }
+
+
+    public void setDefaultImplementationType(Class<?> type, Class<?> implementationType, String... classifiers) {
+        Key key = new Key(type, classifiers);
+        defaultImplementationTypes.put(key, implementationType);
+    }
+
+    public Class<?> getDefaultImplementationType(Class<?> type, String... classifiers) {
+        Key key = new Key(type, classifiers);
+        return defaultImplementationTypes.get(key);
+    }
+
 
     @SuppressWarnings({"unchecked"})
     public <T> T getInstanceOfType(Class<T> type, String... classifiers) {
-        if (classifiers != null && classifiers.length == 0) {
-            classifiers = null;
-        }
         Key key = new Key(type, classifiers);
 
         T instance = (T) instances.get(key);
@@ -76,6 +88,10 @@ public class Context {
         return instance;
     }
 
+    protected <T> void setInstanceOfType(Class<T> type, T implementationType, String... classifiers) {
+        Key key = new Key(type, classifiers);
+        instances.put(key, implementationType);
+    }
 
     @SuppressWarnings("unchecked")
     protected <T> T createInstanceOfType(Class<T> type, String... classifiers) {
@@ -86,22 +102,23 @@ public class Context {
         }
 
         Object[] arguments;
-        Class<?>[] argumentTypes;
+        Class<?>[] parameterTypes;
         if (constructors.length == 0) {
             arguments = new Object[0];
-            argumentTypes = new Class[0];
+            parameterTypes = new Class[0];
 
         } else {
             Constructor<?> constructor = constructors[0];
-            argumentTypes = constructor.getParameterTypes();
+            parameterTypes = constructor.getParameterTypes();
+            Type[] genericParameterTypes = constructor.getGenericParameterTypes();
             Annotation[][] argumentAnnotations = constructor.getParameterAnnotations();
 
-            arguments = new Object[argumentTypes.length];
-            for (int i = 0; i < argumentTypes.length; i++) {
-                arguments[i] = getArgumentInstance(argumentTypes[i], argumentAnnotations[i]);
+            arguments = new Object[parameterTypes.length];
+            for (int i = 0; i < parameterTypes.length; i++) {
+                arguments[i] = getArgumentInstance(parameterTypes[i], genericParameterTypes[i], argumentAnnotations[i]);
             }
         }
-        Object instance = ReflectionUtils.createInstanceOfType(implementationType, true, argumentTypes, arguments);
+        Object instance = ReflectionUtils.createInstanceOfType(implementationType, true, parameterTypes, arguments);
         if (instance instanceof Factory) {
             instance = ((Factory) instance).create();
         }
@@ -111,7 +128,7 @@ public class Context {
         return (T) instance;
     }
 
-    protected Object getArgumentInstance(Class<?> argumentType, Annotation[] argumentAnnotations) {
+    protected Object getArgumentInstance(Class<?> argumentType, Type genericArgumentType, Annotation[] argumentAnnotations) {
         Property propertyAnnotation = getPropertyAnnotation(argumentAnnotations);
         Classifier classifierAnnotation = getClassifierAnnotation(argumentAnnotations);
 
@@ -119,7 +136,16 @@ public class Context {
 
         Object instance;
         if (propertyAnnotation != null) {
-            instance = configuration.getValueOfType(argumentType, propertyAnnotation.value(), argumentClassifiers);
+            String propertyName = propertyAnnotation.value();
+            if (List.class.isAssignableFrom(argumentType)) {
+                Class<?> elementType = ReflectionUtils.getGenericParameterClass(genericArgumentType);
+                if (elementType == null) {
+                    elementType = String.class;
+                }
+                instance = configuration.getValueListOfType(elementType, propertyName, argumentClassifiers);
+            } else {
+                instance = configuration.getValueOfType(argumentType, propertyName, argumentClassifiers);
+            }
         } else {
             instance = getInstanceOfType(argumentType, argumentClassifiers);
         }
@@ -146,21 +172,17 @@ public class Context {
 
     @SuppressWarnings("unchecked")
     protected Class<?> getImplementationType(Class<?> type, String... classifiers) {
-        String propertyName = type.getName();
-        String value = configuration.getOptionalString(propertyName, classifiers);
-        if (value == null) {
-            // no config found, default to given type
+        Class<?> implementationType = getConfiguredImplementationType(type, classifiers);
+        if (implementationType == null) {
+            implementationType = getDefaultImplementationType(type, classifiers);
+        }
+
+        // no default found, use the given type if it is not an interface
+        if (implementationType == null) {
             if (type.isInterface()) {
                 throw new UnitilsException("No implementation type configured for given interface type " + type.getName());
             }
-            return type;
-        }
-
-        Class<?> implementationType;
-        try {
-            implementationType = Class.forName(value);
-        } catch (Exception e) {
-            throw new UnitilsException("Invalid implementation type " + value, e);
+            implementationType = type;
         }
         if (implementationType.isInterface()) {
             throw new UnitilsException("Interface found as implementation type of " + implementationType.getName());
@@ -169,6 +191,19 @@ public class Context {
             throw new UnitilsException("Implementation type " + implementationType.getName() + " is not of type " + type.getName() + " or " + Factory.class.getName() + "<" + type.getName() + ">");
         }
         return implementationType;
+    }
+
+    protected Class<?> getConfiguredImplementationType(Class<?> type, String... classifiers) {
+        String propertyName = type.getName();
+        String value = configuration.getOptionalString(propertyName, classifiers);
+        if (value == null) {
+            return null;
+        }
+        try {
+            return Class.forName(value);
+        } catch (Exception e) {
+            throw new UnitilsException("Invalid implementation type " + value, e);
+        }
     }
 
 
@@ -195,7 +230,11 @@ public class Context {
 
         public Key(Class<?> type, String... classifiers) {
             this.type = type;
-            this.classifiers = classifiers;
+            if (classifiers != null && classifiers.length == 0) {
+                this.classifiers = null;
+            } else {
+                this.classifiers = classifiers;
+            }
         }
 
         @Override

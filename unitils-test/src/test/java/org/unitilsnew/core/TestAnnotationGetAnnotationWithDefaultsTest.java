@@ -38,7 +38,7 @@ import static org.unitilsnew.core.TestAnnotationGetAnnotationWithDefaultsTest.Te
 public class TestAnnotationGetAnnotationWithDefaultsTest {
 
     /* Tested object */
-    private TestAnnotation<MyAnnotation> testAnnotation;
+    private Annotations<MyAnnotation> annotations;
 
     private Configuration configuration;
 
@@ -56,9 +56,9 @@ public class TestAnnotationGetAnnotationWithDefaultsTest {
 
     @Test
     public void annotationWithDefaults() {
-        testAnnotation = new TestAnnotation<MyAnnotation>(allDefaultsAnnotation, asList(noDefaultsAnnotation), configuration);
+        annotations = new Annotations<MyAnnotation>(allDefaultsAnnotation, asList(noDefaultsAnnotation), configuration);
 
-        MyAnnotation result = testAnnotation.getAnnotationWithDefaults();
+        MyAnnotation result = annotations.getAnnotationWithDefaults();
         assertEquals("value", result.string());
         assertEquals(4, result.primitive());
         assertEquals(VALUE1, result.enumValue());

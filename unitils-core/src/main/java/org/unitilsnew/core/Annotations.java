@@ -27,14 +27,14 @@ import java.util.List;
 /**
  * @author Tim Ducheyne
  */
-public class TestAnnotation<A extends Annotation> {
+public class Annotations<A extends Annotation> {
 
     protected A annotation;
     protected List<A> classAnnotations;
     protected Configuration configuration;
 
 
-    public TestAnnotation(A annotation, List<A> classAnnotations, Configuration configuration) {
+    public Annotations(A annotation, List<A> classAnnotations, Configuration configuration) {
         this.annotation = annotation;
         this.classAnnotations = classAnnotations;
         this.configuration = configuration;
