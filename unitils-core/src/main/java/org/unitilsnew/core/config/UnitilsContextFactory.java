@@ -31,6 +31,9 @@ public class UnitilsContextFactory implements Factory<UnitilsContext> {
 
     public static final String MODULE_PROPERTIES_NAME = "unitils-module.properties";
 
+    public static final String LISTENERS_PROPERTY = "listeners";
+    public static final String FACADES_PROPERTY = "facades";
+
     protected Properties userProperties;
     protected PropertiesReader propertiesReader;
 
@@ -45,8 +48,11 @@ public class UnitilsContextFactory implements Factory<UnitilsContext> {
         List<Properties> modulesProperties = loadModuleProperties();
         Configuration unitilsConfiguration = createUnitilsConfiguration(modulesProperties);
         List<Class<? extends TestListener>> testListenerTypes = getTestListenerTypes(modulesProperties);
+        List<Class<?>> facadeTypes = getFacadeTypes(modulesProperties);
 
-        return new UnitilsContext(unitilsConfiguration, testListenerTypes);
+        UnitilsContext unitilsContext = new UnitilsContext(unitilsConfiguration, testListenerTypes);
+        initializeFacades(facadeTypes, unitilsContext);
+        return unitilsContext;
     }
 
 
@@ -64,7 +70,7 @@ public class UnitilsContextFactory implements Factory<UnitilsContext> {
         List<Class<? extends TestListener>> testListenerTypes = new ArrayList<Class<? extends TestListener>>();
         for (Properties moduleProperties : modulesProperties) {
             Configuration moduleConfiguration = new Configuration(moduleProperties);
-            List<Class> types = moduleConfiguration.getOptionalValueListOfType(Class.class, TestListener.class.getName());
+            List<Class<?>> types = moduleConfiguration.getOptionalClassList(LISTENERS_PROPERTY);
             for (Class<?> type : types) {
                 // todo check type implements TestListener
                 Class<? extends TestListener> testListenerType = (Class<TestListener>) type;
@@ -72,6 +78,22 @@ public class UnitilsContextFactory implements Factory<UnitilsContext> {
             }
         }
         return testListenerTypes;
+    }
+
+    protected List<Class<?>> getFacadeTypes(List<Properties> modulesProperties) {
+        List<Class<?>> facadeTypes = new ArrayList<Class<?>>();
+        for (Properties moduleProperties : modulesProperties) {
+            Configuration moduleConfiguration = new Configuration(moduleProperties);
+            List<Class<?>> moduleFacadeTypes = moduleConfiguration.getOptionalClassList(FACADES_PROPERTY);
+            facadeTypes.addAll(moduleFacadeTypes);
+        }
+        return facadeTypes;
+    }
+
+    protected void initializeFacades(List<Class<?>> facadeTypes, UnitilsContext unitilsContext) {
+        for (Class<?> facadeType : facadeTypes) {
+            unitilsContext.getInstanceOfType(facadeType);
+        }
     }
 
     protected List<Properties> loadModuleProperties() {

@@ -131,117 +131,6 @@ public class Configuration {
         return value;
     }
 
-
-    /**
-     * Gets the boolean value for the property with the given name. If no such property is found,
-     * the value is empty or not a boolean, an exception will be raised.
-     *
-     * @param propertyName The name, not null
-     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
-     * @return The boolean value, not null
-     */
-    public Boolean getBoolean(String propertyName, String... classifiers) {
-        String value = getString(propertyName, classifiers);
-        return toBoolean(value, propertyName, classifiers);
-    }
-
-    /**
-     * Gets the boolean value for the property with the given name. If no such property is found or
-     * the value is empty, null is returned. An exception will be raised if the
-     * value is not a boolean.
-     *
-     * @param propertyName The name, not null
-     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
-     * @return The boolean value, null if not found
-     */
-    public Boolean getOptionalBoolean(String propertyName, String... classifiers) {
-        String value = getOptionalString(propertyName, classifiers);
-        return toBoolean(value, propertyName, classifiers);
-    }
-
-
-    /**
-     * Gets the int value for the property with the given name. If no such property is found, the value is empty
-     * or cannot be converted to an int, an exception will be raised.
-     *
-     * @param propertyName The name, not null
-     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
-     * @return The int value
-     */
-    public Integer getInteger(String propertyName, String... classifiers) {
-        String value = getString(propertyName, classifiers);
-        return toInteger(value, propertyName, classifiers);
-    }
-
-    /**
-     * Gets the int value for the property with the given name. If no such property is found or
-     * the value is empty, null is returned. An exception will be raised if the
-     * value cannot be converted to an int.
-     *
-     * @param propertyName The name, not null
-     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
-     * @return The int value, null if not found
-     */
-    public Integer getOptionalInteger(String propertyName, String... classifiers) {
-        String value = getOptionalString(propertyName, classifiers);
-        return toInteger(value, propertyName, classifiers);
-    }
-
-
-    /**
-     * Gets the long value for the property with the given name. If no such property is found, the value is empty
-     * or cannot be converted to a long, an exception will be raised.
-     *
-     * @param propertyName The name, not null
-     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
-     * @return The long value, not null
-     */
-    public Long getLong(String propertyName, String... classifiers) {
-        String value = getString(propertyName, classifiers);
-        return toLong(value, propertyName, classifiers);
-    }
-
-    /**
-     * Gets the long value for the property with the given name. If no such property is found or
-     * the value is empty, null is returned. An exception will be raised if the
-     * value cannot be converted to a long.
-     *
-     * @param propertyName The name, not null
-     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
-     * @return The long value, null if not found
-     */
-    public Long getOptionalLong(String propertyName, String... classifiers) {
-        String value = getOptionalString(propertyName, classifiers);
-        return toLong(value, propertyName, classifiers);
-    }
-
-    /**
-     * Gets the class value for the property with the given name. If no such property is found, the value is empty
-     * or cannot be converted to a class, an exception will be raised.
-     *
-     * @param propertyName The name, not null
-     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
-     * @return The class value, not null
-     */
-    public Class<?> getClass(String propertyName, String... classifiers) {
-        String value = getString(propertyName, classifiers);
-        return toClass(value, propertyName, classifiers);
-    }
-
-    /**
-     * Gets the class value for the property with the given name. If no such property is found or
-     * the value is empty, null is returned. An exception will be raised if the
-     * value cannot be converted to a class.
-     *
-     * @param propertyName The name, not null
-     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
-     * @return The class value, null if not found
-     */
-    public Class<?> getOptionalClass(String propertyName, String... classifiers) {
-        String value = getOptionalString(propertyName, classifiers);
-        return toClass(value, propertyName, classifiers);
-    }
-
     /**
      * Gets the list of comma separated string values for the property with the given name. If no such property is found or
      * the value is empty, an exception will be raised. Empty elements (",,") will not be added.
@@ -274,32 +163,192 @@ public class Configuration {
 
 
     /**
-     * Gets an instance of the class name specified by the property with the given name. If no such property is found, the
-     * value is empty or the instance cannot be created, an exception will be raised.<br/>
+     * Gets the boolean value for the property with the given name. If no such property is found,
+     * the value is empty or not a boolean, an exception will be raised.
      *
      * @param propertyName The name, not null
      * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
-     * @return The instance value, not null
+     * @return The boolean value, not null
      */
-    @SuppressWarnings({"unchecked"})
-    public <T> T getInstance(String propertyName, String... classifiers) {
+    public Boolean getBoolean(String propertyName, String... classifiers) {
         String value = getString(propertyName, classifiers);
-        return (T) toInstance(value, propertyName, classifiers);
+        return toBoolean(value, propertyName, classifiers);
     }
 
     /**
-     * Gets an instance of the class name specified by the property with the given name. If no such property is found, the
-     * value is empty, null is returned. An exception will be raised if the instance cannot be created.<br/
+     * Gets the boolean value for the property with the given name. If no such property is found or
+     * the value is empty, null is returned. An exception will be raised if the
+     * value is not a boolean.
      *
      * @param propertyName The name, not null
      * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
-     * @return The instance value, null if not found
+     * @return The boolean value, null if not found
      */
-    @SuppressWarnings({"unchecked"})
-    public <T> T getOptionalInstance(String propertyName, String... classifiers) {
+    public Boolean getOptionalBoolean(String propertyName, String... classifiers) {
         String value = getOptionalString(propertyName, classifiers);
-        return (T) toInstance(value, propertyName, classifiers);
+        return toBoolean(value, propertyName, classifiers);
     }
+
+    public List<Boolean> getBooleanList(String propertyName, String... classifiers) {
+        List<Boolean> result = getOptionalBooleanList(propertyName, classifiers);
+        if (result.isEmpty()) {
+            throw new UnitilsException("No value found for " + nameToString(propertyName, classifiers));
+        }
+        return result;
+    }
+
+    public List<Boolean> getOptionalBooleanList(String propertyName, String... classifiers) {
+        List<String> values = getStringList(propertyName, classifiers);
+
+        List<Boolean> result = new ArrayList<Boolean>(values.size());
+        for (String value : values) {
+            Boolean bool = toBoolean(value, propertyName, classifiers);
+            result.add(bool);
+        }
+        return result;
+    }
+
+
+    /**
+     * Gets the int value for the property with the given name. If no such property is found, the value is empty
+     * or cannot be converted to an int, an exception will be raised.
+     *
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The int value
+     */
+    public Integer getInteger(String propertyName, String... classifiers) {
+        String value = getString(propertyName, classifiers);
+        return toInteger(value, propertyName, classifiers);
+    }
+
+    /**
+     * Gets the int value for the property with the given name. If no such property is found or
+     * the value is empty, null is returned. An exception will be raised if the
+     * value cannot be converted to an int.
+     *
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The int value, null if not found
+     */
+    public Integer getOptionalInteger(String propertyName, String... classifiers) {
+        String value = getOptionalString(propertyName, classifiers);
+        return toInteger(value, propertyName, classifiers);
+    }
+
+    public List<Integer> getIntegerList(String propertyName, String... classifiers) {
+        List<Integer> result = getOptionalIntegerList(propertyName, classifiers);
+        if (result.isEmpty()) {
+            throw new UnitilsException("No value found for " + nameToString(propertyName, classifiers));
+        }
+        return result;
+    }
+
+    public List<Integer> getOptionalIntegerList(String propertyName, String... classifiers) {
+        List<String> values = getStringList(propertyName, classifiers);
+
+        List<Integer> result = new ArrayList<Integer>(values.size());
+        for (String value : values) {
+            Integer integer = toInteger(value, propertyName, classifiers);
+            result.add(integer);
+        }
+        return result;
+    }
+
+
+    /**
+     * Gets the long value for the property with the given name. If no such property is found, the value is empty
+     * or cannot be converted to a long, an exception will be raised.
+     *
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The long value, not null
+     */
+    public Long getLong(String propertyName, String... classifiers) {
+        String value = getString(propertyName, classifiers);
+        return toLong(value, propertyName, classifiers);
+    }
+
+    /**
+     * Gets the long value for the property with the given name. If no such property is found or
+     * the value is empty, null is returned. An exception will be raised if the
+     * value cannot be converted to a long.
+     *
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The long value, null if not found
+     */
+    public Long getOptionalLong(String propertyName, String... classifiers) {
+        String value = getOptionalString(propertyName, classifiers);
+        return toLong(value, propertyName, classifiers);
+    }
+
+    public List<Long> getLongList(String propertyName, String... classifiers) {
+        List<Long> result = getOptionalLongList(propertyName, classifiers);
+        if (result.isEmpty()) {
+            throw new UnitilsException("No value found for " + nameToString(propertyName, classifiers));
+        }
+        return result;
+    }
+
+    public List<Long> getOptionalLongList(String propertyName, String... classifiers) {
+        List<String> values = getStringList(propertyName, classifiers);
+
+        List<Long> result = new ArrayList<Long>(values.size());
+        for (String value : values) {
+            Long integer = toLong(value, propertyName, classifiers);
+            result.add(integer);
+        }
+        return result;
+    }
+
+
+    /**
+     * Gets the class value for the property with the given name. If no such property is found, the value is empty
+     * or cannot be converted to a class, an exception will be raised.
+     *
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The class value, not null
+     */
+    public Class<?> getClass(String propertyName, String... classifiers) {
+        String value = getString(propertyName, classifiers);
+        return toClass(value, propertyName, classifiers);
+    }
+
+    /**
+     * Gets the class value for the property with the given name. If no such property is found or
+     * the value is empty, null is returned. An exception will be raised if the
+     * value cannot be converted to a class.
+     *
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The class value, null if not found
+     */
+    public Class<?> getOptionalClass(String propertyName, String... classifiers) {
+        String value = getOptionalString(propertyName, classifiers);
+        return toClass(value, propertyName, classifiers);
+    }
+
+    public List<Class<?>> getClassList(String propertyName, String... classifiers) {
+        List<Class<?>> result = getOptionalClassList(propertyName, classifiers);
+        if (result.isEmpty()) {
+            throw new UnitilsException("No value found for " + nameToString(propertyName, classifiers));
+        }
+        return result;
+    }
+
+    public List<Class<?>> getOptionalClassList(String propertyName, String... classifiers) {
+        List<String> values = getStringList(propertyName, classifiers);
+
+        List<Class<?>> result = new ArrayList<Class<?>>(values.size());
+        for (String value : values) {
+            Class<?> clazz = toClass(value, propertyName, classifiers);
+            result.add(clazz);
+        }
+        return result;
+    }
+
 
     /**
      * Gets an instance of the given type (typically an interface).
@@ -341,6 +390,26 @@ public class Configuration {
         return toInstance(type, value, propertyName, classifiers);
     }
 
+    public <T> List<T> getInstanceOfList(Class<T> type, String... classifiers) {
+        List<T> result = getOptionalInstanceOfList(type, classifiers);
+        if (result.isEmpty()) {
+            throw new UnitilsException("No value found for " + nameToString(type.getName(), classifiers));
+        }
+        return result;
+    }
+
+    public <T> List<T> getOptionalInstanceOfList(Class<T> type, String... classifiers) {
+        String propertyName = type.getName();
+        List<String> values = getStringList(propertyName, classifiers);
+
+        List<T> result = new ArrayList<T>(values.size());
+        for (String value : values) {
+            T instance = toInstance(type, value, propertyName, classifiers);
+            result.add(instance);
+        }
+        return result;
+    }
+
 
     public <T extends Enum<T>> T getEnumValue(Class<T> type, String propertyName, String... classifiers) {
         String value = getString(propertyName, classifiers);
@@ -350,6 +419,25 @@ public class Configuration {
     public <T extends Enum<T>> T getOptionalEnumValue(Class<T> type, String propertyName, String... classifiers) {
         String value = getOptionalString(propertyName, classifiers);
         return toEnum(type, value, propertyName, classifiers);
+    }
+
+    public <T extends Enum<T>> List<T> getEnumList(Class<T> type, String propertyName, String... classifiers) {
+        List<T> result = getOptionalEnumList(type, propertyName, classifiers);
+        if (result.isEmpty()) {
+            throw new UnitilsException("No value found for " + nameToString(propertyName, classifiers));
+        }
+        return result;
+    }
+
+    public <T extends Enum<T>> List<T> getOptionalEnumList(Class<T> type, String propertyName, String... classifiers) {
+        List<String> values = getStringList(propertyName, classifiers);
+
+        List<T> result = new ArrayList<T>(values.size());
+        for (String value : values) {
+            T enumValue = toEnum(type, value, propertyName, classifiers);
+            result.add(enumValue);
+        }
+        return result;
     }
 
 
@@ -362,7 +450,6 @@ public class Configuration {
         String value = getOptionalString(propertyName, classifiers);
         return toValueOfType(type, value, propertyName, classifiers);
     }
-
 
     public <T> List<T> getValueListOfType(Class<T> type, String propertyName, String... classifiers) {
         List<String> values = getStringList(propertyName, classifiers);
@@ -393,7 +480,6 @@ public class Configuration {
         }
         return "property " + propertyName + " and classifiers " + Arrays.toString(classifiers);
     }
-
 
     protected String getProperty(String propertyName) {
         if (overridingProperties != null && overridingProperties.containsKey(propertyName)) {
