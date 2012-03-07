@@ -170,13 +170,17 @@ public class Context {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     protected Class<?> getImplementationType(Class<?> type, String... classifiers) {
+        // try configured type
         Class<?> implementationType = getConfiguredImplementationType(type, classifiers);
+        // no type configured, check set default type
         if (implementationType == null) {
             implementationType = getDefaultImplementationType(type, classifiers);
         }
-
+        // no default found, try to find a factory for the type
+        if (implementationType == null) {
+            implementationType = getDefaultFactoryType(type);
+        }
         // no default found, use the given type if it is not an interface
         if (implementationType == null) {
             if (type.isInterface()) {
@@ -203,6 +207,14 @@ public class Context {
             return Class.forName(value);
         } catch (Exception e) {
             throw new UnitilsException("Invalid implementation type " + value, e);
+        }
+    }
+
+    protected Class<?> getDefaultFactoryType(Class<?> type) {
+        try {
+            return Class.forName(type.getName() + "Factory");
+        } catch (ClassNotFoundException e) {
+            return null;
         }
     }
 

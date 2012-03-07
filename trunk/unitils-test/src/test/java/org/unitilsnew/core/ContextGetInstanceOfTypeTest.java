@@ -59,7 +59,21 @@ public class ContextGetInstanceOfTypeTest extends UnitilsJUnit4 {
     }
 
     @Test
-    public void typeIsUsedWhenNoConfigFound() {
+    public void noConfigButDefaultFound() {
+        context.setDefaultImplementationType(TestInterface.class, NoArgumentConstructorClass.class);
+
+        TestInterface result = context.getInstanceOfType(TestInterface.class);
+        assertTrue(result instanceof NoArgumentConstructorClass);
+    }
+
+    @Test
+    public void noConfigOrDefaultFoundButFactoryExists() {
+        TestInterface2 result = context.getInstanceOfType(TestInterface2.class);
+        assertTrue(result instanceof TestInterface2Impl);
+    }
+
+    @Test
+    public void typeIsUsedWhenNoOtherDefaultOrFactoryFound() {
         NoArgumentConstructorClass result = context.getInstanceOfType(NoArgumentConstructorClass.class);
         assertNotNull(result);
     }
@@ -147,4 +161,18 @@ public class ContextGetInstanceOfTypeTest extends UnitilsJUnit4 {
         public TwoConstructorsClass(int a) {
         }
     }
+
+    protected static interface TestInterface2 {
+    }
+
+    protected static class TestInterface2Impl implements TestInterface2 {
+    }
+
+    protected static class TestInterface2Factory implements Factory<TestInterface2> {
+
+        public TestInterface2 create() {
+            return new TestInterface2Impl();
+        }
+    }
+
 }

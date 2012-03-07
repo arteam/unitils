@@ -16,7 +16,6 @@
 
 package org.unitilsnew.core.config;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,6 +23,8 @@ import org.unitils.core.UnitilsException;
 import org.unitilsnew.core.Factory;
 
 import java.util.Properties;
+
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * @author Tim Ducheyne
@@ -75,7 +76,7 @@ public class UserPropertiesFactory implements Factory<Properties> {
      * @param properties The instance to add to loaded properties to, not null
      */
     protected void addUnitilsProperties(Properties properties) {
-        String customConfigurationFileName = getPropertiesFileName(UNITILS_PROPERTIES_NAME_PROPERTY, DEFAULT_UNITILS_PROPERTIES_NAME, properties);
+        String customConfigurationFileName = getPropertiesFileName(UNITILS_PROPERTIES_NAME_PROPERTY, DEFAULT_UNITILS_PROPERTIES_NAME, null);
         Properties customProperties = propertiesReader.loadPropertiesFromClasspath(customConfigurationFileName);
         if (customProperties == null) {
             logger.info("No properties found in classpath with name " + customConfigurationFileName);
@@ -90,7 +91,7 @@ public class UserPropertiesFactory implements Factory<Properties> {
      * @param properties The instance to add to loaded properties to, not null
      */
     protected void addUnitilsLocalProperties(Properties properties) {
-        String localConfigurationFileName = getPropertiesFileName(UNITILS_PROPERTIES_NAME_PROPERTY, DEFAULT_LOCAL_PROPERTIES_NAME, properties);
+        String localConfigurationFileName = getPropertiesFileName(LOCAL_PROPERTIES_NAME_PROPERTY, DEFAULT_LOCAL_PROPERTIES_NAME, properties);
         Properties localProperties = propertiesReader.loadPropertiesFromUserHome(localConfigurationFileName);
         if (localProperties == null) {
             localProperties = propertiesReader.loadPropertiesFromClasspath(localConfigurationFileName);
@@ -134,17 +135,20 @@ public class UserPropertiesFactory implements Factory<Properties> {
     }
 
     /**
-     * Gets the configuration file name from the system properties or if not defined, from the given loaded properties.
-     * An exception is raised if no value is defined.
+     * Gets the configuration file name from the system properties or if not defined from the given loaded properties.
+     * The default file name is returned when no value is found.
      *
      * @param fileNameProperty The name of the property that defines the local/custom file name, not null
-     * @param defaultFileName  The default value to use, when no system property was found for the file name, not null
-     * @param properties       The properties that were already loaded, not null
+     * @param defaultFileName  The default value to use, when no value was found for the file name, not null
+     * @param properties       The properties that were already loaded, can be null
      * @return The property value, not null
      */
     protected String getPropertiesFileName(String fileNameProperty, String defaultFileName, Properties properties) {
-        String configurationFileName = properties.getProperty(fileNameProperty);
-        if (StringUtils.isBlank(configurationFileName)) {
+        String configurationFileName = System.getProperty(fileNameProperty);
+        if (properties != null && isBlank(configurationFileName)) {
+            configurationFileName = properties.getProperty(fileNameProperty);
+        }
+        if (isBlank(configurationFileName)) {
             return defaultFileName;
         }
         return configurationFileName;
