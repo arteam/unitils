@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,9 @@ import org.junit.Test;
 import org.unitils.core.UnitilsException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
@@ -29,7 +31,7 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEqua
 /**
  * @author Tim Ducheyne
  */
-public class ConfigurationGetStringListTest {
+public class ConfigurationGetClassListTest {
 
     /* Tested object */
     private Configuration configuration;
@@ -38,52 +40,56 @@ public class ConfigurationGetStringListTest {
     @Before
     public void initialize() throws Exception {
         Properties properties = new Properties();
-        properties.setProperty("stringListProperty", "test1, test2, test3");
-        properties.setProperty("propertyWithSpaces", "   test1  , test2 ");
-        properties.setProperty("propertyWithEmptyValues", "test1, , test2, , ");
+        properties.setProperty("classListProperty", Map.class.getName() + ", " + List.class.getName() + ", " + Set.class.getName());
+        properties.setProperty("propertyWithSpaces", "   " + Map.class.getName() + "  , " + List.class.getName() + " ");
+        properties.setProperty("propertyWithEmptyValues", Map.class.getName() + ", , " + List.class.getName() + ", , ");
         properties.setProperty("propertyWithOnlyEmptyValues", ", ,, , ");
         properties.setProperty("empty", " ");
-        properties.setProperty("propertyWithClassifiers.a.b", "value");
+        properties.setProperty("propertyWithClassifiers.a.b", Map.class.getName());
         configuration = new Configuration(properties);
     }
 
 
     @Test
+    @SuppressWarnings("unchecked")
     public void valid() {
-        List<String> result = configuration.getStringList("stringListProperty");
-        assertReflectionEquals(asList("test1", "test2", "test3"), result);
+        List<Class<?>> result = configuration.getClassList("classListProperty");
+        assertReflectionEquals(asList(Map.class, List.class, Set.class), result);
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void valuesAreTrimmed() {
-        List<String> result = configuration.getStringList("propertyWithSpaces");
-        assertReflectionEquals(asList("test1", "test2"), result);
+        List<Class<?>> result = configuration.getClassList("propertyWithSpaces");
+        assertReflectionEquals(asList(Map.class, List.class), result);
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void emptyValuesAreIgnored() {
-        List<String> result = configuration.getStringList("propertyWithEmptyValues");
-        assertReflectionEquals(asList("test1", "test2"), result);
+        List<Class<?>> result = configuration.getClassList("propertyWithEmptyValues");
+        assertReflectionEquals(asList(Map.class, List.class), result);
     }
 
     @Test(expected = UnitilsException.class)
     public void notFound() {
-        configuration.getStringList("xxx");
+        configuration.getClassList("xxx");
     }
 
     @Test(expected = UnitilsException.class)
     public void notFoundWhenOnlyEmptyValues() {
-        configuration.getStringList("propertyWithOnlyEmptyValues");
+        configuration.getClassList("propertyWithOnlyEmptyValues");
     }
 
     @Test(expected = UnitilsException.class)
     public void notFoundWhenEmpty() {
-        configuration.getStringList("empty");
+        configuration.getClassList("empty");
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void valueWithClassifiers() {
-        List<String> result = configuration.getStringList("propertyWithClassifiers", "a", "b");
-        assertReflectionEquals(asList("value"), result);
+        List<Class<?>> result = configuration.getClassList("propertyWithClassifiers", "a", "b");
+        assertReflectionEquals(asList(Map.class), result);
     }
 }
