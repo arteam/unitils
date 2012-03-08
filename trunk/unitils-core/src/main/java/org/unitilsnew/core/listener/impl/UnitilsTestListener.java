@@ -27,9 +27,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import static java.util.Collections.sort;
 
 /**
  * @author Tim Ducheyne
@@ -51,7 +52,7 @@ public class UnitilsTestListener {
         this.testListeners = testListeners;
         this.context = context;
 
-        Collections.sort(testListeners, testListenerTestPhaseComparator);
+        sort(testListeners, testListenerTestPhaseComparator);
     }
 
 
@@ -61,7 +62,7 @@ public class UnitilsTestListener {
         currentTestListeners = new ArrayList<TestListener>(testListeners);
 
         addFieldAnnotationListeners(currentTestClass, currentTestListeners);
-        Collections.sort(currentTestListeners, testListenerTestPhaseComparator);
+        sort(currentTestListeners, testListenerTestPhaseComparator);
 
         for (TestListener testListener : currentTestListeners) {
             testListener.beforeTestClass(currentTestClass);
@@ -72,7 +73,7 @@ public class UnitilsTestListener {
         currentTestInstance = new TestInstance(currentTestClass, testObject, testMethod);
 
         addTestAnnotationListeners(currentTestInstance, currentTestListeners);
-        Collections.sort(currentTestListeners, testListenerTestPhaseComparator);
+        sort(currentTestListeners, testListenerTestPhaseComparator);
 
         for (TestListener testListener : currentTestListeners) {
             testListener.beforeTestSetUp(currentTestInstance);
