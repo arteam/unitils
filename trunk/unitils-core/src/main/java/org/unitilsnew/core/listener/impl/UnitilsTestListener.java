@@ -37,28 +37,28 @@ import java.util.Set;
  */
 public class UnitilsTestListener {
 
-    private List<TestListener> moduleTestListeners;
-    private Context context;
+    protected List<TestListener> testListeners;
+    protected Context context;
 
-    private TestClass currentTestClass;
-    private TestInstance currentTestInstance;
-    private List<TestListener> currentTestListeners;
+    protected TestClass currentTestClass;
+    protected TestInstance currentTestInstance;
+    protected List<TestListener> currentTestListeners;
 
-    private TestListenerTestPhaseComparator testListenerTestPhaseComparator = new TestListenerTestPhaseComparator();
+    protected TestListenerTestPhaseComparator testListenerTestPhaseComparator = new TestListenerTestPhaseComparator();
 
 
-    public UnitilsTestListener(List<TestListener> moduleTestListeners, Context context) {
-        this.moduleTestListeners = moduleTestListeners;
+    public UnitilsTestListener(List<TestListener> testListeners, Context context) {
+        this.testListeners = testListeners;
         this.context = context;
 
-        Collections.sort(moduleTestListeners, testListenerTestPhaseComparator);
+        Collections.sort(testListeners, testListenerTestPhaseComparator);
     }
 
 
     public void beforeTestClass(Class<?> testClass) {
         currentTestClass = new TestClass(testClass);
         currentTestInstance = null;
-        currentTestListeners = new ArrayList<TestListener>(moduleTestListeners);
+        currentTestListeners = new ArrayList<TestListener>(testListeners);
 
         addFieldAnnotationListeners(currentTestClass, currentTestListeners);
         Collections.sort(currentTestListeners, testListenerTestPhaseComparator);

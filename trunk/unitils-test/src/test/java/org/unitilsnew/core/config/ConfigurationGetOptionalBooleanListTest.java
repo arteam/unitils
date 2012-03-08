@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEqua
 /**
  * @author Tim Ducheyne
  */
-public class ConfigurationGetOptionalStringListTest {
+public class ConfigurationGetOptionalBooleanListTest {
 
     /* Tested object */
     private Configuration configuration;
@@ -38,55 +38,55 @@ public class ConfigurationGetOptionalStringListTest {
     @Before
     public void initialize() throws Exception {
         Properties properties = new Properties();
-        properties.setProperty("stringListProperty", "test1, test2, test3");
-        properties.setProperty("propertyWithSpaces", "   test1  , test2 ");
-        properties.setProperty("propertyWithEmptyValues", "test1, , test2, , ");
+        properties.setProperty("booleanListProperty", "true, false, true");
+        properties.setProperty("propertyWithSpaces", "   true  , false ");
+        properties.setProperty("propertyWithEmptyValues", "true, , false, , ");
         properties.setProperty("propertyWithOnlyEmptyValues", ", ,, , ");
         properties.setProperty("empty", "  ");
-        properties.setProperty("propertyWithClassifiers.a.b", "value");
+        properties.setProperty("propertyWithClassifiers.a.b", "true");
         configuration = new Configuration(properties);
     }
 
 
     @Test
     public void valid() {
-        List<String> result = configuration.getOptionalStringList("stringListProperty");
-        assertReflectionEquals(asList("test1", "test2", "test3"), result);
+        List<Boolean> result = configuration.getOptionalBooleanList("booleanListProperty");
+        assertReflectionEquals(asList(true, false, true), result);
     }
 
     @Test
     public void valuesAreTrimmed() {
-        List<String> result = configuration.getOptionalStringList("propertyWithSpaces");
-        assertReflectionEquals(asList("test1", "test2"), result);
+        List<Boolean> result = configuration.getOptionalBooleanList("propertyWithSpaces");
+        assertReflectionEquals(asList(true, false), result);
     }
 
     @Test
     public void emptyValuesAreIgnored() {
-        List<String> result = configuration.getOptionalStringList("propertyWithEmptyValues");
-        assertReflectionEquals(asList("test1", "test2"), result);
+        List<Boolean> result = configuration.getOptionalBooleanList("propertyWithEmptyValues");
+        assertReflectionEquals(asList(true, false), result);
     }
 
     @Test
     public void emptyWhenNotFound() {
-        List<String> result = configuration.getOptionalStringList("xxx");
+        List<Boolean> result = configuration.getOptionalBooleanList("xxx");
         assertTrue(result.isEmpty());
     }
 
     @Test
     public void emptyWhenOnlyEmptyValues() {
-        List<String> result = configuration.getOptionalStringList("propertyWithOnlyEmptyValues");
+        List<Boolean> result = configuration.getOptionalBooleanList("propertyWithOnlyEmptyValues");
         assertTrue(result.isEmpty());
     }
 
     @Test
     public void emptyWhenEmpty() {
-        List<String> result = configuration.getOptionalStringList("empty");
+        List<Boolean> result = configuration.getOptionalBooleanList("empty");
         assertTrue(result.isEmpty());
     }
 
     @Test
     public void valueWithClassifiers() {
-        List<String> result = configuration.getOptionalStringList("propertyWithClassifiers", "a", "b");
-        assertReflectionEquals(asList("value"), result);
+        List<Boolean> result = configuration.getOptionalBooleanList("propertyWithClassifiers", "a", "b");
+        assertReflectionEquals(asList(true), result);
     }
 }

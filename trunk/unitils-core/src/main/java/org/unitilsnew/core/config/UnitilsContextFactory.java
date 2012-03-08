@@ -16,6 +16,7 @@
 
 package org.unitilsnew.core.config;
 
+import org.unitils.core.UnitilsException;
 import org.unitilsnew.core.Factory;
 import org.unitilsnew.core.UnitilsContext;
 import org.unitilsnew.core.listener.TestListener;
@@ -66,15 +67,18 @@ public class UnitilsContextFactory implements Factory<UnitilsContext> {
         return configuration;
     }
 
+    @SuppressWarnings("unchecked")
     protected List<Class<? extends TestListener>> getTestListenerTypes(List<Properties> modulesProperties) {
         List<Class<? extends TestListener>> testListenerTypes = new ArrayList<Class<? extends TestListener>>();
         for (Properties moduleProperties : modulesProperties) {
             Configuration moduleConfiguration = new Configuration(moduleProperties);
-            List<Class<?>> types = moduleConfiguration.getOptionalClassList(LISTENERS_PROPERTY);
-            for (Class<?> type : types) {
-                // todo check type implements TestListener
-                Class<? extends TestListener> testListenerType = (Class<TestListener>) type;
-                testListenerTypes.add(testListenerType);
+            List<Class<?>> moduleTestListenerTypes = moduleConfiguration.getOptionalClassList(LISTENERS_PROPERTY);
+            for (Class<?> moduleTestListenerType : moduleTestListenerTypes) {
+
+                if (!TestListener.class.isAssignableFrom(moduleTestListenerType)) {
+                    throw new UnitilsException("Unable to create unitils context. Module configured a test listener type that does not extend " + TestListener.class.getName() + ": " + moduleTestListenerType);
+                }
+                testListenerTypes.add((Class<? extends TestListener>) moduleTestListenerType);
             }
         }
         return testListenerTypes;

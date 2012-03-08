@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEqua
 /**
  * @author Tim Ducheyne
  */
-public class ConfigurationGetStringListTest {
+public class ConfigurationGetIntegerListTest {
 
     /* Tested object */
     private Configuration configuration;
@@ -38,52 +38,52 @@ public class ConfigurationGetStringListTest {
     @Before
     public void initialize() throws Exception {
         Properties properties = new Properties();
-        properties.setProperty("stringListProperty", "test1, test2, test3");
-        properties.setProperty("propertyWithSpaces", "   test1  , test2 ");
-        properties.setProperty("propertyWithEmptyValues", "test1, , test2, , ");
+        properties.setProperty("integerListProperty", "1, 2, 3");
+        properties.setProperty("propertyWithSpaces", "   1  , 2 ");
+        properties.setProperty("propertyWithEmptyValues", "1, , 2, , ");
         properties.setProperty("propertyWithOnlyEmptyValues", ", ,, , ");
         properties.setProperty("empty", " ");
-        properties.setProperty("propertyWithClassifiers.a.b", "value");
+        properties.setProperty("propertyWithClassifiers.a.b", "1");
         configuration = new Configuration(properties);
     }
 
 
     @Test
     public void valid() {
-        List<String> result = configuration.getStringList("stringListProperty");
-        assertReflectionEquals(asList("test1", "test2", "test3"), result);
+        List<Integer> result = configuration.getIntegerList("integerListProperty");
+        assertReflectionEquals(asList(1, 2, 3), result);
     }
 
     @Test
     public void valuesAreTrimmed() {
-        List<String> result = configuration.getStringList("propertyWithSpaces");
-        assertReflectionEquals(asList("test1", "test2"), result);
+        List<Integer> result = configuration.getIntegerList("propertyWithSpaces");
+        assertReflectionEquals(asList(1, 2), result);
     }
 
     @Test
     public void emptyValuesAreIgnored() {
-        List<String> result = configuration.getStringList("propertyWithEmptyValues");
-        assertReflectionEquals(asList("test1", "test2"), result);
+        List<Integer> result = configuration.getIntegerList("propertyWithEmptyValues");
+        assertReflectionEquals(asList(1, 2), result);
     }
 
     @Test(expected = UnitilsException.class)
     public void notFound() {
-        configuration.getStringList("xxx");
+        configuration.getIntegerList("xxx");
     }
 
     @Test(expected = UnitilsException.class)
     public void notFoundWhenOnlyEmptyValues() {
-        configuration.getStringList("propertyWithOnlyEmptyValues");
+        configuration.getIntegerList("propertyWithOnlyEmptyValues");
     }
 
     @Test(expected = UnitilsException.class)
     public void notFoundWhenEmpty() {
-        configuration.getStringList("empty");
+        configuration.getIntegerList("empty");
     }
 
     @Test
     public void valueWithClassifiers() {
-        List<String> result = configuration.getStringList("propertyWithClassifiers", "a", "b");
-        assertReflectionEquals(asList("value"), result);
+        List<Integer> result = configuration.getIntegerList("propertyWithClassifiers", "a", "b");
+        assertReflectionEquals(asList(1), result);
     }
 }

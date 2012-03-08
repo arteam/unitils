@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,12 @@ import java.util.Properties;
 
 import static java.util.Arrays.asList;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
+import static org.unitilsnew.core.config.ConfigurationGetEnumListTest.TestEnum.*;
 
 /**
  * @author Tim Ducheyne
  */
-public class ConfigurationGetStringListTest {
+public class ConfigurationGetEnumListTest {
 
     /* Tested object */
     private Configuration configuration;
@@ -38,52 +39,57 @@ public class ConfigurationGetStringListTest {
     @Before
     public void initialize() throws Exception {
         Properties properties = new Properties();
-        properties.setProperty("stringListProperty", "test1, test2, test3");
-        properties.setProperty("propertyWithSpaces", "   test1  , test2 ");
-        properties.setProperty("propertyWithEmptyValues", "test1, , test2, , ");
+        properties.setProperty("enumListProperty", "VALUE1, VALUE2, VALUE3");
+        properties.setProperty("propertyWithSpaces", "   VALUE1  , VALUE2 ");
+        properties.setProperty("propertyWithEmptyValues", "VALUE1, , VALUE2, , ");
         properties.setProperty("propertyWithOnlyEmptyValues", ", ,, , ");
         properties.setProperty("empty", " ");
-        properties.setProperty("propertyWithClassifiers.a.b", "value");
+        properties.setProperty("propertyWithClassifiers.a.b", "VALUE1");
         configuration = new Configuration(properties);
     }
 
 
     @Test
     public void valid() {
-        List<String> result = configuration.getStringList("stringListProperty");
-        assertReflectionEquals(asList("test1", "test2", "test3"), result);
+        List<TestEnum> result = configuration.getEnumList(TestEnum.class, "enumListProperty");
+        assertReflectionEquals(asList(VALUE1, VALUE2, VALUE3), result);
     }
 
     @Test
     public void valuesAreTrimmed() {
-        List<String> result = configuration.getStringList("propertyWithSpaces");
-        assertReflectionEquals(asList("test1", "test2"), result);
+        List<TestEnum> result = configuration.getEnumList(TestEnum.class, "propertyWithSpaces");
+        assertReflectionEquals(asList(VALUE1, VALUE2), result);
     }
 
     @Test
     public void emptyValuesAreIgnored() {
-        List<String> result = configuration.getStringList("propertyWithEmptyValues");
-        assertReflectionEquals(asList("test1", "test2"), result);
+        List<TestEnum> result = configuration.getEnumList(TestEnum.class, "propertyWithEmptyValues");
+        assertReflectionEquals(asList(VALUE1, VALUE2), result);
     }
 
     @Test(expected = UnitilsException.class)
     public void notFound() {
-        configuration.getStringList("xxx");
+        configuration.getEnumList(TestEnum.class, "xxx");
     }
 
     @Test(expected = UnitilsException.class)
     public void notFoundWhenOnlyEmptyValues() {
-        configuration.getStringList("propertyWithOnlyEmptyValues");
+        configuration.getEnumList(TestEnum.class, "propertyWithOnlyEmptyValues");
     }
 
     @Test(expected = UnitilsException.class)
     public void notFoundWhenEmpty() {
-        configuration.getStringList("empty");
+        configuration.getEnumList(TestEnum.class, "empty");
     }
 
     @Test
     public void valueWithClassifiers() {
-        List<String> result = configuration.getStringList("propertyWithClassifiers", "a", "b");
-        assertReflectionEquals(asList("value"), result);
+        List<TestEnum> result = configuration.getEnumList(TestEnum.class, "propertyWithClassifiers", "a", "b");
+        assertReflectionEquals(asList(VALUE1), result);
+    }
+
+    public static enum TestEnum {
+
+        VALUE1, VALUE2, VALUE3
     }
 }

@@ -189,6 +189,14 @@ public class Configuration {
         return toBoolean(value, propertyName, classifiers);
     }
 
+    /**
+     * Gets the list of comma separated boolean values for the property with the given name. If no such property is found or
+     * the value is empty, an exception will be raised. Empty elements (",,") will not be added.
+     *
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The boolean list, not null
+     */
     public List<Boolean> getBooleanList(String propertyName, String... classifiers) {
         List<Boolean> result = getOptionalBooleanList(propertyName, classifiers);
         if (result.isEmpty()) {
@@ -197,8 +205,16 @@ public class Configuration {
         return result;
     }
 
+    /**
+     * Gets the list of comma separated boolean values for the property with the given name. If no such property is found or
+     * the value is empty, an empty list is returned. Empty elements (",,") will not be added.
+     *
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The boolean list, empty if not found
+     */
     public List<Boolean> getOptionalBooleanList(String propertyName, String... classifiers) {
-        List<String> values = getStringList(propertyName, classifiers);
+        List<String> values = getOptionalStringList(propertyName, classifiers);
 
         List<Boolean> result = new ArrayList<Boolean>(values.size());
         for (String value : values) {
@@ -236,6 +252,14 @@ public class Configuration {
         return toInteger(value, propertyName, classifiers);
     }
 
+    /**
+     * Gets the list of comma separated int values for the property with the given name. If no such property is found or
+     * the value is empty, an exception will be raised. Empty elements (",,") will not be added.
+     *
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The int list, not null
+     */
     public List<Integer> getIntegerList(String propertyName, String... classifiers) {
         List<Integer> result = getOptionalIntegerList(propertyName, classifiers);
         if (result.isEmpty()) {
@@ -244,8 +268,16 @@ public class Configuration {
         return result;
     }
 
+    /**
+     * Gets the list of comma separated int values for the property with the given name. If no such property is found or
+     * the value is empty, an empty list is returned. Empty elements (",,") will not be added.
+     *
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The int list, empty if not found
+     */
     public List<Integer> getOptionalIntegerList(String propertyName, String... classifiers) {
-        List<String> values = getStringList(propertyName, classifiers);
+        List<String> values = getOptionalStringList(propertyName, classifiers);
 
         List<Integer> result = new ArrayList<Integer>(values.size());
         for (String value : values) {
@@ -283,6 +315,14 @@ public class Configuration {
         return toLong(value, propertyName, classifiers);
     }
 
+    /**
+     * Gets the list of comma separated long values for the property with the given name. If no such property is found or
+     * the value is empty, an exception will be raised. Empty elements (",,") will not be added.
+     *
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The trimmed long list, not null
+     */
     public List<Long> getLongList(String propertyName, String... classifiers) {
         List<Long> result = getOptionalLongList(propertyName, classifiers);
         if (result.isEmpty()) {
@@ -291,13 +331,21 @@ public class Configuration {
         return result;
     }
 
+    /**
+     * Gets the list of comma separated long values for the property with the given name. If no such property is found or
+     * the value is empty, an empty list is returned. Empty elements (",,") will not be added.
+     *
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The long list, empty if not found
+     */
     public List<Long> getOptionalLongList(String propertyName, String... classifiers) {
-        List<String> values = getStringList(propertyName, classifiers);
+        List<String> values = getOptionalStringList(propertyName, classifiers);
 
         List<Long> result = new ArrayList<Long>(values.size());
         for (String value : values) {
-            Long integer = toLong(value, propertyName, classifiers);
-            result.add(integer);
+            Long longValue = toLong(value, propertyName, classifiers);
+            result.add(longValue);
         }
         return result;
     }
@@ -318,8 +366,7 @@ public class Configuration {
 
     /**
      * Gets the class value for the property with the given name. If no such property is found or
-     * the value is empty, null is returned. An exception will be raised if the
-     * value cannot be converted to a class.
+     * the value is empty, null is returned. An exception will be raised if the value cannot be converted to a class.
      *
      * @param propertyName The name, not null
      * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
@@ -330,6 +377,15 @@ public class Configuration {
         return toClass(value, propertyName, classifiers);
     }
 
+    /**
+     * Gets the list of comma separated class values for the property with the given name. If no such property is found,
+     * the value is empty or cannot be converted to a class, an exception will be raised.
+     * Empty elements (",,") will not be added.
+     *
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The class list, not null
+     */
     public List<Class<?>> getClassList(String propertyName, String... classifiers) {
         List<Class<?>> result = getOptionalClassList(propertyName, classifiers);
         if (result.isEmpty()) {
@@ -338,8 +394,17 @@ public class Configuration {
         return result;
     }
 
+    /**
+     * Gets the list of comma separated class values for the property with the given name. If no such property is found or
+     * the value is empty, an empty list is returned. Empty elements (",,") will not be added.
+     * An exception will be raised if the value cannot be converted to a class.
+     *
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The class list, empty if not found
+     */
     public List<Class<?>> getOptionalClassList(String propertyName, String... classifiers) {
-        List<String> values = getStringList(propertyName, classifiers);
+        List<String> values = getOptionalStringList(propertyName, classifiers);
 
         List<Class<?>> result = new ArrayList<Class<?>>(values.size());
         for (String value : values) {
@@ -390,6 +455,22 @@ public class Configuration {
         return toInstance(type, value, propertyName, classifiers);
     }
 
+    /**
+     * Gets the list of comma separated instances of the given type (typically an interface).
+     * It will look for a property using the classname and classifiers and create an instance of the classname
+     * specified as value.<br/>
+     * E.g. if you have following property:<br/>
+     * <br/>
+     * org.package.Reader=org.package.MyReaderImpl, org.package.OtherReaderImpl<br/>
+     * <br/>
+     * Calling getInstanceOf(Reader.class) will then return an instance of MyReaderImpl and OtherReaderImpl<br/>
+     * <br/>
+     * If no such property is found or the value is empty, an exception will be raised. Empty elements (",,") will not be added.
+     *
+     * @param type        The type of the instance
+     * @param classifiers An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The instance list, not null
+     */
     public <T> List<T> getInstanceOfList(Class<T> type, String... classifiers) {
         List<T> result = getOptionalInstanceOfList(type, classifiers);
         if (result.isEmpty()) {
@@ -398,9 +479,25 @@ public class Configuration {
         return result;
     }
 
+    /**
+     * Gets the list of comma separated instances of the given type (typically an interface).
+     * It will look for a property using the classname and classifiers and create an instance of the classname
+     * specified as value.<br/>
+     * E.g. if you have following property:<br/>
+     * <br/>
+     * org.package.Reader=org.package.MyReaderImpl, org.package.OtherReaderImpl<br/>
+     * <br/>
+     * Calling getInstanceOf(Reader.class) will then return an instance of MyReaderImpl and OtherReaderImpl<br/>
+     * <br/>
+     * If no such property is found or the value is empty, an empty list is returned. Empty elements (",,") will not be added.
+     *
+     * @param type        The type of the instance
+     * @param classifiers An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The trimmed string list, empty if not found
+     */
     public <T> List<T> getOptionalInstanceOfList(Class<T> type, String... classifiers) {
         String propertyName = type.getName();
-        List<String> values = getStringList(propertyName, classifiers);
+        List<String> values = getOptionalStringList(propertyName, classifiers);
 
         List<T> result = new ArrayList<T>(values.size());
         for (String value : values) {
@@ -411,16 +508,43 @@ public class Configuration {
     }
 
 
+    /**
+     * Gets the enum value for the property with the given name. If no such property is found, the value is empty
+     * or cannot be converted to the given enum type, an exception will be raised.
+     *
+     * @param type         The enum type, not null
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The enum value, not null
+     */
     public <T extends Enum<T>> T getEnumValue(Class<T> type, String propertyName, String... classifiers) {
         String value = getString(propertyName, classifiers);
         return toEnum(type, value, propertyName, classifiers);
     }
 
+    /**
+     * Gets the enum value for the property with the given name. If no such property is found or
+     * the value is empty, null is returned. An exception will be raised if the value cannot be converted to a the given enum type.
+     *
+     * @param type         The enum type, not null
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The enum value, null if not found
+     */
     public <T extends Enum<T>> T getOptionalEnumValue(Class<T> type, String propertyName, String... classifiers) {
         String value = getOptionalString(propertyName, classifiers);
         return toEnum(type, value, propertyName, classifiers);
     }
 
+    /**
+     * Gets the list of comma separated enum values for the property with the given name. If no such property is found or
+     * the value is empty, an exception will be raised. Empty elements (",,") will not be added.
+     *
+     * @param type         The enum type, not null
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The enum list, not null
+     */
     public <T extends Enum<T>> List<T> getEnumList(Class<T> type, String propertyName, String... classifiers) {
         List<T> result = getOptionalEnumList(type, propertyName, classifiers);
         if (result.isEmpty()) {
@@ -429,8 +553,17 @@ public class Configuration {
         return result;
     }
 
+    /**
+     * Gets the list of comma separated enum values for the property with the given name. If no such property is found or
+     * the value is empty, an empty list is returned. Empty elements (",,") will not be added.
+     *
+     * @param type         The enum type, not null
+     * @param propertyName The name, not null
+     * @param classifiers  An optional list of classifiers for the property name (see class javadoc for more info)
+     * @return The enum list, empty if not found
+     */
     public <T extends Enum<T>> List<T> getOptionalEnumList(Class<T> type, String propertyName, String... classifiers) {
-        List<String> values = getStringList(propertyName, classifiers);
+        List<String> values = getOptionalStringList(propertyName, classifiers);
 
         List<T> result = new ArrayList<T>(values.size());
         for (String value : values) {
@@ -440,7 +573,7 @@ public class Configuration {
         return result;
     }
 
-
+    // todo javadoc
     public <T> T getValueOfType(Class<T> type, String propertyName, String... classifiers) {
         String value = getString(propertyName, classifiers);
         return toValueOfType(type, value, propertyName, classifiers);
@@ -452,12 +585,9 @@ public class Configuration {
     }
 
     public <T> List<T> getValueListOfType(Class<T> type, String propertyName, String... classifiers) {
-        List<String> values = getStringList(propertyName, classifiers);
-
-        List<T> result = new ArrayList<T>(values.size());
-        for (String value : values) {
-            T valueOfType = toValueOfType(type, value, propertyName, classifiers);
-            result.add(valueOfType);
+        List<T> result = getOptionalValueListOfType(type, propertyName, classifiers);
+        if (result.isEmpty()) {
+            throw new UnitilsException("No value found for " + nameToString(propertyName, classifiers));
         }
         return result;
     }
