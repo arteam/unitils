@@ -21,10 +21,7 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
-import org.unitilsnew.core.Annotations;
-import org.unitilsnew.core.Context;
-import org.unitilsnew.core.TestClass;
-import org.unitilsnew.core.TestInstance;
+import org.unitilsnew.core.*;
 import org.unitilsnew.core.annotation.FieldAnnotation;
 import org.unitilsnew.core.config.Configuration;
 import org.unitilsnew.core.listener.FieldAnnotationListener;
@@ -68,9 +65,10 @@ public class UnitilsTestListenerFieldAnnotationTest extends UnitilsJUnit4 {
 
     @Test
     public void fieldAnnotation() throws Exception {
-        Field testField = AnnotationOnField.class.getDeclaredField("testField");
+        Field field = AnnotationOnField.class.getDeclaredField("testField");
         Method testMethod = AnnotationOnField.class.getDeclaredMethod("testMethod");
 
+        TestField testField = new TestField(field, null);
         TestClass testClass = new TestClass(AnnotationOnField.class);
         TestInstance testInstance = new TestInstance(testClass, null, testMethod);
         TestFieldAnnotation fieldAnnotation = testField.getAnnotation(TestFieldAnnotation.class);
@@ -82,7 +80,6 @@ public class UnitilsTestListenerFieldAnnotationTest extends UnitilsJUnit4 {
         unitilsTestListener.afterTestMethod(null);
         unitilsTestListener.afterTestTearDown();
 
-        fieldAnnotationHandlerMock.assertInvokedInSequence().beforeTestClass(testClass, testField, annotations);
         fieldAnnotationHandlerMock.assertInvokedInSequence().beforeTestSetUp(testInstance, testField, annotations);
         fieldAnnotationHandlerMock.assertInvokedInSequence().beforeTestMethod(testInstance, testField, annotations);
         fieldAnnotationHandlerMock.assertInvokedInSequence().afterTestMethod(testInstance, testField, annotations, null);
@@ -91,9 +88,10 @@ public class UnitilsTestListenerFieldAnnotationTest extends UnitilsJUnit4 {
 
     @Test
     public void classAnnotationIsOnlyForDefaults() throws Exception {
-        Field testField = AnnotationOnClass.class.getDeclaredField("testField");
+        Field field = AnnotationOnClass.class.getDeclaredField("testField");
         Method testMethod = AnnotationOnClass.class.getDeclaredMethod("testMethod");
 
+        TestField testField = new TestField(field, null);
         TestClass testClass = new TestClass(AnnotationOnClass.class);
         TestInstance testInstance = new TestInstance(testClass, null, testMethod);
         TestFieldAnnotation classAnnotation = AnnotationOnClass.class.getAnnotation(TestFieldAnnotation.class);
@@ -105,7 +103,6 @@ public class UnitilsTestListenerFieldAnnotationTest extends UnitilsJUnit4 {
         unitilsTestListener.afterTestMethod(null);
         unitilsTestListener.afterTestTearDown();
 
-        fieldAnnotationHandlerMock.assertNotInvoked().beforeTestClass(testClass, testField, annotations);
         fieldAnnotationHandlerMock.assertNotInvoked().beforeTestSetUp(testInstance, testField, annotations);
         fieldAnnotationHandlerMock.assertNotInvoked().beforeTestMethod(testInstance, testField, annotations);
         fieldAnnotationHandlerMock.assertNotInvoked().afterTestMethod(testInstance, testField, annotations, null);
@@ -114,9 +111,10 @@ public class UnitilsTestListenerFieldAnnotationTest extends UnitilsJUnit4 {
 
     @Test
     public void classAndFieldAnnotation() throws Exception {
-        Field testField = AnnotationOnClassAndField.class.getDeclaredField("testField");
+        Field field = AnnotationOnClassAndField.class.getDeclaredField("testField");
         Method testMethod = AnnotationOnClassAndField.class.getDeclaredMethod("testMethod");
 
+        TestField testField = new TestField(field, null);
         TestClass testClass = new TestClass(AnnotationOnClassAndField.class);
         TestInstance testInstance = new TestInstance(testClass, null, testMethod);
         TestFieldAnnotation fieldAnnotation = testField.getAnnotation(TestFieldAnnotation.class);
@@ -129,7 +127,6 @@ public class UnitilsTestListenerFieldAnnotationTest extends UnitilsJUnit4 {
         unitilsTestListener.afterTestMethod(null);
         unitilsTestListener.afterTestTearDown();
 
-        fieldAnnotationHandlerMock.assertInvokedInSequence().beforeTestClass(testClass, testField, annotations);
         fieldAnnotationHandlerMock.assertInvokedInSequence().beforeTestSetUp(testInstance, testField, annotations);
         fieldAnnotationHandlerMock.assertInvokedInSequence().beforeTestMethod(testInstance, testField, annotations);
         fieldAnnotationHandlerMock.assertInvokedInSequence().afterTestMethod(testInstance, testField, annotations, null);
@@ -149,7 +146,6 @@ public class UnitilsTestListenerFieldAnnotationTest extends UnitilsJUnit4 {
         unitilsTestListener.afterTestMethod(null);
         unitilsTestListener.afterTestTearDown();
 
-        fieldAnnotationHandlerMock.assertNotInvoked().beforeTestClass(null, null, null);
         fieldAnnotationHandlerMock.assertNotInvoked().beforeTestSetUp(null, null, null);
         fieldAnnotationHandlerMock.assertNotInvoked().beforeTestMethod(null, null, null);
         fieldAnnotationHandlerMock.assertNotInvoked().afterTestMethod(null, null, null, null);

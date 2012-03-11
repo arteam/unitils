@@ -33,8 +33,7 @@ public class TestClass {
     protected List<Field> fields;
     protected List<Method> methods;
 
-    protected List<Annotation> classAnnotations;
-    protected List<AnnotatedField<?>> annotatedFields;
+    protected List<Annotation> annotations;
 
 
     public TestClass(Class<?> testClass) {
@@ -68,91 +67,31 @@ public class TestClass {
         return methods;
     }
 
-    public List<Annotation> getClassAnnotations() {
-        if (classAnnotations != null) {
-            return classAnnotations;
-        }
-        classAnnotations = new ArrayList<Annotation>(3);
-        addClassAnnotations(testClass, classAnnotations);
-        return classAnnotations;
-    }
 
-    public List<AnnotatedField<?>> getAnnotatedFields() {
-        if (annotatedFields != null) {
-            return annotatedFields;
-        }
-        annotatedFields = new ArrayList<AnnotatedField<?>>(3);
-        addFieldAnnotations(testClass, annotatedFields);
-        return annotatedFields;
-    }
+    @SuppressWarnings("unchecked")
+    public <A extends Annotation> List<A> getAnnotations(Class<A> annotationClass) {
+        List<A> result = new ArrayList<A>(3);
 
-
-    public List<Class<? extends Annotation>> getAnnotationTypesAnnotatedWith(Class<? extends Annotation> annotationClass) {
-        List<Class<? extends Annotation>> annotationTypes = new ArrayList<Class<? extends Annotation>>();
-        List<Annotation> classAnnotations = getClassAnnotations();
-        for (Annotation classAnnotation : classAnnotations) {
-            Class<? extends Annotation> annotationType = classAnnotation.annotationType();
-            if (annotationType.getAnnotation(annotationClass) != null) {
-                annotationTypes.add(annotationType);
+        List<Annotation> annotations = getAnnotations();
+        for (Annotation annotation : annotations) {
+            if (annotation.annotationType().equals(annotationClass)) {
+                result.add((A) annotation);
             }
         }
-        List<AnnotatedField<?>> annotatedFields = getAnnotatedFields();
-        for (AnnotatedField<?> annotatedField : annotatedFields) {
-            Class<? extends Annotation> annotationType = annotatedField.getAnnotation().annotationType();
-            if (annotationType.getAnnotation(annotationClass) != null) {
-                annotationTypes.add(annotationType);
-            }
-        }
-        return annotationTypes;
+        return result;
     }
 
-    /**
-     * todo javadoc
-     * Returns the declared fields of the test class and its superclasses that are marked with the given annotation
-     *
-     * @param annotationClass The annotation type, not null
-     * @return A List containing fields annotated with the given annotation, empty list if none found
-     */
-    public <A extends Annotation> List<A> getClassAnnotations(Class<A> annotationClass) {
-        List<A> classAnnotations = new ArrayList<A>(3);
-        Class<?> clazz = testClass;
-        while (!Object.class.equals(clazz)) {
-            A annotation = clazz.getAnnotation(annotationClass);
-            if (annotation != null) {
-                classAnnotations.add(annotation);
-            }
-            clazz = clazz.getSuperclass();
+    public List<Annotation> getAnnotations() {
+        if (annotations != null) {
+            return annotations;
         }
-        return classAnnotations;
+        annotations = new ArrayList<Annotation>(3);
+        addAnnotations(testClass, annotations);
+        return annotations;
     }
 
-    public <A extends Annotation> List<AnnotatedField<A>> getAnnotatedFields(Class<A> annotationClass) {
-        List<Field> fields = getFields();
-        List<A> classAnnotations = getClassAnnotations(annotationClass);
-        List<AnnotatedField<A>> annotatedFields = new ArrayList<AnnotatedField<A>>(fields.size());
-        for (Field field : fields) {
-            A annotation = field.getAnnotation(annotationClass);
-            if (annotation == null) {
-                continue;
-            }
-            AnnotatedField<A> annotatedField = new AnnotatedField<A>(field, annotation);
-            annotatedFields.add(annotatedField);
-        }
-        return annotatedFields;
-    }
-
-    public <A extends Annotation> List<AnnotatedMethod<A>> getAnnotatedMethods(Class<A> annotationClass) {
-        List<Method> methods = getMethods();
-        List<AnnotatedMethod<A>> annotatedMethods = new ArrayList<AnnotatedMethod<A>>(methods.size());
-        for (Method method : methods) {
-            A annotation = method.getAnnotation(annotationClass);
-            if (annotation == null) {
-                continue;
-            }
-            AnnotatedMethod<A> annotatedMethod = new AnnotatedMethod<A>(method, annotation);
-            annotatedMethods.add(annotatedMethod);
-        }
-        return annotatedMethods;
+    public <A extends Annotation> boolean hasAnnotation(Class<A> annotationClass) {
+        return testClass.isAnnotationPresent(annotationClass);
     }
 
 
@@ -174,22 +113,12 @@ public class TestClass {
         addMethods(clazz.getSuperclass(), methods);
     }
 
-    protected void addClassAnnotations(Class<?> clazz, List<Annotation> classAnnotations) {
+    protected void addAnnotations(Class<?> clazz, List<Annotation> classAnnotations) {
         if (Object.class.equals(clazz)) {
             return;
         }
         Annotation[] annotations = clazz.getDeclaredAnnotations();
         classAnnotations.addAll(asList(annotations));
-        addClassAnnotations(clazz.getSuperclass(), classAnnotations);
-    }
-
-    protected void addFieldAnnotations(Class<?> testClass, List<AnnotatedField<?>> annotatedFields) {
-        List<Field> fields = getFields();
-        for (Field field : fields) {
-            Annotation[] annotations = field.getDeclaredAnnotations();
-            for (Annotation annotation : annotations) {
-                annotatedFields.add(new AnnotatedField<Annotation>(field, annotation));
-            }
-        }
+        addAnnotations(clazz.getSuperclass(), classAnnotations);
     }
 }

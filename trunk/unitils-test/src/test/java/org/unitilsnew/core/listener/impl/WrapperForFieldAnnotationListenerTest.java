@@ -21,14 +21,10 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
-import org.unitilsnew.core.Annotations;
-import org.unitilsnew.core.TestClass;
-import org.unitilsnew.core.TestInstance;
-import org.unitilsnew.core.TestPhase;
+import org.unitilsnew.core.*;
 import org.unitilsnew.core.listener.FieldAnnotationListener;
 
 import java.lang.annotation.Target;
-import java.lang.reflect.Field;
 
 import static org.junit.Assert.assertEquals;
 import static org.unitilsnew.core.TestPhase.CONSTRUCTION;
@@ -43,7 +39,8 @@ public class WrapperForFieldAnnotationListenerTest extends UnitilsJUnit4 {
 
     private Mock<FieldAnnotationListener<Target>> fieldAnnotationListenerMock;
 
-    private Field field;
+    @Dummy
+    private TestField testField;
     @Dummy
     private Annotations<Target> annotations;
     @Dummy
@@ -54,8 +51,7 @@ public class WrapperForFieldAnnotationListenerTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() throws Exception {
-        field = getClass().getDeclaredField("field");
-        wrapperForFieldAnnotationListener = new WrapperForFieldAnnotationListener<Target>(field, annotations, fieldAnnotationListenerMock.getMock());
+        wrapperForFieldAnnotationListener = new WrapperForFieldAnnotationListener<Target>(testField, annotations, fieldAnnotationListenerMock.getMock());
     }
 
 
@@ -68,21 +64,15 @@ public class WrapperForFieldAnnotationListenerTest extends UnitilsJUnit4 {
     }
 
     @Test
-    public void beforeTestClass() {
-        wrapperForFieldAnnotationListener.beforeTestClass(testClass);
-        fieldAnnotationListenerMock.assertInvoked().beforeTestClass(testClass, field, annotations);
-    }
-
-    @Test
     public void beforeTestSetUp() {
         wrapperForFieldAnnotationListener.beforeTestSetUp(testInstance);
-        fieldAnnotationListenerMock.assertInvoked().beforeTestSetUp(testInstance, field, annotations);
+        fieldAnnotationListenerMock.assertInvoked().beforeTestSetUp(testInstance, testField, annotations);
     }
 
     @Test
     public void beforeTestMethod() {
         wrapperForFieldAnnotationListener.beforeTestMethod(testInstance);
-        fieldAnnotationListenerMock.assertInvoked().beforeTestMethod(testInstance, field, annotations);
+        fieldAnnotationListenerMock.assertInvoked().beforeTestMethod(testInstance, testField, annotations);
     }
 
     @Test
@@ -90,12 +80,12 @@ public class WrapperForFieldAnnotationListenerTest extends UnitilsJUnit4 {
         NullPointerException e = new NullPointerException();
 
         wrapperForFieldAnnotationListener.afterTestMethod(testInstance, e);
-        fieldAnnotationListenerMock.assertInvoked().afterTestMethod(testInstance, field, annotations, e);
+        fieldAnnotationListenerMock.assertInvoked().afterTestMethod(testInstance, testField, annotations, e);
     }
 
     @Test
     public void afterTestTearDown() {
         wrapperForFieldAnnotationListener.afterTestTearDown(testInstance);
-        fieldAnnotationListenerMock.assertInvoked().afterTestTearDown(testInstance, field, annotations);
+        fieldAnnotationListenerMock.assertInvoked().afterTestTearDown(testInstance, testField, annotations);
     }
 }

@@ -16,12 +16,11 @@
 package org.unitilsnew.core.listener;
 
 import org.unitilsnew.core.Annotations;
-import org.unitilsnew.core.TestClass;
+import org.unitilsnew.core.TestField;
 import org.unitilsnew.core.TestInstance;
 import org.unitilsnew.core.TestPhase;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 
 import static org.unitilsnew.core.TestPhase.EXECUTION;
 
@@ -36,24 +35,14 @@ public abstract class FieldAnnotationListener<A extends Annotation> {
     }
 
     /**
-     * Invoked before the generic class setup (e.g. @BeforeClass) is performed.
-     *
-     * @param testClass   The test class, not null
-     * @param field       The field, not null
-     * @param annotations The annotation, not null
-     */
-    public void beforeTestClass(TestClass testClass, Field field, Annotations<A> annotations) {
-    }
-
-    /**
      * Invoked before the test setup (eg @Before) is run.
      * This can be overridden to for example initialize the test-fixture.
      *
      * @param testInstance The test instance, not null
-     * @param field        The field, not null
+     * @param testField    The test field, not null
      * @param annotations  The annotation, not null
      */
-    public void beforeTestSetUp(TestInstance testInstance, Field field, Annotations<A> annotations) {
+    public void beforeTestSetUp(TestInstance testInstance, TestField testField, Annotations<A> annotations) {
     }
 
     /**
@@ -62,10 +51,10 @@ public abstract class FieldAnnotationListener<A extends Annotation> {
      * the test setup.
      *
      * @param testInstance The test instance, not null
-     * @param field        The field, not null
+     * @param testField    The test field, not null
      * @param annotations  The annotation, not null
      */
-    public void beforeTestMethod(TestInstance testInstance, Field field, Annotations<A> annotations) {
+    public void beforeTestMethod(TestInstance testInstance, TestField testField, Annotations<A> annotations) {
     }
 
     /**
@@ -74,11 +63,11 @@ public abstract class FieldAnnotationListener<A extends Annotation> {
      * It the before method or the test raised an exception, this exception will be passed to the method.
      *
      * @param testInstance  The test instance, not null
-     * @param field         The field, not null
+     * @param testField     The test field, not null
      * @param annotations   The annotation, not null
      * @param testThrowable The throwable thrown during the test or beforeTestMethod, null if none was thrown
      */
-    public void afterTestMethod(TestInstance testInstance, Field field, Annotations<A> annotations, Throwable testThrowable) {
+    public void afterTestMethod(TestInstance testInstance, TestField testField, Annotations<A> annotations, Throwable testThrowable) {
     }
 
     /**
@@ -86,10 +75,10 @@ public abstract class FieldAnnotationListener<A extends Annotation> {
      * This can be overridden to for example perform extra cleanup after the test.
      *
      * @param testInstance The test instance, not null
-     * @param field        The field, not null
+     * @param testField    The test field, not null
      * @param annotations  The annotation, not null
      */
-    public void afterTestTearDown(TestInstance testInstance, Field field, Annotations<A> annotations) {
+    public void afterTestTearDown(TestInstance testInstance, TestField testField, Annotations<A> annotations) {
     }
 
 }

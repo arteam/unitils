@@ -24,13 +24,11 @@ import org.unitilsnew.core.listener.TestAnnotationListener;
 import org.unitilsnew.core.listener.TestListener;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
-import static java.util.Collections.sort;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * @author Tim Ducheyne
@@ -43,26 +41,23 @@ public class UnitilsTestListener {
 
     protected TestClass currentTestClass;
     protected TestInstance currentTestInstance;
-    protected List<TestListener> currentTestListeners;
-
-    protected TestListenerTestPhaseComparator testListenerTestPhaseComparator = new TestListenerTestPhaseComparator();
+    protected SortedSet<TestListener> currentTestListeners;
 
 
     public UnitilsTestListener(List<TestListener> testListeners, Context context) {
         this.testListeners = testListeners;
         this.context = context;
-
-        sort(testListeners, testListenerTestPhaseComparator);
     }
+
+    // todo test  testphases + testlisteners
 
 
     public void beforeTestClass(Class<?> testClass) {
         currentTestClass = new TestClass(testClass);
         currentTestInstance = null;
-        currentTestListeners = new ArrayList<TestListener>(testListeners);
 
-        addFieldAnnotationListeners(currentTestClass, currentTestListeners);
-        sort(currentTestListeners, testListenerTestPhaseComparator);
+        currentTestListeners = new TreeSet<TestListener>(new TestListenerTestPhaseComparator());
+        currentTestListeners.addAll(testListeners);
 
         for (TestListener testListener : currentTestListeners) {
             testListener.beforeTestClass(currentTestClass);
@@ -72,8 +67,8 @@ public class UnitilsTestListener {
     public void beforeTestSetUp(Object testObject, Method testMethod) {
         currentTestInstance = new TestInstance(currentTestClass, testObject, testMethod);
 
+        addFieldAnnotationListeners(currentTestInstance, currentTestListeners);
         addTestAnnotationListeners(currentTestInstance, currentTestListeners);
-        sort(currentTestListeners, testListenerTestPhaseComparator);
 
         for (TestListener testListener : currentTestListeners) {
             testListener.beforeTestSetUp(currentTestInstance);
@@ -99,49 +94,64 @@ public class UnitilsTestListener {
     }
 
 
-    protected void addFieldAnnotationListeners(TestClass testClass, List<TestListener> testListeners) {
-        List<Class<? extends Annotation>> annotationTypes = testClass.getAnnotationTypesAnnotatedWith(FieldAnnotation.class);
-        for (Class<? extends Annotation> annotationType : annotationTypes) {
-            addFieldAnnotationTestListeners(testClass, annotationType, testListeners);
+    protected void addFieldAnnotationListeners(TestInstance testInstance, SortedSet<TestListener> testListeners) {
+        List<TestField> testFields = testInstance.getTestFields();
+        for (TestField testField : testFields) {
+            List<Annotation> annotations = testField.getAnnotations();
+            for (Annotation annotation : annotations) {
+                TestListener testListener = createFieldAnnotationTestListener(annotation, testInstance, testField);
+                if (testListener != null) {
+                    testListeners.add(testListener);
+                }
+            }
         }
     }
 
-    protected <A extends Annotation> void addFieldAnnotationTestListeners(TestClass testClass, Class<A> annotationType, List<TestListener> testListeners) {
-        FieldAnnotation fieldAnnotation = annotationType.getAnnotation(FieldAnnotation.class);
+    protected void addTestAnnotationListeners(TestInstance testInstance, SortedSet<TestListener> testListeners) {
+        List<Annotation> classAnnotations = testInstance.getClassAnnotations();
+        List<Annotation> methodAnnotations = testInstance.getMethodAnnotations();
 
+        List<Annotation> classAndMethodAnnotations = new ArrayList<Annotation>();
+        classAndMethodAnnotations.addAll(classAnnotations);
+        classAndMethodAnnotations.addAll(methodAnnotations);
+
+        for (Annotation annotation : classAndMethodAnnotations) {
+            TestListener testListener = createTestAnnotationListeners(annotation, testInstance);
+            if (testListener != null) {
+                testListeners.add(testListener);
+            }
+        }
+    }
+
+
+    @SuppressWarnings("unchecked")
+    protected <A extends Annotation> TestListener createFieldAnnotationTestListener(A annotation, TestInstance testInstance, TestField testField) {
+        Class<A> annotationType = (Class<A>) annotation.annotationType();
+        List<A> classAnnotations = testInstance.getClassAnnotations(annotationType);
+        FieldAnnotation fieldAnnotation = annotationType.getAnnotation(FieldAnnotation.class);
+        if (fieldAnnotation == null) {
+            return null;
+        }
         Class<? extends FieldAnnotationListener<A>> fieldAnnotationListenerType = (Class<FieldAnnotationListener<A>>) fieldAnnotation.value();
         FieldAnnotationListener<A> fieldAnnotationListener = context.getInstanceOfType(fieldAnnotationListenerType);
 
-        List<A> classAnnotations = testClass.getClassAnnotations(annotationType);
-        List<AnnotatedField<A>> annotatedFields = testClass.getAnnotatedFields(annotationType);
-        for (AnnotatedField<A> annotatedField : annotatedFields) {
-            Annotation annotation = annotatedField.getAnnotation();
-            Field field = annotatedField.getField();
-            Annotations<A> annotations = new Annotations<A>(annotatedField.getAnnotation(), classAnnotations, context.getConfiguration());
-
-            WrapperForFieldAnnotationListener<A> wrapperForFieldAnnotationListener = new WrapperForFieldAnnotationListener<A>(field, annotations, fieldAnnotationListener);
-            testListeners.add(wrapperForFieldAnnotationListener);
-        }
+        Annotations<A> annotations = new Annotations<A>(annotation, classAnnotations, context.getConfiguration());
+        return new WrapperForFieldAnnotationListener<A>(testField, annotations, fieldAnnotationListener);
     }
 
-    protected void addTestAnnotationListeners(TestInstance testInstance, List<TestListener> testListeners) {
-        Set<Class<? extends Annotation>> annotationTypes = testInstance.getAnnotationTypesAnnotatedWith(TestAnnotation.class);
-        for (Class<? extends Annotation> annotationType : annotationTypes) {
-            addTestAnnotationListeners(testInstance, annotationType, testListeners);
-        }
-    }
-
-    private <A extends Annotation> void addTestAnnotationListeners(TestInstance testInstance, Class<A> annotationType, List<TestListener> testListeners) {
+    @SuppressWarnings("unchecked")
+    protected <A extends Annotation> TestListener createTestAnnotationListeners(A annotation, TestInstance testInstance) {
+        Class<A> annotationType = (Class<A>) annotation.annotationType();
+        List<A> classAnnotations = testInstance.getClassAnnotations(annotationType);
         TestAnnotation testAnnotation = annotationType.getAnnotation(TestAnnotation.class);
+        if (testAnnotation == null) {
+            return null;
+        }
 
         Class<? extends TestAnnotationListener<A>> testAnnotationListenerType = (Class<TestAnnotationListener<A>>) testAnnotation.value();
         TestAnnotationListener<A> testAnnotationListener = context.getInstanceOfType(testAnnotationListenerType);
 
-        List<A> classAnnotations = testInstance.getTestClass().getClassAnnotations(annotationType);
-        A annotation = testInstance.getMethodAnnotation(annotationType);
         Annotations<A> annotations = new Annotations<A>(annotation, classAnnotations, context.getConfiguration());
-
-        WrapperForTestAnnotationListener<A> wrapperForTestAnnotationListener = new WrapperForTestAnnotationListener<A>(annotations, testAnnotationListener);
-        testListeners.add(wrapperForTestAnnotationListener);
+        return new WrapperForTestAnnotationListener<A>(annotations, testAnnotationListener);
     }
 }

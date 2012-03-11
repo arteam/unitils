@@ -33,7 +33,7 @@ public class ContextKeyHashCodeTest {
         Key key = new Key(StringBuffer.class, "a", "b");
         int result = key.hashCode();
 
-        assertTrue(result > 0);
+        assertTrue(result != 0);
     }
 
     @Test
@@ -49,7 +49,7 @@ public class ContextKeyHashCodeTest {
         Key key = new Key(null, "a", "b");
         int result = key.hashCode();
 
-        assertTrue(result > 0);
+        assertTrue(result != 0);
     }
 
     @Test
@@ -57,7 +57,7 @@ public class ContextKeyHashCodeTest {
         Key key = new Key(StringBuffer.class);
         int result = key.hashCode();
 
-        assertTrue(result > 0);
+        assertTrue(result != 0);
     }
 
     @Test

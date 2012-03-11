@@ -40,6 +40,7 @@ public class Annotations<A extends Annotation> {
         this.configuration = configuration;
     }
 
+
     @SuppressWarnings("unchecked")
     public A getAnnotationWithDefaults() {
         List<A> allAnnotations = getAllAnnotation();
