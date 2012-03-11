@@ -15,15 +15,15 @@
  */
 package org.unitils.mock.core;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import org.junit.Before;
 import org.junit.Test;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.junit.Assert.*;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 /**
  * Tests the mock object functionality.
@@ -139,6 +139,12 @@ public class MockObjectReturnsTest {
         assertSame(mockedSet.getMock(), result);
     }
 
+    @Test
+    public void returnsWithVarAgrs() {
+        mockObject.returns("result").testMethodWithVarArgs(3);
+        Object result = mockObject.getMock().testMethodWithVarArgs(3);
+        assertEquals("result", result);
+    }
 
     /**
      * Interface that is mocked during the tests
@@ -155,6 +161,6 @@ public class MockObjectReturnsTest {
 
         public Map<String, String> testMethodMap();
 
+        public Object testMethodWithVarArgs(int arg, String... otherArgs);
     }
-
 }
