@@ -16,12 +16,12 @@
 
 package org.unitilsnew.core;
 
-import org.unitils.core.UnitilsException;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Tim Ducheyne
@@ -32,6 +32,7 @@ public class TestInstance {
     protected Method testMethod;
     protected Object testObject;
 
+    protected List<TestField> testFields;
     protected List<Annotation> methodAnnotations;
 
 
@@ -58,6 +59,57 @@ public class TestInstance {
         return testClass.getName() + "." + testMethod.getName();
     }
 
+
+    public List<TestField> getTestFields() {
+        if (testFields != null) {
+            return testFields;
+        }
+        testFields = new ArrayList<TestField>();
+        addTestFields(testObject, testFields);
+        return testFields;
+    }
+
+    public List<TestField> getTestFieldsOfType(Class<?> type) {
+        List<TestField> testFields = getTestFields();
+        List<TestField> result = new ArrayList<TestField>(testFields.size());
+
+        for (TestField testField : testFields) {
+            if (testField.isOfType(type)) {
+                result.add(testField);
+            }
+        }
+        return result;
+    }
+
+    public <A extends Annotation> List<TestField> getTestFieldsWithAnnotation(Class<A> annotationClass) {
+        List<TestField> testFields = getTestFields();
+        List<TestField> result = new ArrayList<TestField>(testFields.size());
+
+        for (TestField testField : testFields) {
+            if (testField.hasAnnotation(annotationClass)) {
+                result.add(testField);
+            }
+        }
+        return result;
+    }
+
+    public <A extends Annotation> List<A> getClassAnnotations(Class<A> annotationClass) {
+        return testClass.getAnnotations(annotationClass);
+    }
+
+    public List<Annotation> getClassAnnotations() {
+        return testClass.getAnnotations();
+    }
+
+    public <A extends Annotation> boolean hasClassAnnotation(Class<A> annotationClass) {
+        return testClass.hasAnnotation(annotationClass);
+    }
+
+
+    public <A extends Annotation> A getMethodAnnotation(Class<A> annotationClass) {
+        return testMethod.getAnnotation(annotationClass);
+    }
+
     public List<Annotation> getMethodAnnotations() {
         if (methodAnnotations != null) {
             return methodAnnotations;
@@ -67,47 +119,16 @@ public class TestInstance {
         return methodAnnotations;
     }
 
-    public Set<Class<? extends Annotation>> getAnnotationTypesAnnotatedWith(Class<? extends Annotation> annotationClass) {
-        Set<Class<? extends Annotation>> annotationTypes = new LinkedHashSet<Class<? extends Annotation>>();
-
-        List<Class<? extends Annotation>> classAnnotationTypes = testClass.getAnnotationTypesAnnotatedWith(annotationClass);
-        annotationTypes.addAll(classAnnotationTypes);
-
-        List<Annotation> methodAnnotations = getMethodAnnotations();
-        for (Annotation methodAnnotation : methodAnnotations) {
-            Class<? extends Annotation> annotationType = methodAnnotation.annotationType();
-            if (annotationType.getAnnotation(annotationClass) != null) {
-                annotationTypes.add(annotationType);
-            }
-        }
-        return annotationTypes;
-    }
-
-
-    public <A extends Annotation> List<AnnotatedField<A>> getFieldAnnotations(Class<A> annotationClass) {
-        return testClass.getAnnotatedFields(annotationClass);
-    }
-
-    public <A extends Annotation> A getMethodAnnotation(Class<A> annotationClass) {
-        return testMethod.getAnnotation(annotationClass);
-    }
-
     public <A extends Annotation> boolean hasMethodAnnotation(Class<A> annotationClass) {
-        return testMethod.getAnnotation(annotationClass) != null;
+        return testMethod.isAnnotationPresent(annotationClass);
     }
 
-    public void setFieldValue(Field field, Object value) {
-        try {
-            field.setAccessible(true);
-            field.set(testObject, value);
 
-        } catch (IllegalArgumentException e) {
-            throw new UnitilsException("Unable to set value of field " + field.getName()
-                    + ". Ensure that the field is of the correct type. Value: " + value, e);
-
-        } catch (IllegalAccessException e) {
-            // cannot occur since field.accessible has been set to true
-            throw new UnitilsException("Error while trying to access field " + field, e);
+    protected void addTestFields(Object testObject, List<TestField> testFields) {
+        List<Field> fields = testClass.getFields();
+        for (Field field : fields) {
+            TestField testField = new TestField(field, testObject);
+            testFields.add(testField);
         }
     }
 }

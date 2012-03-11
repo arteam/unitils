@@ -16,18 +16,13 @@
 
 package org.unitilsnew.core.listener;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.annotation.Dummy;
-import org.unitilsnew.core.Annotations;
-import org.unitilsnew.core.TestClass;
-import org.unitilsnew.core.TestInstance;
-import org.unitilsnew.core.TestPhase;
+import org.unitilsnew.core.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Target;
-import java.lang.reflect.Field;
 
 import static org.junit.Assert.assertEquals;
 import static org.unitilsnew.core.TestPhase.EXECUTION;
@@ -38,22 +33,16 @@ import static org.unitilsnew.core.TestPhase.EXECUTION;
 public class FieldAnnotationListenerTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private FieldAnnotationListener<Target> fieldAnnotationListener;
+    private FieldAnnotationListener<Target> fieldAnnotationListener = new MyFieldAnnotationListener<Target>();
 
-    private Field field;
+    @Dummy
+    private TestField testField;
     @Dummy
     private Annotations<Target> annotations;
     @Dummy
     private TestClass testClass;
     @Dummy
     private TestInstance testInstance;
-
-
-    @Before
-    public void initialize() throws Exception {
-        field = getClass().getDeclaredField("field");
-        fieldAnnotationListener = new MyFieldAnnotationListener<Target>();
-    }
 
 
     @Test
@@ -63,29 +52,24 @@ public class FieldAnnotationListenerTest extends UnitilsJUnit4 {
     }
 
     @Test
-    public void defaultBeforeTestClassDoesNothing() {
-        fieldAnnotationListener.beforeTestClass(testClass, field, annotations);
-    }
-
-    @Test
     public void defaultBeforeTestSetUpDoesNothing() {
-        fieldAnnotationListener.beforeTestSetUp(testInstance, field, annotations);
+        fieldAnnotationListener.beforeTestSetUp(testInstance, testField, annotations);
     }
 
     @Test
     public void defaultBeforeTestMethodDoesNothing() {
-        fieldAnnotationListener.beforeTestMethod(testInstance, field, annotations);
+        fieldAnnotationListener.beforeTestMethod(testInstance, testField, annotations);
     }
 
     @Test
     public void defaultAfterTestMethodDoesNothing() {
         NullPointerException e = new NullPointerException();
-        fieldAnnotationListener.afterTestMethod(testInstance, field, annotations, e);
+        fieldAnnotationListener.afterTestMethod(testInstance, testField, annotations, e);
     }
 
     @Test
     public void defaultAfterTestTearDownDoesNothing() {
-        fieldAnnotationListener.afterTestTearDown(testInstance, field, annotations);
+        fieldAnnotationListener.afterTestTearDown(testInstance, testField, annotations);
     }
 
 

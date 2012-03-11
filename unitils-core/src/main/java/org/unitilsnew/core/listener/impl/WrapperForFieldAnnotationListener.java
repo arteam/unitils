@@ -17,27 +17,26 @@
 package org.unitilsnew.core.listener.impl;
 
 import org.unitilsnew.core.Annotations;
-import org.unitilsnew.core.TestClass;
+import org.unitilsnew.core.TestField;
 import org.unitilsnew.core.TestInstance;
 import org.unitilsnew.core.TestPhase;
 import org.unitilsnew.core.listener.FieldAnnotationListener;
 import org.unitilsnew.core.listener.TestListener;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 
 /**
  * @author Tim Ducheyne
  */
 public class WrapperForFieldAnnotationListener<A extends Annotation> extends TestListener {
 
-    protected Field field;
+    protected TestField testField;
     protected Annotations<A> annotations;
     protected FieldAnnotationListener<A> fieldAnnotationListener;
 
 
-    public WrapperForFieldAnnotationListener(Field field, Annotations<A> annotations, FieldAnnotationListener<A> fieldAnnotationListener) {
-        this.field = field;
+    public WrapperForFieldAnnotationListener(TestField testField, Annotations<A> annotations, FieldAnnotationListener<A> fieldAnnotationListener) {
+        this.testField = testField;
         this.annotations = annotations;
         this.fieldAnnotationListener = fieldAnnotationListener;
     }
@@ -49,27 +48,22 @@ public class WrapperForFieldAnnotationListener<A extends Annotation> extends Tes
     }
 
     @Override
-    public void beforeTestClass(TestClass testClass) {
-        fieldAnnotationListener.beforeTestClass(testClass, field, annotations);
-    }
-
-    @Override
     public void beforeTestSetUp(TestInstance testInstance) {
-        fieldAnnotationListener.beforeTestSetUp(testInstance, field, annotations);
+        fieldAnnotationListener.beforeTestSetUp(testInstance, testField, annotations);
     }
 
     @Override
     public void beforeTestMethod(TestInstance testInstance) {
-        fieldAnnotationListener.beforeTestMethod(testInstance, field, annotations);
+        fieldAnnotationListener.beforeTestMethod(testInstance, testField, annotations);
     }
 
     @Override
     public void afterTestMethod(TestInstance testInstance, Throwable testThrowable) {
-        fieldAnnotationListener.afterTestMethod(testInstance, field, annotations, testThrowable);
+        fieldAnnotationListener.afterTestMethod(testInstance, testField, annotations, testThrowable);
     }
 
     @Override
     public void afterTestTearDown(TestInstance testInstance) {
-        fieldAnnotationListener.afterTestTearDown(testInstance, field, annotations);
+        fieldAnnotationListener.afterTestTearDown(testInstance, testField, annotations);
     }
 }

@@ -19,51 +19,51 @@ package org.unitilsnew.core;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
+import org.unitilsnew.core.config.Configuration;
 
 import java.lang.annotation.Target;
-import java.lang.reflect.Field;
+import java.util.List;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertSame;
 
 /**
  * @author Tim Ducheyne
  */
-public class AnnotatedFieldTest extends UnitilsJUnit4 {
+public class AnnotationsTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private AnnotatedField<Target> annotatedField;
+    private Annotations<Target> annotations;
 
-    private Mock<TestInstance> testInstanceMock;
-    private Field field;
     @Dummy
     private Target annotation;
+    @Dummy
+    private Target classAnnotation1;
+    @Dummy
+    private Target classAnnotation2;
+    @Dummy
+    private Configuration configuration;
+
+    private List<Target> classAnnotations;
 
 
     @Before
     public void initialize() throws Exception {
-        field = getClass().getDeclaredField("field");
-
-        annotatedField = new AnnotatedField<Target>(field, annotation);
+        classAnnotations = asList(classAnnotation1, classAnnotation2);
+        annotations = new Annotations<Target>(annotation, classAnnotations, configuration);
     }
 
-
-    @Test
-    public void setFieldValue() {
-        annotatedField.setFieldValue(testInstanceMock.getMock(), "value");
-        testInstanceMock.assertInvoked().setFieldValue(field, "value");
-    }
 
     @Test
     public void getAnnotation() {
-        Target result = annotatedField.getAnnotation();
+        Target result = annotations.getAnnotation();
         assertSame(annotation, result);
     }
 
     @Test
-    public void getField() {
-        Field result = annotatedField.getField();
-        assertSame(field, result);
+    public void getClassAnnotations() {
+        List<Target> result = annotations.getClassAnnotations();
+        assertSame(classAnnotations, result);
     }
 }
