@@ -30,6 +30,11 @@
     <name>JUnit tests for Unitils</name>
 
     <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.4</version>
+        </dependency>
 
         <!-- There is a mismatch in the version of cglib that hibernate and unitils-mock uses. -->
         <!-- Make sure we use the same version as the unitils-mock module -->
