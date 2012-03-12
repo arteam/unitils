@@ -18,7 +18,6 @@ package org.unitilsnew.core;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.unitilsnew.core.Context.Key;
 
@@ -65,6 +64,6 @@ public class ContextKeyHashCodeTest {
         Key key = new Key(null, null);
         int result = key.hashCode();
 
-        assertEquals(0, result);
+        assertTrue(result != 0);
     }
 }

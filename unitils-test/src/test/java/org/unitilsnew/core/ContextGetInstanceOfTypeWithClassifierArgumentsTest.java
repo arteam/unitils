@@ -70,11 +70,22 @@ public class ContextGetInstanceOfTypeWithClassifierArgumentsTest extends Unitils
     }
 
     @Test
+    @SuppressWarnings("NullArgumentToVariableArgMethod")
     public void nullClassifierSameAsNoClassifiers() {
-        configurationMock.returns(TestClassA.class.getName()).getOptionalString(TestInterface.class.getName(), null);
+        configurationMock.returns(TestClassA.class.getName()).getOptionalString(TestInterface.class.getName());
 
-        SingleClassifierClass result1 = context.getInstanceOfType(SingleClassifierClass.class);
-        SingleClassifierClass result2 = context.getInstanceOfType(SingleClassifierClass.class, null);
+        TestInterface result1 = context.getInstanceOfType(TestInterface.class);
+        TestInterface result2 = context.getInstanceOfType(TestInterface.class, null);
+        assertSame(result1, result2);
+    }
+
+    @Test
+    @SuppressWarnings("RedundantArrayCreation")
+    public void emptyClassifierSameAsNoClassifiers() {
+        configurationMock.returns(TestClassA.class.getName()).getOptionalString(TestInterface.class.getName());
+
+        TestInterface result1 = context.getInstanceOfType(TestInterface.class);
+        TestInterface result2 = context.getInstanceOfType(TestInterface.class, new String[0]);
         assertSame(result1, result2);
     }
 

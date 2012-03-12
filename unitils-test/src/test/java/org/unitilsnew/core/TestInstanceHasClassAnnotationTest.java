@@ -20,7 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.annotation.Retention;
-import java.lang.reflect.Method;
+import java.lang.annotation.Target;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.Assert.assertFalse;
@@ -29,52 +29,52 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Tim Ducheyne
  */
-public class TestInstanceHasMethodAnnotationTest {
+public class TestInstanceHasClassAnnotationTest {
 
     /* Tested object */
     private TestInstance testInstance;
 
-    private TestClass testClass;
-    private Method annotationMethod;
-    private Method noAnnotationMethod;
-
 
     @Before
     public void initialize() throws Exception {
-        annotationMethod = MyClass.class.getMethod("annotation");
-        noAnnotationMethod = MyClass.class.getMethod("noAnnotation");
-        testClass = new TestClass(MyClass.class);
+        TestClass testClass = new TestClass(MyClass.class);
+        testInstance = new TestInstance(testClass, null, null);
     }
 
 
     @Test
-    public void annotation() {
-        testInstance = new TestInstance(testClass, null, annotationMethod);
-
-        boolean result = testInstance.hasMethodAnnotation(MyAnnotation.class);
+    public void hasAnnotation() {
+        boolean result = testInstance.hasClassAnnotation(MyAnnotation1.class);
         assertTrue(result);
     }
 
     @Test
-    public void noAnnotation() {
-        testInstance = new TestInstance(testClass, null, noAnnotationMethod);
+    public void hasAnnotationOnSuperClass() {
+        boolean result = testInstance.hasClassAnnotation(MyAnnotation2.class);
+        assertTrue(result);
+    }
 
-        boolean result = testInstance.hasMethodAnnotation(MyAnnotation.class);
+    @Test
+    public void annotationNotFound() {
+        boolean result = testInstance.hasClassAnnotation(Target.class);
         assertFalse(result);
     }
 
 
     @Retention(RUNTIME)
-    private @interface MyAnnotation {
+    private @interface MyAnnotation1 {
     }
 
-    private static class MyClass {
-
-        @MyAnnotation
-        public void annotation() {
-        }
-
-        public void noAnnotation() {
-        }
+    @Retention(RUNTIME)
+    private @interface MyAnnotation2 {
     }
+
+    @MyAnnotation2
+    private static class MySuperClass {
+    }
+
+    @MyAnnotation1
+    private static class MyClass extends MySuperClass {
+    }
+
 }

@@ -48,8 +48,8 @@ public class ContextGetInstanceOfTypeWithFactoryArgumentsTest extends UnitilsJUn
     }
 
     @Test
-    public void validFactory() {
-        configurationMock.returns(FactoryClass.class.getName()).getOptionalString(Map.class.getName(), null);
+    public void factoryAsImplementationType() {
+        configurationMock.returns(FactoryClass.class.getName()).getOptionalString(Map.class.getName());
 
         Map result = context.getInstanceOfType(Map.class);
         assertTrue(result instanceof Properties);
@@ -57,23 +57,15 @@ public class ContextGetInstanceOfTypeWithFactoryArgumentsTest extends UnitilsJUn
 
     @Test
     public void factoryAsArgumentImplementationType() {
-        configurationMock.returns(FactoryClass.class.getName()).getOptionalString(Map.class.getName(), null);
+        configurationMock.returns(FactoryClass.class.getName()).getOptionalString(Map.class.getName());
 
         TestClassA result = context.getInstanceOfType(TestClassA.class);
         assertTrue(result.map instanceof Properties);
     }
 
     @Test
-    public void factoryAsPropertyType() {
-        configurationMock.returns(new Properties()).getValueOfType(Map.class, "map", null);
-
-        TestClassB result = context.getInstanceOfType(TestClassB.class);
-        assertTrue(result.map instanceof Properties);
-    }
-
-    @Test
     public void sameInstanceIsReturnedForSecondCall() {
-        configurationMock.returns(FactoryClass.class.getName()).getOptionalString(Map.class.getName(), null);
+        configurationMock.returns(FactoryClass.class.getName()).getOptionalString(Map.class.getName());
 
         Map result1 = context.getInstanceOfType(Map.class);
         Map result2 = context.getInstanceOfType(Map.class);
@@ -82,7 +74,7 @@ public class ContextGetInstanceOfTypeWithFactoryArgumentsTest extends UnitilsJUn
 
     @Test(expected = UnitilsException.class)
     public void factoryCreatesInstanceOfWrongType() {
-        configurationMock.returns(FactoryClass.class.getName()).getOptionalString(List.class.getName(), null);
+        configurationMock.returns(FactoryClass.class.getName()).getOptionalString(List.class.getName());
 
         context.getInstanceOfType(List.class);
     }

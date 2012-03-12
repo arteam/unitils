@@ -56,7 +56,7 @@ public class TestInstanceGetMethodAnnotationTest {
     }
 
     @Test
-    public void noAnnotation() {
+    public void nullWhenNoAnnotation() {
         testInstance = new TestInstance(testClass, null, noAnnotationMethod);
 
         MyAnnotation result = testInstance.getMethodAnnotation(MyAnnotation.class);

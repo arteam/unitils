@@ -132,7 +132,7 @@ public class Context {
         Property propertyAnnotation = getPropertyAnnotation(argumentAnnotations);
         Classifier classifierAnnotation = getClassifierAnnotation(argumentAnnotations);
 
-        String[] argumentClassifiers = classifierAnnotation == null ? null : classifierAnnotation.value();
+        String[] argumentClassifiers = classifierAnnotation == null ? new String[0] : classifierAnnotation.value();
 
         Object instance;
         if (propertyAnnotation != null) {
@@ -242,8 +242,8 @@ public class Context {
 
         public Key(Class<?> type, String... classifiers) {
             this.type = type;
-            if (classifiers != null && classifiers.length == 0) {
-                this.classifiers = null;
+            if (classifiers == null) {
+                this.classifiers = new String[0];
             } else {
                 this.classifiers = classifiers;
             }

@@ -75,7 +75,7 @@ public class ContextDefaultImplementationTypeTest extends UnitilsJUnit4 {
 
     @Test
     public void defaultTypeNotUsedWhenConfigFound() {
-        configurationMock.returns(OtherTestClass.class.getName()).getOptionalString(TestInterface.class.getName(), null);
+        configurationMock.returns(OtherTestClass.class.getName()).getOptionalString(TestInterface.class.getName());
         context.setDefaultImplementationType(TestInterface.class, TestClass.class);
 
         TestInterface result = context.getInstanceOfType(TestInterface.class);

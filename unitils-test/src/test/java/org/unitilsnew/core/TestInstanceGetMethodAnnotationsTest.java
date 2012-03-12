@@ -59,7 +59,7 @@ public class TestInstanceGetMethodAnnotationsTest {
     }
 
     @Test
-    public void noAnnotations() {
+    public void emptyWhenNoAnnotations() {
         testInstance = new TestInstance(testClass, null, noAnnotationsMethod);
 
         List<Annotation> result = testInstance.getMethodAnnotations();
