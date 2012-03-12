@@ -32,7 +32,6 @@ import java.util.TreeSet;
 
 /**
  * @author Tim Ducheyne
- * @author Filip Neven
  */
 public class UnitilsTestListener {
 
@@ -49,7 +48,7 @@ public class UnitilsTestListener {
         this.context = context;
     }
 
-    // todo test  testphases + testlisteners
+    // todo test  testphases
 
 
     public void beforeTestClass(Class<?> testClass) {

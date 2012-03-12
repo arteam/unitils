@@ -22,20 +22,16 @@ import org.junit.Test;
 import java.lang.reflect.Field;
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 
 /**
  * @author Tim Ducheyne
  */
-public class TestInstanceGetTestFieldsTest {
+public class TestClassGetFieldsTest {
 
     /* Tested object */
-    private TestInstance testInstance;
-
     private TestClass testClass;
-    private TestClass noFieldsTestClass;
-    private Object testObject;
-    private NoFieldsClass noFieldsTestObject;
 
     private Field field1a;
     private Field field2;
@@ -49,45 +45,31 @@ public class TestInstanceGetTestFieldsTest {
         field2 = SuperClass.class.getDeclaredField("field2");
         field1b = MyClass.class.getDeclaredField("field1");
         field3 = MyClass.class.getDeclaredField("field3");
-
-        testClass = new TestClass(MyClass.class);
-        noFieldsTestClass = new TestClass(NoFieldsClass.class);
-        testObject = new MyClass();
-        noFieldsTestObject = new NoFieldsClass();
     }
 
 
     @Test
     public void fields() {
-        testInstance = new TestInstance(testClass, testObject, null);
+        testClass = new TestClass(MyClass.class);
 
-        List<TestField> result = testInstance.getTestFields();
-        assertEquals(4, result.size());
-        assertEquals(field1b, result.get(0).getField());
-        assertEquals(field3, result.get(1).getField());
-        assertEquals(field1a, result.get(2).getField());
-        assertEquals(field2, result.get(3).getField());
-
-        assertSame(testObject, result.get(0).testObject);
-        assertSame(testObject, result.get(1).testObject);
-        assertSame(testObject, result.get(2).testObject);
-        assertSame(testObject, result.get(3).testObject);
+        List<Field> result = testClass.getFields();
+        assertEquals(asList(field1b, field3, field1a, field2), result);
     }
 
     @Test
     public void emptyWhenNoFields() {
-        testInstance = new TestInstance(noFieldsTestClass, noFieldsTestObject, null);
+        testClass = new TestClass(NoFieldsClass.class);
 
-        List<TestField> result = testInstance.getTestFields();
+        List<Field> result = testClass.getFields();
         assertTrue(result.isEmpty());
     }
 
     @Test
     public void testFieldsAreCached() {
-        testInstance = new TestInstance(testClass, testObject, null);
+        testClass = new TestClass(MyClass.class);
 
-        List<TestField> result1 = testInstance.getTestFields();
-        List<TestField> result2 = testInstance.getTestFields();
+        List<Field> result1 = testClass.getFields();
+        List<Field> result2 = testClass.getFields();
         assertSame(result1, result2);
     }
 

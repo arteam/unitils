@@ -40,6 +40,8 @@ import static java.util.Arrays.asList;
 import static org.unitilsnew.core.TestPhase.EXECUTION;
 
 /**
+ * todo add test for annotation that is not annotated
+ *
  * @author Tim Ducheyne
  */
 public class UnitilsTestListenerFieldAnnotationTest extends UnitilsJUnit4 {
@@ -58,7 +60,7 @@ public class UnitilsTestListenerFieldAnnotationTest extends UnitilsJUnit4 {
         unitilsTestListener = new UnitilsTestListener(new ArrayList<TestListener>(), contextMock.getMock());
 
         fieldAnnotationHandlerMock.returns(EXECUTION).getTestPhase();
-        contextMock.returns(fieldAnnotationHandlerMock).getInstanceOfType(TestFieldAnnotationHandler.class, new String[]{});
+        contextMock.returns(fieldAnnotationHandlerMock).getInstanceOfType(TestFieldAnnotationHandler.class);
         contextMock.returns(configuration).getConfiguration();
     }
 

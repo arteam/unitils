@@ -91,7 +91,13 @@ public class TestClass {
     }
 
     public <A extends Annotation> boolean hasAnnotation(Class<A> annotationClass) {
-        return testClass.isAnnotationPresent(annotationClass);
+        List<Annotation> annotations = getAnnotations();
+        for (Annotation annotation : annotations) {
+            if (annotation.annotationType().equals(annotationClass)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -100,7 +106,12 @@ public class TestClass {
             return;
         }
         Field[] classFields = clazz.getDeclaredFields();
-        fields.addAll(asList(classFields));
+        for (Field field : classFields) {
+            // exclude special fields
+            if (!field.isSynthetic()) {
+                fields.add(field);
+            }
+        }
         addFields(clazz.getSuperclass(), fields);
     }
 
@@ -109,7 +120,12 @@ public class TestClass {
             return;
         }
         Method[] classMethods = clazz.getDeclaredMethods();
-        methods.addAll(asList(classMethods));
+        for (Method method : classMethods) {
+            // exclude special methods
+            if (!method.isSynthetic() && !method.isBridge()) {
+                methods.add(method);
+            }
+        }
         addMethods(clazz.getSuperclass(), methods);
     }
 

@@ -56,16 +56,16 @@ public class ContextGetInstanceOfTypeWithPropertyArgumentsTest extends UnitilsJU
     @Test
     public void propertyTypes() {
         StringBuffer stringBuffer = new StringBuffer();
-        configurationMock.returns("value").getValueOfType(String.class, "string", null);
-        configurationMock.returns(true).getValueOfType(Boolean.class, "boolean", null);
-        configurationMock.returns(true).getValueOfType(Boolean.TYPE, "boolean", null);
-        configurationMock.returns(5).getValueOfType(Integer.TYPE, "integer", null);
-        configurationMock.returns(5).getValueOfType(Integer.class, "integer", null);
-        configurationMock.returns(6L).getValueOfType(Long.TYPE, "long", null);
-        configurationMock.returns(6L).getValueOfType(Long.class, "long", null);
-        configurationMock.returns(stringBuffer).getValueOfType(StringBuffer.class, "object", null);
-        configurationMock.returns(FIELD).getValueOfType(ElementType.class, "enum", null);
-        configurationMock.returns(Map.class).getValueOfType(Class.class, "class", null);
+        configurationMock.returns("value").getValueOfType(String.class, "string");
+        configurationMock.returns(true).getValueOfType(Boolean.class, "boolean");
+        configurationMock.returns(true).getValueOfType(Boolean.TYPE, "boolean");
+        configurationMock.returns(5).getValueOfType(Integer.TYPE, "integer");
+        configurationMock.returns(5).getValueOfType(Integer.class, "integer");
+        configurationMock.returns(6L).getValueOfType(Long.TYPE, "long");
+        configurationMock.returns(6L).getValueOfType(Long.class, "long");
+        configurationMock.returns(stringBuffer).getValueOfType(StringBuffer.class, "object");
+        configurationMock.returns(FIELD).getValueOfType(ElementType.class, "enum");
+        configurationMock.returns(Map.class).getValueOfType(Class.class, "class");
 
         SimpleTypesClass result = context.getInstanceOfType(SimpleTypesClass.class);
         assertEquals("value", result.stringValue);
@@ -81,16 +81,17 @@ public class ContextGetInstanceOfTypeWithPropertyArgumentsTest extends UnitilsJU
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void listPropertyTypes() {
         StringBuffer stringBuffer1 = new StringBuffer();
         StringBuffer stringBuffer2 = new StringBuffer();
-        configurationMock.returns(asList("value1", "value2")).getValueListOfType(String.class, "strings", null);
-        configurationMock.returns(asList(true, false)).getValueListOfType(Boolean.class, "booleans", null);
-        configurationMock.returns(asList(5, 6)).getValueListOfType(Integer.class, "integers", null);
-        configurationMock.returns(asList(7L, 8L)).getValueListOfType(Long.class, "longs", null);
-        configurationMock.returns(asList(stringBuffer1, stringBuffer2)).getValueListOfType(StringBuffer.class, "objects", null);
-        configurationMock.returns(asList(FIELD, METHOD)).getValueListOfType(ElementType.class, "enums", null);
-        configurationMock.returns(asList(Map.class, Set.class)).getValueListOfType(Class.class, "classes", null);
+        configurationMock.returns(asList("value1", "value2")).getValueListOfType(String.class, "strings");
+        configurationMock.returns(asList(true, false)).getValueListOfType(Boolean.class, "booleans");
+        configurationMock.returns(asList(5, 6)).getValueListOfType(Integer.class, "integers");
+        configurationMock.returns(asList(7L, 8L)).getValueListOfType(Long.class, "longs");
+        configurationMock.returns(asList(stringBuffer1, stringBuffer2)).getValueListOfType(StringBuffer.class, "objects");
+        configurationMock.returns(asList(FIELD, METHOD)).getValueListOfType(ElementType.class, "enums");
+        configurationMock.returns(asList(Map.class, Set.class)).getValueListOfType(Class.class, "classes");
 
         ListTypesClass result = context.getInstanceOfType(ListTypesClass.class);
         assertReflectionEquals(asList("value1", "value2"), result.stringValues);
@@ -104,14 +105,14 @@ public class ContextGetInstanceOfTypeWithPropertyArgumentsTest extends UnitilsJU
 
     @Test(expected = UnitilsException.class)
     public void invalidType() {
-        configurationMock.raises(UnitilsException.class).getValueOfType(StringBuffer.class, "object", null);
+        configurationMock.raises(UnitilsException.class).getValueOfType(StringBuffer.class, "object");
 
         context.getInstanceOfType(ObjectTypeClass.class);
     }
 
     @Test
     public void rawListTypeReturnsStringElements() {
-        configurationMock.returns(asList("value1", "value2")).getValueListOfType(String.class, "rawValues", null);
+        configurationMock.returns(asList("value1", "value2")).getValueListOfType(String.class, "rawValues");
 
         RawListClass result = context.getInstanceOfType(RawListClass.class);
         assertReflectionEquals(asList("value1", "value2"), result.rawValues);

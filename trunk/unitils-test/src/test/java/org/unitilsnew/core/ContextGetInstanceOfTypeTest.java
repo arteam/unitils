@@ -44,7 +44,7 @@ public class ContextGetInstanceOfTypeTest extends UnitilsJUnit4 {
 
     @Test
     public void noConstructors() {
-        configurationMock.returns(NoConstructorClass.class.getName()).getOptionalString(TestInterface.class.getName(), null);
+        configurationMock.returns(NoConstructorClass.class.getName()).getOptionalString(TestInterface.class.getName());
 
         TestInterface result = context.getInstanceOfType(TestInterface.class);
         assertTrue(result instanceof NoConstructorClass);
@@ -52,7 +52,7 @@ public class ContextGetInstanceOfTypeTest extends UnitilsJUnit4 {
 
     @Test
     public void noArgumentConstructor() {
-        configurationMock.returns(NoArgumentConstructorClass.class.getName()).getOptionalString(TestInterface.class.getName(), null);
+        configurationMock.returns(NoArgumentConstructorClass.class.getName()).getOptionalString(TestInterface.class.getName());
 
         TestInterface result = context.getInstanceOfType(TestInterface.class);
         assertTrue(result instanceof NoArgumentConstructorClass);
@@ -92,7 +92,7 @@ public class ContextGetInstanceOfTypeTest extends UnitilsJUnit4 {
 
     @Test
     public void constructorWithArguments() {
-        configurationMock.returns(ConstructorsWithArgumentsClass.class.getName()).getOptionalString(TestInterface.class.getName(), null);
+        configurationMock.returns(ConstructorsWithArgumentsClass.class.getName()).getOptionalString(TestInterface.class.getName());
 
         TestInterface result = context.getInstanceOfType(TestInterface.class);
         assertTrue(result instanceof ConstructorsWithArgumentsClass);
@@ -102,7 +102,7 @@ public class ContextGetInstanceOfTypeTest extends UnitilsJUnit4 {
 
     @Test(expected = UnitilsException.class)
     public void tooManyConstructors() {
-        configurationMock.returns(TwoConstructorsClass.class.getName()).getOptionalString(TestInterface.class.getName(), null);
+        configurationMock.returns(TwoConstructorsClass.class.getName()).getOptionalString(TestInterface.class.getName());
 
         TestInterface result = context.getInstanceOfType(TestInterface.class);
         assertTrue(result instanceof NoConstructorClass);
@@ -110,21 +110,21 @@ public class ContextGetInstanceOfTypeTest extends UnitilsJUnit4 {
 
     @Test(expected = UnitilsException.class)
     public void invalidClassName() {
-        configurationMock.returns("xxx").getOptionalString(TestInterface.class.getName(), null);
+        configurationMock.returns("xxx").getOptionalString(TestInterface.class.getName());
 
         context.getInstanceOfType(TestInterface.class);
     }
 
     @Test(expected = UnitilsException.class)
     public void implementationTypeShouldNotBeAnInterface() {
-        configurationMock.returns(TestInterface.class.getName()).getOptionalString(TestInterface.class.getName(), null);
+        configurationMock.returns(TestInterface.class.getName()).getOptionalString(TestInterface.class.getName());
 
         context.getInstanceOfType(TestInterface.class);
     }
 
     @Test(expected = UnitilsException.class)
     public void implementationTypeShouldBeOfCorrectType() {
-        configurationMock.returns(StringBuffer.class.getName()).getOptionalString(TestInterface.class.getName(), null);
+        configurationMock.returns(StringBuffer.class.getName()).getOptionalString(TestInterface.class.getName());
 
         context.getInstanceOfType(TestInterface.class);
     }

@@ -65,6 +65,7 @@ public class ContextKeyEqualsTest {
     }
 
     @Test
+    @SuppressWarnings("ObjectEqualsNull")
     public void notEqualToNull() {
         Key key1 = new Key(StringBuffer.class);
 
@@ -72,6 +73,7 @@ public class ContextKeyEqualsTest {
     }
 
     @Test
+    @SuppressWarnings("EqualsBetweenInconvertibleTypes")
     public void notEqualToOtherType() {
         Key key1 = new Key(StringBuffer.class);
 
