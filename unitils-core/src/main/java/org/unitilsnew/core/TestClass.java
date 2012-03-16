@@ -58,6 +58,7 @@ public class TestClass {
         return fields;
     }
 
+    // note: gets all methods => overridden methods are returned twice
     public List<Method> getMethods() {
         if (methods != null) {
             return methods;
@@ -136,5 +137,26 @@ public class TestClass {
         Annotation[] annotations = clazz.getDeclaredAnnotations();
         classAnnotations.addAll(asList(annotations));
         addAnnotations(clazz.getSuperclass(), classAnnotations);
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        TestClass testClass1 = (TestClass) o;
+        if (testClass != null ? !testClass.equals(testClass1.testClass) : testClass1.testClass != null) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return testClass != null ? testClass.hashCode() : 0;
     }
 }

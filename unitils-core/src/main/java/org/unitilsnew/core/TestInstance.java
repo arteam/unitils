@@ -20,8 +20,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import static java.util.Collections.addAll;
 
 /**
  * @author Tim Ducheyne
@@ -115,7 +116,7 @@ public class TestInstance {
             return methodAnnotations;
         }
         methodAnnotations = new ArrayList<Annotation>();
-        Collections.addAll(methodAnnotations, testMethod.getDeclaredAnnotations());
+        addAll(methodAnnotations, testMethod.getDeclaredAnnotations());
         return methodAnnotations;
     }
 

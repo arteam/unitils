@@ -29,16 +29,20 @@ import java.util.List;
 public class UnitilsTestListenerFactory implements Factory<UnitilsTestListener> {
 
     protected UnitilsContext unitilsContext;
+    protected WrapperForFieldAnnotationListenerFactory wrapperForFieldAnnotationListenerFactory;
+    protected WrapperForTestAnnotationListenerFactory wrapperForTestAnnotationListenerFactory;
 
 
-    public UnitilsTestListenerFactory(UnitilsContext unitilsContext) {
+    public UnitilsTestListenerFactory(UnitilsContext unitilsContext, WrapperForFieldAnnotationListenerFactory wrapperForFieldAnnotationListenerFactory, WrapperForTestAnnotationListenerFactory wrapperForTestAnnotationListenerFactory) {
         this.unitilsContext = unitilsContext;
+        this.wrapperForFieldAnnotationListenerFactory = wrapperForFieldAnnotationListenerFactory;
+        this.wrapperForTestAnnotationListenerFactory = wrapperForTestAnnotationListenerFactory;
     }
 
 
     public UnitilsTestListener create() {
         List<TestListener> testListeners = createTestListeners();
-        return new UnitilsTestListener(testListeners, unitilsContext);
+        return new UnitilsTestListener(testListeners, wrapperForFieldAnnotationListenerFactory, wrapperForTestAnnotationListenerFactory);
     }
 
 

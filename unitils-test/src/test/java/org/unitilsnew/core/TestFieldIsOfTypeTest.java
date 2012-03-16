@@ -18,44 +18,48 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
-import org.unitils.mock.annotation.Dummy;
 
-import java.lang.annotation.Target;
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
+import java.util.Map;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Tim Ducheyne
  */
-public class AnnotatedMethodTest extends UnitilsJUnit4 {
+public class TestFieldIsOfTypeTest {
 
     /* Tested object */
-    private AnnotatedMethod<Target> annotatedMethod;
+    private TestField testField;
 
-    private Method method;
-    @Dummy
-    private Target annotation;
+    private Field field;
 
 
     @Before
     public void initialize() throws Exception {
-        method = getClass().getDeclaredMethod("initialize");
+        field = MyClass.class.getDeclaredField("field");
+        MyClass testObject = new MyClass();
 
-        annotatedMethod = new AnnotatedMethod<Target>(method, annotation);
+        testField = new TestField(field, testObject);
     }
 
 
     @Test
-    public void getMethod() {
-        Method result = annotatedMethod.getMethod();
-        assertSame(method, result);
+    public void ofType() {
+        boolean result = testField.isOfType(String.class);
+        assertTrue(result);
     }
 
     @Test
-    public void getAnnotation() {
-        Target result = annotatedMethod.getAnnotation();
-        assertSame(annotation, result);
+    public void notOfType() {
+        boolean result = testField.isOfType(Map.class);
+        assertFalse(result);
+    }
+
+
+    private static class MyClass {
+
+        private String field;
     }
 }

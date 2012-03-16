@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.unitils.core.UnitilsException;
 
 import java.lang.reflect.Field;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -28,7 +29,7 @@ import static org.junit.Assert.assertNull;
 /**
  * @author Tim Ducheyne
  */
-public class TestFieldSetValueTest {
+public class TestFieldGetValueTest {
 
     /* Tested object */
     private TestField testField;
@@ -46,29 +47,33 @@ public class TestFieldSetValueTest {
 
 
     @Test
-    public void setValue() {
-        testField.setValue("value");
-        assertEquals("value", testObject.field);
+    public void getValue() {
+        String result = testField.getValue("value");
+        assertEquals("value", result);
     }
 
     @Test
     public void nullValue() {
-        testField.setValue(null);
-        assertNull(testObject.field);
+        testObject.field = null;
+
+        String result = testField.getValue("value");
+        assertNull(result);
+    }
+
+    @Test(expected = ClassCastException.class)
+    public void invalidType() {
+        Map result = testField.getValue("value");
     }
 
     @Test(expected = UnitilsException.class)
-    public void invalidValue() {
-        testField.setValue(111L);
+    public void exception() {
+        testField = new TestField(null, testObject);
+        testField.getValue("value");
     }
-
-//    public void illegalAccess(){
-//        testField = new TestField(field, testObject);
-//    }
 
 
     private static class MyClass {
 
-        private String field;
+        private String field = "value";
     }
 }

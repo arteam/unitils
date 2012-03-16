@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
+import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.core.UnitilsContext;
 import org.unitilsnew.core.listener.TestListener;
 
@@ -35,11 +36,15 @@ public class UnitilsTestListenerFactoryCreateTest extends UnitilsJUnit4 {
     private UnitilsTestListenerFactory unitilsTestListenerFactory;
 
     private Mock<UnitilsContext> unitilsContextMock;
+    @Dummy
+    private WrapperForFieldAnnotationListenerFactory wrapperForFieldAnnotationListenerFactory;
+    @Dummy
+    private WrapperForTestAnnotationListenerFactory wrapperForTestAnnotationListenerFactory;
 
 
     @Before
     public void initialize() {
-        unitilsTestListenerFactory = new UnitilsTestListenerFactory(unitilsContextMock.getMock());
+        unitilsTestListenerFactory = new UnitilsTestListenerFactory(unitilsContextMock.getMock(), wrapperForFieldAnnotationListenerFactory, wrapperForTestAnnotationListenerFactory);
     }
 
 
@@ -57,6 +62,8 @@ public class UnitilsTestListenerFactoryCreateTest extends UnitilsJUnit4 {
         assertEquals(2, result.testListeners.size());
         assertSame(myTestListener1, result.testListeners.get(0));
         assertSame(myTestListener2, result.testListeners.get(1));
+        assertSame(wrapperForFieldAnnotationListenerFactory, result.wrapperForFieldAnnotationListenerFactory);
+        assertSame(wrapperForTestAnnotationListenerFactory, result.wrapperForTestAnnotationListenerFactory);
     }
 
     @Test

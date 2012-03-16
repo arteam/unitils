@@ -25,28 +25,26 @@ import java.lang.annotation.Target;
 import java.util.List;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Tim Ducheyne
  */
-public class TestInstanceGetClassAnnotationsTest {
+public class TestClassGetAnnotationsTest {
 
     /* Tested object */
-    private TestInstance testInstance;
+    private TestClass testClass;
 
 
     @Before
     public void initialize() throws Exception {
-        TestClass testClass = new TestClass(MyClass.class);
-        testInstance = new TestInstance(testClass, null, null);
+        testClass = new TestClass(MyClass.class);
     }
 
 
     @Test
     public void annotationsOfType() {
-        List<MyAnnotation1> result = testInstance.getClassAnnotations(MyAnnotation1.class);
+        List<MyAnnotation1> result = testClass.getAnnotations(MyAnnotation1.class);
 
         assertEquals(2, result.size());
         assertEquals("annotation1", result.get(0).value());
@@ -55,14 +53,14 @@ public class TestInstanceGetClassAnnotationsTest {
 
     @Test
     public void noAnnotationsOfTypeFound() {
-        List<Target> result = testInstance.getClassAnnotations(Target.class);
+        List<Target> result = testClass.getAnnotations(Target.class);
 
         assertTrue(result.isEmpty());
     }
 
     @Test
     public void allAnnotations() {
-        List<Annotation> result = testInstance.getClassAnnotations();
+        List<Annotation> result = testClass.getAnnotations();
 
         assertEquals(4, result.size());
         assertEquals("annotation1", ((MyAnnotation1) result.get(0)).value());
@@ -73,10 +71,18 @@ public class TestInstanceGetClassAnnotationsTest {
 
     @Test
     public void noAnnotationsFound() {
-        testInstance = new TestInstance(new TestClass(NoAnnotationsClass.class), null, null);
+        testClass = new TestClass(NoAnnotationsClass.class);
 
-        List<Annotation> result = testInstance.getClassAnnotations();
+        List<Annotation> result = testClass.getAnnotations();
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void annotationsAreCached() {
+        List<Annotation> result1 = testClass.getAnnotations();
+        List<Annotation> result2 = testClass.getAnnotations();
+
+        assertSame(result1, result2);
     }
 
 
