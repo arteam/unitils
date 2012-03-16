@@ -21,6 +21,8 @@ import org.junit.Test;
 import org.unitils.core.UnitilsException;
 
 import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -28,47 +30,53 @@ import static org.junit.Assert.assertNull;
 /**
  * @author Tim Ducheyne
  */
-public class TestFieldSetValueTest {
+public class TestFieldGetGenericTypeTest {
 
     /* Tested object */
     private TestField testField;
 
+    private Field regularField;
+    private Field genericField;
+    private Field multiGenericField;
     private MyClass testObject;
 
 
     @Before
     public void initialize() throws Exception {
-        Field field = MyClass.class.getDeclaredField("field");
+        regularField = MyClass.class.getDeclaredField("regularField");
+        genericField = MyClass.class.getDeclaredField("genericField");
+        multiGenericField = MyClass.class.getDeclaredField("multiGenericField");
         testObject = new MyClass();
-
-        testField = new TestField(field, testObject);
     }
 
 
     @Test
-    public void setValue() {
-        testField.setValue("value");
-        assertEquals("value", testObject.field);
+    public void genericField() {
+        testField = new TestField(genericField, testObject);
+
+        Class<?> result = testField.getGenericType();
+        assertEquals(String.class, result);
     }
 
     @Test
-    public void nullValue() {
-        testField.setValue(null);
-        assertNull(testObject.field);
+    public void nullWhenNoGenericType() {
+        testField = new TestField(regularField, testObject);
+
+        Class<?> result = testField.getGenericType();
+        assertNull(result);
     }
 
     @Test(expected = UnitilsException.class)
-    public void invalidValue() {
-        testField.setValue(111L);
+    public void exceptionWhenMoreThanOneGenericType() {
+        testField = new TestField(multiGenericField, testObject);
+        testField.getGenericType();
     }
-
-//    public void illegalAccess(){
-//        testField = new TestField(field, testObject);
-//    }
 
 
     private static class MyClass {
 
-        private String field;
+        private String regularField;
+        private List<String> genericField;
+        private Map<String, String> multiGenericField;
     }
 }

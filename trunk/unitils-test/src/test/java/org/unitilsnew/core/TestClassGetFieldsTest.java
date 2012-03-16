@@ -65,7 +65,7 @@ public class TestClassGetFieldsTest {
     }
 
     @Test
-    public void testFieldsAreCached() {
+    public void fieldsAreCached() {
         testClass = new TestClass(MyClass.class);
 
         List<Field> result1 = testClass.getFields();

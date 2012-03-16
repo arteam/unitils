@@ -18,6 +18,7 @@ package org.unitilsnew.core;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.unitilsnew.core.Context.Key;
 
@@ -40,7 +41,7 @@ public class ContextKeyHashCodeTest {
         Key key1 = new Key(StringBuffer.class, "a", "b");
         Key key2 = new Key(StringBuffer.class, "a", "b");
 
-        assertTrue(key1.hashCode() == key2.hashCode());
+        assertEquals(key1.hashCode(), key2.hashCode());
     }
 
     @Test

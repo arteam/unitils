@@ -18,53 +18,55 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.core.UnitilsException;
 
 import java.lang.reflect.Field;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 /**
  * @author Tim Ducheyne
  */
-public class TestFieldSetValueTest {
+public class TestFieldTest {
 
     /* Tested object */
     private TestField testField;
 
-    private MyClass testObject;
+    private Field field;
 
 
     @Before
     public void initialize() throws Exception {
-        Field field = MyClass.class.getDeclaredField("field");
-        testObject = new MyClass();
+        field = MyClass.class.getDeclaredField("field");
+        MyClass testObject = new MyClass();
 
         testField = new TestField(field, testObject);
     }
 
 
     @Test
-    public void setValue() {
-        testField.setValue("value");
-        assertEquals("value", testObject.field);
+    public void getField() {
+        Field result = testField.getField();
+        assertSame(field, result);
     }
 
     @Test
-    public void nullValue() {
-        testField.setValue(null);
-        assertNull(testObject.field);
+    public void getName() {
+        String result = testField.getName();
+        assertEquals("field", result);
     }
 
-    @Test(expected = UnitilsException.class)
-    public void invalidValue() {
-        testField.setValue(111L);
+    @Test
+    public void getType() {
+        Class<?> result = testField.getType();
+        assertEquals(String.class, result);
     }
 
-//    public void illegalAccess(){
-//        testField = new TestField(field, testObject);
-//    }
+    @Test
+    public void testToString() {
+        String result = testField.toString();
+        assertEquals("field", result);
+    }
 
 
     private static class MyClass {

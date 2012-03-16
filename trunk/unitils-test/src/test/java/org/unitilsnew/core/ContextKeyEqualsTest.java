@@ -67,21 +67,37 @@ public class ContextKeyEqualsTest {
     @Test
     @SuppressWarnings("ObjectEqualsNull")
     public void notEqualToNull() {
-        Key key1 = new Key(StringBuffer.class);
+        Key key = new Key(StringBuffer.class);
 
-        assertFalse(key1.equals(null));
+        assertFalse(key.equals(null));
     }
 
     @Test
     @SuppressWarnings("EqualsBetweenInconvertibleTypes")
     public void notEqualToOtherType() {
-        Key key1 = new Key(StringBuffer.class);
+        Key key = new Key(StringBuffer.class);
 
-        assertFalse(key1.equals("xxx"));
+        assertFalse(key.equals("xxx"));
     }
 
     @Test
-    public void nullKeyValues() {
+    public void nullType() {
+        Key key1 = new Key(null, "a", "b");
+        Key key2 = new Key(null, "a", "b");
+
+        assertTrue(key1.equals(key2));
+    }
+
+    @Test
+    public void nullClassifiers() {
+        Key key1 = new Key(StringBuffer.class);
+        Key key2 = new Key(StringBuffer.class);
+
+        assertTrue(key1.equals(key2));
+    }
+
+    @Test
+    public void nullTypeAndClassifiers() {
         Key key1 = new Key(null, null);
         Key key2 = new Key(null, null);
 

@@ -18,57 +18,54 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.core.UnitilsException;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 /**
  * @author Tim Ducheyne
  */
-public class TestFieldSetValueTest {
+public class TestFieldGetAnnotationTest {
 
     /* Tested object */
     private TestField testField;
-
-    private MyClass testObject;
 
 
     @Before
     public void initialize() throws Exception {
         Field field = MyClass.class.getDeclaredField("field");
-        testObject = new MyClass();
+        MyClass testObject = new MyClass();
 
         testField = new TestField(field, testObject);
     }
 
 
     @Test
-    public void setValue() {
-        testField.setValue("value");
-        assertEquals("value", testObject.field);
+    public void annotationOfType() {
+        MyAnnotation result = testField.getAnnotation(MyAnnotation.class);
+        assertEquals("annotation1", result.value());
     }
 
     @Test
-    public void nullValue() {
-        testField.setValue(null);
-        assertNull(testObject.field);
+    public void nullWhenAnnotationNotFound() {
+        Target result = testField.getAnnotation(Target.class);
+        assertNull(result);
     }
 
-    @Test(expected = UnitilsException.class)
-    public void invalidValue() {
-        testField.setValue(111L);
+
+    @Retention(RUNTIME)
+    private @interface MyAnnotation {
+        String value();
     }
-
-//    public void illegalAccess(){
-//        testField = new TestField(field, testObject);
-//    }
-
 
     private static class MyClass {
 
+        @MyAnnotation("annotation1")
         private String field;
     }
 }
