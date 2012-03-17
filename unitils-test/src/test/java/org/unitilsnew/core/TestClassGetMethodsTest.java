@@ -98,6 +98,9 @@ public class TestClassGetMethodsTest {
         public String method3(String a, String b) {
             return null;
         }
+
+        public static void staticMethod() {
+        }
     }
 
     private static class NoMethodsClass {
