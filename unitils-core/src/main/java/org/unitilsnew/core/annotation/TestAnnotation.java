@@ -16,7 +16,7 @@
 
 package org.unitilsnew.core.annotation;
 
-import org.unitilsnew.core.listener.TestAnnotationListener;
+import org.unitilsnew.core.TestAnnotationListener;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;

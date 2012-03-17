@@ -14,24 +14,20 @@
  * limitations under the License.
  */
 
-package org.unitilsnew.core.annotation;
+package org.unitilsnew.core.engine;
 
-import org.unitilsnew.core.FieldAnnotationListener;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import org.unitilsnew.core.TestListener;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.util.Comparator;
 
 /**
  * @author Tim Ducheyne
  */
-@Target({TYPE})
-@Retention(RUNTIME)
-public @interface FieldAnnotation {
+public class TestListenerTestPhaseComparator implements Comparator<TestListener> {
 
-    Class<? extends FieldAnnotationListener<? extends Annotation>> value();
 
+    public int compare(TestListener testListener1, TestListener testListener2) {
+        return testListener1.getTestPhase().ordinal() - testListener2.getTestPhase().ordinal();
+    }
 }

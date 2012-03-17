@@ -19,9 +19,9 @@ import org.junit.internal.runners.*;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
-import org.unitilsnew.core.Context;
-import org.unitilsnew.core.config.BootstrapContextFactory;
-import org.unitilsnew.core.listener.impl.UnitilsTestListener;
+import org.unitilsnew.core.context.BootstrapContextFactory;
+import org.unitilsnew.core.context.Context;
+import org.unitilsnew.core.engine.UnitilsTestListener;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

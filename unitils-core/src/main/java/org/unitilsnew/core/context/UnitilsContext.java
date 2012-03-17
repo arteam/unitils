@@ -14,24 +14,28 @@
  * limitations under the License.
  */
 
-package org.unitilsnew.core.annotation;
+package org.unitilsnew.core.context;
 
-import org.unitilsnew.core.FieldAnnotationListener;
+import org.unitilsnew.core.TestListener;
+import org.unitilsnew.core.config.Configuration;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.util.List;
 
 /**
  * @author Tim Ducheyne
  */
-@Target({TYPE})
-@Retention(RUNTIME)
-public @interface FieldAnnotation {
+public class UnitilsContext extends Context {
 
-    Class<? extends FieldAnnotationListener<? extends Annotation>> value();
+    protected List<Class<? extends TestListener>> testListenerTypes;
 
+
+    public UnitilsContext(Configuration configuration, List<Class<? extends TestListener>> testListenerTypes) {
+        super(configuration);
+        this.testListenerTypes = testListenerTypes;
+    }
+
+
+    public List<Class<? extends TestListener>> getTestListenerTypes() {
+        return testListenerTypes;
+    }
 }

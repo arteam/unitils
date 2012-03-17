@@ -18,9 +18,9 @@ package org.unitilsnew;
 import junit.framework.TestCase;
 import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
-import org.unitilsnew.core.Context;
-import org.unitilsnew.core.config.BootstrapContextFactory;
-import org.unitilsnew.core.listener.impl.UnitilsTestListener;
+import org.unitilsnew.core.context.BootstrapContextFactory;
+import org.unitilsnew.core.context.Context;
+import org.unitilsnew.core.engine.UnitilsTestListener;
 
 import java.lang.reflect.Method;
 
