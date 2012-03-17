@@ -17,7 +17,7 @@
 package org.unitilsnew.core;
 
 import org.unitilsnew.core.config.Configuration;
-import org.unitilsnew.core.listener.impl.AnnotationDefaultInvocationHandler;
+import org.unitilsnew.core.engine.AnnotationDefaultInvocationHandler;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Proxy;

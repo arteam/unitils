@@ -21,9 +21,9 @@ import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
-import org.unitilsnew.core.Context;
-import org.unitilsnew.core.config.BootstrapContextFactory;
-import org.unitilsnew.core.listener.impl.UnitilsTestListener;
+import org.unitilsnew.core.context.BootstrapContextFactory;
+import org.unitilsnew.core.context.Context;
+import org.unitilsnew.core.engine.UnitilsTestListener;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
