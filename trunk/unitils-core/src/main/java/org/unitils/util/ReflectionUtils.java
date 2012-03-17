@@ -710,6 +710,10 @@ public class ReflectionUtils {
             return;
         }
         for (Field field : clazz.getDeclaredFields()) {
+            // don't copy static and special fields (e.g. EMMA adds fields for calculating coverage that can't be copied)
+            if (field.isSynthetic() || isStatic(field.getModifiers())) {
+                continue;
+            }
             field.setAccessible(true);
             Object fromValue = field.get(fromObject);
             field.set(toObject, fromValue);

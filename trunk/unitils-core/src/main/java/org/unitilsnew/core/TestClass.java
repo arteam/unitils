@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.asList;
 
 /**
@@ -108,8 +109,8 @@ public class TestClass {
         }
         Field[] classFields = clazz.getDeclaredFields();
         for (Field field : classFields) {
-            // exclude special fields
-            if (!field.isSynthetic()) {
+            // exclude static and special fields
+            if (!field.isSynthetic() && !isStatic(field.getModifiers())) {
                 fields.add(field);
             }
         }
@@ -123,7 +124,7 @@ public class TestClass {
         Method[] classMethods = clazz.getDeclaredMethods();
         for (Method method : classMethods) {
             // exclude special methods
-            if (!method.isSynthetic() && !method.isBridge()) {
+            if (!method.isSynthetic() && !method.isBridge() && !isStatic(method.getModifiers())) {
                 methods.add(method);
             }
         }

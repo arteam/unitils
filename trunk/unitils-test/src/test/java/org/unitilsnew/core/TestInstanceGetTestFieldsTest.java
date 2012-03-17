@@ -100,6 +100,8 @@ public class TestInstanceGetTestFieldsTest {
 
     private static class MyClass extends SuperClass {
 
+        private static String staticField;
+
         private String field1;
         private String field3;
     }
