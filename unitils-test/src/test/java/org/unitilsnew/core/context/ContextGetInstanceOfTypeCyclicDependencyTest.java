@@ -18,9 +18,9 @@ package org.unitilsnew.core.context;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
+import org.unitilsnew.UnitilsJUnit4;
 import org.unitilsnew.core.config.Configuration;
 
 import static org.junit.Assert.fail;

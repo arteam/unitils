@@ -18,9 +18,9 @@ package org.unitilsnew.core.context;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
+import org.unitilsnew.UnitilsJUnit4;
 import org.unitilsnew.core.TestListener;
 import org.unitilsnew.core.config.Configuration;
 import org.unitilsnew.core.config.PropertiesReader;
@@ -30,8 +30,10 @@ import java.util.Properties;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static org.junit.Assert.*;
-import static org.unitilsnew.core.context.UnitilsContextFactory.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.unitilsnew.core.context.UnitilsContextFactory.LISTENERS_PROPERTY;
+import static org.unitilsnew.core.context.UnitilsContextFactory.MODULE_PROPERTIES_NAME;
 
 /**
  * @author Tim Ducheyne
@@ -58,10 +60,6 @@ public class UnitilsContextFactoryCreateTest extends UnitilsJUnit4 {
         moduleProperties2.put("module2", "value2");
         moduleProperties1.put("property", "module-value");
         userProperties.put("property", "user-value");
-
-        MyFacade1.initialized = false;
-        MyFacade2.initialized = false;
-        MyFacade3.initialized = false;
     }
 
 
@@ -134,44 +132,6 @@ public class UnitilsContextFactoryCreateTest extends UnitilsJUnit4 {
         unitilsContextFactory.create();
     }
 
-    @Test
-    public void facadesAreLoadedForAllModules() {
-        moduleProperties1.put(FACADES_PROPERTY, MyFacade1.class.getName() + "," + MyFacade2.class.getName());
-        moduleProperties2.put(FACADES_PROPERTY, MyFacade3.class.getName());
-
-        UnitilsContext result = unitilsContextFactory.create();
-
-        assertTrue(MyFacade1.initialized);
-        assertTrue(MyFacade2.initialized);
-        assertTrue(MyFacade3.initialized);
-    }
-
-    @Test
-    public void noFacadesFound() {
-        UnitilsContext result = unitilsContextFactory.create();
-
-        assertFalse(MyFacade1.initialized);
-        assertFalse(MyFacade2.initialized);
-        assertFalse(MyFacade3.initialized);
-    }
-
-    @Test
-    public void emptyFacades() {
-        moduleProperties1.put(FACADES_PROPERTY, "");
-
-        UnitilsContext result = unitilsContextFactory.create();
-
-        assertFalse(MyFacade1.initialized);
-        assertFalse(MyFacade2.initialized);
-        assertFalse(MyFacade3.initialized);
-    }
-
-    @Test(expected = UnitilsException.class)
-    public void invalidFacade() {
-        moduleProperties1.put(FACADES_PROPERTY, "xxx");
-        unitilsContextFactory.create();
-    }
-
 
     private static class MyTestListener1 extends TestListener {
     }
@@ -180,32 +140,5 @@ public class UnitilsContextFactoryCreateTest extends UnitilsJUnit4 {
     }
 
     private static class MyTestListener3 extends TestListener {
-    }
-
-    private static class MyFacade1 {
-
-        private static boolean initialized;
-
-        private MyFacade1() {
-            initialized = true;
-        }
-    }
-
-    private static class MyFacade2 {
-
-        private static boolean initialized;
-
-        private MyFacade2() {
-            initialized = true;
-        }
-    }
-
-    private static class MyFacade3 {
-
-        private static boolean initialized;
-
-        private MyFacade3() {
-            initialized = true;
-        }
     }
 }

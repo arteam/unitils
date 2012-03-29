@@ -18,10 +18,10 @@ package org.unitilsnew.core.engine;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
 import org.unitils.mock.PartialMock;
 import org.unitils.mock.annotation.Dummy;
+import org.unitilsnew.UnitilsJUnit4;
 import org.unitilsnew.core.TestClass;
 import org.unitilsnew.core.TestInstance;
 import org.unitilsnew.core.TestListener;
