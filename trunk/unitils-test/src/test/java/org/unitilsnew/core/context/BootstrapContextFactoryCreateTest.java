@@ -18,8 +18,6 @@ package org.unitilsnew.core.context;
 
 import org.junit.Test;
 import org.unitilsnew.core.config.UserPropertiesFactory;
-import org.unitilsnew.core.engine.UnitilsTestListener;
-import org.unitilsnew.core.engine.UnitilsTestListenerFactory;
 
 import java.util.Properties;
 
@@ -45,7 +43,6 @@ public class BootstrapContextFactoryCreateTest {
     public void defaultImplementationTypesInstalled() {
         Context result = bootstrapContextFactory.create();
 
-        assertEquals(UnitilsTestListenerFactory.class, result.getDefaultImplementationType(UnitilsTestListener.class));
         assertEquals(UnitilsContextFactory.class, result.getDefaultImplementationType(UnitilsContext.class));
         assertEquals(UserPropertiesFactory.class, result.getDefaultImplementationType(Properties.class));
     }

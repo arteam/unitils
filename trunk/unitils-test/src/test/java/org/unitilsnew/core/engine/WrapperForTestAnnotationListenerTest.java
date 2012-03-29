@@ -18,14 +18,15 @@ package org.unitilsnew.core.engine;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
+import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
+import org.unitilsnew.UnitilsJUnit4;
 import org.unitilsnew.core.*;
 
 import java.lang.annotation.Target;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.unitilsnew.core.TestPhase.CONSTRUCTION;
 
 /**
@@ -37,9 +38,8 @@ public class WrapperForTestAnnotationListenerTest extends UnitilsJUnit4 {
     private WrapperForTestAnnotationListener wrapperForTestAnnotationListener;
 
     private Mock<TestAnnotationListener<Target>> testAnnotationListenerMock;
+    private Mock<Annotations<Target>> annotationsMock;
 
-    @Dummy
-    private Annotations<Target> annotations;
     @Dummy
     private TestClass testClass;
     @Dummy
@@ -48,7 +48,8 @@ public class WrapperForTestAnnotationListenerTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() throws Exception {
-        wrapperForTestAnnotationListener = new WrapperForTestAnnotationListener<Target>(annotations, testAnnotationListenerMock.getMock());
+        annotationsMock.returns(Target.class).getType();
+        wrapperForTestAnnotationListener = new WrapperForTestAnnotationListener<Target>(annotationsMock.getMock(), testAnnotationListenerMock.getMock());
     }
 
 
@@ -63,13 +64,13 @@ public class WrapperForTestAnnotationListenerTest extends UnitilsJUnit4 {
     @Test
     public void beforeTestSetUp() {
         wrapperForTestAnnotationListener.beforeTestSetUp(testInstance);
-        testAnnotationListenerMock.assertInvoked().beforeTestSetUp(testInstance, annotations);
+        testAnnotationListenerMock.assertInvoked().beforeTestSetUp(testInstance, annotationsMock.getMock());
     }
 
     @Test
     public void beforeTestMethod() {
         wrapperForTestAnnotationListener.beforeTestMethod(testInstance);
-        testAnnotationListenerMock.assertInvoked().beforeTestMethod(testInstance, annotations);
+        testAnnotationListenerMock.assertInvoked().beforeTestMethod(testInstance, annotationsMock.getMock());
     }
 
     @Test
@@ -77,12 +78,68 @@ public class WrapperForTestAnnotationListenerTest extends UnitilsJUnit4 {
         NullPointerException e = new NullPointerException();
 
         wrapperForTestAnnotationListener.afterTestMethod(testInstance, e);
-        testAnnotationListenerMock.assertInvoked().afterTestMethod(testInstance, annotations, e);
+        testAnnotationListenerMock.assertInvoked().afterTestMethod(testInstance, annotationsMock.getMock(), e);
     }
 
     @Test
     public void afterTestTearDown() {
         wrapperForTestAnnotationListener.afterTestTearDown(testInstance);
-        testAnnotationListenerMock.assertInvoked().afterTestTearDown(testInstance, annotations);
+        testAnnotationListenerMock.assertInvoked().afterTestTearDown(testInstance, annotationsMock.getMock());
+    }
+
+
+    @Test
+    public void beforeTestSetUpException() {
+        Exception exception = new NullPointerException("message");
+        testAnnotationListenerMock.raises(exception).beforeTestSetUp(null, null);
+        try {
+            wrapperForTestAnnotationListener.beforeTestSetUp(testInstance);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertSame(exception, e.getCause());
+            assertEquals("Unable to handle test annotation @Target:\n" +
+                    "message", e.getMessage());
+        }
+    }
+
+    @Test
+    public void beforeTestMethodException() {
+        Exception exception = new NullPointerException("message");
+        testAnnotationListenerMock.raises(exception).beforeTestMethod(null, null);
+        try {
+            wrapperForTestAnnotationListener.beforeTestMethod(testInstance);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertSame(exception, e.getCause());
+            assertEquals("Unable to handle test annotation @Target:\n" +
+                    "message", e.getMessage());
+        }
+    }
+
+    @Test
+    public void afterTestMethodException() {
+        Exception exception = new NullPointerException();
+        testAnnotationListenerMock.raises(exception).afterTestMethod(null, null, null);
+        try {
+            wrapperForTestAnnotationListener.afterTestMethod(testInstance, null);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertSame(exception, e.getCause());
+            assertEquals("Unable to handle test annotation @Target", e.getMessage());
+        }
+    }
+
+    @Test
+    public void afterTestTearDownException() {
+        Exception exception = new NullPointerException("message");
+        testAnnotationListenerMock.raises(exception).afterTestTearDown(null, null);
+        try {
+            wrapperForTestAnnotationListener.afterTestTearDown(testInstance);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertSame(exception, e.getCause());
+            assertEquals("Unable to handle test annotation @Target:\n" +
+                    "message", e.getMessage());
+        }
     }
 }

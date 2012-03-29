@@ -48,7 +48,7 @@ public class TestFieldGetValueTest {
 
     @Test
     public void getValue() {
-        String result = testField.getValue("value");
+        String result = testField.getValue();
         assertEquals("value", result);
     }
 
@@ -56,19 +56,19 @@ public class TestFieldGetValueTest {
     public void nullValue() {
         testObject.field = null;
 
-        String result = testField.getValue("value");
+        String result = testField.getValue();
         assertNull(result);
     }
 
     @Test(expected = ClassCastException.class)
     public void invalidType() {
-        Map result = testField.getValue("value");
+        Map result = testField.getValue();
     }
 
     @Test(expected = UnitilsException.class)
     public void exception() {
         testField = new TestField(null, testObject);
-        testField.getValue("value");
+        testField.getValue();
     }
 
 

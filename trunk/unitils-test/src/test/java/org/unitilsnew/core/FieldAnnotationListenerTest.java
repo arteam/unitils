@@ -17,8 +17,8 @@
 package org.unitilsnew.core;
 
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.annotation.Dummy;
+import org.unitilsnew.UnitilsJUnit4;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Target;

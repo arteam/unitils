@@ -18,14 +18,17 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
+import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
+import org.unitilsnew.UnitilsJUnit4;
 import org.unitilsnew.core.config.Configuration;
 
+import java.lang.annotation.Annotation;
 import java.lang.annotation.Target;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
 /**
@@ -36,8 +39,8 @@ public class AnnotationsTest extends UnitilsJUnit4 {
     /* Tested object */
     private Annotations<Target> annotations;
 
-    @Dummy
-    private Target annotation;
+    private Mock<Target> annotationMock;
+
     @Dummy
     private Target classAnnotation1;
     @Dummy
@@ -50,20 +53,27 @@ public class AnnotationsTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() throws Exception {
+        annotationMock.returns(Target.class).annotationType();
         classAnnotations = asList(classAnnotation1, classAnnotation2);
-        annotations = new Annotations<Target>(annotation, classAnnotations, configuration);
+        annotations = new Annotations<Target>(annotationMock.getMock(), classAnnotations, configuration);
     }
 
 
     @Test
     public void getAnnotation() {
         Target result = annotations.getAnnotation();
-        assertSame(annotation, result);
+        assertSame(annotationMock.getMock(), result);
     }
 
     @Test
     public void getClassAnnotations() {
         List<Target> result = annotations.getClassAnnotations();
         assertSame(classAnnotations, result);
+    }
+
+    @Test
+    public void getType() {
+        Class<? extends Annotation> result = annotations.getType();
+        assertEquals(Target.class, result);
     }
 }
