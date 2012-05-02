@@ -16,9 +16,13 @@
 
 package org.unitilsnew.core.engine;
 
+import org.unitils.core.UnitilsException;
 import org.unitilsnew.core.*;
+import org.unitilsnew.core.reflect.Annotations;
 
 import java.lang.annotation.Annotation;
+
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * @author Tim Ducheyne
@@ -44,21 +48,52 @@ public class WrapperForFieldAnnotationListener<A extends Annotation> extends Tes
 
     @Override
     public void beforeTestSetUp(TestInstance testInstance) {
-        fieldAnnotationListener.beforeTestSetUp(testInstance, testField, annotations);
+        try {
+            fieldAnnotationListener.beforeTestSetUp(testInstance, testField, annotations);
+        } catch (Exception e) {
+            throw new UnitilsException(getExceptionMessage(e), e);
+        }
     }
 
     @Override
     public void beforeTestMethod(TestInstance testInstance) {
-        fieldAnnotationListener.beforeTestMethod(testInstance, testField, annotations);
+        try {
+            fieldAnnotationListener.beforeTestMethod(testInstance, testField, annotations);
+        } catch (Exception e) {
+            throw new UnitilsException(getExceptionMessage(e), e);
+        }
     }
 
     @Override
     public void afterTestMethod(TestInstance testInstance, Throwable testThrowable) {
-        fieldAnnotationListener.afterTestMethod(testInstance, testField, annotations, testThrowable);
+        try {
+            fieldAnnotationListener.afterTestMethod(testInstance, testField, annotations, testThrowable);
+        } catch (Exception e) {
+            throw new UnitilsException(getExceptionMessage(e), e);
+        }
     }
 
     @Override
     public void afterTestTearDown(TestInstance testInstance) {
-        fieldAnnotationListener.afterTestTearDown(testInstance, testField, annotations);
+        try {
+            fieldAnnotationListener.afterTestTearDown(testInstance, testField, annotations);
+        } catch (Exception e) {
+            throw new UnitilsException(getExceptionMessage(e), e);
+        }
+    }
+
+
+    protected String getExceptionMessage(Exception e) {
+        StringBuilder message = new StringBuilder("Unable to handle field annotation @");
+        message.append(annotations.getType().getSimpleName());
+        message.append(" on field '");
+        message.append(testField.getName());
+        message.append("'");
+        String exceptionMessage = e.getMessage();
+        if (!isBlank(exceptionMessage)) {
+            message.append(":\n");
+            message.append(exceptionMessage);
+        }
+        return message.toString();
     }
 }

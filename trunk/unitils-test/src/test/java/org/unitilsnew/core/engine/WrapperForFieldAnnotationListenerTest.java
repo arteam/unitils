@@ -22,7 +22,12 @@ import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
-import org.unitilsnew.core.*;
+import org.unitilsnew.core.FieldAnnotationListener;
+import org.unitilsnew.core.TestField;
+import org.unitilsnew.core.TestInstance;
+import org.unitilsnew.core.TestPhase;
+import org.unitilsnew.core.reflect.Annotations;
+import org.unitilsnew.core.reflect.ClassWrapper;
 
 import java.lang.annotation.Target;
 
@@ -42,7 +47,7 @@ public class WrapperForFieldAnnotationListenerTest extends UnitilsJUnit4 {
     private Mock<TestField> testFieldMock;
 
     @Dummy
-    private TestClass testClass;
+    private ClassWrapper classWrapper;
     @Dummy
     private TestInstance testInstance;
 
@@ -99,7 +104,7 @@ public class WrapperForFieldAnnotationListenerTest extends UnitilsJUnit4 {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertSame(exception, e.getCause());
-            assertEquals("Unable to handle field annotation @Target on field fieldName:\n" +
+            assertEquals("Unable to handle field annotation @Target on field 'fieldName':\n" +
                     "message", e.getMessage());
         }
     }
@@ -113,7 +118,7 @@ public class WrapperForFieldAnnotationListenerTest extends UnitilsJUnit4 {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertSame(exception, e.getCause());
-            assertEquals("Unable to handle field annotation @Target on field fieldName", e.getMessage());
+            assertEquals("Unable to handle field annotation @Target on field 'fieldName'", e.getMessage());
         }
     }
 
@@ -126,7 +131,7 @@ public class WrapperForFieldAnnotationListenerTest extends UnitilsJUnit4 {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertSame(exception, e.getCause());
-            assertEquals("Unable to handle field annotation @Target on field fieldName", e.getMessage());
+            assertEquals("Unable to handle field annotation @Target on field 'fieldName'", e.getMessage());
         }
     }
 
@@ -139,7 +144,7 @@ public class WrapperForFieldAnnotationListenerTest extends UnitilsJUnit4 {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertSame(exception, e.getCause());
-            assertEquals("Unable to handle field annotation @Target on field fieldName:\n" +
+            assertEquals("Unable to handle field annotation @Target on field 'fieldName':\n" +
                     "message", e.getMessage());
         }
     }

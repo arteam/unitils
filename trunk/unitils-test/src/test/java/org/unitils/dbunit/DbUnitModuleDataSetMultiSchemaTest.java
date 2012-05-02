@@ -18,19 +18,20 @@ package org.unitils.dbunit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import static org.unitils.database.SQLUnitils.*;
 import org.unitils.database.annotations.TestDataSource;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.util.PropertyUtils;
+import org.unitilsnew.UnitilsJUnit4;
 
 import javax.sql.DataSource;
 import java.util.Properties;
+
+import static org.junit.Assert.assertEquals;
+import static org.unitils.database.SQLUnitils.*;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 
 /**
  * Test class for loading of data sets in mutliple database schemas.

@@ -19,8 +19,6 @@ package org.unitilsnew.core.context;
 import org.unitilsnew.core.Factory;
 import org.unitilsnew.core.config.Configuration;
 import org.unitilsnew.core.config.UserPropertiesFactory;
-import org.unitilsnew.core.engine.UnitilsTestListener;
-import org.unitilsnew.core.engine.UnitilsTestListenerFactory;
 
 import java.util.Properties;
 
@@ -40,7 +38,6 @@ public class BootstrapContextFactory implements Factory<Context> {
 
 
     protected void setDefaultImplementationTypes(Context context) {
-        context.setDefaultImplementationType(UnitilsTestListener.class, UnitilsTestListenerFactory.class);
         context.setDefaultImplementationType(UnitilsContext.class, UnitilsContextFactory.class);
         context.setDefaultImplementationType(Properties.class, UserPropertiesFactory.class);
     }

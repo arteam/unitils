@@ -18,6 +18,7 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitilsnew.core.reflect.ClassWrapper;
 
 import java.lang.annotation.Retention;
 import java.lang.reflect.Method;
@@ -34,7 +35,7 @@ public class TestInstanceHasMethodAnnotationTest {
     /* Tested object */
     private TestInstance testInstance;
 
-    private TestClass testClass;
+    private ClassWrapper classWrapper;
     private Method annotationMethod;
     private Method noAnnotationMethod;
 
@@ -43,13 +44,13 @@ public class TestInstanceHasMethodAnnotationTest {
     public void initialize() throws Exception {
         annotationMethod = MyClass.class.getMethod("annotation");
         noAnnotationMethod = MyClass.class.getMethod("noAnnotation");
-        testClass = new TestClass(MyClass.class);
+        classWrapper = new ClassWrapper(MyClass.class);
     }
 
 
     @Test
     public void annotation() {
-        testInstance = new TestInstance(testClass, null, annotationMethod);
+        testInstance = new TestInstance(classWrapper, null, annotationMethod);
 
         boolean result = testInstance.hasMethodAnnotation(MyAnnotation.class);
         assertTrue(result);
@@ -57,7 +58,7 @@ public class TestInstanceHasMethodAnnotationTest {
 
     @Test
     public void noAnnotation() {
-        testInstance = new TestInstance(testClass, null, noAnnotationMethod);
+        testInstance = new TestInstance(classWrapper, null, noAnnotationMethod);
 
         boolean result = testInstance.hasMethodAnnotation(MyAnnotation.class);
         assertFalse(result);

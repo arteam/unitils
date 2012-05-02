@@ -16,11 +16,11 @@
 
 package org.unitilsnew.core.engine;
 
-import org.unitilsnew.core.Annotations;
 import org.unitilsnew.core.TestAnnotationListener;
 import org.unitilsnew.core.TestInstance;
 import org.unitilsnew.core.annotation.TestAnnotation;
 import org.unitilsnew.core.context.Context;
+import org.unitilsnew.core.reflect.Annotations;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;

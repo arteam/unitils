@@ -49,6 +49,7 @@ public class Context {
     public Context(Configuration configuration) {
         this.configuration = configuration;
         setInstanceOfType(Configuration.class, configuration);
+        setInstanceOfType(Context.class, this);
     }
 
 

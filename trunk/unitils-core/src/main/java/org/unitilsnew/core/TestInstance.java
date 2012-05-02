@@ -16,8 +16,10 @@
 
 package org.unitilsnew.core;
 
+import org.unitilsnew.core.reflect.ClassWrapper;
+import org.unitilsnew.core.reflect.FieldWrapper;
+
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,23 +31,20 @@ import static java.util.Collections.addAll;
  */
 public class TestInstance {
 
-    protected TestClass testClass;
+    protected ClassWrapper classWrapper;
     protected Method testMethod;
     protected Object testObject;
 
-    protected List<TestField> testFields;
-    protected List<Annotation> methodAnnotations;
 
-
-    public TestInstance(TestClass testClass, Object testObject, Method testMethod) {
-        this.testClass = testClass;
+    public TestInstance(ClassWrapper classWrapper, Object testObject, Method testMethod) {
+        this.classWrapper = classWrapper;
         this.testMethod = testMethod;
         this.testObject = testObject;
     }
 
 
-    public TestClass getTestClass() {
-        return testClass;
+    public ClassWrapper getClassWrapper() {
+        return classWrapper;
     }
 
     public Method getTestMethod() {
@@ -57,15 +56,27 @@ public class TestInstance {
     }
 
     public String getName() {
-        return testClass.getName() + "." + testMethod.getName();
+        return classWrapper.getName() + "." + testMethod.getName();
     }
 
 
-    public List<TestField> getTestFields() {
-        if (testFields != null) {
-            return testFields;
+    public TestField getTestField(String name) {
+        FieldWrapper fieldWrapper = classWrapper.getField(name);
+        return new TestField(fieldWrapper, testObject);
+    }
+
+    public List<TestField> getTestFields(List<String> names) {
+        List<FieldWrapper> fieldWrappers = classWrapper.getFields(names);
+        List<TestField> testFields = new ArrayList<TestField>(fieldWrappers.size());
+        for (FieldWrapper fieldWrapper : fieldWrappers) {
+            TestField testField = new TestField(fieldWrapper, testObject);
+            testFields.add(testField);
         }
-        testFields = new ArrayList<TestField>();
+        return testFields;
+    }
+
+    public List<TestField> getTestFields() {
+        List<TestField> testFields = new ArrayList<TestField>();
         addTestFields(testObject, testFields);
         return testFields;
     }
@@ -95,15 +106,15 @@ public class TestInstance {
     }
 
     public <A extends Annotation> List<A> getClassAnnotations(Class<A> annotationClass) {
-        return testClass.getAnnotations(annotationClass);
+        return classWrapper.getAnnotations(annotationClass);
     }
 
     public List<Annotation> getClassAnnotations() {
-        return testClass.getAnnotations();
+        return classWrapper.getAnnotations();
     }
 
     public <A extends Annotation> boolean hasClassAnnotation(Class<A> annotationClass) {
-        return testClass.hasAnnotation(annotationClass);
+        return classWrapper.hasAnnotation(annotationClass);
     }
 
 
@@ -112,10 +123,7 @@ public class TestInstance {
     }
 
     public List<Annotation> getMethodAnnotations() {
-        if (methodAnnotations != null) {
-            return methodAnnotations;
-        }
-        methodAnnotations = new ArrayList<Annotation>();
+        List<Annotation> methodAnnotations = new ArrayList<Annotation>();
         addAll(methodAnnotations, testMethod.getDeclaredAnnotations());
         return methodAnnotations;
     }
@@ -126,9 +134,9 @@ public class TestInstance {
 
 
     protected void addTestFields(Object testObject, List<TestField> testFields) {
-        List<Field> fields = testClass.getFields();
-        for (Field field : fields) {
-            TestField testField = new TestField(field, testObject);
+        List<FieldWrapper> fieldWrappers = classWrapper.getFields();
+        for (FieldWrapper fieldWrapper : fieldWrappers) {
+            TestField testField = new TestField(fieldWrapper, testObject);
             testFields.add(testField);
         }
     }
@@ -144,7 +152,7 @@ public class TestInstance {
         }
 
         TestInstance that = (TestInstance) o;
-        if (testClass != null ? !testClass.equals(that.testClass) : that.testClass != null) {
+        if (classWrapper != null ? !classWrapper.equals(that.classWrapper) : that.classWrapper != null) {
             return false;
         }
         if (testMethod != null ? !testMethod.equals(that.testMethod) : that.testMethod != null) {
@@ -158,7 +166,7 @@ public class TestInstance {
 
     @Override
     public int hashCode() {
-        int result = testClass != null ? testClass.hashCode() : 0;
+        int result = classWrapper != null ? classWrapper.hashCode() : 0;
         result = 31 * result + (testMethod != null ? testMethod.hashCode() : 0);
         result = 31 * result + (testObject != null ? testObject.hashCode() : 0);
         return result;

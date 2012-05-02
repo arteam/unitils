@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
-import org.unitils.UnitilsJUnit4;
+import org.unitilsnew.UnitilsJUnit4;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.util.TransactionMode;
 import org.unitils.dbunit.annotation.DataSet;

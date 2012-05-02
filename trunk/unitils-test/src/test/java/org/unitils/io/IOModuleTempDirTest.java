@@ -17,8 +17,8 @@
 package org.unitils.io;
 
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.io.annotation.TempDir;
+import org.unitilsnew.UnitilsJUnit4;
 
 import java.io.File;
 

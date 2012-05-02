@@ -18,6 +18,8 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitilsnew.core.reflect.ClassWrapper;
+import org.unitilsnew.core.reflect.FieldWrapper;
 
 import java.lang.reflect.Field;
 
@@ -33,14 +35,15 @@ public class TestFieldTest {
     private TestField testField;
 
     private Field field;
+    private MyClass testObject;
 
 
     @Before
     public void initialize() throws Exception {
         field = MyClass.class.getDeclaredField("field");
-        MyClass testObject = new MyClass();
+        testObject = new MyClass();
 
-        testField = new TestField(field, testObject);
+        testField = new TestField(new FieldWrapper(field), testObject);
     }
 
 
@@ -51,6 +54,12 @@ public class TestFieldTest {
     }
 
     @Test
+    public void getTestObject() {
+        Object result = testField.getTestObject();
+        assertSame(testObject, result);
+    }
+
+    @Test
     public void getName() {
         String result = testField.getName();
         assertEquals("field", result);
@@ -58,14 +67,19 @@ public class TestFieldTest {
 
     @Test
     public void getType() {
-        Class<?> result = testField.getType();
-        assertEquals(String.class, result);
+        assertEquals(String.class, testField.getType());
     }
 
     @Test
-    public void testToString() {
+    public void nameAsToString() {
         String result = testField.toString();
         assertEquals("field", result);
+    }
+
+    @Test
+    public void getClassWrapper() {
+        ClassWrapper result = testField.getClassWrapper();
+        assertEquals(String.class, result.getWrappedClass());
     }
 
 

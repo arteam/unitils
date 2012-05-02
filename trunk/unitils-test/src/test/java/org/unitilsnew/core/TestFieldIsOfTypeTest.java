@@ -18,9 +18,9 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitilsnew.core.reflect.FieldWrapper;
 
 import java.lang.reflect.Field;
-import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -33,33 +33,45 @@ public class TestFieldIsOfTypeTest {
     /* Tested object */
     private TestField testField;
 
-    private Field field;
-
 
     @Before
     public void initialize() throws Exception {
-        field = MyClass.class.getDeclaredField("field");
-        MyClass testObject = new MyClass();
-
-        testField = new TestField(field, testObject);
+        Field field = MyClass.class.getDeclaredField("field");
+        testField = new TestField(new FieldWrapper(field), null);
     }
 
 
     @Test
-    public void ofType() {
-        boolean result = testField.isOfType(String.class);
+    public void equalType() {
+        boolean result = testField.isOfType(Type1.class);
         assertTrue(result);
     }
 
     @Test
-    public void notOfType() {
-        boolean result = testField.isOfType(Map.class);
+    public void falseWhenAssignableType() {
+        boolean result = testField.isOfType(Type2.class);
+        assertFalse(result);
+    }
+
+    @Test
+    public void falseWhenDifferentType() {
+        boolean result = testField.isOfType(Type3.class);
         assertFalse(result);
     }
 
 
     private static class MyClass {
 
-        private String field;
+        private Type1 field;
+    }
+
+
+    private static class Type1 {
+    }
+
+    private static class Type2 extends Type1 {
+    }
+
+    private static class Type3 {
     }
 }

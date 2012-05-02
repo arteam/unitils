@@ -21,7 +21,6 @@ import org.apache.commons.lang.time.DateUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
@@ -30,6 +29,7 @@ import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.script.ExecutedScript;
 import org.unitils.dbmaintainer.script.Script;
+import org.unitilsnew.UnitilsJUnit4;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;

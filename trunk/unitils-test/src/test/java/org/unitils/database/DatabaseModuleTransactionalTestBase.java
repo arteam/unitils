@@ -15,9 +15,7 @@
  */
 package org.unitils.database;
 
-import static org.easymock.classextension.EasyMock.*;
 import org.junit.Before;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.Unitils;
 import org.unitils.database.config.DataSourceFactory;
@@ -26,6 +24,8 @@ import org.unitils.spring.SpringModule;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.util.Properties;
+
+import static org.easymock.classextension.EasyMock.*;
 
 /**
  * Base class for tests that verify the transactional behavior of the database module

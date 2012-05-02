@@ -18,6 +18,7 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitilsnew.core.reflect.ClassWrapper;
 
 import java.lang.reflect.Method;
 
@@ -29,8 +30,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestInstanceEqualsTest {
 
-    private TestClass testClass1;
-    private TestClass testClass2;
+    private ClassWrapper classWrapper1;
+    private ClassWrapper classWrapper2;
     private Object testObject1;
     private Object testObject2;
     private Method testMethod1;
@@ -39,8 +40,8 @@ public class TestInstanceEqualsTest {
 
     @Before
     public void initialize() throws Exception {
-        testClass1 = new TestClass(MyClass1.class);
-        testClass2 = new TestClass(MyClass2.class);
+        classWrapper1 = new ClassWrapper(MyClass1.class);
+        classWrapper2 = new ClassWrapper(MyClass2.class);
         testObject1 = new MyClass1();
         testObject2 = new MyClass2();
         testMethod1 = MyClass1.class.getDeclaredMethod("method1");
@@ -50,8 +51,8 @@ public class TestInstanceEqualsTest {
 
     @Test
     public void equal() {
-        TestInstance testInstance1 = new TestInstance(testClass1, testObject1, testMethod1);
-        TestInstance testInstance2 = new TestInstance(testClass1, testObject1, testMethod1);
+        TestInstance testInstance1 = new TestInstance(classWrapper1, testObject1, testMethod1);
+        TestInstance testInstance2 = new TestInstance(classWrapper1, testObject1, testMethod1);
 
         assertTrue(testInstance1.equals(testInstance2));
         assertTrue(testInstance2.equals(testInstance1));
@@ -59,15 +60,15 @@ public class TestInstanceEqualsTest {
 
     @Test
     public void same() {
-        TestInstance testInstance = new TestInstance(testClass1, testObject1, testMethod1);
+        TestInstance testInstance = new TestInstance(classWrapper1, testObject1, testMethod1);
 
         assertTrue(testInstance.equals(testInstance));
     }
 
     @Test
     public void notEqualTestClass() {
-        TestInstance testInstance1 = new TestInstance(testClass1, testObject1, testMethod1);
-        TestInstance testInstance2 = new TestInstance(testClass2, testObject1, testMethod1);
+        TestInstance testInstance1 = new TestInstance(classWrapper1, testObject1, testMethod1);
+        TestInstance testInstance2 = new TestInstance(classWrapper2, testObject1, testMethod1);
 
         assertFalse(testInstance1.equals(testInstance2));
         assertFalse(testInstance2.equals(testInstance1));
@@ -75,8 +76,8 @@ public class TestInstanceEqualsTest {
 
     @Test
     public void notEqualTestObject() {
-        TestInstance testInstance1 = new TestInstance(testClass1, testObject1, testMethod1);
-        TestInstance testInstance2 = new TestInstance(testClass1, testObject2, testMethod1);
+        TestInstance testInstance1 = new TestInstance(classWrapper1, testObject1, testMethod1);
+        TestInstance testInstance2 = new TestInstance(classWrapper1, testObject2, testMethod1);
 
         assertFalse(testInstance1.equals(testInstance2));
         assertFalse(testInstance2.equals(testInstance1));
@@ -84,8 +85,8 @@ public class TestInstanceEqualsTest {
 
     @Test
     public void notEqualTestMethod() {
-        TestInstance testInstance1 = new TestInstance(testClass1, testObject1, testMethod1);
-        TestInstance testInstance2 = new TestInstance(testClass1, testObject1, testMethod2);
+        TestInstance testInstance1 = new TestInstance(classWrapper1, testObject1, testMethod1);
+        TestInstance testInstance2 = new TestInstance(classWrapper1, testObject1, testMethod2);
 
         assertFalse(testInstance1.equals(testInstance2));
         assertFalse(testInstance2.equals(testInstance1));
@@ -94,7 +95,7 @@ public class TestInstanceEqualsTest {
     @Test
     @SuppressWarnings("ObjectEqualsNull")
     public void notEqualToNull() {
-        TestInstance testInstance = new TestInstance(testClass1, testObject1, testMethod1);
+        TestInstance testInstance = new TestInstance(classWrapper1, testObject1, testMethod1);
 
         assertFalse(testInstance.equals(null));
     }
@@ -102,7 +103,7 @@ public class TestInstanceEqualsTest {
     @Test
     @SuppressWarnings("EqualsBetweenInconvertibleTypes")
     public void notEqualToOtherType() {
-        TestInstance testInstance = new TestInstance(testClass1, testObject1, testMethod1);
+        TestInstance testInstance = new TestInstance(classWrapper1, testObject1, testMethod1);
 
         assertFalse(testInstance.equals("xxx"));
     }
@@ -117,16 +118,16 @@ public class TestInstanceEqualsTest {
 
     @Test
     public void nullTestObjects() {
-        TestInstance testInstance1 = new TestInstance(testClass1, null, testMethod1);
-        TestInstance testInstance2 = new TestInstance(testClass1, null, testMethod1);
+        TestInstance testInstance1 = new TestInstance(classWrapper1, null, testMethod1);
+        TestInstance testInstance2 = new TestInstance(classWrapper1, null, testMethod1);
 
         assertTrue(testInstance1.equals(testInstance2));
     }
 
     @Test
     public void nullTestMethods() {
-        TestInstance testInstance1 = new TestInstance(testClass1, testObject1, null);
-        TestInstance testInstance2 = new TestInstance(testClass1, testObject1, null);
+        TestInstance testInstance1 = new TestInstance(classWrapper1, testObject1, null);
+        TestInstance testInstance2 = new TestInstance(classWrapper1, testObject1, null);
 
         assertTrue(testInstance1.equals(testInstance2));
     }

@@ -19,6 +19,7 @@ package org.unitilsnew.core;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
+import org.unitilsnew.core.reflect.FieldWrapper;
 
 import java.lang.reflect.Field;
 
@@ -41,7 +42,7 @@ public class TestFieldSetValueTest {
         Field field = MyClass.class.getDeclaredField("field");
         testObject = new MyClass();
 
-        testField = new TestField(field, testObject);
+        testField = new TestField(new FieldWrapper(field), testObject);
     }
 
 

@@ -15,19 +15,17 @@
  */
 package org.unitils.orm.hibernate;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Properties;
-
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
+import org.unitilsnew.UnitilsJUnit4;
+
+import java.util.Properties;
+
+import static org.junit.Assert.*;
 
 /**
  * Test class for injection methods of the HibernateModule

@@ -15,19 +15,26 @@
  */
 package org.unitils.inject.annotation;
 
-import static java.lang.annotation.ElementType.FIELD;
+import org.unitils.inject.listener.TestedObjectFieldAnnotationListener;
+import org.unitilsnew.core.annotation.FieldAnnotation;
+
 import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 /**
- * Annotation indicating the object under test. The object(s) referenced by the annotated field(s) is (are) used as
- * default target for injection.
+ * Annotation indicating the object under test.
+ * The object(s) referenced by the annotated field(s) is (are) used as default target for injection.
+ *
+ * Note: static fields are not supported and will be ignored.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 @Target(FIELD)
 @Retention(RUNTIME)
+@FieldAnnotation(TestedObjectFieldAnnotationListener.class)
 public @interface TestedObject {
 }

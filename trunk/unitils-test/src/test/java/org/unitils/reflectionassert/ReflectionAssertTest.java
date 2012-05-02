@@ -16,17 +16,17 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.AssertionFailedError;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
+import org.unitilsnew.UnitilsJUnit4;
+
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertTrue;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 import static org.unitils.util.CollectionUtils.asSet;
-
-import static java.util.Arrays.asList;
 
 
 /**
@@ -202,8 +202,8 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
             assertTrue(a.getMessage().contains("[1, 2]"));
         }
     }
-    
-    
+
+
     @Test
     public void assertPropertiesNotNullTest_fullySetObject() {
         ReflectionAssert.assertPropertiesNotNull("properties parentObject ar not fully set", new TestObjectString("", ""));

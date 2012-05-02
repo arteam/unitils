@@ -18,6 +18,7 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitilsnew.core.reflect.ClassWrapper;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
@@ -25,7 +26,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Tim Ducheyne
@@ -35,7 +37,7 @@ public class TestInstanceGetMethodAnnotationsTest {
     /* Tested object */
     private TestInstance testInstance;
 
-    private TestClass testClass;
+    private ClassWrapper classWrapper;
     private Method annotationsMethod;
     private Method noAnnotationsMethod;
 
@@ -44,13 +46,13 @@ public class TestInstanceGetMethodAnnotationsTest {
     public void initialize() throws Exception {
         annotationsMethod = MyClass.class.getMethod("annotations");
         noAnnotationsMethod = MyClass.class.getMethod("noAnnotations");
-        testClass = new TestClass(MyClass.class);
+        classWrapper = new ClassWrapper(MyClass.class);
     }
 
 
     @Test
     public void annotations() {
-        testInstance = new TestInstance(testClass, null, annotationsMethod);
+        testInstance = new TestInstance(classWrapper, null, annotationsMethod);
 
         List<Annotation> result = testInstance.getMethodAnnotations();
         assertEquals(2, result.size());
@@ -60,19 +62,10 @@ public class TestInstanceGetMethodAnnotationsTest {
 
     @Test
     public void emptyWhenNoAnnotations() {
-        testInstance = new TestInstance(testClass, null, noAnnotationsMethod);
+        testInstance = new TestInstance(classWrapper, null, noAnnotationsMethod);
 
         List<Annotation> result = testInstance.getMethodAnnotations();
         assertTrue(result.isEmpty());
-    }
-
-    @Test
-    public void annotationsAreCached() {
-        testInstance = new TestInstance(testClass, null, annotationsMethod);
-
-        List<Annotation> result1 = testInstance.getMethodAnnotations();
-        List<Annotation> result2 = testInstance.getMethodAnnotations();
-        assertSame(result1, result2);
     }
 
 

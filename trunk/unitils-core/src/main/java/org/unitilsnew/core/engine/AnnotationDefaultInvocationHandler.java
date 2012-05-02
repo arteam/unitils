@@ -53,10 +53,7 @@ public class AnnotationDefaultInvocationHandler<A extends Annotation> implements
         Object defaultValue = method.getDefaultValue();
         for (A annotation : annotations) {
             Object result = method.invoke(annotation, args);
-            if (result == defaultValue) {
-                continue;
-            }
-            if (defaultValue != null && !defaultValue.equals(result)) {
+            if (result != defaultValue && (defaultValue == null || !defaultValue.equals(result))) {
                 return result;
             }
         }
@@ -68,6 +65,6 @@ public class AnnotationDefaultInvocationHandler<A extends Annotation> implements
         if (isBlank(propertyName)) {
             return defaultValue;
         }
-        return configuration.getOptionalValueOfType(method.getReturnType(), propertyName);
+        return configuration.getValueOfType(method.getReturnType(), propertyName);
     }
 }

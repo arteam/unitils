@@ -19,6 +19,7 @@ package org.unitilsnew.core.engine;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.core.UnitilsException;
 import org.unitilsnew.core.annotation.AnnotationDefault;
 import org.unitilsnew.core.config.Configuration;
 
@@ -31,8 +32,7 @@ import java.util.Properties;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.unitilsnew.core.engine.AnnotationDefaultInvocationHandlerInvokeTest.TestEnum.*;
 
 /**
@@ -143,11 +143,15 @@ public class AnnotationDefaultInvocationHandlerInvokeTest {
     }
 
     @Test
-    public void propertyNotFound() throws Throwable {
+    public void exceptionWhenPropertyNotFound() throws Throwable {
         annotationDefaultInvocationHandler = new AnnotationDefaultInvocationHandler<MyAnnotation>(asList(allDefaultsAnnotation), configuration);
 
-        Object result = annotationDefaultInvocationHandler.invoke(null, propertyNotFoundMethod, new Object[]{});
-        assertNull(result);
+        try {
+            annotationDefaultInvocationHandler.invoke(null, propertyNotFoundMethod, new Object[]{});
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("No value found for property xxx", e.getMessage());
+        }
     }
 
     @Test

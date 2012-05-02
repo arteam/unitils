@@ -16,20 +16,21 @@
 package org.unitils.dbmaintainer.script.impl;
 
 import org.junit.After;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
-import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.database.SQLUnitils.isEmpty;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptContentHandle.UrlScriptContentHandle;
+import org.unitilsnew.UnitilsJUnit4;
 
 import javax.sql.DataSource;
 import java.util.Properties;
+
+import static org.junit.Assert.assertTrue;
+import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import static org.unitils.database.SQLUnitils.isEmpty;
 
 /**
  * Test class for the DefaultScriptRunner.

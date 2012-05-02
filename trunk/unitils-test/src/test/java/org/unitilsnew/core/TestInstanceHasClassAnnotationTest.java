@@ -18,6 +18,7 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitilsnew.core.reflect.ClassWrapper;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -37,8 +38,8 @@ public class TestInstanceHasClassAnnotationTest {
 
     @Before
     public void initialize() throws Exception {
-        TestClass testClass = new TestClass(MyClass.class);
-        testInstance = new TestInstance(testClass, null, null);
+        ClassWrapper classWrapper = new ClassWrapper(MyClass.class);
+        testInstance = new TestInstance(classWrapper, null, null);
     }
 
 

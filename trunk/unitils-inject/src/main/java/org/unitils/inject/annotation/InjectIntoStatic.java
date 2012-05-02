@@ -15,12 +15,17 @@
  */
 package org.unitils.inject.annotation;
 
+import org.unitils.inject.listener.InjectIntoStaticFieldAnnotationListener;
 import org.unitils.inject.util.Restore;
+import org.unitilsnew.core.annotation.AnnotationDefault;
+import org.unitilsnew.core.annotation.FieldAnnotation;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.FIELD;
-import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import java.lang.annotation.Target;
+import static org.unitils.inject.util.Restore.DEFAULT;
 
 /**
  * Annotation indicating that the the {@link org.unitils.inject.InjectModule} should try to inject the object assigned to
@@ -40,6 +45,7 @@ import java.lang.annotation.Target;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
+@FieldAnnotation(InjectIntoStaticFieldAnnotationListener.class)
 public @interface InjectIntoStatic {
 
     /**
@@ -47,10 +53,10 @@ public @interface InjectIntoStatic {
      *
      * @return the target class, null for tested object
      */
-	Class<?> target();
+    Class<?> target();
 
     /**
-     * OGNL expression that defines the property to which the object referenced by the annotated fiel is injected
+     * OGNL expression that defines the property to which the object referenced by the annotated field is injected
      *
      * @return the ognl expression, not null
      */
@@ -62,6 +68,7 @@ public @interface InjectIntoStatic {
      *
      * @return the reset type, not null
      */
-    Restore restore() default Restore.DEFAULT;
+    @AnnotationDefault("inject.defaultRestore") Restore restore() default DEFAULT;
 
+    @AnnotationDefault("inject.autoCreateInnerFields") boolean autoCreateInnerFields() default true;
 }

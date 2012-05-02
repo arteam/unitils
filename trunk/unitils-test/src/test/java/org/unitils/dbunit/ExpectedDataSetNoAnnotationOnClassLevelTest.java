@@ -18,18 +18,19 @@ package org.unitils.dbunit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
-import static org.unitils.database.SQLUnitils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
+import org.unitilsnew.UnitilsJUnit4;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.Properties;
+
+import static org.unitils.database.SQLUnitils.executeUpdate;
 
 /**
  * Tests the expected data set behavior when the annotation is not put on class level.
@@ -82,7 +83,7 @@ public class ExpectedDataSetNoAnnotationOnClassLevelTest extends UnitilsJUnit4 {
     }
 
 
-     /**
+    /**
      * Test for default annotation on method-level and no annotation on class-level
      */
     @Test

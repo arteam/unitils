@@ -18,6 +18,7 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitilsnew.core.reflect.ClassWrapper;
 
 import java.lang.reflect.Method;
 
@@ -32,7 +33,7 @@ public class TestInstanceTest {
     /* Tested object */
     private TestInstance testInstance;
 
-    private TestClass testClass;
+    private ClassWrapper classWrapper;
     private Object testObject;
     private Method testMethod;
 
@@ -40,22 +41,22 @@ public class TestInstanceTest {
     @Before
     public void initialize() throws Exception {
         testMethod = MyClass.class.getMethod("method");
-        testClass = new TestClass(MyClass.class);
+        classWrapper = new ClassWrapper(MyClass.class);
         testObject = new MyClass();
     }
 
 
     @Test
     public void getTestClass() {
-        testInstance = new TestInstance(testClass, testObject, testMethod);
+        testInstance = new TestInstance(classWrapper, testObject, testMethod);
 
-        TestClass result = testInstance.getTestClass();
-        assertSame(testClass, result);
+        ClassWrapper result = testInstance.getClassWrapper();
+        assertSame(classWrapper, result);
     }
 
     @Test
     public void getTestMethod() {
-        testInstance = new TestInstance(testClass, testObject, testMethod);
+        testInstance = new TestInstance(classWrapper, testObject, testMethod);
 
         Method result = testInstance.getTestMethod();
         assertSame(testMethod, result);
@@ -63,7 +64,7 @@ public class TestInstanceTest {
 
     @Test
     public void getTestObject() {
-        testInstance = new TestInstance(testClass, testObject, testMethod);
+        testInstance = new TestInstance(classWrapper, testObject, testMethod);
 
         Object result = testInstance.getTestObject();
         assertSame(testObject, result);
@@ -71,10 +72,10 @@ public class TestInstanceTest {
 
     @Test
     public void getName() {
-        testInstance = new TestInstance(testClass, testObject, testMethod);
+        testInstance = new TestInstance(classWrapper, testObject, testMethod);
 
         String result = testInstance.getName();
-        assertEquals("MyClass.method", result);
+        assertEquals("org.unitilsnew.core.TestInstanceTest$MyClass.method", result);
     }
 
 

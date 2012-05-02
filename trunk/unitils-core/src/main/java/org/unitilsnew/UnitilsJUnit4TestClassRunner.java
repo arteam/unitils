@@ -19,8 +19,7 @@ import org.junit.internal.runners.*;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
-import org.unitilsnew.core.context.BootstrapContextFactory;
-import org.unitilsnew.core.context.Context;
+import org.unitilsnew.core.engine.Unitils;
 import org.unitilsnew.core.engine.UnitilsTestListener;
 
 import java.lang.reflect.InvocationTargetException;
@@ -38,9 +37,8 @@ import java.lang.reflect.Method;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
+// todo unit test
 public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
-
-    protected UnitilsTestListener unitilsTestListener;
 
 
     /**
@@ -198,16 +196,7 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
      * @return The unitils test listener
      */
     protected UnitilsTestListener getUnitilsTestListener() {
-        if (unitilsTestListener == null) {
-            unitilsTestListener = createUnitilsTestListener();
-        }
-        return unitilsTestListener;
-    }
-
-    protected UnitilsTestListener createUnitilsTestListener() {
-        BootstrapContextFactory bootstrapContextFactory = new BootstrapContextFactory();
-        Context context = bootstrapContextFactory.create();
-        return context.getInstanceOfType(UnitilsTestListener.class);
+        return Unitils.getUnitilsTestListener();
     }
 }
 

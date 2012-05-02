@@ -16,15 +16,16 @@
 package org.unitils.dbunit.dataset;
 
 import org.dbunit.dataset.datatype.DataType;
-import static org.dbunit.dataset.datatype.DataType.VARCHAR;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbunit.dataset.comparison.SchemaDifference;
 import org.unitils.dbunit.dataset.comparison.TableDifference;
+import org.unitilsnew.UnitilsJUnit4;
+
+import static org.dbunit.dataset.datatype.DataType.VARCHAR;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Tests the comparison behavior of a data set schema.

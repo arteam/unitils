@@ -18,11 +18,11 @@ package org.unitils.io.filecontent.impl;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.io.conversion.ConversionStrategy;
 import org.unitils.io.reader.ReadingStrategy;
 import org.unitils.mock.Mock;
+import org.unitilsnew.UnitilsJUnit4;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;

@@ -32,6 +32,7 @@ public class UnitilsContext extends Context {
     public UnitilsContext(Configuration configuration, List<Class<? extends TestListener>> testListenerTypes) {
         super(configuration);
         this.testListenerTypes = testListenerTypes;
+        setInstanceOfType(UnitilsContext.class, this);
     }
 
 

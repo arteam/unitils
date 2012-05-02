@@ -21,13 +21,13 @@ import org.junit.Test;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
-import org.unitilsnew.core.Annotations;
 import org.unitilsnew.core.TestAnnotationListener;
-import org.unitilsnew.core.TestClass;
 import org.unitilsnew.core.TestInstance;
 import org.unitilsnew.core.annotation.TestAnnotation;
 import org.unitilsnew.core.config.Configuration;
 import org.unitilsnew.core.context.Context;
+import org.unitilsnew.core.reflect.Annotations;
+import org.unitilsnew.core.reflect.ClassWrapper;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -76,8 +76,8 @@ public class WrapperForTestAnnotationListenerFactoryCreateTest extends UnitilsJU
         Method testMethod = MyClass.class.getDeclaredMethod("testMethod");
         Object testObject = new MyClass();
 
-        TestClass testClass = new TestClass(MyClass.class);
-        TestInstance testInstance = new TestInstance(testClass, testObject, testMethod);
+        ClassWrapper classWrapper = new ClassWrapper(MyClass.class);
+        TestInstance testInstance = new TestInstance(classWrapper, testObject, testMethod);
 
         MyTestAnnotation1 methodAnnotation1 = testMethod.getAnnotation(MyTestAnnotation1.class);
         Annotations<MyTestAnnotation1> annotations1 = new Annotations<MyTestAnnotation1>(methodAnnotation1, new ArrayList<MyTestAnnotation1>(), configuration);
@@ -103,8 +103,8 @@ public class WrapperForTestAnnotationListenerFactoryCreateTest extends UnitilsJU
         Method testMethod = AnnotationOnClass.class.getDeclaredMethod("testMethod");
         Object testObject = new AnnotationOnClass();
 
-        TestClass testClass = new TestClass(AnnotationOnClass.class);
-        TestInstance testInstance = new TestInstance(testClass, testObject, testMethod);
+        ClassWrapper classWrapper = new ClassWrapper(AnnotationOnClass.class);
+        TestInstance testInstance = new TestInstance(classWrapper, testObject, testMethod);
         MyTestAnnotation1 classAnnotation = AnnotationOnClass.class.getAnnotation(MyTestAnnotation1.class);
         MyTestAnnotation1 superClassAnnotation = AnnotationOnSuperClass.class.getAnnotation(MyTestAnnotation1.class);
 
@@ -122,8 +122,8 @@ public class WrapperForTestAnnotationListenerFactoryCreateTest extends UnitilsJU
         Method testMethod = AnnotationOnClassAndMethod.class.getDeclaredMethod("testMethod");
         Object testObject = new AnnotationOnClassAndMethod();
 
-        TestClass testClass = new TestClass(AnnotationOnClassAndMethod.class);
-        TestInstance testInstance = new TestInstance(testClass, null, testMethod);
+        ClassWrapper classWrapper = new ClassWrapper(AnnotationOnClassAndMethod.class);
+        TestInstance testInstance = new TestInstance(classWrapper, null, testMethod);
         MyTestAnnotation1 methodAnnotation = testMethod.getAnnotation(MyTestAnnotation1.class);
         MyTestAnnotation1 classAnnotation = AnnotationOnClassAndMethod.class.getAnnotation(MyTestAnnotation1.class);
         MyTestAnnotation1 superClassAnnotation = AnnotationOnSuperClass.class.getAnnotation(MyTestAnnotation1.class);
@@ -142,8 +142,8 @@ public class WrapperForTestAnnotationListenerFactoryCreateTest extends UnitilsJU
         Method testMethod = OtherAnnotation.class.getDeclaredMethod("testMethod");
         Object testObject = new OtherAnnotation();
 
-        TestClass testClass = new TestClass(OtherAnnotation.class);
-        TestInstance testInstance = new TestInstance(testClass, testObject, testMethod);
+        ClassWrapper classWrapper = new ClassWrapper(OtherAnnotation.class);
+        TestInstance testInstance = new TestInstance(classWrapper, testObject, testMethod);
 
         List<WrapperForTestAnnotationListener> result = wrapperForTestAnnotationListenerFactory.create(testInstance);
         assertTrue(result.isEmpty());
@@ -154,8 +154,8 @@ public class WrapperForTestAnnotationListenerFactoryCreateTest extends UnitilsJU
         Method testMethod = NoAnnotation.class.getDeclaredMethod("testMethod");
         Object testObject = new NoAnnotation();
 
-        TestClass testClass = new TestClass(NoAnnotation.class);
-        TestInstance testInstance = new TestInstance(testClass, testObject, testMethod);
+        ClassWrapper classWrapper = new ClassWrapper(NoAnnotation.class);
+        TestInstance testInstance = new TestInstance(classWrapper, testObject, testMethod);
 
         List<WrapperForTestAnnotationListener> result = wrapperForTestAnnotationListenerFactory.create(testInstance);
         assertTrue(result.isEmpty());

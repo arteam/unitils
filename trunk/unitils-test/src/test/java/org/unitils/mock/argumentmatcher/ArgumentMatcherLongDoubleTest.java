@@ -15,10 +15,11 @@
  */
 package org.unitils.mock.argumentmatcher;
 
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
+import org.unitilsnew.UnitilsJUnit4;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests the behavior of the argment matchers with long and double objects.

@@ -18,7 +18,7 @@ package org.unitils.integrationtest.persistence;
 import static junit.framework.Assert.assertTrue;
 
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
+import org.unitilsnew.UnitilsJUnit4;
 
 /**
  * @author Filip Neven

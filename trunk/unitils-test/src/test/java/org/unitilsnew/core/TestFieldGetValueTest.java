@@ -19,8 +19,8 @@ package org.unitilsnew.core;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
+import org.unitilsnew.core.reflect.FieldWrapper;
 
-import java.lang.reflect.Field;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -34,12 +34,13 @@ public class TestFieldGetValueTest {
     /* Tested object */
     private TestField testField;
 
+    private FieldWrapper field;
     private MyClass testObject;
 
 
     @Before
     public void initialize() throws Exception {
-        Field field = MyClass.class.getDeclaredField("field");
+        field = new FieldWrapper(MyClass.class.getDeclaredField("field"));
         testObject = new MyClass();
 
         testField = new TestField(field, testObject);
@@ -67,7 +68,7 @@ public class TestFieldGetValueTest {
 
     @Test(expected = UnitilsException.class)
     public void exception() {
-        testField = new TestField(null, testObject);
+        testField = new TestField(field, null);
         testField.getValue();
     }
 

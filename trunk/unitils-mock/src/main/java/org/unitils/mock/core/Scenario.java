@@ -41,11 +41,10 @@ public class Scenario {
         UNVERIFIED, VERIFIED, VERIFIED_IN_ORDER
     }
 
-    protected List<ObservedInvocation> observedInvocations = new ArrayList<ObservedInvocation>();
-
-    protected List<VerificationStatus> invocationVerificationStatuses = new ArrayList<VerificationStatus>();
-
     protected Object testObject;
+
+    protected List<ObservedInvocation> observedInvocations = new ArrayList<ObservedInvocation>();
+    protected List<VerificationStatus> invocationVerificationStatuses = new ArrayList<VerificationStatus>();
 
 
     public Scenario(Object testObject) {

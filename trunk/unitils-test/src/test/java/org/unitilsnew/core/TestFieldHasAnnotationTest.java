@@ -18,10 +18,10 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitilsnew.core.reflect.FieldWrapper;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.lang.reflect.Field;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.Assert.assertFalse;
@@ -38,7 +38,7 @@ public class TestFieldHasAnnotationTest {
 
     @Before
     public void initialize() throws Exception {
-        Field field = MyClass.class.getDeclaredField("field");
+        FieldWrapper field = new FieldWrapper(MyClass.class.getDeclaredField("field"));
         Object testObject = new MyClass();
 
         testField = new TestField(field, testObject);

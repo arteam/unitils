@@ -18,16 +18,17 @@ package org.unitils.orm.hibernate;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
+import org.unitilsnew.UnitilsJUnit4;
 
 import java.util.List;
 import java.util.Properties;
+
+import static org.junit.Assert.*;
 
 /**
  * Test class for the loading of the configuration in the HibernateModule

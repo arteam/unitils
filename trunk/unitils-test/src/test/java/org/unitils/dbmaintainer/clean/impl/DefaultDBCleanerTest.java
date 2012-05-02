@@ -16,26 +16,26 @@
 package org.unitils.dbmaintainer.clean.impl;
 
 import org.junit.After;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.SQLHandler;
-
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
+import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.database.annotations.TestDataSource;
+import org.unitilsnew.UnitilsJUnit4;
+
+import javax.sql.DataSource;
+import java.util.Properties;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import static org.unitils.core.util.SQLTestUtils.dropTestTables;
 import static org.unitils.core.util.SQLTestUtils.dropTestViews;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.isEmpty;
-import org.unitils.database.annotations.TestDataSource;
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.*;
-
-import javax.sql.DataSource;
-import java.util.Properties;
 
 /**
  * Test class for the DBCleaner.

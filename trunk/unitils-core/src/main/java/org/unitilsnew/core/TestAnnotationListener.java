@@ -16,6 +16,8 @@
 
 package org.unitilsnew.core;
 
+import org.unitilsnew.core.reflect.Annotations;
+
 import java.lang.annotation.Annotation;
 
 import static org.unitilsnew.core.TestPhase.EXECUTION;

@@ -15,13 +15,14 @@
  */
 package org.unitils.dbunit.dataset;
 
-import static org.dbunit.dataset.datatype.DataType.VARCHAR;
-import static org.junit.Assert.*;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbunit.dataset.comparison.ColumnDifference;
 import org.unitils.dbunit.dataset.comparison.RowDifference;
+import org.unitilsnew.UnitilsJUnit4;
+
+import static org.dbunit.dataset.datatype.DataType.VARCHAR;
+import static org.junit.Assert.*;
 
 /**
  * Tests the comparison behavior of a data set row using primary keys.

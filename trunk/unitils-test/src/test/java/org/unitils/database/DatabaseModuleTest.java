@@ -15,88 +15,85 @@
  */
 package org.unitils.database;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitilsnew.UnitilsJUnit4;
+
+import javax.sql.DataSource;
+import java.util.Properties;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests for the DatabaseModule
- * 
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public class DatabaseModuleTest extends UnitilsJUnit4 {
 
-	/* Tested object */
-	private TestDatabaseModule databaseModule;
+    /* Tested object */
+    private TestDatabaseModule databaseModule;
 
 
-	/**
-	 * Initializes the test fixture.
-	 */
-	@Before
-	public void setUp() throws Exception {
-		Properties configuration = new ConfigurationLoader().loadConfiguration();
-		configuration.setProperty(DatabaseModule.PROPERTY_UPDATEDATABASESCHEMA_ENABLED, "true");
+    /**
+     * Initializes the test fixture.
+     */
+    @Before
+    public void setUp() throws Exception {
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        configuration.setProperty(DatabaseModule.PROPERTY_UPDATEDATABASESCHEMA_ENABLED, "true");
 
-		databaseModule = new TestDatabaseModule();
-		databaseModule.init(configuration);
-	}
-
-
-	/**
-	 * Test the injection of the dataSource into a test object. This should also have triggered the DbMaintainer.
-	 */
-	@Test
-	public void testInjectDataSource() throws Exception {
-		DbTest dbTest = new DbTest();
-		databaseModule.injectDataSource(dbTest);
-
-		assertNotNull(dbTest.dataSourceFromField);
-		assertNotNull(dbTest.dataSourceFromMethod);
-		assertSame(dbTest.dataSourceFromField, dbTest.dataSourceFromMethod);
-		assertTrue(databaseModule.updateDataSchemaCalled);
-	}
+        databaseModule = new TestDatabaseModule();
+        databaseModule.init(configuration);
+    }
 
 
-	/**
-	 * Object that plays the role of database test object in this class's tests.
-	 */
-	public static class DbTest {
+    /**
+     * Test the injection of the dataSource into a test object. This should also have triggered the DbMaintainer.
+     */
+    @Test
+    public void testInjectDataSource() throws Exception {
+        DbTest dbTest = new DbTest();
+        databaseModule.injectDataSource(dbTest);
 
-		private DataSource dataSourceFromMethod;
-
-		@TestDataSource
-		private DataSource dataSourceFromField = null;
-
-		@TestDataSource
-		public void setDataSource(DataSource dataSource) {
-			this.dataSourceFromMethod = dataSource;
-		}
-	}
+        assertNotNull(dbTest.dataSourceFromField);
+        assertNotNull(dbTest.dataSourceFromMethod);
+        assertSame(dbTest.dataSourceFromField, dbTest.dataSourceFromMethod);
+        assertTrue(databaseModule.updateDataSchemaCalled);
+    }
 
 
-	/**
-	 * Database module that intercepts the updating of the database schema.
-	 */
-	public class TestDatabaseModule extends DatabaseModule {
+    /**
+     * Object that plays the role of database test object in this class's tests.
+     */
+    public static class DbTest {
 
-		private boolean updateDataSchemaCalled = false;
+        private DataSource dataSourceFromMethod;
 
-		public void updateDatabase(SQLHandler sqlHandler) {
-			updateDataSchemaCalled = true;
-		}
-	}
+        @TestDataSource
+        private DataSource dataSourceFromField = null;
+
+        @TestDataSource
+        public void setDataSource(DataSource dataSource) {
+            this.dataSourceFromMethod = dataSource;
+        }
+    }
+
+
+    /**
+     * Database module that intercepts the updating of the database schema.
+     */
+    public class TestDatabaseModule extends DatabaseModule {
+
+        private boolean updateDataSchemaCalled = false;
+
+        public void updateDatabase(SQLHandler sqlHandler) {
+            updateDataSchemaCalled = true;
+        }
+    }
 
 }

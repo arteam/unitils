@@ -15,6 +15,8 @@
  */
 package org.unitilsnew.core;
 
+import org.unitilsnew.core.reflect.ClassWrapper;
+
 import static org.unitilsnew.core.TestPhase.EXECUTION;
 
 /**
@@ -54,9 +56,9 @@ public abstract class TestListener {
     /**
      * Invoked before the generic class setup (e.g. @BeforeClass) is performed.
      *
-     * @param testClass The test class, not null
+     * @param classWrapper The test class, not null
      */
-    public void beforeTestClass(TestClass testClass) {
+    public void beforeTestClass(ClassWrapper classWrapper) {
     }
 
     /**

@@ -18,6 +18,7 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitilsnew.core.reflect.ClassWrapper;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
@@ -39,8 +40,8 @@ public class TestInstanceGetClassAnnotationsTest {
 
     @Before
     public void initialize() throws Exception {
-        TestClass testClass = new TestClass(MyClass.class);
-        testInstance = new TestInstance(testClass, null, null);
+        ClassWrapper classWrapper = new ClassWrapper(MyClass.class);
+        testInstance = new TestInstance(classWrapper, null, null);
     }
 
 
@@ -73,7 +74,7 @@ public class TestInstanceGetClassAnnotationsTest {
 
     @Test
     public void noAnnotationsFound() {
-        testInstance = new TestInstance(new TestClass(NoAnnotationsClass.class), null, null);
+        testInstance = new TestInstance(new ClassWrapper(NoAnnotationsClass.class), null, null);
 
         List<Annotation> result = testInstance.getClassAnnotations();
         assertTrue(result.isEmpty());

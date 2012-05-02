@@ -16,20 +16,21 @@
 package org.unitils.dbmaintainer.script.impl;
 
 import org.junit.After;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import org.unitilsnew.UnitilsJUnit4;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Properties;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
 /**
  * Tests the SQL script parser
