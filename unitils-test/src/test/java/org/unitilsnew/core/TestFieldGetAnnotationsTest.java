@@ -18,14 +18,15 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitilsnew.core.reflect.FieldWrapper;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
-import java.lang.reflect.Field;
 import java.util.List;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Tim Ducheyne
@@ -35,15 +36,15 @@ public class TestFieldGetAnnotationsTest {
     /* Tested object */
     private TestField testField;
 
-    private Field field;
-    private Field noAnnotationsField;
+    private FieldWrapper field;
+    private FieldWrapper noAnnotationsField;
     private Object testObject;
 
 
     @Before
     public void initialize() throws Exception {
-        field = MyClass.class.getDeclaredField("field");
-        noAnnotationsField = MyClass.class.getDeclaredField("noAnnotationsField");
+        field = new FieldWrapper(MyClass.class.getDeclaredField("field"));
+        noAnnotationsField = new FieldWrapper(MyClass.class.getDeclaredField("noAnnotationsField"));
         testObject = new MyClass();
 
         testField = new TestField(field, testObject);
@@ -65,14 +66,6 @@ public class TestFieldGetAnnotationsTest {
 
         List<Annotation> result = testField.getAnnotations();
         assertTrue(result.isEmpty());
-    }
-
-    @Test
-    public void annotationsAreCached() {
-        List<Annotation> result1 = testField.getAnnotations();
-        List<Annotation> result2 = testField.getAnnotations();
-
-        assertSame(result1, result2);
     }
 
 

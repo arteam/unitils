@@ -18,16 +18,17 @@ package org.unitils.dbunit.util;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.ITableIterator;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
+import org.unitilsnew.UnitilsJUnit4;
+
+import java.io.File;
+
+import static java.util.Arrays.asList;
+import static org.junit.Assert.*;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenientEquals;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.toFile;
-
-import java.io.File;
-import static java.util.Arrays.asList;
 
 /**
  * Test for {@link MultiSchemaXmlDataSetReader}.

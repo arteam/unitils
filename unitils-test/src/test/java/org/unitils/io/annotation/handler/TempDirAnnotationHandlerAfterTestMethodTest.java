@@ -18,12 +18,12 @@ package org.unitils.io.annotation.handler;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.io.annotation.TempDir;
 import org.unitils.io.temp.TempService;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
+import org.unitilsnew.UnitilsJUnit4;
 
 import java.io.File;
 

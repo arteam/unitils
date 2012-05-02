@@ -16,93 +16,94 @@
 
 package org.unitilsnew.core;
 
-import org.unitils.core.UnitilsException;
+import org.unitilsnew.core.reflect.ClassWrapper;
+import org.unitilsnew.core.reflect.FieldWrapper;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.lang.reflect.Type;
 import java.util.List;
-
-import static java.util.Collections.addAll;
-import static org.unitils.util.ReflectionUtils.getGenericParameterClass;
 
 /**
  * @author Tim Ducheyne
  */
 public class TestField {
 
-    protected Field field;
+    protected FieldWrapper fieldWrapper;
     protected Object testObject;
 
     protected List<Annotation> fieldAnnotations;
 
 
-    public TestField(Field field, Object testObject) {
-        this.field = field;
+    public TestField(FieldWrapper fieldWrapper, Object testObject) {
+        this.fieldWrapper = fieldWrapper;
         this.testObject = testObject;
     }
 
 
     public Field getField() {
-        return field;
+        return fieldWrapper.getWrappedField();
+    }
+
+    public Object getTestObject() {
+        return testObject;
     }
 
     public String getName() {
-        return field.getName();
+        return fieldWrapper.getName();
     }
 
     public Class<?> getType() {
-        return field.getType();
+        return fieldWrapper.getType();
     }
 
-    public Class<?> getGenericType() {
-        return getGenericParameterClass(field.getGenericType());
+    public Type getGenericType() {
+        return fieldWrapper.getGenericType();
     }
 
-    public boolean isOfType(Class<?> type) {
-        Class<?> fieldType = field.getType();
-        return type.isAssignableFrom(fieldType);
+    public ClassWrapper getClassWrapper() {
+        return fieldWrapper.getClassWrapper();
+    }
+
+
+    public boolean isOfType(Type type) {
+        return fieldWrapper.isOfType(type);
+    }
+
+    public boolean isAssignableFrom(Class<?> type) {
+        return fieldWrapper.isAssignableFrom(type);
+    }
+
+
+    public Class<?> getSingleGenericClass() {
+        return fieldWrapper.getSingleGenericClass();
+    }
+
+    public Type getSingleGenericType() {
+        return fieldWrapper.getSingleGenericType();
     }
 
 
     @SuppressWarnings("unchecked")
-    public <T> T getValue(Object value) {
-        try {
-            field.setAccessible(true);
-            return (T) field.get(testObject);
-
-        } catch (Exception e) {
-            throw new UnitilsException("Error while trying to access field " + field, e);
-        }
+    public <T> T getValue() {
+        return (T) fieldWrapper.getValue(testObject);
     }
 
     public void setValue(Object value) {
-        try {
-            field.setAccessible(true);
-            field.set(testObject, value);
-
-        } catch (Exception e) {
-            throw new UnitilsException("Unable to set value of field " + field.getName()
-                    + ". Ensure that the value is of the correct type. Field type: " + field.getType() + ". Value: " + value, e);
-        }
+        fieldWrapper.setValue(value, testObject);
     }
 
 
     public <A extends Annotation> A getAnnotation(Class<A> annotationClass) {
-        return field.getAnnotation(annotationClass);
+        return fieldWrapper.getAnnotation(annotationClass);
     }
 
     public List<Annotation> getAnnotations() {
-        if (fieldAnnotations != null) {
-            return fieldAnnotations;
-        }
-        fieldAnnotations = new ArrayList<Annotation>();
-        addAll(fieldAnnotations, field.getDeclaredAnnotations());
-        return fieldAnnotations;
+        return fieldWrapper.getAnnotations();
     }
 
     public <A extends Annotation> boolean hasAnnotation(Class<A> annotationClass) {
-        return field.getAnnotation(annotationClass) != null;
+        return fieldWrapper.hasAnnotation(annotationClass);
     }
 
 
@@ -121,7 +122,7 @@ public class TestField {
             return false;
         }
         TestField testField = (TestField) o;
-        if (field != null ? !field.equals(testField.field) : testField.field != null) {
+        if (fieldWrapper != null ? !fieldWrapper.equals(testField.fieldWrapper) : testField.fieldWrapper != null) {
             return false;
         }
         if (testObject != null ? !testObject.equals(testField.testObject) : testField.testObject != null) {
@@ -132,7 +133,7 @@ public class TestField {
 
     @Override
     public int hashCode() {
-        int result = field != null ? field.hashCode() : 0;
+        int result = fieldWrapper != null ? fieldWrapper.hashCode() : 0;
         result = 31 * result + (testObject != null ? testObject.hashCode() : 0);
         return result;
     }

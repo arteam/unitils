@@ -22,12 +22,13 @@ import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
 import org.unitilsnew.core.FieldAnnotationListener;
-import org.unitilsnew.core.TestClass;
 import org.unitilsnew.core.TestField;
 import org.unitilsnew.core.TestInstance;
 import org.unitilsnew.core.annotation.FieldAnnotation;
 import org.unitilsnew.core.config.Configuration;
 import org.unitilsnew.core.context.Context;
+import org.unitilsnew.core.reflect.ClassWrapper;
+import org.unitilsnew.core.reflect.FieldWrapper;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -77,12 +78,12 @@ public class WrapperForFieldAnnotationListenerFactoryCreateTest extends UnitilsJ
         Method testMethod = MyClass.class.getDeclaredMethod("testMethod");
         Object testObject = new MyClass();
 
-        TestClass testClass = new TestClass(MyClass.class);
-        TestInstance testInstance = new TestInstance(testClass, testObject, testMethod);
+        ClassWrapper classWrapper = new ClassWrapper(MyClass.class);
+        TestInstance testInstance = new TestInstance(classWrapper, testObject, testMethod);
 
-        TestField testField1 = new TestField(field1, testObject);
+        TestField testField1 = new TestField(new FieldWrapper(field1), testObject);
         MyFieldAnnotation1 fieldAnnotation1 = testField1.getAnnotation(MyFieldAnnotation1.class);
-        TestField testField2 = new TestField(field2, testObject);
+        TestField testField2 = new TestField(new FieldWrapper(field2), testObject);
         MyFieldAnnotation2 fieldAnnotation2 = testField2.getAnnotation(MyFieldAnnotation2.class);
 
         List<WrapperForFieldAnnotationListener> result = wrapperForFieldAnnotationListenerFactory.create(testInstance);
@@ -107,10 +108,10 @@ public class WrapperForFieldAnnotationListenerFactoryCreateTest extends UnitilsJ
         Method testMethod = AnnotationOnClassAndField.class.getDeclaredMethod("testMethod");
         Object testObject = new AnnotationOnClassAndField();
 
-        TestClass testClass = new TestClass(AnnotationOnClassAndField.class);
-        TestInstance testInstance = new TestInstance(testClass, testObject, testMethod);
+        ClassWrapper classWrapper = new ClassWrapper(AnnotationOnClassAndField.class);
+        TestInstance testInstance = new TestInstance(classWrapper, testObject, testMethod);
 
-        TestField testField = new TestField(field, testObject);
+        TestField testField = new TestField(new FieldWrapper(field), testObject);
         MyFieldAnnotation1 fieldAnnotation = testField.getAnnotation(MyFieldAnnotation1.class);
         MyFieldAnnotation1 classAnnotation = AnnotationOnClassAndField.class.getAnnotation(MyFieldAnnotation1.class);
         MyFieldAnnotation1 superClassAnnotation = AnnotationOnSuperClass.class.getAnnotation(MyFieldAnnotation1.class);
@@ -131,8 +132,8 @@ public class WrapperForFieldAnnotationListenerFactoryCreateTest extends UnitilsJ
         Method testMethod = AnnotationOnClass.class.getDeclaredMethod("testMethod");
         Object testObject = new AnnotationOnClass();
 
-        TestClass testClass = new TestClass(AnnotationOnClass.class);
-        TestInstance testInstance = new TestInstance(testClass, testObject, testMethod);
+        ClassWrapper classWrapper = new ClassWrapper(AnnotationOnClass.class);
+        TestInstance testInstance = new TestInstance(classWrapper, testObject, testMethod);
 
         List<WrapperForFieldAnnotationListener> result = wrapperForFieldAnnotationListenerFactory.create(testInstance);
         assertTrue(result.isEmpty());
@@ -143,8 +144,8 @@ public class WrapperForFieldAnnotationListenerFactoryCreateTest extends UnitilsJ
         Method testMethod = NoAnnotation.class.getDeclaredMethod("testMethod");
         Object testObject = new NoAnnotation();
 
-        TestClass testClass = new TestClass(NoAnnotation.class);
-        TestInstance testInstance = new TestInstance(testClass, testObject, testMethod);
+        ClassWrapper classWrapper = new ClassWrapper(NoAnnotation.class);
+        TestInstance testInstance = new TestInstance(classWrapper, testObject, testMethod);
 
         List<WrapperForFieldAnnotationListener> result = wrapperForFieldAnnotationListenerFactory.create(testInstance);
         assertTrue(result.isEmpty());
@@ -155,8 +156,8 @@ public class WrapperForFieldAnnotationListenerFactoryCreateTest extends UnitilsJ
         Method testMethod = NoFields.class.getDeclaredMethod("testMethod");
         Object testObject = new NoFields();
 
-        TestClass testClass = new TestClass(NoFields.class);
-        TestInstance testInstance = new TestInstance(testClass, testObject, testMethod);
+        ClassWrapper classWrapper = new ClassWrapper(NoFields.class);
+        TestInstance testInstance = new TestInstance(classWrapper, testObject, testMethod);
 
         List<WrapperForFieldAnnotationListener> result = wrapperForFieldAnnotationListenerFactory.create(testInstance);
         assertTrue(result.isEmpty());
@@ -167,8 +168,8 @@ public class WrapperForFieldAnnotationListenerFactoryCreateTest extends UnitilsJ
         Method testMethod = OtherAnnotation.class.getDeclaredMethod("testMethod");
         Object testObject = new OtherAnnotation();
 
-        TestClass testClass = new TestClass(OtherAnnotation.class);
-        TestInstance testInstance = new TestInstance(testClass, testObject, testMethod);
+        ClassWrapper classWrapper = new ClassWrapper(OtherAnnotation.class);
+        TestInstance testInstance = new TestInstance(classWrapper, testObject, testMethod);
 
         List<WrapperForFieldAnnotationListener> result = wrapperForFieldAnnotationListenerFactory.create(testInstance);
         assertTrue(result.isEmpty());

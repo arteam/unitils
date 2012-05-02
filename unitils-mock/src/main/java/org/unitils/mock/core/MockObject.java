@@ -30,8 +30,8 @@ import org.unitils.mock.core.matching.impl.BehaviorDefiningMatchingInvocationHan
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.ExceptionThrowingMockBehavior;
 import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
+import org.unitilsnew.core.reflect.TypeWrapper;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +39,6 @@ import java.util.Map;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.uncapitalize;
 import static org.unitils.mock.core.proxy.ProxyFactory.createInitializedOrUninitializedInstanceOfType;
-import static org.unitils.util.ReflectionUtils.getGenericType;
 
 /**
  * Implementation of a Mock.
@@ -144,14 +143,15 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
 
 
     /**
-     * @param field The field that declared this mock object, null if there is no field (or not known)
+     * @param declaredType The declared type (e.g. type of field) of this mock object, null if not known
      * @return The type of the object to inject (i.e. the mocked type), not null.
      */
-    public Type getObjectToInjectType(Field field) {
-        if (field == null) {
+    public Type getObjectToInjectType(Type declaredType) {
+        if (declaredType == null) {
             return mockedType;
         }
-        return getGenericType(field);
+        TypeWrapper declaredTypeWrapper = new TypeWrapper(declaredType);
+        return declaredTypeWrapper.getSingleGenericType();
     }
 
     //

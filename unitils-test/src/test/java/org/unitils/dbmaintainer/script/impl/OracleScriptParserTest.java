@@ -16,19 +16,20 @@
 package org.unitils.dbmaintainer.script.impl;
 
 import org.junit.After;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import org.unitilsnew.UnitilsJUnit4;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Properties;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
 /**
  * Tests the Oracle SQL and PL-SQL script parser
@@ -113,7 +114,7 @@ public class OracleScriptParserTest extends UnitilsJUnit4 {
     }
 
 
-   /**
+    /**
      * Test parsing some statements out of a PL-SQL script ending with a comment.
      * 4 statements should have been found in the script.
      */

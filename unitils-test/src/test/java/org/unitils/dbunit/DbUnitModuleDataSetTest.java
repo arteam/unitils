@@ -16,23 +16,24 @@
 package org.unitils.dbunit;
 
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
-import static org.unitils.database.SQLUnitils.*;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.datasetfactory.impl.MultiSchemaXmlDataSetFactory;
 import org.unitils.dbunit.datasetloadstrategy.impl.CleanInsertLoadStrategy;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
+import org.unitilsnew.UnitilsJUnit4;
 
 import javax.sql.DataSource;
 import java.io.File;
 import java.util.Properties;
 import java.util.Set;
+
+import static org.junit.Assert.*;
+import static org.unitils.database.SQLUnitils.*;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 /**
  * Test class for loading of data sets using the {@link DbUnitModule}.

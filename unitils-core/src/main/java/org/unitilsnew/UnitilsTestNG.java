@@ -21,8 +21,7 @@ import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
-import org.unitilsnew.core.context.BootstrapContextFactory;
-import org.unitilsnew.core.context.Context;
+import org.unitilsnew.core.engine.Unitils;
 import org.unitilsnew.core.engine.UnitilsTestListener;
 
 import java.lang.reflect.InvocationTargetException;
@@ -36,12 +35,12 @@ import java.lang.reflect.Method;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
+// todo unit test
 public abstract class UnitilsTestNG implements IHookable {
 
     /* True if beforeTestSetUp was called */
     protected boolean beforeTestSetUpCalled = false;
 
-    protected UnitilsTestListener unitilsTestListener;
 
     /**
      * Called before a test of a test class is run. This is where {@link org.unitils.core.TestListener#afterCreateTestObject(Object)} is called.
@@ -151,15 +150,6 @@ public abstract class UnitilsTestNG implements IHookable {
      * @return The unitils test listener
      */
     protected UnitilsTestListener getUnitilsTestListener() {
-        if (unitilsTestListener == null) {
-            unitilsTestListener = createUnitilsTestListener();
-        }
-        return unitilsTestListener;
-    }
-
-    protected UnitilsTestListener createUnitilsTestListener() {
-        BootstrapContextFactory bootstrapContextFactory = new BootstrapContextFactory();
-        Context context = bootstrapContextFactory.create();
-        return context.getInstanceOfType(UnitilsTestListener.class);
+        return Unitils.getUnitilsTestListener();
     }
 }

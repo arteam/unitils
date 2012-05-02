@@ -15,10 +15,8 @@
  */
 package org.unitils.dbmaintainer;
 
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.script.ExecutedScript;
@@ -35,12 +33,15 @@ import org.unitils.inject.annotation.TestedObject;
 import org.unitils.mock.ArgumentMatchers;
 import org.unitils.mock.Mock;
 import org.unitils.mock.MockUnitils;
-import static org.unitils.mock.MockUnitils.assertNoMoreInvocations;
+import org.unitilsnew.UnitilsJUnit4;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+
+import static org.junit.Assert.fail;
+import static org.unitils.mock.MockUnitils.assertNoMoreInvocations;
 
 /**
  * Tests the main algorithm of the DBMaintainer, using mocks for all implementation classes.

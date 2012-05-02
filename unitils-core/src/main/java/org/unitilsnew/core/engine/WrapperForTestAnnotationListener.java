@@ -16,9 +16,16 @@
 
 package org.unitilsnew.core.engine;
 
-import org.unitilsnew.core.*;
+import org.unitils.core.UnitilsException;
+import org.unitilsnew.core.TestAnnotationListener;
+import org.unitilsnew.core.TestInstance;
+import org.unitilsnew.core.TestListener;
+import org.unitilsnew.core.TestPhase;
+import org.unitilsnew.core.reflect.Annotations;
 
 import java.lang.annotation.Annotation;
+
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * @author Tim Ducheyne
@@ -42,21 +49,49 @@ public class WrapperForTestAnnotationListener<A extends Annotation> extends Test
 
     @Override
     public void beforeTestSetUp(TestInstance testInstance) {
-        testAnnotationListener.beforeTestSetUp(testInstance, annotations);
+        try {
+            testAnnotationListener.beforeTestSetUp(testInstance, annotations);
+        } catch (Exception e) {
+            throw new UnitilsException(getExceptionMessage(e), e);
+        }
     }
 
     @Override
     public void beforeTestMethod(TestInstance testInstance) {
-        testAnnotationListener.beforeTestMethod(testInstance, annotations);
+        try {
+            testAnnotationListener.beforeTestMethod(testInstance, annotations);
+        } catch (Exception e) {
+            throw new UnitilsException(getExceptionMessage(e), e);
+        }
     }
 
     @Override
     public void afterTestMethod(TestInstance testInstance, Throwable testThrowable) {
-        testAnnotationListener.afterTestMethod(testInstance, annotations, testThrowable);
+        try {
+            testAnnotationListener.afterTestMethod(testInstance, annotations, testThrowable);
+        } catch (Exception e) {
+            throw new UnitilsException(getExceptionMessage(e), e);
+        }
     }
 
     @Override
     public void afterTestTearDown(TestInstance testInstance) {
-        testAnnotationListener.afterTestTearDown(testInstance, annotations);
+        try {
+            testAnnotationListener.afterTestTearDown(testInstance, annotations);
+        } catch (Exception e) {
+            throw new UnitilsException(getExceptionMessage(e), e);
+        }
+    }
+
+
+    protected String getExceptionMessage(Exception e) {
+        StringBuilder message = new StringBuilder("Unable to handle test annotation @");
+        message.append(annotations.getType().getSimpleName());
+        String exceptionMessage = e.getMessage();
+        if (!isBlank(exceptionMessage)) {
+            message.append(":\n");
+            message.append(exceptionMessage);
+        }
+        return message.toString();
     }
 }

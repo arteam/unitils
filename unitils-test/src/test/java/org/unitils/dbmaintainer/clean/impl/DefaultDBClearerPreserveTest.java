@@ -19,25 +19,25 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hsqldb.Trigger;
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.SQLHandler;
-
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
-import static org.unitils.core.util.SQLTestUtils.*;
-import static org.unitils.database.SQLUnitils.executeUpdate;
+import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.DBClearer;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.*;
+import org.unitilsnew.UnitilsJUnit4;
 
 import javax.sql.DataSource;
 import java.util.Properties;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import static org.unitils.core.util.SQLTestUtils.*;
+import static org.unitils.database.SQLUnitils.executeUpdate;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.*;
 
 /**
  * Test class for the {@link DBClearer} with configuratin to preserve all items.

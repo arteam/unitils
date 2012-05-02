@@ -22,7 +22,11 @@ import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
-import org.unitilsnew.core.*;
+import org.unitilsnew.core.TestAnnotationListener;
+import org.unitilsnew.core.TestInstance;
+import org.unitilsnew.core.TestPhase;
+import org.unitilsnew.core.reflect.Annotations;
+import org.unitilsnew.core.reflect.ClassWrapper;
 
 import java.lang.annotation.Target;
 
@@ -41,7 +45,7 @@ public class WrapperForTestAnnotationListenerTest extends UnitilsJUnit4 {
     private Mock<Annotations<Target>> annotationsMock;
 
     @Dummy
-    private TestClass testClass;
+    private ClassWrapper classWrapper;
     @Dummy
     private TestInstance testInstance;
 

@@ -15,63 +15,51 @@
  */
 package org.unitils.database.config;
 
-import static org.unitils.easymock.EasyMockUnitils.replay;
-
-import java.util.Properties;
-
 import org.apache.commons.dbcp.BasicDataSource;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
-import org.unitils.easymock.annotation.Mock;
+import org.unitils.mock.Mock;
+import org.unitilsnew.UnitilsJUnit4;
+
+import java.util.Properties;
 
 /**
  * Tests for the properties data source factory.
  */
 public class PropertiesDataSourceFactoryTest extends UnitilsJUnit4 {
 
-	/* Object under test */
-	private PropertiesDataSourceFactory propertiesFileDataSource;
+    /* Tested object */
+    private PropertiesDataSourceFactory propertiesFileDataSource;
 
-	/* Mocked data source */
-	@Mock
-	private BasicDataSource mockBasicDataSource;
+    private Mock<BasicDataSource> mockBasicDataSource;
 
 
-	/**
-	 * Initializes the test
-	 */
-	@Before
-	public void setUp() throws Exception {
-		Properties configuration = new Properties();
-		configuration.setProperty("database.driverClassName", "testdriver");
-		configuration.setProperty("database.url", "testurl");
-		configuration.setProperty("database.userName", "testusername");
-		configuration.setProperty("database.password", "testpassword");
+    @Before
+    public void setUp() throws Exception {
+        Properties configuration = new Properties();
+        configuration.setProperty("database.driverClassName", "testdriver");
+        configuration.setProperty("database.url", "testurl");
+        configuration.setProperty("database.userName", "testusername");
+        configuration.setProperty("database.password", "testpassword");
 
-		propertiesFileDataSource = new PropertiesDataSourceFactory() {
-			@Override
-			protected BasicDataSource getNewDataSource() {
-				return mockBasicDataSource;
-			}
-		};
-		propertiesFileDataSource.init(configuration);
-	}
+        propertiesFileDataSource = new PropertiesDataSourceFactory() {
+            @Override
+            protected BasicDataSource getNewDataSource() {
+                return mockBasicDataSource.getMock();
+            }
+        };
+        propertiesFileDataSource.init(configuration);
+    }
 
 
-	/**
-	 * Test creating a data source.
-	 */
-	@Test
-	public void testCreateDataSource() {
-		// expectations
-		mockBasicDataSource.setDriverClassName("testdriver");
-		mockBasicDataSource.setUrl("testurl");
-		mockBasicDataSource.setUsername("testusername");
-		mockBasicDataSource.setPassword("testpassword");
-		replay();
+    @Test
+    public void testCreateDataSource() {
+        propertiesFileDataSource.createDataSource();
 
-		propertiesFileDataSource.createDataSource();
-	}
+        mockBasicDataSource.assertInvoked().setDriverClassName("testdriver");
+        mockBasicDataSource.assertInvoked().setUrl("testurl");
+        mockBasicDataSource.assertInvoked().setUsername("testusername");
+        mockBasicDataSource.assertInvoked().setPassword("testpassword");
+    }
 
 }

@@ -18,6 +18,7 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitilsnew.core.reflect.ClassWrapper;
 
 import java.lang.reflect.Method;
 
@@ -29,14 +30,14 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestInstanceHashCodeTest {
 
-    private TestClass testClass;
+    private ClassWrapper classWrapper;
     private Object testObject;
     private Method testMethod;
 
 
     @Before
     public void initialize() throws Exception {
-        testClass = new TestClass(MyClass.class);
+        classWrapper = new ClassWrapper(MyClass.class);
         testObject = new MyClass();
         testMethod = MyClass.class.getDeclaredMethod("method");
     }
@@ -44,7 +45,7 @@ public class TestInstanceHashCodeTest {
 
     @Test
     public void hashCodeForClass() {
-        TestInstance testInstance = new TestInstance(testClass, testObject, testMethod);
+        TestInstance testInstance = new TestInstance(classWrapper, testObject, testMethod);
         int result = testInstance.hashCode();
 
         assertTrue(result != 0);
@@ -52,8 +53,8 @@ public class TestInstanceHashCodeTest {
 
     @Test
     public void sameHashCodeWhenEqual() {
-        TestInstance testInstance1 = new TestInstance(testClass, testObject, testMethod);
-        TestInstance testInstance2 = new TestInstance(testClass, testObject, testMethod);
+        TestInstance testInstance1 = new TestInstance(classWrapper, testObject, testMethod);
+        TestInstance testInstance2 = new TestInstance(classWrapper, testObject, testMethod);
 
         assertEquals(testInstance1.hashCode(), testInstance2.hashCode());
     }
@@ -68,7 +69,7 @@ public class TestInstanceHashCodeTest {
 
     @Test
     public void nullTestObject() {
-        TestInstance testInstance = new TestInstance(testClass, null, testMethod);
+        TestInstance testInstance = new TestInstance(classWrapper, null, testMethod);
         int result = testInstance.hashCode();
 
         assertTrue(result != 0);
@@ -76,7 +77,7 @@ public class TestInstanceHashCodeTest {
 
     @Test
     public void nullTestMethod() {
-        TestInstance testInstance = new TestInstance(testClass, testObject, null);
+        TestInstance testInstance = new TestInstance(classWrapper, testObject, null);
         int result = testInstance.hashCode();
 
         assertTrue(result != 0);

@@ -17,8 +17,8 @@
 package org.unitils.io;
 
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.io.annotation.FileContent;
+import org.unitilsnew.UnitilsJUnit4;
 
 import java.util.Properties;
 

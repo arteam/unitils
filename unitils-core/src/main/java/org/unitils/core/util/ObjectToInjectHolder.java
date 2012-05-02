@@ -15,7 +15,6 @@
  */
 package org.unitils.core.util;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
 /**
@@ -34,12 +33,8 @@ public interface ObjectToInjectHolder<T> {
     T getObjectToInject();
 
     /**
-     * Gets the type of the object to inject.
-     * If this object was declared as an instance field, the field will be given as an argument.
-     * This can give more type information when generic types are being used.
-     *
-     * @param field The field that declared this object, null if there is no field
-     * @return The type, not null
+     * @param declaredType The declared type (e.g. type of field) of this mock object, null if not known
+     * @return The type of the object to inject (i.e. the mocked type), not null.
      */
-    Type getObjectToInjectType(Field field);
+    Type getObjectToInjectType(Type declaredType);
 }

@@ -18,6 +18,7 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitilsnew.core.reflect.FieldWrapper;
 
 import java.lang.reflect.Field;
 
@@ -29,18 +30,19 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestFieldHashCodeTest {
 
-    private Field field;
+    private FieldWrapper fieldWrapper;
 
 
     @Before
     public void initialize() throws Exception {
-        field = MyClass.class.getDeclaredField("field");
+        Field field = MyClass.class.getDeclaredField("field");
+        fieldWrapper = new FieldWrapper(field);
     }
 
 
     @Test
     public void hashCodeForClass() {
-        TestField testField = new TestField(field, "a");
+        TestField testField = new TestField(fieldWrapper, "a");
         int result = testField.hashCode();
 
         assertTrue(result != 0);
@@ -48,8 +50,8 @@ public class TestFieldHashCodeTest {
 
     @Test
     public void sameHashCodeWhenEqual() {
-        TestField testField1 = new TestField(field, "a");
-        TestField testField2 = new TestField(field, "a");
+        TestField testField1 = new TestField(fieldWrapper, "a");
+        TestField testField2 = new TestField(fieldWrapper, "a");
 
         assertEquals(testField1.hashCode(), testField2.hashCode());
     }
@@ -64,7 +66,7 @@ public class TestFieldHashCodeTest {
 
     @Test
     public void nullTestObject() {
-        TestField testField = new TestField(field, null);
+        TestField testField = new TestField(fieldWrapper, null);
         int result = testField.hashCode();
 
         assertTrue(result != 0);

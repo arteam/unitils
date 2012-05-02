@@ -18,8 +18,7 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import java.lang.reflect.Field;
+import org.unitilsnew.core.reflect.FieldWrapper;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -29,14 +28,14 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestFieldEqualsTest {
 
-    private Field field1;
-    private Field field2;
+    private FieldWrapper field1;
+    private FieldWrapper field2;
 
 
     @Before
     public void initialize() throws Exception {
-        field1 = MyClass.class.getDeclaredField("field1");
-        field2 = MyClass.class.getDeclaredField("field2");
+        field1 = new FieldWrapper(MyClass.class.getDeclaredField("field1"));
+        field2 = new FieldWrapper(MyClass.class.getDeclaredField("field2"));
     }
 
 

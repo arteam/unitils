@@ -15,10 +15,11 @@
  */
 package org.unitils.util;
 
-import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
+import org.unitilsnew.UnitilsJUnit4;
+
+import static org.junit.Assert.assertNotNull;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
 /**

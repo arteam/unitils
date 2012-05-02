@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
+import org.unitilsnew.core.reflect.ClassWrapper;
 
 import static org.junit.Assert.assertEquals;
 import static org.unitilsnew.core.TestPhase.EXECUTION;
@@ -33,7 +34,7 @@ public class TestListenerTest extends UnitilsJUnit4 {
     private TestListener testListener;
 
     @Dummy
-    private TestClass testClass;
+    private ClassWrapper classWrapper;
     @Dummy
     private TestInstance testInstance;
 
@@ -52,7 +53,7 @@ public class TestListenerTest extends UnitilsJUnit4 {
 
     @Test
     public void defaultBeforeTestClassDoesNothing() {
-        testListener.beforeTestClass(testClass);
+        testListener.beforeTestClass(classWrapper);
     }
 
     @Test

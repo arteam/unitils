@@ -19,7 +19,7 @@ package org.unitils.mock.annotation;
 
 import junit.framework.Assert;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
+import org.unitilsnew.UnitilsJUnit4;
 
 /**
  * @author Jeroen Horemans

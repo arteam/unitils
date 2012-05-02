@@ -16,21 +16,22 @@
 package org.unitils.dbunit;
 
 import org.junit.After;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
-import static org.unitils.database.SQLUnitils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
+import org.unitilsnew.UnitilsJUnit4;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.Properties;
+
+import static org.junit.Assert.fail;
+import static org.unitils.database.SQLUnitils.executeUpdate;
 
 /**
  * Tests the expected data set behavior.

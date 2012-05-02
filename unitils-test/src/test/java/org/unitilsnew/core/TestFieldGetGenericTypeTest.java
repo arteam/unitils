@@ -18,14 +18,13 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.core.UnitilsException;
+import org.unitilsnew.core.reflect.FieldWrapper;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 /**
  * @author Tim Ducheyne
@@ -35,48 +34,37 @@ public class TestFieldGetGenericTypeTest {
     /* Tested object */
     private TestField testField;
 
-    private Field regularField;
+    private Field field;
     private Field genericField;
-    private Field multiGenericField;
-    private MyClass testObject;
 
 
     @Before
     public void initialize() throws Exception {
-        regularField = MyClass.class.getDeclaredField("regularField");
+        field = MyClass.class.getDeclaredField("field");
         genericField = MyClass.class.getDeclaredField("genericField");
-        multiGenericField = MyClass.class.getDeclaredField("multiGenericField");
-        testObject = new MyClass();
     }
 
 
     @Test
-    public void genericField() {
-        testField = new TestField(genericField, testObject);
+    public void classType() {
+        testField = new TestField(new FieldWrapper(field), null);
 
-        Class<?> result = testField.getGenericType();
+        Type result = testField.getGenericType();
         assertEquals(String.class, result);
     }
 
     @Test
-    public void nullWhenNoGenericType() {
-        testField = new TestField(regularField, testObject);
+    public void genericType() {
+        testField = new TestField(new FieldWrapper(genericField), null);
 
-        Class<?> result = testField.getGenericType();
-        assertNull(result);
-    }
-
-    @Test(expected = UnitilsException.class)
-    public void exceptionWhenMoreThanOneGenericType() {
-        testField = new TestField(multiGenericField, testObject);
-        testField.getGenericType();
+        Type result = testField.getGenericType();
+        assertEquals(genericField.getGenericType(), result);
     }
 
 
     private static class MyClass {
 
-        private String regularField;
+        private String field;
         private List<String> genericField;
-        private Map<String, String> multiGenericField;
     }
 }

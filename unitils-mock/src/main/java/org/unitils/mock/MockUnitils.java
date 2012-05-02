@@ -19,10 +19,10 @@ package org.unitils.mock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitils.core.Unitils;
 import org.unitils.mock.core.MockObject;
 import org.unitils.mock.core.Scenario;
-import org.unitils.mock.dummy.DummyObjectUtil;
+import org.unitils.mock.dummy.DummyObjectFactory;
+import org.unitilsnew.core.engine.Unitils;
 
 import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationStackTrace;
 
@@ -34,7 +34,9 @@ import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationStackTrac
 public class MockUnitils {
 
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(MockModule.class);
+    protected static Log logger = LogFactory.getLog(MockUnitils.class);
+
+    protected static DummyObjectFactory dummyObjectFactory = Unitils.getInstanceOfType(DummyObjectFactory.class);
 
 
     public static void assertNoMoreInvocations() {
@@ -43,7 +45,7 @@ public class MockUnitils {
 
 
     public static <T> T createDummy(Class<T> type) {
-        return DummyObjectUtil.createDummy(type);
+        return dummyObjectFactory.createDummy(type);
     }
 
 
@@ -78,9 +80,5 @@ public class MockUnitils {
 
     private static Scenario getScenario() {
         return MockObject.getCurrentScenario();
-    }
-
-    private static MockModule getMockModule() {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(MockModule.class);
     }
 }

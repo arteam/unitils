@@ -2,10 +2,11 @@ package org.unitils.spring;
 
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit38.AbstractJUnit38SpringContextTests;
-import org.unitils.TracingTestListener;
-import static org.unitils.TracingTestListener.TestInvocation.TEST_SET_UP;
-import static org.unitils.TracingTestListener.TestInvocation.TEST_TEAR_DOWN;
 import org.unitils.spring.util.SpringUnitilsAdaptorTestExecutionListener;
+import org.unitilsnew.TracingTestListener;
+
+import static org.unitilsnew.TracingTestListener.TestInvocation.TEST_SET_UP;
+import static org.unitilsnew.TracingTestListener.TestInvocation.TEST_TEAR_DOWN;
 
 // todo javadoc
 @TestExecutionListeners(value = SpringUnitilsAdaptorTestExecutionListener.class, inheritListeners = false)

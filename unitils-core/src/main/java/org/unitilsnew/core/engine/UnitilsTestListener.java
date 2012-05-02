@@ -16,9 +16,9 @@
 
 package org.unitilsnew.core.engine;
 
-import org.unitilsnew.core.TestClass;
 import org.unitilsnew.core.TestInstance;
 import org.unitilsnew.core.TestListener;
+import org.unitilsnew.core.reflect.ClassWrapper;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class UnitilsTestListener {
     protected WrapperForTestAnnotationListenerFactory wrapperForTestAnnotationListenerFactory;
     protected TestListenerTestPhaseComparator testListenerTestPhaseComparator = new TestListenerTestPhaseComparator();
 
-    protected TestClass currentTestClass;
+    protected ClassWrapper currentClassWrapper;
     protected TestInstance currentTestInstance;
     protected List<TestListener> currentTestListeners;
 
@@ -49,7 +49,7 @@ public class UnitilsTestListener {
 
 
     public void beforeTestClass(Class<?> testClass) {
-        currentTestClass = new TestClass(testClass);
+        currentClassWrapper = new ClassWrapper(testClass);
         currentTestInstance = null;
 
         currentTestListeners = new ArrayList<TestListener>();
@@ -57,12 +57,12 @@ public class UnitilsTestListener {
         sort(currentTestListeners, testListenerTestPhaseComparator);
 
         for (TestListener testListener : currentTestListeners) {
-            testListener.beforeTestClass(currentTestClass);
+            testListener.beforeTestClass(currentClassWrapper);
         }
     }
 
     public void beforeTestSetUp(Object testObject, Method testMethod) {
-        currentTestInstance = new TestInstance(currentTestClass, testObject, testMethod);
+        currentTestInstance = new TestInstance(currentClassWrapper, testObject, testMethod);
 
         addFieldAndTestAnnotationListeners(currentTestInstance, currentTestListeners);
         sort(currentTestListeners, testListenerTestPhaseComparator);

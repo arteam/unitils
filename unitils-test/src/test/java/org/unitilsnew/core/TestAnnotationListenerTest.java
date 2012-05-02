@@ -20,6 +20,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
+import org.unitilsnew.core.reflect.Annotations;
+import org.unitilsnew.core.reflect.ClassWrapper;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Target;
@@ -38,7 +40,7 @@ public class TestAnnotationListenerTest extends UnitilsJUnit4 {
     @Dummy
     private Annotations<Target> annotations;
     @Dummy
-    private TestClass testClass;
+    private ClassWrapper classWrapper;
     @Dummy
     private TestInstance testInstance;
 

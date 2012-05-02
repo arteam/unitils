@@ -1,21 +1,12 @@
 package org.unitils.spring;
 
-import static org.unitils.TracingTestListener.TestInvocation.TEST_AFTER_CLASS;
-import static org.unitils.TracingTestListener.TestInvocation.TEST_BEFORE_CLASS;
-import static org.unitils.TracingTestListener.TestInvocation.TEST_METHOD;
-import static org.unitils.TracingTestListener.TestInvocation.TEST_SET_UP;
-import static org.unitils.TracingTestListener.TestInvocation.TEST_TEAR_DOWN;
+import org.junit.*;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.unitilsnew.TracingTestListener.TestInvocation.*;
 
 public class SpringUnitilsJUnit4Test_TestClass1 extends SpringUnitilsJUnit4TestBase {
 
-	@BeforeClass
+    @BeforeClass
     public static void beforeClass() {
         registerTestInvocation(TEST_BEFORE_CLASS, SpringUnitilsJUnit4Test_TestClass1.class, null);
     }

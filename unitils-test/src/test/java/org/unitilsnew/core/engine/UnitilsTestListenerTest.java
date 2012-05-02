@@ -22,10 +22,10 @@ import org.unitils.mock.Mock;
 import org.unitils.mock.PartialMock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
-import org.unitilsnew.core.TestClass;
 import org.unitilsnew.core.TestInstance;
 import org.unitilsnew.core.TestListener;
 import org.unitilsnew.core.config.Configuration;
+import org.unitilsnew.core.reflect.ClassWrapper;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -47,7 +47,7 @@ public class UnitilsTestListenerTest extends UnitilsJUnit4 {
     @Dummy
     private Configuration configuration;
 
-    private TestClass testClass;
+    private ClassWrapper classWrapper;
     private TestInstance testInstance;
     private Object testObject;
     private Method testMethod;
@@ -62,8 +62,8 @@ public class UnitilsTestListenerTest extends UnitilsJUnit4 {
         testMethod = MyClass.class.getDeclaredMethod("testMethod");
         testThrowable = new NullPointerException();
 
-        testClass = new TestClass(MyClass.class);
-        testInstance = new TestInstance(testClass, testObject, testMethod);
+        classWrapper = new ClassWrapper(MyClass.class);
+        testInstance = new TestInstance(classWrapper, testObject, testMethod);
     }
 
 

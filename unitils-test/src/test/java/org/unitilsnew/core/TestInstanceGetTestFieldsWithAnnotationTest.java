@@ -18,6 +18,7 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitilsnew.core.reflect.ClassWrapper;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -48,9 +49,9 @@ public class TestInstanceGetTestFieldsWithAnnotationTest {
         subClassField1 = MySubClass.class.getDeclaredField("field1");
         subClassField3 = MySubClass.class.getDeclaredField("field3");
 
-        TestClass testClass = new TestClass(MySubClass.class);
+        ClassWrapper classWrapper = new ClassWrapper(MySubClass.class);
         Object testObject = new MySubClass();
-        testInstance = new TestInstance(testClass, testObject, null);
+        testInstance = new TestInstance(classWrapper, testObject, null);
     }
 
 

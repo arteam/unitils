@@ -18,7 +18,7 @@
 package org.unitils.mock.mockbehavior.impl;
 
 import org.unitils.mock.core.proxy.ProxyInvocation;
-import org.unitils.mock.dummy.DummyObjectUtil;
+import org.unitils.mock.dummy.DummyObjectFactory;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -45,10 +45,16 @@ import java.util.Map;
  */
 public class DummyValueReturningMockBehavior extends DefaultValueReturningMockBehavior {
 
-    /*
-     * this list keeps track of what object we have returned. So that we return the "same" instance on each invocation
-     */
-    private Map<MethodKey, Object> returnValues = new HashMap<MethodKey, Object>();
+    protected DummyObjectFactory dummyObjectFactory;
+
+    /* Keeps track of what object we have returned, so that we return the "same" instance on each invocation */
+    protected Map<MethodKey, Object> returnValues = new HashMap<MethodKey, Object>();
+
+
+    public DummyValueReturningMockBehavior(DummyObjectFactory dummyObjectFactory) {
+        this.dummyObjectFactory = dummyObjectFactory;
+    }
+
 
     /**
      * Executes the mock behavior.
@@ -74,7 +80,7 @@ public class DummyValueReturningMockBehavior extends DefaultValueReturningMockBe
         }
 
         if (result == null && isDummyProof(returnType)) {
-            result = DummyObjectUtil.createDummy(returnType, new DummyValueReturningMockBehavior());
+            result = dummyObjectFactory.createDummy(returnType, new DummyValueReturningMockBehavior(dummyObjectFactory));
         }
         returnValues.put(key, result);
 
@@ -126,7 +132,7 @@ public class DummyValueReturningMockBehavior extends DefaultValueReturningMockBe
             }
             if (arguments.size() > 0) {
                 Iterator<Object> it2 = other.arguments.iterator();
-                for (Iterator<Object> it1 = arguments.iterator(); it1.hasNext();) {
+                for (Iterator<Object> it1 = arguments.iterator(); it1.hasNext(); ) {
                     Object object1 = it1.next();
                     Object object2 = it2.next();
                     if (object1 == null && object2 == null) {

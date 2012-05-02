@@ -19,22 +19,23 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hsqldb.Trigger;
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.database.annotations.TestDataSource;
+import org.unitilsnew.UnitilsJUnit4;
+
+import javax.sql.DataSource;
+import java.util.Properties;
+import java.util.Set;
+
+import static java.util.Arrays.asList;
+import static org.junit.Assert.*;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import static org.unitils.core.util.SQLTestUtils.*;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.getItemAsLong;
-import org.unitils.database.annotations.TestDataSource;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
-
-import javax.sql.DataSource;
-import static java.util.Arrays.asList;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * Tests for the db support class. Each type of database has to provide a subclass in which it sets-up the database

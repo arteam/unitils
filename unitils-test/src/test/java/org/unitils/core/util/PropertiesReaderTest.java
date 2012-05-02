@@ -15,16 +15,17 @@
  */
 package org.unitils.core.util;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.inject.annotation.TestedObject;
 import org.unitils.thirdparty.org.apache.commons.io.FileUtils;
+import org.unitilsnew.UnitilsJUnit4;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Fabian Krueger

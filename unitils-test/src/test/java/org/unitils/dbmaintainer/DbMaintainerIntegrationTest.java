@@ -15,35 +15,36 @@
  */
 package org.unitils.dbmaintainer;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
-import static org.unitils.core.util.SQLTestUtils.dropTestTables;
 import org.unitils.database.SQLUnitils;
 import org.unitils.database.annotations.TestDataSource;
-import static org.unitils.dbmaintainer.DBMaintainer.PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED;
-import static org.unitils.dbmaintainer.DBMaintainer.PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED;
-import static org.unitils.dbmaintainer.script.impl.DefaultScriptSource.PROPKEY_SCRIPT_LOCATIONS;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
-import static org.unitils.dbmaintainer.version.impl.DefaultExecutedScriptInfoSource.PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE;
 import org.unitils.thirdparty.org.apache.commons.io.FileUtils;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import org.unitils.util.PropertyUtils;
+import org.unitilsnew.UnitilsJUnit4;
 
 import javax.sql.DataSource;
 import java.io.*;
 import java.util.Properties;
 import java.util.Set;
+
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
+import static org.unitils.core.util.SQLTestUtils.dropTestTables;
+import static org.unitils.dbmaintainer.DBMaintainer.PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED;
+import static org.unitils.dbmaintainer.DBMaintainer.PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED;
+import static org.unitils.dbmaintainer.script.impl.DefaultScriptSource.PROPKEY_SCRIPT_LOCATIONS;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
+import static org.unitils.dbmaintainer.version.impl.DefaultExecutedScriptInfoSource.PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE;
 
 /**
  * @author Filip Neven
@@ -88,9 +89,9 @@ public class DbMaintainerIntegrationTest extends UnitilsJUnit4 {
         scriptsLocation2 = new File(System.getProperty("java.io.tmpdir") + "/dbmaintain-integrationtest/scripts2");
         scriptsLocation1 = new File(System.getProperty("java.io.tmpdir") + "/dbmaintain-integrationtest/scripts1");
 
-        logger.info("temp dir created as script location1 : " + scriptsLocation1);        
-        logger.info("temp dir created as script location2 : " + scriptsLocation2);        
-        
+        logger.info("temp dir created as script location1 : " + scriptsLocation1);
+        logger.info("temp dir created as script location2 : " + scriptsLocation2);
+
         configuration.put(PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE, "true");
         configuration.put(PROPKEY_SCRIPT_LOCATIONS, scriptsLocation1.getAbsolutePath());
         configuration.put(PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED, "false");

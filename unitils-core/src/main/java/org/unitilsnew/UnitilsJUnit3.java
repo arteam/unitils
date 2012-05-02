@@ -18,8 +18,7 @@ package org.unitilsnew;
 import junit.framework.TestCase;
 import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
-import org.unitilsnew.core.context.BootstrapContextFactory;
-import org.unitilsnew.core.context.Context;
+import org.unitilsnew.core.engine.Unitils;
 import org.unitilsnew.core.engine.UnitilsTestListener;
 
 import java.lang.reflect.Method;
@@ -32,12 +31,11 @@ import java.lang.reflect.Method;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
+// todo unit test
 public abstract class UnitilsJUnit3 extends TestCase {
 
     /* Keeps track of the test class for which tests are currently being executed. */
     protected static Class<?> currentTestClass;
-
-    protected UnitilsTestListener unitilsTestListener;
 
 
     /**
@@ -157,15 +155,6 @@ public abstract class UnitilsJUnit3 extends TestCase {
      * @return The unitils test listener
      */
     protected UnitilsTestListener getUnitilsTestListener() {
-        if (unitilsTestListener == null) {
-            unitilsTestListener = createUnitilsTestListener();
-        }
-        return unitilsTestListener;
-    }
-
-    protected UnitilsTestListener createUnitilsTestListener() {
-        BootstrapContextFactory bootstrapContextFactory = new BootstrapContextFactory();
-        Context context = bootstrapContextFactory.create();
-        return context.getInstanceOfType(UnitilsTestListener.class);
+        return Unitils.getUnitilsTestListener();
     }
 }

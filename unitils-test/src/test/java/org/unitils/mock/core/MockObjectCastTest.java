@@ -15,13 +15,14 @@
  */
 package org.unitils.mock.core;
 
-import static junit.framework.Assert.assertNotNull;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.PartialMock;
+import org.unitilsnew.UnitilsJUnit4;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static junit.framework.Assert.assertNotNull;
 
 /**
  * Tests the casting of mock objects (UNI-168 and UNI-169).

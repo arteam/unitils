@@ -18,11 +18,15 @@ package org.unitilsnew.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitilsnew.core.reflect.ClassWrapper;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
+import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyReflectionEquals;
 
 /**
  * @author Tim Ducheyne
@@ -32,8 +36,8 @@ public class TestInstanceGetTestFieldsTest {
     /* Tested object */
     private TestInstance testInstance;
 
-    private TestClass testClass;
-    private TestClass noFieldsTestClass;
+    private ClassWrapper classWrapper;
+    private ClassWrapper noFieldsClassWrapper;
     private Object testObject;
     private NoFieldsClass noFieldsTestObject;
 
@@ -50,8 +54,8 @@ public class TestInstanceGetTestFieldsTest {
         field1b = MyClass.class.getDeclaredField("field1");
         field3 = MyClass.class.getDeclaredField("field3");
 
-        testClass = new TestClass(MyClass.class);
-        noFieldsTestClass = new TestClass(NoFieldsClass.class);
+        classWrapper = new ClassWrapper(MyClass.class);
+        noFieldsClassWrapper = new ClassWrapper(NoFieldsClass.class);
         testObject = new MyClass();
         noFieldsTestObject = new NoFieldsClass();
     }
@@ -59,7 +63,7 @@ public class TestInstanceGetTestFieldsTest {
 
     @Test
     public void fields() {
-        testInstance = new TestInstance(testClass, testObject, null);
+        testInstance = new TestInstance(classWrapper, testObject, null);
 
         List<TestField> result = testInstance.getTestFields();
         assertEquals(4, result.size());
@@ -76,19 +80,27 @@ public class TestInstanceGetTestFieldsTest {
 
     @Test
     public void emptyWhenNoFields() {
-        testInstance = new TestInstance(noFieldsTestClass, noFieldsTestObject, null);
+        testInstance = new TestInstance(noFieldsClassWrapper, noFieldsTestObject, null);
 
         List<TestField> result = testInstance.getTestFields();
         assertTrue(result.isEmpty());
     }
 
-    @Test
-    public void testFieldsAreCached() {
-        testInstance = new TestInstance(testClass, testObject, null);
 
-        List<TestField> result1 = testInstance.getTestFields();
-        List<TestField> result2 = testInstance.getTestFields();
-        assertSame(result1, result2);
+    @Test
+    public void namedFields() {
+        testInstance = new TestInstance(classWrapper, testObject, null);
+
+        List<TestField> result = testInstance.getTestFields(asList("field1", "field2"));
+        assertPropertyReflectionEquals("fieldWrapper.wrappedField", asList(field1b, field2), result);
+    }
+
+    @Test
+    public void emptyWhenEmptyNames() {
+        testInstance = new TestInstance(classWrapper, testObject, null);
+
+        List<TestField> result = testInstance.getTestFields(Collections.<String>emptyList());
+        assertTrue(result.isEmpty());
     }
 
 

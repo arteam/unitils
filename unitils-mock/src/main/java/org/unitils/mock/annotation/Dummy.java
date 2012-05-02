@@ -17,6 +17,9 @@
  */
 package org.unitils.mock.annotation;
 
+import org.unitils.mock.listener.DummyFieldAnnotationListener;
+import org.unitilsnew.core.annotation.FieldAnnotation;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -47,6 +50,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
+@FieldAnnotation(DummyFieldAnnotationListener.class)
 public @interface Dummy {
 
 }

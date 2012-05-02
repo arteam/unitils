@@ -17,13 +17,14 @@ package org.unitils.core.util;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.NoOp;
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
 import org.unitils.mock.core.MockObject;
+import org.unitilsnew.UnitilsJUnit4;
 
 import java.util.Collection;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**

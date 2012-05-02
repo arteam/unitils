@@ -15,16 +15,17 @@
  */
 package org.unitils.dbunit.datasetfactory.impl;
 
-import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import static org.unitils.dbunit.datasetfactory.impl.DefaultDataSetResolver.PROPKEY_DATA_SET_PATH_PREFIX;
-import static org.unitils.dbunit.datasetfactory.impl.DefaultDataSetResolver.PROPKEY_PREFIX_WITH_PACKAGE_NAME;
+import org.unitilsnew.UnitilsJUnit4;
 
 import java.io.File;
 import java.util.Properties;
+
+import static org.junit.Assert.assertNotNull;
+import static org.unitils.dbunit.datasetfactory.impl.DefaultDataSetResolver.PROPKEY_DATA_SET_PATH_PREFIX;
+import static org.unitils.dbunit.datasetfactory.impl.DefaultDataSetResolver.PROPKEY_PREFIX_WITH_PACKAGE_NAME;
 
 /**
  * Tests the default data set resolver.

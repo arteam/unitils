@@ -2,8 +2,8 @@ package org.unitils.spring;
 
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
-import org.unitils.TracingTestListener;
 import org.unitils.spring.util.SpringUnitilsAdaptorTestExecutionListener;
+import org.unitilsnew.TracingTestListener;
 
 
 // todo javadoc
