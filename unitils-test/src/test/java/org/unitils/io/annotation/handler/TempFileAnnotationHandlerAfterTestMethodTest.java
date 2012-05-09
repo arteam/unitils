@@ -19,8 +19,10 @@ package org.unitils.io.annotation.handler;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
+import org.unitils.io.annotation.TempDir;
 import org.unitils.io.annotation.TempFile;
 import org.unitils.io.temp.TempService;
+import org.unitils.io.FieldAnnotationListenerTestableAdapter;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
@@ -38,25 +40,28 @@ import static org.junit.Assert.fail;
 public class TempFileAnnotationHandlerAfterTestMethodTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private TempFileAnnotationHandler tempFileAnnotationHandler;
+    private FieldAnnotationListenerTestableAdapter<TempDir> tempFileAnnotationHandler;
 
     private Mock<TempService> tempServiceMock;
+
     @Dummy
     private File testFile;
 
 
     @Before
     public void initialize() {
-        tempFileAnnotationHandler = new TempFileAnnotationHandler(tempServiceMock.getMock(), true);
-    }
 
+        TempFileAnnotationHandler sut = new TempFileAnnotationHandler(tempServiceMock.getMock(), true);
+        tempFileAnnotationHandler = new FieldAnnotationListenerTestableAdapter<TempDir>(sut);
+
+    }
 
     @Test
     public void cleanup() {
         TestClass testObject = new TestClass();
         testObject.tempFile = testFile;
 
-        tempFileAnnotationHandler.afterTestMethod(testObject, null, null);
+        tempFileAnnotationHandler.afterTestMethod(testObject, "testNothing", "tempFile", null, null);
 
         tempServiceMock.assertInvoked().deleteTempFileOrDir(testFile);
     }
@@ -66,17 +71,11 @@ public class TempFileAnnotationHandlerAfterTestMethodTest extends UnitilsJUnit4 
         TestClass testObject = new TestClass();
         testObject.tempFile = testFile;
 
-        tempFileAnnotationHandler = new TempFileAnnotationHandler(tempServiceMock.getMock(), false);
-        tempFileAnnotationHandler.afterTestMethod(testObject, null, null);
+        TempFileAnnotationHandler sut = new TempFileAnnotationHandler(tempServiceMock.getMock(), false);
+        tempFileAnnotationHandler = new FieldAnnotationListenerTestableAdapter<TempDir>(sut);
 
-        tempServiceMock.assertNotInvoked().deleteTempFileOrDir(null);
-    }
+        tempFileAnnotationHandler.afterTestMethod(testObject, "testNothing", "tempFile", null, null);
 
-    @Test
-    public void noAnnotations() {
-        NoAnnotationTestClass testObject = new NoAnnotationTestClass();
-
-        tempFileAnnotationHandler.afterTestMethod(testObject, null, null);
         tempServiceMock.assertNotInvoked().deleteTempFileOrDir(null);
     }
 
@@ -87,7 +86,7 @@ public class TempFileAnnotationHandlerAfterTestMethodTest extends UnitilsJUnit4 
         tempServiceMock.raises(exception).deleteTempFileOrDir(null);
 
         try {
-            tempFileAnnotationHandler.afterTestMethod(testObject, null, null);
+            tempFileAnnotationHandler.afterTestMethod(testObject, "testNothing", "tempFile", null, null);
             fail("UnitilsException expected");
 
         } catch (UnitilsException e) {
@@ -95,16 +94,16 @@ public class TempFileAnnotationHandlerAfterTestMethodTest extends UnitilsJUnit4 
         }
     }
 
-
+    @SuppressWarnings("all")
     private static class TestClass {
+
 
         @TempFile("tempFile.tmp")
         protected File tempFile;
-    }
 
-    private static class NoAnnotationTestClass {
-
-        protected File tempFile;
+        public void testNothing() {
+            //Do Nothing
+        }
     }
 
 }

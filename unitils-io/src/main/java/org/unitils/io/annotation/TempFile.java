@@ -16,6 +16,9 @@
 
 package org.unitils.io.annotation;
 
+import org.unitils.io.annotation.handler.TempFileAnnotationHandler;
+import org.unitilsnew.core.annotation.FieldAnnotation;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -43,6 +46,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
+@FieldAnnotation(value = TempFileAnnotationHandler.class)
 public @interface TempFile {
 
     /**

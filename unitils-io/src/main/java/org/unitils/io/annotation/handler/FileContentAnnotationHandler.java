@@ -16,18 +16,14 @@
 
 package org.unitils.io.annotation.handler;
 
-import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
 import org.unitils.io.annotation.FileContent;
 import org.unitils.io.filecontent.FileContentReader;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Set;
+import org.unitilsnew.core.FieldAnnotationListener;
+import org.unitilsnew.core.TestField;
+import org.unitilsnew.core.TestInstance;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.ReflectionUtils.setFieldValue;
 
 /**
  * Implements the behavior of the {@link FileContent} annotation.<br/>
@@ -38,7 +34,7 @@ import static org.unitils.util.ReflectionUtils.setFieldValue;
  * @author Thomas De Rycke
  * @since 3.3
  */
-public class FileContentAnnotationHandler extends TestListener {
+public class FileContentAnnotationHandler extends FieldAnnotationListener<FileContent> {
 
     /* The reader that will get the file content */
     private FileContentReader fileContentReader;
@@ -50,23 +46,19 @@ public class FileContentAnnotationHandler extends TestListener {
         this.fileContentReader = fileContentReader;
     }
 
-
     /**
-     * All fields that have an {@link FileContent} annotation will be handled before the setup of the test.
-     * This will convert the content of the requested file to the target type of the field and inject the
-     * result into the field.
+     * All fields that have an {@link FileContent} annotation will be handled before the setup of the test. This will convert the content of
+     * the requested file to the target type of the field and inject the result into the field.
      *
-     * @param testObject The test instance, not null
-     * @param testMethod The test method, not null
+     * @param testInstance The test instance, not null
+     * @param testField    The test method, not null
      */
-    @Override
-    public void beforeTestSetUp(Object testObject, Method testMethod) {
-        Set<Field> fieldsAnnotatedWithFileContent = getFieldsAnnotatedWith(testObject.getClass(), FileContent.class);
-        for (Field field : fieldsAnnotatedWithFileContent) {
-            readFileContentForField(testObject, field);
-        }
-    }
 
+
+    @Override
+    public void beforeTestSetUp(TestInstance testInstance, TestField testField, org.unitilsnew.core.reflect.Annotations<FileContent> annotations) {
+        readFileContentForField(testInstance, testField);
+    }
 
     /**
      * Does the actual content reading and injection for the given field.
@@ -74,17 +66,16 @@ public class FileContentAnnotationHandler extends TestListener {
      * @param testObject The test instance, not null
      * @param field      The field with the FileContent annotation, not null
      */
-    protected void readFileContentForField(Object testObject, Field field) {
+    protected void readFileContentForField(TestInstance testObject, TestField field) {
         FileContent fileContentAnnotation = field.getAnnotation(FileContent.class);
 
         String encoding = determineEncoding(fileContentAnnotation);
         String fileName = determineFileName(fileContentAnnotation);
-        Class<?> targetType = field.getType();
-        Class<?> testClass = testObject.getClass();
+        Class<?> targetType = field.getField().getType();
+        Class<?> testClass = testObject.getTestObject().getClass();
         try {
             Object result = fileContentReader.readFileContent(fileName, targetType, encoding, testClass);
-            setFieldValue(testObject, field, result);
-
+            field.setValue(result);
         } catch (Exception e) {
             throw new UnitilsException("Error reading file content for field " + field.getName(), e);
         }

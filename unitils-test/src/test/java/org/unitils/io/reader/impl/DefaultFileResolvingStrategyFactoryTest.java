@@ -16,15 +16,11 @@
 
 package org.unitils.io.reader.impl;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.unitils.core.UnitilsException;
+import org.unitils.io.reader.FileResolvingStrategyFactory;
 
-import java.util.Properties;
-
-import static org.junit.Assert.*;
-import static org.unitils.io.reader.impl.DefaultFileResolvingStrategyFactory.PATH_PREFIX_PROPERTY;
-import static org.unitils.io.reader.impl.DefaultFileResolvingStrategyFactory.PREFIX_WITH_PACKAGE_NAME_PROPERTY;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Tim Ducheyne
@@ -33,23 +29,13 @@ import static org.unitils.io.reader.impl.DefaultFileResolvingStrategyFactory.PRE
  */
 public class DefaultFileResolvingStrategyFactoryTest {
 
-    /* Tested object */
-    private DefaultFileResolvingStrategyFactory defaultFileResolvingStrategyFactory = new DefaultFileResolvingStrategyFactory();
 
-    private Properties properties;
-
-
-    @Before
-    public void initialize() {
-        properties = new Properties();
-        properties.setProperty(PATH_PREFIX_PROPERTY, "prefix");
-        properties.setProperty(PREFIX_WITH_PACKAGE_NAME_PROPERTY, "true");
-    }
-
-
+    //This test is failing for now --> as intended.
     @Test
     public void defaultSetup() {
-        DefaultFileResolvingStrategy fileResolvingStrategy = (DefaultFileResolvingStrategy) defaultFileResolvingStrategyFactory.createFileResolvingStrategy(properties);
+        FileResolvingStrategyFactory defaultFileResolvingStrategyFactory = new FileResolvingStrategyFactory("true", "prefix");
+        DefaultFileResolvingStrategy fileResolvingStrategy = (DefaultFileResolvingStrategy) defaultFileResolvingStrategyFactory.create();
+
 
         assertEquals("prefix", fileResolvingStrategy.fileResolver.getPathPrefix());
         assertTrue(fileResolvingStrategy.fileResolver.isPrefixWithPackageName());
@@ -57,35 +43,10 @@ public class DefaultFileResolvingStrategyFactoryTest {
 
     @Test
     public void emptyPathPrefix() {
-        properties.setProperty(PATH_PREFIX_PROPERTY, "");
+        FileResolvingStrategyFactory defaultFileResolvingStrategyFactory = new FileResolvingStrategyFactory("true", "");
 
-        DefaultFileResolvingStrategy fileResolvingStrategy = (DefaultFileResolvingStrategy) defaultFileResolvingStrategyFactory.createFileResolvingStrategy(properties);
-        assertNull(fileResolvingStrategy.fileResolver.getPathPrefix());
+        DefaultFileResolvingStrategy fileResolvingStrategy = (DefaultFileResolvingStrategy) defaultFileResolvingStrategyFactory.create();
+        assertEquals("", fileResolvingStrategy.fileResolver.getPathPrefix());
     }
 
-    @Test
-    public void noPathPrefix() {
-        properties.remove(PATH_PREFIX_PROPERTY);
-
-        DefaultFileResolvingStrategy fileResolvingStrategy = (DefaultFileResolvingStrategy) defaultFileResolvingStrategyFactory.createFileResolvingStrategy(properties);
-        assertNull(fileResolvingStrategy.fileResolver.getPathPrefix());
-    }
-
-    @Test(expected = UnitilsException.class)
-    public void noPrefixWithPackageName() {
-        properties.remove(PREFIX_WITH_PACKAGE_NAME_PROPERTY);
-        defaultFileResolvingStrategyFactory.createFileResolvingStrategy(properties);
-    }
-
-    @Test(expected = UnitilsException.class)
-    public void emptyPrefixWithPackageName() {
-        properties.setProperty(PREFIX_WITH_PACKAGE_NAME_PROPERTY, "");
-        defaultFileResolvingStrategyFactory.createFileResolvingStrategy(properties);
-    }
-
-    @Test(expected = UnitilsException.class)
-    public void invalidPrefixWithPackageName() {
-        properties.setProperty(PREFIX_WITH_PACKAGE_NAME_PROPERTY, "xxx");
-        defaultFileResolvingStrategyFactory.createFileResolvingStrategy(properties);
-    }
 }

@@ -140,7 +140,6 @@ public class MockObjectTest {
     @Test
     public void proxyArgumentsAndResult() {
         Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[]{Collection.class}, new InvocationHandler() {
-            @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 return null;
             }

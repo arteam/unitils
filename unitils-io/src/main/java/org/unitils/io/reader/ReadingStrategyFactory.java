@@ -16,14 +16,26 @@
 
 package org.unitils.io.reader;
 
-import java.util.Properties;
+import org.unitils.io.reader.impl.FileReadingStrategy;
+import org.unitilsnew.core.Factory;
 
 /**
  * @author Tim Ducheyne
  * @author Jeroen Horemans
  * @since 3.3
  */
-public interface ReadingStrategyFactory {
+public class ReadingStrategyFactory implements Factory<ReadingStrategy> {
 
-    ReadingStrategy createReadingStrategy(Properties configuration);
+
+    private FileResolvingStrategy fileResolvingStrategy;
+
+
+    public ReadingStrategyFactory(FileResolvingStrategy fileResolvingStrategy) {
+        this.fileResolvingStrategy = fileResolvingStrategy;
+    }
+
+
+    public ReadingStrategy create() {
+        return new FileReadingStrategy(fileResolvingStrategy);
+    }
 }

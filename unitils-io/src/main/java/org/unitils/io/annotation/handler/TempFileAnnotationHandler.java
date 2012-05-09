@@ -16,19 +16,18 @@
 
 package org.unitils.io.annotation.handler;
 
-import org.unitils.core.TestListener;
+import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
+import org.unitils.io.annotation.TempDir;
 import org.unitils.io.annotation.TempFile;
 import org.unitils.io.temp.TempService;
+import org.unitilsnew.core.FieldAnnotationListener;
+import org.unitilsnew.core.TestField;
+import org.unitilsnew.core.TestInstance;
+import org.unitilsnew.core.annotation.Property;
+import org.unitilsnew.core.reflect.Annotations;
 
 import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Set;
-
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.ReflectionUtils.getFieldValue;
-import static org.unitils.util.ReflectionUtils.setFieldValue;
 
 /**
  * Implements the behavior of the {@link TempFile} annotation.<br/>
@@ -39,57 +38,54 @@ import static org.unitils.util.ReflectionUtils.setFieldValue;
  * @author Thomas De Rycke
  * @since 3.3
  */
-public class TempFileAnnotationHandler extends TestListener {
+public class TempFileAnnotationHandler extends FieldAnnotationListener<TempDir> {
 
     /* True if the temp files should be deleted after the test */
     protected Boolean cleanupAfterTest;
+
     /* The file service that will create and delete the temp dirs */
     protected TempService tempService;
 
 
-    public TempFileAnnotationHandler(TempService tempService, boolean cleanupAfterTest) {
+    public TempFileAnnotationHandler(TempService tempService, @Property("IOModule.temp.cleanupAfterTest") Boolean cleanupAfterTest) {
         this.tempService = tempService;
         this.cleanupAfterTest = cleanupAfterTest;
     }
 
-
     @Override
-    public void beforeTestSetUp(Object testObject, Method testMethod) {
-        Set<Field> tmpFileFields = getFieldsAnnotatedWith(testObject.getClass(), TempFile.class);
-        for (Field field : tmpFileFields) {
-            createTempFileForField(testObject, testMethod, field);
-        }
+    public void beforeTestSetUp(TestInstance testInstance, TestField testField, Annotations<TempDir> tempDirAnnotations) {
+        createTempFileForField(testInstance, testField, tempDirAnnotations);
     }
 
+
     @Override
-    public void afterTestMethod(Object testObject, Method testMethod, Throwable t) {
+    public void afterTestMethod(TestInstance testInstance, TestField testField, Annotations<TempDir> tempDirAnnotations, Throwable testThrowable) {
         if (!cleanupAfterTest) {
             return;
         }
-        Set<Field> tmpFileFields = getFieldsAnnotatedWith(testObject.getClass(), TempFile.class);
-        for (Field field : tmpFileFields) {
-            deleteTempFileForField(testObject, field);
-        }
+        deleteTempFileForField(testInstance, testField);
+
     }
 
-    protected void createTempFileForField(Object testObject, Method testMethod, Field field) {
-        TempFile annotation = field.getAnnotation(TempFile.class);
-        String fileName = annotation.value();
-        if (fileName.isEmpty()) {
-            fileName = testObject.getClass().getName() + "-" + testMethod.getName() + ".tmp";
+    protected void createTempFileForField(TestInstance testObject, TestField field, Annotations<TempDir> annotation) {
+        // TODO check why this does not work, and the code underneath does
+        // String fileName = annotation.getFirstAnnotation().value();
+        String fileName = field.getAnnotation(TempFile.class).value();
+
+        if (StringUtils.isEmpty(fileName)) {
+            fileName = testObject.getTestObject().getClass().getName() + "-" + testObject.getTestMethod().getName() + ".tmp";
         }
         try {
             File tempFile = tempService.createTempFile(fileName);
-            setFieldValue(testObject, field, tempFile);
+            field.setValue(tempFile);
         } catch (Exception e) {
             throw new UnitilsException("Error creating temp file for field " + field.getName(), e);
         }
     }
 
-    protected void deleteTempFileForField(Object testObject, Field field) {
+    protected void deleteTempFileForField(Object testObject, TestField field) {
         try {
-            File tempFile = getFieldValue(testObject, field);
-            tempService.deleteTempFileOrDir(tempFile);
+            tempService.deleteTempFileOrDir((File) field.getValue());
         } catch (Exception e) {
             throw new UnitilsException("Error deleting temp file for field " + field.getName(), e);
         }

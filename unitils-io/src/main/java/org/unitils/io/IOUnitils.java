@@ -16,7 +16,9 @@
 
 package org.unitils.io;
 
-import org.unitils.core.Unitils;
+import org.unitils.io.filecontent.FileContentReader;
+import org.unitils.io.temp.TempService;
+import org.unitilsnew.core.engine.Unitils;
 
 import java.io.File;
 
@@ -26,17 +28,28 @@ import java.io.File;
  * @author Thomas De Rycke
  * @since 3.3
  */
-public class IOUnitils {
+public abstract class IOUnitils {
+
+    protected static FileContentReader fileContentReader = Unitils.getInstanceOfType(FileContentReader.class);
+
+    protected static TempService tempService = Unitils.getInstanceOfType(TempService.class);
 
     /**
-     * Loads the content of 'test-class'.'target-type-default-extension' and converts it to the given target type using the default encoding.
-     * e.g.
-     * <pre><code>
+     * Loads the content of 'test-class'.'target-type-default-extension' and converts it to the given target type using the default
+     * encoding. e.g.
+     * <p/>
+     * <pre>
+     * <code>
      * String result1 = readFileContent(String.class, this);
      * Properties result2 = readFileContent(Properties.class, this);
-     * </code></pre>
-     * If this is an instance of MyTest, this will read-in file name  org/myPackage/MyTest.txt  (txt is the default extension for the String converter) and return the result as a string.<p/>
-     * The second line will read-in file name org/myPackage/MyTest.properties  (properties is the default extension of the Properties converter) and return the result as a Properties instance.
+     * </code>
+     * </pre>
+     * <p/>
+     * If this is an instance of MyTest, this will read-in file name org/myPackage/MyTest.txt (txt is the default extension for the String
+     * converter) and return the result as a string.
+     * <p/>
+     * The second line will read-in file name org/myPackage/MyTest.properties (properties is the default extension of the Properties
+     * converter) and return the result as a Properties instance.
      * <p/>
      * See {@link org.unitils.io.annotation.FileContent} for more information on how the file is resolved.
      *
@@ -65,14 +78,18 @@ public class IOUnitils {
 
 
     /**
-     * Loads the content of the file with the given name and converts it to the given target type using the default encoding.
-     * e.g.
-     * <pre><code>
+     * Loads the content of the file with the given name and converts it to the given target type using the default encoding. e.g.
+     * <p/>
+     * <pre>
+     * <code>
      * String result1 = readFileContent("myFile.csv", String.class, this);
      * Properties result2 = readFileContent("/myFile.map", Properties.class, this);
-     * </code></pre>
-     * If this is an instance of MyTest, this will read-in file name  org/myPackage/myFile.csv  and return the result as a string.<p/>
-     * The second line will read-in file name myFile.properties  and return the result as a Properties instance.
+     * </code>
+     * </pre>
+     * <p/>
+     * If this is an instance of MyTest, this will read-in file name org/myPackage/myFile.csv and return the result as a string.
+     * <p/>
+     * The second line will read-in file name myFile.properties and return the result as a Properties instance.
      * <p/>
      * See {@link org.unitils.io.annotation.FileContent} for more information on how the file is resolved.
      *
@@ -98,42 +115,42 @@ public class IOUnitils {
      */
     public static <T> T readFileContent(String fileName, Class<T> targetType, String encoding, Object testInstance) {
         Class<?> testClass = testInstance.getClass();
-        return getIOModule().readFileContent(fileName, targetType, encoding, testClass);
+        return fileContentReader.readFileContent(fileName, targetType, encoding, testClass);
     }
 
     /**
-     * Creates a temporary file with the given name. The parent directory for this file can be
-     * specified by setting the {@link org.unitils.io.temp.impl.DefaultTempServiceFactory#ROOT_TEMP_DIR} property.
-     * If no root temp dir is specified the default user temp dir will be used.
+     * Creates a temporary file with the given name. The parent directory for this file can be specified by setting the
+     * {@link org.unitils.io.temp.impl.DefaultTempServiceFactory#ROOT_TEMP_DIR} property. If no root temp dir is specified the default user
+     * temp dir will be used.
      * <p/>
      * Watch out: if the file already exists, it will first be deleted.
      * <p/>
-     * The file will not be removed after the test. You can use {@link #deleteTempFileOrDir(java.io.File)}, if you want
-     * to perform cleanup after the test.
+     * The file will not be removed after the test. You can use {@link #deleteTempFileOrDir(java.io.File)}, if you want to perform cleanup
+     * after the test.
      *
      * @param fileName The name of the temp file, not null
      * @return The temp file, not null
      */
     public static File createTempFile(String fileName) {
-        return getIOModule().createTempFile(fileName);
+        return tempService.createTempFile(fileName);
     }
 
     /**
-     * Creates a temporary directory with the given name. The parent directory for this directory can be
-     * specified by setting the {@link org.unitils.io.temp.impl.DefaultTempServiceFactory#ROOT_TEMP_DIR} property.
-     * If no root temp dir is specified the default user temp dir will be used.
+     * Creates a temporary directory with the given name. The parent directory for this directory can be specified by setting the
+     * {@link org.unitils.io.temp.impl.DefaultTempServiceFactory#ROOT_TEMP_DIR} property. If no root temp dir is specified the default user
+     * temp dir will be used.
      * <p/>
-     * Watch out: if the directory already exists, it will first be deleted. If the directory was not empty,
-     * all files in the directory will be deleted.
+     * Watch out: if the directory already exists, it will first be deleted. If the directory was not empty, all files in the directory will
+     * be deleted.
      * <p/>
-     * The directory will not be removed after the test. You can use {@link #deleteTempFileOrDir(java.io.File)}, if
-     * you want to perform cleanup after the test.
+     * The directory will not be removed after the test. You can use {@link #deleteTempFileOrDir(java.io.File)}, if you want to perform
+     * cleanup after the test.
      *
      * @param dirName The name of the temp dir, not null
      * @return The temp dir, not null
      */
     public static File createTempDir(String dirName) {
-        return getIOModule().createTempDir(dirName);
+        return tempService.createTempDir(dirName);
     }
 
     /**
@@ -146,11 +163,6 @@ public class IOUnitils {
      * @param fileOrDir The file or directory to delete, can be null
      */
     public static void deleteTempFileOrDir(File fileOrDir) {
-        getIOModule().deleteTempFileOrDir(fileOrDir);
-    }
-
-
-    private static IOModule getIOModule() {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(IOModule.class);
+        tempService.deleteTempFileOrDir(fileOrDir);
     }
 }

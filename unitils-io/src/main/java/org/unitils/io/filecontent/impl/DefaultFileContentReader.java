@@ -54,6 +54,7 @@ public class DefaultFileContentReader implements FileContentReader {
         }
         InputStream inputStream = null;
         try {
+
             if (isBlank(fileName)) {
                 inputStream = readingStrategy.getDefaultInputStream(conversionStrategy.getDefaultFileExtension(), testClass);
             } else {
@@ -70,7 +71,7 @@ public class DefaultFileContentReader implements FileContentReader {
 
 
     protected ConversionStrategy<?> determineConversionStrategy(Class<?> targetType) {
-        for (ConversionStrategy conversionStrategy : conversionStrategies) {
+        for (ConversionStrategy<?> conversionStrategy : conversionStrategies) {
             if (conversionStrategy.getTargetType().isAssignableFrom(targetType)) {
                 return conversionStrategy;
             }
