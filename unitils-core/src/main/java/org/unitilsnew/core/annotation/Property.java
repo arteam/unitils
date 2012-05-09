@@ -31,4 +31,6 @@ public @interface Property {
 
     String value();
 
+    boolean optional() default false;
+
 }
