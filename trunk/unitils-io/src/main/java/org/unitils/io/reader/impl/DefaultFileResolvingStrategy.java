@@ -28,6 +28,7 @@ import java.net.URI;
  */
 public class DefaultFileResolvingStrategy implements FileResolvingStrategy {
 
+
     protected FileResolver fileResolver;
 
 

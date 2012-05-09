@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.unitils.core.UnitilsException;
 import org.unitils.io.annotation.FileContent;
 import org.unitils.io.filecontent.FileContentReader;
+import org.unitils.io.FieldAnnotationListenerTestableAdapter;
 import org.unitils.mock.Mock;
 import org.unitilsnew.UnitilsJUnit4;
 
@@ -36,16 +37,17 @@ import static org.unitils.mock.ArgumentMatchers.isNull;
  */
 public class FileContentAnnotationHandlerTest extends UnitilsJUnit4 {
 
-    /* Tested object */
-    private FileContentAnnotationHandler fileContentAnnotationHandler;
-
     private Mock<FileContentReader> fileContentReaderMock;
+
+    private FieldAnnotationListenerTestableAdapter<FileContent> fileContentAnnotationHandlerWrapper;
+
     private Properties testProperties = new Properties();
 
 
     @Before
     public void initialize() {
-        fileContentAnnotationHandler = new FileContentAnnotationHandler(fileContentReaderMock.getMock());
+        FileContentAnnotationHandler fileContentAnnotationHandler = new FileContentAnnotationHandler(fileContentReaderMock.getMock());
+        fileContentAnnotationHandlerWrapper = new FieldAnnotationListenerTestableAdapter<FileContent>(fileContentAnnotationHandler);
     }
 
 
@@ -54,44 +56,43 @@ public class FileContentAnnotationHandlerTest extends UnitilsJUnit4 {
         DefaultValuesTestClass testObject = new DefaultValuesTestClass();
         fileContentReaderMock.returns(testProperties).readFileContent(isNull(String.class), Properties.class, isNull(String.class), DefaultValuesTestClass.class);
 
-        fileContentAnnotationHandler.beforeTestSetUp(testObject, null);
+
+        fileContentAnnotationHandlerWrapper.beforeTestSetUp(testObject, "runThis", "properties", null);
         assertSame(testProperties, testObject.properties);
     }
 
     @Test
     public void fileNameSpecified() {
         FileNameSpecifiedTestClass testObject = new FileNameSpecifiedTestClass();
+
+        fileContentReaderMock.returns(testProperties).readFileContent(isNull(String.class), Properties.class, isNull(String.class), DefaultValuesTestClass.class);
         fileContentReaderMock.returns(testProperties).readFileContent("fileName", Properties.class, isNull(String.class), FileNameSpecifiedTestClass.class);
 
-        fileContentAnnotationHandler.beforeTestSetUp(testObject, null);
+        fileContentAnnotationHandlerWrapper.beforeTestSetUp(testObject, "runThis", "properties", null);
         assertSame(testProperties, testObject.properties);
     }
 
     @Test
     public void encodingSpecified() {
         EncodingSpecifiedTestClass testObject = new EncodingSpecifiedTestClass();
+
+        fileContentReaderMock.returns(testProperties).readFileContent(isNull(String.class), Properties.class, isNull(String.class), DefaultValuesTestClass.class);
         fileContentReaderMock.returns(testProperties).readFileContent(isNull(String.class), Properties.class, "encoding", EncodingSpecifiedTestClass.class);
 
-        fileContentAnnotationHandler.beforeTestSetUp(testObject, null);
+        fileContentAnnotationHandlerWrapper.beforeTestSetUp(testObject, "testThis", "properties", null);
         assertSame(testProperties, testObject.properties);
-    }
-
-    @Test
-    public void noAnnotations() {
-        NoAnnotationTestClass testObject = new NoAnnotationTestClass();
-
-        fileContentAnnotationHandler.beforeTestSetUp(testObject, null);
-        fileContentReaderMock.assertNotInvoked().readFileContent(isNull(String.class), Properties.class, isNull(String.class), NoAnnotationTestClass.class);
     }
 
     @Test
     public void exception() {
         NullPointerException exception = new NullPointerException();
         DefaultValuesTestClass testObject = new DefaultValuesTestClass();
+
+        //fileContentReaderMock.returns(testProperties).readFileContent(isNull(String.class), Properties.class, isNull(String.class), DefaultValuesTestClass.class);
         fileContentReaderMock.raises(exception).readFileContent(null, Properties.class, null, DefaultValuesTestClass.class);
 
         try {
-            fileContentAnnotationHandler.beforeTestSetUp(testObject, null);
+            fileContentAnnotationHandlerWrapper.beforeTestSetUp(testObject, "testThis", "properties", null);
             fail("UnitilsException expected");
 
         } catch (UnitilsException e) {
@@ -101,26 +102,43 @@ public class FileContentAnnotationHandlerTest extends UnitilsJUnit4 {
     }
 
 
-    private static class DefaultValuesTestClass {
+    public static class DefaultValuesTestClass {
 
         @FileContent
         protected Properties properties;
+
+        public void runThis() {
+            // empty
+        }
     }
 
-    private static class FileNameSpecifiedTestClass {
+    public static class FileNameSpecifiedTestClass {
 
         @FileContent("fileName")
         protected Properties properties;
+
+        public void runThis() {
+            // empty
+        }
     }
 
-    private static class EncodingSpecifiedTestClass {
+    public static class EncodingSpecifiedTestClass {
 
         @FileContent(encoding = "encoding")
         protected Properties properties;
+
+        public void runThis() {
+            // empty
+        }
     }
 
-    private static class NoAnnotationTestClass {
+    public static class NoAnnotationTestClass {
 
         protected Properties properties;
+
+        public void runThis() {
+            // empty
+        }
     }
+
 }

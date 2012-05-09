@@ -30,7 +30,6 @@ import static org.unitils.io.IOUnitils.readFileContent;
  */
 public class IOUnitilsReadFileContentTest {
 
-
     @Test
     public void defaultFileNameWithStringContent() {
         String stringContent = readFileContent(String.class, this);

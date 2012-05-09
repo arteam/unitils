@@ -20,6 +20,8 @@ package org.unitils.io.annotation.handler;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
+import org.unitils.io.FieldAnnotationListenerTestableAdapter;
+import org.unitils.io.annotation.TempDir;
 import org.unitils.io.annotation.TempFile;
 import org.unitils.io.temp.TempService;
 import org.unitils.mock.Mock;
@@ -30,7 +32,6 @@ import java.io.File;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
-import static org.unitils.util.ReflectionUtils.getMethod;
 
 /**
  * @author Tim Ducheyne
@@ -40,7 +41,7 @@ import static org.unitils.util.ReflectionUtils.getMethod;
 public class TempFileAnnotationHandlerBeforeTestSetUpTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private TempFileAnnotationHandler tempFileAnnotationHandler;
+    private FieldAnnotationListenerTestableAdapter<TempDir> tempFileAnnotationHandler;
 
     private Mock<TempService> tempServiceMock;
     @Dummy
@@ -49,7 +50,8 @@ public class TempFileAnnotationHandlerBeforeTestSetUpTest extends UnitilsJUnit4 
 
     @Before
     public void initialize() {
-        tempFileAnnotationHandler = new TempFileAnnotationHandler(tempServiceMock.getMock(), false);
+        TempFileAnnotationHandler sut = new TempFileAnnotationHandler(tempServiceMock.getMock(), false);
+        tempFileAnnotationHandler = new FieldAnnotationListenerTestableAdapter<TempDir>(sut);
     }
 
 
@@ -58,7 +60,7 @@ public class TempFileAnnotationHandlerBeforeTestSetUpTest extends UnitilsJUnit4 
         DefaultValuesTestClass testObject = new DefaultValuesTestClass();
         tempServiceMock.returns(testFile).createTempFile(DefaultValuesTestClass.class.getName() + "-defaultValues.tmp");
 
-        tempFileAnnotationHandler.beforeTestSetUp(testObject, getMethod(getClass(), "defaultValues", false));
+        tempFileAnnotationHandler.beforeTestSetUp(testObject, "defaultValues", "tempFile", null);
         assertSame(testFile, testObject.tempFile);
     }
 
@@ -67,17 +69,10 @@ public class TempFileAnnotationHandlerBeforeTestSetUpTest extends UnitilsJUnit4 
         FileNameSpecifiedTestClass testObject = new FileNameSpecifiedTestClass();
         tempServiceMock.returns(testFile).createTempFile("tempFile.tmp");
 
-        tempFileAnnotationHandler.beforeTestSetUp(testObject, null);
+        tempFileAnnotationHandler.beforeTestSetUp(testObject, "doNothing", "tempFile", null);
         assertSame(testFile, testObject.tempFile);
     }
 
-    @Test
-    public void noAnnotations() {
-        NoAnnotationTestClass testObject = new NoAnnotationTestClass();
-
-        tempFileAnnotationHandler.beforeTestSetUp(testObject, null);
-        tempServiceMock.assertNotInvoked().createTempFile(null);
-    }
 
     @Test
     public void exception() {
@@ -86,7 +81,7 @@ public class TempFileAnnotationHandlerBeforeTestSetUpTest extends UnitilsJUnit4 
         tempServiceMock.raises(exception).createTempFile(null);
 
         try {
-            tempFileAnnotationHandler.beforeTestSetUp(testObject, null);
+            tempFileAnnotationHandler.beforeTestSetUp(testObject, "doNothing", "tempFile", null);
             fail("UnitilsException expected");
 
         } catch (UnitilsException e) {
@@ -101,30 +96,41 @@ public class TempFileAnnotationHandlerBeforeTestSetUpTest extends UnitilsJUnit4 
         InvalidTargetTestClass testObject = new InvalidTargetTestClass();
         tempServiceMock.returns(testFile).createTempFile("tempFile.tmp");
 
-        tempFileAnnotationHandler.beforeTestSetUp(testObject, null);
+        tempFileAnnotationHandler.beforeTestSetUp(testObject, "doNothing", "properties", null);
     }
 
 
-    private static class DefaultValuesTestClass {
+    protected static class DefaultValuesTestClass {
 
         @TempFile
         protected File tempFile;
+
+        public void doNothing() {
+            //Do Nothing
+        }
+
+        public void defaultValues() {
+            //Do Nothing
+        }
     }
 
-    private static class FileNameSpecifiedTestClass {
+    protected static class FileNameSpecifiedTestClass {
 
         @TempFile("tempFile.tmp")
         protected File tempFile;
+
+        public void doNothing() {
+            //Do Nothing
+        }
     }
 
-    private static class NoAnnotationTestClass {
-
-        protected File tempFile;
-    }
-
-    private static class InvalidTargetTestClass {
+    protected static class InvalidTargetTestClass {
 
         @TempFile("tempFile.tmp")
         protected Properties properties;
+
+        public void doNothing() {
+            //Do Nothing
+        }
     }
 }

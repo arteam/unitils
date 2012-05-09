@@ -16,15 +16,73 @@
 
 package org.unitils.io.filecontent;
 
-import java.util.Properties;
+import org.unitils.io.conversion.ConversionStrategy;
+import org.unitils.io.filecontent.impl.DefaultFileContentReader;
+import org.unitils.io.reader.ReadingStrategy;
+import org.unitilsnew.core.Factory;
+import org.unitilsnew.core.annotation.Property;
+import org.unitilsnew.core.config.Configuration;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
 /**
  * @author Tim Ducheyne
  * @author Jeroen Horemans
  * @since 3.3
  */
-public interface FileContentReaderFactory {
+public class FileContentReaderFactory implements Factory<FileContentReader> {
 
-    FileContentReader createFileContentReader(Properties configuration);
+    public static final String DEFAULT_CONVERSION_STRATEGY_KEY = "IOModule.conversion.default";
 
+    public static final String CUSTOM_CONVERSION_STRATEGY_KEY = "IOModule.conversion.custom";
+
+    public static final String DEFAULT_FILE_ENCODING = "IOModule.encoding.default";
+
+
+    protected List<ConversionStrategy<?>> conversionStrategies;
+
+    protected String defaultEncoding;
+
+    protected ReadingStrategy readingStrategy;
+
+    protected Configuration config;
+
+    public FileContentReaderFactory(Configuration config, @Property(DEFAULT_FILE_ENCODING) String defaultEncoding, ReadingStrategy readingStrategy) {
+        this.config = config;
+        this.defaultEncoding = defaultEncoding;
+        this.readingStrategy = readingStrategy;
+    }
+
+    public FileContentReader create() {
+        conversionStrategies = createConversionStrategies(config);
+
+
+        return new DefaultFileContentReader(readingStrategy, conversionStrategies, defaultEncoding);
+
+    }
+
+
+    protected List<ConversionStrategy<?>> createConversionStrategies(Configuration configuration) {
+        List<ConversionStrategy<?>> conversionStrategies = new LinkedList<ConversionStrategy<?>>();
+        conversionStrategies.addAll(createConversionStrategies(configuration.getOptionalStringList(CUSTOM_CONVERSION_STRATEGY_KEY)));
+        conversionStrategies.addAll(createConversionStrategies(configuration.getStringList(DEFAULT_CONVERSION_STRATEGY_KEY)));
+        return conversionStrategies;
+    }
+
+    protected List<ConversionStrategy<?>> createConversionStrategies(List<String> conversionStrategyClassNames) {
+        if (conversionStrategyClassNames == null || conversionStrategyClassNames.isEmpty()) {
+            return new LinkedList<ConversionStrategy<?>>();
+        }
+        List<ConversionStrategy<?>> conversionStrategies = new ArrayList<ConversionStrategy<?>>(conversionStrategyClassNames.size());
+
+        for (String conversionStrategyClassName : conversionStrategyClassNames) {
+            ConversionStrategy<?> conversionStrategy = createInstanceOfType(conversionStrategyClassName, false);
+            conversionStrategies.add(conversionStrategy);
+        }
+        return conversionStrategies;
+    }
 }

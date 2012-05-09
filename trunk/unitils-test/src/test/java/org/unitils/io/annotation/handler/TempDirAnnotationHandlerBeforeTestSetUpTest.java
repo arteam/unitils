@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.unitils.core.UnitilsException;
 import org.unitils.io.annotation.TempDir;
 import org.unitils.io.temp.TempService;
+import org.unitils.io.FieldAnnotationListenerTestableAdapter;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
@@ -29,7 +30,6 @@ import java.io.File;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
-import static org.unitils.util.ReflectionUtils.getMethod;
 
 /**
  * @author Tim Ducheyne
@@ -38,45 +38,44 @@ import static org.unitils.util.ReflectionUtils.getMethod;
  */
 public class TempDirAnnotationHandlerBeforeTestSetUpTest extends UnitilsJUnit4 {
 
-    /* Tested object */
-    private TempDirAnnotationHandler tempDirAnnotationHandler;
+
+    private FieldAnnotationListenerTestableAdapter<TempDir> tempDirAnnotationHandler;
 
     private Mock<TempService> tempServiceMock;
+
     @Dummy
     private File testDir;
 
 
     @Before
     public void initialize() {
-        tempDirAnnotationHandler = new TempDirAnnotationHandler(tempServiceMock.getMock(), false);
+        TempDirAnnotationHandler handler = new TempDirAnnotationHandler(tempServiceMock.getMock(), false);
+        tempDirAnnotationHandler = new FieldAnnotationListenerTestableAdapter<TempDir>(handler);
     }
 
 
     @Test
     public void defaultValues() {
         DefaultValuesTestClass testObject = new DefaultValuesTestClass();
-        tempServiceMock.returns(testDir).createTempDir(DefaultValuesTestClass.class.getName() + "-defaultValues");
+        tempServiceMock.returns(testDir).createTempDir(DefaultValuesTestClass.class.getName() + "-doNothing");
 
-        tempDirAnnotationHandler.beforeTestSetUp(testObject, getMethod(getClass(), "defaultValues", false));
+        tempDirAnnotationHandler.beforeTestSetUp(testObject, "doNothing", "tempDir", null);
+
+        tempServiceMock.assertInvoked();
         assertSame(testDir, testObject.tempDir);
     }
+
 
     @Test
     public void fileNameSpecified() {
         FileNameSpecifiedTestClass testObject = new FileNameSpecifiedTestClass();
         tempServiceMock.returns(testDir).createTempDir("tempDir");
 
-        tempDirAnnotationHandler.beforeTestSetUp(testObject, null);
+        tempDirAnnotationHandler.beforeTestSetUp(testObject, "doNothing", "tempDir", null);
+
         assertSame(testDir, testObject.tempDir);
     }
 
-    @Test
-    public void noAnnotations() {
-        NoAnnotationTestClass testObject = new NoAnnotationTestClass();
-
-        tempDirAnnotationHandler.beforeTestSetUp(testObject, null);
-        tempServiceMock.assertNotInvoked().createTempDir(null);
-    }
 
     @Test
     public void exception() {
@@ -85,7 +84,8 @@ public class TempDirAnnotationHandlerBeforeTestSetUpTest extends UnitilsJUnit4 {
         tempServiceMock.raises(exception).createTempDir(null);
 
         try {
-            tempDirAnnotationHandler.beforeTestSetUp(testObject, null);
+            tempDirAnnotationHandler.beforeTestSetUp(testObject, "doNothing", "tempDir", null);
+
             fail("UnitilsException expected");
 
         } catch (UnitilsException e) {
@@ -100,30 +100,39 @@ public class TempDirAnnotationHandlerBeforeTestSetUpTest extends UnitilsJUnit4 {
         InvalidTargetTestClass testObject = new InvalidTargetTestClass();
         tempServiceMock.returns(testDir).createTempDir("tempDir");
 
-        tempDirAnnotationHandler.beforeTestSetUp(testObject, null);
+        tempDirAnnotationHandler.beforeTestSetUp(testObject, "doNothing", "properties", null);
+
     }
 
 
-    private static class DefaultValuesTestClass {
+    protected static class DefaultValuesTestClass {
 
         @TempDir
         protected File tempDir;
+
+        public void doNothing() {
+            // Do Nothing
+        }
     }
 
-    private static class FileNameSpecifiedTestClass {
+    protected static class FileNameSpecifiedTestClass {
 
         @TempDir("tempDir")
         protected File tempDir;
+
+        public void doNothing() {
+            // Do Nothing
+        }
     }
 
-    private static class NoAnnotationTestClass {
-
-        protected File tempDir;
-    }
-
-    private static class InvalidTargetTestClass {
+    protected static class InvalidTargetTestClass {
 
         @TempDir("tempDir")
         protected Properties properties;
+
+        public void doNothing() {
+            // Do Nothing
+        }
+
     }
 }

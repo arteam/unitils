@@ -16,14 +16,37 @@
 
 package org.unitils.io.reader;
 
-import java.util.Properties;
+import org.unitils.core.util.FileResolver;
+import org.unitils.io.reader.impl.DefaultFileResolvingStrategy;
+import org.unitilsnew.core.Factory;
+import org.unitilsnew.core.annotation.Property;
 
 /**
  * @author Tim Ducheyne
  * @author Jeroen Horemans
  * @since 3.3
  */
-public interface FileResolvingStrategyFactory {
+public class FileResolvingStrategyFactory implements Factory<FileResolvingStrategy> {
 
-    FileResolvingStrategy createFileResolvingStrategy(Properties configuration);
+    /* Property key for the path prefix */
+    public static final String PREFIX_WITH_PACKAGE_NAME_PROPERTY = "IOModule.file.prefixWithPackageName";
+
+    /* Property key for the path prefix */
+    public static final String PATH_PREFIX_PROPERTY = "IOModule.file.pathPrefix";
+
+    protected Boolean prefixWithPackageName;
+
+    protected String pathPrefix;
+
+
+    public FileResolvingStrategyFactory(@Property(PREFIX_WITH_PACKAGE_NAME_PROPERTY) String prefixWithPackageName, @Property(value=PATH_PREFIX_PROPERTY, optional = true) String pathPrefix) {
+        this.prefixWithPackageName = Boolean.valueOf(prefixWithPackageName);
+        this.pathPrefix = pathPrefix;
+    }
+
+
+    public FileResolvingStrategy create() {
+        FileResolver fileResolver = new FileResolver(prefixWithPackageName, pathPrefix);
+        return new DefaultFileResolvingStrategy(fileResolver);
+    }
 }

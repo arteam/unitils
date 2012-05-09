@@ -16,6 +16,9 @@
 
 package org.unitils.io.annotation;
 
+import org.unitils.io.annotation.handler.FileContentAnnotationHandler;
+import org.unitilsnew.core.annotation.FieldAnnotation;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -56,7 +59,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Example usage:
  * <pre><code>
  * public class MyTestClass extends UnitilsJUnit4 {
- *
+ * <p/>
  * '    @FileContent
  *      private String field1;
  * '    @FileContent("/someFile.properties")
@@ -78,6 +81,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
+@FieldAnnotation(FileContentAnnotationHandler.class)
 public @interface FileContent {
 
     /**

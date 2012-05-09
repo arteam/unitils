@@ -15,6 +15,7 @@
  */
 package org.unitils.core.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
 
 import java.io.File;
@@ -100,14 +101,14 @@ public class FileResolver {
      * @return The file, not null
      */
     public URI resolveFileName(String fileName, Class<?> testClass) {
-        // construct file name
+        // construct file name 
         String fullFileName = constructFullFileName(fileName, testClass);
 
         // if name starts with / treat it as absolute path
         if (fullFileName.startsWith("/")) {
             File file = new File(fullFileName);
             if (!file.exists()) {
-                throw new UnitilsException("File with name " + fullFileName + " cannot be found.");
+                throw new UnitilsException("File with name " + file.getAbsolutePath() + " cannot be found.");
             }
             return file.toURI();
         }
@@ -149,7 +150,7 @@ public class FileResolver {
             fileName = fileName.substring(1);
         }
         // add configured prefix
-        if (pathPrefix != null) {
+        if (!StringUtils.isEmpty(pathPrefix)) {
             fileName = pathPrefix + '/' + fileName;
         }
         return fileName;
