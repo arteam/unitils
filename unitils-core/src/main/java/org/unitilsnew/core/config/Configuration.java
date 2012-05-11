@@ -79,6 +79,14 @@ public class Configuration {
         this.overridingProperties = overridingProperties;
     }
 
+    // todo unit test
+    public Properties getAllProperties() {
+        Properties result = new Properties();
+        result.putAll(properties);
+        result.putAll(overridingProperties);
+        return result;
+    }
+
 
     /**
      * Gets the string value for the property with the given name. If no such property is found or
@@ -110,6 +118,9 @@ public class Configuration {
         if (classifiers != null && classifiers.length > 0) {
             StringBuilder propertyNameWithClassifiers = new StringBuilder(propertyName);
             for (String classifier : classifiers) {
+                if (classifier == null) {
+                    continue;
+                }
                 propertyNameWithClassifiers.append('.');
                 propertyNameWithClassifiers.append(classifier.trim());
 

@@ -88,10 +88,10 @@ public class WrapperForFieldAnnotationListener<A extends Annotation> extends Tes
         message.append(annotations.getType().getSimpleName());
         message.append(" on field '");
         message.append(testField.getName());
-        message.append("'");
+        message.append("'.");
         String exceptionMessage = e.getMessage();
         if (!isBlank(exceptionMessage)) {
-            message.append(":\n");
+            message.append(" Reason:\n");
             message.append(exceptionMessage);
         }
         return message.toString();

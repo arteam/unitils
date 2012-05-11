@@ -18,6 +18,18 @@
             <version>${pom.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.dbmaintain</groupId>
+            <artifactId>dbmaintain</artifactId>
+            <version>2.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>ant</groupId>
+                    <artifactId>ant</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- todo remove -->
+        <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-dbmaintainer</artifactId>
             <version>${pom.version}</version>
@@ -25,6 +37,7 @@
         <dependency>
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
+            <!-- todo upgrade -->
             <version>1.2.2</version>
             <scope>compile</scope>
             <exclusions>  <!-- not needed dependencies -->
