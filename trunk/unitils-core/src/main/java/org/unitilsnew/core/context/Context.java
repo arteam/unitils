@@ -33,6 +33,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
+
 /**
  * @author Tim Ducheyne
  */
@@ -83,7 +85,11 @@ public class Context {
                 logger.debug("Created instance for type " + key + ": " + instance.getClass().getName());
 
             } catch (Exception e) {
-                throw new UnitilsException("Unable to create instance for type " + key + "\n" + e.getMessage(), e);
+                String reason = "";
+                if (!isBlank(e.getMessage())) {
+                    reason = " Reason:\n" + e.getMessage();
+                }
+                throw new UnitilsException("Unable to create instance for type " + key + "." + reason, e);
             }
             instances.put(key, instance);
         }

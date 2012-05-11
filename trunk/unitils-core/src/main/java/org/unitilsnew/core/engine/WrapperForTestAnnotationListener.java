@@ -87,9 +87,10 @@ public class WrapperForTestAnnotationListener<A extends Annotation> extends Test
     protected String getExceptionMessage(Exception e) {
         StringBuilder message = new StringBuilder("Unable to handle test annotation @");
         message.append(annotations.getType().getSimpleName());
+        message.append(".");
         String exceptionMessage = e.getMessage();
         if (!isBlank(exceptionMessage)) {
-            message.append(":\n");
+            message.append(" Reason:\n");
             message.append(exceptionMessage);
         }
         return message.toString();

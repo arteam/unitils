@@ -18,16 +18,16 @@ package org.unitilsnew.core.config;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.core.UnitilsException;
 
 import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Tim Ducheyne
  */
-public class ConfigurationGetStringClassifierTest {
+public class ConfigurationGetOptionalStringClassifierTest {
 
     /* Tested object */
     private Configuration configuration;
@@ -45,19 +45,26 @@ public class ConfigurationGetStringClassifierTest {
 
     @Test
     public void noClassifiers() {
-        String result = configuration.getString("property");
+        String result = configuration.getOptionalString("property");
+        assertEquals("value1", result);
+    }
+
+    @Test
+    public void nullClassifierSameAsNoClassifiers() {
+        String classifier = null;
+        String result = configuration.getOptionalString("property", classifier);
         assertEquals("value1", result);
     }
 
     @Test
     public void oneClassifier() {
-        String result = configuration.getString("property", "level1");
+        String result = configuration.getOptionalString("property", "level1");
         assertEquals("value2", result);
     }
 
     @Test
     public void twoClassifiers() {
-        String result = configuration.getString("property", "level1", "level2");
+        String result = configuration.getOptionalString("property", "level1", "level2");
         assertEquals("value3", result);
     }
 
@@ -65,15 +72,16 @@ public class ConfigurationGetStringClassifierTest {
     public void noPropertyForSecondClassifierFallsBackToFirstClassifier() {
         configuration.getProperties().remove("property.level1.level2");
 
-        String result = configuration.getString("property", "level1", "level2");
+        String result = configuration.getOptionalString("property", "level1", "level2");
         assertEquals("value2", result);
     }
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void noFallBackForEmptyValue() {
         configuration.getProperties().setProperty("property.level1.level2", "  ");
 
-        configuration.getString("property", "level1", "level2");
+        String result = configuration.getOptionalString("property", "level1", "level2");
+        assertNull(result);
     }
 
     @Test
@@ -81,16 +89,17 @@ public class ConfigurationGetStringClassifierTest {
         configuration.getProperties().remove("property.level1");
         configuration.getProperties().remove("property.level1.level2");
 
-        String result = configuration.getString("property", "level1", "level2");
+        String result = configuration.getOptionalString("property", "level1", "level2");
         assertEquals("value1", result);
     }
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void noPropertiesFound() {
         configuration.getProperties().remove("property");
         configuration.getProperties().remove("property.level1");
         configuration.getProperties().remove("property.level1.level2");
 
-        configuration.getString("property", "level1", "level2");
+        String result = configuration.getOptionalString("property", "level1", "level2");
+        assertNull(result);
     }
 }
