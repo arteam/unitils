@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.unitilsnew.database.annotations;
 
 import org.unitilsnew.core.annotation.TestAnnotation;
@@ -22,7 +23,6 @@ import org.unitilsnew.database.util.TransactionMode;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.unitilsnew.database.util.TransactionMode.DEFAULT;
@@ -44,7 +44,7 @@ import static org.unitilsnew.database.util.TransactionMode.DEFAULT;
  * @author Tim Ducheyne
  * @see org.unitils.database.util.TransactionMode
  */
-@Target({TYPE, METHOD})
+@Target(TYPE)
 @Retention(RUNTIME)
 @TestAnnotation(TransactionalTestAnnotationListener.class)
 public @interface Transactional {
@@ -60,5 +60,6 @@ public @interface Transactional {
     TransactionMode value() default DEFAULT;
 
     // todo remove or refactor  (was used in spring module)
+    // todo it should be possible to specify the transaction manager when more than one is defined in a spring context (e.g. hibernate and datasource)
     String transactionManagerName() default "";
 }
