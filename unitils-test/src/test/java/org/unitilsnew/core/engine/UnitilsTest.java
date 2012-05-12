@@ -18,6 +18,7 @@ package org.unitilsnew.core.engine;
 
 import org.junit.Test;
 import org.unitilsnew.UnitilsJUnit4;
+import org.unitilsnew.core.Unitils;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;

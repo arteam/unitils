@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package org.unitilsnew.core.engine;
+package org.unitilsnew.core;
 
 import org.unitilsnew.core.context.BootstrapContextFactory;
 import org.unitilsnew.core.context.Context;
 import org.unitilsnew.core.context.UnitilsContext;
+import org.unitilsnew.core.engine.UnitilsTestListener;
 
 /**
- * todo move to core package
- *
  * @author Tim Ducheyne
  */
 public class Unitils {

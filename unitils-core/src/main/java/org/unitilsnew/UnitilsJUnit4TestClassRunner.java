@@ -19,7 +19,7 @@ import org.junit.internal.runners.*;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
-import org.unitilsnew.core.engine.Unitils;
+import org.unitilsnew.core.Unitils;
 import org.unitilsnew.core.engine.UnitilsTestListener;
 
 import java.lang.reflect.InvocationTargetException;

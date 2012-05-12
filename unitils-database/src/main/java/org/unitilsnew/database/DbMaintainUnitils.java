@@ -15,7 +15,7 @@
  */
 package org.unitilsnew.database;
 
-import org.unitilsnew.core.engine.Unitils;
+import org.unitilsnew.core.Unitils;
 import org.unitilsnew.database.dbmaintain.DbMaintainWrapper;
 
 /**

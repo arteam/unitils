@@ -16,7 +16,7 @@
 package org.unitilsnew.database;
 
 import org.springframework.beans.factory.FactoryBean;
-import org.unitilsnew.core.engine.Unitils;
+import org.unitilsnew.core.Unitils;
 import org.unitilsnew.database.core.DataSourceWrapper;
 import org.unitilsnew.database.core.DataSourceWrapperManager;
 
