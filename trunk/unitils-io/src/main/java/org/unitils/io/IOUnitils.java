@@ -18,7 +18,7 @@ package org.unitils.io;
 
 import org.unitils.io.filecontent.FileContentReader;
 import org.unitils.io.temp.TempService;
-import org.unitilsnew.core.engine.Unitils;
+import org.unitilsnew.core.Unitils;
 
 import java.io.File;
 

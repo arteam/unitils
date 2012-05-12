@@ -20,7 +20,7 @@ import org.unitils.core.UnitilsException;
 import org.unitils.inject.core.InjectionByTypeService;
 import org.unitils.inject.core.InjectionService;
 import org.unitils.inject.core.ObjectToInject;
-import org.unitilsnew.core.engine.Unitils;
+import org.unitilsnew.core.Unitils;
 import org.unitilsnew.core.reflect.OriginalFieldValue;
 
 /**

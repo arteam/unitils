@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.mock.core.MockObject;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.dummy.DummyObjectFactory;
-import org.unitilsnew.core.engine.Unitils;
+import org.unitilsnew.core.Unitils;
 
 import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationStackTrace;
 
