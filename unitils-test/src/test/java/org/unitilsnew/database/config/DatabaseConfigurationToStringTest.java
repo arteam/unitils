@@ -17,7 +17,6 @@
 package org.unitilsnew.database.config;
 
 import org.junit.Test;
-import org.unitilsnew.UnitilsJUnit4;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
@@ -25,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Tim Ducheyne
  */
-public class DatabaseConfigurationToStringTest extends UnitilsJUnit4 {
+public class DatabaseConfigurationToStringTest {
 
     /* Tested object */
     private DatabaseConfiguration databaseConfiguration;
