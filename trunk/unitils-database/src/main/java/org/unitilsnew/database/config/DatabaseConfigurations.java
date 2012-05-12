@@ -50,7 +50,7 @@ public class DatabaseConfigurations {
         }
         DatabaseConfiguration databaseConfiguration = getOptionalDatabaseConfiguration(databaseName);
         if (databaseConfiguration == null) {
-            throw new UnitilsException("No configuration found for database with name " + databaseName);
+            throw new UnitilsException("No configuration found for database with name '" + databaseName + "'");
         }
         return databaseConfiguration;
     }
