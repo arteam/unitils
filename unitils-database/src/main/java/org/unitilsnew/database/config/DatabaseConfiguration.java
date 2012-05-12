@@ -93,17 +93,48 @@ public class DatabaseConfiguration {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         if (databaseName != null) {
-            stringBuilder.append("database name: ");
+            stringBuilder.append("database name: '");
             stringBuilder.append(databaseName);
-            stringBuilder.append(" ");
+            stringBuilder.append("', ");
         }
-        stringBuilder.append("driver: ");
-        stringBuilder.append(driverClassName);
+        stringBuilder.append("driver class name: ");
+        if (driverClassName == null) {
+            stringBuilder.append("<null>");
+        } else {
+            stringBuilder.append("'");
+            stringBuilder.append(driverClassName);
+            stringBuilder.append("'");
+        }
         stringBuilder.append(", url: ");
-        stringBuilder.append(url);
-        stringBuilder.append(", user: ");
-        stringBuilder.append(userName);
-        stringBuilder.append(", password: <not shown>");
+        if (url == null) {
+            stringBuilder.append("<null>");
+        } else {
+            stringBuilder.append("'");
+            stringBuilder.append(url);
+            stringBuilder.append("'");
+        }
+        stringBuilder.append(", user name: ");
+        if (userName == null) {
+            stringBuilder.append("<null>");
+        } else {
+            stringBuilder.append("'");
+            stringBuilder.append(userName);
+            stringBuilder.append("'");
+        }
+        stringBuilder.append(", password: <not shown>, default schema name: ");
+        if (defaultSchemaName == null) {
+            stringBuilder.append("<null>");
+        } else {
+            stringBuilder.append("'");
+            stringBuilder.append(defaultSchemaName);
+            stringBuilder.append("'");
+        }
+        stringBuilder.append(", schema names: ");
+        if (schemaNames == null) {
+            stringBuilder.append("<null>");
+        } else {
+            stringBuilder.append(schemaNames);
+        }
         return stringBuilder.toString();
     }
 }
