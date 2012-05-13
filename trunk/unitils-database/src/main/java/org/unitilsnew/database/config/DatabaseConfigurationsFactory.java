@@ -58,21 +58,20 @@ public class DatabaseConfigurationsFactory implements Factory<DatabaseConfigurat
     }
 
 
-    // todo validate here???
     protected DatabaseConfiguration createDatabaseConfiguration(String databaseName, boolean defaultDatabase) {
-        String driverClassName = configuration.getOptionalString("database.driverClassName", databaseName);
-        String url = configuration.getOptionalString("database.url", databaseName);
-        String userName = configuration.getOptionalString("database.userName", databaseName);
-        String password = configuration.getOptionalString("database.password", databaseName);
-        String dialect = configuration.getOptionalString("database.dialect", databaseName);
-        List<String> schemaNames = configuration.getOptionalStringList("database.schemaNames", databaseName);
-        Boolean updateDisabled = configuration.getOptionalBoolean("database.updateDisabled", databaseName);
+        String[] classifiers = databaseName == null ? new String[0] : new String[]{databaseName};
+        String driverClassName = configuration.getOptionalString("database.driverClassName", classifiers);
+        String url = configuration.getOptionalString("database.url", classifiers);
+        String userName = configuration.getOptionalString("database.userName", classifiers);
+        String password = configuration.getOptionalString("database.password", classifiers);
+        String dialect = configuration.getOptionalString("database.dialect", classifiers);
+        List<String> schemaNames = configuration.getOptionalStringList("database.schemaNames", classifiers);
+        Boolean updateDisabled = configuration.getOptionalBoolean("database.updateDisabled", classifiers);
 
         String defaultSchemaName = schemaNames.isEmpty() ? null : schemaNames.get(0);
         boolean disabled = updateDisabled == null ? false : updateDisabled;
         if (disabled && defaultDatabase) {
-            // todo exception message
-            throw new UnitilsException("Default database cannot be disabled.");
+            throw new UnitilsException("Unable to create database configuration. Default database cannot be disabled.");
         }
         return new DatabaseConfiguration(databaseName, dialect, driverClassName, url, userName, password, defaultSchemaName, schemaNames, disabled, defaultDatabase);
     }
