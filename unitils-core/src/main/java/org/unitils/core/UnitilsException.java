@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,14 @@
  */
 package org.unitils.core;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
+
 /**
  * Exception type, used for all unrecoverable exceptions that occur in unitils.
  */
 public class UnitilsException extends RuntimeException {
+
+    // todo unit test
 
     public UnitilsException() {
     }
@@ -35,4 +39,17 @@ public class UnitilsException extends RuntimeException {
         super(cause);
     }
 
+
+    @Override
+    public String getMessage() {
+        String reason = "";
+
+        Throwable cause = getCause();
+        if (cause != null) {
+            if (!isBlank(cause.getMessage())) {
+                reason = " Reason:\n" + cause.getMessage();
+            }
+        }
+        return super.getMessage() + reason;
+    }
 }

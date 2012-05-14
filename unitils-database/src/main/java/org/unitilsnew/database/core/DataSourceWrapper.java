@@ -30,11 +30,10 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.jdbc.support.JdbcUtils.closeStatement;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * @author Tim Ducheyne
@@ -47,6 +46,7 @@ public class DataSourceWrapper {
     protected DatabaseConfiguration databaseConfiguration;
     /* The data source that should be used, not null */
     protected DataSource wrappedDataSource;
+    protected TransactionAwareDataSourceProxy transactionAwareDataSourceProxy;
     protected SimpleJdbcTemplate simpleJdbcTemplate;
 
 
@@ -68,8 +68,10 @@ public class DataSourceWrapper {
             // no wrapping requested or needed
             return wrappedDataSource;
         }
-        // todo should this always be the same instance??
-        return new TransactionAwareDataSourceProxy(wrappedDataSource);
+        if (transactionAwareDataSourceProxy == null) {
+            transactionAwareDataSourceProxy = new TransactionAwareDataSourceProxy(wrappedDataSource);
+        }
+        return transactionAwareDataSourceProxy;
     }
 
     public SimpleJdbcTemplate getSimpleJdbcTemplate() {
@@ -86,7 +88,7 @@ public class DataSourceWrapper {
         try {
             return DataSourceUtils.getConnection(wrappedDataSource);
         } catch (Exception e) {
-            throw new UnitilsException("Unable to connect to database: " + databaseConfiguration, e);
+            throw new UnitilsException("Unable to connect to database for " + databaseConfiguration + ".", e);
         }
     }
 
@@ -113,20 +115,13 @@ public class DataSourceWrapper {
      * @param sql The sql string for retrieving the items
      * @return The nr of updates
      */
-    public int executeUpdate(String sql) {
+    public int executeUpdate(String sql, Object... args) {
         logger.debug(sql);
-
-        Connection connection = null;
-        Statement statement = null;
         try {
-            connection = getConnection();
-            statement = connection.createStatement();
-            return statement.executeUpdate(sql);
+            SimpleJdbcTemplate simpleJdbcTemplate = getSimpleJdbcTemplate();
+            return simpleJdbcTemplate.update(sql, args);
         } catch (Exception e) {
-            throw new UnitilsException("Error while executing statement: " + sql, e);
-        } finally {
-            closeStatement(statement);
-            releaseConnection(connection);
+            throw new UnitilsException("Unable to execute statement: '" + sql + "'.", e);
         }
     }
 
@@ -136,9 +131,9 @@ public class DataSourceWrapper {
      * @param sql The sql string for retrieving the items
      * @return The nr of updates, -1 if not successful
      */
-    public int executeUpdateQuietly(String sql) {
+    public int executeUpdateQuietly(String sql, Object... args) {
         try {
-            return executeUpdate(sql);
+            return executeUpdate(sql, args);
         } catch (Exception e) {
             // Ignored
             return -1;
@@ -151,6 +146,9 @@ public class DataSourceWrapper {
      * @return The nr of rows in the table
      */
     public long getTableCount(String tableName) {
+        if (isBlank(tableName)) {
+            throw new UnitilsException("Unable to get table count. Table name is null or empty.");
+        }
         return getLong("select count(1) from " + tableName);
     }
 
@@ -194,19 +192,21 @@ public class DataSourceWrapper {
         logger.debug(sql);
         try {
             SimpleJdbcTemplate simpleJdbcTemplate = getSimpleJdbcTemplate();
-            return simpleJdbcTemplate.query(sql, new ParameterizedRowMapper<List<String>>() {
-                public List<String> mapRow(ResultSet rs, int rowNum) throws SQLException {
-                    int columnCount = rs.getMetaData().getColumnCount();
-                    List<String> row = new ArrayList<String>(columnCount);
-                    for (int i = 1; i <= columnCount; i++) {
-                        String value = rs.getString(i);
-                        row.add(value);
-                    }
-                    return row;
-                }
-            }, args);
+            return simpleJdbcTemplate.query(sql, new RowParameterizedRowMapper(), args);
         } catch (Exception e) {
-            throw new UnitilsException("Error while executing statement: " + sql, e);
+            throw new UnitilsException("Unable to execute statement: '" + sql + "'.", e);
+        }
+    }
+
+    protected static class RowParameterizedRowMapper implements ParameterizedRowMapper<List<String>> {
+        public List<String> mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+            int columnCount = resultSet.getMetaData().getColumnCount();
+            List<String> row = new ArrayList<String>(columnCount);
+            for (int i = 1; i <= columnCount; i++) {
+                String value = resultSet.getString(i);
+                row.add(value);
+            }
+            return row;
         }
     }
 
@@ -290,9 +290,9 @@ public class DataSourceWrapper {
             SimpleJdbcTemplate simpleJdbcTemplate = getSimpleJdbcTemplate();
             return simpleJdbcTemplate.queryForObject(sql, type, args);
         } catch (EmptyResultDataAccessException e) {
-            throw new UnitilsException("No item value found: " + sql, e);
+            throw new UnitilsException("Unable to get value. Statement did not produce any results: '" + sql + "'.", e);
         } catch (Exception e) {
-            throw new UnitilsException("Error while executing statement: " + sql, e);
+            throw new UnitilsException("Unable to execute statement: '" + sql + "'.", e);
         }
     }
 
@@ -308,7 +308,7 @@ public class DataSourceWrapper {
             SimpleJdbcTemplate simpleJdbcTemplate = getSimpleJdbcTemplate();
             return simpleJdbcTemplate.query(sql, new ParameterizedSingleColumnRowMapper<T>(), args);
         } catch (Exception e) {
-            throw new UnitilsException("Error while executing statement: " + sql, e);
+            throw new UnitilsException("Unable to execute statement: '" + sql + "'.", e);
         }
     }
 }
