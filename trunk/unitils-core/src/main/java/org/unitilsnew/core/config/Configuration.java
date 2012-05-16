@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,11 +79,12 @@ public class Configuration {
         this.overridingProperties = overridingProperties;
     }
 
-    // todo unit test
     public Properties getAllProperties() {
         Properties result = new Properties();
         result.putAll(properties);
-        result.putAll(overridingProperties);
+        if (overridingProperties != null) {
+            result.putAll(overridingProperties);
+        }
         return result;
     }
 
