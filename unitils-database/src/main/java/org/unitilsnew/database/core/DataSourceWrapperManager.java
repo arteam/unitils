@@ -56,7 +56,6 @@ public class DataSourceWrapperManager {
         DataSourceWrapper dataSourceWrapper = dataSourceWrappers.get(databaseName);
         if (dataSourceWrapper == null) {
             dataSourceWrapper = createDataSourceWrapper(databaseName);
-            // todo catch exceptions and provide feedback
             dataSourceWrappers.put(databaseName, dataSourceWrapper);
         }
         DataSource dataSource = dataSourceWrapper.getDataSource(false);
@@ -66,10 +65,8 @@ public class DataSourceWrapperManager {
 
 
     protected DataSourceWrapper createDataSourceWrapper(String databaseName) {
-        //todo
-//        logger.info("Created data source. Driver: " + driverClassName + ", url: " + url + ", user: " + userName + ", password: <not shown>");
-
         DatabaseConfiguration databaseConfiguration = databaseConfigurations.getDatabaseConfiguration(databaseName);
+        logger.info("Creating data source for " + databaseConfiguration);
         return dataSourceWrapperFactory.create(databaseConfiguration);
     }
 }

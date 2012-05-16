@@ -51,7 +51,6 @@ public class DataSourceWrapper {
 
 
     // todo javadoc
-    // todo unit test
     // todo exceptions when null values
     // todo spring bean
     // todo test connection => does not happen when datasource is created (verify clear exceptions)
