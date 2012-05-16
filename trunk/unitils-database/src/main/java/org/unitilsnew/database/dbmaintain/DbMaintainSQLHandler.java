@@ -45,10 +45,6 @@ public class DbMaintainSQLHandler implements SQLHandler {
     protected TransactionManager transactionManager;
 
 
-    // todo move methods out to some service
-    // todo switch to spring
-
-
     public DbMaintainSQLHandler(TransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
@@ -65,7 +61,7 @@ public class DbMaintainSQLHandler implements SQLHandler {
             statement.execute(sql);
 
         } catch (Exception e) {
-            throw new DatabaseException("Could not perform database statement: " + sql, e);
+            throw new DatabaseException("Unable to perform database statement:\n" + sql, e);
         } finally {
             closeStatement(statement);
             releaseConnection(connection, dataSource);
@@ -81,13 +77,13 @@ public class DbMaintainSQLHandler implements SQLHandler {
             connection = getConnection(dataSource);
             statement = connection.createStatement();
             int nbChanges = statement.executeUpdate(sql);
-            if (!connection.getAutoCommit()) {
+            if (transactionManager.isTransactionActive()) {
                 transactionManager.commit();
             }
             return nbChanges;
 
         } catch (Exception e) {
-            throw new DatabaseException("Error while performing database update:\n" + sql, e);
+            throw new DatabaseException("Unable to perform database update:\n" + sql, e);
         } finally {
             closeStatement(statement);
             releaseConnection(connection, dataSource);
@@ -108,15 +104,14 @@ public class DbMaintainSQLHandler implements SQLHandler {
                 return resultSet.getLong(1);
             }
         } catch (Exception e) {
-            throw new DatabaseException("Error while executing statement: " + sql, e);
+            throw new DatabaseException("Error while executing query:\n" + sql, e);
         } finally {
             closeResultSet(resultSet);
             closeStatement(statement);
             releaseConnection(connection, dataSource);
         }
-
-        // in case no value was found, throw an exception
-        throw new DatabaseException("No item value found: " + sql);
+        // no value was found, throw an exception
+        throw new DatabaseException("No value found for query:\n" + sql);
     }
 
     public String getItemAsString(String sql, DataSource dataSource) {
@@ -133,14 +128,14 @@ public class DbMaintainSQLHandler implements SQLHandler {
                 return resultSet.getString(1);
             }
         } catch (Exception e) {
-            throw new DatabaseException("Error while executing statement: " + sql, e);
+            throw new DatabaseException("Error while executing query:\n" + sql, e);
         } finally {
             closeResultSet(resultSet);
             closeStatement(statement);
             releaseConnection(connection, dataSource);
         }
         // in case no value was found, throw an exception
-        throw new DatabaseException("No item value found: " + sql);
+        throw new DatabaseException("No value found for query:\n" + sql);
     }
 
     public Set<String> getItemsAsStringSet(String sql, DataSource dataSource) {
@@ -160,7 +155,7 @@ public class DbMaintainSQLHandler implements SQLHandler {
             return result;
 
         } catch (Exception e) {
-            throw new DatabaseException("Error while executing statement: " + sql, e);
+            throw new DatabaseException("Error while executing query:\n" + sql, e);
         } finally {
             closeResultSet(resultSet);
             closeStatement(statement);
@@ -181,7 +176,7 @@ public class DbMaintainSQLHandler implements SQLHandler {
             return resultSet.next();
 
         } catch (Exception e) {
-            throw new DatabaseException("Error while executing statement: " + sql, e);
+            throw new DatabaseException("Error while executing query:\n" + sql, e);
         } finally {
             closeResultSet(resultSet);
             closeStatement(statement);
@@ -190,15 +185,17 @@ public class DbMaintainSQLHandler implements SQLHandler {
     }
 
     public void startTransaction(DataSource dataSource) {
-        transactionManager.startTransaction();
         transactionManager.registerDataSource(dataSource);
+        transactionManager.startTransaction();
     }
 
     public void endTransactionAndCommit(DataSource dataSource) {
+        transactionManager.registerDataSource(dataSource);
         transactionManager.commit();
     }
 
     public void endTransactionAndRollback(DataSource dataSource) {
+        transactionManager.registerDataSource(dataSource);
         transactionManager.rollback();
     }
 

@@ -38,8 +38,6 @@ import static org.apache.commons.lang.StringUtils.isBlank;
  */
 public class DbMaintainDatabaseConnectionManager implements DatabaseConnectionManager {
 
-    // todo unit test
-
     protected DatabaseConfigurations databaseConfigurations;
     protected DataSourceWrapperManager dataSourceWrapperManager;
     protected DbMaintainSQLHandler dbMaintainSQLHandler;

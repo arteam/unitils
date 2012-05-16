@@ -27,7 +27,6 @@ import org.unitilsnew.core.annotation.Property;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * @author Tim Ducheyne
@@ -38,21 +37,17 @@ public class DbMaintainWrapper {
     /* The logger instance for this class */
     protected static Log logger = LogFactory.getLog(DbMaintainWrapper.class);
 
-    protected DbMaintainConfiguration dbMaintainConfiguration;
-    protected DbMaintainDatabaseConnectionManager dbMaintainDatabaseConnectionManager;
+    protected MainFactory mainFactory;
     /* Indicates if the DBMaintain should be invoked to update the database */
     protected boolean dbMaintainEnabled;
-
-    protected MainFactory mainFactory;
     /* The registered database update listeners that will be called when db-maintain has updated the database */
     protected List<DatabaseUpdateListener> databaseUpdateListeners = new ArrayList<DatabaseUpdateListener>();
     /* True if update database has already been called */
     protected boolean updateDatabaseCalled = false;
 
 
-    public DbMaintainWrapper(DbMaintainConfiguration dbMaintainConfiguration, DbMaintainDatabaseConnectionManager dbMaintainDatabaseConnectionManager, @Property("database.dbMaintain.enabled") boolean dbMaintainEnabled) {
-        this.dbMaintainConfiguration = dbMaintainConfiguration;
-        this.dbMaintainDatabaseConnectionManager = dbMaintainDatabaseConnectionManager;
+    public DbMaintainWrapper(MainFactory mainFactory, @Property("database.dbMaintain.enabled") boolean dbMaintainEnabled) {
+        this.mainFactory = mainFactory;
         this.dbMaintainEnabled = dbMaintainEnabled;
     }
 
@@ -81,31 +76,26 @@ public class DbMaintainWrapper {
     }
 
     public void markDatabaseAsUpToDate() {
-        MainFactory mainFactory = getMainFactory();
         DbMaintainer dbMaintainer = mainFactory.createDbMaintainer();
         dbMaintainer.markDatabaseAsUpToDate();
     }
 
     public void clearDatabase() {
-        MainFactory mainFactory = getMainFactory();
         DBClearer dbClearer = mainFactory.createDBClearer();
         dbClearer.clearDatabase();
     }
 
     public void cleanDatabase() {
-        MainFactory mainFactory = getMainFactory();
         DBCleaner dbCleaner = mainFactory.createDBCleaner();
         dbCleaner.cleanDatabase();
     }
 
     public void disableConstraints() {
-        MainFactory mainFactory = getMainFactory();
         ConstraintsDisabler constraintsDisabler = mainFactory.createConstraintsDisabler();
         constraintsDisabler.disableConstraints();
     }
 
     public void updateSequences() {
-        MainFactory mainFactory = getMainFactory();
         SequenceUpdater sequenceUpdater = mainFactory.createSequenceUpdater();
         sequenceUpdater.updateSequences();
     }
@@ -122,7 +112,6 @@ public class DbMaintainWrapper {
 
     protected boolean updateDatabase() {
         logger.info("Checking if database(s) have to be updated.");
-        MainFactory mainFactory = getMainFactory();
         DbMaintainer dbMaintainer = mainFactory.createDbMaintainer();
         return dbMaintainer.updateDatabase(false);
     }
@@ -131,13 +120,5 @@ public class DbMaintainWrapper {
         for (DatabaseUpdateListener databaseUpdateListener : databaseUpdateListeners) {
             databaseUpdateListener.databaseWasUpdated();
         }
-    }
-
-    protected MainFactory getMainFactory() {
-        if (mainFactory == null) {
-            Properties dbMaintainProperties = dbMaintainConfiguration.getProperties();
-            mainFactory = new MainFactory(dbMaintainProperties, dbMaintainDatabaseConnectionManager);
-        }
-        return mainFactory;
     }
 }
