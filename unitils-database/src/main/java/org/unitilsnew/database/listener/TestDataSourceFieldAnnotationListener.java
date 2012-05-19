@@ -23,9 +23,7 @@ import org.unitilsnew.core.TestPhase;
 import org.unitilsnew.core.annotation.Property;
 import org.unitilsnew.core.reflect.Annotations;
 import org.unitilsnew.database.annotations.TestDataSource;
-import org.unitilsnew.database.core.DataSourceWrapper;
-import org.unitilsnew.database.core.DataSourceWrapperManager;
-import org.unitilsnew.database.dbmaintain.DbMaintainWrapper;
+import org.unitilsnew.database.core.DataSourceService;
 
 import javax.sql.DataSource;
 
@@ -37,8 +35,7 @@ import static org.unitilsnew.core.TestPhase.CONSTRUCTION;
 public class TestDataSourceFieldAnnotationListener extends FieldAnnotationListener<TestDataSource> {
 
     protected boolean wrapDataSourceInTransactionalProxy;
-    protected DataSourceWrapperManager dataSourceWrapperManager;
-    protected DbMaintainWrapper dbMaintainWrapper;
+    protected DataSourceService dataSourceService;
 
 
     @Override
@@ -47,10 +44,9 @@ public class TestDataSourceFieldAnnotationListener extends FieldAnnotationListen
     }
 
 
-    public TestDataSourceFieldAnnotationListener(@Property("database.wrapDataSourceInTransactionalProxy") boolean wrapDataSourceInTransactionalProxy, DataSourceWrapperManager dataSourceWrapperManager, DbMaintainWrapper dbMaintainWrapper) {
+    public TestDataSourceFieldAnnotationListener(@Property("database.wrapDataSourceInTransactionalProxy") boolean wrapDataSourceInTransactionalProxy, DataSourceService dataSourceService) {
         this.wrapDataSourceInTransactionalProxy = wrapDataSourceInTransactionalProxy;
-        this.dataSourceWrapperManager = dataSourceWrapperManager;
-        this.dbMaintainWrapper = dbMaintainWrapper;
+        this.dataSourceService = dataSourceService;
     }
 
 
@@ -59,14 +55,7 @@ public class TestDataSourceFieldAnnotationListener extends FieldAnnotationListen
         TestDataSource annotation = annotations.getAnnotationWithDefaults();
         String databaseName = annotation.value();
 
-        dbMaintainWrapper.updateDatabaseIfNeeded();
-        DataSource dataSource = getDataSource(databaseName);
+        DataSource dataSource = dataSourceService.getDataSource(databaseName, wrapDataSourceInTransactionalProxy);
         testField.setValue(dataSource);
-    }
-
-
-    protected DataSource getDataSource(String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
-        return dataSourceWrapper.getDataSource(wrapDataSourceInTransactionalProxy);
     }
 }

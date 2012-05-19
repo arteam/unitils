@@ -16,8 +16,8 @@
 package org.unitilsnew.database;
 
 import org.unitilsnew.core.Unitils;
+import org.unitilsnew.database.core.DataSourceService;
 import org.unitilsnew.database.core.DataSourceWrapper;
-import org.unitilsnew.database.core.DataSourceWrapperManager;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class SqlUnitils {
 
     // todo unit test
 
-    protected static DataSourceWrapperManager dataSourceWrapperManager = Unitils.getInstanceOfType(DataSourceWrapperManager.class);
+    protected static DataSourceService dataSourceService = Unitils.getInstanceOfType(DataSourceService.class);
 
 
     /**
@@ -54,7 +54,7 @@ public class SqlUnitils {
      * @return The nr of updates
      */
     public static int executeUpdate(String sql, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         return dataSourceWrapper.executeUpdate(sql);
     }
 
@@ -77,7 +77,7 @@ public class SqlUnitils {
      * @return The nr of updates, -1 if not successful
      */
     public static int executeUpdateQuietly(String sql, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         return dataSourceWrapper.executeUpdateQuietly(sql);
     }
 
@@ -96,7 +96,7 @@ public class SqlUnitils {
      * @return The nr of rows in the given table
      */
     public static long getTableCount(String tableName, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         return dataSourceWrapper.getTableCount(tableName);
     }
 
@@ -116,7 +116,7 @@ public class SqlUnitils {
      * @return True if the given table is empty
      */
     public static boolean isTableEmpty(String tableName, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         return dataSourceWrapper.isTableEmpty(tableName);
     }
 
@@ -141,7 +141,7 @@ public class SqlUnitils {
      * @return The string value
      */
     public static String getString(String sql, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         return dataSourceWrapper.getString(sql);
     }
 
@@ -164,7 +164,7 @@ public class SqlUnitils {
      * @return The string value, not null
      */
     public static List<String> getStringList(String sql, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         return dataSourceWrapper.getStringList(sql);
     }
 
@@ -189,7 +189,7 @@ public class SqlUnitils {
      * @return The boolean value
      */
     public static boolean getBoolean(String sql, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         return dataSourceWrapper.getBoolean(sql);
     }
 
@@ -211,7 +211,7 @@ public class SqlUnitils {
      * @return The booleans, not null
      */
     public static List<Boolean> getBooleanList(String sql, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         return dataSourceWrapper.getBooleanList(sql);
     }
 
@@ -236,7 +236,7 @@ public class SqlUnitils {
      * @return The int value
      */
     public static int getInteger(String sql, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         return dataSourceWrapper.getInteger(sql);
     }
 
@@ -258,7 +258,7 @@ public class SqlUnitils {
      * @return The integers, not null
      */
     public static List<Integer> getIntegerList(String sql, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         return dataSourceWrapper.getIntegerList(sql);
     }
 
@@ -283,7 +283,7 @@ public class SqlUnitils {
      * @return The long value
      */
     public static long getLong(String sql, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         return dataSourceWrapper.getLong(sql);
     }
 
@@ -305,7 +305,7 @@ public class SqlUnitils {
      * @return The longs, not null
      */
     public static List<Long> getLongList(String sql, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         return dataSourceWrapper.getLongList(sql);
     }
 
@@ -332,7 +332,7 @@ public class SqlUnitils {
      * @return The value, not null
      */
     public static <T> T getObject(String sql, Class<T> type, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         return dataSourceWrapper.getObject(sql, type);
     }
 
@@ -356,7 +356,7 @@ public class SqlUnitils {
      * @return The values, not null
      */
     public static <T> List<T> getObjectList(String sql, Class<T> type, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         return dataSourceWrapper.getObjectList(sql, type);
     }
 }

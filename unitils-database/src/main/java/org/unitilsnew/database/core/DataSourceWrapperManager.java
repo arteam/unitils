@@ -21,11 +21,8 @@ import org.apache.commons.logging.LogFactory;
 import org.unitilsnew.database.config.DatabaseConfiguration;
 import org.unitilsnew.database.config.DatabaseConfigurations;
 
-import javax.sql.DataSource;
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
-
-import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * @author Tim Ducheyne
@@ -35,37 +32,31 @@ public class DataSourceWrapperManager {
     /* The logger instance for this class */
     protected static Log logger = LogFactory.getLog(DataSourceWrapperManager.class);
 
-    protected static Map<String, DataSourceWrapper> dataSourceWrappers = new HashMap<String, DataSourceWrapper>(3);
+    protected static Map<DatabaseConfiguration, DataSourceWrapper> dataSourceWrappers = new IdentityHashMap<DatabaseConfiguration, DataSourceWrapper>(3);
 
     protected DatabaseConfigurations databaseConfigurations;
     protected DataSourceWrapperFactory dataSourceWrapperFactory;
-    protected TransactionManager transactionManager;
 
 
-    public DataSourceWrapperManager(DatabaseConfigurations databaseConfigurations, DataSourceWrapperFactory dataSourceWrapperFactory, TransactionManager transactionManager) {
+    public DataSourceWrapperManager(DatabaseConfigurations databaseConfigurations, DataSourceWrapperFactory dataSourceWrapperFactory) {
         this.databaseConfigurations = databaseConfigurations;
         this.dataSourceWrapperFactory = dataSourceWrapperFactory;
-        this.transactionManager = transactionManager;
     }
 
 
     public synchronized DataSourceWrapper getDataSourceWrapper(String databaseName) {
-        if (isBlank(databaseName)) {
-            databaseName = null;
-        }
-        DataSourceWrapper dataSourceWrapper = dataSourceWrappers.get(databaseName);
+        DatabaseConfiguration databaseConfiguration = databaseConfigurations.getDatabaseConfiguration(databaseName);
+
+        DataSourceWrapper dataSourceWrapper = dataSourceWrappers.get(databaseConfiguration);
         if (dataSourceWrapper == null) {
-            dataSourceWrapper = createDataSourceWrapper(databaseName);
-            dataSourceWrappers.put(databaseName, dataSourceWrapper);
+            dataSourceWrapper = createDataSourceWrapper(databaseConfiguration);
+            dataSourceWrappers.put(databaseConfiguration, dataSourceWrapper);
         }
-        DataSource dataSource = dataSourceWrapper.getDataSource(false);
-        transactionManager.registerDataSource(dataSource);
         return dataSourceWrapper;
     }
 
 
-    protected DataSourceWrapper createDataSourceWrapper(String databaseName) {
-        DatabaseConfiguration databaseConfiguration = databaseConfigurations.getDatabaseConfiguration(databaseName);
+    protected DataSourceWrapper createDataSourceWrapper(DatabaseConfiguration databaseConfiguration) {
         logger.info("Creating data source for " + databaseConfiguration);
         return dataSourceWrapperFactory.create(databaseConfiguration);
     }

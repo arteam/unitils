@@ -17,8 +17,8 @@
 package org.unitilsnew.database;
 
 import org.unitilsnew.core.Unitils;
+import org.unitilsnew.database.core.DataSourceService;
 import org.unitilsnew.database.core.DataSourceWrapper;
-import org.unitilsnew.database.core.DataSourceWrapperManager;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDE
  */
 public class SqlAssert {
 
-    protected static DataSourceWrapperManager dataSourceWrapperManager = Unitils.getInstanceOfType(DataSourceWrapperManager.class);
+    protected static DataSourceService dataSourceService = Unitils.getInstanceOfType(DataSourceService.class);
 
     // todo javadoc
     // todo unit test
@@ -49,7 +49,7 @@ public class SqlAssert {
     }
 
     public static void assertRows(String sql, String databaseName, String[]... expectedRows) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         List<List<String>> actualRows = dataSourceWrapper.getRowsAsString(sql);
         assertReflectionEquals(expectedRows, actualRows, LENIENT_ORDER);
     }
@@ -64,7 +64,7 @@ public class SqlAssert {
     }
 
     public static void assertTableCount(String tableName, long expectedCount, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         long actualCount = dataSourceWrapper.getTableCount(tableName);
         assertReflectionEquals(expectedCount, actualCount);
     }
@@ -75,7 +75,7 @@ public class SqlAssert {
     }
 
     public static void assertTableEmpty(String tableName, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         boolean empty = dataSourceWrapper.isTableEmpty(tableName);
         if (!empty) {
             fail("Table " + tableName + " is not empty.");
@@ -88,7 +88,7 @@ public class SqlAssert {
     }
 
     public static void assertStringResult(String sql, String expectedValue, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         String actualValue = dataSourceWrapper.getString(sql);
         assertReflectionEquals(expectedValue, actualValue);
     }
@@ -98,7 +98,7 @@ public class SqlAssert {
     }
 
     public static void assertStringListResult(String sql, List<String> expectedValues, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         List<String> actualValues = dataSourceWrapper.getStringList(sql);
         assertReflectionEquals(expectedValues, actualValues);
     }
@@ -109,7 +109,7 @@ public class SqlAssert {
     }
 
     public static void assertBooleanResult(String sql, boolean expectedValue, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         boolean actualValue = dataSourceWrapper.getBoolean(sql);
         assertReflectionEquals(expectedValue, actualValue);
     }
@@ -119,7 +119,7 @@ public class SqlAssert {
     }
 
     public static void assertBooleanListResult(String sql, List<Boolean> expectedValues, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         List<Boolean> actualValues = dataSourceWrapper.getBooleanList(sql);
         assertReflectionEquals(expectedValues, actualValues);
     }
@@ -130,7 +130,7 @@ public class SqlAssert {
     }
 
     public static void assertIntegerResult(String sql, long expectedValue, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         int actualValue = dataSourceWrapper.getInteger(sql);
         assertReflectionEquals(expectedValue, actualValue);
     }
@@ -140,7 +140,7 @@ public class SqlAssert {
     }
 
     public static void assertIntegerListResult(String sql, List<Long> expectedValues, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         List<Integer> actualValues = dataSourceWrapper.getIntegerList(sql);
         assertReflectionEquals(expectedValues, actualValues, LENIENT_ORDER);
     }
@@ -155,7 +155,7 @@ public class SqlAssert {
     }
 
     public static void assertLong(String sql, long expectedValue, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         long actualValue = dataSourceWrapper.getLong(sql);
         assertReflectionEquals(expectedValue, actualValue);
     }
@@ -165,7 +165,7 @@ public class SqlAssert {
     }
 
     public static void assertLongList(String sql, List<Long> expectedValues, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         List<Long> actualValues = dataSourceWrapper.getLongList(sql);
         assertReflectionEquals(expectedValues, actualValues, LENIENT_ORDER);
     }
@@ -176,7 +176,7 @@ public class SqlAssert {
     }
 
     public static <T> void assertObject(String sql, Class<T> type, List<T> expectedValue, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         T actualValue = dataSourceWrapper.getObject(sql, type);
         assertReflectionEquals(expectedValue, actualValue);
     }
@@ -186,7 +186,7 @@ public class SqlAssert {
     }
 
     public static <T> void assertObjectList(String sql, Class<T> type, T expectedValues, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         List<T> actualValues = dataSourceWrapper.getObjectList(sql, type);
         assertReflectionEquals(expectedValues, actualValues, LENIENT_ORDER);
     }

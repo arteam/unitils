@@ -18,7 +18,6 @@ package org.unitilsnew.database.listener;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
@@ -26,13 +25,9 @@ import org.unitilsnew.core.TestField;
 import org.unitilsnew.core.TestInstance;
 import org.unitilsnew.core.reflect.Annotations;
 import org.unitilsnew.database.annotations.TestDataSource;
-import org.unitilsnew.database.core.DataSourceWrapper;
-import org.unitilsnew.database.core.DataSourceWrapperManager;
-import org.unitilsnew.database.dbmaintain.DbMaintainWrapper;
+import org.unitilsnew.database.core.DataSourceService;
 
 import javax.sql.DataSource;
-
-import static org.unitils.mock.ArgumentMatchers.any;
 
 /**
  * @author Tim Ducheyne
@@ -42,9 +37,7 @@ public class TestDataSourceFieldAnnotationListenerBeforeTestSetupTest extends Un
     /* Tested object */
     private TestDataSourceFieldAnnotationListener testDataSourceFieldAnnotationListener;
 
-    private Mock<DataSourceWrapperManager> dataSourceWrapperManagerMock;
-    private Mock<DbMaintainWrapper> dbMaintainWrapperMock;
-    private DataSourceWrapper dataSourceWrapper;
+    private Mock<DataSourceService> dataSourceServiceMock;
     @Dummy
     private DataSource dataSource;
 
@@ -59,9 +52,7 @@ public class TestDataSourceFieldAnnotationListenerBeforeTestSetupTest extends Un
 
     @Before
     public void initialize() throws Exception {
-        testDataSourceFieldAnnotationListener = new TestDataSourceFieldAnnotationListener(false, dataSourceWrapperManagerMock.getMock(), dbMaintainWrapperMock.getMock());
-
-        dataSourceWrapper = new DataSourceWrapper(null, dataSource);
+        testDataSourceFieldAnnotationListener = new TestDataSourceFieldAnnotationListener(false, dataSourceServiceMock.getMock());
 
         annotation1 = MyClass.class.getDeclaredField("field1").getAnnotation(TestDataSource.class);
         annotation2 = MyClass.class.getDeclaredField("field2").getAnnotation(TestDataSource.class);
@@ -71,7 +62,7 @@ public class TestDataSourceFieldAnnotationListenerBeforeTestSetupTest extends Un
     @Test
     public void defaultDatabase() {
         annotationsMock.returns(annotation1).getAnnotationWithDefaults();
-        dataSourceWrapperManagerMock.returns(dataSourceWrapper).getDataSourceWrapper("");
+        dataSourceServiceMock.returns(dataSource).getDataSource("", false);
 
         testDataSourceFieldAnnotationListener.beforeTestSetUp(testInstanceMock.getMock(), testFieldMock.getMock(), annotationsMock.getMock());
 
@@ -81,7 +72,7 @@ public class TestDataSourceFieldAnnotationListenerBeforeTestSetupTest extends Un
     @Test
     public void namedDatabase() {
         annotationsMock.returns(annotation2).getAnnotationWithDefaults();
-        dataSourceWrapperManagerMock.returns(dataSourceWrapper).getDataSourceWrapper("myDatabase");
+        dataSourceServiceMock.returns(dataSource).getDataSource("myDatabase", false);
 
         testDataSourceFieldAnnotationListener.beforeTestSetUp(testInstanceMock.getMock(), testFieldMock.getMock(), annotationsMock.getMock());
 
@@ -90,14 +81,14 @@ public class TestDataSourceFieldAnnotationListenerBeforeTestSetupTest extends Un
 
     @Test
     public void wrappedInTransactionalProxy() {
-        testDataSourceFieldAnnotationListener = new TestDataSourceFieldAnnotationListener(true, dataSourceWrapperManagerMock.getMock(), dbMaintainWrapperMock.getMock());
+        testDataSourceFieldAnnotationListener = new TestDataSourceFieldAnnotationListener(true, dataSourceServiceMock.getMock());
 
         annotationsMock.returns(annotation1).getAnnotationWithDefaults();
-        dataSourceWrapperManagerMock.returns(dataSourceWrapper).getDataSourceWrapper(null);
+        dataSourceServiceMock.returns(dataSource).getDataSource(null, true);
 
         testDataSourceFieldAnnotationListener.beforeTestSetUp(testInstanceMock.getMock(), testFieldMock.getMock(), annotationsMock.getMock());
 
-        testFieldMock.assertInvoked().setValue(any(TransactionAwareDataSourceProxy.class));
+        testFieldMock.assertInvoked().setValue(dataSource);
     }
 
 

@@ -36,8 +36,8 @@ public class DbMaintainUnitils {
      *
      * @return true if an update was performed
      */
-    public static boolean updateDatabaseIfNeeded() {
-        return dbMaintainWrapper.updateDatabaseIfNeeded();
+    public static boolean updateDatabase() {
+        return dbMaintainWrapper.updateDatabase();
     }
 
     /**
