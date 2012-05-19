@@ -17,8 +17,8 @@
 package org.unitilsnew.database;
 
 import org.unitilsnew.core.Unitils;
+import org.unitilsnew.database.core.DataSourceService;
 import org.unitilsnew.database.core.DataSourceWrapper;
-import org.unitilsnew.database.core.DataSourceWrapperManager;
 import org.unitilsnew.database.core.TransactionManager;
 
 import javax.sql.DataSource;
@@ -29,9 +29,7 @@ import javax.sql.DataSource;
  */
 public class DatabaseUnitils {
 
-    // todo unit test
-
-    protected static DataSourceWrapperManager dataSourceWrapperManager = Unitils.getInstanceOfType(DataSourceWrapperManager.class);
+    protected static DataSourceService dataSourceService = Unitils.getInstanceOfType(DataSourceService.class);
     protected static TransactionManager transactionManager = Unitils.getInstanceOfType(TransactionManager.class);
 
 
@@ -47,7 +45,7 @@ public class DatabaseUnitils {
      * @return The data source, not null
      */
     public static DataSource getDataSource(String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
         return dataSourceWrapper.getWrappedDataSource();
     }
 
@@ -57,7 +55,7 @@ public class DatabaseUnitils {
     }
 
     public static DataSourceWrapper getDataSourceWrapper(String databaseName) {
-        return dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        return dataSourceService.getDataSourceWrapper(databaseName);
     }
 
 
@@ -81,6 +79,4 @@ public class DatabaseUnitils {
     public static void rollbackTransaction() {
         transactionManager.rollback();
     }
-
-
 }

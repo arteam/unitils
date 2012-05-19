@@ -28,7 +28,7 @@ import static org.unitilsnew.core.TestPhase.CONSTRUCTION;
 public class TestDataSourceFieldAnnotationListenerTest {
 
     /* Tested object */
-    private TestDataSourceFieldAnnotationListener testDataSourceFieldAnnotationListener = new TestDataSourceFieldAnnotationListener(false, null, null);
+    private TestDataSourceFieldAnnotationListener testDataSourceFieldAnnotationListener = new TestDataSourceFieldAnnotationListener(false, null);
 
 
     @Test

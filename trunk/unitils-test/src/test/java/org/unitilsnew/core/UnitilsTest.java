@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.unitilsnew.core.engine;
+package org.unitilsnew.core;
 
 import org.junit.Test;
 import org.unitilsnew.UnitilsJUnit4;
-import org.unitilsnew.core.Unitils;
+import org.unitilsnew.core.engine.UnitilsTestListener;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
@@ -61,6 +61,6 @@ public class UnitilsTest extends UnitilsJUnit4 {
     }
 
 
-    public static class MyClass {
+    private static class MyClass {
     }
 }

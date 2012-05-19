@@ -38,9 +38,8 @@ public class DataSourceWrapperManagerGetDataSourceWrapperTest extends UnitilsJUn
     /* Tested object */
     private DataSourceWrapperManager dataSourceWrapperManager;
 
-    protected Mock<DatabaseConfigurations> databaseConfigurationsMock;
-    protected Mock<DataSourceWrapperFactory> dataSourceWrapperFactoryMock;
-    protected Mock<TransactionManager> transactionManagerMock;
+    private Mock<DatabaseConfigurations> databaseConfigurationsMock;
+    private Mock<DataSourceWrapperFactory> dataSourceWrapperFactoryMock;
 
     @Dummy
     private DatabaseConfiguration databaseConfiguration;
@@ -51,9 +50,7 @@ public class DataSourceWrapperManagerGetDataSourceWrapperTest extends UnitilsJUn
 
     @Before
     public void initialize() {
-        dataSourceWrapperManager = new DataSourceWrapperManager(databaseConfigurationsMock.getMock(), dataSourceWrapperFactoryMock.getMock(), transactionManagerMock.getMock());
-
-        DataSourceWrapperManager.dataSourceWrappers.clear();
+        dataSourceWrapperManager = new DataSourceWrapperManager(databaseConfigurationsMock.getMock(), dataSourceWrapperFactoryMock.getMock());
     }
 
     @After
@@ -65,18 +62,17 @@ public class DataSourceWrapperManagerGetDataSourceWrapperTest extends UnitilsJUn
     @Test
     public void createDataSourceWrapper() throws Exception {
         databaseConfigurationsMock.returns(databaseConfiguration).getDatabaseConfiguration("myDatabase");
-        dataSourceWrapperFactoryMock.returns(dataSourceWrapperMock).create(databaseConfiguration);
+        dataSourceWrapperFactoryMock.onceReturns(dataSourceWrapperMock).create(databaseConfiguration);
         dataSourceWrapperMock.returns(dataSource).getDataSource(false);
 
         DataSourceWrapper result = dataSourceWrapperManager.getDataSourceWrapper("myDatabase");
 
         assertSame(dataSourceWrapperMock.getMock(), result);
-        transactionManagerMock.assertInvoked().registerDataSource(dataSource);
     }
 
     @Test
     public void dataSourceWrappersAreCached() throws Exception {
-        databaseConfigurationsMock.onceReturns(databaseConfiguration).getDatabaseConfiguration("myDatabase");
+        databaseConfigurationsMock.returns(databaseConfiguration).getDatabaseConfiguration("myDatabase");
         dataSourceWrapperFactoryMock.onceReturns(dataSourceWrapperMock).create(databaseConfiguration);
         dataSourceWrapperMock.returns(dataSource).getDataSource(false);
 
@@ -84,30 +80,27 @@ public class DataSourceWrapperManagerGetDataSourceWrapperTest extends UnitilsJUn
         DataSourceWrapper result2 = dataSourceWrapperManager.getDataSourceWrapper("myDatabase");
 
         assertSame(result1, result2);
-        transactionManagerMock.assertInvoked().registerDataSource(dataSource);
     }
 
     @Test
     public void nullDatabaseName() throws Exception {
-        databaseConfigurationsMock.onceReturns(databaseConfiguration).getDatabaseConfiguration(isNull(String.class));
+        databaseConfigurationsMock.returns(databaseConfiguration).getDatabaseConfiguration(isNull(String.class));
         dataSourceWrapperFactoryMock.onceReturns(dataSourceWrapperMock).create(databaseConfiguration);
         dataSourceWrapperMock.returns(dataSource).getDataSource(false);
 
         DataSourceWrapper result = dataSourceWrapperManager.getDataSourceWrapper(null);
 
         assertSame(dataSourceWrapperMock.getMock(), result);
-        transactionManagerMock.assertInvoked().registerDataSource(dataSource);
     }
 
     @Test
     public void emptyDatabaseNameSameAsNullDatabaseName() throws Exception {
-        databaseConfigurationsMock.onceReturns(databaseConfiguration).getDatabaseConfiguration(isNull(String.class));
+        databaseConfigurationsMock.onceReturns(databaseConfiguration).getDatabaseConfiguration("");
         dataSourceWrapperFactoryMock.onceReturns(dataSourceWrapperMock).create(databaseConfiguration);
         dataSourceWrapperMock.returns(dataSource).getDataSource(false);
 
         DataSourceWrapper result = dataSourceWrapperManager.getDataSourceWrapper("");
 
         assertSame(dataSourceWrapperMock.getMock(), result);
-        transactionManagerMock.assertInvoked().registerDataSource(dataSource);
     }
 }

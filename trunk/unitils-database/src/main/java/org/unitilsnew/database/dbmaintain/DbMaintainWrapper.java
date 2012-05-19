@@ -51,7 +51,6 @@ public class DbMaintainWrapper {
         this.dbMaintainEnabled = dbMaintainEnabled;
     }
 
-
     /**
      * Determines whether the test database is outdated and, if that is the case, updates the database with the
      * latest changes.
@@ -65,10 +64,25 @@ public class DbMaintainWrapper {
         }
         if (!dbMaintainEnabled) {
             logger.info("DbMaintain is disabled. No database updates will be performed.");
+            updateDatabaseCalled = true;
             return false;
         }
-        boolean databaseUpdated = updateDatabase();
         updateDatabaseCalled = true;
+        return updateDatabase();
+    }
+
+    /**
+     * Determines whether the test database is outdated and, if that is the case, updates the database with the
+     * latest changes.
+     *
+     * @return True if an update occurred, false if the database was up to date
+     * @see {@link org.dbmaintain.DbMaintainer}
+     */
+    public boolean updateDatabase() {
+        logger.info("Checking if database(s) have to be updated.");
+        DbMaintainer dbMaintainer = mainFactory.createDbMaintainer();
+
+        boolean databaseUpdated = dbMaintainer.updateDatabase(false);
         if (databaseUpdated) {
             notifyDatabaseUpdateListeners();
         }
@@ -109,12 +123,6 @@ public class DbMaintainWrapper {
         databaseUpdateListeners.remove(databaseUpdateListener);
     }
 
-
-    protected boolean updateDatabase() {
-        logger.info("Checking if database(s) have to be updated.");
-        DbMaintainer dbMaintainer = mainFactory.createDbMaintainer();
-        return dbMaintainer.updateDatabase(false);
-    }
 
     protected void notifyDatabaseUpdateListeners() {
         for (DatabaseUpdateListener databaseUpdateListener : databaseUpdateListeners) {

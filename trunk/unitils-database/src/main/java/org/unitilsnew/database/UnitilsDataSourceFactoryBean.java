@@ -17,8 +17,7 @@ package org.unitilsnew.database;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.unitilsnew.core.Unitils;
-import org.unitilsnew.database.core.DataSourceWrapper;
-import org.unitilsnew.database.core.DataSourceWrapperManager;
+import org.unitilsnew.database.core.DataSourceService;
 
 import javax.sql.DataSource;
 
@@ -35,7 +34,7 @@ import javax.sql.DataSource;
  */
 public class UnitilsDataSourceFactoryBean implements FactoryBean {
 
-    protected static DataSourceWrapperManager dataSourceWrapperManager = Unitils.getInstanceOfType(DataSourceWrapperManager.class);
+    protected static DataSourceService dataSourceService = Unitils.getInstanceOfType(DataSourceService.class);
 
     protected String databaseName;
 
@@ -46,8 +45,7 @@ public class UnitilsDataSourceFactoryBean implements FactoryBean {
      * @return The data source, not null
      */
     public Object getObject() throws Exception {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
-        return dataSourceWrapper.getWrappedDataSource();
+        return dataSourceService.getDataSource(databaseName);
     }
 
 
