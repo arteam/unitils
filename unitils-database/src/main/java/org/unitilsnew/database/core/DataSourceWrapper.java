@@ -18,6 +18,7 @@ package org.unitilsnew.database.core;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -218,7 +219,12 @@ public class DataSourceWrapper {
      * @return The boolean value
      */
     public boolean getBoolean(String sql, Object... args) {
-        return getObject(sql, Boolean.class, args);
+        Boolean result = getObject(sql, Boolean.class, args);
+        if (result == null) {
+            // todo unit test
+            throw new UnitilsException("Unable to get boolean value. Statement returned a null value: '" + sql + "'.");
+        }
+        return result;
     }
 
     /**
@@ -240,7 +246,12 @@ public class DataSourceWrapper {
      * @return The int value
      */
     public int getInteger(String sql, Object... args) {
-        return getObject(sql, Integer.class, args);
+        Integer result = getObject(sql, Integer.class, args);
+        if (result == null) {
+            // todo unit test
+            throw new UnitilsException("Unable to get int value. Statement returned a null value: '" + sql + "'.");
+        }
+        return result;
     }
 
     /**
@@ -262,7 +273,12 @@ public class DataSourceWrapper {
      * @return The long value
      */
     public long getLong(String sql, Object... args) {
-        return getObject(sql, Long.class, args);
+        Long result = getObject(sql, Long.class, args);
+        if (result == null) {
+            // todo unit test
+            throw new UnitilsException("Unable to get long value. Statement returned a null value: '" + sql + "'.");
+        }
+        return result;
     }
 
     /**
@@ -284,12 +300,20 @@ public class DataSourceWrapper {
      * @return The boolean value
      */
     public <T> T getObject(String sql, Class<T> type, Object... args) {
+        if (type == null) {
+            // todo unit test
+            throw new UnitilsException("Unable to get value. Type cannot be null.");
+        }
         logger.debug(sql);
         try {
             SimpleJdbcTemplate simpleJdbcTemplate = getSimpleJdbcTemplate();
             return simpleJdbcTemplate.queryForObject(sql, type, args);
+
         } catch (EmptyResultDataAccessException e) {
             throw new UnitilsException("Unable to get value. Statement did not produce any results: '" + sql + "'.", e);
+        } catch (IncorrectResultSizeDataAccessException e) {
+            // todo unit test
+            throw new UnitilsException("Unable to get value. Statement produced more than 1 result: '" + sql + "'.", e);
         } catch (Exception e) {
             throw new UnitilsException("Unable to execute statement: '" + sql + "'.", e);
         }
@@ -302,10 +326,15 @@ public class DataSourceWrapper {
      * @return The strings, not null
      */
     public <T> List<T> getObjectList(String sql, Class<T> type, Object... args) {
+        if (type == null) {
+            // todo unit test
+            throw new UnitilsException("Unable to get value list. Type cannot be null.");
+        }
         logger.debug(sql);
         try {
             SimpleJdbcTemplate simpleJdbcTemplate = getSimpleJdbcTemplate();
-            return simpleJdbcTemplate.query(sql, new ParameterizedSingleColumnRowMapper<T>(), args);
+            ParameterizedSingleColumnRowMapper<T> rowMapper = ParameterizedSingleColumnRowMapper.newInstance(type);
+            return simpleJdbcTemplate.query(sql, rowMapper, args);
         } catch (Exception e) {
             throw new UnitilsException("Unable to execute statement: '" + sql + "'.", e);
         }

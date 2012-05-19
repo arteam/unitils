@@ -30,8 +30,6 @@ import java.util.List;
  */
 public class SqlUnitils {
 
-    // todo unit test
-
     protected static DataSourceService dataSourceService = Unitils.getInstanceOfType(DataSourceService.class);
 
 
