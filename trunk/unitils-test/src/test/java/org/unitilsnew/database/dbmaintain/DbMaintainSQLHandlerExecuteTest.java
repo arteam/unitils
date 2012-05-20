@@ -59,7 +59,7 @@ public class DbMaintainSQLHandlerExecuteTest extends UnitilsJUnit4 {
     @Test
     public void execute() {
         dbMaintainSQLHandler.execute("insert into my_table(id) values(10)", dataSource);
-        assertTableCount("my_table", 1);
+        assertTableCount(1, "my_table");
     }
 
     @Test

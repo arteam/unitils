@@ -48,7 +48,7 @@ public class SqlUnitilsExecuteUpdateIntegrationTest {
         int result1 = SqlUnitils.executeUpdate("create table my_table (id int)");
         int result2 = SqlUnitils.executeUpdate("insert into my_table (id) values ('111')");
 
-        assertTableCount("my_table", 1);
+        assertTableCount(1, "my_table");
         assertEquals(0, result1);
         assertEquals(1, result2);
     }
@@ -58,7 +58,7 @@ public class SqlUnitilsExecuteUpdateIntegrationTest {
         int result1 = SqlUnitils.executeUpdate("create table my_table (id int)", "database2");
         int result2 = SqlUnitils.executeUpdate("insert into my_table (id) values ('111')", "database2");
 
-        assertTableCount("my_table", 1, "database2");
+        assertTableCount(1, "my_table", "database2");
         assertEquals(0, result1);
         assertEquals(1, result2);
     }
@@ -78,7 +78,7 @@ public class SqlUnitilsExecuteUpdateIntegrationTest {
         SqlUnitils.executeUpdate("create table my_table (id int)", null);
         SqlUnitils.executeUpdate("insert into my_table (id) values ('111')", null);
 
-        assertTableCount("my_table", 1);
+        assertTableCount(1, "my_table");
     }
 
     @Test

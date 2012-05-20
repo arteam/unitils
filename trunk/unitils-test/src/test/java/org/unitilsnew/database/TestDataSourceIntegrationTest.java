@@ -66,7 +66,7 @@ public class TestDataSourceIntegrationTest extends UnitilsJUnit4 {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(defaultDataSource);
         jdbcTemplate.execute("insert into my_table(id) values (111)");
 
-        assertTableCount("my_table", 1, "database1");
+        assertTableCount(1, "my_table", "database1");
         assertTableEmpty("my_table", "database2");
     }
 
@@ -76,6 +76,6 @@ public class TestDataSourceIntegrationTest extends UnitilsJUnit4 {
         jdbcTemplate.execute("insert into my_table(id) values (111)");
 
         assertTableEmpty("my_table", "database1");
-        assertTableCount("my_table", 1, "database2");
+        assertTableCount(1, "my_table", "database2");
     }
 }

@@ -56,7 +56,7 @@ public class DatabaseUnitilsGetDataSourceIntegrationTest {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         jdbcTemplate.execute("insert into my_table(id) values (111)");
 
-        assertTableCount("my_table", 1, "database1");
+        assertTableCount(1, "my_table", "database1");
         assertTableEmpty("my_table", "database2");
     }
 
@@ -68,7 +68,7 @@ public class DatabaseUnitilsGetDataSourceIntegrationTest {
         jdbcTemplate.execute("insert into my_table(id) values (111)");
 
         assertTableEmpty("my_table", "database1");
-        assertTableCount("my_table", 1, "database2");
+        assertTableCount(1, "my_table", "database2");
     }
 
     @Test
@@ -88,7 +88,7 @@ public class DatabaseUnitilsGetDataSourceIntegrationTest {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         jdbcTemplate.execute("insert into my_table(id) values (111)");
 
-        assertTableCount("my_table", 1, "database1");
+        assertTableCount(1, "my_table", "database1");
         assertTableEmpty("my_table", "database2");
     }
 
