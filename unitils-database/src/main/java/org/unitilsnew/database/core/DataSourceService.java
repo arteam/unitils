@@ -27,8 +27,6 @@ import javax.sql.DataSource;
  */
 public class DataSourceService {
 
-    // todo unit test
-
     /* The logger instance for this class */
     protected static Log logger = LogFactory.getLog(DataSourceService.class);
 
@@ -57,7 +55,7 @@ public class DataSourceService {
     public DataSourceWrapper getDataSourceWrapper(String databaseName) {
         DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
 
-        DataSource dataSource = dataSourceWrapper.getDataSource(false);
+        DataSource dataSource = dataSourceWrapper.getWrappedDataSource();
         transactionManager.registerDataSource(dataSource);
         dbMaintainWrapper.updateDatabaseIfNeeded();
         return dataSourceWrapper;
