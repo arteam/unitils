@@ -221,7 +221,6 @@ public class DataSourceWrapper {
     public boolean getBoolean(String sql, Object... args) {
         Boolean result = getObject(sql, Boolean.class, args);
         if (result == null) {
-            // todo unit test
             throw new UnitilsException("Unable to get boolean value. Statement returned a null value: '" + sql + "'.");
         }
         return result;
@@ -248,7 +247,6 @@ public class DataSourceWrapper {
     public int getInteger(String sql, Object... args) {
         Integer result = getObject(sql, Integer.class, args);
         if (result == null) {
-            // todo unit test
             throw new UnitilsException("Unable to get int value. Statement returned a null value: '" + sql + "'.");
         }
         return result;
@@ -275,7 +273,6 @@ public class DataSourceWrapper {
     public long getLong(String sql, Object... args) {
         Long result = getObject(sql, Long.class, args);
         if (result == null) {
-            // todo unit test
             throw new UnitilsException("Unable to get long value. Statement returned a null value: '" + sql + "'.");
         }
         return result;
@@ -301,7 +298,6 @@ public class DataSourceWrapper {
      */
     public <T> T getObject(String sql, Class<T> type, Object... args) {
         if (type == null) {
-            // todo unit test
             throw new UnitilsException("Unable to get value. Type cannot be null.");
         }
         logger.debug(sql);
@@ -312,7 +308,6 @@ public class DataSourceWrapper {
         } catch (EmptyResultDataAccessException e) {
             throw new UnitilsException("Unable to get value. Statement did not produce any results: '" + sql + "'.", e);
         } catch (IncorrectResultSizeDataAccessException e) {
-            // todo unit test
             throw new UnitilsException("Unable to get value. Statement produced more than 1 result: '" + sql + "'.", e);
         } catch (Exception e) {
             throw new UnitilsException("Unable to execute statement: '" + sql + "'.", e);
@@ -327,7 +322,6 @@ public class DataSourceWrapper {
      */
     public <T> List<T> getObjectList(String sql, Class<T> type, Object... args) {
         if (type == null) {
-            // todo unit test
             throw new UnitilsException("Unable to get value list. Type cannot be null.");
         }
         logger.debug(sql);
