@@ -60,7 +60,7 @@ public class DbMaintainUnitilsMarkDatabaseAsUpToDateIntegrationTest {
         DbMaintainUnitils.markDatabaseAsUpToDate();
 
         DbMaintainUnitils.updateDatabase();
-        assertTableCount("my_table", 0);
+        assertTableCount(0, "my_table");
     }
 
 

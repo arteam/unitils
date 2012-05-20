@@ -20,7 +20,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.unitilsnew.database.SqlAssert.assertIntegerResult;
 import static org.unitilsnew.database.SqlUnitils.executeUpdate;
 import static org.unitilsnew.database.SqlUnitils.executeUpdateQuietly;
 
@@ -44,9 +43,9 @@ public class DbMaintainUnitilsClearDatabaseIntegrationTest {
 
     @Test
     public void clearDatabase() throws Exception {
-        assertIntegerResult("select count(1) from INFORMATION_SCHEMA.SYSTEM_TABLES where TABLE_NAME = 'MY_TABLE'", 1);
+        SqlAssert.assertInteger(1, "select count(1) from INFORMATION_SCHEMA.SYSTEM_TABLES where TABLE_NAME = 'MY_TABLE'");
 
         DbMaintainUnitils.clearDatabase();
-        assertIntegerResult("select count(1) from INFORMATION_SCHEMA.SYSTEM_TABLES where TABLE_NAME = 'MY_TABLE'", 0);
+        SqlAssert.assertInteger(0, "select count(1) from INFORMATION_SCHEMA.SYSTEM_TABLES where TABLE_NAME = 'MY_TABLE'");
     }
 }

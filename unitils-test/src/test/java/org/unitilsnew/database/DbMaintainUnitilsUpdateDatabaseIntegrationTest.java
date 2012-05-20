@@ -66,16 +66,16 @@ public class DbMaintainUnitilsUpdateDatabaseIntegrationTest {
     @Test
     public void updateDatabase() throws Exception {
         DbMaintainUnitils.updateDatabase();
-        assertTableCount("my_table", 0);
+        assertTableCount(0, "my_table");
 
         createScript(script1, "insert into my_table(id) values ('111');");
         createScript(script2, "insert into my_table(id) values ('222');");
         DbMaintainUnitils.updateDatabase();
-        assertTableCount("my_table", 2);
+        assertTableCount(2, "my_table");
 
         createScript(script3, "insert into my_table(id) values ('333');");
         DbMaintainUnitils.updateDatabase();
-        assertTableCount("my_table", 3);
+        assertTableCount(3, "my_table");
     }
 
     @Test

@@ -56,7 +56,7 @@ public class DatabaseUnitilsTransactionIntegrationTest {
 
         DatabaseUnitils.commitTransaction();
 
-        assertTableCount("my_table", 1);
+        assertTableCount(1, "my_table");
     }
 
     @Test
@@ -67,7 +67,7 @@ public class DatabaseUnitilsTransactionIntegrationTest {
         dataSourceWrapper.executeUpdate("insert into my_table(id) values (111)");
         DatabaseUnitils.commitTransaction();
 
-        assertTableCount("my_table", 1);
+        assertTableCount(1, "my_table");
     }
 
     @Test

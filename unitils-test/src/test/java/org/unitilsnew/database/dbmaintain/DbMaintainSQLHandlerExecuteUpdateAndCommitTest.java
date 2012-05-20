@@ -65,7 +65,7 @@ public class DbMaintainSQLHandlerExecuteUpdateAndCommitTest extends UnitilsJUnit
 
         dbMaintainSQLHandler.executeUpdateAndCommit("insert into my_table(id) values(10)", dataSource);
 
-        assertTableCount("my_table", 1);
+        assertTableCount(1, "my_table");
         transactionManagerMock.assertInvoked().commit();
     }
 
@@ -73,7 +73,7 @@ public class DbMaintainSQLHandlerExecuteUpdateAndCommitTest extends UnitilsJUnit
     public void noCommitIfNoTransactionIsActive() {
         dbMaintainSQLHandler.executeUpdateAndCommit("insert into my_table(id) values(10)", dataSource);
 
-        assertTableCount("my_table", 1);
+        assertTableCount(1, "my_table");
         transactionManagerMock.assertNotInvoked().commit();
     }
 

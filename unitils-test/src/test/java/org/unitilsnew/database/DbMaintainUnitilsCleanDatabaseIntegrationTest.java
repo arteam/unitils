@@ -46,7 +46,7 @@ public class DbMaintainUnitilsCleanDatabaseIntegrationTest {
 
     @Test
     public void cleanDatabase() throws Exception {
-        assertTableCount("my_table", 1);
+        assertTableCount(1, "my_table");
 
         DbMaintainUnitils.cleanDatabase();
         assertTableEmpty("my_table");

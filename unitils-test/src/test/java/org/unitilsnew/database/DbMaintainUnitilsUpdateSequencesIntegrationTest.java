@@ -20,7 +20,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.unitilsnew.database.SqlAssert.assertIntegerResult;
 import static org.unitilsnew.database.SqlUnitils.executeUpdate;
 import static org.unitilsnew.database.SqlUnitils.executeUpdateQuietly;
 
@@ -44,9 +43,9 @@ public class DbMaintainUnitilsUpdateSequencesIntegrationTest {
 
     @Test
     public void updateSequences() throws Exception {
-        assertIntegerResult("call next value for my_sequence", 0);
+        SqlAssert.assertInteger(0, "call next value for my_sequence");
 
         DbMaintainUnitils.updateSequences();
-        assertIntegerResult("call next value for my_sequence", 1000);
+        SqlAssert.assertInteger(1000, "call next value for my_sequence");
     }
 }

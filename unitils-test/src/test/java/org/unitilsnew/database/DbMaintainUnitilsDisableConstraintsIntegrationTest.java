@@ -50,6 +50,6 @@ public class DbMaintainUnitilsDisableConstraintsIntegrationTest {
 
         DbMaintainUnitils.disableConstraints();
         executeUpdateQuietly("insert into my_table(id) values (null)");
-        assertTableCount("my_table", 1);
+        assertTableCount(1, "my_table");
     }
 }
