@@ -76,4 +76,15 @@ public class DataSourceWrapperGetIntegerTest extends UnitilsJUnit4 {
                     "message", e.getMessage());
         }
     }
+
+    @Test
+    public void exceptionWhenNullValueFound() throws Exception {
+        simpleJdbcTemplateMock.returns(null).queryForObject("query", Integer.class, "arg");
+        try {
+            dataSourceWrapper.getMock().getInteger("query", "arg");
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to get int value. Statement returned a null value: 'query'.", e.getMessage());
+        }
+    }
 }

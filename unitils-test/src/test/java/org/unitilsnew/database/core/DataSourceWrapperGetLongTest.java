@@ -76,4 +76,15 @@ public class DataSourceWrapperGetLongTest extends UnitilsJUnit4 {
                     "message", e.getMessage());
         }
     }
+
+    @Test
+    public void exceptionWhenNullValueFound() throws Exception {
+        simpleJdbcTemplateMock.returns(null).queryForObject("query", Long.class, "arg");
+        try {
+            dataSourceWrapper.getMock().getLong("query", "arg");
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to get long value. Statement returned a null value: 'query'.", e.getMessage());
+        }
+    }
 }

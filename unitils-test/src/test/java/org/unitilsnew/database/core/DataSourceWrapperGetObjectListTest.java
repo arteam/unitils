@@ -67,4 +67,14 @@ public class DataSourceWrapperGetObjectListTest extends UnitilsJUnit4 {
                     "message", e.getMessage());
         }
     }
+
+    @Test
+    public void exceptionWhenNullType() throws Exception {
+        try {
+            dataSourceWrapper.getMock().getObjectList("query", null, "arg");
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to get value list. Type cannot be null.", e.getMessage());
+        }
+    }
 }

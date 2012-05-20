@@ -75,4 +75,15 @@ public class DataSourceWrapperGetBooleanTest extends UnitilsJUnit4 {
                     "message", e.getMessage());
         }
     }
+
+    @Test
+    public void exceptionWhenNullValueFound() throws Exception {
+        simpleJdbcTemplateMock.returns(null).queryForObject("query", Boolean.class, "arg");
+        try {
+            dataSourceWrapper.getMock().getBoolean("query", "arg");
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to get boolean value. Statement returned a null value: 'query'.", e.getMessage());
+        }
+    }
 }

@@ -19,6 +19,7 @@ package org.unitilsnew.database.core;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
@@ -76,6 +77,28 @@ public class DataSourceWrapperGetObjectTest extends UnitilsJUnit4 {
         } catch (UnitilsException e) {
             assertEquals("Unable to get value. Statement did not produce any results: 'query'. Reason:\n" +
                     "message", e.getMessage());
+        }
+    }
+
+    @Test
+    public void exceptionWhenMoreThanOneValueFound() throws Exception {
+        simpleJdbcTemplateMock.raises(new IncorrectResultSizeDataAccessException("message", 1)).queryForObject("query", BigDecimal.class, "arg");
+        try {
+            dataSourceWrapper.getMock().getObject("query", BigDecimal.class, "arg");
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to get value. Statement produced more than 1 result: 'query'. Reason:\n" +
+                    "message", e.getMessage());
+        }
+    }
+
+    @Test
+    public void exceptionWhenNullType() throws Exception {
+        try {
+            dataSourceWrapper.getMock().getObject("query", null, "arg");
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to get value. Type cannot be null.", e.getMessage());
         }
     }
 }
