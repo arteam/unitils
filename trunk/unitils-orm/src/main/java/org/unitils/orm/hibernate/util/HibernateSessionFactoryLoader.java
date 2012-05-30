@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-import org.unitils.database.DatabaseModule;
+import org.unitils.database.DatabaseUnitils;
 import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
 import org.unitils.orm.common.util.OrmConfig;
 import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
@@ -75,12 +75,7 @@ public class HibernateSessionFactoryLoader implements OrmPersistenceUnitLoader<S
 
 
     protected DataSource getDataSource() {
-        return getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded();
-    }
-
-
-    protected DatabaseModule getDatabaseModule() {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+        return DatabaseUnitils.getDataSource();
     }
 
 

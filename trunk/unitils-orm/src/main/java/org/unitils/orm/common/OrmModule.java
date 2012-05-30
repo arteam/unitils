@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,21 +20,21 @@ import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.ResourceConfigLoader;
-import org.unitils.database.DatabaseModule;
-import org.unitils.database.util.Flushable;
+import org.unitils.database.DatabaseUnitils;
 import org.unitils.orm.common.spring.OrmSpringSupport;
 import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
 import org.unitils.orm.common.util.OrmConfig;
 import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+
+import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
 /**
  * Base module defining common behavior for a module that provides object relational mapping support for tests.
@@ -43,16 +43,19 @@ import java.util.*;
  * The persistence unit is injected into the test object's annotated fields. This module also supports
  * flushing of the active persistence context.
  *
+ * @param <ORM_PERSISTENCE_UNIT>    Type of the ORM persistence unit
+ * @param <ORM_PERSISTENCE_CONTEXT> Type of the ORM persistence context
+ * @param <PROVIDER_CONFIGURATION_OBJECT>
+ *                                  Type of the implementation specific configuration object
+ * @param <PERSISTENCE_UNIT_CONFIG_ANNOTATION>
+ *                                  Type of the annotation used for configuring and injecting the persistence unit
+ * @param <ORM_CONFIG>              Type of the value object extending {@link OrmConfig} that contains all unitils specific persitence unit configuration
+ * @param <ORM_PERSISTENCE_UNIT_CONFIG_LOADER>
+ *                                  Subtype of {@link OrmPersistenceUnitLoader} that loads the persistence unit based on the ORM_CONFIG.
  * @author Filip Neven
  * @author Tim Ducheyne
- * @param <ORM_PERSISTENCE_UNIT> Type of the ORM persistence unit
- * @param <ORM_PERSISTENCE_CONTEXT> Type of the ORM persistence context
- * @param <PROVIDER_CONFIGURATION_OBJECT> Type of the implementation specific configuration object
- * @param <PERSISTENCE_UNIT_CONFIG_ANNOTATION> Type of the annotation used for configuring and injecting the persistence unit
- * @param <ORM_CONFIG> Type of the value object extending {@link OrmConfig} that contains all unitils specific persitence unit configuration
- * @param <ORM_PERSISTENCE_UNIT_CONFIG_LOADER> Subtype of {@link OrmPersistenceUnitLoader} that loads the persistence unit based on the ORM_CONFIG.
  */
-abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, PROVIDER_CONFIGURATION_OBJECT, PERSISTENCE_UNIT_CONFIG_ANNOTATION extends Annotation, ORM_CONFIG extends OrmConfig, ORM_PERSISTENCE_UNIT_CONFIG_LOADER extends ResourceConfigLoader<ORM_CONFIG>> implements Module, Flushable {
+abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, PROVIDER_CONFIGURATION_OBJECT, PERSISTENCE_UNIT_CONFIG_ANNOTATION extends Annotation, ORM_CONFIG extends OrmConfig, ORM_PERSISTENCE_UNIT_CONFIG_LOADER extends ResourceConfigLoader<ORM_CONFIG>> implements Module {
 
     /**
      * Class that loads the persistence unit configuration
@@ -180,12 +183,12 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
         if (configuredPersistenceUnit == null) {
             configuredPersistenceUnit = ormPersistenceUnitLoader.getConfiguredOrmPersistenceUnit(testObject, persistenceUnitConfig);
             configuredOrmPersistenceUnitCache.put(persistenceUnitConfig, configuredPersistenceUnit);
-            getDatabaseModule().activateTransactionIfNeeded();
+            DatabaseUnitils.startTransaction();
         }
         return configuredPersistenceUnit;
     }
-    
-    
+
+
     /*protected boolean isConfiguredPersistenceUnitActive(Object testObject) {
         if (ormSpringSupport != null && ormSpringSupport.isPersistenceUnitConfiguredInSpring(testObject)) {
             return true;
@@ -349,11 +352,6 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
     protected boolean isSpringModuleEnabled() {
         // We specify the fully qualified classname of the spring module as string, to avoid classloading issues
         return Unitils.getInstance().getModulesRepository().isModuleEnabled("org.unitils.spring.SpringModule");
-    }
-
-
-    protected DatabaseModule getDatabaseModule() {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
     }
 
 
