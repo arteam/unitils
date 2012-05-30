@@ -59,7 +59,7 @@ public class InjectionService {
             return doInjectInto(target, target.getClass(), property, objectToInject, autoCreateInnerFields);
 
         } catch (Exception e) {
-            throw new UnitilsException("Unable to inject into property '" + property + "' with target of type " + target.getClass().getName() + ". Reason:\n" + e.getMessage(), e);
+            throw new UnitilsException("Unable to inject into property '" + property + "' with target of type " + target.getClass().getName() + ".", e);
         }
     }
 
@@ -77,7 +77,7 @@ public class InjectionService {
             return doInjectInto(null, targetClass, property, objectToInject, autoCreateInnerFields);
 
         } catch (Exception e) {
-            throw new UnitilsException("Unable to inject into static property '" + property + "' with target class " + targetClass.getName() + ". Reason:\n" + e.getMessage(), e);
+            throw new UnitilsException("Unable to inject into static property '" + property + "' with target class " + targetClass.getName() + ".", e);
         }
     }
 

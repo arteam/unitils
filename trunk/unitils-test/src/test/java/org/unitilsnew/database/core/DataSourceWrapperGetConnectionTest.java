@@ -62,8 +62,8 @@ public class DataSourceWrapperGetConnectionTest extends UnitilsJUnit4 {
             dataSourceWrapper.getConnection();
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to connect to database for database name: 'myDatabase', driver class name: 'myDriver', url: 'myUrl', user name: 'myUser', password: <not shown>, default schema name: 'schemaA', schema names: [schemaA, schemaB]. Reason:\n" +
-                    "No DataSource specified", e.getMessage());
+            assertEquals("Unable to connect to database for database name: 'myDatabase', driver class name: 'myDriver', url: 'myUrl', user name: 'myUser', password: <not shown>, default schema name: 'schemaA', schema names: [schemaA, schemaB].\n" +
+                    "Reason: IllegalArgumentException: No DataSource specified", e.getMessage());
         }
     }
 }

@@ -70,13 +70,13 @@ public class DatabaseUnitils {
      * Commits the current transaction.
      */
     public static void commitTransaction() {
-        transactionManager.commit();
+        transactionManager.commit(true);
     }
 
     /**
      * Performs a rollback of the current transaction.
      */
     public static void rollbackTransaction() {
-        transactionManager.rollback();
+        transactionManager.rollback(true);
     }
 }

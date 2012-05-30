@@ -114,9 +114,10 @@ public class InjectionByTypeServiceInjectIntoByTypeTest {
             injectionByTypeService.injectIntoByType(target, objectToInject, true);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to inject into by type 'class org.unitils.inject.core.InjectionByTypeServiceInjectIntoByTypeTest$Type1'. Reason:\n" +
-                    "Unable to set value for field with name 'type1'.\n" +
-                    "Make sure that the field exists on the target object and that the value is of the correct type: org.unitils.inject.core.InjectionByTypeServiceInjectIntoByTypeTest$Type1. Value: xxx", e.getMessage());
+            assertEquals("Unable to inject into by type 'class org.unitils.inject.core.InjectionByTypeServiceInjectIntoByTypeTest$Type1'.\n" +
+                    "Reason: Unable to set value for field with name 'type1'.\n" +
+                    "Make sure that the field exists on the target object and that the value is of the correct type: org.unitils.inject.core.InjectionByTypeServiceInjectIntoByTypeTest$Type1. Value: xxx\n" +
+                    "Reason: IllegalArgumentException: Can not set org.unitils.inject.core.InjectionByTypeServiceInjectIntoByTypeTest$Type1 field org.unitils.inject.core.InjectionByTypeServiceInjectIntoByTypeTest$Target.type1 to java.lang.String", e.getMessage());
         }
     }
 

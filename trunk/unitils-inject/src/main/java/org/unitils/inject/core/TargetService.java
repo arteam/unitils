@@ -38,7 +38,7 @@ public class TargetService {
             List<TestField> targetTestFields = getTargetTestFields(targetNames, testInstance);
             targets = getTargets(targetTestFields);
         } catch (Exception e) {
-            throw new UnitilsException("Unable to get targets for injection. Reason:\n" + e.getMessage(), e);
+            throw new UnitilsException("Unable to get targets for injection.", e);
         }
         if (targets.isEmpty()) {
             throw new UnitilsException("No targets for injection found.\n" +

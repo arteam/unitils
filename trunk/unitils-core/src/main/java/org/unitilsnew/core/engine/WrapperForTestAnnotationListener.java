@@ -25,8 +25,6 @@ import org.unitilsnew.core.reflect.Annotations;
 
 import java.lang.annotation.Annotation;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
-
 /**
  * @author Tim Ducheyne
  */
@@ -85,14 +83,6 @@ public class WrapperForTestAnnotationListener<A extends Annotation> extends Test
 
 
     protected String getExceptionMessage(Exception e) {
-        StringBuilder message = new StringBuilder("Unable to handle test annotation @");
-        message.append(annotations.getType().getSimpleName());
-        message.append(".");
-        String exceptionMessage = e.getMessage();
-        if (!isBlank(exceptionMessage)) {
-            message.append(" Reason:\n");
-            message.append(exceptionMessage);
-        }
-        return message.toString();
+        return "Unable to handle test annotation @" + annotations.getType().getSimpleName() + ".";
     }
 }

@@ -75,7 +75,7 @@ public class MockTestListener extends TestListener {
         try {
             return testField.getSingleGenericClass();
         } catch (UnitilsException e) {
-            throw new UnitilsException("Unable to determine type of mock for field " + testField + ". A mock should be declared using the generic Mock<YourTypeToMock> type. Reason:\n" + e.getMessage(), e);
+            throw new UnitilsException("Unable to determine type of mock for field " + testField + ". A mock should be declared using the generic Mock<YourTypeToMock> type.", e);
         }
     }
 

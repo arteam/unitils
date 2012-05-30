@@ -25,12 +25,10 @@ import org.unitilsnew.database.core.TransactionManager;
 
 import javax.sql.DataSource;
 
-import static org.unitils.mock.MockUnitils.assertNoMoreInvocations;
-
 /**
  * @author Tim Ducheyne
  */
-public class DbMaintainSQLHandlerTest extends UnitilsJUnit4 {
+public class DbMaintainSQLHandlerEndTransactionAndRollbackTest extends UnitilsJUnit4 {
 
     /* Tested object */
     private DbMaintainSQLHandler dbMaintainSQLHandler;
@@ -47,16 +45,22 @@ public class DbMaintainSQLHandlerTest extends UnitilsJUnit4 {
 
 
     @Test
-    public void startTransaction() {
-        dbMaintainSQLHandler.startTransaction(dataSource);
+    public void endWholeTransactionWhenNoTransactionWasStartedForTest() {
+        transactionManagerMock.returns(false).isTransactionStarted();
 
-        transactionManagerMock.assertInvoked().registerDataSource(dataSource);
-        transactionManagerMock.assertInvoked().startTransaction();
+        dbMaintainSQLHandler.startTransaction(dataSource);
+        dbMaintainSQLHandler.endTransactionAndRollback(dataSource);
+
+        transactionManagerMock.assertInvoked().rollback(true);
     }
 
     @Test
-    public void closeAllConnections() {
-        dbMaintainSQLHandler.closeAllConnections();
-        assertNoMoreInvocations();
+    public void keepTransactionWhenTransactionWasStartedForTest() {
+        transactionManagerMock.returns(true).isTransactionStarted();
+
+        dbMaintainSQLHandler.startTransaction(dataSource);
+        dbMaintainSQLHandler.endTransactionAndRollback(dataSource);
+
+        transactionManagerMock.assertInvoked().rollback(false);
     }
 }

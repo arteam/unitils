@@ -104,8 +104,8 @@ public class WrapperForFieldAnnotationListenerTest extends UnitilsJUnit4 {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertSame(exception, e.getCause());
-            assertEquals("Unable to handle field annotation @Target on field 'fieldName':\n" +
-                    "message", e.getMessage());
+            assertEquals("Unable to handle field annotation @Target on field 'fieldName'.\n" +
+                    "Reason: NullPointerException: message", e.getMessage());
         }
     }
 
@@ -118,7 +118,7 @@ public class WrapperForFieldAnnotationListenerTest extends UnitilsJUnit4 {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertSame(exception, e.getCause());
-            assertEquals("Unable to handle field annotation @Target on field 'fieldName'", e.getMessage());
+            assertEquals("Unable to handle field annotation @Target on field 'fieldName'.", e.getMessage());
         }
     }
 
@@ -131,7 +131,7 @@ public class WrapperForFieldAnnotationListenerTest extends UnitilsJUnit4 {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertSame(exception, e.getCause());
-            assertEquals("Unable to handle field annotation @Target on field 'fieldName'", e.getMessage());
+            assertEquals("Unable to handle field annotation @Target on field 'fieldName'.", e.getMessage());
         }
     }
 
@@ -144,8 +144,8 @@ public class WrapperForFieldAnnotationListenerTest extends UnitilsJUnit4 {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertSame(exception, e.getCause());
-            assertEquals("Unable to handle field annotation @Target on field 'fieldName':\n" +
-                    "message", e.getMessage());
+            assertEquals("Unable to handle field annotation @Target on field 'fieldName'.\n" +
+                    "Reason: NullPointerException: message", e.getMessage());
         }
     }
 }

@@ -47,7 +47,11 @@ public class UnitilsException extends RuntimeException {
         Throwable cause = getCause();
         if (cause != null) {
             if (!isBlank(cause.getMessage())) {
-                reason = " Reason:\n" + cause.getMessage();
+                reason = "\nReason: ";
+                if (!(cause instanceof UnitilsException)) {
+                    reason += cause.getClass().getSimpleName() + ": ";
+                }
+                reason = reason + cause.getMessage();
             }
         }
         return super.getMessage() + reason;

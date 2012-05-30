@@ -68,9 +68,10 @@ public class OriginalFieldValueRestoreToOriginalValueTest extends UnitilsJUnit4 
             originalFieldValue = new OriginalFieldValue("original value", fieldWrapper, "xxx");
             originalFieldValue.restoreToOriginalValue();
         } catch (UnitilsException e) {
-            assertEquals("Unable to restore field with name 'value' to value 'original value'. Reason:\n" +
-                    "Unable to set value for field with name 'value'.\n" +
-                    "Make sure that the field exists on the target object and that the value is of the correct type: java.lang.String. Value: original value", e.getMessage());
+            assertEquals("Unable to restore field with name 'value' to value 'original value'.\n" +
+                    "Reason: Unable to set value for field with name 'value'.\n" +
+                    "Make sure that the field exists on the target object and that the value is of the correct type: java.lang.String. Value: original value\n" +
+                    "Reason: IllegalArgumentException: Can not set java.lang.String field org.unitilsnew.core.reflect.OriginalFieldValueRestoreToOriginalValueTest$MyClass.value to java.lang.String", e.getMessage());
         }
     }
 

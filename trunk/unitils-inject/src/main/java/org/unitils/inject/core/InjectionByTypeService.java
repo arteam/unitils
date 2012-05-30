@@ -89,7 +89,7 @@ public class InjectionByTypeService {
         try {
             return targetFieldWrapper.setValue(value, target);
         } catch (Exception e) {
-            throw new UnitilsException("Unable to inject into by type '" + type + "'. Reason:\n" + e.getMessage(), e);
+            throw new UnitilsException("Unable to inject into by type '" + type + "'.", e);
         }
     }
 
@@ -136,7 +136,7 @@ public class InjectionByTypeService {
         try {
             return targetFieldWrapper.setValue(value, null);
         } catch (Exception e) {
-            throw new UnitilsException("Unable to inject into static by type '" + type + "'. Reason:\n" + e.getMessage(), e);
+            throw new UnitilsException("Unable to inject into static by type '" + type + "'.", e);
         }
     }
 

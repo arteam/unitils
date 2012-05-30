@@ -22,8 +22,6 @@ import org.unitilsnew.core.reflect.Annotations;
 
 import java.lang.annotation.Annotation;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
-
 /**
  * @author Tim Ducheyne
  */
@@ -84,16 +82,6 @@ public class WrapperForFieldAnnotationListener<A extends Annotation> extends Tes
 
 
     protected String getExceptionMessage(Exception e) {
-        StringBuilder message = new StringBuilder("Unable to handle field annotation @");
-        message.append(annotations.getType().getSimpleName());
-        message.append(" on field '");
-        message.append(testField.getName());
-        message.append("'.");
-        String exceptionMessage = e.getMessage();
-        if (!isBlank(exceptionMessage)) {
-            message.append(" Reason:\n");
-            message.append(exceptionMessage);
-        }
-        return message.toString();
+        return "Unable to handle field annotation @" + annotations.getType().getSimpleName() + " on field '" + testField.getName() + "'.";
     }
 }

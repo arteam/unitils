@@ -54,7 +54,8 @@ public class ClassWrapperCreateInstanceTest {
             fail("UnitilsException expected");
 
         } catch (UnitilsException e) {
-            assertEquals("Unable to create instance of type org.unitilsnew.core.reflect.ClassWrapperCreateInstanceTest$NoDefaultConstructor. No default (no-argument) constructor found.", e.getMessage());
+            assertEquals("Unable to create instance of type org.unitilsnew.core.reflect.ClassWrapperCreateInstanceTest$NoDefaultConstructor. No default (no-argument) constructor found.\n" +
+                    "Reason: NoSuchMethodException: org.unitilsnew.core.reflect.ClassWrapperCreateInstanceTest$NoDefaultConstructor.<init>()", e.getMessage());
         }
     }
 
@@ -78,7 +79,8 @@ public class ClassWrapperCreateInstanceTest {
             fail("UnitilsException expected");
 
         } catch (UnitilsException e) {
-            assertEquals("Unable to create instance of type org.unitilsnew.core.reflect.ClassWrapperCreateInstanceTest$ConstructorRaisedException. Reason: java.lang.NullPointerException: test", e.getMessage());
+            assertEquals("Unable to create instance of type org.unitilsnew.core.reflect.ClassWrapperCreateInstanceTest$ConstructorRaisedException.\n" +
+                    "Reason: NullPointerException: test", e.getMessage());
         }
     }
 

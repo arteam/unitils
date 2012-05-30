@@ -125,9 +125,10 @@ public class InjectionByTypeServiceInjectIntoStaticByTypeTest {
             injectionByTypeService.injectIntoStaticByType(Target.class, objectToInject, true);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to inject into static by type 'class org.unitils.inject.core.InjectionByTypeServiceInjectIntoStaticByTypeTest$Type1'. Reason:\n" +
-                    "Unable to set value for field with name 'type1'.\n" +
-                    "Make sure that the field exists on the target object and that the value is of the correct type: org.unitils.inject.core.InjectionByTypeServiceInjectIntoStaticByTypeTest$Type1. Value: xxx", e.getMessage());
+            assertEquals("Unable to inject into static by type 'class org.unitils.inject.core.InjectionByTypeServiceInjectIntoStaticByTypeTest$Type1'.\n" +
+                    "Reason: Unable to set value for field with name 'type1'.\n" +
+                    "Make sure that the field exists on the target object and that the value is of the correct type: org.unitils.inject.core.InjectionByTypeServiceInjectIntoStaticByTypeTest$Type1. Value: xxx\n" +
+                    "Reason: IllegalArgumentException: Can not set static org.unitils.inject.core.InjectionByTypeServiceInjectIntoStaticByTypeTest$Type1 field org.unitils.inject.core.InjectionByTypeServiceInjectIntoStaticByTypeTest$Target.type1 to java.lang.String", e.getMessage());
         }
     }
 

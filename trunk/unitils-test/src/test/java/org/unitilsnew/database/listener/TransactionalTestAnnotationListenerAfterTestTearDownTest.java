@@ -64,8 +64,8 @@ public class TransactionalTestAnnotationListenerAfterTestTearDownTest extends Un
 
         transactionalTestAnnotationListener.afterTestTearDown(testInstanceMock.getMock(), annotationsMock.getMock());
 
-        transactionManagerMock.assertNotInvoked().commit();
-        transactionManagerMock.assertNotInvoked().rollback();
+        transactionManagerMock.assertNotInvoked().commit(true);
+        transactionManagerMock.assertNotInvoked().rollback(true);
     }
 
     @Test
@@ -74,7 +74,7 @@ public class TransactionalTestAnnotationListenerAfterTestTearDownTest extends Un
 
         transactionalTestAnnotationListener.afterTestTearDown(testInstanceMock.getMock(), annotationsMock.getMock());
 
-        transactionManagerMock.assertInvoked().commit();
+        transactionManagerMock.assertInvoked().commit(true);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class TransactionalTestAnnotationListenerAfterTestTearDownTest extends Un
 
         transactionalTestAnnotationListener.afterTestTearDown(testInstanceMock.getMock(), annotationsMock.getMock());
 
-        transactionManagerMock.assertInvoked().rollback();
+        transactionManagerMock.assertInvoked().rollback(true);
     }
 
     @Test
@@ -92,8 +92,8 @@ public class TransactionalTestAnnotationListenerAfterTestTearDownTest extends Un
 
         transactionalTestAnnotationListener.afterTestTearDown(testInstanceMock.getMock(), annotationsMock.getMock());
 
-        transactionManagerMock.assertNotInvoked().commit();
-        transactionManagerMock.assertNotInvoked().rollback();
+        transactionManagerMock.assertNotInvoked().commit(true);
+        transactionManagerMock.assertNotInvoked().rollback(true);
     }
 
 

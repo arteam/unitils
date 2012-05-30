@@ -101,8 +101,8 @@ public class WrapperForTestAnnotationListenerTest extends UnitilsJUnit4 {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertSame(exception, e.getCause());
-            assertEquals("Unable to handle test annotation @Target:\n" +
-                    "message", e.getMessage());
+            assertEquals("Unable to handle test annotation @Target.\n" +
+                    "Reason: NullPointerException: message", e.getMessage());
         }
     }
 
@@ -115,8 +115,8 @@ public class WrapperForTestAnnotationListenerTest extends UnitilsJUnit4 {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertSame(exception, e.getCause());
-            assertEquals("Unable to handle test annotation @Target:\n" +
-                    "message", e.getMessage());
+            assertEquals("Unable to handle test annotation @Target.\n" +
+                    "Reason: NullPointerException: message", e.getMessage());
         }
     }
 
@@ -129,7 +129,7 @@ public class WrapperForTestAnnotationListenerTest extends UnitilsJUnit4 {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertSame(exception, e.getCause());
-            assertEquals("Unable to handle test annotation @Target", e.getMessage());
+            assertEquals("Unable to handle test annotation @Target.", e.getMessage());
         }
     }
 
@@ -142,8 +142,8 @@ public class WrapperForTestAnnotationListenerTest extends UnitilsJUnit4 {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertSame(exception, e.getCause());
-            assertEquals("Unable to handle test annotation @Target:\n" +
-                    "message", e.getMessage());
+            assertEquals("Unable to handle test annotation @Target.\n" +
+                    "Reason: NullPointerException: message", e.getMessage());
         }
     }
 }

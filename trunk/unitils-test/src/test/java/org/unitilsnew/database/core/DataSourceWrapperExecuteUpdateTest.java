@@ -61,8 +61,8 @@ public class DataSourceWrapperExecuteUpdateTest extends UnitilsJUnit4 {
             dataSourceWrapper.getMock().executeUpdate("sql", "arg");
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to execute statement: 'sql'. Reason:\n" +
-                    "message", e.getMessage());
+            assertEquals("Unable to execute statement: 'sql'.\n" +
+                    "Reason: NullPointerException: message", e.getMessage());
         }
     }
 }

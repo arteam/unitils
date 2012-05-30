@@ -171,8 +171,9 @@ public class CompositeFieldWrapperSetValueTest {
             compositeFieldWrapper.setValue("value", object, true);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to set value for composite field with name 'inner1.inner2.inner3.field'. Could not auto create instance of inner field 'inner3'. Reason:\n" +
-                    "Unable to create instance of type org.unitilsnew.core.reflect.CompositeFieldWrapperSetValueTest$Inner3. No default (no-argument) constructor found.", e.getMessage());
+            assertEquals("Unable to set value for composite field with name 'inner1.inner2.inner3.field'. Could not auto create instance of inner field 'inner3'.\n" +
+                    "Reason: Unable to create instance of type org.unitilsnew.core.reflect.CompositeFieldWrapperSetValueTest$Inner3. No default (no-argument) constructor found.\n" +
+                    "Reason: NoSuchMethodException: org.unitilsnew.core.reflect.CompositeFieldWrapperSetValueTest$Inner3.<init>()", e.getMessage());
         }
     }
 
@@ -184,7 +185,8 @@ public class CompositeFieldWrapperSetValueTest {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Unable to set value for field with name 'field'.\n" +
-                    "Make sure that the field exists on the target object and that the value is of the correct type: java.lang.String. Value: value", e.getMessage());
+                    "Make sure that the field exists on the target object and that the value is of the correct type: java.lang.String. Value: value\n" +
+                    "Reason: IllegalArgumentException: Can not set java.lang.String field org.unitilsnew.core.reflect.CompositeFieldWrapperSetValueTest$OtherClass.field to org.unitilsnew.core.reflect.CompositeFieldWrapperSetValueTest$MyClass", e.getMessage());
         }
     }
 
@@ -196,7 +198,8 @@ public class CompositeFieldWrapperSetValueTest {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Unable to set value for field with name 'field'.\n" +
-                    "Make sure that the field exists on the target object and that the value is of the correct type: java.lang.String. Value: value", e.getMessage());
+                    "Make sure that the field exists on the target object and that the value is of the correct type: java.lang.String. Value: value\n" +
+                    "Reason: IllegalArgumentException: Can not set java.lang.String field org.unitilsnew.core.reflect.CompositeFieldWrapperSetValueTest$OtherClass.field to org.unitilsnew.core.reflect.CompositeFieldWrapperSetValueTest$Inner1", e.getMessage());
         }
     }
 
@@ -207,9 +210,10 @@ public class CompositeFieldWrapperSetValueTest {
             compositeFieldWrapper.setValue("value", object);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to set value for composite field with name 'inner1.field.field'. Cannot get value of inner field 'field'. Reason:\n" +
-                    "Unable to get value of field with name 'field'.\n" +
-                    "Make sure that the field exists on the target object.", e.getMessage());
+            assertEquals("Unable to set value for composite field with name 'inner1.field.field'. Cannot get value of inner field 'field'.\n" +
+                    "Reason: Unable to get value of field with name 'field'.\n" +
+                    "Make sure that the field exists on the target object.\n" +
+                    "Reason: IllegalArgumentException: Can not set java.lang.String field org.unitilsnew.core.reflect.CompositeFieldWrapperSetValueTest$OtherClass.field to org.unitilsnew.core.reflect.CompositeFieldWrapperSetValueTest$Inner1", e.getMessage());
         }
     }
 

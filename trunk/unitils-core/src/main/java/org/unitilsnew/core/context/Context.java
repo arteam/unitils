@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * @author Tim Ducheyne
@@ -85,11 +83,7 @@ public class Context {
                 logger.debug("Created instance for type " + key + ": " + instance.getClass().getName());
 
             } catch (Exception e) {
-                String reason = "";
-                if (!isBlank(e.getMessage())) {
-                    reason = " Reason:\n" + e.getMessage();
-                }
-                throw new UnitilsException("Unable to create instance for type " + key + "." + reason, e);
+                throw new UnitilsException("Unable to create instance for type " + key + ".", e);
             }
             instances.put(key, instance);
         }
