@@ -26,18 +26,22 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Custom test runner that will Unitils-enable your test. This will make sure that the
- * core unitils test listener methods are invoked in the expected order. See {@link org.unitils.core.TestListener} for
- * more information on the listener invocation order.
- * <p/>
- * NOTE: if a test fails, the error is logged as debug logging. This is a temporary work-around for
- * a problem with IntelliJ JUnit-4 runner that reports a 'Wrong test finished' error when something went wrong
- * in the before. [IDEA-12498]
- *
  * @author Tim Ducheyne
  * @author Filip Neven
+ * @deprecated The {@link JUnit4ClassRunner} is deprececated and marked for deletion in future. As soon as its deleted with
+ *             junit and we have to upgrade that version we will have to delete this file To. The new class to use is the
+ *             {@link UnitilsBlockJUnit4TestClassRunner}
+ *             <p/>
+ *             <p/>
+ *             Custom test runner that will Unitils-enable your test. This will make sure that the
+ *             core unitils test listener methods are invoked in the expected order. See {@link org.unitils.core.TestListener} for
+ *             more information on the listener invocation order.
+ *             <p/>
+ *             NOTE: if a test fails, the error is logged as debug logging. This is a temporary work-around for
+ *             a problem with IntelliJ JUnit-4 runner that reports a 'Wrong test finished' error when something went wrong
+ *             in the before. [IDEA-12498]
  */
-// todo unit test
+
 public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
 
 
@@ -80,10 +84,10 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
         try {
             testObject = createTest();
         } catch (InvocationTargetException e) {
-            notifier.testAborted(description, e.getCause());
+            notifier.fireTestFailure(new Failure(description, e.getCause()));
             return;
         } catch (Exception e) {
-            notifier.testAborted(description, e);
+            notifier.fireTestFailure(new Failure(description, e));
             return;
         }
         TestMethod testMethod = wrapMethod(method);
