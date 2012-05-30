@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,8 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import static org.unitils.core.util.SQLTestUtils.*;
-import static org.unitils.database.SQLUnitils.executeUpdate;
-import static org.unitils.database.SQLUnitils.getItemAsLong;
+import static org.unitils.database.SqlUnitils.executeUpdate;
+import static org.unitils.database.SqlUnitils.getLong;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 /**
@@ -311,9 +311,9 @@ public class DbSupportTest extends UnitilsJUnit4 {
         }
 
         dbSupport.incrementIdentityColumnToValue(dbSupport.toCorrectCaseIdentifier("TEST_TABLE"), "COL1", 30);
-        executeUpdate("insert into test_table (col2) values ('xxxx')", dataSource);
+        executeUpdate("insert into test_table (col2) values ('xxxx')");
 
-        long result = getItemAsLong("select col1 from test_table", dataSource);
+        long result = getLong("select col1 from test_table");
         assertEquals(30, result);
     }
 
@@ -422,7 +422,7 @@ public class DbSupportTest extends UnitilsJUnit4 {
         for (String triggerName : triggerNames) {
             dbSupport.dropTrigger(triggerName);
         }
-        executeUpdate("insert into " + dbSupport.quoted("Test_CASE_Table") + " (col1) values (null)", dataSource);
+        executeUpdate("insert into " + dbSupport.quoted("Test_CASE_Table") + " (col1) values (null)");
     }
 
 
@@ -447,9 +447,9 @@ public class DbSupportTest extends UnitilsJUnit4 {
         // should succeed now
         if ("mssql".equals(dbSupport.getDatabaseDialect())) {
             // col1 is an identity column, don't insert a value in col1
-            executeUpdate("insert into test_table (col2) values (null)", dataSource);
+            executeUpdate("insert into test_table (col2) values (null)");
         } else {
-            executeUpdate("insert into test_table (col1, col2) values (1, null)", dataSource);
+            executeUpdate("insert into test_table (col1, col2) values (1, null)");
         }
     }
 
@@ -521,17 +521,17 @@ public class DbSupportTest extends UnitilsJUnit4 {
      */
     private void createTestDatabaseHsqlDb() throws Exception {
         // create tables
-        executeUpdate("create table test_table (col1 int not null identity, col2 varchar(12) not null)", dataSource);
-        executeUpdate("create table \"Test_CASE_Table\" (col1 int, foreign key (col1) references test_table(col1))", dataSource);
+        executeUpdate("create table test_table (col1 int not null identity, col2 varchar(12) not null)");
+        executeUpdate("create table \"Test_CASE_Table\" (col1 int, foreign key (col1) references test_table(col1))");
         // create views
-        executeUpdate("create view test_view as select col1 from test_table", dataSource);
-        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
+        executeUpdate("create view test_view as select col1 from test_table");
+        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"");
         // create sequences
-        executeUpdate("create sequence test_sequence", dataSource);
-        executeUpdate("create sequence \"Test_CASE_Sequence\"", dataSource);
+        executeUpdate("create sequence test_sequence");
+        executeUpdate("create sequence \"Test_CASE_Sequence\"");
         // create triggers
-        executeUpdate("create trigger test_trigger before insert on \"Test_CASE_Table\" call \"org.unitils.core.dbsupport.HsqldbDbSupportTest.TestTrigger\"", dataSource);
-        executeUpdate("create trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" call \"org.unitils.core.dbsupport.HsqldbDbSupportTest.TestTrigger\"", dataSource);
+        executeUpdate("create trigger test_trigger before insert on \"Test_CASE_Table\" call \"org.unitils.core.dbsupport.HsqldbDbSupportTest.TestTrigger\"");
+        executeUpdate("create trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" call \"org.unitils.core.dbsupport.HsqldbDbSupportTest.TestTrigger\"");
     }
 
 
@@ -568,14 +568,14 @@ public class DbSupportTest extends UnitilsJUnit4 {
      */
     private void createTestDatabaseMySql() throws Exception {
         // create tables
-        executeUpdate("create table test_table (col1 int not null primary key AUTO_INCREMENT, col2 varchar(12) not null)", dataSource);
-        executeUpdate("create table `Test_CASE_Table` (col1 int, foreign key (col1) references test_table(col1))", dataSource);
+        executeUpdate("create table test_table (col1 int not null primary key AUTO_INCREMENT, col2 varchar(12) not null)");
+        executeUpdate("create table `Test_CASE_Table` (col1 int, foreign key (col1) references test_table(col1))");
         // create views
-        executeUpdate("create view test_view as select col1 from test_table", dataSource);
-        executeUpdate("create view `Test_CASE_View` as select col1 from `Test_CASE_Table`", dataSource);
+        executeUpdate("create view test_view as select col1 from test_table");
+        executeUpdate("create view `Test_CASE_View` as select col1 from `Test_CASE_Table`");
         // create triggers
-        executeUpdate("create trigger test_trigger before insert on `Test_CASE_Table` FOR EACH ROW begin end", dataSource);
-        executeUpdate("create trigger `Test_CASE_Trigger` after insert on `Test_CASE_Table` FOR EACH ROW begin end", dataSource);
+        executeUpdate("create trigger test_trigger before insert on `Test_CASE_Table` FOR EACH ROW begin end");
+        executeUpdate("create trigger `Test_CASE_Trigger` after insert on `Test_CASE_Table` FOR EACH ROW begin end");
     }
 
 
@@ -597,23 +597,23 @@ public class DbSupportTest extends UnitilsJUnit4 {
      */
     private void createTestDatabaseOracle() throws Exception {
         // create tables
-        executeUpdate("create table test_table (col1 varchar(10) not null primary key, col2 varchar(12) not null)", dataSource);
-        executeUpdate("create table \"Test_CASE_Table\" (col1 varchar(10), foreign key (col1) references test_table(col1))", dataSource);
+        executeUpdate("create table test_table (col1 varchar(10) not null primary key, col2 varchar(12) not null)");
+        executeUpdate("create table \"Test_CASE_Table\" (col1 varchar(10), foreign key (col1) references test_table(col1))");
         // create views
-        executeUpdate("create view test_view as select col1 from test_table", dataSource);
-        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
+        executeUpdate("create view test_view as select col1 from test_table");
+        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"");
         // create synonyms
-        executeUpdate("create synonym test_synonym for test_table", dataSource);
-        executeUpdate("create synonym \"Test_CASE_Synonym\" for \"Test_CASE_Table\"", dataSource);
+        executeUpdate("create synonym test_synonym for test_table");
+        executeUpdate("create synonym \"Test_CASE_Synonym\" for \"Test_CASE_Table\"");
         // create sequences
-        executeUpdate("create sequence test_sequence", dataSource);
-        executeUpdate("create sequence \"Test_CASE_Sequence\"", dataSource);
+        executeUpdate("create sequence test_sequence");
+        executeUpdate("create sequence \"Test_CASE_Sequence\"");
         // create triggers
-        executeUpdate("create or replace trigger test_trigger before insert on \"Test_CASE_Table\" begin dbms_output.put_line('test'); end test_trigger", dataSource);
-        executeUpdate("create or replace trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" begin dbms_output.put_line('test'); end \"Test_CASE_Trigger\"", dataSource);
+        executeUpdate("create or replace trigger test_trigger before insert on \"Test_CASE_Table\" begin dbms_output.put_line('test'); end test_trigger");
+        executeUpdate("create or replace trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" begin dbms_output.put_line('test'); end \"Test_CASE_Trigger\"");
         // create types
-        executeUpdate("create type test_type AS (col1 int)", dataSource);
-        executeUpdate("create type \"Test_CASE_Type\" AS (col1 int)", dataSource);
+        executeUpdate("create type test_type AS (col1 int)");
+        executeUpdate("create type \"Test_CASE_Type\" AS (col1 int)");
     }
 
 
@@ -638,26 +638,26 @@ public class DbSupportTest extends UnitilsJUnit4 {
      */
     private void createTestDatabasePostgreSql() throws Exception {
         // create tables
-        executeUpdate("create table test_table (col1 varchar(10) not null primary key, col2 varchar(12) not null)", dataSource);
-        executeUpdate("create table \"Test_CASE_Table\" (col1 varchar(10), foreign key (col1) references test_table(col1))", dataSource);
+        executeUpdate("create table test_table (col1 varchar(10) not null primary key, col2 varchar(12) not null)");
+        executeUpdate("create table \"Test_CASE_Table\" (col1 varchar(10), foreign key (col1) references test_table(col1))");
         // create views
-        executeUpdate("create view test_view as select col1 from test_table", dataSource);
-        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
+        executeUpdate("create view test_view as select col1 from test_table");
+        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"");
         // create sequences
-        executeUpdate("create sequence test_sequence", dataSource);
-        executeUpdate("create sequence \"Test_CASE_Sequence\"", dataSource);
+        executeUpdate("create sequence test_sequence");
+        executeUpdate("create sequence \"Test_CASE_Sequence\"");
         // create triggers
         try {
-            executeUpdate("create language plpgsql", dataSource);
+            executeUpdate("create language plpgsql");
         } catch (Exception e) {
             // ignore language already exists
         }
-        executeUpdate("create or replace function test() returns trigger as $$ declare begin end; $$ language plpgsql", dataSource);
-        executeUpdate("create trigger test_trigger before insert on \"Test_CASE_Table\" FOR EACH ROW EXECUTE PROCEDURE test()", dataSource);
-        executeUpdate("create trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" FOR EACH ROW EXECUTE PROCEDURE test()", dataSource);
+        executeUpdate("create or replace function test() returns trigger as $$ declare begin end; $$ language plpgsql");
+        executeUpdate("create trigger test_trigger before insert on \"Test_CASE_Table\" FOR EACH ROW EXECUTE PROCEDURE test()");
+        executeUpdate("create trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" FOR EACH ROW EXECUTE PROCEDURE test()");
         // create types
-        executeUpdate("create type test_type AS (col1 int)", dataSource);
-        executeUpdate("create type \"Test_CASE_Type\" AS (col1 int)", dataSource);
+        executeUpdate("create type test_type AS (col1 int)");
+        executeUpdate("create type \"Test_CASE_Type\" AS (col1 int)");
     }
 
 
@@ -681,20 +681,20 @@ public class DbSupportTest extends UnitilsJUnit4 {
      */
     private void createTestDatabaseDb2() throws Exception {
         // create tables
-        executeUpdate("create table test_table (col1 int not null primary key generated by default as identity, col2 varchar(12) not null)", dataSource);
-        executeUpdate("create table \"Test_CASE_Table\" (col1 int, foreign key (col1) references test_table(col1))", dataSource);
+        executeUpdate("create table test_table (col1 int not null primary key generated by default as identity, col2 varchar(12) not null)");
+        executeUpdate("create table \"Test_CASE_Table\" (col1 int, foreign key (col1) references test_table(col1))");
         // create views
-        executeUpdate("create view test_view as select col1 from test_table", dataSource);
-        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
+        executeUpdate("create view test_view as select col1 from test_table");
+        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"");
         // create sequences
-        executeUpdate("create sequence test_sequence", dataSource);
-        executeUpdate("create sequence \"Test_CASE_Sequence\"", dataSource);
+        executeUpdate("create sequence test_sequence");
+        executeUpdate("create sequence \"Test_CASE_Sequence\"");
         // create triggers
-        executeUpdate("create trigger test_trigger before insert on \"Test_CASE_Table\" FOR EACH ROW when (1 < 0) SIGNAL SQLSTATE '0'", dataSource);
-        executeUpdate("create trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" FOR EACH ROW when (1 < 0) SIGNAL SQLSTATE '0'", dataSource);
+        executeUpdate("create trigger test_trigger before insert on \"Test_CASE_Table\" FOR EACH ROW when (1 < 0) SIGNAL SQLSTATE '0'");
+        executeUpdate("create trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" FOR EACH ROW when (1 < 0) SIGNAL SQLSTATE '0'");
         // create types
-        executeUpdate("create type test_type AS (col1 int) MODE DB2SQL", dataSource);
-        executeUpdate("create type \"Test_CASE_Type\" AS (col1 int) MODE DB2SQL", dataSource);
+        executeUpdate("create type test_type AS (col1 int) MODE DB2SQL");
+        executeUpdate("create type \"Test_CASE_Type\" AS (col1 int) MODE DB2SQL");
     }
 
 
@@ -718,18 +718,18 @@ public class DbSupportTest extends UnitilsJUnit4 {
      */
     private void createTestDatabaseDerby() throws Exception {
         // create tables
-        executeUpdate("create table test_table (col1 int not null primary key generated by default as identity, col2 varchar(12) not null)", dataSource);
-        executeUpdate("create table \"Test_CASE_Table\" (col1 int, foreign key (col1) references test_table(col1))", dataSource);
+        executeUpdate("create table test_table (col1 int not null primary key generated by default as identity, col2 varchar(12) not null)");
+        executeUpdate("create table \"Test_CASE_Table\" (col1 int, foreign key (col1) references test_table(col1))");
         // create views
-        executeUpdate("create view test_view as select col1 from test_table", dataSource);
-        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
+        executeUpdate("create view test_view as select col1 from test_table");
+        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"");
         // create synonyms
-        executeUpdate("create synonym test_synonym for test_table", dataSource);
-        executeUpdate("create synonym \"Test_CASE_Synonym\" for \"Test_CASE_Table\"", dataSource);
+        executeUpdate("create synonym test_synonym for test_table");
+        executeUpdate("create synonym \"Test_CASE_Synonym\" for \"Test_CASE_Table\"");
         // create triggers
-        executeUpdate("call SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('testKey', 'test')", dataSource);
-        executeUpdate("create trigger test_trigger no cascade before insert on \"Test_CASE_Table\" FOR EACH ROW MODE DB2SQL VALUES SYSCS_UTIL.SYSCS_GET_DATABASE_PROPERTY('testKey')", dataSource);
-        executeUpdate("create trigger \"Test_CASE_Trigger\" no cascade before insert on \"Test_CASE_Table\" FOR EACH ROW MODE DB2SQL VALUES SYSCS_UTIL.SYSCS_GET_DATABASE_PROPERTY('testKey')", dataSource);
+        executeUpdate("call SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('testKey', 'test')");
+        executeUpdate("create trigger test_trigger no cascade before insert on \"Test_CASE_Table\" FOR EACH ROW MODE DB2SQL VALUES SYSCS_UTIL.SYSCS_GET_DATABASE_PROPERTY('testKey')");
+        executeUpdate("create trigger \"Test_CASE_Trigger\" no cascade before insert on \"Test_CASE_Table\" FOR EACH ROW MODE DB2SQL VALUES SYSCS_UTIL.SYSCS_GET_DATABASE_PROPERTY('testKey')");
     }
 
 
@@ -753,20 +753,20 @@ public class DbSupportTest extends UnitilsJUnit4 {
      */
     private void createTestDatabaseMsSql() throws Exception {
         // create tables
-        executeUpdate("create table test_table (col1 int not null primary key identity, col2 varchar(12) not null)", dataSource);
-        executeUpdate("create table \"Test_CASE_Table\" (col1 int, foreign key (col1) references test_table(col1))", dataSource);
+        executeUpdate("create table test_table (col1 int not null primary key identity, col2 varchar(12) not null)");
+        executeUpdate("create table \"Test_CASE_Table\" (col1 int, foreign key (col1) references test_table(col1))");
         // create views
-        executeUpdate("create view test_view as select col1 from test_table", dataSource);
-        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
+        executeUpdate("create view test_view as select col1 from test_table");
+        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"");
         // create synonyms
-        executeUpdate("create synonym test_synonym for test_table", dataSource);
-        executeUpdate("create synonym \"Test_CASE_Synonym\" for \"Test_CASE_Table\"", dataSource);
+        executeUpdate("create synonym test_synonym for test_table");
+        executeUpdate("create synonym \"Test_CASE_Synonym\" for \"Test_CASE_Table\"");
         // create triggers
-        executeUpdate("create trigger test_trigger on \"Test_CASE_Table\" after insert AS select * from test_table", dataSource);
-        executeUpdate("create trigger \"Test_CASE_Trigger\" on \"Test_CASE_Table\" after insert AS select * from test_table", dataSource);
+        executeUpdate("create trigger test_trigger on \"Test_CASE_Table\" after insert AS select * from test_table");
+        executeUpdate("create trigger \"Test_CASE_Trigger\" on \"Test_CASE_Table\" after insert AS select * from test_table");
         // create types
-        executeUpdate("create type test_type from int", dataSource);
-        executeUpdate("create type \"Test_CASE_Type\" from int", dataSource);
+        executeUpdate("create type test_type from int");
+        executeUpdate("create type \"Test_CASE_Type\" from int");
     }
 
 

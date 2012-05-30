@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.difference.Difference;
-import org.unitils.util.PropertyUtils;
 import org.unitilsnew.UnitilsJUnit4;
 
 import javax.sql.DataSource;
@@ -37,10 +36,9 @@ import java.util.Properties;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.unitils.database.SQLUnitils.executeUpdate;
-import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import static org.unitils.database.SqlUnitils.executeUpdate;
+import static org.unitils.database.SqlUnitils.executeUpdateQuietly;
 import static org.unitils.database.util.TransactionMode.COMMIT;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 
 
@@ -80,10 +78,6 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
-        if (disabled) {
-            return;
-        }
 
         testChild = new Child(1L, new Parent(1L));
         testChild.getParent().setChildren(asList(testChild));
@@ -178,13 +172,13 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
      * Creates the test tables.
      */
     private void createTestTables() {
-        executeUpdate("create table PARENT (id bigint not null, primary key (id))", dataSource);
-        executeUpdate("create table CHILD (id bigint not null, parent_id bigint not null, primary key (id))", dataSource);
-        executeUpdate("alter table CHILD add constraint CHILDTOPARENT foreign key (parent_id) references PARENT", dataSource);
-        executeUpdate("insert into PARENT (id) values (1)", dataSource);
-        executeUpdate("insert into PARENT (id) values (2)", dataSource);
-        executeUpdate("insert into CHILD (id, parent_id) values (1, 1)", dataSource);
-        executeUpdate("insert into CHILD (id, parent_id) values (2, 2)", dataSource);
+        executeUpdate("create table PARENT (id bigint not null, primary key (id))");
+        executeUpdate("create table CHILD (id bigint not null, parent_id bigint not null, primary key (id))");
+        executeUpdate("alter table CHILD add constraint CHILDTOPARENT foreign key (parent_id) references PARENT");
+        executeUpdate("insert into PARENT (id) values (1)");
+        executeUpdate("insert into PARENT (id) values (2)");
+        executeUpdate("insert into CHILD (id, parent_id) values (1, 1)");
+        executeUpdate("insert into CHILD (id, parent_id) values (2, 2)");
     }
 
 
@@ -192,7 +186,7 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
      * Removes the test tables
      */
     private void dropTestTables() {
-        executeUpdateQuietly("drop table CHILD", dataSource);
-        executeUpdateQuietly("drop table PARENT", dataSource);
+        executeUpdateQuietly("drop table CHILD");
+        executeUpdateQuietly("drop table PARENT");
     }
 }

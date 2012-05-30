@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.database.SQLUnitils.*;
+import static org.unitils.database.SqlUnitils.*;
 
 /**
  * Tests DbUnitModule's feature for using different DataSetOperations
@@ -86,7 +86,7 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit4 {
      * @param expectedDataSetName the name of the data set, not null
      */
     private void assertLoadedDataSet(String expectedDataSetName) {
-        String dataSet = getItemAsString("select dataset from test", dataSource);
+        String dataSet = getString("select dataset from test");
         assertEquals(expectedDataSetName, dataSet);
     }
 
@@ -95,7 +95,7 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit4 {
      * Creates the test tables.
      */
     private void createTestTables() {
-        executeUpdate("create table test(dataset varchar(100))", dataSource);
+        executeUpdate("create table test(dataset varchar(100))");
     }
 
 
@@ -103,7 +103,7 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit4 {
      * Removes the test database tables
      */
     private void dropTestTables() {
-        executeUpdateQuietly("drop table test", dataSource);
+        executeUpdateQuietly("drop table test");
     }
 
 
