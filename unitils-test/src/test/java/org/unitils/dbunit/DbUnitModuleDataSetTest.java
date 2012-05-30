@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,11 +28,11 @@ import org.unitilsnew.UnitilsJUnit4;
 
 import javax.sql.DataSource;
 import java.io.File;
+import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 import static org.junit.Assert.*;
-import static org.unitils.database.SQLUnitils.*;
+import static org.unitils.database.SqlUnitils.*;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 /**
@@ -138,7 +138,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit4 {
     @Test
     public void testInsertDataSet_noClassAndMethodDataSet() throws Exception {
         dbUnitModule.insertDataSet(DataSetTestNoClassLevel.class.getMethod("testMethod3"), new DataSetTestNoClassLevel());
-        Set<String> datasets = getItemsAsStringSet("select dataset from test", dataSource);
+        List<String> datasets = getStringList("select dataset from test");
         assertTrue(datasets.isEmpty()); // nothing loaded
     }
 
@@ -181,7 +181,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit4 {
     public void testInsertDataSet_elementsWithDifferentColumns() throws Exception {
         File dataSetFile = new File(this.getClass().getResource("DifferentColumnsDataSet.xml").getPath());
         dbUnitModule.insertDataSet(dataSetFile, MultiSchemaXmlDataSetFactory.class, CleanInsertLoadStrategy.class);
-        assertLenientEquals(3, getItemAsLong("select count(1) from test", dataSource));
+        assertLenientEquals(3, getLong("select count(1) from test"));
     }
 
     // Tests for behavior when data is loaded for a superclass method, but the test instance is of a
@@ -229,7 +229,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit4 {
     public void testInsertDataSet_multipleDataSets() throws Exception {
         dbUnitModule.insertDataSet(DataSetTest.class.getMethod("testMethodMultipleDataSets"), new DataSetTest());
         assertLoadedDataSet("dataSet1.xml");
-        assertLenientEquals("dataSet2.xml", getItemAsString("select dataset from test1", dataSource));
+        assertLenientEquals("dataSet2.xml", getString("select dataset from test1"));
     }
 
 
@@ -239,7 +239,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit4 {
      * @param expectedDataSetName the name of the data set, not null
      */
     private void assertLoadedDataSet(String expectedDataSetName) throws Exception {
-        String dataSet = getItemAsString("select dataset from test", dataSource);
+        String dataSet = getString("select dataset from test");
         assertEquals(expectedDataSetName, dataSet);
     }
 
@@ -248,8 +248,8 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit4 {
      * Utility method to create the test table.
      */
     private void createTestTables() {
-        executeUpdate("create table test (dataset varchar(100), anotherColumn varchar(100))", dataSource);
-        executeUpdate("create table test1 (dataset varchar(100))", dataSource);
+        executeUpdate("create table test (dataset varchar(100), anotherColumn varchar(100))");
+        executeUpdate("create table test1 (dataset varchar(100))");
     }
 
 
@@ -257,8 +257,8 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit4 {
      * Removes the test database table
      */
     private void dropTestTable() {
-        executeUpdateQuietly("drop table test", dataSource);
-        executeUpdateQuietly("drop table test1", dataSource);
+        executeUpdateQuietly("drop table test");
+        executeUpdateQuietly("drop table test1");
     }
 
 

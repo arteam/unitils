@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,15 +23,13 @@ import org.junit.Test;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
-import org.unitils.util.PropertyUtils;
 import org.unitilsnew.UnitilsJUnit4;
 
 import javax.sql.DataSource;
 import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
-import static org.unitils.database.SQLUnitils.*;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
+import static org.unitils.database.SqlUnitils.*;
 
 /**
  * Test class for loading of data sets in mutliple database schemas.
@@ -61,10 +59,7 @@ public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
-        if (disabled) {
-            return;
-        }
+
         dbUnitModule = new DbUnitModule();
         dbUnitModule.init(configuration);
 
@@ -124,7 +119,7 @@ public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit4 {
      * @param schemaName the name of the schema, not null
      */
     private void assertLoadedDataSet(String schemaName) {
-        String dataSet = getItemAsString("select dataset from " + schemaName + ".test", dataSource);
+        String dataSet = getString("select dataset from " + schemaName + ".test");
         assertEquals(schemaName, dataSet);
     }
 
@@ -134,13 +129,13 @@ public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit4 {
      */
     private void createTestTables() {
         // PUBLIC SCHEMA
-        executeUpdate("create table TEST(dataset varchar(100))", dataSource);
+        executeUpdate("create table TEST(dataset varchar(100))");
         // SCHEMA_A
-        executeUpdate("create schema SCHEMA_A AUTHORIZATION DBA", dataSource);
-        executeUpdate("create table SCHEMA_A.TEST(dataset varchar(100))", dataSource);
+        executeUpdate("create schema SCHEMA_A AUTHORIZATION DBA");
+        executeUpdate("create table SCHEMA_A.TEST(dataset varchar(100))");
         // SCHEMA_B
-        executeUpdate("create schema SCHEMA_B AUTHORIZATION DBA", dataSource);
-        executeUpdate("create table SCHEMA_B.TEST(dataset varchar(100))", dataSource);
+        executeUpdate("create schema SCHEMA_B AUTHORIZATION DBA");
+        executeUpdate("create table SCHEMA_B.TEST(dataset varchar(100))");
     }
 
 
@@ -148,11 +143,11 @@ public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit4 {
      * Removes the test database tables
      */
     private void dropTestTables() {
-        executeUpdateQuietly("drop table TEST", dataSource);
-        executeUpdateQuietly("drop table SCHEMA_A.TEST", dataSource);
-        executeUpdateQuietly("drop schema SCHEMA_A", dataSource);
-        executeUpdateQuietly("drop table SCHEMA_B.TEST", dataSource);
-        executeUpdateQuietly("drop schema SCHEMA_B", dataSource);
+        executeUpdateQuietly("drop table TEST");
+        executeUpdateQuietly("drop table SCHEMA_A.TEST");
+        executeUpdateQuietly("drop schema SCHEMA_A");
+        executeUpdateQuietly("drop table SCHEMA_B.TEST");
+        executeUpdateQuietly("drop schema SCHEMA_B");
     }
 
 

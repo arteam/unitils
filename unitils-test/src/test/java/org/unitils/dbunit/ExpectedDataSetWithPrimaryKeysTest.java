@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 import static org.junit.Assert.fail;
-import static org.unitils.database.SQLUnitils.executeUpdate;
+import static org.unitils.database.SqlUnitils.executeUpdate;
 
 /**
  * Test the expected data set behavior when there are primary keys.
@@ -142,7 +142,7 @@ public class ExpectedDataSetWithPrimaryKeysTest extends UnitilsJUnit4 {
      * Utility method to create the test table.
      */
     private void createTestTable() throws SQLException {
-        executeUpdate("create table TEST(pk varchar(2) primary key, column1 varchar(10), column2 varchar(10))", dataSource);
+        executeUpdate("create table TEST(pk varchar(2) primary key, column1 varchar(10), column2 varchar(10))");
     }
 
 
@@ -151,7 +151,7 @@ public class ExpectedDataSetWithPrimaryKeysTest extends UnitilsJUnit4 {
      */
     private void dropTestTable() throws SQLException {
         try {
-            executeUpdate("drop table TEST", dataSource);
+            executeUpdate("drop table TEST");
         } catch (UnitilsException e) {
             // Ignored
         }
