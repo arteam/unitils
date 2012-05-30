@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-import org.unitils.database.DatabaseModule;
+import org.unitils.database.DatabaseUnitils;
 import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
 import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
 import org.unitils.orm.jpa.JpaModule;
@@ -57,10 +57,10 @@ public class JpaEntityManagerFactoryLoader implements OrmPersistenceUnitLoader<E
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
         factoryBean.setDataSource(getDataSource());
         factoryBean.setJpaVendorAdapter(getJpaProviderSupport().getSpringJpaVendorAdaptor());
-		String persistenceXmlFile = jpaConfig.getConfigFiles().iterator().next();
-		if (!StringUtils.isEmpty(persistenceXmlFile)) {
-			factoryBean.setPersistenceXmlLocation(persistenceXmlFile);
-		}
+        String persistenceXmlFile = jpaConfig.getConfigFiles().iterator().next();
+        if (!StringUtils.isEmpty(persistenceXmlFile)) {
+            factoryBean.setPersistenceXmlLocation(persistenceXmlFile);
+        }
         factoryBean.setPersistenceUnitName(jpaConfig.getPersistenceUnitName());
         LoadTimeWeaver loadTimeWeaver = getJpaProviderSupport().getLoadTimeWeaver();
         if (loadTimeWeaver != null) {
@@ -80,17 +80,12 @@ public class JpaEntityManagerFactoryLoader implements OrmPersistenceUnitLoader<E
 
 
     protected DataSource getDataSource() {
-        return getDatabaseModule().getDataSource();
+        return DatabaseUnitils.getDataSource();
     }
 
 
     protected JpaProviderSupport getJpaProviderSupport() {
         return getJpaModule().getJpaProviderSupport();
-    }
-
-
-    protected DatabaseModule getDatabaseModule() {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
     }
 
 
