@@ -44,7 +44,7 @@ public class TransactionManager {
     /* The logger instance for this class */
     protected static Log logger = LogFactory.getLog(TransactionManager.class);
 
-    protected boolean startTransactionWhenDataSourceIsRegistered;
+    protected boolean transactionStarted;
     protected DataSource dataSource;
     protected TransactionStatus transactionStatus;
 
@@ -52,14 +52,10 @@ public class TransactionManager {
 
 
     public void startTransaction() {
-        if (isTransactionActive() || startTransactionWhenDataSourceIsRegistered) {
-            throw new UnitilsException("Unable to start transaction. A transaction is already active. Make sure to call commit or rollback to end the transaction.");
+        transactionStarted = true;
+        if (!isTransactionActive() && dataSource != null) {
+            startTransaction(dataSource);
         }
-        if (dataSource == null) {
-            startTransactionWhenDataSourceIsRegistered = true;
-            return;
-        }
-        startTransaction(dataSource);
     }
 
     public void registerDataSource(DataSource dataSource) {
@@ -71,11 +67,14 @@ public class TransactionManager {
             // transaction already active, ignore
             return;
         }
-        if (startTransactionWhenDataSourceIsRegistered) {
+        if (isTransactionStarted()) {
             startTransaction(dataSource);
-            startTransactionWhenDataSourceIsRegistered = false;
         }
         this.dataSource = dataSource;
+    }
+
+    public boolean isTransactionStarted() {
+        return transactionStarted;
     }
 
     public boolean isTransactionActive() {
@@ -85,9 +84,11 @@ public class TransactionManager {
 
     /**
      * Commits the current transaction.
-     * Nothing happens if no transaction is currently active.
      */
-    public void commit() {
+    public void commit(boolean endTransaction) {
+        if (endTransaction) {
+            transactionStarted = false;
+        }
         if (transactionStatus == null) {
             throw new UnitilsException("Unable to commit. No transaction is currently active. Make sure to call startTransaction to start a transaction.");
         }
@@ -99,9 +100,11 @@ public class TransactionManager {
 
     /**
      * Rolls back the current transaction.
-     * Nothing happens if no transaction is currently active.
      */
-    public void rollback() {
+    public void rollback(boolean endTransaction) {
+        if (endTransaction) {
+            transactionStarted = false;
+        }
         if (transactionStatus == null) {
             throw new UnitilsException("Unable to rollback. No transaction is currently active. Make sure to call startTransaction to start a transaction.");
         }

@@ -63,8 +63,8 @@ public class DataSourceWrapperGetObjectListTest extends UnitilsJUnit4 {
             dataSourceWrapper.getMock().getObjectList("query", BigDecimal.class, "arg");
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to execute statement: 'query'. Reason:\n" +
-                    "message", e.getMessage());
+            assertEquals("Unable to execute statement: 'query'.\n" +
+                    "Reason: NullPointerException: message", e.getMessage());
         }
     }
 

@@ -92,7 +92,7 @@ public class CompositeFieldWrapper {
             try {
                 innerFieldValue = innerFieldWrapper.getValue(endObject);
             } catch (Exception e) {
-                throw new UnitilsException("Unable to set value for composite field with name '" + getName() + "'. Cannot get value of inner field '" + innerFieldWrapper + "'. Reason:\n" + e.getMessage());
+                throw new UnitilsException("Unable to set value for composite field with name '" + getName() + "'. Cannot get value of inner field '" + innerFieldWrapper + "'.", e);
             }
             if (innerFieldValue == null) {
                 if (autoCreateInnerFields) {
@@ -105,7 +105,7 @@ public class CompositeFieldWrapper {
                         endObject = autoCreatedInstance;
 
                     } catch (Exception e) {
-                        throw new UnitilsException("Unable to set value for composite field with name '" + getName() + "'. Could not auto create instance of inner field '" + innerFieldWrapper + "'. Reason:\n" + e.getMessage());
+                        throw new UnitilsException("Unable to set value for composite field with name '" + getName() + "'. Could not auto create instance of inner field '" + innerFieldWrapper + "'.", e);
                     }
                 } else {
                     throw new UnitilsException("Unable to set value for composite field with name '" + getName() + "'. Inner field with name '" + innerFieldWrapper + "' is null.");

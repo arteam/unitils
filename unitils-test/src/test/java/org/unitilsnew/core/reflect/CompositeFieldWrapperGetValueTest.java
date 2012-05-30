@@ -104,7 +104,8 @@ public class CompositeFieldWrapperGetValueTest {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Unable to get value of field with name 'field'.\n" +
-                    "Make sure that the field exists on the target object.", e.getMessage());
+                    "Make sure that the field exists on the target object.\n" +
+                    "Reason: IllegalArgumentException: Can not set java.lang.String field org.unitilsnew.core.reflect.CompositeFieldWrapperGetValueTest$OtherClass.field to org.unitilsnew.core.reflect.CompositeFieldWrapperGetValueTest$MyClass", e.getMessage());
         }
     }
 
@@ -116,7 +117,8 @@ public class CompositeFieldWrapperGetValueTest {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Unable to get value of field with name 'field'.\n" +
-                    "Make sure that the field exists on the target object.", e.getMessage());
+                    "Make sure that the field exists on the target object.\n" +
+                    "Reason: IllegalArgumentException: Can not set java.lang.String field org.unitilsnew.core.reflect.CompositeFieldWrapperGetValueTest$OtherClass.field to org.unitilsnew.core.reflect.CompositeFieldWrapperGetValueTest$Inner1", e.getMessage());
         }
     }
 

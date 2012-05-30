@@ -106,9 +106,10 @@ public class InjectionByTypeServiceInjectIntoByTypeGenericTypeTest {
             injectionByTypeService.injectIntoByType(target, objectToInject, true);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to inject into by type 'java.util.List<org.unitils.inject.core.InjectionByTypeServiceInjectIntoByTypeGenericTypeTest$Type1>'. Reason:\n" +
-                    "Unable to set value for field with name 'type1'.\n" +
-                    "Make sure that the field exists on the target object and that the value is of the correct type: java.util.List. Value: xxx", e.getMessage());
+            assertEquals("Unable to inject into by type 'java.util.List<org.unitils.inject.core.InjectionByTypeServiceInjectIntoByTypeGenericTypeTest$Type1>'.\n" +
+                    "Reason: Unable to set value for field with name 'type1'.\n" +
+                    "Make sure that the field exists on the target object and that the value is of the correct type: java.util.List. Value: xxx\n" +
+                    "Reason: IllegalArgumentException: Can not set java.util.List field org.unitils.inject.core.InjectionByTypeServiceInjectIntoByTypeGenericTypeTest$Target.type1 to java.lang.String", e.getMessage());
         }
     }
 

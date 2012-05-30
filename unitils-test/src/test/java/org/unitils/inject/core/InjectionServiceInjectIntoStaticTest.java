@@ -85,8 +85,8 @@ public class InjectionServiceInjectIntoStaticTest {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertNotNull(e.getCause());
-            assertEquals("Unable to inject into static property 'xxx' with target class org.unitils.inject.core.InjectionServiceInjectIntoStaticTest$Target. Reason:\n" +
-                    "Unable to get field for property 'xxx'. Field with name 'xxx' does not exist on class org.unitils.inject.core.InjectionServiceInjectIntoStaticTest$Target or one of its superclasses.", e.getMessage());
+            assertEquals("Unable to inject into static property 'xxx' with target class org.unitils.inject.core.InjectionServiceInjectIntoStaticTest$Target.\n" +
+                    "Reason: Unable to get field for property 'xxx'. Field with name 'xxx' does not exist on class org.unitils.inject.core.InjectionServiceInjectIntoStaticTest$Target or one of its superclasses.", e.getMessage());
         }
     }
 
@@ -98,8 +98,8 @@ public class InjectionServiceInjectIntoStaticTest {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertNotNull(e.getCause());
-            assertEquals("Unable to inject into static property 'inner.field' with target class org.unitils.inject.core.InjectionServiceInjectIntoStaticTest$Target. Reason:\n" +
-                    "Unable to set value for composite field with name 'inner.field'. Inner field with name 'inner' is null.", e.getMessage());
+            assertEquals("Unable to inject into static property 'inner.field' with target class org.unitils.inject.core.InjectionServiceInjectIntoStaticTest$Target.\n" +
+                    "Reason: Unable to set value for composite field with name 'inner.field'. Inner field with name 'inner' is null.", e.getMessage());
         }
     }
 

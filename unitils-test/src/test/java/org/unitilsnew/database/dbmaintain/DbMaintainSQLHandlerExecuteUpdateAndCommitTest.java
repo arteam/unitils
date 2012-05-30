@@ -66,7 +66,7 @@ public class DbMaintainSQLHandlerExecuteUpdateAndCommitTest extends UnitilsJUnit
         dbMaintainSQLHandler.executeUpdateAndCommit("insert into my_table(id) values(10)", dataSource);
 
         assertTableCount(1, "my_table");
-        transactionManagerMock.assertInvoked().commit();
+        transactionManagerMock.assertInvoked().commit(false);
     }
 
     @Test
@@ -74,7 +74,7 @@ public class DbMaintainSQLHandlerExecuteUpdateAndCommitTest extends UnitilsJUnit
         dbMaintainSQLHandler.executeUpdateAndCommit("insert into my_table(id) values(10)", dataSource);
 
         assertTableCount(1, "my_table");
-        transactionManagerMock.assertNotInvoked().commit();
+        transactionManagerMock.assertNotInvoked().commit(false);
     }
 
     @Test
@@ -85,7 +85,7 @@ public class DbMaintainSQLHandlerExecuteUpdateAndCommitTest extends UnitilsJUnit
         } catch (DatabaseException e) {
             assertEquals("Unable to perform database update:\n" +
                     "xx", e.getMessage());
-            transactionManagerMock.assertNotInvoked().commit();
+            transactionManagerMock.assertNotInvoked().commit(false);
         }
     }
 }

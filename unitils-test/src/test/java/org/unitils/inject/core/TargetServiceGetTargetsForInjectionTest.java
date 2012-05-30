@@ -105,8 +105,8 @@ public class TargetServiceGetTargetsForInjectionTest {
             targetService.getTargetsForInjection(asList("xxx"), testInstance);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to get targets for injection. Reason:\n" +
-                    "Unable to get field with name 'xxx'. No such field exists on class org.unitils.inject.core.TargetServiceGetTargetsForInjectionTest$MyClass or one of its superclasses.", e.getMessage());
+            assertEquals("Unable to get targets for injection.\n" +
+                    "Reason: Unable to get field with name 'xxx'. No such field exists on class org.unitils.inject.core.TargetServiceGetTargetsForInjectionTest$MyClass or one of its superclasses.", e.getMessage());
         }
     }
 

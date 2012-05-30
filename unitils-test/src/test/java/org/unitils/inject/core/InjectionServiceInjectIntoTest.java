@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,8 +87,8 @@ public class InjectionServiceInjectIntoTest {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertNotNull(e.getCause());
-            assertEquals("Unable to inject into property 'xxx' with target of type org.unitils.inject.core.InjectionServiceInjectIntoTest$TargetClass. Reason:\n" +
-                    "Unable to get field for property 'xxx'. Field with name 'xxx' does not exist on class org.unitils.inject.core.InjectionServiceInjectIntoTest$TargetClass or one of its superclasses.", e.getMessage());
+            assertEquals("Unable to inject into property 'xxx' with target of type org.unitils.inject.core.InjectionServiceInjectIntoTest$TargetClass.\n" +
+                    "Reason: Unable to get field for property 'xxx'. Field with name 'xxx' does not exist on class org.unitils.inject.core.InjectionServiceInjectIntoTest$TargetClass or one of its superclasses.", e.getMessage());
         }
     }
 
@@ -101,8 +101,8 @@ public class InjectionServiceInjectIntoTest {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertNotNull(e.getCause());
-            assertEquals("Unable to inject into property 'inner.field' with target of type org.unitils.inject.core.InjectionServiceInjectIntoTest$TargetClass. Reason:\n" +
-                    "Unable to set value for composite field with name 'inner.field'. Inner field with name 'inner' is null.", e.getMessage());
+            assertEquals("Unable to inject into property 'inner.field' with target of type org.unitils.inject.core.InjectionServiceInjectIntoTest$TargetClass.\n" +
+                    "Reason: Unable to set value for composite field with name 'inner.field'. Inner field with name 'inner' is null.", e.getMessage());
         }
     }
 

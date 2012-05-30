@@ -114,8 +114,8 @@ public class SqlAssertAssertTableCountIntegrationTest {
             SqlAssert.assertTableCount(0, "xxx");
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to execute statement: 'select count(1) from xxx'. Reason:\n" +
-                    "StatementCallback; bad SQL grammar [select count(1) from xxx]; nested exception is java.sql.SQLException: Table not found in statement [select count(1) from xxx]", e.getMessage());
+            assertEquals("Unable to execute statement: 'select count(1) from xxx'.\n" +
+                    "Reason: BadSqlGrammarException: StatementCallback; bad SQL grammar [select count(1) from xxx]; nested exception is java.sql.SQLException: Table not found in statement [select count(1) from xxx]", e.getMessage());
         }
     }
 }

@@ -74,7 +74,7 @@ public class OriginalFieldValue {
             fieldWrapper.setValue(value, object);
 
         } catch (Exception e) {
-            throw new UnitilsException("Unable to restore field with name '" + fieldWrapper.getName() + "' to value '" + value + "'. Reason:\n" + e.getMessage(), e);
+            throw new UnitilsException("Unable to restore field with name '" + fieldWrapper.getName() + "' to value '" + value + "'.", e);
         }
     }
 }

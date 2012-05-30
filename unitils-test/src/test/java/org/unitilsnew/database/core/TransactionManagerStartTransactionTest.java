@@ -18,13 +18,13 @@ package org.unitilsnew.database.core;
 
 import org.junit.After;
 import org.junit.Test;
-import org.unitils.core.UnitilsException;
 import org.unitilsnew.UnitilsJUnit4;
 import org.unitilsnew.database.annotations.TestDataSource;
 
 import javax.sql.DataSource;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Tim Ducheyne
@@ -47,8 +47,8 @@ public class TransactionManagerStartTransactionTest extends UnitilsJUnit4 {
     @Test
     public void transactionMarkedAsStartedWhenNoDataSourceRegistered() throws Exception {
         transactionManager.startTransaction();
-        assertTrue(transactionManager.startTransactionWhenDataSourceIsRegistered);
-        assertNull(transactionManager.transactionStatus);
+        assertFalse(transactionManager.isTransactionActive());
+        assertTrue(transactionManager.isTransactionStarted());
     }
 
     @Test
@@ -56,18 +56,27 @@ public class TransactionManagerStartTransactionTest extends UnitilsJUnit4 {
         transactionManager.registerDataSource(dataSource);
 
         transactionManager.startTransaction();
-        assertNotNull(transactionManager.transactionStatus);
-        assertFalse(transactionManager.startTransactionWhenDataSourceIsRegistered);
+        assertTrue(transactionManager.isTransactionActive());
+        assertTrue(transactionManager.isTransactionStarted());
     }
 
     @Test
-    public void exceptionWhenTransactionAlreadyStarted() throws Exception {
+    public void startTransactionTwice() throws Exception {
         transactionManager.startTransaction();
-        try {
-            transactionManager.startTransaction();
-            fail("UnitilsException expected");
-        } catch (UnitilsException e) {
-            assertEquals("Unable to start transaction. A transaction is already active. Make sure to call commit or rollback to end the transaction.", e.getMessage());
-        }
+        transactionManager.startTransaction();
+
+        assertFalse(transactionManager.isTransactionActive());
+        assertTrue(transactionManager.isTransactionStarted());
+    }
+
+    @Test
+    public void startTransactionTwiceWhenDataSourceRegistered() throws Exception {
+        transactionManager.registerDataSource(dataSource);
+
+        transactionManager.startTransaction();
+        transactionManager.startTransaction();
+
+        assertTrue(transactionManager.isTransactionActive());
+        assertTrue(transactionManager.isTransactionStarted());
     }
 }

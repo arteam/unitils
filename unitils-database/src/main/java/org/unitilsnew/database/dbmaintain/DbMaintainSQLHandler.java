@@ -43,6 +43,7 @@ public class DbMaintainSQLHandler implements SQLHandler {
     protected static Log logger = LogFactory.getLog(DbMaintainSQLHandler.class);
 
     protected TransactionManager transactionManager;
+    protected boolean transactionWasAlreadyStarted;
 
 
     public DbMaintainSQLHandler(TransactionManager transactionManager) {
@@ -78,7 +79,7 @@ public class DbMaintainSQLHandler implements SQLHandler {
             statement = connection.createStatement();
             int nbChanges = statement.executeUpdate(sql);
             if (transactionManager.isTransactionActive()) {
-                transactionManager.commit();
+                transactionManager.commit(false);
             }
             return nbChanges;
 
@@ -184,19 +185,19 @@ public class DbMaintainSQLHandler implements SQLHandler {
         }
     }
 
+
     public void startTransaction(DataSource dataSource) {
+        transactionWasAlreadyStarted = transactionManager.isTransactionStarted();
         transactionManager.registerDataSource(dataSource);
         transactionManager.startTransaction();
     }
 
     public void endTransactionAndCommit(DataSource dataSource) {
-        transactionManager.registerDataSource(dataSource);
-        transactionManager.commit();
+        transactionManager.commit(!transactionWasAlreadyStarted);
     }
 
     public void endTransactionAndRollback(DataSource dataSource) {
-        transactionManager.registerDataSource(dataSource);
-        transactionManager.rollback();
+        transactionManager.rollback(!transactionWasAlreadyStarted);
     }
 
     public void closeAllConnections() {

@@ -105,8 +105,8 @@ public class SqlUnitilsGetBooleanListIntegrationTest {
             SqlUnitils.getBooleanList("xxx");
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to execute statement: 'xxx'. Reason:\n" +
-                    "StatementCallback; bad SQL grammar [xxx]; nested exception is java.sql.SQLException: Unexpected token: XXX in statement [xxx]", e.getMessage());
+            assertEquals("Unable to execute statement: 'xxx'.\n" +
+                    "Reason: BadSqlGrammarException: StatementCallback; bad SQL grammar [xxx]; nested exception is java.sql.SQLException: Unexpected token: XXX in statement [xxx]", e.getMessage());
         }
     }
 }

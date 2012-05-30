@@ -85,8 +85,8 @@ public class SqlAssertAssertBooleanIntegrationTest {
             SqlAssert.assertBoolean(true, "select value from my_table");
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to get value. Statement did not produce any results: 'select value from my_table'. Reason:\n" +
-                    "Incorrect result size: expected 1, actual 0", e.getMessage());
+            assertEquals("Unable to get value. Statement did not produce any results: 'select value from my_table'.\n" +
+                    "Reason: EmptyResultDataAccessException: Incorrect result size: expected 1, actual 0", e.getMessage());
         }
     }
 
@@ -134,8 +134,8 @@ public class SqlAssertAssertBooleanIntegrationTest {
             SqlAssert.assertBoolean(true, "xxx");
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to execute statement: 'xxx'. Reason:\n" +
-                    "StatementCallback; bad SQL grammar [xxx]; nested exception is java.sql.SQLException: Unexpected token: XXX in statement [xxx]", e.getMessage());
+            assertEquals("Unable to execute statement: 'xxx'.\n" +
+                    "Reason: BadSqlGrammarException: StatementCallback; bad SQL grammar [xxx]; nested exception is java.sql.SQLException: Unexpected token: XXX in statement [xxx]", e.getMessage());
         }
     }
 }

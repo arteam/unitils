@@ -52,8 +52,7 @@ public class UnitilsTestListener {
         currentClassWrapper = new ClassWrapper(testClass);
         currentTestInstance = null;
 
-        currentTestListeners = new ArrayList<TestListener>();
-        currentTestListeners.addAll(testListeners);
+        currentTestListeners = new ArrayList<TestListener>(testListeners);
         sort(currentTestListeners, testListenerTestPhaseComparator);
 
         for (TestListener testListener : currentTestListeners) {
@@ -64,6 +63,7 @@ public class UnitilsTestListener {
     public void beforeTestSetUp(Object testObject, Method testMethod) {
         currentTestInstance = new TestInstance(currentClassWrapper, testObject, testMethod);
 
+        currentTestListeners = new ArrayList<TestListener>(testListeners);
         addFieldAndTestAnnotationListeners(currentTestInstance, currentTestListeners);
         sort(currentTestListeners, testListenerTestPhaseComparator);
 

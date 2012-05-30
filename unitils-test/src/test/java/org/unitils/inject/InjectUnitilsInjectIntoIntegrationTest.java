@@ -53,8 +53,8 @@ public class InjectUnitilsInjectIntoIntegrationTest extends UnitilsJUnit4 {
             InjectUnitils.injectInto(target, "xxx", value);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to inject into property 'xxx' with target of type org.unitils.inject.InjectUnitilsInjectIntoIntegrationTest$Target. Reason:\n" +
-                    "Unable to get field for property 'xxx'. Field with name 'xxx' does not exist on class org.unitils.inject.InjectUnitilsInjectIntoIntegrationTest$Target or one of its superclasses.", e.getMessage());
+            assertEquals("Unable to inject into property 'xxx' with target of type org.unitils.inject.InjectUnitilsInjectIntoIntegrationTest$Target.\n" +
+                    "Reason: Unable to get field for property 'xxx'. Field with name 'xxx' does not exist on class org.unitils.inject.InjectUnitilsInjectIntoIntegrationTest$Target or one of its superclasses.", e.getMessage());
         }
     }
 
@@ -64,9 +64,10 @@ public class InjectUnitilsInjectIntoIntegrationTest extends UnitilsJUnit4 {
             InjectUnitils.injectInto(target, "field", otherValue);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to inject into property 'field' with target of type org.unitils.inject.InjectUnitilsInjectIntoIntegrationTest$Target. Reason:\n" +
-                    "Unable to set value for field with name 'field'.\n" +
-                    "Make sure that the field exists on the target object and that the value is of the correct type: org.unitils.inject.InjectUnitilsInjectIntoIntegrationTest$Type. Value: other type", e.getMessage());
+            assertEquals("Unable to inject into property 'field' with target of type org.unitils.inject.InjectUnitilsInjectIntoIntegrationTest$Target.\n" +
+                    "Reason: Unable to set value for field with name 'field'.\n" +
+                    "Make sure that the field exists on the target object and that the value is of the correct type: org.unitils.inject.InjectUnitilsInjectIntoIntegrationTest$Type. Value: other type\n" +
+                    "Reason: IllegalArgumentException: Can not set org.unitils.inject.InjectUnitilsInjectIntoIntegrationTest$Type field org.unitils.inject.InjectUnitilsInjectIntoIntegrationTest$Target.field to org.unitils.inject.InjectUnitilsInjectIntoIntegrationTest$OtherType", e.getMessage());
         }
     }
 
@@ -82,8 +83,8 @@ public class InjectUnitilsInjectIntoIntegrationTest extends UnitilsJUnit4 {
             InjectUnitils.injectInto(target, "field.innerField", "value", false);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to inject into property 'field.innerField' with target of type org.unitils.inject.InjectUnitilsInjectIntoIntegrationTest$Target. Reason:\n" +
-                    "Unable to set value for composite field with name 'field.innerField'. Inner field with name 'field' is null.", e.getMessage());
+            assertEquals("Unable to inject into property 'field.innerField' with target of type org.unitils.inject.InjectUnitilsInjectIntoIntegrationTest$Target.\n" +
+                    "Reason: Unable to set value for composite field with name 'field.innerField'. Inner field with name 'field' is null.", e.getMessage());
         }
     }
 

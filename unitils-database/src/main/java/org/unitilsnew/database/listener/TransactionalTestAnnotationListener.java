@@ -63,10 +63,10 @@ public class TransactionalTestAnnotationListener extends TestAnnotationListener<
         TransactionMode transactionMode = annotation.value();
 
         if (transactionMode == COMMIT) {
-            transactionManager.commit();
+            transactionManager.commit(true);
 
         } else if (transactionMode == ROLLBACK) {
-            transactionManager.rollback();
+            transactionManager.rollback(true);
         }
     }
 }

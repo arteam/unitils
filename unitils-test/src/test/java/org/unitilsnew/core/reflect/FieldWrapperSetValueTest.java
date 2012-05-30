@@ -117,7 +117,8 @@ public class FieldWrapperSetValueTest {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Unable to set value for field with name 'field'.\n" +
-                    "Make sure that the field exists on the target object and that the value is of the correct type: java.lang.String. Value: value", e.getMessage());
+                    "Make sure that the field exists on the target object and that the value is of the correct type: java.lang.String. Value: value\n" +
+                    "Reason: IllegalArgumentException: Can not set java.lang.String field org.unitilsnew.core.reflect.FieldWrapperSetValueTest$OtherClass.field to org.unitilsnew.core.reflect.FieldWrapperSetValueTest$MyClass", e.getMessage());
         }
     }
 
@@ -129,7 +130,8 @@ public class FieldWrapperSetValueTest {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Unable to set value for field with name 'field'.\n" +
-                    "Make sure that the field exists on the target object and that the value is of the correct type: java.lang.String. Value: 111", e.getMessage());
+                    "Make sure that the field exists on the target object and that the value is of the correct type: java.lang.String. Value: 111\n" +
+                    "Reason: IllegalArgumentException: Can not set java.lang.String field org.unitilsnew.core.reflect.FieldWrapperSetValueTest$MyClass.field to java.lang.Long", e.getMessage());
         }
     }
 
@@ -141,7 +143,8 @@ public class FieldWrapperSetValueTest {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Unable to set value for field with name 'staticField'.\n" +
-                    "Make sure that the field exists on the target object and that the value is of the correct type: java.lang.String. Value: 111", e.getMessage());
+                    "Make sure that the field exists on the target object and that the value is of the correct type: java.lang.String. Value: 111\n" +
+                    "Reason: IllegalArgumentException: Can not set static java.lang.String field org.unitilsnew.core.reflect.FieldWrapperSetValueTest$MyClass.staticField to java.lang.Long", e.getMessage());
         }
     }
 

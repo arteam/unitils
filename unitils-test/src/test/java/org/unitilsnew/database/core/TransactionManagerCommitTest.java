@@ -45,19 +45,29 @@ public class TransactionManagerCommitTest extends UnitilsJUnit4 {
 
 
     @Test
-    public void transactionRunning() throws Exception {
+    public void endTransaction() throws Exception {
         transactionManager.startTransaction();
         transactionManager.registerDataSource(dataSource);
 
-        transactionManager.commit();
-        assertFalse(transactionManager.startTransactionWhenDataSourceIsRegistered);
-        assertNull(transactionManager.transactionStatus);
+        transactionManager.commit(true);
+        assertFalse(transactionManager.isTransactionActive());
+        assertFalse(transactionManager.isTransactionStarted());
+    }
+
+    @Test
+    public void keepTransactionRunning() throws Exception {
+        transactionManager.startTransaction();
+        transactionManager.registerDataSource(dataSource);
+
+        transactionManager.commit(false);
+        assertFalse(transactionManager.isTransactionActive());
+        assertTrue(transactionManager.isTransactionStarted());
     }
 
     @Test
     public void exceptionWhenNoTransactionRunning() throws Exception {
         try {
-            transactionManager.commit();
+            transactionManager.commit(false);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Unable to commit. No transaction is currently active. Make sure to call startTransaction to start a transaction.", e.getMessage());
@@ -68,7 +78,7 @@ public class TransactionManagerCommitTest extends UnitilsJUnit4 {
     public void exceptionWhenTransactionIsOnlyMarkedAsStartedButNoDataSourceWasRegistered() throws Exception {
         transactionManager.startTransaction();
         try {
-            transactionManager.commit();
+            transactionManager.commit(false);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Unable to commit. No transaction is currently active. Make sure to call startTransaction to start a transaction.", e.getMessage());

@@ -215,14 +215,12 @@ public class ClassWrapper extends TypeWrapper {
         } catch (NoSuchMethodException e) {
             throw new UnitilsException("Unable to create instance of type " + getName() + ". No default (no-argument) constructor found.", e);
 
-
         } catch (InstantiationException e) {
             throw new UnitilsException("Unable to create instance of type " + getName() + ". Type is an abstract class.", e);
 
         } catch (Exception e) {
             Throwable cause = (e instanceof InvocationTargetException) ? e.getCause() : e;
-            String reason = cause == null ? "" : " Reason: " + cause.toString();
-            throw new UnitilsException("Unable to create instance of type " + getName() + "." + reason, cause);
+            throw new UnitilsException("Unable to create instance of type " + getName() + ".", cause);
         }
     }
 
