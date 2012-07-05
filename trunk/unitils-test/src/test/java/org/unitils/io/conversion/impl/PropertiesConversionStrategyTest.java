@@ -36,16 +36,26 @@ public class PropertiesConversionStrategyTest {
     /* Tested object */
     private PropertiesConversionStrategy conversion = new PropertiesConversionStrategy();
 
-    private String input = "test=€é*ù¨´ù]:~e;[=+";
+    private String input = "test=$µé*ù¨´ù]:~e;[=+";
 
 
     @Test
-    public void validEncoding() throws IOException {
+    public void validEncodingUtf8() throws IOException {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes("utf-8"));
 
         Properties result = conversion.convertContent(inputStream, "utf-8");
         assertEquals("{" + input + "}", result.toString());
     }
+
+
+    @Test
+    public void validEncodingISO88591() throws IOException {
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes("ISO-8859-1"));
+
+        Properties result = conversion.convertContent(inputStream, "ISO-8859-1");
+        assertEquals("{" + input + "}", result.toString());
+    }
+
 
     @Test(expected = UnsupportedEncodingException.class)
     public void invalidEncoding() throws IOException {
