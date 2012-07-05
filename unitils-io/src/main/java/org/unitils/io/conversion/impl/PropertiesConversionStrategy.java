@@ -17,6 +17,7 @@
 package org.unitils.io.conversion.impl;
 
 import org.unitils.io.conversion.ConversionStrategy;
+import org.unitils.util.ReaderInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +39,10 @@ public class PropertiesConversionStrategy implements ConversionStrategy<Properti
 
     public Properties convertContent(InputStream inputStream, String encoding) throws IOException {
         Properties result = new Properties();
-        result.load(new InputStreamReader(inputStream, encoding));
+
+       InputStream readerInputStream = new ReaderInputStream(new InputStreamReader(inputStream,encoding));
+
+        result.load(readerInputStream);
         return result;
     }
 

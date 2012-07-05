@@ -32,7 +32,7 @@ import java.io.File;
  */
 public class TempServiceFactory implements Factory<TempService> {
 
-    public static final String ROOT_TEMP_DIR = " IOModule.temp.rootTempDir";
+    public static final String ROOT_TEMP_DIR = "IOModule.temp.rootTempDir";
 
     protected String systemTempDirName;
 
