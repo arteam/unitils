@@ -196,28 +196,6 @@
             </binaries>
         </moduleSet>
 
-        <!-- unitils-spring -->
-        <moduleSet>
-            <includes>
-                <include>org.unitils:unitils-spring</include>
-            </includes>
-            <sources>
-                <fileSets>
-                    <fileSet>
-                        <includes>
-                            <include>pom.xml</include>
-                            <include>src/main/**</include>
-                        </includes>
-                    </fileSet>
-                </fileSets>
-            </sources>
-            <binaries>
-                <includeDependencies>false</includeDependencies>
-                <outputDirectory>unitils-spring</outputDirectory>
-                <unpack>false</unpack>
-            </binaries>
-        </moduleSet>
-
         <!-- unitils-testng -->
         <moduleSet>
             <includes>
