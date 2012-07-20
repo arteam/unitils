@@ -20,9 +20,11 @@ import org.dbmaintain.database.DatabaseConnection;
 import org.dbmaintain.database.DatabaseInfo;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.core.UnitilsException;
 import org.unitils.database.config.DatabaseConfiguration;
+import org.unitils.database.core.DataSourceProvider;
+import org.unitils.database.core.DataSourceProviderManager;
 import org.unitils.database.core.DataSourceWrapper;
-import org.unitils.database.core.DataSourceWrapperManager;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
@@ -41,7 +43,8 @@ public class DbMaintainDatabaseConnectionManagerGetDatabaseConnectionTest extend
     /* Tested object */
     private DbMaintainDatabaseConnectionManager dbMaintainDatabaseConnectionManager;
 
-    private Mock<DataSourceWrapperManager> dataSourceWrapperManagerMock;
+    private Mock<DataSourceProviderManager> dataSourceProviderManagerMock;
+    private Mock<DataSourceProvider> dataSourceProviderMock;
     @Dummy
     private DbMaintainSQLHandler dbMaintainSQLHandler;
     private Mock<DataSourceWrapper> dataSourceWrapperMock;
@@ -51,7 +54,8 @@ public class DbMaintainDatabaseConnectionManagerGetDatabaseConnectionTest extend
 
     @Before
     public void initialize() {
-        dbMaintainDatabaseConnectionManager = new DbMaintainDatabaseConnectionManager(null, dataSourceWrapperManagerMock.getMock(), dbMaintainSQLHandler);
+        dbMaintainDatabaseConnectionManager = new DbMaintainDatabaseConnectionManager(dataSourceProviderManagerMock.getMock(), dbMaintainSQLHandler);
+        dataSourceProviderManagerMock.returns(dataSourceProviderMock).getDataSourceProvider();
 
         DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration("myDatabase", "myDialect", "myDriver", "myUrl", "myUser", "myPass", "schema1", asList("schema1", "schema2"), false, true);
         dataSourceWrapperMock.returns(databaseConfiguration).getDatabaseConfiguration();
@@ -61,7 +65,7 @@ public class DbMaintainDatabaseConnectionManagerGetDatabaseConnectionTest extend
 
     @Test
     public void namedDatabase() {
-        dataSourceWrapperManagerMock.returns(dataSourceWrapperMock).getDataSourceWrapper("myDatabase");
+        dataSourceProviderMock.returns(dataSourceWrapperMock).getDataSourceWrapper("myDatabase");
 
         DatabaseConnection result = dbMaintainDatabaseConnectionManager.getDatabaseConnection("myDatabase");
         DatabaseInfo databaseInfo = result.getDatabaseInfo();
@@ -80,7 +84,7 @@ public class DbMaintainDatabaseConnectionManagerGetDatabaseConnectionTest extend
 
     @Test
     public void nullDatabaseName() {
-        dataSourceWrapperManagerMock.returns(dataSourceWrapperMock).getDataSourceWrapper(null);
+        dataSourceProviderMock.returns(dataSourceWrapperMock).getDataSourceWrapper(null);
 
         DatabaseConnection result = dbMaintainDatabaseConnectionManager.getDatabaseConnection(null);
         assertNotNull(result.getDatabaseInfo());
@@ -90,7 +94,7 @@ public class DbMaintainDatabaseConnectionManagerGetDatabaseConnectionTest extend
 
     @Test
     public void blankDatabaseNameSameAsNullDatabaseName() {
-        dataSourceWrapperManagerMock.returns(dataSourceWrapperMock).getDataSourceWrapper(null);
+        dataSourceProviderMock.returns(dataSourceWrapperMock).getDataSourceWrapper(null);
 
         DatabaseConnection result = dbMaintainDatabaseConnectionManager.getDatabaseConnection("");
         assertNotNull(result.getDatabaseInfo());
@@ -100,10 +104,23 @@ public class DbMaintainDatabaseConnectionManagerGetDatabaseConnectionTest extend
 
     @Test
     public void databaseConnectionsAreCached() {
-        dataSourceWrapperManagerMock.returns(dataSourceWrapperMock).getDataSourceWrapper(null);
+        dataSourceProviderMock.returns(dataSourceWrapperMock).getDataSourceWrapper(null);
 
         DatabaseConnection result1 = dbMaintainDatabaseConnectionManager.getDatabaseConnection(null);
         DatabaseConnection result2 = dbMaintainDatabaseConnectionManager.getDatabaseConnection(null);
         assertSame(result1, result2);
+    }
+
+    @Test
+    public void exceptionWhenDefaultDatabaseIsDisabled() {
+        DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration("myDatabase", "myDialect", "myDriver", "myUrl", "myUser", "myPass", "schema1", asList("schema1", "schema2"), true, true);
+        dataSourceWrapperMock.onceReturns(databaseConfiguration).getDatabaseConfiguration();
+        dataSourceProviderMock.returns(dataSourceWrapperMock).getDataSourceWrapper(null);
+        try {
+            dbMaintainDatabaseConnectionManager.getDatabaseConnection(null);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Invalid DbMaintain configuration. Default database cannot be disabled.", e.getMessage());
+        }
     }
 }

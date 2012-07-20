@@ -42,7 +42,7 @@ public class DataSourceWrapperTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        dataSourceWrapper = new DataSourceWrapper(databaseConfiguration, dataSource);
+        dataSourceWrapper = new DataSourceWrapper(dataSource, databaseConfiguration);
     }
 
 

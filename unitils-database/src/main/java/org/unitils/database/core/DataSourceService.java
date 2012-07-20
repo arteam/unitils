@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.database.dbmaintain.DbMaintainWrapper;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 /**
  * @author Tim Ducheyne
@@ -30,15 +31,21 @@ public class DataSourceService {
     /* The logger instance for this class */
     protected static Log logger = LogFactory.getLog(DataSourceService.class);
 
-    protected DataSourceWrapperManager dataSourceWrapperManager;
+    protected DataSourceProviderManager dataSourceProviderManager;
     protected DbMaintainWrapper dbMaintainWrapper;
     protected TransactionManager transactionManager;
 
 
-    public DataSourceService(DataSourceWrapperManager dataSourceWrapperManager, DbMaintainWrapper dbMaintainWrapper, TransactionManager transactionManager) {
-        this.dataSourceWrapperManager = dataSourceWrapperManager;
+    public DataSourceService(DataSourceProviderManager dataSourceProviderManager, DbMaintainWrapper dbMaintainWrapper, TransactionManager transactionManager) {
+        this.dataSourceProviderManager = dataSourceProviderManager;
         this.dbMaintainWrapper = dbMaintainWrapper;
         this.transactionManager = transactionManager;
+    }
+
+
+    public List<String> getDatabaseNames() {
+        DataSourceProvider dataSourceProvider = dataSourceProviderManager.getDataSourceProvider();
+        return dataSourceProvider.getDatabaseNames();
     }
 
 
@@ -53,7 +60,8 @@ public class DataSourceService {
 
 
     public DataSourceWrapper getDataSourceWrapper(String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceProvider dataSourceProvider = dataSourceProviderManager.getDataSourceProvider();
+        DataSourceWrapper dataSourceWrapper = dataSourceProvider.getDataSourceWrapper(databaseName);
 
         DataSource dataSource = dataSourceWrapper.getWrappedDataSource();
         transactionManager.registerDataSource(dataSource);

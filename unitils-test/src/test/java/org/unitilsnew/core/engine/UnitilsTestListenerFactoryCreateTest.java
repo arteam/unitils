@@ -23,9 +23,11 @@ import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
 import org.unitilsnew.core.TestListener;
 import org.unitilsnew.core.context.UnitilsContext;
+import org.unitilsnew.core.spring.SpringTestListener;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 /**
  * @author Tim Ducheyne
@@ -40,11 +42,13 @@ public class UnitilsTestListenerFactoryCreateTest extends UnitilsJUnit4 {
     private WrapperForFieldAnnotationListenerFactory wrapperForFieldAnnotationListenerFactory;
     @Dummy
     private WrapperForTestAnnotationListenerFactory wrapperForTestAnnotationListenerFactory;
+    @Dummy
+    private SpringTestListener springTestListener;
 
 
     @Before
     public void initialize() {
-        unitilsTestListenerFactory = new UnitilsTestListenerFactory(unitilsContextMock.getMock(), wrapperForFieldAnnotationListenerFactory, wrapperForTestAnnotationListenerFactory);
+        unitilsTestListenerFactory = new UnitilsTestListenerFactory(unitilsContextMock.getMock(), wrapperForFieldAnnotationListenerFactory, wrapperForTestAnnotationListenerFactory, springTestListener);
     }
 
 
@@ -59,9 +63,10 @@ public class UnitilsTestListenerFactoryCreateTest extends UnitilsJUnit4 {
 
         UnitilsTestListener result = unitilsTestListenerFactory.create();
 
-        assertEquals(2, result.testListeners.size());
+        assertEquals(3, result.testListeners.size());
         assertSame(myTestListener1, result.testListeners.get(0));
         assertSame(myTestListener2, result.testListeners.get(1));
+        assertSame(springTestListener, result.testListeners.get(2));
         assertSame(wrapperForFieldAnnotationListenerFactory, result.wrapperForFieldAnnotationListenerFactory);
         assertSame(wrapperForTestAnnotationListenerFactory, result.wrapperForTestAnnotationListenerFactory);
     }
@@ -69,7 +74,9 @@ public class UnitilsTestListenerFactoryCreateTest extends UnitilsJUnit4 {
     @Test
     public void emptyTestListenerTypes() throws Exception {
         UnitilsTestListener result = unitilsTestListenerFactory.create();
-        assertTrue(result.testListeners.isEmpty());
+
+        assertEquals(1, result.testListeners.size());
+        assertSame(springTestListener, result.testListeners.get(0));
     }
 
 

@@ -20,9 +20,9 @@ import org.dbmaintain.database.DatabaseConnection;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.database.config.DatabaseConfiguration;
-import org.unitils.database.config.DatabaseConfigurations;
+import org.unitils.database.core.DataSourceProvider;
+import org.unitils.database.core.DataSourceProviderManager;
 import org.unitils.database.core.DataSourceWrapper;
-import org.unitils.database.core.DataSourceWrapperManager;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
@@ -43,8 +43,8 @@ public class DbMaintainDatabaseConnectionManagerGetDatabaseConnectionsTest exten
     /* Tested object */
     private DbMaintainDatabaseConnectionManager dbMaintainDatabaseConnectionManager;
 
-    private Mock<DatabaseConfigurations> databaseConfigurationsMock;
-    private Mock<DataSourceWrapperManager> dataSourceWrapperManagerMock;
+    private Mock<DataSourceProviderManager> dataSourceProviderManagerMock;
+    private Mock<DataSourceProvider> dataSourceProviderMock;
     @Dummy
     private DbMaintainSQLHandler dbMaintainSQLHandler;
     private Mock<DataSourceWrapper> dataSourceWrapperMock1;
@@ -55,7 +55,8 @@ public class DbMaintainDatabaseConnectionManagerGetDatabaseConnectionsTest exten
 
     @Before
     public void initialize() {
-        dbMaintainDatabaseConnectionManager = new DbMaintainDatabaseConnectionManager(databaseConfigurationsMock.getMock(), dataSourceWrapperManagerMock.getMock(), dbMaintainSQLHandler);
+        dbMaintainDatabaseConnectionManager = new DbMaintainDatabaseConnectionManager(dataSourceProviderManagerMock.getMock(), dbMaintainSQLHandler);
+        dataSourceProviderManagerMock.returns(dataSourceProviderMock).getDataSourceProvider();
 
         DatabaseConfiguration databaseConfiguration1 = new DatabaseConfiguration("database1", null, null, null, null, null, null, Collections.<String>emptyList(), false, true);
         dataSourceWrapperMock1.returns(databaseConfiguration1).getDatabaseConfiguration();
@@ -69,9 +70,9 @@ public class DbMaintainDatabaseConnectionManagerGetDatabaseConnectionsTest exten
 
     @Test
     public void namedDatabase() {
-        databaseConfigurationsMock.returns(asList("database1", "database2")).getDatabaseNames();
-        dataSourceWrapperManagerMock.returns(dataSourceWrapperMock1).getDataSourceWrapper("database1");
-        dataSourceWrapperManagerMock.returns(dataSourceWrapperMock2).getDataSourceWrapper("database2");
+        dataSourceProviderMock.returns(asList("database1", "database2")).getDatabaseNames();
+        dataSourceProviderMock.returns(dataSourceWrapperMock1).getDataSourceWrapper("database1");
+        dataSourceProviderMock.returns(dataSourceWrapperMock2).getDataSourceWrapper("database2");
 
         List<DatabaseConnection> result = dbMaintainDatabaseConnectionManager.getDatabaseConnections();
         assertEquals(2, result.size());
@@ -81,8 +82,8 @@ public class DbMaintainDatabaseConnectionManagerGetDatabaseConnectionsTest exten
 
     @Test
     public void defaultDatabaseWhenThereAreNoNamedDatabases() {
-        databaseConfigurationsMock.returns(Collections.<String>emptyList()).getDatabaseNames();
-        dataSourceWrapperManagerMock.returns(dataSourceWrapperMock1).getDataSourceWrapper(isNull(String.class));
+        dataSourceProviderMock.returns(Collections.<String>emptyList()).getDatabaseNames();
+        dataSourceProviderMock.returns(dataSourceWrapperMock1).getDataSourceWrapper(isNull(String.class));
 
         List<DatabaseConnection> result = dbMaintainDatabaseConnectionManager.getDatabaseConnections();
         assertEquals(1, result.size());

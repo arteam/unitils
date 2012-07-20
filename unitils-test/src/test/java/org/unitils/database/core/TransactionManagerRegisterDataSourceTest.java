@@ -16,17 +16,22 @@
 
 package org.unitils.database.core;
 
-import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.unitils.core.UnitilsException;
-import org.unitils.database.annotations.TestDataSource;
+import org.unitils.database.transaction.TransactionProvider;
+import org.unitils.database.transaction.TransactionProviderManager;
+import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
 
 import javax.sql.DataSource;
 
 import static org.junit.Assert.*;
+import static org.springframework.transaction.TransactionDefinition.PROPAGATION_REQUIRED;
 
 /**
  * @author Tim Ducheyne
@@ -34,44 +39,55 @@ import static org.junit.Assert.*;
 public class TransactionManagerRegisterDataSourceTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private TransactionManager transactionManager = new TransactionManager();
+    private TransactionManager transactionManager;
 
-    @TestDataSource
+    private Mock<TransactionProviderManager> transactionProviderManagerMock;
+    private Mock<TransactionProvider> transactionProviderMock;
+    private Mock<PlatformTransactionManager> platformTransactionManagerMock;
+    @Dummy
+    private TransactionStatus transactionStatus;
+    @Dummy
     private DataSource dataSource;
     @Dummy
     private DataSource otherDataSource;
 
 
-    @After
-    public void cleanup() {
-        TransactionManager.dataSourceTransactionManagers.clear();
+    @Before
+    public void initialize() {
+        transactionManager = new TransactionManager(transactionProviderManagerMock.getMock());
+
+        transactionProviderManagerMock.returns(transactionProviderMock).getTransactionProvider();
+        transactionProviderMock.returns(platformTransactionManagerMock).getPlatformTransactionManager(null, null);
+        platformTransactionManagerMock.returns(transactionStatus).getTransaction(null);
     }
 
 
     @Test
-    public void onlyRegisterDataSourceWhenNoTransactionStarted() throws Exception {
+    public void registerDataSourceWhenNoTransactionStarted() throws Exception {
         transactionManager.registerDataSource(dataSource);
 
         assertSame(dataSource, transactionManager.dataSource);
-        assertNull(transactionManager.transactionStatus);
+        assertFalse(transactionManager.isTransactionActive());
     }
 
     @Test
     public void startTransactionWhenTransactionMarkedAsStarted() throws Exception {
-        transactionManager.startTransaction();
-
+        transactionManager.startTransaction("myTransactionManager");
         transactionManager.registerDataSource(dataSource);
-        assertNotNull(transactionManager.transactionStatus);
+
+        assertTrue(transactionManager.isTransactionActive());
+        transactionProviderMock.assertInvoked().getPlatformTransactionManager("myTransactionManager", dataSource);
+        platformTransactionManagerMock.assertInvoked().getTransaction(new DefaultTransactionDefinition(PROPAGATION_REQUIRED));
     }
 
     @Test
     public void doNotStartNewTransactionWhenRegisteringSameDataSourceMoreThanOnceWhileTransactionIsRunning() throws Exception {
-        transactionManager.startTransaction();
+        transactionManager.startTransaction("myTransactionManager");
         transactionManager.registerDataSource(dataSource);
-        TransactionStatus beforeTransactionStatus = transactionManager.transactionStatus;
+        platformTransactionManagerMock.assertInvoked().getTransaction(null);
 
         transactionManager.registerDataSource(dataSource);
-        assertSame(beforeTransactionStatus, transactionManager.transactionStatus);
+        platformTransactionManagerMock.assertNotInvoked().getTransaction(null);
     }
 
     @Test
@@ -83,7 +99,7 @@ public class TransactionManagerRegisterDataSourceTest extends UnitilsJUnit4 {
 
     @Test
     public void exceptionWhenTransactionAlreadyStartedForOtherDataSource() throws Exception {
-        transactionManager.startTransaction();
+        transactionManager.startTransaction("myTransactionManager");
         transactionManager.registerDataSource(dataSource);
         try {
             transactionManager.registerDataSource(otherDataSource);

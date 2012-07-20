@@ -37,7 +37,8 @@ public class DataSourceServiceGetDataSourceTest extends UnitilsJUnit4 {
     /* Tested object */
     private DataSourceService dataSourceService;
 
-    private Mock<DataSourceWrapperManager> dataSourceWrapperManagerMock;
+    private Mock<DataSourceProviderManager> dataSourceProviderManagerMock;
+    private Mock<DataSourceProvider> dataSourceProviderMock;
     private Mock<DbMaintainWrapper> dbMaintainWrapperMock;
     private Mock<TransactionManager> transactionManagerMock;
 
@@ -50,13 +51,14 @@ public class DataSourceServiceGetDataSourceTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        dataSourceService = new DataSourceService(dataSourceWrapperManagerMock.getMock(), dbMaintainWrapperMock.getMock(), transactionManagerMock.getMock());
+        dataSourceService = new DataSourceService(dataSourceProviderManagerMock.getMock(), dbMaintainWrapperMock.getMock(), transactionManagerMock.getMock());
+        dataSourceProviderManagerMock.returns(dataSourceProviderMock).getDataSourceProvider();
     }
 
 
     @Test
     public void getDataSource() throws Exception {
-        dataSourceWrapperManagerMock.returns(dataSourceWrapperMock).getDataSourceWrapper("databaseName");
+        dataSourceProviderMock.returns(dataSourceWrapperMock).getDataSourceWrapper("databaseName");
         dataSourceWrapperMock.returns(dataSource).getDataSource(false);
         dataSourceWrapperMock.returns(dataSource).getWrappedDataSource();
 
@@ -69,7 +71,7 @@ public class DataSourceServiceGetDataSourceTest extends UnitilsJUnit4 {
 
     @Test
     public void nullDatabaseName() throws Exception {
-        dataSourceWrapperManagerMock.returns(dataSourceWrapperMock).getDataSourceWrapper(isNull(String.class));
+        dataSourceProviderMock.returns(dataSourceWrapperMock).getDataSourceWrapper(isNull(String.class));
         dataSourceWrapperMock.returns(dataSource).getDataSource(false);
         dataSourceWrapperMock.returns(dataSource).getWrappedDataSource();
 
@@ -82,7 +84,7 @@ public class DataSourceServiceGetDataSourceTest extends UnitilsJUnit4 {
 
     @Test
     public void wrapDataSourceInTransactionalProxy() throws Exception {
-        dataSourceWrapperManagerMock.returns(dataSourceWrapperMock).getDataSourceWrapper("databaseName");
+        dataSourceProviderMock.returns(dataSourceWrapperMock).getDataSourceWrapper("databaseName");
         dataSourceWrapperMock.returns(dataSource).getDataSource(true);
         dataSourceWrapperMock.returns(dataSource).getWrappedDataSource();
 

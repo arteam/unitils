@@ -20,19 +20,26 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbmaintain.database.DatabaseException;
 import org.dbmaintain.database.SQLHandler;
-import org.unitils.database.core.TransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.unitils.database.transaction.impl.DefaultTransactionProvider;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.Set;
 
 import static org.springframework.jdbc.datasource.DataSourceUtils.getConnection;
 import static org.springframework.jdbc.datasource.DataSourceUtils.releaseConnection;
 import static org.springframework.jdbc.support.JdbcUtils.closeResultSet;
 import static org.springframework.jdbc.support.JdbcUtils.closeStatement;
+import static org.springframework.transaction.TransactionDefinition.PROPAGATION_REQUIRED;
 
 /**
  * @author Tim Ducheyne
@@ -42,12 +49,12 @@ public class DbMaintainSQLHandler implements SQLHandler {
     /* The logger instance for this class */
     protected static Log logger = LogFactory.getLog(DbMaintainSQLHandler.class);
 
-    protected TransactionManager transactionManager;
-    protected boolean transactionWasAlreadyStarted;
+    protected DefaultTransactionProvider defaultTransactionProvider;
+    protected Map<DataSource, TransactionStatus> transactionStatuses = new IdentityHashMap<DataSource, TransactionStatus>(3);
 
 
-    public DbMaintainSQLHandler(TransactionManager transactionManager) {
-        this.transactionManager = transactionManager;
+    public DbMaintainSQLHandler(DefaultTransactionProvider defaultTransactionProvider) {
+        this.defaultTransactionProvider = defaultTransactionProvider;
     }
 
 
@@ -78,9 +85,7 @@ public class DbMaintainSQLHandler implements SQLHandler {
             connection = getConnection(dataSource);
             statement = connection.createStatement();
             int nbChanges = statement.executeUpdate(sql);
-            if (transactionManager.isTransactionActive()) {
-                transactionManager.commit(false);
-            }
+            commitTransaction(dataSource);
             return nbChanges;
 
         } catch (Exception e) {
@@ -187,19 +192,43 @@ public class DbMaintainSQLHandler implements SQLHandler {
 
 
     public void startTransaction(DataSource dataSource) {
-        transactionWasAlreadyStarted = transactionManager.isTransactionStarted();
-        transactionManager.registerDataSource(dataSource);
-        transactionManager.startTransaction();
+        PlatformTransactionManager platformTransactionManager = defaultTransactionProvider.getPlatformTransactionManager(null, dataSource);
+        TransactionDefinition transactionDefinition = new DefaultTransactionDefinition(PROPAGATION_REQUIRED);
+        TransactionStatus transactionStatus = platformTransactionManager.getTransaction(transactionDefinition);
+        transactionStatuses.put(dataSource, transactionStatus);
     }
 
     public void endTransactionAndCommit(DataSource dataSource) {
-        transactionManager.commit(!transactionWasAlreadyStarted);
+        commitTransaction(dataSource);
+        transactionStatuses.remove(dataSource);
     }
 
     public void endTransactionAndRollback(DataSource dataSource) {
-        transactionManager.rollback(!transactionWasAlreadyStarted);
+        rollbackTransaction(dataSource);
+        transactionStatuses.remove(dataSource);
     }
 
     public void closeAllConnections() {
+    }
+
+
+    protected void commitTransaction(DataSource dataSource) {
+        TransactionStatus transactionStatus = transactionStatuses.get(dataSource);
+        if (transactionStatus == null) {
+            // nothing to commit
+            return;
+        }
+        PlatformTransactionManager platformTransactionManager = defaultTransactionProvider.getPlatformTransactionManager(null, dataSource);
+        platformTransactionManager.commit(transactionStatus);
+    }
+
+    protected void rollbackTransaction(DataSource dataSource) {
+        TransactionStatus transactionStatus = transactionStatuses.get(dataSource);
+        if (transactionStatus == null) {
+            // nothing to rollback
+            return;
+        }
+        PlatformTransactionManager platformTransactionManager = defaultTransactionProvider.getPlatformTransactionManager(null, dataSource);
+        platformTransactionManager.rollback(transactionStatus);
     }
 }

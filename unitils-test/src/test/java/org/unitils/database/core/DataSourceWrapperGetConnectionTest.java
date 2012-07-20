@@ -45,7 +45,7 @@ public class DataSourceWrapperGetConnectionTest extends UnitilsJUnit4 {
     @Before
     public void initialize() {
         databaseConfiguration = new DatabaseConfiguration("myDatabase", "myDialect", "myDriver", "myUrl", "myUser", "myPass", "schemaA", asList("schemaA", "schemaB"), false, true);
-        dataSourceWrapper = new DataSourceWrapper(databaseConfiguration, dataSource);
+        dataSourceWrapper = new DataSourceWrapper(dataSource, databaseConfiguration);
     }
 
 
@@ -57,7 +57,7 @@ public class DataSourceWrapperGetConnectionTest extends UnitilsJUnit4 {
 
     @Test
     public void exceptionWhenConnectionFailure() {
-        dataSourceWrapper = new DataSourceWrapper(databaseConfiguration, null);
+        dataSourceWrapper = new DataSourceWrapper(null, databaseConfiguration);
         try {
             dataSourceWrapper.getConnection();
             fail("UnitilsException expected");

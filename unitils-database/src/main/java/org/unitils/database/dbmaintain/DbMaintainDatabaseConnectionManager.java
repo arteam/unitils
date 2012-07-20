@@ -20,10 +20,11 @@ import org.dbmaintain.database.DatabaseConnection;
 import org.dbmaintain.database.DatabaseConnectionManager;
 import org.dbmaintain.database.DatabaseInfo;
 import org.dbmaintain.database.SQLHandler;
+import org.unitils.core.UnitilsException;
 import org.unitils.database.config.DatabaseConfiguration;
-import org.unitils.database.config.DatabaseConfigurations;
+import org.unitils.database.core.DataSourceProvider;
+import org.unitils.database.core.DataSourceProviderManager;
 import org.unitils.database.core.DataSourceWrapper;
-import org.unitils.database.core.DataSourceWrapperManager;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
@@ -38,16 +39,14 @@ import static org.apache.commons.lang.StringUtils.isBlank;
  */
 public class DbMaintainDatabaseConnectionManager implements DatabaseConnectionManager {
 
-    protected DatabaseConfigurations databaseConfigurations;
-    protected DataSourceWrapperManager dataSourceWrapperManager;
+    protected DataSourceProviderManager dataSourceProviderManager;
     protected DbMaintainSQLHandler dbMaintainSQLHandler;
 
     protected Map<String, DatabaseConnection> databaseConnections = new HashMap<String, DatabaseConnection>();
 
 
-    public DbMaintainDatabaseConnectionManager(DatabaseConfigurations databaseConfigurations, DataSourceWrapperManager dataSourceWrapperManager, DbMaintainSQLHandler dbMaintainSQLHandler) {
-        this.databaseConfigurations = databaseConfigurations;
-        this.dataSourceWrapperManager = dataSourceWrapperManager;
+    public DbMaintainDatabaseConnectionManager(DataSourceProviderManager dataSourceProviderManager, DbMaintainSQLHandler dbMaintainSQLHandler) {
+        this.dataSourceProviderManager = dataSourceProviderManager;
         this.dbMaintainSQLHandler = dbMaintainSQLHandler;
     }
 
@@ -70,7 +69,9 @@ public class DbMaintainDatabaseConnectionManager implements DatabaseConnectionMa
 
     public List<DatabaseConnection> getDatabaseConnections() {
         List<DatabaseConnection> databaseConnections = new ArrayList<DatabaseConnection>();
-        List<String> databaseNames = databaseConfigurations.getDatabaseNames();
+
+        DataSourceProvider dataSourceProvider = dataSourceProviderManager.getDataSourceProvider();
+        List<String> databaseNames = dataSourceProvider.getDatabaseNames();
         for (String databaseName : databaseNames) {
             DatabaseConnection databaseConnection = getDatabaseConnection(databaseName);
             databaseConnections.add(databaseConnection);
@@ -84,7 +85,8 @@ public class DbMaintainDatabaseConnectionManager implements DatabaseConnectionMa
 
 
     protected DatabaseConnection createDatabaseConnection(String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceWrapperManager.getDataSourceWrapper(databaseName);
+        DataSourceProvider dataSourceProvider = dataSourceProviderManager.getDataSourceProvider();
+        DataSourceWrapper dataSourceWrapper = dataSourceProvider.getDataSourceWrapper(databaseName);
 
         DataSource dataSource = dataSourceWrapper.getWrappedDataSource();
         DatabaseConfiguration databaseConfiguration = dataSourceWrapper.getDatabaseConfiguration();
@@ -101,9 +103,12 @@ public class DbMaintainDatabaseConnectionManager implements DatabaseConnectionMa
         String password = databaseConfiguration.getPassword();
         String defaultSchemaName = databaseConfiguration.getDefaultSchemaName();
         List<String> schemaNames = databaseConfiguration.getSchemaNames();
-        boolean disabled = databaseConfiguration.isDisabled();
+        boolean disabled = databaseConfiguration.isUpdateDisabled();
         boolean defaultDatabase = databaseConfiguration.isDefaultDatabase();
 
+        if (disabled && defaultDatabase) {
+            throw new UnitilsException("Invalid DbMaintain configuration. Default database cannot be disabled.");
+        }
         return new DatabaseInfo(databaseName, dialect, driverClassName, url, userName, password, schemaNames, disabled, defaultDatabase);
     }
 

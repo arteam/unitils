@@ -36,7 +36,7 @@ public class DataSourceWrapperFactory {
      */
     public DataSourceWrapper create(DatabaseConfiguration databaseConfiguration) {
         DataSource dataSource = createDataSource(databaseConfiguration);
-        return new DataSourceWrapper(databaseConfiguration, dataSource);
+        return new DataSourceWrapper(dataSource, databaseConfiguration);
     }
 
 

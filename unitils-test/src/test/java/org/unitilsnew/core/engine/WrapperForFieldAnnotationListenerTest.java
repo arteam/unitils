@@ -90,8 +90,10 @@ public class WrapperForFieldAnnotationListenerTest extends UnitilsJUnit4 {
 
     @Test
     public void afterTestTearDown() {
-        wrapperForFieldAnnotationListener.afterTestTearDown(testInstance);
-        fieldAnnotationListenerMock.assertInvoked().afterTestTearDown(testInstance, testFieldMock.getMock(), annotationsMock.getMock());
+        NullPointerException e = new NullPointerException();
+
+        wrapperForFieldAnnotationListener.afterTestTearDown(testInstance, e);
+        fieldAnnotationListenerMock.assertInvoked().afterTestTearDown(testInstance, testFieldMock.getMock(), annotationsMock.getMock(), e);
     }
 
 
@@ -138,9 +140,9 @@ public class WrapperForFieldAnnotationListenerTest extends UnitilsJUnit4 {
     @Test
     public void afterTestTearDownException() {
         Exception exception = new NullPointerException("message");
-        fieldAnnotationListenerMock.raises(exception).afterTestTearDown(null, null, null);
+        fieldAnnotationListenerMock.raises(exception).afterTestTearDown(null, null, null, null);
         try {
-            wrapperForFieldAnnotationListener.afterTestTearDown(testInstance);
+            wrapperForFieldAnnotationListener.afterTestTearDown(testInstance, null);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertSame(exception, e.getCause());

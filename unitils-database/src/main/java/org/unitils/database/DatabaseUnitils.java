@@ -63,7 +63,12 @@ public class DatabaseUnitils {
      * Starts a new transaction.
      */
     public static void startTransaction() {
-        transactionManager.startTransaction();
+        startTransaction(null);
+    }
+
+    // todo unit test
+    public static void startTransaction(String transactionManagerName) {
+        transactionManager.startTransaction(transactionManagerName);
     }
 
     /**

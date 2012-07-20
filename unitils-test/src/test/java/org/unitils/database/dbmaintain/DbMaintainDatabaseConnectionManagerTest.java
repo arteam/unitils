@@ -38,7 +38,7 @@ public class DbMaintainDatabaseConnectionManagerTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        dbMaintainDatabaseConnectionManager = new DbMaintainDatabaseConnectionManager(null, null, dbMaintainSQLHandler);
+        dbMaintainDatabaseConnectionManager = new DbMaintainDatabaseConnectionManager(null, dbMaintainSQLHandler);
     }
 
 

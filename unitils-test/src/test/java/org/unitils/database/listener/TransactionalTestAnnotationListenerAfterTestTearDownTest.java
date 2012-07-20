@@ -62,7 +62,7 @@ public class TransactionalTestAnnotationListenerAfterTestTearDownTest extends Un
     public void ignoreWhenDisabled() {
         annotationsMock.returns(annotation1).getAnnotationWithDefaults();
 
-        transactionalTestAnnotationListener.afterTestTearDown(testInstanceMock.getMock(), annotationsMock.getMock());
+        transactionalTestAnnotationListener.afterTestTearDown(testInstanceMock.getMock(), annotationsMock.getMock(), null);
 
         transactionManagerMock.assertNotInvoked().commit(true);
         transactionManagerMock.assertNotInvoked().rollback(true);
@@ -72,7 +72,7 @@ public class TransactionalTestAnnotationListenerAfterTestTearDownTest extends Un
     public void commit() {
         annotationsMock.returns(annotation2).getAnnotationWithDefaults();
 
-        transactionalTestAnnotationListener.afterTestTearDown(testInstanceMock.getMock(), annotationsMock.getMock());
+        transactionalTestAnnotationListener.afterTestTearDown(testInstanceMock.getMock(), annotationsMock.getMock(), null);
 
         transactionManagerMock.assertInvoked().commit(true);
     }
@@ -81,7 +81,7 @@ public class TransactionalTestAnnotationListenerAfterTestTearDownTest extends Un
     public void rollback() {
         annotationsMock.returns(annotation3).getAnnotationWithDefaults();
 
-        transactionalTestAnnotationListener.afterTestTearDown(testInstanceMock.getMock(), annotationsMock.getMock());
+        transactionalTestAnnotationListener.afterTestTearDown(testInstanceMock.getMock(), annotationsMock.getMock(), null);
 
         transactionManagerMock.assertInvoked().rollback(true);
     }
@@ -90,7 +90,7 @@ public class TransactionalTestAnnotationListenerAfterTestTearDownTest extends Un
     public void ignoreWhenDefault() {
         annotationsMock.returns(annotation4).getAnnotationWithDefaults();
 
-        transactionalTestAnnotationListener.afterTestTearDown(testInstanceMock.getMock(), annotationsMock.getMock());
+        transactionalTestAnnotationListener.afterTestTearDown(testInstanceMock.getMock(), annotationsMock.getMock(), null);
 
         transactionManagerMock.assertNotInvoked().commit(true);
         transactionManagerMock.assertNotInvoked().rollback(true);

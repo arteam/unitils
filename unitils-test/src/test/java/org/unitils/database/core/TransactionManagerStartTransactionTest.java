@@ -16,15 +16,22 @@
 
 package org.unitils.database.core;
 
-import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.unitils.database.annotations.TestDataSource;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.unitils.core.UnitilsException;
+import org.unitils.database.transaction.TransactionProvider;
+import org.unitils.database.transaction.TransactionProviderManager;
+import org.unitils.mock.Mock;
+import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
 
 import javax.sql.DataSource;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.springframework.transaction.TransactionDefinition.PROPAGATION_REQUIRED;
 
 /**
  * @author Tim Ducheyne
@@ -32,21 +39,31 @@ import static org.junit.Assert.assertTrue;
 public class TransactionManagerStartTransactionTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private TransactionManager transactionManager = new TransactionManager();
+    private TransactionManager transactionManager;
 
-    @TestDataSource
+    private Mock<TransactionProviderManager> transactionProviderManagerMock;
+    private Mock<TransactionProvider> transactionProviderMock;
+    private Mock<PlatformTransactionManager> platformTransactionManagerMock;
+    @Dummy
+    private TransactionStatus transactionStatus;
+    @Dummy
     private DataSource dataSource;
 
 
-    @After
-    public void cleanup() {
-        TransactionManager.dataSourceTransactionManagers.clear();
+    @Before
+    public void initialize() {
+        transactionManager = new TransactionManager(transactionProviderManagerMock.getMock());
+
+        transactionProviderManagerMock.returns(transactionProviderMock).getTransactionProvider();
+        transactionProviderMock.returns(platformTransactionManagerMock).getPlatformTransactionManager(null, null);
+        platformTransactionManagerMock.returns(transactionStatus).getTransaction(null);
     }
 
 
     @Test
     public void transactionMarkedAsStartedWhenNoDataSourceRegistered() throws Exception {
-        transactionManager.startTransaction();
+        transactionManager.startTransaction("myTransactionManager");
+
         assertFalse(transactionManager.isTransactionActive());
         assertTrue(transactionManager.isTransactionStarted());
     }
@@ -54,16 +71,18 @@ public class TransactionManagerStartTransactionTest extends UnitilsJUnit4 {
     @Test
     public void transactionReallyStartedWhenDataSourceRegistered() throws Exception {
         transactionManager.registerDataSource(dataSource);
+        transactionManager.startTransaction("myTransactionManager");
 
-        transactionManager.startTransaction();
         assertTrue(transactionManager.isTransactionActive());
         assertTrue(transactionManager.isTransactionStarted());
+        transactionProviderMock.assertInvoked().getPlatformTransactionManager("myTransactionManager", dataSource);
+        platformTransactionManagerMock.assertInvoked().getTransaction(new DefaultTransactionDefinition(PROPAGATION_REQUIRED));
     }
 
     @Test
     public void startTransactionTwice() throws Exception {
-        transactionManager.startTransaction();
-        transactionManager.startTransaction();
+        transactionManager.startTransaction("myTransactionManager");
+        transactionManager.startTransaction("myTransactionManager");
 
         assertFalse(transactionManager.isTransactionActive());
         assertTrue(transactionManager.isTransactionStarted());
@@ -72,11 +91,45 @@ public class TransactionManagerStartTransactionTest extends UnitilsJUnit4 {
     @Test
     public void startTransactionTwiceWhenDataSourceRegistered() throws Exception {
         transactionManager.registerDataSource(dataSource);
-
-        transactionManager.startTransaction();
-        transactionManager.startTransaction();
+        transactionManager.startTransaction("myTransactionManager");
+        transactionManager.startTransaction("myTransactionManager");
 
         assertTrue(transactionManager.isTransactionActive());
         assertTrue(transactionManager.isTransactionStarted());
+        platformTransactionManagerMock.assertInvoked().getTransaction(new DefaultTransactionDefinition(PROPAGATION_REQUIRED));
+    }
+
+    @Test
+    public void nullTransactionManagerNameSameAsBlankName() throws Exception {
+        transactionManager.registerDataSource(dataSource);
+        transactionManager.startTransaction(null);
+
+        assertTrue(transactionManager.isTransactionActive());
+        assertTrue(transactionManager.isTransactionStarted());
+        transactionProviderMock.assertInvoked().getPlatformTransactionManager("", dataSource);
+    }
+
+    @Test
+    public void exceptionWhenTransactionAlreadyStartedForOtherTransactionManager_currentIsDefault() throws Exception {
+        transactionManager.startTransaction(null);
+        try {
+            transactionManager.startTransaction("otherTransactionManager");
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to start transaction for transaction manager with name 'otherTransactionManager'. A transaction for the default transaction manager is already active for this test.\n" +
+                    "A transaction can only be started for 1 transaction manager at the same time. If you want a transaction spanning multiple data sources, you will need to set up an XA-transaction manager in a spring context.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void exceptionWhenTransactionAlreadyStartedForOtherTransactionManager_newIsDefault() throws Exception {
+        transactionManager.startTransaction("myTransactionManager");
+        try {
+            transactionManager.startTransaction(null);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to start transaction for the default transaction manager. A transaction for transaction manager with name 'myTransactionManager' is already active for this test.\n" +
+                    "A transaction can only be started for 1 transaction manager at the same time. If you want a transaction spanning multiple data sources, you will need to set up an XA-transaction manager in a spring context.", e.getMessage());
+        }
     }
 }

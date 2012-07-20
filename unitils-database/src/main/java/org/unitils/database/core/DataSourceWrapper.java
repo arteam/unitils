@@ -50,14 +50,13 @@ public class DataSourceWrapper {
     protected TransactionAwareDataSourceProxy transactionAwareDataSourceProxy;
     protected SimpleJdbcTemplate simpleJdbcTemplate;
 
-
+    // todo use jdbc template instead of simple jdbc template  + check with spring 2.5
     // todo javadoc
     // todo exceptions when null values
-    // todo spring bean
     // todo test connection => does not happen when datasource is created (verify clear exceptions)
 
 
-    public DataSourceWrapper(DatabaseConfiguration databaseConfiguration, DataSource wrappedDataSource) {
+    public DataSourceWrapper(DataSource wrappedDataSource, DatabaseConfiguration databaseConfiguration) {
         this.databaseConfiguration = databaseConfiguration;
         this.wrappedDataSource = wrappedDataSource;
     }

@@ -51,14 +51,15 @@ public class TransactionalTestAnnotationListener extends TestAnnotationListener<
     public void beforeTestSetUp(TestInstance testInstance, Annotations<Transactional> annotations) {
         Transactional annotation = annotations.getAnnotationWithDefaults();
         TransactionMode transactionMode = annotation.value();
+        String transactionManagerName = annotation.transactionManagerName();
 
         if (transactionMode == COMMIT || transactionMode == ROLLBACK) {
-            transactionManager.startTransaction();
+            transactionManager.startTransaction(transactionManagerName);
         }
     }
 
     @Override
-    public void afterTestTearDown(TestInstance testInstance, Annotations<Transactional> annotations) {
+    public void afterTestTearDown(TestInstance testInstance, Annotations<Transactional> annotations, Throwable testThrowable) {
         Transactional annotation = annotations.getAnnotationWithDefaults();
         TransactionMode transactionMode = annotation.value();
 

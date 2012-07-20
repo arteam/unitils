@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package org.unitils.database.core;
+package org.unitils.database.core.impl;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.database.config.DatabaseConfiguration;
 import org.unitils.database.config.DatabaseConfigurations;
+import org.unitils.database.core.DataSourceWrapper;
+import org.unitils.database.core.DataSourceWrapperFactory;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
@@ -33,10 +34,10 @@ import static org.unitils.mock.ArgumentMatchers.isNull;
 /**
  * @author Tim Ducheyne
  */
-public class DataSourceWrapperManagerGetDataSourceWrapperTest extends UnitilsJUnit4 {
+public class DefaultDataSourceProviderGetDataSourceWrapperTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private DataSourceWrapperManager dataSourceWrapperManager;
+    private DefaultDataSourceProvider defaultDatabaseProvider;
 
     private Mock<DatabaseConfigurations> databaseConfigurationsMock;
     private Mock<DataSourceWrapperFactory> dataSourceWrapperFactoryMock;
@@ -50,22 +51,17 @@ public class DataSourceWrapperManagerGetDataSourceWrapperTest extends UnitilsJUn
 
     @Before
     public void initialize() {
-        dataSourceWrapperManager = new DataSourceWrapperManager(databaseConfigurationsMock.getMock(), dataSourceWrapperFactoryMock.getMock());
-    }
-
-    @After
-    public void cleanup() {
-        DataSourceWrapperManager.dataSourceWrappers.clear();
+        defaultDatabaseProvider = new DefaultDataSourceProvider(databaseConfigurationsMock.getMock(), dataSourceWrapperFactoryMock.getMock());
     }
 
 
     @Test
-    public void createDataSourceWrapper() throws Exception {
+    public void getDataSourceWrapper() throws Exception {
         databaseConfigurationsMock.returns(databaseConfiguration).getDatabaseConfiguration("myDatabase");
         dataSourceWrapperFactoryMock.onceReturns(dataSourceWrapperMock).create(databaseConfiguration);
         dataSourceWrapperMock.returns(dataSource).getDataSource(false);
 
-        DataSourceWrapper result = dataSourceWrapperManager.getDataSourceWrapper("myDatabase");
+        DataSourceWrapper result = defaultDatabaseProvider.getDataSourceWrapper("myDatabase");
 
         assertSame(dataSourceWrapperMock.getMock(), result);
     }
@@ -76,8 +72,8 @@ public class DataSourceWrapperManagerGetDataSourceWrapperTest extends UnitilsJUn
         dataSourceWrapperFactoryMock.onceReturns(dataSourceWrapperMock).create(databaseConfiguration);
         dataSourceWrapperMock.returns(dataSource).getDataSource(false);
 
-        DataSourceWrapper result1 = dataSourceWrapperManager.getDataSourceWrapper("myDatabase");
-        DataSourceWrapper result2 = dataSourceWrapperManager.getDataSourceWrapper("myDatabase");
+        DataSourceWrapper result1 = defaultDatabaseProvider.getDataSourceWrapper("myDatabase");
+        DataSourceWrapper result2 = defaultDatabaseProvider.getDataSourceWrapper("myDatabase");
 
         assertSame(result1, result2);
     }
@@ -88,7 +84,7 @@ public class DataSourceWrapperManagerGetDataSourceWrapperTest extends UnitilsJUn
         dataSourceWrapperFactoryMock.onceReturns(dataSourceWrapperMock).create(databaseConfiguration);
         dataSourceWrapperMock.returns(dataSource).getDataSource(false);
 
-        DataSourceWrapper result = dataSourceWrapperManager.getDataSourceWrapper(null);
+        DataSourceWrapper result = defaultDatabaseProvider.getDataSourceWrapper(null);
 
         assertSame(dataSourceWrapperMock.getMock(), result);
     }
@@ -99,7 +95,7 @@ public class DataSourceWrapperManagerGetDataSourceWrapperTest extends UnitilsJUn
         dataSourceWrapperFactoryMock.onceReturns(dataSourceWrapperMock).create(databaseConfiguration);
         dataSourceWrapperMock.returns(dataSource).getDataSource(false);
 
-        DataSourceWrapper result = dataSourceWrapperManager.getDataSourceWrapper("");
+        DataSourceWrapper result = defaultDatabaseProvider.getDataSourceWrapper("");
 
         assertSame(dataSourceWrapperMock.getMock(), result);
     }

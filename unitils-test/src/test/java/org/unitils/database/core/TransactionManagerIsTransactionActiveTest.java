@@ -16,9 +16,14 @@
 
 package org.unitils.database.core;
 
-import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.unitils.database.annotations.TestDataSource;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.unitils.database.transaction.TransactionProvider;
+import org.unitils.database.transaction.TransactionProviderManager;
+import org.unitils.mock.Mock;
+import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
 
 import javax.sql.DataSource;
@@ -32,21 +37,30 @@ import static org.junit.Assert.assertTrue;
 public class TransactionManagerIsTransactionActiveTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private TransactionManager transactionManager = new TransactionManager();
+    private TransactionManager transactionManager;
 
-    @TestDataSource
+    private Mock<TransactionProviderManager> transactionProviderManagerMock;
+    private Mock<TransactionProvider> transactionProviderMock;
+    private Mock<PlatformTransactionManager> platformTransactionManagerMock;
+    @Dummy
+    private TransactionStatus transactionStatus;
+    @Dummy
     private DataSource dataSource;
 
 
-    @After
-    public void cleanup() {
-        TransactionManager.dataSourceTransactionManagers.clear();
+    @Before
+    public void initialize() {
+        transactionManager = new TransactionManager(transactionProviderManagerMock.getMock());
+
+        transactionProviderManagerMock.returns(transactionProviderMock).getTransactionProvider();
+        transactionProviderMock.returns(platformTransactionManagerMock).getPlatformTransactionManager(null, null);
+        platformTransactionManagerMock.returns(transactionStatus).getTransaction(null);
     }
 
 
     @Test
     public void active() throws Exception {
-        transactionManager.startTransaction();
+        transactionManager.startTransaction("myTransactionManager");
         transactionManager.registerDataSource(dataSource);
 
         boolean result = transactionManager.isTransactionActive();
@@ -60,8 +74,18 @@ public class TransactionManagerIsTransactionActiveTest extends UnitilsJUnit4 {
     }
 
     @Test
+    public void noLongerActive() throws Exception {
+        transactionManager.startTransaction("myTransactionManager");
+        transactionManager.registerDataSource(dataSource);
+        transactionManager.rollback(true);
+
+        boolean result = transactionManager.isTransactionActive();
+        assertFalse(result);
+    }
+
+    @Test
     public void notActiveIfOnlyMarkedAsStarted() throws Exception {
-        transactionManager.startTransaction();
+        transactionManager.startTransaction("myTransactionManager");
 
         boolean result = transactionManager.isTransactionActive();
         assertFalse(result);
