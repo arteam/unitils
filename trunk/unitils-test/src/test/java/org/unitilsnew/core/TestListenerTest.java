@@ -74,7 +74,8 @@ public class TestListenerTest extends UnitilsJUnit4 {
 
     @Test
     public void defaultAfterTestTearDownDoesNothing() {
-        testListener.afterTestTearDown(testInstance);
+        NullPointerException e = new NullPointerException();
+        testListener.afterTestTearDown(testInstance, e);
     }
 
 

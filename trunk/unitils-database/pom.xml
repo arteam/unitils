@@ -35,40 +35,18 @@
         <dependency>
             <groupId>org.dbmaintain</groupId>
             <artifactId>dbmaintain</artifactId>
-            <version>${dbmaintain.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>ant</groupId>
-                    <artifactId>ant</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
-            <version>${commons-dbcp.version}</version>
-            <scope>compile</scope>
-            <exclusions>  <!-- not needed dependencies -->
-                <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xerces</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
-            <version>${spring.version}</version>
         </dependency>
     </dependencies>
 

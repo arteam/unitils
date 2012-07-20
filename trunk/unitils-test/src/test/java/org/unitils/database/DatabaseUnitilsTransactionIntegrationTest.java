@@ -137,4 +137,17 @@ public class DatabaseUnitilsTransactionIntegrationTest {
             DatabaseUnitils.rollbackTransaction();
         }
     }
+
+    @Test
+    public void exceptionWhenUsingMoreThanOneTransactionManager() throws Exception {
+        try {
+            DatabaseUnitils.startTransaction("myTransactionManager");
+            DatabaseUnitils.startTransaction("otherTransactionManager");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to start transaction for transaction manager with name 'otherTransactionManager'. A transaction for transaction manager with name 'myTransactionManager' is already active for this test.\n" +
+                    "A transaction can only be started for 1 transaction manager at the same time. If you want a transaction spanning multiple data sources, you will need to set up an XA-transaction manager in a spring context.", e.getMessage());
+        } finally {
+            DatabaseUnitils.rollbackTransaction();
+        }
+    }
 }

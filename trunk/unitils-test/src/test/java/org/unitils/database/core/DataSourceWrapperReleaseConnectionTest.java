@@ -45,7 +45,7 @@ public class DataSourceWrapperReleaseConnectionTest extends UnitilsJUnit4 {
     @Before
     public void initialize() {
         databaseConfiguration = new DatabaseConfiguration("myDatabase", "myDialect", "myDriver", "myUrl", "myUser", "myPass", "schemaA", asList("schemaA", "schemaB"), false, true);
-        dataSourceWrapper = new DataSourceWrapper(databaseConfiguration, dataSource);
+        dataSourceWrapper = new DataSourceWrapper(dataSource, databaseConfiguration);
     }
 
 

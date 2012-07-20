@@ -72,9 +72,9 @@ public class WrapperForFieldAnnotationListener<A extends Annotation> extends Tes
     }
 
     @Override
-    public void afterTestTearDown(TestInstance testInstance) {
+    public void afterTestTearDown(TestInstance testInstance, Throwable testThrowable) {
         try {
-            fieldAnnotationListener.afterTestTearDown(testInstance, testField, annotations);
+            fieldAnnotationListener.afterTestTearDown(testInstance, testField, annotations, testThrowable);
         } catch (Exception e) {
             throw new UnitilsException(getExceptionMessage(e), e);
         }

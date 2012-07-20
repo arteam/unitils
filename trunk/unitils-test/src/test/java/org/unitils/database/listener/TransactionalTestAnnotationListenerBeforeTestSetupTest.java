@@ -45,6 +45,7 @@ public class TransactionalTestAnnotationListenerBeforeTestSetupTest extends Unit
     private Transactional annotation2;
     private Transactional annotation3;
     private Transactional annotation4;
+    private Transactional annotation5;
 
 
     @Before
@@ -55,6 +56,7 @@ public class TransactionalTestAnnotationListenerBeforeTestSetupTest extends Unit
         annotation2 = MyClass2.class.getAnnotation(Transactional.class);
         annotation3 = MyClass3.class.getAnnotation(Transactional.class);
         annotation4 = MyClass4.class.getAnnotation(Transactional.class);
+        annotation5 = MyClass5.class.getAnnotation(Transactional.class);
     }
 
 
@@ -64,7 +66,7 @@ public class TransactionalTestAnnotationListenerBeforeTestSetupTest extends Unit
 
         transactionalTestAnnotationListener.beforeTestSetUp(testInstanceMock.getMock(), annotationsMock.getMock());
 
-        transactionManagerMock.assertNotInvoked().startTransaction();
+        transactionManagerMock.assertNotInvoked().startTransaction(null);
     }
 
     @Test
@@ -73,7 +75,7 @@ public class TransactionalTestAnnotationListenerBeforeTestSetupTest extends Unit
 
         transactionalTestAnnotationListener.beforeTestSetUp(testInstanceMock.getMock(), annotationsMock.getMock());
 
-        transactionManagerMock.assertInvoked().startTransaction();
+        transactionManagerMock.assertInvoked().startTransaction("");
     }
 
     @Test
@@ -82,7 +84,7 @@ public class TransactionalTestAnnotationListenerBeforeTestSetupTest extends Unit
 
         transactionalTestAnnotationListener.beforeTestSetUp(testInstanceMock.getMock(), annotationsMock.getMock());
 
-        transactionManagerMock.assertInvoked().startTransaction();
+        transactionManagerMock.assertInvoked().startTransaction("");
     }
 
     @Test
@@ -91,7 +93,16 @@ public class TransactionalTestAnnotationListenerBeforeTestSetupTest extends Unit
 
         transactionalTestAnnotationListener.beforeTestSetUp(testInstanceMock.getMock(), annotationsMock.getMock());
 
-        transactionManagerMock.assertNotInvoked().startTransaction();
+        transactionManagerMock.assertNotInvoked().startTransaction(null);
+    }
+
+    @Test
+    public void transactionManagerNameSpecified() {
+        annotationsMock.returns(annotation5).getAnnotationWithDefaults();
+
+        transactionalTestAnnotationListener.beforeTestSetUp(testInstanceMock.getMock(), annotationsMock.getMock());
+
+        transactionManagerMock.assertNotInvoked().startTransaction("myTransactionManager");
     }
 
 
@@ -111,5 +122,10 @@ public class TransactionalTestAnnotationListenerBeforeTestSetupTest extends Unit
 
     @Transactional
     private static class MyClass4 {
+    }
+
+    @Transactional(transactionManagerName = "myTransactionManager")
+    private static class MyClass5 {
+
     }
 }

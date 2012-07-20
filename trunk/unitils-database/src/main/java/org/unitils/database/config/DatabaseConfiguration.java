@@ -31,11 +31,11 @@ public class DatabaseConfiguration {
     protected String password;
     protected String defaultSchemaName;
     protected List<String> schemaNames;
-    protected boolean disabled;
+    protected boolean updateDisabled;
     protected boolean defaultDatabase;
 
 
-    public DatabaseConfiguration(String databaseName, String dialect, String driverClassName, String url, String userName, String password, String defaultSchemaName, List<String> schemaNames, boolean disabled, boolean defaultDatabase) {
+    public DatabaseConfiguration(String databaseName, String dialect, String driverClassName, String url, String userName, String password, String defaultSchemaName, List<String> schemaNames, boolean updateDisabled, boolean defaultDatabase) {
         this.databaseName = databaseName;
         this.dialect = dialect;
         this.driverClassName = driverClassName;
@@ -44,7 +44,7 @@ public class DatabaseConfiguration {
         this.password = password;
         this.defaultSchemaName = defaultSchemaName;
         this.schemaNames = schemaNames;
-        this.disabled = disabled;
+        this.updateDisabled = updateDisabled;
         this.defaultDatabase = defaultDatabase;
     }
 
@@ -81,8 +81,8 @@ public class DatabaseConfiguration {
         return schemaNames;
     }
 
-    public boolean isDisabled() {
-        return disabled;
+    public boolean isUpdateDisabled() {
+        return updateDisabled;
     }
 
     public boolean isDefaultDatabase() {

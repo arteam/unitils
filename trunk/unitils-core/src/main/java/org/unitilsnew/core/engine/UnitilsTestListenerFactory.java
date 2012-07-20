@@ -19,6 +19,7 @@ package org.unitilsnew.core.engine;
 import org.unitilsnew.core.Factory;
 import org.unitilsnew.core.TestListener;
 import org.unitilsnew.core.context.UnitilsContext;
+import org.unitilsnew.core.spring.SpringTestListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +32,14 @@ public class UnitilsTestListenerFactory implements Factory<UnitilsTestListener> 
     protected UnitilsContext unitilsContext;
     protected WrapperForFieldAnnotationListenerFactory wrapperForFieldAnnotationListenerFactory;
     protected WrapperForTestAnnotationListenerFactory wrapperForTestAnnotationListenerFactory;
+    protected SpringTestListener springTestListener;
 
 
-    public UnitilsTestListenerFactory(UnitilsContext unitilsContext, WrapperForFieldAnnotationListenerFactory wrapperForFieldAnnotationListenerFactory, WrapperForTestAnnotationListenerFactory wrapperForTestAnnotationListenerFactory) {
+    public UnitilsTestListenerFactory(UnitilsContext unitilsContext, WrapperForFieldAnnotationListenerFactory wrapperForFieldAnnotationListenerFactory, WrapperForTestAnnotationListenerFactory wrapperForTestAnnotationListenerFactory, SpringTestListener springTestListener) {
         this.unitilsContext = unitilsContext;
         this.wrapperForFieldAnnotationListenerFactory = wrapperForFieldAnnotationListenerFactory;
         this.wrapperForTestAnnotationListenerFactory = wrapperForTestAnnotationListenerFactory;
+        this.springTestListener = springTestListener;
     }
 
 
@@ -53,6 +56,7 @@ public class UnitilsTestListenerFactory implements Factory<UnitilsTestListener> 
             TestListener testListener = (TestListener) unitilsContext.getInstanceOfType(testListenerType);
             testListeners.add(testListener);
         }
+        testListeners.add(springTestListener);
         return testListeners;
     }
 }

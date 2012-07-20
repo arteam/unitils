@@ -70,7 +70,8 @@ public class FieldAnnotationListenerTest extends UnitilsJUnit4 {
 
     @Test
     public void defaultAfterTestTearDownDoesNothing() {
-        fieldAnnotationListener.afterTestTearDown(testInstance, testField, annotations);
+        NullPointerException e = new NullPointerException();
+        fieldAnnotationListener.afterTestTearDown(testInstance, testField, annotations, e);
     }
 
 

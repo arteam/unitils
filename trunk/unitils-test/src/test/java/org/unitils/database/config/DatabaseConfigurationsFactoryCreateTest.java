@@ -18,7 +18,6 @@ package org.unitils.database.config;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
 import org.unitilsnew.UnitilsJUnit4;
 import org.unitilsnew.core.config.Configuration;
@@ -76,7 +75,7 @@ public class DatabaseConfigurationsFactoryCreateTest extends UnitilsJUnit4 {
         assertEquals("dialectA", databaseConfigurationA.getDialect());
         assertEquals(asList("schema1", "schema2"), databaseConfigurationA.getSchemaNames());
         assertTrue(databaseConfigurationA.isDefaultDatabase());
-        assertFalse(databaseConfigurationA.isDisabled());
+        assertFalse(databaseConfigurationA.isUpdateDisabled());
 
         DatabaseConfiguration databaseConfigurationB = result.getDatabaseConfiguration("b");
         assertEquals("b", databaseConfigurationB.getDatabaseName());
@@ -87,7 +86,7 @@ public class DatabaseConfigurationsFactoryCreateTest extends UnitilsJUnit4 {
         assertEquals("dialectB", databaseConfigurationB.getDialect());
         assertTrue(databaseConfigurationB.getSchemaNames().isEmpty());
         assertFalse(databaseConfigurationB.isDefaultDatabase());
-        assertTrue(databaseConfigurationB.isDisabled());
+        assertTrue(databaseConfigurationB.isUpdateDisabled());
     }
 
     @Test
@@ -126,17 +125,6 @@ public class DatabaseConfigurationsFactoryCreateTest extends UnitilsJUnit4 {
         assertEquals("dialectA", databaseConfigurationA.getDialect());
         assertEquals(asList("schema1", "schema2"), databaseConfigurationA.getSchemaNames());
         assertTrue(databaseConfigurationA.isDefaultDatabase());
-        assertFalse(databaseConfigurationA.isDisabled());
-    }
-
-    @Test
-    public void exceptionWhenDefaultDatabaseIsDisabled() {
-        configurationMock.returns(true).getOptionalBoolean("database.updateDisabled");
-        try {
-            databaseConfigurationsFactory.create();
-            fail("UnitilsException expected");
-        } catch (UnitilsException e) {
-            assertEquals("Unable to create database configuration. Default database cannot be disabled.", e.getMessage());
-        }
+        assertFalse(databaseConfigurationA.isUpdateDisabled());
     }
 }

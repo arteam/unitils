@@ -22,7 +22,7 @@ import org.unitilsnew.core.Unitils;
 import javax.sql.DataSource;
 
 /**
- * Spring <code>FactoryBean</code> that provides access to the datasource configured in unitils.
+ * Spring <code>FactoryBean</code> that provides access to the data source configured in unitils.
  * <p/>
  * For example, you can define a bean in spring named 'dataSource' that connects to the test database as follows:
  * <pre><code>

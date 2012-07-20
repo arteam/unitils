@@ -16,7 +16,6 @@
 
 package org.unitils.database.config;
 
-import org.unitils.core.UnitilsException;
 import org.unitilsnew.core.Factory;
 import org.unitilsnew.core.config.Configuration;
 
@@ -69,10 +68,9 @@ public class DatabaseConfigurationsFactory implements Factory<DatabaseConfigurat
         Boolean updateDisabled = configuration.getOptionalBoolean("database.updateDisabled", classifiers);
 
         String defaultSchemaName = schemaNames.isEmpty() ? null : schemaNames.get(0);
-        boolean disabled = updateDisabled == null ? false : updateDisabled;
-        if (disabled && defaultDatabase) {
-            throw new UnitilsException("Unable to create database configuration. Default database cannot be disabled.");
+        if (updateDisabled == null) {
+            updateDisabled = false;
         }
-        return new DatabaseConfiguration(databaseName, dialect, driverClassName, url, userName, password, defaultSchemaName, schemaNames, disabled, defaultDatabase);
+        return new DatabaseConfiguration(databaseName, dialect, driverClassName, url, userName, password, defaultSchemaName, schemaNames, updateDisabled, defaultDatabase);
     }
 }

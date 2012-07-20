@@ -38,6 +38,7 @@ public class UnitilsTestListener {
 
     protected ClassWrapper currentClassWrapper;
     protected TestInstance currentTestInstance;
+    protected Throwable currentTestThrowable;
     protected List<TestListener> currentTestListeners;
 
 
@@ -51,6 +52,7 @@ public class UnitilsTestListener {
     public void beforeTestClass(Class<?> testClass) {
         currentClassWrapper = new ClassWrapper(testClass);
         currentTestInstance = null;
+        currentTestThrowable = null;
 
         currentTestListeners = new ArrayList<TestListener>(testListeners);
         sort(currentTestListeners, testListenerTestPhaseComparator);
@@ -62,6 +64,7 @@ public class UnitilsTestListener {
 
     public void beforeTestSetUp(Object testObject, Method testMethod) {
         currentTestInstance = new TestInstance(currentClassWrapper, testObject, testMethod);
+        currentTestThrowable = null;
 
         currentTestListeners = new ArrayList<TestListener>(testListeners);
         addFieldAndTestAnnotationListeners(currentTestInstance, currentTestListeners);
@@ -80,14 +83,16 @@ public class UnitilsTestListener {
     }
 
     public void afterTestMethod(Throwable testThrowable) {
+        currentTestThrowable = testThrowable;
+
         for (TestListener testListener : currentTestListeners) {
-            testListener.afterTestMethod(currentTestInstance, testThrowable);
+            testListener.afterTestMethod(currentTestInstance, currentTestThrowable);
         }
     }
 
     public void afterTestTearDown() {
         for (TestListener testListener : currentTestListeners) {
-            testListener.afterTestTearDown(currentTestInstance);
+            testListener.afterTestTearDown(currentTestInstance, currentTestThrowable);
         }
     }
 

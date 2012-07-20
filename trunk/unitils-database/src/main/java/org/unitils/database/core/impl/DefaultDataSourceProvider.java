@@ -14,37 +14,45 @@
  * limitations under the License.
  */
 
-package org.unitils.database.core;
+package org.unitils.database.core.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.database.config.DatabaseConfiguration;
 import org.unitils.database.config.DatabaseConfigurations;
+import org.unitils.database.core.DataSourceProvider;
+import org.unitils.database.core.DataSourceWrapper;
+import org.unitils.database.core.DataSourceWrapperFactory;
 
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Tim Ducheyne
  */
-public class DataSourceWrapperManager {
+public class DefaultDataSourceProvider implements DataSourceProvider {
 
     /* The logger instance for this class */
-    protected static Log logger = LogFactory.getLog(DataSourceWrapperManager.class);
+    protected static Log logger = LogFactory.getLog(DefaultDataSourceProvider.class);
 
-    protected static Map<DatabaseConfiguration, DataSourceWrapper> dataSourceWrappers = new IdentityHashMap<DatabaseConfiguration, DataSourceWrapper>(3);
+    protected Map<DatabaseConfiguration, DataSourceWrapper> dataSourceWrappers = new IdentityHashMap<DatabaseConfiguration, DataSourceWrapper>(3);
 
     protected DatabaseConfigurations databaseConfigurations;
     protected DataSourceWrapperFactory dataSourceWrapperFactory;
 
 
-    public DataSourceWrapperManager(DatabaseConfigurations databaseConfigurations, DataSourceWrapperFactory dataSourceWrapperFactory) {
+    public DefaultDataSourceProvider(DatabaseConfigurations databaseConfigurations, DataSourceWrapperFactory dataSourceWrapperFactory) {
         this.databaseConfigurations = databaseConfigurations;
         this.dataSourceWrapperFactory = dataSourceWrapperFactory;
     }
 
 
-    public synchronized DataSourceWrapper getDataSourceWrapper(String databaseName) {
+    public List<String> getDatabaseNames() {
+        return databaseConfigurations.getDatabaseNames();
+    }
+
+    public DataSourceWrapper getDataSourceWrapper(String databaseName) {
         DatabaseConfiguration databaseConfiguration = databaseConfigurations.getDatabaseConfiguration(databaseName);
 
         DataSourceWrapper dataSourceWrapper = dataSourceWrappers.get(databaseConfiguration);

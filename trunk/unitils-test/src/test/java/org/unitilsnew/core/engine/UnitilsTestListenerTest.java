@@ -83,8 +83,8 @@ public class UnitilsTestListenerTest extends UnitilsJUnit4 {
         testListener2Mock.assertInvokedInSequence().beforeTestMethod(testInstance);
         testListener1Mock.assertInvokedInSequence().afterTestMethod(testInstance, testThrowable);
         testListener2Mock.assertInvokedInSequence().afterTestMethod(testInstance, testThrowable);
-        testListener1Mock.assertInvokedInSequence().afterTestTearDown(testInstance);
-        testListener2Mock.assertInvokedInSequence().afterTestTearDown(testInstance);
+        testListener1Mock.assertInvokedInSequence().afterTestTearDown(testInstance, testThrowable);
+        testListener2Mock.assertInvokedInSequence().afterTestTearDown(testInstance, testThrowable);
     }
 
 
@@ -104,8 +104,8 @@ public class UnitilsTestListenerTest extends UnitilsJUnit4 {
         testListener2Mock.assertInvokedInSequence().beforeTestMethod(testInstance);
         testListener1Mock.assertInvokedInSequence().afterTestMethod(testInstance, testThrowable);
         testListener2Mock.assertInvokedInSequence().afterTestMethod(testInstance, testThrowable);
-        testListener1Mock.assertInvokedInSequence().afterTestTearDown(testInstance);
-        testListener2Mock.assertInvokedInSequence().afterTestTearDown(testInstance);
+        testListener1Mock.assertInvokedInSequence().afterTestTearDown(testInstance, testThrowable);
+        testListener2Mock.assertInvokedInSequence().afterTestTearDown(testInstance, testThrowable);
     }
 
     @Test
@@ -124,8 +124,8 @@ public class UnitilsTestListenerTest extends UnitilsJUnit4 {
         testListener2Mock.assertInvokedInSequence().beforeTestMethod(testInstance);
         testListener1Mock.assertInvokedInSequence().afterTestMethod(testInstance, testThrowable);
         testListener2Mock.assertInvokedInSequence().afterTestMethod(testInstance, testThrowable);
-        testListener1Mock.assertInvokedInSequence().afterTestTearDown(testInstance);
-        testListener2Mock.assertInvokedInSequence().afterTestTearDown(testInstance);
+        testListener1Mock.assertInvokedInSequence().afterTestTearDown(testInstance, testThrowable);
+        testListener2Mock.assertInvokedInSequence().afterTestTearDown(testInstance, testThrowable);
     }
 
     @Test
@@ -139,7 +139,7 @@ public class UnitilsTestListenerTest extends UnitilsJUnit4 {
         testListener1Mock.assertNotInvoked().beforeTestSetUp(null);
         testListener1Mock.assertNotInvoked().beforeTestMethod(null);
         testListener1Mock.assertNotInvoked().afterTestMethod(null, null);
-        testListener1Mock.assertNotInvoked().afterTestTearDown(null);
+        testListener1Mock.assertNotInvoked().afterTestTearDown(null, null);
     }
 
 

@@ -123,9 +123,9 @@ public class UnitilsTestListenerTestPhaseTest extends UnitilsJUnit4 {
         unitilsTestListener.beforeTestSetUp(null, null);
         unitilsTestListener.afterTestTearDown();
 
-        constructionTestListenerMock.assertInvokedInSequence().afterTestTearDown(null);
-        injectionTestListenerMock.assertInvokedInSequence().afterTestTearDown(null);
-        setupTestListenerMock.assertInvokedInSequence().afterTestTearDown(null);
-        executionTestListenerMock.assertInvokedInSequence().afterTestTearDown(null);
+        constructionTestListenerMock.assertInvokedInSequence().afterTestTearDown(null, null);
+        injectionTestListenerMock.assertInvokedInSequence().afterTestTearDown(null, null);
+        setupTestListenerMock.assertInvokedInSequence().afterTestTearDown(null, null);
+        executionTestListenerMock.assertInvokedInSequence().afterTestTearDown(null, null);
     }
 }

@@ -95,9 +95,10 @@ public abstract class TestListener {
      * Invoked after the test tear down (eg @After).
      * This can be overridden to for example perform extra cleanup after the test.
      *
-     * @param testInstance The test instance, not null
+     * @param testInstance  The test instance, not null
+     * @param testThrowable The throwable thrown during the test or beforeTestMethod, null if none was thrown
      */
-    public void afterTestTearDown(TestInstance testInstance) {
+    public void afterTestTearDown(TestInstance testInstance, Throwable testThrowable) {
     }
 
 }

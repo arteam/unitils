@@ -18,7 +18,7 @@ package org.unitils.database.dbmaintain;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.database.core.TransactionManager;
+import org.unitils.database.transaction.impl.DefaultTransactionProvider;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
@@ -30,29 +30,21 @@ import static org.unitils.mock.MockUnitils.assertNoMoreInvocations;
 /**
  * @author Tim Ducheyne
  */
-public class DbMaintainSQLHandlerTest extends UnitilsJUnit4 {
+public class DbMaintainSQLHandlerCloseAllConnectionsTest extends UnitilsJUnit4 {
 
     /* Tested object */
     private DbMaintainSQLHandler dbMaintainSQLHandler;
 
-    private Mock<TransactionManager> transactionManagerMock;
+    private Mock<DefaultTransactionProvider> defaultTransactionProviderMock;
     @Dummy
     private DataSource dataSource;
 
 
     @Before
     public void initialize() {
-        dbMaintainSQLHandler = new DbMaintainSQLHandler(transactionManagerMock.getMock());
+        dbMaintainSQLHandler = new DbMaintainSQLHandler(defaultTransactionProviderMock.getMock());
     }
 
-
-    @Test
-    public void startTransaction() {
-        dbMaintainSQLHandler.startTransaction(dataSource);
-
-        transactionManagerMock.assertInvoked().registerDataSource(dataSource);
-        transactionManagerMock.assertInvoked().startTransaction();
-    }
 
     @Test
     public void closeAllConnections() {

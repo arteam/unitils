@@ -37,7 +37,8 @@ public class DataSourceServiceGetDataSourceWrapperTest extends UnitilsJUnit4 {
     /* Tested object */
     private DataSourceService dataSourceService;
 
-    private Mock<DataSourceWrapperManager> dataSourceWrapperManagerMock;
+    private Mock<DataSourceProviderManager> dataSourceProviderManagerMock;
+    private Mock<DataSourceProvider> dataSourceProviderMock;
     private Mock<DbMaintainWrapper> dbMaintainWrapperMock;
     private Mock<TransactionManager> transactionManagerMock;
 
@@ -50,13 +51,14 @@ public class DataSourceServiceGetDataSourceWrapperTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        dataSourceService = new DataSourceService(dataSourceWrapperManagerMock.getMock(), dbMaintainWrapperMock.getMock(), transactionManagerMock.getMock());
+        dataSourceService = new DataSourceService(dataSourceProviderManagerMock.getMock(), dbMaintainWrapperMock.getMock(), transactionManagerMock.getMock());
+        dataSourceProviderManagerMock.returns(dataSourceProviderMock).getDataSourceProvider();
     }
 
 
     @Test
     public void getDataSourceWrapper() throws Exception {
-        dataSourceWrapperManagerMock.returns(dataSourceWrapperMock).getDataSourceWrapper("databaseName");
+        dataSourceProviderMock.returns(dataSourceWrapperMock).getDataSourceWrapper("databaseName");
         dataSourceWrapperMock.returns(dataSource).getWrappedDataSource();
 
         DataSourceWrapper result = dataSourceService.getDataSourceWrapper("databaseName");
@@ -68,7 +70,7 @@ public class DataSourceServiceGetDataSourceWrapperTest extends UnitilsJUnit4 {
 
     @Test
     public void nullDatabaseName() throws Exception {
-        dataSourceWrapperManagerMock.returns(dataSourceWrapperMock).getDataSourceWrapper(isNull(String.class));
+        dataSourceProviderMock.returns(dataSourceWrapperMock).getDataSourceWrapper(isNull(String.class));
         dataSourceWrapperMock.returns(dataSource).getWrappedDataSource();
 
         DataSourceWrapper result = dataSourceService.getDataSourceWrapper(null);

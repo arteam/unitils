@@ -18,7 +18,9 @@ package org.unitils.database.dbmaintain;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.database.core.TransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.unitils.database.transaction.impl.DefaultTransactionProvider;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
@@ -33,34 +35,35 @@ public class DbMaintainSQLHandlerEndTransactionAndRollbackTest extends UnitilsJU
     /* Tested object */
     private DbMaintainSQLHandler dbMaintainSQLHandler;
 
-    private Mock<TransactionManager> transactionManagerMock;
+    private Mock<DefaultTransactionProvider> defaultTransactionProviderMock;
+    private Mock<PlatformTransactionManager> platformTransactionManagerMock;
+    @Dummy
+    private TransactionStatus transactionStatus;
     @Dummy
     private DataSource dataSource;
 
 
     @Before
     public void initialize() {
-        dbMaintainSQLHandler = new DbMaintainSQLHandler(transactionManagerMock.getMock());
+        dbMaintainSQLHandler = new DbMaintainSQLHandler(defaultTransactionProviderMock.getMock());
+
+        defaultTransactionProviderMock.returns(platformTransactionManagerMock).getPlatformTransactionManager(null, dataSource);
+        platformTransactionManagerMock.returns(transactionStatus).getTransaction(null);
     }
 
 
     @Test
-    public void endWholeTransactionWhenNoTransactionWasStartedForTest() {
-        transactionManagerMock.returns(false).isTransactionStarted();
-
+    public void endTransactionAndRollback() {
         dbMaintainSQLHandler.startTransaction(dataSource);
         dbMaintainSQLHandler.endTransactionAndRollback(dataSource);
 
-        transactionManagerMock.assertInvoked().rollback(true);
+        platformTransactionManagerMock.assertInvoked().rollback(transactionStatus);
     }
 
     @Test
-    public void keepTransactionWhenTransactionWasStartedForTest() {
-        transactionManagerMock.returns(true).isTransactionStarted();
-
-        dbMaintainSQLHandler.startTransaction(dataSource);
+    public void ignoreWhenNoTransactionWasActive() {
         dbMaintainSQLHandler.endTransactionAndRollback(dataSource);
 
-        transactionManagerMock.assertInvoked().rollback(false);
+        platformTransactionManagerMock.assertNotInvoked().rollback(transactionStatus);
     }
 }
