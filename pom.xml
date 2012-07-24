@@ -31,13 +31,11 @@
 
     <modules>
         <module>unitils-core</module>
-        <module>unitils-testng</module>
         <module>unitils-database</module>
         <module>unitils-dbunit</module>
         <module>unitils-easymock</module>
         <module>unitils-inject</module>
         <module>unitils-mock</module>
-        <module>unitils-orm</module>
         <module>unitils-io</module>
 
         <module>unitils-test</module>
@@ -77,6 +75,7 @@
         <asm-analysis.version>3.1</asm-analysis.version>
         <asm-tree.version>3.1</asm-tree.version>
         <objenesis.version>1.1</objenesis.version>
+        <hibernate.version>3.2.5.ga</hibernate.version>
 
         <project.build.java.target>1.5</project.build.java.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -112,13 +111,11 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
                 <version>${testng.version}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -244,6 +241,17 @@
                 <groupId>org.objenesis</groupId>
                 <artifactId>objenesis</artifactId>
                 <version>${objenesis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate</artifactId>
+                <version>${hibernate.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.transaction</groupId>
+                        <artifactId>jta</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>
