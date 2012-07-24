@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.orm.hibernate.util;
+package org.unitils.hibernate;
 
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
@@ -51,11 +51,10 @@ public class HibernateAssert {
         List<String> differences = new ArrayList<String>();
         for (String line : script) {
             // ignore constraints
-            if (line.indexOf("add constraint") == -1) {
+            if (!line.contains("add constraint")) {
                 differences.add(line);
             }
         }
-        // todo fix dependency => junit dependency is coming from spring 2.5
         assertTrue("Found mismatches between Java objects and database tables. Applying following DDL statements to the " +
                 "database should resolve the problem: \n" + formatErrorMessage(differences), differences.isEmpty());
     }
@@ -86,7 +85,7 @@ public class HibernateAssert {
      * @return A formatted message, containing the different message parts.
      */
     private static String formatErrorMessage(List<String> messageParts) {
-        StringBuffer message = new StringBuffer();
+        StringBuilder message = new StringBuilder();
         for (String messagePart : messageParts) {
             message.append(messagePart);
             message.append(";\n");

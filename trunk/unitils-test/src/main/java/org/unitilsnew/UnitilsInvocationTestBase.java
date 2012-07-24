@@ -21,8 +21,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
-import org.unitils.spring.SpringUnitilsJUnit38TestBase;
-import org.unitils.spring.SpringUnitilsJUnit4TestBase;
 import org.unitilsnew.TracingTestListener.Call;
 import org.unitilsnew.TracingTestListener.Invocation;
 import org.unitilsnew.TracingTestListener.TestFramework;
@@ -84,10 +82,8 @@ abstract public class UnitilsInvocationTestBase {
         tracingTestListener = new TracingTestListener();
 
         UnitilsJUnit3TestBase.setTracingTestListener(tracingTestListener);
-        SpringUnitilsJUnit38TestBase.setTracingTestListener(tracingTestListener);
 
         UnitilsJUnit4TestBase.setTracingTestListener(tracingTestListener);
-        SpringUnitilsJUnit4TestBase.setTracingTestListener(tracingTestListener);
 
         // todo
 //        InjectionUtils.injectInto(tracingTestListener, Unitils.getInstance(), "testListener");
@@ -96,10 +92,8 @@ abstract public class UnitilsInvocationTestBase {
     @After
     public void cleanUp() throws Exception {
         UnitilsJUnit3TestBase.setTracingTestListener(null);
-        SpringUnitilsJUnit38TestBase.setTracingTestListener(null);
 
         UnitilsJUnit4TestBase.setTracingTestListener(null);
-        SpringUnitilsJUnit4TestBase.setTracingTestListener(null);
     }
 
 
@@ -190,7 +184,7 @@ abstract public class UnitilsInvocationTestBase {
     }
 
     private String toString(List<Call> callList) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (Call call : callList) {
             result.append(call.toString()).append("\n");
         }

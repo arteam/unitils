@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
-import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.difference.Difference;
@@ -62,7 +61,8 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
     @TestDataSource
     protected DataSource dataSource;
 
-    @HibernateSessionFactory("org/unitils/reflectionassert/hibernate/hibernate.cfg.xml")
+    // todo implement
+    // @HibernateSessionFactory("org/unitils/reflectionassert/hibernate/hibernate.cfg.xml")
     protected SessionFactory sessionFactory;
 
     /* Class under test */

@@ -217,60 +217,6 @@
             </binaries>
         </moduleSet>
 
-        <!-- unitils-orm -->
-        <moduleSet>
-            <includes>
-                <include>org.unitils:unitils-orm</include>
-            </includes>
-            <sources>
-                <fileSets>
-                    <fileSet>
-                        <includes>
-                            <include>pom.xml</include>
-                            <include>src/main/**</include>
-                        </includes>
-                    </fileSet>
-                </fileSets>
-            </sources>
-            <binaries>
-                <outputDirectory>unitils-orm</outputDirectory>
-                <dependencySets>
-                    <dependencySet>
-                        <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>unitils-orm/lib</outputDirectory>
-                    </dependencySet>
-                </dependencySets>
-                <unpack>false</unpack>
-            </binaries>
-        </moduleSet>
-
-        <!-- unitils-testng -->
-        <moduleSet>
-            <includes>
-                <include>org.unitils:unitils-testng</include>
-            </includes>
-            <sources>
-                <fileSets>
-                    <fileSet>
-                        <includes>
-                            <include>pom.xml</include>
-                            <include>src/main/**</include>
-                        </includes>
-                    </fileSet>
-                </fileSets>
-            </sources>
-            <binaries>
-                <outputDirectory>unitils-testng</outputDirectory>
-                <dependencySets>
-                    <dependencySet>
-                        <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>unitils-testng/lib</outputDirectory>
-                    </dependencySet>
-                </dependencySets>
-                <unpack>false</unpack>
-            </binaries>
-        </moduleSet>
-
     </moduleSets>
 
     <fileSets>
