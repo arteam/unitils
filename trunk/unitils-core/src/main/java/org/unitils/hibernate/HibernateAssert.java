@@ -37,6 +37,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class HibernateAssert {
 
+    // todo unit test
+    // todo refactor to not use deprecated session.connection() usage
 
     /**
      * Checks if the mapping of the Hibernate managed objects with the database is still correct.

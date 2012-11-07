@@ -51,7 +51,7 @@ public class AnnotationsGetAllAnnotationsTest extends UnitilsJUnit4 {
     public void getAllAnnotations() {
         annotations = new Annotations<Target>(annotation, asList(classAnnotation1, classAnnotation2), configuration);
 
-        List<Target> result = annotations.getAllAnnotation();
+        List<Target> result = annotations.getAllAnnotations();
         assertReflectionEquals(asList(annotation, classAnnotation1, classAnnotation2), result);
     }
 
@@ -59,7 +59,7 @@ public class AnnotationsGetAllAnnotationsTest extends UnitilsJUnit4 {
     public void onlyClassAnnotations() {
         annotations = new Annotations<Target>(null, asList(classAnnotation1, classAnnotation2), configuration);
 
-        List<Target> result = annotations.getAllAnnotation();
+        List<Target> result = annotations.getAllAnnotations();
         assertReflectionEquals(asList(classAnnotation1, classAnnotation2), result);
     }
 
@@ -67,7 +67,7 @@ public class AnnotationsGetAllAnnotationsTest extends UnitilsJUnit4 {
     public void noClassAnnotations() {
         annotations = new Annotations<Target>(annotation, Collections.<Target>emptyList(), configuration);
 
-        List<Target> result = annotations.getAllAnnotation();
+        List<Target> result = annotations.getAllAnnotations();
         assertReflectionEquals(asList(annotation), result);
     }
 
@@ -75,7 +75,7 @@ public class AnnotationsGetAllAnnotationsTest extends UnitilsJUnit4 {
     public void noAnnotations() {
         annotations = new Annotations<Target>(null, Collections.<Target>emptyList(), configuration);
 
-        List<Target> result = annotations.getAllAnnotation();
+        List<Target> result = annotations.getAllAnnotations();
         assertTrue(result.isEmpty());
     }
 }

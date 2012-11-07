@@ -1,5 +1,5 @@
 /*
- * Copyright 2010,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.unitilsnew.core.annotation.Property;
 import org.unitilsnew.core.config.Configuration;
 
 import java.lang.annotation.ElementType;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,8 +33,7 @@ import java.util.Set;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 /**
@@ -108,6 +108,43 @@ public class ContextGetInstanceOfTypeWithPropertyArgumentsTest extends UnitilsJU
         configurationMock.raises(UnitilsException.class).getValueOfType(StringBuffer.class, "object");
 
         context.getInstanceOfType(ObjectTypeClass.class);
+    }
+
+    @Test
+    public void nullWhenOptionalAndPropertyNotFound() {
+        configurationMock.returns(null).getOptionalValueOfType(String.class, "optional");
+
+        OptionalClass result = context.getInstanceOfType(OptionalClass.class);
+        assertNull(result.optionalValue);
+    }
+
+    @Test
+    public void emptyWhenOptionalAndListPropertyNotFound() {
+        configurationMock.returns(new ArrayList<String>()).getOptionalValueListOfType(String.class, "optionalList");
+
+        OptionalListClass result = context.getInstanceOfType(OptionalListClass.class);
+        assertTrue(result.optionalValues.isEmpty());
+    }
+
+    @Test(expected = UnitilsException.class)
+    public void exceptionWhenRequiredAndPropertyNotFound() {
+        configurationMock.raises(UnitilsException.class).getValueOfType(String.class, "required");
+
+        context.getInstanceOfType(RequiredClass.class);
+    }
+
+    @Test(expected = UnitilsException.class)
+    public void exceptionWhenRequiredAndListPropertyNotFound() {
+        configurationMock.raises(UnitilsException.class).getValueListOfType(String.class, "requiredList");
+
+        context.getInstanceOfType(RequiredListClass.class);
+    }
+
+    @Test(expected = UnitilsException.class)
+    public void exceptionWhenOptionalNotSpecifiedAndPropertyNotFound() {
+        configurationMock.raises(UnitilsException.class).getValueOfType(String.class, "default");
+
+        context.getInstanceOfType(RequiredIsDefaultClass.class);
     }
 
     @Test
@@ -187,10 +224,54 @@ public class ContextGetInstanceOfTypeWithPropertyArgumentsTest extends UnitilsJU
         }
     }
 
+    protected static class OptionalClass {
+
+        protected String optionalValue;
+
+        public OptionalClass(@Property(value = "optional", optional = true) String optionalValue) {
+            this.optionalValue = optionalValue;
+        }
+    }
+
+    protected static class OptionalListClass {
+
+        protected List<String> optionalValues;
+
+        public OptionalListClass(@Property(value = "optionalList", optional = true) List<String> optionalValues) {
+            this.optionalValues = optionalValues;
+        }
+    }
+
+    protected static class RequiredClass {
+
+        protected String requiredValue;
+
+        public RequiredClass(@Property(value = "required", optional = false) String requiredValue) {
+            this.requiredValue = requiredValue;
+        }
+    }
+
+    protected static class RequiredListClass {
+
+        protected List<String> requiredValues;
+
+        public RequiredListClass(@Property(value = "requiredList", optional = false) List<String> requiredValues) {
+            this.requiredValues = requiredValues;
+        }
+    }
+
+    protected static class RequiredIsDefaultClass {
+
+        protected String defaultIsRequiredValue;
+
+        public RequiredIsDefaultClass(@Property("default") String defaultIsRequiredValue) {
+            this.defaultIsRequiredValue = defaultIsRequiredValue;
+        }
+    }
+
     protected static class RawListClass {
 
         protected List rawValues;
-
 
         public RawListClass(@Property("rawValues") List rawValues) {
             this.rawValues = rawValues;

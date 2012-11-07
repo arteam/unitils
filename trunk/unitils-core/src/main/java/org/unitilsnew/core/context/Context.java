@@ -138,20 +138,33 @@ public class Context {
 
         Object instance;
         if (propertyAnnotation != null) {
-            String propertyName = propertyAnnotation.value();
-            if (List.class.isAssignableFrom(argumentType)) {
-                Class<?> elementType = ReflectionUtils.getGenericParameterClass(genericArgumentType);
-                if (elementType == null) {
-                    elementType = String.class;
-                }
-                instance = configuration.getValueListOfType(elementType, propertyName, argumentClassifiers);
-            } else {
-                instance = configuration.getValueOfType(argumentType, propertyName, argumentClassifiers);
-            }
+            instance = getPropertyValue(propertyAnnotation, argumentType, genericArgumentType, argumentClassifiers);
         } else {
             instance = getInstanceOfType(argumentType, argumentClassifiers);
         }
         return instance;
+    }
+
+    protected Object getPropertyValue(Property propertyAnnotation, Class<?> argumentType, Type genericArgumentType, String[] argumentClassifiers) {
+        Object instance;
+        String propertyName = propertyAnnotation.value();
+        boolean optional = propertyAnnotation.optional();
+
+        if (List.class.isAssignableFrom(argumentType)) {
+            Class<?> elementType = ReflectionUtils.getGenericParameterClass(genericArgumentType);
+            if (elementType == null) {
+                elementType = String.class;
+            }
+            if (optional) {
+                return configuration.getOptionalValueListOfType(elementType, propertyName, argumentClassifiers);
+            }
+            return configuration.getValueListOfType(elementType, propertyName, argumentClassifiers);
+        }
+        if (optional) {
+            return configuration.getOptionalValueOfType(argumentType, propertyName, argumentClassifiers);
+        }
+        return configuration.getValueOfType(argumentType, propertyName, argumentClassifiers);
+
     }
 
     protected Property getPropertyAnnotation(Annotation[] argumentAnnotations) {

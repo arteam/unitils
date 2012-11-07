@@ -43,16 +43,17 @@ public class Annotations<A extends Annotation> {
 
     @SuppressWarnings("unchecked")
     public A getAnnotationWithDefaults() {
-        List<A> allAnnotations = getAllAnnotation();
+        List<A> allAnnotations = getAllAnnotations();
         if (allAnnotations.isEmpty()) {
             return null;
         }
 
-        ClassLoader classLoader = getClass().getClassLoader();
-        Class<?>[] annotationType = new Class<?>[]{allAnnotations.get(0).annotationType()};
+        A annotation = allAnnotations.get(0);
+        Class<? extends Annotation> annotationType = annotation.annotationType();
+        ClassLoader classLoader = annotation.getClass().getClassLoader();
 
         AnnotationDefaultInvocationHandler<A> invocationHandler = new AnnotationDefaultInvocationHandler<A>(allAnnotations, configuration);
-        return (A) Proxy.newProxyInstance(classLoader, annotationType, invocationHandler);
+        return (A) Proxy.newProxyInstance(classLoader, new Class<?>[]{annotationType}, invocationHandler);
     }
 
     public A getFirstAnnotation() {
@@ -65,7 +66,7 @@ public class Annotations<A extends Annotation> {
         return null;
     }
 
-    public List<A> getAllAnnotation() {
+    public List<A> getAllAnnotations() {
         List<A> allAnnotations = new ArrayList<A>();
         if (annotation != null) {
             allAnnotations.add(annotation);
