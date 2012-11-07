@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package org.unitils.io.annotation;
 
-import org.unitils.io.annotation.handler.FileContentAnnotationHandler;
+import org.unitils.io.listener.FileContentFieldAnnotationListener;
 import org.unitilsnew.core.annotation.FieldAnnotation;
 
 import java.lang.annotation.Retention;
@@ -81,7 +81,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
-@FieldAnnotation(FileContentAnnotationHandler.class)
+@FieldAnnotation(FileContentFieldAnnotationListener.class)
 public @interface FileContent {
 
     /**

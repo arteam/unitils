@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import java.net.URI;
  * @since 3.3
  */
 public class DefaultFileResolvingStrategy implements FileResolvingStrategy {
-
 
     protected FileResolver fileResolver;
 
