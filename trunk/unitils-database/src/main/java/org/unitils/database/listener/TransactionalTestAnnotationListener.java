@@ -16,7 +16,7 @@
 
 package org.unitils.database.listener;
 
-import org.unitils.database.annotations.Transactional;
+import org.unitils.database.annotation.Transactional;
 import org.unitils.database.core.TransactionManager;
 import org.unitils.database.util.TransactionMode;
 import org.unitilsnew.core.TestAnnotationListener;

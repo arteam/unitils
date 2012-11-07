@@ -20,7 +20,7 @@ import org.dbmaintain.database.DatabaseException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.database.annotations.TestDataSource;
+import org.unitils.database.annotation.TestDataSource;
 import org.unitilsnew.UnitilsJUnit4;
 
 import javax.sql.DataSource;

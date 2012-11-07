@@ -22,7 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.unitils.database.annotations.TestDataSource;
+import org.unitils.database.annotation.TestDataSource;
 import org.unitils.database.transaction.impl.DefaultTransactionProvider;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;

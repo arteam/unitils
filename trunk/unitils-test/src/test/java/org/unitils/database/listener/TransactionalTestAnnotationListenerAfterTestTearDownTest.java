@@ -18,7 +18,7 @@ package org.unitils.database.listener;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.database.annotations.Transactional;
+import org.unitils.database.annotation.Transactional;
 import org.unitils.database.core.TransactionManager;
 import org.unitils.mock.Mock;
 import org.unitilsnew.UnitilsJUnit4;

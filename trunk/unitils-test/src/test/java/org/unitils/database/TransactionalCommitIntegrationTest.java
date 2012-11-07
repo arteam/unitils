@@ -19,7 +19,7 @@ package org.unitils.database;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.unitils.database.annotations.Transactional;
+import org.unitils.database.annotation.Transactional;
 import org.unitilsnew.UnitilsJUnit4;
 
 import static org.unitils.database.SqlAssert.assertTableCount;
