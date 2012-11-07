@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.database.annotations;
+package org.unitils.database.annotation;
 
 import org.unitils.database.listener.TestDataSourceFieldAnnotationListener;
 import org.unitilsnew.core.annotation.FieldAnnotation;
@@ -39,7 +39,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * </code></pre>
  * If there is more than 1 data source, you can specify the name of the database if you are configuring unitils
  * from properties or the id/name of the spring bean if you are using spring.<br/>
- * <b>NOTE</b>: you cannot use the {@link org.unitils.database.annotations.Transactional} annotation when there is more than 1 data source.
+ * <b>NOTE</b>: you cannot use the {@link org.unitils.database.annotation.Transactional} annotation when there is more than 1 data source.
  * <br/><br/>
  * <i>Configuration in properties</i>: if the updateDataBaseSchema.enabled property is set to true, the test database
  * schema will automatically be updated using DbMaintain if needed. This check will be performed only once,

@@ -18,7 +18,7 @@ package org.unitils.database.core;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.database.annotations.TestDataSource;
+import org.unitils.database.annotation.TestDataSource;
 import org.unitils.database.config.DatabaseConfiguration;
 import org.unitils.mock.Mock;
 import org.unitilsnew.UnitilsJUnit4;

@@ -16,7 +16,7 @@
 
 package org.unitils.database.listener;
 
-import org.unitils.database.annotations.TestDataSource;
+import org.unitils.database.annotation.TestDataSource;
 import org.unitils.database.core.DataSourceService;
 import org.unitilsnew.core.FieldAnnotationListener;
 import org.unitilsnew.core.TestField;

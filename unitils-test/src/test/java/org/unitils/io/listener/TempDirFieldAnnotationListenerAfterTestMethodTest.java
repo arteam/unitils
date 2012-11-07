@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.unitils.io.annotation.handler;
+package org.unitils.io.listener;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,10 +41,10 @@ import static org.junit.Assert.fail;
  * @author Jeroen Horemans
  * @since 3.3
  */
-public class TempDirAnnotationHandlerAfterTestMethodTest extends UnitilsJUnit4 {
+public class TempDirFieldAnnotationListenerAfterTestMethodTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private TempDirAnnotationHandler tempDirAnnotationHandler;
+    private TempDirFieldAnnotationListener tempDirFieldAnnotationListener;
 
     private Mock<TempService> tempServiceMock;
 
@@ -54,7 +54,7 @@ public class TempDirAnnotationHandlerAfterTestMethodTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        tempDirAnnotationHandler = new TempDirAnnotationHandler(tempServiceMock.getMock(), true);
+        tempDirFieldAnnotationListener = new TempDirFieldAnnotationListener(tempServiceMock.getMock(), true);
     }
 
 
@@ -67,7 +67,7 @@ public class TempDirAnnotationHandlerAfterTestMethodTest extends UnitilsJUnit4 {
 
         testObject.tempDir = testDir;
 
-        tempDirAnnotationHandler.afterTestMethod(createTestInstance(testObject), testField, null, null);
+        tempDirFieldAnnotationListener.afterTestMethod(createTestInstance(testObject), testField, null, null);
 
         tempServiceMock.assertInvoked().deleteTempFileOrDir(testDir);
     }
@@ -80,8 +80,8 @@ public class TempDirAnnotationHandlerAfterTestMethodTest extends UnitilsJUnit4 {
         TestField testField = new TestField(new FieldWrapper(field), testObject);
         testObject.tempDir = testDir;
 
-        tempDirAnnotationHandler = new TempDirAnnotationHandler(tempServiceMock.getMock(), false);
-        tempDirAnnotationHandler.afterTestMethod(createTestInstance(testObject), testField, null, null);
+        tempDirFieldAnnotationListener = new TempDirFieldAnnotationListener(tempServiceMock.getMock(), false);
+        tempDirFieldAnnotationListener.afterTestMethod(createTestInstance(testObject), testField, null, null);
 
         tempServiceMock.assertNotInvoked().deleteTempFileOrDir(null);
     }
@@ -96,7 +96,7 @@ public class TempDirAnnotationHandlerAfterTestMethodTest extends UnitilsJUnit4 {
         tempServiceMock.raises(exception).deleteTempFileOrDir(null);
 
         try {
-            tempDirAnnotationHandler.afterTestMethod(createTestInstance(testObject), testField, null, null);
+            tempDirFieldAnnotationListener.afterTestMethod(createTestInstance(testObject), testField, null, null);
             fail("UnitilsException expected");
 
         } catch (UnitilsException e) {

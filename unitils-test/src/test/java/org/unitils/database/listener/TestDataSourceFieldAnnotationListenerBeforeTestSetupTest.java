@@ -18,7 +18,7 @@ package org.unitils.database.listener;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.database.annotations.TestDataSource;
+import org.unitils.database.annotation.TestDataSource;
 import org.unitils.database.core.DataSourceService;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;

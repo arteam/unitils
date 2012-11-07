@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.unitils.database.annotations;
+package org.unitils.database.annotation;
 
 import org.unitils.database.listener.TransactionalTestAnnotationListener;
 import org.unitils.database.util.TransactionMode;

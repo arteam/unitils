@@ -20,7 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
-import org.unitils.database.annotations.TestDataSource;
+import org.unitils.database.annotation.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitilsnew.UnitilsJUnit4;
