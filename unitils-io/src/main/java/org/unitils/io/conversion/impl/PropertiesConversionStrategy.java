@@ -36,8 +36,6 @@ import java.util.Properties;
  */
 public class PropertiesConversionStrategy implements ConversionStrategy<Properties> {
 
-    // todo td close input stream
-
 
     public Properties convertContent(InputStream inputStream, String encoding) throws IOException {
         InputStream readerInputStream = new ReaderInputStream(new InputStreamReader(inputStream, encoding));
