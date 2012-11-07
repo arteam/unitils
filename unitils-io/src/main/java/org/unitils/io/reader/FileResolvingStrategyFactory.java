@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,18 +28,14 @@ import org.unitilsnew.core.annotation.Property;
  */
 public class FileResolvingStrategyFactory implements Factory<FileResolvingStrategy> {
 
-    /* Property key for the path prefix */
-    public static final String PREFIX_WITH_PACKAGE_NAME_PROPERTY = "IOModule.file.prefixWithPackageName";
-
-    /* Property key for the path prefix */
-    public static final String PATH_PREFIX_PROPERTY = "IOModule.file.pathPrefix";
+    public static final String PREFIX_WITH_PACKAGE_NAME_PROPERTY = "io.file.prefixWithPackageName";
+    public static final String PATH_PREFIX_PROPERTY = "io.file.pathPrefix";
 
     protected Boolean prefixWithPackageName;
-
     protected String pathPrefix;
 
 
-    public FileResolvingStrategyFactory(@Property(PREFIX_WITH_PACKAGE_NAME_PROPERTY) String prefixWithPackageName, @Property(value=PATH_PREFIX_PROPERTY, optional = true) String pathPrefix) {
+    public FileResolvingStrategyFactory(@Property(PREFIX_WITH_PACKAGE_NAME_PROPERTY) String prefixWithPackageName, @Property(value = PATH_PREFIX_PROPERTY, optional = true) String pathPrefix) {
         this.prefixWithPackageName = Boolean.valueOf(prefixWithPackageName);
         this.pathPrefix = pathPrefix;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ public class DefaultFileContentReader implements FileContentReader {
         this.defaultEncoding = defaultEncoding;
     }
 
+
     @SuppressWarnings({"unchecked"})
     public <T> T readFileContent(String fileName, Class<T> targetType, String encoding, Class<?> testClass) {
         ConversionStrategy<?> conversionStrategy = determineConversionStrategy(targetType);
@@ -63,7 +64,8 @@ public class DefaultFileContentReader implements FileContentReader {
             return (T) conversionStrategy.convertContent(inputStream, encoding);
 
         } catch (Exception e) {
-            throw new UnitilsException("Unable to read file content for file " + fileName + " and target type " + targetType.getSimpleName(), e);
+            String name = isBlank(fileName) ? "default file name" : "file with name '" + fileName + "'";
+            throw new UnitilsException("Unable to read file content for " + name + " and target type " + targetType.getSimpleName(), e);
         } finally {
             closeQuietly(inputStream);
         }

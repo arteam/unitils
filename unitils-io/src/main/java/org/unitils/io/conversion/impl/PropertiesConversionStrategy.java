@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,12 +36,13 @@ import java.util.Properties;
  */
 public class PropertiesConversionStrategy implements ConversionStrategy<Properties> {
 
+    // todo td close input stream
+
 
     public Properties convertContent(InputStream inputStream, String encoding) throws IOException {
+        InputStream readerInputStream = new ReaderInputStream(new InputStreamReader(inputStream, encoding));
+
         Properties result = new Properties();
-
-       InputStream readerInputStream = new ReaderInputStream(new InputStreamReader(inputStream,encoding));
-
         result.load(readerInputStream);
         return result;
     }

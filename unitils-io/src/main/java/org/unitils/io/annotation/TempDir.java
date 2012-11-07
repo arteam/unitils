@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package org.unitils.io.annotation;
 
-import org.unitils.io.annotation.handler.TempDirAnnotationHandler;
+import org.unitils.io.listener.TempDirFieldAnnotationListener;
 import org.unitilsnew.core.annotation.FieldAnnotation;
 
 import java.lang.annotation.Retention;
@@ -31,13 +31,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * A optional name can be specified for directory. If no name is specified, a default name 'class-name'-'method-name' will be used.
  * <p/>
  * The parent directory for this directory can be
- * specified by setting the {@link org.unitils.io.temp.impl.DefaultTempServiceFactory#ROOT_TEMP_DIR} property.
+ * specified by setting the {@link org.unitils.io.temp.TempService#ROOT_TEMP_DIR_PROPERTY} property.
  * If no root temp dir is specified the default user temp dir will be used.
  * <p/>
  * Watch out: if the directory already exists, it will first be deleted. If the directory was not empty,
  * all files in the directory will be deleted.
  * <p/>
- * By default, the directory will not be removed after the test. You can set the {@link org.unitils.io.IOModule#CLEANUP_AFTER_TEST}
+ * By default, the directory will not be removed after the test. You can set the {@link org.unitils.io.listener.TempDirFieldAnnotationListener#CLEANUP_AFTER_TEST_PROPERTY}
  * property to true if you want unitils to delete the directories automatically after each test.
  *
  * @author Jeroen Horemans
@@ -47,7 +47,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
-@FieldAnnotation(value = TempDirAnnotationHandler.class)
+@FieldAnnotation(TempDirFieldAnnotationListener.class)
 public @interface TempDir {
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,40 +36,32 @@ import static org.unitils.util.ReflectionUtils.createInstanceOfType;
  */
 public class FileContentReaderFactory implements Factory<FileContentReader> {
 
-    public static final String DEFAULT_CONVERSION_STRATEGY_KEY = "IOModule.conversion.default";
+    public static final String DEFAULT_CONVERSION_STRATEGY_PROPERTY = "io.conversion.default";
+    public static final String CUSTOM_CONVERSION_STRATEGY_PROPERTY = "io.conversion.custom";
+    public static final String DEFAULT_FILE_ENCODING_PROPERTY = "io.encoding.default";
 
-    public static final String CUSTOM_CONVERSION_STRATEGY_KEY = "IOModule.conversion.custom";
-
-    public static final String DEFAULT_FILE_ENCODING = "IOModule.encoding.default";
-
-
-    protected List<ConversionStrategy<?>> conversionStrategies;
-
+    protected Configuration configuration;
     protected String defaultEncoding;
-
     protected ReadingStrategy readingStrategy;
 
-    protected Configuration config;
 
-    public FileContentReaderFactory(Configuration config, @Property(DEFAULT_FILE_ENCODING) String defaultEncoding, ReadingStrategy readingStrategy) {
-        this.config = config;
+    public FileContentReaderFactory(Configuration configuration, @Property(DEFAULT_FILE_ENCODING_PROPERTY) String defaultEncoding, ReadingStrategy readingStrategy) {
+        this.configuration = configuration;
         this.defaultEncoding = defaultEncoding;
         this.readingStrategy = readingStrategy;
     }
 
+
     public FileContentReader create() {
-        conversionStrategies = createConversionStrategies(config);
-
-
+        List<ConversionStrategy<?>> conversionStrategies = createConversionStrategies(configuration);
         return new DefaultFileContentReader(readingStrategy, conversionStrategies, defaultEncoding);
-
     }
 
 
     protected List<ConversionStrategy<?>> createConversionStrategies(Configuration configuration) {
         List<ConversionStrategy<?>> conversionStrategies = new LinkedList<ConversionStrategy<?>>();
-        conversionStrategies.addAll(createConversionStrategies(configuration.getOptionalStringList(CUSTOM_CONVERSION_STRATEGY_KEY)));
-        conversionStrategies.addAll(createConversionStrategies(configuration.getStringList(DEFAULT_CONVERSION_STRATEGY_KEY)));
+        conversionStrategies.addAll(createConversionStrategies(configuration.getOptionalStringList(CUSTOM_CONVERSION_STRATEGY_PROPERTY)));
+        conversionStrategies.addAll(createConversionStrategies(configuration.getStringList(DEFAULT_CONVERSION_STRATEGY_PROPERTY)));
         return conversionStrategies;
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,4 +25,5 @@ package org.unitils.io.filecontent;
 public interface FileContentReader {
 
     <T> T readFileContent(String fileName, Class<T> targetType, String encoding, Class<?> testClass);
+
 }

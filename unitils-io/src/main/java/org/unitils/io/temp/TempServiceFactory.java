@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,15 @@
 
 package org.unitils.io.temp;
 
-import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.io.temp.impl.DefaultTempService;
 import org.unitilsnew.core.Factory;
 import org.unitilsnew.core.annotation.Property;
 
 import java.io.File;
+
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.unitils.io.temp.TempService.ROOT_TEMP_DIR_PROPERTY;
 
 /**
  * @author Jeroen Horemans
@@ -32,29 +34,25 @@ import java.io.File;
  */
 public class TempServiceFactory implements Factory<TempService> {
 
-    public static final String ROOT_TEMP_DIR = "IOModule.temp.rootTempDir";
-
     protected String systemTempDirName;
-
     protected String rootTempDirName;
 
-    public TempServiceFactory(@Property(value = ROOT_TEMP_DIR, optional = true) String rootTempDirName, @Property("java.io.tmpdir") String systemTempDirName)
 
-    {
+    public TempServiceFactory(@Property(value = ROOT_TEMP_DIR_PROPERTY, optional = true) String rootTempDirName, @Property("java.io.tmpdir") String systemTempDirName) {
         this.systemTempDirName = systemTempDirName;
         this.rootTempDirName = rootTempDirName;
     }
+
 
     public TempService create() {
         File rootTempDir = getRootTempDir();
         return new DefaultTempService(rootTempDir);
     }
 
+
     protected File getRootTempDir() {
-
         String tempDir;
-
-        if (StringUtils.isEmpty(rootTempDirName)) {
+        if (isBlank(rootTempDirName)) {
             tempDir = systemTempDirName;
         } else {
             tempDir = rootTempDirName;
@@ -62,7 +60,7 @@ public class TempServiceFactory implements Factory<TempService> {
 
         File rootTempDir = new File(tempDir);
         if (rootTempDir.isFile()) {
-            throw new UnitilsException("Root temp dir " + rootTempDirName + " is not a directory. Please fill in a directory for property " + ROOT_TEMP_DIR);
+            throw new UnitilsException("Root temp dir " + rootTempDirName + " is not a directory. Please fill in a directory for property " + ROOT_TEMP_DIR_PROPERTY);
         }
         rootTempDir.mkdirs();
         return rootTempDir;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2012,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,10 @@ package org.unitils.io;
 
 import org.unitils.io.filecontent.FileContentReader;
 import org.unitils.io.temp.TempService;
-import org.unitilsnew.core.Unitils;
 
 import java.io.File;
+
+import static org.unitilsnew.core.Unitils.getInstanceOfType;
 
 /**
  * @author Jeroen Horemans
@@ -30,9 +31,9 @@ import java.io.File;
  */
 public abstract class IOUnitils {
 
-    protected static FileContentReader fileContentReader = Unitils.getInstanceOfType(FileContentReader.class);
+    protected static FileContentReader fileContentReader = getInstanceOfType(FileContentReader.class);
+    protected static TempService tempService = getInstanceOfType(TempService.class);
 
-    protected static TempService tempService = Unitils.getInstanceOfType(TempService.class);
 
     /**
      * Loads the content of 'test-class'.'target-type-default-extension' and converts it to the given target type using the default
@@ -120,7 +121,7 @@ public abstract class IOUnitils {
 
     /**
      * Creates a temporary file with the given name. The parent directory for this file can be specified by setting the
-     * {@link org.unitils.io.temp.impl.DefaultTempServiceFactory#ROOT_TEMP_DIR} property. If no root temp dir is specified the default user
+     * {@link org.unitils.io.temp.TempService#ROOT_TEMP_DIR_PROPERTY} property. If no root temp dir is specified the default user
      * temp dir will be used.
      * <p/>
      * Watch out: if the file already exists, it will first be deleted.
@@ -137,7 +138,7 @@ public abstract class IOUnitils {
 
     /**
      * Creates a temporary directory with the given name. The parent directory for this directory can be specified by setting the
-     * {@link org.unitils.io.temp.impl.DefaultTempServiceFactory#ROOT_TEMP_DIR} property. If no root temp dir is specified the default user
+     * {@link org.unitils.io.temp.TempService#ROOT_TEMP_DIR_PROPERTY} property. If no root temp dir is specified the default user
      * temp dir will be used.
      * <p/>
      * Watch out: if the directory already exists, it will first be deleted. If the directory was not empty, all files in the directory will
