@@ -18,6 +18,7 @@ package org.unitils.io.listener;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.core.UnitilsException;
 import org.unitils.io.annotation.TempDir;
 import org.unitils.io.temp.TempService;
 import org.unitils.mock.Mock;
@@ -30,6 +31,7 @@ import org.unitilsnew.core.reflect.Annotations;
 import java.io.File;
 import java.util.Properties;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 /**
@@ -62,13 +64,19 @@ public class TempDirFieldAnnotationListenerBeforeTestSetUpTest extends UnitilsJU
         annotation1 = MyClass.class.getDeclaredField("field1").getAnnotation(TempDir.class);
         annotation2 = MyClass.class.getDeclaredField("field2").getAnnotation(TempDir.class);
         annotation3 = MyClass.class.getDeclaredField("field3").getAnnotation(TempDir.class);
+
+        testInstanceMock.returns(MyClass.class).getClassWrapper().getWrappedClass();
+        testInstanceMock.returns("className").getClassWrapper().getName();
+        testInstanceMock.returns(MyClass.class.getDeclaredMethod("testMethod")).getTestMethod();
+
+        testFieldMock.returns("fieldName").getName();
     }
 
 
     @Test
     public void defaultValues() {
         annotationsMock.returns(annotation1).getAnnotationWithDefaults();
-        tempServiceMock.returns(testDir).createTempDir("");
+        tempServiceMock.returns(testDir).createTempDir("className-testMethod");
 
         tempDirFieldAnnotationListener.beforeTestSetUp(testInstanceMock.getMock(), testFieldMock.getMock(), annotationsMock.getMock());
 
@@ -89,11 +97,17 @@ public class TempDirFieldAnnotationListenerBeforeTestSetUpTest extends UnitilsJU
     @Test
     public void targetFieldIsNotAFile() {
         annotationsMock.returns(annotation3).getAnnotationWithDefaults();
-        tempServiceMock.returns(testDir).createTempDir("");
+        tempServiceMock.returns(testDir).createTempDir("className-testMethod");
+        testFieldMock.raises(new UnitilsException("reason")).setValue(testDir);
 
-        tempDirFieldAnnotationListener.beforeTestSetUp(testInstanceMock.getMock(), testFieldMock.getMock(), annotationsMock.getMock());
+        try {
+            tempDirFieldAnnotationListener.beforeTestSetUp(testInstanceMock.getMock(), testFieldMock.getMock(), annotationsMock.getMock());
+            fail("UnitilsException expected");
 
-        fail("todo");
+        } catch (UnitilsException e) {
+            assertEquals("Error creating temp dir for field 'fieldName'\n" +
+                    "Reason: reason", e.getMessage());
+        }
     }
 
 
@@ -109,5 +123,8 @@ public class TempDirFieldAnnotationListenerBeforeTestSetUpTest extends UnitilsJU
         private Properties field3;
 
         private File field4;
+
+        public void testMethod() {
+        }
     }
 }

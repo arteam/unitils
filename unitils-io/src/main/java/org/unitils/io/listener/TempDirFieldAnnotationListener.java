@@ -57,7 +57,6 @@ public class TempDirFieldAnnotationListener extends FieldAnnotationListener<Temp
     @Override
     public void beforeTestSetUp(TestInstance testInstance, TestField testField, Annotations<TempDir> annotations) {
         String fileName = annotations.getAnnotationWithDefaults().value();
-
         createTempDirForField(testInstance, testField, fileName);
     }
 
@@ -72,22 +71,24 @@ public class TempDirFieldAnnotationListener extends FieldAnnotationListener<Temp
 
     protected void createTempDirForField(TestInstance testInstance, TestField testField, String fileName) {
         if (isBlank(fileName)) {
-            fileName = testInstance.getTestObject().getClass().getName() + "-" + testInstance.getTestMethod().getName();
+            fileName = testInstance.getClassWrapper().getName() + "-" + testInstance.getTestMethod().getName();
         }
         try {
             File f = tempService.createTempDir(fileName);
             testField.setValue(f);
+
         } catch (Exception e) {
-            throw new UnitilsException("Error creating temp dir for field " + testField.getName(), e);
+            throw new UnitilsException("Error creating temp dir for field '" + testField.getName() + "'", e);
         }
     }
 
-    protected void deleteTempDirForField(TestField field) {
+    protected void deleteTempDirForField(TestField testField) {
         try {
-            File tempDir = field.getValue();
+            File tempDir = testField.getValue();
             tempService.deleteTempFileOrDir(tempDir);
+
         } catch (Exception e) {
-            throw new UnitilsException("Error deleting temp dir for field " + field.getName(), e);
+            throw new UnitilsException("Error deleting temp dir for field '" + testField.getName() + "'", e);
         }
     }
 }

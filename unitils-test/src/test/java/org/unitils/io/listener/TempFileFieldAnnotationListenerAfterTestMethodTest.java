@@ -18,6 +18,7 @@ package org.unitils.io.listener;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.core.UnitilsException;
 import org.unitils.io.temp.TempService;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
@@ -26,7 +27,9 @@ import org.unitilsnew.core.TestField;
 
 import java.io.File;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.unitils.mock.ArgumentMatchers.isNull;
 
 /**
  * @author Tim Ducheyne
@@ -48,13 +51,14 @@ public class TempFileFieldAnnotationListenerAfterTestMethodTest extends UnitilsJ
     @Before
     public void initialize() {
         tempFileFieldAnnotationListener = new TempFileFieldAnnotationListener(tempServiceMock.getMock(), true);
+
+        testFieldMock.returns("fieldName").getName();
+        testFieldMock.returns(testFile).getValue();
     }
 
 
     @Test
     public void cleanup() {
-        testFieldMock.returns(testFile).getValue();
-
         tempFileFieldAnnotationListener.afterTestMethod(null, testFieldMock.getMock(), null, null);
 
         tempServiceMock.assertInvoked().deleteTempFileOrDir(testFile);
@@ -62,12 +66,11 @@ public class TempFileFieldAnnotationListenerAfterTestMethodTest extends UnitilsJ
 
     @Test
     public void nullFile() {
-        fail("todo");
-    }
+        testFieldMock.onceReturns(null).getValue();
 
-    @Test
-    public void wrongType() {
-        fail("todo");
+        tempFileFieldAnnotationListener.afterTestMethod(null, testFieldMock.getMock(), null, null);
+
+        tempServiceMock.assertInvoked().deleteTempFileOrDir(isNull(File.class));
     }
 
     @Test
@@ -77,5 +80,19 @@ public class TempFileFieldAnnotationListenerAfterTestMethodTest extends UnitilsJ
         tempFileFieldAnnotationListener.afterTestMethod(null, null, null, null);
 
         tempServiceMock.assertNotInvoked().deleteTempFileOrDir(null);
+    }
+
+    @Test
+    public void exception() {
+        tempServiceMock.raises(new UnitilsException("reason")).deleteTempFileOrDir(null);
+
+        try {
+            tempFileFieldAnnotationListener.afterTestMethod(null, testFieldMock.getMock(), null, null);
+            fail("UnitilsException expected");
+
+        } catch (UnitilsException e) {
+            assertEquals("Error deleting temp file for field 'fieldName'\n" +
+                    "Reason: reason", e.getMessage());
+        }
     }
 }
