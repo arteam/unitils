@@ -23,18 +23,14 @@ import org.unitils.io.annotation.TempDir;
 import org.unitils.io.temp.TempService;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
-import org.unitils.util.ReflectionUtils;
 import org.unitilsnew.UnitilsJUnit4;
 import org.unitilsnew.core.TestField;
-import org.unitilsnew.core.TestInstance;
-import org.unitilsnew.core.reflect.ClassWrapper;
-import org.unitilsnew.core.reflect.FieldWrapper;
 
 import java.io.File;
-import java.lang.reflect.Field;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.unitils.mock.ArgumentMatchers.isNull;
 
 /**
  * @author Tim Ducheyne
@@ -47,6 +43,7 @@ public class TempDirFieldAnnotationListenerAfterTestMethodTest extends UnitilsJU
     private TempDirFieldAnnotationListener tempDirFieldAnnotationListener;
 
     private Mock<TempService> tempServiceMock;
+    private Mock<TestField> testFieldMock;
 
     @Dummy
     private File testDir;
@@ -55,58 +52,51 @@ public class TempDirFieldAnnotationListenerAfterTestMethodTest extends UnitilsJU
     @Before
     public void initialize() {
         tempDirFieldAnnotationListener = new TempDirFieldAnnotationListener(tempServiceMock.getMock(), true);
+
+        testFieldMock.returns("fieldName").getName();
+        testFieldMock.returns(testDir).getValue();
     }
 
 
     @Test
     public void cleanup() {
-        TestableClass testObject = new TestableClass();
-
-        Field field = ReflectionUtils.getFieldWithName(TestableClass.class, "tempDir", false);
-        TestField testField = new TestField(new FieldWrapper(field), testObject);
-
-        testObject.tempDir = testDir;
-
-        tempDirFieldAnnotationListener.afterTestMethod(createTestInstance(testObject), testField, null, null);
+        tempDirFieldAnnotationListener.afterTestMethod(null, testFieldMock.getMock(), null, null);
 
         tempServiceMock.assertInvoked().deleteTempFileOrDir(testDir);
     }
 
     @Test
+    public void nullDirectory() {
+        testFieldMock.onceReturns(null).getValue();
+
+        tempDirFieldAnnotationListener.afterTestMethod(null, testFieldMock.getMock(), null, null);
+
+        tempServiceMock.assertInvoked().deleteTempFileOrDir(isNull(File.class));
+    }
+
+    @Test
     public void cleanupDisabled() {
-        TestableClass testObject = new TestableClass();
-        Field field = ReflectionUtils.getFieldWithName(TestableClass.class, "tempDir", false);
-
-        TestField testField = new TestField(new FieldWrapper(field), testObject);
-        testObject.tempDir = testDir;
-
         tempDirFieldAnnotationListener = new TempDirFieldAnnotationListener(tempServiceMock.getMock(), false);
-        tempDirFieldAnnotationListener.afterTestMethod(createTestInstance(testObject), testField, null, null);
+
+        tempDirFieldAnnotationListener.afterTestMethod(null, testFieldMock.getMock(), null, null);
 
         tempServiceMock.assertNotInvoked().deleteTempFileOrDir(null);
     }
 
     @Test
     public void exception() {
-        TestableClass testObject = new TestableClass();
-        Field field = ReflectionUtils.getFieldWithName(TestableClass.class, "tempDir", false);
-        TestField testField = new TestField(new FieldWrapper(field), testObject);
-
-        NullPointerException exception = new NullPointerException();
-        tempServiceMock.raises(exception).deleteTempFileOrDir(null);
+        tempServiceMock.raises(new UnitilsException("reason")).deleteTempFileOrDir(null);
 
         try {
-            tempDirFieldAnnotationListener.afterTestMethod(createTestInstance(testObject), testField, null, null);
+            tempDirFieldAnnotationListener.afterTestMethod(null, testFieldMock.getMock(), null, null);
             fail("UnitilsException expected");
 
         } catch (UnitilsException e) {
-            assertSame(exception, e.getCause());
+            assertEquals("Error deleting temp dir for field 'fieldName'\n" +
+                    "Reason: reason", e.getMessage());
         }
     }
 
-    private TestInstance createTestInstance(Object obj) {
-        return new TestInstance(new ClassWrapper(obj.getClass()), obj, null);
-    }
 
     private static class TestableClass {
 

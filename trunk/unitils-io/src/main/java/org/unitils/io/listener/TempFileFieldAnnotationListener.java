@@ -16,6 +16,7 @@
 
 package org.unitils.io.listener;
 
+import org.unitils.core.UnitilsException;
 import org.unitils.io.annotation.TempFile;
 import org.unitils.io.temp.TempService;
 import org.unitilsnew.core.FieldAnnotationListener;
@@ -55,14 +56,8 @@ public class TempFileFieldAnnotationListener extends FieldAnnotationListener<Tem
 
     @Override
     public void beforeTestSetUp(TestInstance testInstance, TestField testField, Annotations<TempFile> annotations) {
-        TempFile annotation = annotations.getAnnotationWithDefaults();
         String fileName = annotations.getAnnotationWithDefaults().value();
-        if (isBlank(fileName)) {
-            fileName = testInstance.getTestObject().getClass().getName() + "-" + testInstance.getTestMethod().getName() + ".tmp";
-        }
-
-        File tempFile = tempService.createTempFile(fileName);
-        testField.setValue(tempFile);
+        createTempFileForField(testInstance, testField, fileName);
     }
 
     @Override
@@ -70,8 +65,30 @@ public class TempFileFieldAnnotationListener extends FieldAnnotationListener<Tem
         if (!cleanupAfterTest) {
             return;
         }
-        // todo check for classclast
-        File file = (File) testField.getValue();
-        tempService.deleteTempFileOrDir(file);
+        deleteTempFileForField(testField);
+    }
+
+
+    protected void createTempFileForField(TestInstance testInstance, TestField testField, String fileName) {
+        if (isBlank(fileName)) {
+            fileName = testInstance.getClassWrapper().getName() + "-" + testInstance.getTestMethod().getName() + ".tmp";
+        }
+        try {
+            File tempFile = tempService.createTempFile(fileName);
+            testField.setValue(tempFile);
+
+        } catch (Exception e) {
+            throw new UnitilsException("Error creating temp file for field '" + testField.getName() + "'", e);
+        }
+    }
+
+    protected void deleteTempFileForField(TestField testField) {
+        try {
+            File file = (File) testField.getValue();
+            tempService.deleteTempFileOrDir(file);
+
+        } catch (Exception e) {
+            throw new UnitilsException("Error deleting temp file for field '" + testField.getName() + "'", e);
+        }
     }
 }

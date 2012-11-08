@@ -56,6 +56,9 @@ public class FileContentFieldAnnotationListenerTest extends UnitilsJUnit4 {
         annotation1 = MyClass.class.getDeclaredField("field1").getAnnotation(FileContent.class);
         annotation2 = MyClass.class.getDeclaredField("field2").getAnnotation(FileContent.class);
         annotation3 = MyClass.class.getDeclaredField("field3").getAnnotation(FileContent.class);
+
+        testInstanceMock.returns(MyClass.class).getClassWrapper().getWrappedClass();
+        testFieldMock.returns(Properties.class).getType();
     }
 
 
