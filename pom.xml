@@ -67,7 +67,7 @@
         <commons-lang.version>2.3</commons-lang.version>
         <commons-collections.version>3.2</commons-collections.version>
         <ognl.version>3.0.4</ognl.version>
-        <dbunit.version>2.2.2</dbunit.version>
+        <dbunit.version>2.4.9</dbunit.version>
         <easymock.version>2.3</easymock.version>
         <easymockclassextension.version>2.3</easymockclassextension.version>
         <cglib.version>2.2</cglib.version>
