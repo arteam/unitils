@@ -1,19 +1,17 @@
 /*
+ * Copyright 2013,  Unitils.org
  *
- *  * Copyright 2010,  Unitils.org
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.unitils.mock.core.proxy;
 
@@ -36,9 +34,9 @@ import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 /**
  * Utility class to create and work with proxy objects.
  *
+ * @author Tim Ducheyne
  * @author Kenny Claes
  * @author Filip Neven
- * @author Tim Ducheyne
  */
 public class ProxyFactory {
 
@@ -116,7 +114,7 @@ public class ProxyFactory {
         } catch (UnitilsException e) {
             logger.warn("Could not create initialized instance of type " + clazz.getSimpleName() + ". No no-arg constructor found. All fields in the instance will have the java default values. Add a default constructor (can be private) if the fields should be initialized. If this concerns an innerclass, make sure it is declared static. Partial mocking of non-static innerclasses is not supported.");
         }
-        // unable to create type using regular constuctor, try objenesis        
+        // unable to create type using regular constructor, try objenesis
         return createUninitializedInstanceOfType(clazz);
     }
 
@@ -130,8 +128,12 @@ public class ProxyFactory {
      */
     @SuppressWarnings("unchecked")
     public static <T> T createUninitializedInstanceOfType(Class<T> clazz) {
-        Objenesis objenesis = new ObjenesisStd();
-        return (T) objenesis.newInstance(clazz);
+        try {
+            Objenesis objenesis = new ObjenesisStd();
+            return (T) objenesis.newInstance(clazz);
+        } catch (Exception e) {
+            throw new UnitilsException("Unable to create instance of type " + clazz, e);
+        }
     }
 
 
