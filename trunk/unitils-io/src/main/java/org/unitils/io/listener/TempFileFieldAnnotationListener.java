@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.unitils.io.listener;
 
 import org.unitils.core.UnitilsException;
@@ -33,8 +32,8 @@ import static org.apache.commons.lang.StringUtils.isBlank;
  * Implements the behavior of the {@link TempFile} annotation.<br/>
  * See annotation javadoc for more info.
  *
- * @author Jeroen Horemans
  * @author Tim Ducheyne
+ * @author Jeroen Horemans
  * @author Thomas De Rycke
  * @since 3.3
  */
@@ -84,7 +83,7 @@ public class TempFileFieldAnnotationListener extends FieldAnnotationListener<Tem
 
     protected void deleteTempFileForField(TestField testField) {
         try {
-            File file = (File) testField.getValue();
+            File file = testField.getValue();
             tempService.deleteTempFileOrDir(file);
 
         } catch (Exception e) {
