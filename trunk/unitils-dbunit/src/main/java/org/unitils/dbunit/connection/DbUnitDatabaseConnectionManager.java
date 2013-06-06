@@ -20,8 +20,6 @@ import org.apache.commons.logging.LogFactory;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.DefaultSQLHandler;
-import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.DatabaseUnitils;
 import org.unitilsnew.core.config.Configuration;
 
@@ -31,7 +29,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import static org.dbunit.database.DatabaseConfig.*;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
 import static org.unitils.core.util.ConfigUtils.getInstanceOf;
 
 /**
@@ -76,9 +73,7 @@ public class DbUnitDatabaseConnectionManager {
     protected DbUnitDatabaseConnection createDbUnitDatabaseConnection(String schemaName) {
         // A DbSupport instance is fetched in order to get the schema name in correct case
         DataSource dataSource = DatabaseUnitils.getDataSource();
-        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        DbSupport dbSupport = getDbSupport(properties, sqlHandler, schemaName);
-
+        DbSupport dbSupport = null;//todo td implement  (remove db support usage)
         // Create connection
         DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(dataSource, dbSupport.getSchemaName());
         configureDbUnitDatabaseConnection(connection, dbSupport);
