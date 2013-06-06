@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.ITableIterator;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.dbunit.datasetfactory.MultiSchemaDataSet;
+import org.unitils.dbunit.datasetfactory.impl.MultiSchemaXmlDataSetReader;
 import org.unitilsnew.UnitilsJUnit4;
 
 import java.io.File;
@@ -31,7 +33,7 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenien
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.toFile;
 
 /**
- * Test for {@link MultiSchemaXmlDataSetReader}.
+ * Test for {@link org.unitils.dbunit.datasetfactory.impl.MultiSchemaXmlDataSetReader}.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -57,12 +59,13 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit4 {
      */
     @Test
     public void testLoadDataSet_lessColumnsLast() throws Exception {
-        MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(toFile(getClass().getResource("LessColumnsLastDataSet.xml")));
+        File file = toFile(getClass().getResource("LessColumnsLastDataSet.xml"));
+        MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(asList(file));
 
-        // there should be 1 dataset for the default schema A
+        // there should be 1 data set for the default schema A
         assertLenientEquals(new String[]{"SCHEMA_A"}, result.getSchemaNames());
 
-        // the dataset should contain 2 tables with the same name
+        // the data set should contain 2 tables with the same name
         IDataSet dataSet = result.getDataSetForSchema("SCHEMA_A");
         assertLenientEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSet.getTableNames());
         ITableIterator tableIterator = dataSet.iterator();
@@ -92,12 +95,13 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit4 {
      */
     @Test
     public void testLoadDataSet_lessColumnsFirst() throws Exception {
-        MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(toFile(getClass().getResource("LessColumnsFirstDataSet.xml")));
+        File file = toFile(getClass().getResource("LessColumnsFirstDataSet.xml"));
+        MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(asList(file));
 
-        // there should be 1 dataset for the default schema A
+        // there should be 1 data set for the default schema A
         assertLenientEquals(new String[]{"SCHEMA_A"}, result.getSchemaNames());
 
-        // the dataset should contain 2 tables with the same name
+        // the data set should contain 2 tables with the same name
         IDataSet dataSet = result.getDataSetForSchema("SCHEMA_A");
         assertLenientEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSet.getTableNames());
         ITableIterator tableIterator = dataSet.iterator();
@@ -127,7 +131,8 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit4 {
      */
     @Test
     public void testLoadDataSet_multiSchema() throws Exception {
-        MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(toFile(getClass().getResource("MultiSchemaDataSet.xml")));
+        File file = toFile(getClass().getResource("MultiSchemaDataSet.xml"));
+        MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(asList(file));
 
         // there should be 3 schemas
         assertLenientEquals(new String[]{"SCHEMA_D", "SCHEMA_B", "SCHEMA_C"}, result.getSchemaNames());
@@ -152,7 +157,8 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit4 {
      */
     @Test
     public void testLoadDataSet_multiSchemaNoDefault() throws Exception {
-        MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(toFile(getClass().getResource("MultiSchemaNoDefaultDataSet.xml")));
+        File file = toFile(getClass().getResource("MultiSchemaNoDefaultDataSet.xml"));
+        MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(asList(file));
 
         // there should be 3 schemas
         assertLenientEquals(new String[]{"SCHEMA_A", "SCHEMA_B", "SCHEMA_C"}, result.getSchemaNames());
@@ -173,18 +179,18 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit4 {
 
     /**
      * Test the loading of a data set out of 2 files:
-     * this will load the LessColumnsLastDataSet.xml and  LessColumnsFirstDataSet.xml dataset
+     * this will load the LessColumnsLastDataSet.xml and  LessColumnsFirstDataSet.xml data set
      */
     @Test
     public void testLoadDataSet_multiInputStreams() throws Exception {
         File file1 = toFile(getClass().getResource("LessColumnsLastDataSet.xml"));
         File file2 = toFile(getClass().getResource("LessColumnsFirstDataSet.xml"));
-        MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(file1, file2);
+        MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(asList(file1, file2));
 
-        // there should be 1 dataset for the default schema A
+        // there should be 1 data set for the default schema A
         assertLenientEquals(new String[]{"SCHEMA_A"}, result.getSchemaNames());
 
-        // the dataset should contain 4 tables with the same name
+        // the data set should contain 4 tables with the same name
         IDataSet dataSet = result.getDataSetForSchema("SCHEMA_A");
         assertLenientEquals(new String[]{"TABLE_A", "TABLE_A", "TABLE_A", "TABLE_A"}, dataSet.getTableNames());
     }

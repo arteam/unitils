@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,9 @@ package org.unitils.dbunit.datasetfactory.impl;
 
 import org.unitils.core.util.FileResolver;
 import org.unitils.dbunit.datasetfactory.DataSetResolver;
+import org.unitilsnew.core.annotation.Property;
 
 import java.io.File;
-import java.util.Properties;
-
-import static org.unitils.util.PropertyUtils.getBoolean;
-import static org.unitils.util.PropertyUtils.getString;
 
 /**
  * Resolves the location for a data set with a certain name.
@@ -33,10 +30,10 @@ import static org.unitils.util.PropertyUtils.getString;
  * If a data set name starts with a / it will not be prefixed with the package name.<br/>
  * E.g. /MyDataSet.xml remains /MyDataSet.xml
  * <p/>
- * Package name prefixing can be disabled using the {@link #PROPKEY_PREFIX_WITH_PACKAGE_NAME} property.<br/>
+ * Package name prefixing can be disabled using the 'dbunit.prefixWithPackageName' property.<br/>
  * prefixWithPackageName=false => MyDataSet.xml remains MyDataSet.xml
  * <p/>
- * If a path prefix is specified using the {@link #PROPKEY_DATA_SET_PATH_PREFIX} property it is added to the file name.<br/>
+ * If a path prefix is specified using the 'dbunit.pathPrefix" property it is added to the file name.<br/>
  * Examples:<br/>
  * <p/>
  * pathPrefix=myPathPrefix: MyDataSet.xml becomes myPathPrefix/org/unitils/test/MyDataSet.xml<br/>
@@ -55,11 +52,6 @@ import static org.unitils.util.PropertyUtils.getString;
  */
 public class DefaultDataSetResolver implements DataSetResolver {
 
-    /* Property key for the path prefix */
-    public static final String PROPKEY_PREFIX_WITH_PACKAGE_NAME = "dbUnit.datasetresolver.prefixWithPackageName";
-    /* Property key for the path prefix */
-    public static final String PROPKEY_DATA_SET_PATH_PREFIX = "dbUnit.datasetresolver.pathPrefix";
-
     /* The actual file resolver */
     protected FileResolver fileResolver;
 
@@ -67,14 +59,14 @@ public class DefaultDataSetResolver implements DataSetResolver {
     /**
      * Initializes the resolver with the given configuration.
      *
-     * @param configuration The configuration, not null
+     * @param prefixWithPackageName True to enable to prefixing of the file name with the package name of the test class
+     * @param pathPrefix            path prefix to add to the file name, null if there is no prefix
      */
-    public void init(Properties configuration) {
-        boolean prefixWithPackageName = getBoolean(PROPKEY_PREFIX_WITH_PACKAGE_NAME, configuration);
-        String pathPrefix = getString(PROPKEY_DATA_SET_PATH_PREFIX, null, configuration);
-
+    public DefaultDataSetResolver(@Property("dbunit.prefixWithPackageName") boolean prefixWithPackageName,
+                                  @Property(value = "dbunit.pathPrefix", optional = true) String pathPrefix) {
         this.fileResolver = new FileResolver(prefixWithPackageName, pathPrefix);
     }
+
 
     /**
      * Resolves the location for a data set with a certain name.
@@ -87,5 +79,4 @@ public class DefaultDataSetResolver implements DataSetResolver {
     public File resolve(Class<?> testClass, String dataSetName) {
         return new File(fileResolver.resolveFileName(dataSetName, testClass));
     }
-
 }
