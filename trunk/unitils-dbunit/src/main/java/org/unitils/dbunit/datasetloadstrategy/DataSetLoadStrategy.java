@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 package org.unitils.dbunit.datasetloadstrategy;
 
 import org.dbunit.dataset.IDataSet;
-import org.unitils.dbunit.util.DbUnitDatabaseConnection;
+import org.unitils.dbunit.connection.DbUnitDatabaseConnection;
 
 /**
  * Defines the contract for implementations that specify an operation that needs to be executed on the database, given
- * a DbUnit dataset. Implementations typically call an implementation of DbUnit's <code>DatabaseOperation</code> class.
+ * a DbUnit data set. Implementations typically call an implementation of DbUnit's <code>DatabaseOperation</code> class.
  * Implementations must have an empty constructor so that an instance can be created using reflection.
  * <p/>
  * The concrete implementation class that is used can be configured using the annotation attribute
@@ -30,17 +30,17 @@ import org.unitils.dbunit.util.DbUnitDatabaseConnection;
  * This wrapper mechanism makes it very easy to use custom DbUnit <code>DatabaseOperation</code> composite object
  * structures, without sacrificing the powerfulness of Unitils' configuration system.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public interface DataSetLoadStrategy {
 
     /**
-     * Executes this DataSetLoadStrategy. This means the given dataset is inserted in the database using the given dbUnit
+     * Executes this DataSetLoadStrategy. This means the given data set is inserted in the database using the given dbUnit
      * database connection object.
      *
-     * @param dbUnitDatabaseConnection DbUnit class providing access to the database
-     * @param dataSet                  The dbunit dataset
+     * @param dbUnitDatabaseConnection DbUnit class providing access to the database, not null
+     * @param dataSet                  The dbunit data set, not null
      */
-    void execute(DbUnitDatabaseConnection dbUnitDatabaseConnection, IDataSet dataSet);
+    void loadDataSet(DbUnitDatabaseConnection dbUnitDatabaseConnection, IDataSet dataSet);
 }

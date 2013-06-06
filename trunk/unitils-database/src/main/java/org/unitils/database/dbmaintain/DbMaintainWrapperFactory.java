@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,6 @@ public class DbMaintainWrapperFactory implements Factory<DbMaintainWrapper> {
     public DbMaintainWrapper create() {
         MainFactory mainFactory = createMainFactory();
         return new DbMaintainWrapper(mainFactory, dbMaintainEnabled);
-
     }
 
     protected MainFactory createMainFactory() {

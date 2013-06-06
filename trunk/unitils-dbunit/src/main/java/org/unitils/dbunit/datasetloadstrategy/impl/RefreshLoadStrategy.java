@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,34 +15,44 @@
  */
 package org.unitils.dbunit.datasetloadstrategy.impl;
 
-import java.sql.SQLException;
-
-import org.dbunit.DatabaseUnitException;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.operation.DatabaseOperation;
-import org.unitils.dbunit.util.DbUnitDatabaseConnection;
-import org.unitils.dbunit.datasetloadstrategy.impl.BaseDataSetLoadStrategy;
+import org.dbunit.operation.RefreshOperation;
+import org.unitils.core.UnitilsException;
+import org.unitils.dbunit.connection.DbUnitDatabaseConnection;
+import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 
 /**
- * {@link org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy} that 'refreshes' the contents of the database with the contents of the dataset. This means
+ * {@link org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy} that 'refreshes' the contents of the database with the contents of the data set. This means
  * that data of existing rows is updated and non-existing rows are inserted. Any rows that are in the database but not
- * in the dataset stay unaffected.
+ * in the data set stay unaffected.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  * @see DatabaseOperation#REFRESH
  */
-public class RefreshLoadStrategy extends BaseDataSetLoadStrategy {
+public class RefreshLoadStrategy implements DataSetLoadStrategy {
+
+    protected RefreshOperation refreshOperation;
+
+
+    public RefreshLoadStrategy(RefreshOperation refreshOperation) {
+        this.refreshOperation = refreshOperation;
+    }
+
 
     /**
-     * Executes this DataSetLoadStrategy. This means the given dataset is inserted in the database using the given dbUnit
-     * database connection object.
+     * Loads the data set using DbUnit's refresh strategy
      *
-     * @param dbUnitDatabaseConnection DbUnit class providing access to the database
-     * @param dataSet                  The dbunit dataset
+     * @param dbUnitDatabaseConnection DbUnit class providing access to the database, not null
+     * @param dataSet                  The dbunit data set, not null
      */
-    @Override
-    public void doExecute(DbUnitDatabaseConnection dbUnitDatabaseConnection, IDataSet dataSet) throws DatabaseUnitException, SQLException {
-        DatabaseOperation.REFRESH.execute(dbUnitDatabaseConnection, dataSet);
+    public void loadDataSet(DbUnitDatabaseConnection dbUnitDatabaseConnection, IDataSet dataSet) {
+        try {
+            refreshOperation.execute(dbUnitDatabaseConnection, dataSet);
+
+        } catch (Exception e) {
+            throw new UnitilsException("Unable to refresh data set.", e);
+        }
     }
 }

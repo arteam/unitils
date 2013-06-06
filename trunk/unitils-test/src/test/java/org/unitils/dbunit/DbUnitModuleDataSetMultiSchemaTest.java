@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,7 @@
  */
 package org.unitils.dbunit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.database.annotation.TestDataSource;
-import org.unitils.dbunit.annotation.DataSet;
 import org.unitilsnew.UnitilsJUnit4;
-
-import javax.sql.DataSource;
-import java.util.Properties;
-
-import static org.junit.Assert.assertEquals;
-import static org.unitils.database.SqlUnitils.*;
 
 /**
  * Test class for loading of data sets in mutliple database schemas.
@@ -39,131 +25,131 @@ import static org.unitils.database.SqlUnitils.*;
  */
 public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit4 {
 
-    /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(DbUnitModuleDataSetMultiSchemaTest.class);
-
-    /* Tested object */
-    private DbUnitModule dbUnitModule;
-
-    /* The dataSource */
-    @TestDataSource
-    private DataSource dataSource = null;
-
-    /* True if current test is not for the current dialect */
-    private boolean disabled;
-
-
-    /**
-     * Initializes the test fixture.
-     */
-    @Before
-    public void setUp() throws Exception {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-
-        dbUnitModule = new DbUnitModule();
-        dbUnitModule.init(configuration);
-
-        dropTestTables();
-        createTestTables();
-    }
-
-
-    /**
-     * Clean-up test database.
-     */
-    @After
-    public void tearDown() throws Exception {
-        if (disabled) {
-            return;
-        }
-        dropTestTables();
-    }
-
-
-    /**
-     * Test for a data set containing multiple namespaces.
-     */
-    @Test
-    public void testDataSet_multiSchema() throws Exception {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
-        dbUnitModule.insertDataSet(DataSetTest.class.getMethod("multiSchema"), new DataSetTest());
-
-        assertLoadedDataSet("PUBLIC");
-        assertLoadedDataSet("SCHEMA_A");
-        assertLoadedDataSet("SCHEMA_B");
-    }
-
-    /**
-     * Test for a data set containing multiple namespaces.
-     */
-    @Test
-    public void testDataSet_multiSchemaNoDefault() throws Exception {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
-        dbUnitModule.insertDataSet(DataSetTest.class.getMethod("multiSchemaNoDefault"), new DataSetTest());
-
-        assertLoadedDataSet("PUBLIC");
-        assertLoadedDataSet("SCHEMA_A");
-        assertLoadedDataSet("SCHEMA_B");
-    }
-
-
-    /**
-     * Utility method to assert that the data set for the schema was loaded.
-     *
-     * @param schemaName the name of the schema, not null
-     */
-    private void assertLoadedDataSet(String schemaName) {
-        String dataSet = getString("select dataset from " + schemaName + ".test");
-        assertEquals(schemaName, dataSet);
-    }
-
-
-    /**
-     * Creates the test tables.
-     */
-    private void createTestTables() {
-        // PUBLIC SCHEMA
-        executeUpdate("create table TEST(dataset varchar(100))");
-        // SCHEMA_A
-        executeUpdate("create schema SCHEMA_A AUTHORIZATION DBA");
-        executeUpdate("create table SCHEMA_A.TEST(dataset varchar(100))");
-        // SCHEMA_B
-        executeUpdate("create schema SCHEMA_B AUTHORIZATION DBA");
-        executeUpdate("create table SCHEMA_B.TEST(dataset varchar(100))");
-    }
-
-
-    /**
-     * Removes the test database tables
-     */
-    private void dropTestTables() {
-        executeUpdateQuietly("drop table TEST");
-        executeUpdateQuietly("drop table SCHEMA_A.TEST");
-        executeUpdateQuietly("drop schema SCHEMA_A");
-        executeUpdateQuietly("drop table SCHEMA_B.TEST");
-        executeUpdateQuietly("drop schema SCHEMA_B");
-    }
-
-
-    /**
-     * Test class with a class level dataset
-     */
-    @DataSet
-    public class DataSetTest {
-
-        @DataSet("DbUnitModuleDataSetMultiSchemaTest$DataSetTest.multiSchema.xml")
-        public void multiSchema() {
-        }
-
-        @DataSet("DbUnitModuleDataSetMultiSchemaTest$DataSetTest.multiSchemaNoDefault.xml")
-        public void multiSchemaNoDefault() {
-        }
-    }
+//    /* The logger instance for this class */
+//    private static Log logger = LogFactory.getLog(DbUnitModuleDataSetMultiSchemaTest.class);
+//
+//    /* Tested object */
+//    private DbUnitModule dbUnitModule;
+//
+//    /* The dataSource */
+//    @TestDataSource
+//    private DataSource dataSource = null;
+//
+//    /* True if current test is not for the current dialect */
+//    private boolean disabled;
+//
+//
+//    /**
+//     * Initializes the test fixture.
+//     */
+//    @Before
+//    public void setUp() throws Exception {
+//        Properties configuration = new ConfigurationLoader().loadConfiguration();
+//
+//        dbUnitModule = new DbUnitModule();
+//        dbUnitModule.init(configuration);
+//
+//        dropTestTables();
+//        createTestTables();
+//    }
+//
+//
+//    /**
+//     * Clean-up test database.
+//     */
+//    @After
+//    public void tearDown() throws Exception {
+//        if (disabled) {
+//            return;
+//        }
+//        dropTestTables();
+//    }
+//
+//
+//    /**
+//     * Test for a data set containing multiple namespaces.
+//     */
+//    @Test
+//    public void testDataSet_multiSchema() throws Exception {
+//        if (disabled) {
+//            logger.warn("Test is not for current dialect. Skipping test.");
+//            return;
+//        }
+//        dbUnitModule.insertDataSet(DataSetTest.class.getMethod("multiSchema"), new DataSetTest());
+//
+//        assertLoadedDataSet("PUBLIC");
+//        assertLoadedDataSet("SCHEMA_A");
+//        assertLoadedDataSet("SCHEMA_B");
+//    }
+//
+//    /**
+//     * Test for a data set containing multiple namespaces.
+//     */
+//    @Test
+//    public void testDataSet_multiSchemaNoDefault() throws Exception {
+//        if (disabled) {
+//            logger.warn("Test is not for current dialect. Skipping test.");
+//            return;
+//        }
+//        dbUnitModule.insertDataSet(DataSetTest.class.getMethod("multiSchemaNoDefault"), new DataSetTest());
+//
+//        assertLoadedDataSet("PUBLIC");
+//        assertLoadedDataSet("SCHEMA_A");
+//        assertLoadedDataSet("SCHEMA_B");
+//    }
+//
+//
+//    /**
+//     * Utility method to assert that the data set for the schema was loaded.
+//     *
+//     * @param schemaName the name of the schema, not null
+//     */
+//    private void assertLoadedDataSet(String schemaName) {
+//        String dataSet = getString("select dataset from " + schemaName + ".test");
+//        assertEquals(schemaName, dataSet);
+//    }
+//
+//
+//    /**
+//     * Creates the test tables.
+//     */
+//    private void createTestTables() {
+//        // PUBLIC SCHEMA
+//        executeUpdate("create table TEST(dataset varchar(100))");
+//        // SCHEMA_A
+//        executeUpdate("create schema SCHEMA_A AUTHORIZATION DBA");
+//        executeUpdate("create table SCHEMA_A.TEST(dataset varchar(100))");
+//        // SCHEMA_B
+//        executeUpdate("create schema SCHEMA_B AUTHORIZATION DBA");
+//        executeUpdate("create table SCHEMA_B.TEST(dataset varchar(100))");
+//    }
+//
+//
+//    /**
+//     * Removes the test database tables
+//     */
+//    private void dropTestTables() {
+//        executeUpdateQuietly("drop table TEST");
+//        executeUpdateQuietly("drop table SCHEMA_A.TEST");
+//        executeUpdateQuietly("drop schema SCHEMA_A");
+//        executeUpdateQuietly("drop table SCHEMA_B.TEST");
+//        executeUpdateQuietly("drop schema SCHEMA_B");
+//    }
+//
+//
+//    /**
+//     * Test class with a class level dataset
+//     */
+//    @DataSet
+//    public class DataSetTest {
+//
+//        @DataSet("DbUnitModuleDataSetMultiSchemaTest$DataSetTest.multiSchema.xml")
+//        public void multiSchema() {
+//        }
+//
+//        @DataSet("DbUnitModuleDataSetMultiSchemaTest$DataSetTest.multiSchemaNoDefault.xml")
+//        public void multiSchemaNoDefault() {
+//        }
+//    }
 
 }

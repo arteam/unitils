@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbunit.util;
+package org.unitils.dbunit.connection;
 
 import org.dbunit.database.AbstractDatabaseConnection;
 import org.springframework.jdbc.datasource.DataSourceUtils;
@@ -26,22 +26,21 @@ import java.sql.SQLException;
 /**
  * Implementation of DBUnits <code>IDatabaseConnection</code> interface. This implementation returns connections from
  * an underlying <code>DataSource</code>. This implementation stores the <code>Connection</code> that was retrieved last,
- * to enable closing it (or returing it to the pool) using {@link #closeJdbcConnection()}.
+ * to enable closing it (or returning it to the pool) using {@link #closeJdbcConnection()}.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
 
     /* DataSource that provides access to JDBC connections */
-    private DataSource dataSource;
-
+    protected DataSource dataSource;
     /* Name of the database schema */
-    private String schemaName;
-
-    /* Connection that is currently in use by DBUnit. Is stored to enable returning it to the connection pool after
-     the DBUnit operation finished */
-    private Connection currentlyUsedConnection, currentlyUsedNativeConnection;
+    protected String schemaName;
+    /* Connection currently used by DBUnit. Will be returned to the pool when close is called. */
+    protected Connection currentConnection;
+    /* The actual native connection that is given to DbUnit. */
+    protected Connection currentNativeConnection;
 
 
     /**
@@ -64,14 +63,12 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
         // Nothing to be done. Connections are closed (i.e. returned to the pool) after every dbUnit operation
     }
 
-
     /**
      * @return The database schema name
      */
     public String getSchema() {
         return schemaName;
     }
-
 
     /**
      * Returns a <code>Connection</code> that can be used by DBUnit. A reference to the connection is kept, to be able
@@ -81,11 +78,24 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
      * @return A JDBC connection
      */
     public Connection getConnection() throws SQLException {
-        if (currentlyUsedConnection == null) {
-            currentlyUsedConnection = DataSourceUtils.getConnection(dataSource);
-            currentlyUsedNativeConnection = getNativeConnection(currentlyUsedConnection);
+        if (currentConnection == null) {
+            currentConnection = DataSourceUtils.getConnection(dataSource);
+            currentNativeConnection = getNativeConnection(currentConnection);
         }
-        return currentlyUsedNativeConnection;
+        return currentNativeConnection;
+    }
+
+    /**
+     * Closes the <code>Connection</code> that was last retrieved using the {@link #getConnection} method
+     */
+    public void closeJdbcConnection() {
+        if (currentConnection == null) {
+            // ignore, already closed
+            return;
+        }
+        DataSourceUtils.releaseConnection(currentConnection, dataSource);
+        currentConnection = null;
+        currentNativeConnection = null;
     }
 
 
@@ -103,19 +113,4 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
         }
         return connection;
     }
-
-
-    /**
-     * Closes the <code>Connection</code> that was last retrieved using the {@link #getConnection} method
-     *
-     * @throws SQLException When connection close fails
-     */
-    public void closeJdbcConnection() throws SQLException {
-        if (currentlyUsedConnection != null) {
-            DataSourceUtils.releaseConnection(currentlyUsedConnection, dataSource);
-            currentlyUsedConnection = null;
-            currentlyUsedNativeConnection = null;
-        }
-    }
-
 }

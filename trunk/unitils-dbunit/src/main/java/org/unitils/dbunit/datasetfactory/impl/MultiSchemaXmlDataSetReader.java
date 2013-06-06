@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbunit.util;
+package org.unitils.dbunit.datasetfactory.impl;
 
-import static org.apache.commons.lang.StringUtils.isEmpty;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbunit.dataset.*;
 import org.dbunit.dataset.datatype.DataType;
 import org.unitils.core.UnitilsException;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import org.unitils.dbunit.datasetfactory.MultiSchemaDataSet;
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -30,10 +29,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+
 /**
- * A reader for DbUnit xml datasets that creates a new ITable instance for each element (row).
+ * A reader for DbUnit xml data sets that creates a new ITable instance for each element (row).
  * <p/>
  * Following format is expected:
  * <code><pre>
@@ -60,7 +63,7 @@ import java.util.Map;
  * </pre></code>
  * <p/>
  * This example defines 2 schemas: SCHEMA_A and SCHEMA_B. The first schema is set as default schema (=default namespace).
- * The 'first_table' table has no namespce and is therefore linked to SCHEMA_A. The 'second_table' table is prefixed
+ * The 'first_table' table has no namespace and is therefore linked to SCHEMA_A. The 'second_table' table is prefixed
  * with namespace b which is linked to SCHEMA_B. If no default namespace is defined, the schema that is
  * passed as constructor argument is taken as default schema.
  *
@@ -70,10 +73,10 @@ import java.util.Map;
 public class MultiSchemaXmlDataSetReader {
 
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(MultiSchemaXmlDataSetReader.class);
+    protected static Log logger = LogFactory.getLog(MultiSchemaXmlDataSetReader.class);
 
     /* The schema name to use when none is specified */
-    private String defaultSchemaName;
+    protected String defaultSchemaName;
 
 
     /**
@@ -87,13 +90,13 @@ public class MultiSchemaXmlDataSetReader {
 
 
     /**
-     * Parses the datasets from the given files.
-     * Each schema is given its own dataset and each row is given its own table.
+     * Parses the data sets from the given files.
+     * Each schema is given its own data set and each row is given its own table.
      *
-     * @param dataSetFiles The dataset files, not null
+     * @param dataSetFiles The data set files, not null
      * @return The read data set, not null
      */
-    public MultiSchemaDataSet readDataSetXml(File... dataSetFiles) {
+    public MultiSchemaDataSet readDataSetXml(List<File> dataSetFiles) {
         try {
             DataSetContentHandler dataSetContentHandler = new DataSetContentHandler(defaultSchemaName);
             XMLReader xmlReader = createXMLReader();
@@ -128,7 +131,7 @@ public class MultiSchemaXmlDataSetReader {
             SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
             saxParserFactory.setNamespaceAware(true);
 
-            // disable validation, so dataset can still be used when a DTD or XSD is missing
+            // disable validation, so data set can still be used when a DTD or XSD is missing
             disableValidation(saxParserFactory);
             return saxParserFactory.newSAXParser().getXMLReader();
 
@@ -136,7 +139,6 @@ public class MultiSchemaXmlDataSetReader {
             throw new UnitilsException("Unable to create SAX parser to read data set xml.", e);
         }
     }
-
 
     /**
      * Disables validation on the given sax parser factory.
@@ -148,12 +150,12 @@ public class MultiSchemaXmlDataSetReader {
         try {
             saxParserFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         } catch (Exception e) {
-            logger.debug("Unable to set http://xml.org/sax/features/external-parameter-entities feature on SAX parser factory to false. Igoring exception: " + e.getMessage());
+            logger.debug("Unable to set http://xml.org/sax/features/external-parameter-entities feature on SAX parser factory to false. Ignoring exception: " + e.getMessage());
         }
         try {
             saxParserFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
         } catch (Exception e) {
-            logger.debug("Unable to set http://apache.org/xml/features/nonvalidating/load-external-dtd feature on SAX parser factory to false. Igoring exception: " + e.getMessage());
+            logger.debug("Unable to set http://apache.org/xml/features/nonvalidating/load-external-dtd feature on SAX parser factory to false. Ignoring exception: " + e.getMessage());
         }
     }
 
@@ -166,7 +168,7 @@ public class MultiSchemaXmlDataSetReader {
         /* The schema name to use when none is specified */
         private String defaultSchemaName;
 
-        /* All created datasets per schema */
+        /* All created data sets per schema */
         private Map<String, CachedDataSet> dataSets = new HashMap<String, CachedDataSet>();
 
 
@@ -178,7 +180,6 @@ public class MultiSchemaXmlDataSetReader {
         public DataSetContentHandler(String defaultSchemaName) {
             this.defaultSchemaName = defaultSchemaName;
         }
-
 
         /**
          * Gets the result data set.
@@ -195,14 +196,13 @@ public class MultiSchemaXmlDataSetReader {
             for (String schemaName : dataSets.keySet()) {
                 CachedDataSet cachedDataSet = dataSets.get(schemaName);
 
-                // wrap datasets in replacement datasets, and replace [null] tokens by the null reference
+                // wrap data sets in replacement data sets, and replace [null] tokens by the null reference
                 ReplacementDataSet replacementDataSet = new ReplacementDataSet(cachedDataSet);
                 replacementDataSet.addReplacementObject("[null]", null);
                 multiSchemaDataSet.setDataSetForSchema(schemaName, replacementDataSet);
             }
             return multiSchemaDataSet;
         }
-
 
         /**
          * Processes an xml element. A new table is started for each element.
@@ -269,7 +269,6 @@ public class MultiSchemaXmlDataSetReader {
             return new DefaultTableMetaData(tableName, columns);
         }
 
-
         /**
          * Gets the attribute values corresponding to each of the given columns.
          *
@@ -290,9 +289,8 @@ public class MultiSchemaXmlDataSetReader {
             return rowValues;
         }
 
-
         /**
-         * Overriden to rethrow exception.
+         * Overridden to rethrow exception.
          *
          * @param e The exception
          */
