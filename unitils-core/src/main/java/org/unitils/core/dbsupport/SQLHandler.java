@@ -5,6 +5,7 @@ import org.unitils.core.UnitilsException;
 import javax.sql.DataSource;
 import java.util.Set;
 
+// todo remove
 public interface SQLHandler {
 
     /**
