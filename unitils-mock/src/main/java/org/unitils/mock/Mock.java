@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,9 @@ import org.unitils.mock.mockbehavior.MockBehavior;
  * <p/>
  * If Unitils encounters a field declared as {@link Mock}, a {@link MockObject} is automatically instantiated and
  * assigned to the declared field.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public interface Mock<T> {
 
@@ -197,6 +200,7 @@ public interface Mock<T> {
     @MatchStatement
     T assertInvoked();
 
+    // todo td assertInvoked + int times
 
     /**
      * Asserts that an invocation that matches the invocation following this call has been observed
@@ -220,6 +224,7 @@ public interface Mock<T> {
     @MatchStatement
     T assertNotInvoked();
 
+    // todo td assertNoMoreInvocations
 
     /**
      * Removes all behavior defined for this mock.
