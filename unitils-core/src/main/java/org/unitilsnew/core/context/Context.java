@@ -98,19 +98,15 @@ public class Context {
     @SuppressWarnings("unchecked")
     protected <T> T createInstanceOfType(Class<T> type, String... classifiers) {
         Class<?> implementationType = getImplementationType(type, classifiers);
-        Constructor<?>[] constructors = implementationType.getConstructors();
-        if (constructors.length > 1) {
-            throw new UnitilsException("Found more than 1 constructor in implementation type " + implementationType.getName());
-        }
+        Constructor<?> constructor = getConstructor(implementationType);
 
         Object[] arguments;
         Class<?>[] parameterTypes;
-        if (constructors.length == 0) {
+        if (constructor == null) {
             arguments = new Object[0];
             parameterTypes = new Class[0];
 
         } else {
-            Constructor<?> constructor = constructors[0];
             parameterTypes = constructor.getParameterTypes();
             Type[] genericParameterTypes = constructor.getGenericParameterTypes();
             Annotation[][] argumentAnnotations = constructor.getParameterAnnotations();
@@ -128,6 +124,24 @@ public class Context {
             throw new UnitilsException("Implementation type " + instance.getClass().getName() + " is not of type " + type.getName());
         }
         return (T) instance;
+    }
+
+    protected Constructor<?> getConstructor(Class<?> implementationType) {
+        Constructor<?>[] constructors = implementationType.getConstructors();
+        // use default constructor if there are no constructors
+        if (constructors.length == 0) {
+            return null;
+        }
+        // try no-args constructor if there is more than one constructor
+        if (constructors.length > 1) {
+            for (Constructor<?> constructor : constructors) {
+                if (constructor.getParameterTypes().length == 0) {
+                    return null;
+                }
+            }
+            throw new UnitilsException("Found more than 1 constructor in implementation type " + implementationType.getName());
+        }
+        return constructors[0];
     }
 
     protected Object getArgumentInstance(Class<?> argumentType, Type genericArgumentType, Annotation[] argumentAnnotations) {

@@ -79,9 +79,15 @@ public class ContextGetInstanceOfTypeTest extends UnitilsJUnit4 {
         assertNotNull(result);
     }
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void noConfigFoundButTypeIsInterface() {
-        context.getInstanceOfType(TestInterface.class);
+        try {
+            context.getInstanceOfType(TestInterface.class);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to create instance for type org.unitilsnew.core.context.ContextGetInstanceOfTypeTest$TestInterface.\n" +
+                    "Reason: No implementation type configured for given interface type org.unitilsnew.core.context.ContextGetInstanceOfTypeTest$TestInterface", e.getMessage());
+        }
     }
 
     @Test
@@ -101,33 +107,61 @@ public class ContextGetInstanceOfTypeTest extends UnitilsJUnit4 {
         assertNotNull(((ConstructorsWithArgumentsClass) result).argument2);
     }
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void tooManyConstructors() {
         configurationMock.returns(TwoConstructorsClass.class.getName()).getOptionalString(TestInterface.class.getName());
+        try {
+            TestInterface result = context.getInstanceOfType(TestInterface.class);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to create instance for type org.unitilsnew.core.context.ContextGetInstanceOfTypeTest$TestInterface.\n" +
+                    "Reason: Found more than 1 constructor in implementation type org.unitilsnew.core.context.ContextGetInstanceOfTypeTest$TwoConstructorsClass", e.getMessage());
+        }
+    }
+
+    @Test
+    public void useNoArgsConstructorWhenThereIsMoreThanOneConstructor() {
+        configurationMock.returns(TwoConstructorsClassWithDefault.class.getName()).getOptionalString(TestInterface.class.getName());
 
         TestInterface result = context.getInstanceOfType(TestInterface.class);
-        assertTrue(result instanceof NoConstructorClass);
+        assertTrue(result instanceof TwoConstructorsClassWithDefault);
     }
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void invalidClassName() {
         configurationMock.returns("xxx").getOptionalString(TestInterface.class.getName());
-
-        context.getInstanceOfType(TestInterface.class);
+        try {
+            context.getInstanceOfType(TestInterface.class);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to create instance for type org.unitilsnew.core.context.ContextGetInstanceOfTypeTest$TestInterface.\n" +
+                    "Reason: Invalid implementation type xxx\n" +
+                    "Reason: ClassNotFoundException: xxx", e.getMessage());
+        }
     }
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void implementationTypeShouldNotBeAnInterface() {
         configurationMock.returns(TestInterface.class.getName()).getOptionalString(TestInterface.class.getName());
-
-        context.getInstanceOfType(TestInterface.class);
+        try {
+            context.getInstanceOfType(TestInterface.class);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to create instance for type org.unitilsnew.core.context.ContextGetInstanceOfTypeTest$TestInterface.\n" +
+                    "Reason: Interface found as implementation type of org.unitilsnew.core.context.ContextGetInstanceOfTypeTest$TestInterface", e.getMessage());
+        }
     }
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void implementationTypeShouldBeOfCorrectType() {
         configurationMock.returns(StringBuffer.class.getName()).getOptionalString(TestInterface.class.getName());
-
-        context.getInstanceOfType(TestInterface.class);
+        try {
+            context.getInstanceOfType(TestInterface.class);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to create instance for type org.unitilsnew.core.context.ContextGetInstanceOfTypeTest$TestInterface.\n" +
+                    "Reason: Implementation type java.lang.StringBuffer is not of type org.unitilsnew.core.context.ContextGetInstanceOfTypeTest$TestInterface or org.unitilsnew.core.Factory<org.unitilsnew.core.context.ContextGetInstanceOfTypeTest$TestInterface>", e.getMessage());
+        }
     }
 
 
@@ -156,10 +190,19 @@ public class ContextGetInstanceOfTypeTest extends UnitilsJUnit4 {
 
     protected static class TwoConstructorsClass implements TestInterface {
 
-        public TwoConstructorsClass() {
+        public TwoConstructorsClass(String a) {
         }
 
         public TwoConstructorsClass(int a) {
+        }
+    }
+
+    protected static class TwoConstructorsClassWithDefault implements TestInterface {
+
+        public TwoConstructorsClassWithDefault() {
+        }
+
+        public TwoConstructorsClassWithDefault(int a) {
         }
     }
 
