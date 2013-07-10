@@ -16,9 +16,12 @@
 
 package org.unitils.database;
 
+import org.dbmaintain.database.Database;
+import org.dbmaintain.database.Databases;
 import org.unitils.database.core.DataSourceService;
 import org.unitils.database.core.DataSourceWrapper;
 import org.unitils.database.core.TransactionManager;
+import org.unitils.database.dbmaintain.DbMaintainWrapper;
 import org.unitilsnew.core.Unitils;
 
 import javax.sql.DataSource;
@@ -31,6 +34,7 @@ public class DatabaseUnitils {
 
     protected static DataSourceService dataSourceService = Unitils.getInstanceOfType(DataSourceService.class);
     protected static TransactionManager transactionManager = Unitils.getInstanceOfType(TransactionManager.class);
+    protected static DbMaintainWrapper dbMaintainWrapper = Unitils.getInstanceOfType(DbMaintainWrapper.class);
 
 
     /**
@@ -56,6 +60,19 @@ public class DatabaseUnitils {
 
     public static DataSourceWrapper getDataSourceWrapper(String databaseName) {
         return dataSourceService.getDataSourceWrapper(databaseName);
+    }
+
+
+    public static Database getDatabase() {
+        return getDatabase(null);
+    }
+
+    public static Database getDatabase(String databaseName) {
+        return dbMaintainWrapper.getDatabase(databaseName);
+    }
+
+    public static Databases getDatabases() {
+        return dbMaintainWrapper.getDatabases();
     }
 
 

@@ -22,8 +22,8 @@ import org.unitilsnew.core.Unitils;
  * Class providing access to the functionality of the database module using static methods. Meant
  * to be used directly in unit tests.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class DbMaintainUnitils {
 

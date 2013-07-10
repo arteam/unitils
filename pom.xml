@@ -59,7 +59,7 @@
 
     <properties>
         <spring.version>3.1.1.RELEASE</spring.version>
-        <dbmaintain.version>2.4</dbmaintain.version>
+        <dbmaintain.version>2.5-SNAPSHOT</dbmaintain.version>
         <junit.version>4.10</junit.version>
         <testng.version>6.5.2</testng.version>
         <commons-dbcp.version>1.3</commons-dbcp.version>
