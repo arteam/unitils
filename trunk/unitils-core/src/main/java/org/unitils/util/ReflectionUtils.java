@@ -349,7 +349,7 @@ public class ReflectionUtils {
      * From the given class, returns the getter for the given property name. If
      * isStatic == true, a static getter is searched. If no such getter exists
      * in the given class, null is returned.
-     *
+     * <p/>
      * When the given field is a boolean the getGetter will also try the
      * isXxxxx.
      *
@@ -574,7 +574,7 @@ public class ReflectionUtils {
 
     /**
      * Gets the string representation of the method as follows:
-     *
+     * <p/>
      * 'class name'.'method name'()
      *
      * @param method The method, not null
@@ -703,6 +703,16 @@ public class ReflectionUtils {
         } catch (Exception e) {
             throw new UnitilsException("Unable to copy fields.", e);
         }
+    }
+
+    public static Class<?> getTestClass(Object testInstanceOrClass) {
+        if (testInstanceOrClass == null) {
+            return null;
+        }
+        if (testInstanceOrClass instanceof Class) {
+            return (Class) testInstanceOrClass;
+        }
+        return testInstanceOrClass.getClass();
     }
 
     private static void copyFields(Class<?> clazz, Object fromObject, Object toObject) throws IllegalAccessException {
