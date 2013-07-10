@@ -19,10 +19,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbmaintain.DbMaintainer;
 import org.dbmaintain.MainFactory;
+import org.dbmaintain.database.Database;
+import org.dbmaintain.database.DatabaseException;
+import org.dbmaintain.database.Databases;
 import org.dbmaintain.structure.clean.DBCleaner;
 import org.dbmaintain.structure.clear.DBClearer;
 import org.dbmaintain.structure.constraint.ConstraintsDisabler;
 import org.dbmaintain.structure.sequence.SequenceUpdater;
+import org.unitils.core.UnitilsException;
 import org.unitilsnew.core.annotation.Property;
 
 import java.util.ArrayList;
@@ -50,6 +54,28 @@ public class DbMaintainWrapper {
         this.mainFactory = mainFactory;
         this.dbMaintainEnabled = dbMaintainEnabled;
     }
+
+
+    public Database getDatabase(String databaseName) {
+        Databases databases = getDatabases();
+        if (databaseName == null) {
+            return databases.getDefaultDatabase();
+        }
+        try {
+            return databases.getDatabase(databaseName);
+        } catch (DatabaseException e) {
+            throw new UnitilsException("Unable to get database with name: " + databaseName, e);
+        }
+    }
+
+    public Databases getDatabases() {
+        try {
+            return mainFactory.getDatabases();
+        } catch (DatabaseException e) {
+            throw new UnitilsException("Unable to get databases", e);
+        }
+    }
+
 
     /**
      * Determines whether the test database is outdated and, if that is the case, updates the database with the
