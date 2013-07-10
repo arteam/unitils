@@ -27,15 +27,15 @@ import java.util.List;
 public interface DataSetFactory {
 
     /**
+     * @return The extension that files which can be interpreted by this factory must have (should not start with a '.')
+     */
+    String getDataSetFileExtension();
+
+    /**
      * Creates a {@link MultiSchemaDataSet} using the given file.
      *
      * @param dataSetFiles The data set files, not null
      * @return A {@link MultiSchemaDataSet} containing the data sets per schema, not null
      */
     MultiSchemaDataSet createDataSet(List<File> dataSetFiles);
-
-    /**
-     * @return The extension that files which can be interpreted by this factory must have (should not start with a '.')
-     */
-    String getDataSetFileExtension();
 }

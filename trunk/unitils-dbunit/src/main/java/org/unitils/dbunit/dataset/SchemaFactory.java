@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,12 +45,10 @@ public class SchemaFactory {
             addTables(dbUnitDataSet, result);
             return result;
 
-        } catch (DataSetException e) {
-            throw new UnitilsException("Unable to create data set for db unit data set. Schema name: " + schemaName, e);
+        } catch (Exception e) {
+            throw new UnitilsException("Unable to create data set for schema " + schemaName, e);
         }
-
     }
-
 
     /**
      * Creates a data set schema for the given DbUnit dataset.
@@ -61,8 +59,10 @@ public class SchemaFactory {
      * @return The data set schema, not null
      */
     public Schema createSchemaForDbUnitDataSet(String schemaName, IDataSet dbUnitDataSet, List<String> tablesToInclude) {
-        IDataSet filteredDataSet = new FilteredDataSet(new IncludeTableFilter(tablesToInclude.toArray(new String[tablesToInclude.size()])), dbUnitDataSet);
-        return createSchemaForDbUnitDataSet(schemaName, filteredDataSet);
+        if (tablesToInclude != null && !tablesToInclude.isEmpty()) {
+            dbUnitDataSet = new FilteredDataSet(new IncludeTableFilter(tablesToInclude.toArray(new String[tablesToInclude.size()])), dbUnitDataSet);
+        }
+        return createSchemaForDbUnitDataSet(schemaName, dbUnitDataSet);
     }
 
 
@@ -88,25 +88,6 @@ public class SchemaFactory {
             addRows(dbUnitTable, table, primaryKeyColumnNames);
         }
     }
-
-
-    /**
-     * @param tableName       The table name to check, not null
-     * @param tablesToInclude Names of tables to include, null for all tables
-     * @return True if the table name should be included
-     */
-    protected boolean shouldIgnoreTable(String tableName, List<String> tablesToInclude) {
-        if (tablesToInclude == null) {
-            return false;
-        }
-        for (String tableToInclude : tablesToInclude) {
-            if (tableToInclude.equalsIgnoreCase(tableName)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
 
     /**
      * Adds the rows of the DbUnit table to the given table.
@@ -137,7 +118,6 @@ public class SchemaFactory {
         }
     }
 
-
     /**
      * Gets the primary key column names for the given DbUnit table.
      *
@@ -151,5 +131,4 @@ public class SchemaFactory {
         }
         return result;
     }
-
 }

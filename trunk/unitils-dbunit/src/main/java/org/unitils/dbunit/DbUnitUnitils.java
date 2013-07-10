@@ -15,6 +15,7 @@
  */
 package org.unitils.dbunit;
 
+import org.unitils.dbunit.connection.DbUnitConnectionManager;
 import org.unitils.dbunit.core.DataSetService;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
@@ -22,6 +23,7 @@ import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.unitils.util.ReflectionUtils.getTestClass;
 import static org.unitilsnew.core.Unitils.getInstanceOfType;
 
 /**
@@ -31,29 +33,22 @@ import static org.unitilsnew.core.Unitils.getInstanceOfType;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public abstract class DbUnitUnitils {
+public class DbUnitUnitils {
 
     protected static DataSetService dataSetService = getInstanceOfType(DataSetService.class);
+    protected static DbUnitConnectionManager dbUnitConnectionManager = getInstanceOfType(DbUnitConnectionManager.class);
 
-
-    /**
-     * Inserts the default data set for the given test class into the database
-     */
-    public static void insertDefaultDataSet(Class<?> testClass) {
-        dataSetService.loadDataSets(null, testClass, null, null);
-    }
 
     /**
      * Inserts the data set consisting of the given list of files into the database
      *
      * @param fileNames The names of the files that define the test data
      */
-    public static void insertDataSet(Class<?> testClass, String... fileNames) {
+    public static void insertDataSet(Object testInstanceOrClass, String... fileNames) {
+        Class<?> testClass = getTestClass(testInstanceOrClass);
         List<String> dataSetFileNames = fileNames == null ? null : asList(fileNames);
         dataSetService.loadDataSets(dataSetFileNames, testClass, null, null);
     }
-
-    // todo td insertDataSet  refreshDataSet etc
 
     /**
      * Inserts the test data coming from the given DbUnit data set file.
@@ -61,8 +56,27 @@ public abstract class DbUnitUnitils {
      * @param dataSetFactoryClass      The class of the factory that must be used to read this data set
      * @param dataSetLoadStrategyClass The class of the load strategy that must be used to load this data set
      */
-    public static void insertDataSet(Class<?> testClass, Class<? extends DataSetLoadStrategy> dataSetLoadStrategyClass, Class<? extends DataSetFactory> dataSetFactoryClass, String... fileNames) {
+    public static void insertDataSet(Object testInstanceOrClass, Class<? extends DataSetLoadStrategy> dataSetLoadStrategyClass, Class<? extends DataSetFactory> dataSetFactoryClass, String... fileNames) {
+        Class<?> testClass = getTestClass(testInstanceOrClass);
         List<String> dataSetFileNames = fileNames == null ? null : asList(fileNames);
         dataSetService.loadDataSets(dataSetFileNames, testClass, dataSetLoadStrategyClass, dataSetFactoryClass);
+    }
+
+
+    public static void assertExpectedDataSet(Object testInstanceOrClass, String... fileNames) {
+        Class<?> testClass = getTestClass(testInstanceOrClass);
+        List<String> dataSetFileNames = fileNames == null ? null : asList(fileNames);
+        dataSetService.assertExpectedDataSets(dataSetFileNames, null, testClass, null);
+    }
+
+    public static void assertExpectedDataSet(Object testInstanceOrClass, Class<? extends DataSetFactory> dataSetFactoryClass, String... fileNames) {
+        Class<?> testClass = getTestClass(testInstanceOrClass);
+        List<String> dataSetFileNames = fileNames == null ? null : asList(fileNames);
+        dataSetService.assertExpectedDataSets(dataSetFileNames, null, testClass, dataSetFactoryClass);
+    }
+
+
+    public static void resetDbUnitConnections() {
+        dbUnitConnectionManager.resetDbUnitConnections();
     }
 }

@@ -20,7 +20,7 @@ import org.dbunit.operation.RefreshOperation;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
-import org.unitils.dbunit.connection.DbUnitDatabaseConnection;
+import org.unitils.dbunit.connection.DbUnitConnection;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitilsnew.UnitilsJUnit4;
@@ -39,7 +39,7 @@ public class RefreshLoadStrategyLoadDataSetTest extends UnitilsJUnit4 {
     private Mock<RefreshOperation> refreshOperationMock;
 
     @Dummy
-    private DbUnitDatabaseConnection dbUnitDatabaseConnection;
+    private DbUnitConnection dbUnitConnection;
     @Dummy
     private IDataSet dataSet;
 
@@ -52,16 +52,16 @@ public class RefreshLoadStrategyLoadDataSetTest extends UnitilsJUnit4 {
 
     @Test
     public void loadDataSet() throws Exception {
-        refreshLoadStrategy.loadDataSet(dbUnitDatabaseConnection, dataSet);
+        refreshLoadStrategy.loadDataSet(dbUnitConnection, dataSet);
 
-        refreshOperationMock.assertInvoked().execute(dbUnitDatabaseConnection, dataSet);
+        refreshOperationMock.assertInvoked().execute(dbUnitConnection, dataSet);
     }
 
     @Test
     public void unitilsExceptionWhenRefreshFails() throws Exception {
-        refreshOperationMock.raises(new NullPointerException("expected")).execute(dbUnitDatabaseConnection, dataSet);
+        refreshOperationMock.raises(new NullPointerException("expected")).execute(dbUnitConnection, dataSet);
         try {
-            refreshLoadStrategy.loadDataSet(dbUnitDatabaseConnection, dataSet);
+            refreshLoadStrategy.loadDataSet(dbUnitConnection, dataSet);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Unable to refresh data set.\nReason: NullPointerException: expected", e.getMessage());

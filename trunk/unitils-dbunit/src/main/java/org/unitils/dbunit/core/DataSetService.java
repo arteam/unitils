@@ -19,10 +19,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbunit.dataset.IDataSet;
 import org.unitils.core.UnitilsException;
-import org.unitils.dbunit.connection.DbUnitDatabaseConnection;
-import org.unitils.dbunit.connection.DbUnitDatabaseConnectionManager;
+import org.unitils.dbunit.connection.DbUnitConnection;
+import org.unitils.dbunit.connection.DbUnitConnectionManager;
+import org.unitils.dbunit.dataset.Schema;
+import org.unitils.dbunit.dataset.SchemaFactory;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
-import org.unitils.dbunit.datasetfactory.DataSetResolver;
+import org.unitils.dbunit.datasetfactory.DataSetResolvingStrategy;
 import org.unitils.dbunit.datasetfactory.MultiSchemaDataSet;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import org.unitilsnew.core.context.Context;
@@ -42,21 +44,19 @@ public class DataSetService {
     /* The logger instance for this class */
     protected static Log logger = LogFactory.getLog(DataSetService.class);
 
-    protected DataSetResolver dataSetResolver;
-    protected DataSetFactory defaultDataSetFactory;
-    protected DataSetLoadStrategy defaultDataSetLoadStrategy;
+    protected DataSetResolvingStrategy dataSetResolvingStrategy;
     protected DataSetAssert dataSetAssert;
-    protected DbUnitDatabaseConnectionManager dbUnitDatabaseConnectionManager;
+    protected SchemaFactory schemaFactory;
+    protected DbUnitConnectionManager dbUnitConnectionManager;
     protected Context context;
 
 
-    public DataSetService(DataSetResolver dataSetResolver, DataSetFactory defaultDataSetFactory, DataSetLoadStrategy defaultDataSetLoadStrategy, DataSetAssert dataSetAssert,
-                          DbUnitDatabaseConnectionManager dbUnitDatabaseConnectionManager, Context context) {
-        this.dataSetResolver = dataSetResolver;
-        this.defaultDataSetFactory = defaultDataSetFactory;
-        this.defaultDataSetLoadStrategy = defaultDataSetLoadStrategy;
+    public DataSetService(DataSetResolvingStrategy dataSetResolvingStrategy, DataSetAssert dataSetAssert, SchemaFactory schemaFactory,
+                          DbUnitConnectionManager dbUnitConnectionManager, Context context) {
+        this.dataSetResolvingStrategy = dataSetResolvingStrategy;
         this.dataSetAssert = dataSetAssert;
-        this.dbUnitDatabaseConnectionManager = dbUnitDatabaseConnectionManager;
+        this.schemaFactory = schemaFactory;
+        this.dbUnitConnectionManager = dbUnitConnectionManager;
         this.context = context;
     }
 
@@ -72,14 +72,15 @@ public class DataSetService {
      * @param dataSetFactoryClass      The type of factory that will create the data sets, not null
      */
     public void loadDataSets(List<String> fileNames, Class<?> testClass, Class<? extends DataSetLoadStrategy> dataSetLoadStrategyClass, Class<? extends DataSetFactory> dataSetFactoryClass) {
-        DataSetLoadStrategy dataSetLoadStrategy = defaultDataSetLoadStrategy;
-        if (dataSetLoadStrategyClass != null) {
-            dataSetLoadStrategy = context.getInstanceOfType(dataSetLoadStrategyClass);
+        if (dataSetLoadStrategyClass == null) {
+            dataSetLoadStrategyClass = DataSetLoadStrategy.class;
         }
-        DataSetFactory dataSetFactory = defaultDataSetFactory;
-        if (dataSetFactoryClass != null) {
-            dataSetFactory = context.getInstanceOfType(dataSetFactoryClass);
+        if (dataSetFactoryClass == null) {
+            dataSetFactoryClass = DataSetFactory.class;
         }
+        DataSetLoadStrategy dataSetLoadStrategy = context.getInstanceOfType(dataSetLoadStrategyClass);
+        DataSetFactory dataSetFactory = context.getInstanceOfType(dataSetFactoryClass);
+
         if (fileNames == null || fileNames.isEmpty()) {
             // empty means, use default file name, which is the name of the class + extension
             String defaultFileName = getDefaultDataSetFileName(testClass, dataSetFactory);
@@ -89,12 +90,12 @@ public class DataSetService {
         logger.info("Loading data sets. File names: " + fileNames);
         MultiSchemaDataSet multiSchemaDataSet = getDataSet(fileNames, testClass, dataSetFactory);
         for (String schemaName : multiSchemaDataSet.getSchemaNames()) {
-            DbUnitDatabaseConnection dbUnitDatabaseConnection = dbUnitDatabaseConnectionManager.getDbUnitDatabaseConnection(schemaName);
+            DbUnitConnection dbUnitConnection = dbUnitConnectionManager.getDbUnitConnection(schemaName);
             try {
                 IDataSet schemaDataSet = multiSchemaDataSet.getDataSetForSchema(schemaName);
-                dataSetLoadStrategy.loadDataSet(dbUnitDatabaseConnection, schemaDataSet);
+                dataSetLoadStrategy.loadDataSet(dbUnitConnection, schemaDataSet);
             } finally {
-                dbUnitDatabaseConnection.closeJdbcConnection();
+                dbUnitConnection.closeJdbcConnection();
             }
         }
     }
@@ -110,10 +111,11 @@ public class DataSetService {
      * @param dataSetFactoryClass The type of DataSetFactory responsible for creating the data set file
      */
     public void assertExpectedDataSets(List<String> fileNames, Method testMethod, Class<?> testClass, Class<? extends DataSetFactory> dataSetFactoryClass) {
-        DataSetFactory dataSetFactory = defaultDataSetFactory;
-        if (dataSetFactoryClass != null) {
-            dataSetFactory = context.getInstanceOfType(dataSetFactoryClass);
+        if (dataSetFactoryClass == null) {
+            dataSetFactoryClass = DataSetFactory.class;
         }
+        DataSetFactory dataSetFactory = context.getInstanceOfType(dataSetFactoryClass);
+
         if (fileNames == null) {
             fileNames = new ArrayList<String>(1);
         }
@@ -126,17 +128,21 @@ public class DataSetService {
         logger.info("Asserting expected data sets. File names: " + fileNames);
         MultiSchemaDataSet multiSchemaDataSet = getDataSet(fileNames, testClass, dataSetFactory);
         for (String schemaName : multiSchemaDataSet.getSchemaNames()) {
-            DbUnitDatabaseConnection dbUnitDatabaseConnection = dbUnitDatabaseConnectionManager.getDbUnitDatabaseConnection(schemaName);
+            DbUnitConnection dbUnitConnection = dbUnitConnectionManager.getDbUnitConnection(schemaName);
             try {
                 IDataSet expectedDataSet = multiSchemaDataSet.getDataSetForSchema(schemaName);
-                IDataSet actualDataSet = dbUnitDatabaseConnection.createDataSet();
+                IDataSet actualDataSet = dbUnitConnection.createDataSet();
 
-                dataSetAssert.assertEqualDbUnitDataSets(schemaName, expectedDataSet, actualDataSet);
+                Schema expectedSchema = schemaFactory.createSchemaForDbUnitDataSet(schemaName, expectedDataSet);
+                List<String> expectedTableNames = expectedSchema.getTableNames();
+                Schema actualSchema = schemaFactory.createSchemaForDbUnitDataSet(schemaName, actualDataSet, expectedTableNames);
+
+                dataSetAssert.assertEqualSchemas(expectedSchema, actualSchema);
 
             } catch (Exception e) {
                 throw new UnitilsException("Unable to assert expected data set for schema " + schemaName, e);
             } finally {
-                dbUnitDatabaseConnection.closeJdbcConnection();
+                dbUnitConnection.closeJdbcConnection();
             }
         }
     }
@@ -145,7 +151,7 @@ public class DataSetService {
     protected MultiSchemaDataSet getDataSet(List<String> fileNames, Class<?> testClass, DataSetFactory dataSetFactory) {
         List<File> dataSetFiles = new ArrayList<File>();
         for (String dataSetFileName : fileNames) {
-            File dataSetFile = dataSetResolver.resolve(testClass, dataSetFileName);
+            File dataSetFile = dataSetResolvingStrategy.resolve(testClass, dataSetFileName);
             dataSetFiles.add(dataSetFile);
         }
         return dataSetFactory.createDataSet(dataSetFiles);
@@ -167,15 +173,23 @@ public class DataSetService {
 
     /**
      * Gets the name of the expected data set file. The default name of this file is constructed as
-     * follows: 'classname without package name'.'test name'-result.xml.
+     * follows: 'classname without package name'.'method name'-result.xml
+     * or 'classname without package name'-result.xml if no method is given.
      *
-     * @param method    The test method, not null
+     * @param method    The test method, null to leave out the method name part
      * @param testClass The test class, not null
      * @param extension The configured extension of data set files, not null
      * @return The expected data set filename, not null
      */
     protected String getDefaultExpectedDataSetFileName(Method method, Class<?> testClass, String extension) {
         String className = testClass.getName();
-        return className.substring(className.lastIndexOf(".") + 1) + "." + method.getName() + "-result." + extension;
+        StringBuilder name = new StringBuilder(className.substring(className.lastIndexOf(".") + 1));
+        if (method != null) {
+            name.append(".");
+            name.append(method.getName());
+        }
+        name.append("-result.");
+        name.append(extension);
+        return name.toString();
     }
 }
