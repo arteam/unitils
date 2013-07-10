@@ -21,6 +21,7 @@ import org.unitils.io.temp.TempService;
 
 import java.io.File;
 
+import static org.unitils.util.ReflectionUtils.getTestClass;
 import static org.unitilsnew.core.Unitils.getInstanceOfType;
 
 /**
@@ -54,12 +55,12 @@ public abstract class IOUnitils {
      * <p/>
      * See {@link org.unitils.io.annotation.FileContent} for more information on how the file is resolved.
      *
-     * @param targetType   The target type to convert the content to, not null
-     * @param testInstance The test instance that will be used to construct the file name and locate the file, not null
+     * @param targetType          The target type to convert the content to, not null
+     * @param testInstanceOrClass The test instance or class that will be used to construct the file name and locate the file, not null
      * @return The file content converted to the target type, not null
      */
-    public static <T> T readFileContent(Class<T> targetType, Object testInstance) {
-        return readFileContent(null, targetType, null, testInstance);
+    public static <T> T readFileContent(Class<T> targetType, Object testInstanceOrClass) {
+        return readFileContent(null, targetType, null, testInstanceOrClass);
     }
 
     /**
@@ -67,14 +68,14 @@ public abstract class IOUnitils {
      * <p/>
      * See {@link org.unitils.io.annotation.FileContent} for more information on how the file is resolved.
      *
-     * @param targetType   The target type to convert the content to, not null
-     * @param encoding     The encoding to use when reading the file, null for the default encoding
-     * @param testInstance The test instance that will be used to construct the file name and locate the file, not null
+     * @param targetType          The target type to convert the content to, not null
+     * @param encoding            The encoding to use when reading the file, null for the default encoding
+     * @param testInstanceOrClass The test instance or class that will be used to construct the file name and locate the file, not null
      * @return The file content converted to the target type, not null
      * @see org.unitils.io.annotation.FileContent
      */
-    public static <T> T readFileContent(Class<T> targetType, String encoding, Object testInstance) {
-        return readFileContent(null, targetType, encoding, testInstance);
+    public static <T> T readFileContent(Class<T> targetType, String encoding, Object testInstanceOrClass) {
+        return readFileContent(null, targetType, encoding, testInstanceOrClass);
     }
 
 
@@ -94,13 +95,13 @@ public abstract class IOUnitils {
      * <p/>
      * See {@link org.unitils.io.annotation.FileContent} for more information on how the file is resolved.
      *
-     * @param fileName     The name of the file, not null
-     * @param targetType   The target type to convert the content to, not null
-     * @param testInstance The test instance that will be used to locate the file, not null
+     * @param fileName            The name of the file, not null
+     * @param targetType          The target type to convert the content to, not null
+     * @param testInstanceOrClass The test instance or class that will be used to locate the file, not null
      * @return The file content converted to the target type, not null
      */
-    public static <T> T readFileContent(String fileName, Class<T> targetType, Object testInstance) {
-        return readFileContent(fileName, targetType, null, testInstance);
+    public static <T> T readFileContent(String fileName, Class<T> targetType, Object testInstanceOrClass) {
+        return readFileContent(fileName, targetType, null, testInstanceOrClass);
     }
 
     /**
@@ -108,14 +109,14 @@ public abstract class IOUnitils {
      * <p/>
      * See {@link org.unitils.io.annotation.FileContent} for more information on how the file is resolved.
      *
-     * @param fileName     The name of the file, not null
-     * @param targetType   The target type to convert the content to, not null
-     * @param encoding     The encoding to use when reading the file, null for the default encoding
-     * @param testInstance The test instance that will be used to locate the file, not null
+     * @param fileName            The name of the file, not null
+     * @param targetType          The target type to convert the content to, not null
+     * @param encoding            The encoding to use when reading the file, null for the default encoding
+     * @param testInstanceOrClass The test instance or class that will be used to locate the file, not null
      * @return The file content converted to the target type, not null
      */
-    public static <T> T readFileContent(String fileName, Class<T> targetType, String encoding, Object testInstance) {
-        Class<?> testClass = testInstance.getClass();
+    public static <T> T readFileContent(String fileName, Class<T> targetType, String encoding, Object testInstanceOrClass) {
+        Class<?> testClass = getTestClass(testInstanceOrClass);
         return fileContentReader.readFileContent(fileName, targetType, encoding, testClass);
     }
 
