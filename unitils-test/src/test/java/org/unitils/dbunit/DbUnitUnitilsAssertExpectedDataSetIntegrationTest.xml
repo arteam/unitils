@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+
+    <TABLE_A pk="1" column1="value1" column2="value2"/>
+    <TABLE_A pk="2" column1="value2" column2="value3"/>
+
+    <TABLE_B column1="aaa"/>
+    <TABLE_B column2="bbb"/>
+
+</dataset>

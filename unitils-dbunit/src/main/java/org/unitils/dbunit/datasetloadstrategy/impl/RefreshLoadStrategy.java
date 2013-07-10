@@ -19,7 +19,7 @@ import org.dbunit.dataset.IDataSet;
 import org.dbunit.operation.DatabaseOperation;
 import org.dbunit.operation.RefreshOperation;
 import org.unitils.core.UnitilsException;
-import org.unitils.dbunit.connection.DbUnitDatabaseConnection;
+import org.unitils.dbunit.connection.DbUnitConnection;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 
 /**
@@ -44,12 +44,12 @@ public class RefreshLoadStrategy implements DataSetLoadStrategy {
     /**
      * Loads the data set using DbUnit's refresh strategy
      *
-     * @param dbUnitDatabaseConnection DbUnit class providing access to the database, not null
-     * @param dataSet                  The dbunit data set, not null
+     * @param dbUnitConnection DbUnit class providing access to the database, not null
+     * @param dataSet          The dbunit data set, not null
      */
-    public void loadDataSet(DbUnitDatabaseConnection dbUnitDatabaseConnection, IDataSet dataSet) {
+    public void loadDataSet(DbUnitConnection dbUnitConnection, IDataSet dataSet) {
         try {
-            refreshOperation.execute(dbUnitDatabaseConnection, dataSet);
+            refreshOperation.execute(dbUnitConnection, dataSet);
 
         } catch (Exception e) {
             throw new UnitilsException("Unable to refresh data set.", e);

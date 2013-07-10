@@ -18,10 +18,10 @@ package org.unitils.dbunit.core;
 import org.dbunit.dataset.IDataSet;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.dbunit.connection.DbUnitDatabaseConnection;
-import org.unitils.dbunit.connection.DbUnitDatabaseConnectionManager;
+import org.unitils.dbunit.connection.DbUnitConnection;
+import org.unitils.dbunit.connection.DbUnitConnectionManager;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
-import org.unitils.dbunit.datasetfactory.DataSetResolver;
+import org.unitils.dbunit.datasetfactory.DataSetResolvingStrategy;
 import org.unitils.dbunit.datasetfactory.MultiSchemaDataSet;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import org.unitils.mock.Mock;
@@ -44,8 +44,8 @@ public class DataSetServiceLoadDataSetsTest extends UnitilsJUnit4 {
     /* Tested object */
     private DataSetService dataSetService;
 
-    private Mock<DataSetResolver> dataSetResolverMock;
-    private Mock<DbUnitDatabaseConnectionManager> dbUnitDatabaseConnectionManagerMock;
+    private Mock<DataSetResolvingStrategy> dataSetResolverMock;
+    private Mock<DbUnitConnectionManager> dbUnitDatabaseConnectionManagerMock;
     private Mock<Context> contextMock;
 
     private Mock<DataSetFactory> dataSetFactoryMock;
@@ -53,8 +53,8 @@ public class DataSetServiceLoadDataSetsTest extends UnitilsJUnit4 {
     private Mock<DataSetLoadStrategy> dataSetLoadStrategyMock;
     private Mock<DataSetLoadStrategy> defaultDataSetLoadStrategyMock;
     private Mock<MultiSchemaDataSet> multiSchemaDataSetMock;
-    private Mock<DbUnitDatabaseConnection> dbUnitDatabaseConnectionMock1;
-    private Mock<DbUnitDatabaseConnection> dbUnitDatabaseConnectionMock2;
+    private Mock<DbUnitConnection> dbUnitDatabaseConnectionMock1;
+    private Mock<DbUnitConnection> dbUnitDatabaseConnectionMock2;
 
     @Dummy
     private IDataSet dataSet1;
@@ -66,15 +66,17 @@ public class DataSetServiceLoadDataSetsTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        dataSetService = new DataSetService(dataSetResolverMock.getMock(), defaultDataSetFactoryMock.getMock(), defaultDataSetLoadStrategyMock.getMock(),
-                null, dbUnitDatabaseConnectionManagerMock.getMock(), contextMock.getMock());
+        dataSetService = new DataSetService(dataSetResolverMock.getMock(), null, null, dbUnitDatabaseConnectionManagerMock.getMock(), contextMock.getMock());
 
         testFile1 = new File("file1");
         testFile2 = new File("file1");
 
+        contextMock.returns(defaultDataSetLoadStrategyMock).getInstanceOfType(DataSetLoadStrategy.class);
+        contextMock.returns(defaultDataSetFactoryMock).getInstanceOfType(DataSetFactory.class);
+
         multiSchemaDataSetMock.returns(asSet("schema1", "schema2")).getSchemaNames();
-        dbUnitDatabaseConnectionManagerMock.returns(dbUnitDatabaseConnectionMock1).getDbUnitDatabaseConnection("schema1");
-        dbUnitDatabaseConnectionManagerMock.returns(dbUnitDatabaseConnectionMock2).getDbUnitDatabaseConnection("schema2");
+        dbUnitDatabaseConnectionManagerMock.returns(dbUnitDatabaseConnectionMock1).getDbUnitConnection("schema1");
+        dbUnitDatabaseConnectionManagerMock.returns(dbUnitDatabaseConnectionMock2).getDbUnitConnection("schema2");
         multiSchemaDataSetMock.returns(dataSet1).getDataSetForSchema("schema1");
         multiSchemaDataSetMock.returns(dataSet2).getDataSetForSchema("schema2");
     }

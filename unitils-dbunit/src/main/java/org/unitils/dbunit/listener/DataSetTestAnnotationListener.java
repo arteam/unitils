@@ -41,14 +41,20 @@ public class DataSetTestAnnotationListener extends TestAnnotationListener<DataSe
 
 
     @Override
-    public void beforeTestSetUp(TestInstance testInstance, Annotations<DataSet> annotations) {
+    public void beforeTestMethod(TestInstance testInstance, Annotations<DataSet> annotations) {
         DataSet annotation = annotations.getAnnotationWithDefaults();
 
         String[] fileNamesArray = annotation.value();
         List<String> fileNames = fileNamesArray == null ? null : asList(fileNamesArray);
         Class<?> testClass = testInstance.getClassWrapper().getWrappedClass();
         Class<? extends DataSetFactory> dataSetFactoryClass = annotation.factory();
+        if (DataSetFactory.class.equals(dataSetFactoryClass)) {
+            dataSetFactoryClass = null;
+        }
         Class<? extends DataSetLoadStrategy> dataSetLoadStrategyClass = annotation.loadStrategy();
+        if (DataSetLoadStrategy.class.equals(dataSetLoadStrategyClass)) {
+            dataSetLoadStrategyClass = null;
+        }
 
         dataSetService.loadDataSets(fileNames, testClass, dataSetLoadStrategyClass, dataSetFactoryClass);
     }

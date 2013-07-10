@@ -95,7 +95,7 @@ public @interface DataSet {
      * @return An implementation class of {@link DataSetLoadStrategy}. Use the default value {@link DataSetLoadStrategy}
      *         to make use of the default loadStrategy configured in the unitils configuration.
      */
-    @AnnotationDefault("dbunit.defaultDataSetLoadStrategy") Class<? extends DataSetLoadStrategy> loadStrategy() default DataSetLoadStrategy.class;
+    @AnnotationDefault Class<? extends DataSetLoadStrategy> loadStrategy() default DataSetLoadStrategy.class;
 
     /**
      * The factory that needs to be used to read the data set file and create a {@link org.unitils.dbunit.datasetfactory.MultiSchemaDataSet}
@@ -104,5 +104,5 @@ public @interface DataSet {
      * @return An implementation class of {@link DataSetFactory}. Use the default value {@link DataSetFactory}
      *         to make use of the default DataSetLoadStrategy configured in the unitils configuration.
      */
-    @AnnotationDefault("dbunit.defaultDataSetFactory") Class<? extends DataSetFactory> factory() default DataSetFactory.class;
+    @AnnotationDefault Class<? extends DataSetFactory> factory() default DataSetFactory.class;
 }

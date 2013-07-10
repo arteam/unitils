@@ -19,10 +19,13 @@ import org.dbunit.dataset.IDataSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
-import org.unitils.dbunit.connection.DbUnitDatabaseConnection;
-import org.unitils.dbunit.connection.DbUnitDatabaseConnectionManager;
+import org.unitils.dbunit.connection.DbUnitConnection;
+import org.unitils.dbunit.connection.DbUnitConnectionManager;
+import org.unitils.dbunit.dataset.Schema;
+import org.unitils.dbunit.dataset.SchemaFactory;
+import org.unitils.dbunit.dataset.Table;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
-import org.unitils.dbunit.datasetfactory.DataSetResolver;
+import org.unitils.dbunit.datasetfactory.DataSetResolvingStrategy;
 import org.unitils.dbunit.datasetfactory.MultiSchemaDataSet;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
@@ -47,16 +50,17 @@ public class DataSetServiceAssertExpectedDataSetsTest extends UnitilsJUnit4 {
     /* Tested object */
     private DataSetService dataSetService;
 
-    private Mock<DataSetResolver> dataSetResolverMock;
-    private Mock<DbUnitDatabaseConnectionManager> dbUnitDatabaseConnectionManagerMock;
+    private Mock<DataSetResolvingStrategy> dataSetResolverMock;
+    private Mock<DbUnitConnectionManager> dbUnitDatabaseConnectionManagerMock;
     private Mock<DataSetAssert> dataSetAssertMock;
+    private Mock<SchemaFactory> schemaFactoryMock;
     private Mock<Context> contextMock;
 
     private Mock<DataSetFactory> dataSetFactoryMock;
     private Mock<DataSetFactory> defaultDataSetFactoryMock;
     private Mock<MultiSchemaDataSet> multiSchemaDataSetMock;
-    private Mock<DbUnitDatabaseConnection> dbUnitDatabaseConnectionMock1;
-    private Mock<DbUnitDatabaseConnection> dbUnitDatabaseConnectionMock2;
+    private Mock<DbUnitConnection> dbUnitDatabaseConnectionMock1;
+    private Mock<DbUnitConnection> dbUnitDatabaseConnectionMock2;
 
     private Method testMethod;
     @Dummy
@@ -67,26 +71,45 @@ public class DataSetServiceAssertExpectedDataSetsTest extends UnitilsJUnit4 {
     private IDataSet actualDataSet1;
     @Dummy
     private IDataSet actualDataSet2;
+
+    private Schema expectedSchema1;
+    private Schema expectedSchema2;
+    private Schema actualSchema1;
+    private Schema actualSchema2;
+
     private File testFile1;
     private File testFile2;
 
 
     @Before
     public void initialize() throws Exception {
-        dataSetService = new DataSetService(dataSetResolverMock.getMock(), defaultDataSetFactoryMock.getMock(), null,
-                dataSetAssertMock.getMock(), dbUnitDatabaseConnectionManagerMock.getMock(), contextMock.getMock());
+        dataSetService = new DataSetService(dataSetResolverMock.getMock(), dataSetAssertMock.getMock(), schemaFactoryMock.getMock(),
+                dbUnitDatabaseConnectionManagerMock.getMock(), contextMock.getMock());
 
         testMethod = MyClass.class.getMethod("testMethod");
         testFile1 = new File("file1");
         testFile2 = new File("file1");
+        expectedSchema1 = new Schema("schema1");
+        expectedSchema1.addTable(new Table("table1"));
+        expectedSchema1.addTable(new Table("table2"));
+        expectedSchema2 = new Schema("schema2");
+        expectedSchema2.addTable(new Table("table3"));
+        actualSchema1 = new Schema("schema1");
+        actualSchema2 = new Schema("schema2");
+
+        contextMock.returns(defaultDataSetFactoryMock).getInstanceOfType(DataSetFactory.class);
 
         multiSchemaDataSetMock.returns(asSet("schema1", "schema2")).getSchemaNames();
-        dbUnitDatabaseConnectionManagerMock.returns(dbUnitDatabaseConnectionMock1).getDbUnitDatabaseConnection("schema1");
-        dbUnitDatabaseConnectionManagerMock.returns(dbUnitDatabaseConnectionMock2).getDbUnitDatabaseConnection("schema2");
+        dbUnitDatabaseConnectionManagerMock.returns(dbUnitDatabaseConnectionMock1).getDbUnitConnection("schema1");
+        dbUnitDatabaseConnectionManagerMock.returns(dbUnitDatabaseConnectionMock2).getDbUnitConnection("schema2");
         dbUnitDatabaseConnectionMock1.returns(actualDataSet1).createDataSet();
         dbUnitDatabaseConnectionMock2.returns(actualDataSet2).createDataSet();
         multiSchemaDataSetMock.returns(expectedDataSet1).getDataSetForSchema("schema1");
         multiSchemaDataSetMock.returns(expectedDataSet2).getDataSetForSchema("schema2");
+        schemaFactoryMock.returns(expectedSchema1).createSchemaForDbUnitDataSet("schema1", expectedDataSet1);
+        schemaFactoryMock.returns(expectedSchema2).createSchemaForDbUnitDataSet("schema2", expectedDataSet2);
+        schemaFactoryMock.returns(actualSchema1).createSchemaForDbUnitDataSet("schema1", actualDataSet1, asList("table1", "table2"));
+        schemaFactoryMock.returns(actualSchema2).createSchemaForDbUnitDataSet("schema2", actualDataSet2, asList("table3"));
     }
 
 
@@ -98,9 +121,9 @@ public class DataSetServiceAssertExpectedDataSetsTest extends UnitilsJUnit4 {
 
         dataSetService.assertExpectedDataSets(asList("dataSet1.xml", "dataSet2.xml"), testMethod, MyClass.class, null);
 
-        dataSetAssertMock.assertInvoked().assertEqualDbUnitDataSets("schema1", expectedDataSet1, actualDataSet1);
+        dataSetAssertMock.assertInvoked().assertEqualSchemas(expectedSchema1, actualSchema1);
         dbUnitDatabaseConnectionMock1.assertInvoked().closeJdbcConnection();
-        dataSetAssertMock.assertInvoked().assertEqualDbUnitDataSets("schema2", expectedDataSet2, actualDataSet2);
+        dataSetAssertMock.assertInvoked().assertEqualSchemas(expectedSchema2, actualSchema2);
         dbUnitDatabaseConnectionMock2.assertInvoked().closeJdbcConnection();
     }
 
@@ -112,7 +135,7 @@ public class DataSetServiceAssertExpectedDataSetsTest extends UnitilsJUnit4 {
 
         dataSetService.assertExpectedDataSets(null, testMethod, MyClass.class, null);
 
-        dataSetAssertMock.assertInvoked().assertEqualDbUnitDataSets("schema1", expectedDataSet1, actualDataSet1);
+        dataSetAssertMock.assertInvoked().assertEqualSchemas(expectedSchema1, actualSchema1);
     }
 
     @Test
@@ -123,7 +146,18 @@ public class DataSetServiceAssertExpectedDataSetsTest extends UnitilsJUnit4 {
 
         dataSetService.assertExpectedDataSets(Collections.<String>emptyList(), testMethod, MyClass.class, null);
 
-        dataSetAssertMock.assertInvoked().assertEqualDbUnitDataSets("schema1", expectedDataSet1, actualDataSet1);
+        dataSetAssertMock.assertInvoked().assertEqualSchemas(expectedSchema1, actualSchema1);
+    }
+
+    @Test
+    public void useDefaultFileWithoutMethodNameWhenMethodIsNull() {
+        defaultDataSetFactoryMock.returns("txt").getDataSetFileExtension();
+        dataSetResolverMock.returns(testFile1).resolve(MyClass.class, "DataSetServiceAssertExpectedDataSetsTest$MyClass-result.txt");
+        defaultDataSetFactoryMock.returns(multiSchemaDataSetMock).createDataSet(asList(testFile1));
+
+        dataSetService.assertExpectedDataSets(null, null, MyClass.class, null);
+
+        dataSetAssertMock.assertInvoked().assertEqualSchemas(expectedSchema1, actualSchema1);
     }
 
     @Test
@@ -134,7 +168,7 @@ public class DataSetServiceAssertExpectedDataSetsTest extends UnitilsJUnit4 {
 
         dataSetService.assertExpectedDataSets(asList("dataSet1.xml"), testMethod, MyClass.class, MyDataSetFactory.class);
 
-        dataSetAssertMock.assertInvoked().assertEqualDbUnitDataSets("schema1", expectedDataSet1, actualDataSet1);
+        dataSetAssertMock.assertInvoked().assertEqualSchemas(expectedSchema1, actualSchema1);
     }
 
     @Test
@@ -145,7 +179,7 @@ public class DataSetServiceAssertExpectedDataSetsTest extends UnitilsJUnit4 {
 
         dataSetService.assertExpectedDataSets(asList("dataSet1.xml"), testMethod, MyClass.class, null);
 
-        dataSetAssertMock.assertNotInvoked().assertEqualDbUnitDataSets(null, null, null);
+        dataSetAssertMock.assertNotInvoked().assertEqualSchemas(null, null);
     }
 
     @Test

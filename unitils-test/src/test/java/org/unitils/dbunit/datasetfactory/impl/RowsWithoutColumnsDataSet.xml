@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+
+    <TABLE_A/>
+    <TABLE_B/>
+    <TABLE_B COLUMN="1"/>
+    <TABLE_B/>
+
+</dataset>

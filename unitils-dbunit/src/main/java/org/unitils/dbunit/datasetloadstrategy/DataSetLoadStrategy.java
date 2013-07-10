@@ -16,7 +16,7 @@
 package org.unitils.dbunit.datasetloadstrategy;
 
 import org.dbunit.dataset.IDataSet;
-import org.unitils.dbunit.connection.DbUnitDatabaseConnection;
+import org.unitils.dbunit.connection.DbUnitConnection;
 
 /**
  * Defines the contract for implementations that specify an operation that needs to be executed on the database, given
@@ -39,8 +39,8 @@ public interface DataSetLoadStrategy {
      * Executes this DataSetLoadStrategy. This means the given data set is inserted in the database using the given dbUnit
      * database connection object.
      *
-     * @param dbUnitDatabaseConnection DbUnit class providing access to the database, not null
-     * @param dataSet                  The dbunit data set, not null
+     * @param dbUnitConnection DbUnit class providing access to the database, not null
+     * @param dataSet          The dbunit data set, not null
      */
-    void loadDataSet(DbUnitDatabaseConnection dbUnitDatabaseConnection, IDataSet dataSet);
+    void loadDataSet(DbUnitConnection dbUnitConnection, IDataSet dataSet);
 }
