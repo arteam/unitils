@@ -14,39 +14,34 @@
  * limitations under the License.
  */
 
-package org.unitils.io.reader.impl;
+package org.unitils.io.reader;
 
 import org.junit.Test;
-import org.unitils.io.reader.FileResolvingStrategyFactory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyReflectionEquals;
 
 /**
  * @author Tim Ducheyne
  * @author Jeroen Horemans
  * @since 3.3
  */
-public class DefaultFileResolvingStrategyFactoryTest {
+public class FileResolvingStrategyFactoryTest {
 
-
-    //This test is failing for now --> as intended.
     @Test
     public void defaultSetup() {
         FileResolvingStrategyFactory defaultFileResolvingStrategyFactory = new FileResolvingStrategyFactory("true", "prefix");
-        DefaultFileResolvingStrategy fileResolvingStrategy = (DefaultFileResolvingStrategy) defaultFileResolvingStrategyFactory.create();
 
-
-        assertEquals("prefix", fileResolvingStrategy.fileResolver.getPathPrefix());
-        assertTrue(fileResolvingStrategy.fileResolver.isPrefixWithPackageName());
+        FileResolvingStrategy fileResolvingStrategy = defaultFileResolvingStrategyFactory.create();
+        assertPropertyReflectionEquals("fileResolver.pathPrefix", "prefix", fileResolvingStrategy);
+        assertPropertyReflectionEquals("fileResolver.prefixWithPackageName", true, fileResolvingStrategy);
     }
 
     @Test
     public void emptyPathPrefix() {
         FileResolvingStrategyFactory defaultFileResolvingStrategyFactory = new FileResolvingStrategyFactory("true", "");
 
-        DefaultFileResolvingStrategy fileResolvingStrategy = (DefaultFileResolvingStrategy) defaultFileResolvingStrategyFactory.create();
-        assertEquals("", fileResolvingStrategy.fileResolver.getPathPrefix());
+        FileResolvingStrategy fileResolvingStrategy = defaultFileResolvingStrategyFactory.create();
+        assertPropertyReflectionEquals("fileResolver.pathPrefix", "", fileResolvingStrategy);
     }
 
 }
