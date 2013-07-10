@@ -37,6 +37,12 @@ public class IOUnitilsReadFileContentTest {
     }
 
     @Test
+    public void defaultFileNameUsingTestClass() {
+        String stringContent = readFileContent(String.class, IOUnitilsReadFileContentTest.class);
+        assertEquals("testFile", stringContent);
+    }
+
+    @Test
     public void defaultFileNameWithPropertiesContent() {
         Properties propertiesContent = readFileContent(Properties.class, this);
         assertEquals("testFile", propertiesContent.getProperty("testFile"));
