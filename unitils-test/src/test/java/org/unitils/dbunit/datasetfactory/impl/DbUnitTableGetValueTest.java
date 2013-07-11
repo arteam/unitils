@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
+import static org.dbunit.dataset.ITable.NO_VALUE;
 import static org.dbunit.dataset.datatype.DataType.VARCHAR;
 import static org.junit.Assert.*;
 
@@ -42,6 +43,7 @@ public class DbUnitTableGetValueTest {
         dbUnitTable.addColumn(new Column("column2", VARCHAR));
         dbUnitTable.addRow(asList("111", "222"));
         dbUnitTable.addRow(asList("333"));
+        dbUnitTable.addRow(asList(null, "444"));
     }
 
 
@@ -53,8 +55,14 @@ public class DbUnitTableGetValueTest {
     }
 
     @Test
-    public void nullWhenNoValue() throws Exception {
+    public void noValueWhenNoValue() throws Exception {
         Object result = dbUnitTable.getValue(1, "column2");
+        assertEquals(NO_VALUE, result);
+    }
+
+    @Test
+    public void nullValue() throws Exception {
+        Object result = dbUnitTable.getValue(2, "column1");
         assertNull(result);
     }
 
@@ -71,10 +79,10 @@ public class DbUnitTableGetValueTest {
     @Test
     public void exceptionWhenRowIndexTooHigh() throws Exception {
         try {
-            dbUnitTable.getValue(2, "column1");
+            dbUnitTable.getValue(3, "column1");
             fail("RowOutOfBoundsException expected");
         } catch (RowOutOfBoundsException e) {
-            assertEquals("2 >= 2", e.getMessage());
+            assertEquals("3 >= 3", e.getMessage());
         }
     }
 

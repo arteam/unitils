@@ -15,14 +15,24 @@
  */
 package org.unitils.dbunit;
 
+import org.dbunit.dataset.Column;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.core.UnitilsException;
 import org.unitils.dbunit.annotation.DataSet;
+import org.unitils.dbunit.datasetfactory.DataSetFactory;
+import org.unitils.dbunit.datasetfactory.MultiSchemaDataSet;
+import org.unitils.dbunit.datasetfactory.impl.DbUnitDataSet;
+import org.unitils.dbunit.datasetfactory.impl.DbUnitTable;
 import org.unitilsnew.UnitilsJUnit4;
 
+import java.io.File;
 import java.sql.SQLException;
+import java.util.List;
 
+import static java.util.Arrays.asList;
+import static org.dbunit.dataset.datatype.DataType.VARCHAR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.unitils.database.SqlUnitils.executeUpdate;
@@ -84,6 +94,7 @@ public class DbUnitUnitilsAssertExpectedDataSetIntegrationTest extends UnitilsJU
                     "    PK, COLUMN1, COLUMN2\n" +
                     "    \"1\", \"value1\", \"value2\"\n" +
                     "    \"2\", \"value2\", \"value3\"\n" +
+                    "    \"3\", \"\", \"value4\"\n" +
                     "  public.TABLE_B\n" +
                     "    COLUMN1, COLUMN2\n" +
                     "    \"aaa\", null\n" +
@@ -106,7 +117,8 @@ public class DbUnitUnitilsAssertExpectedDataSetIntegrationTest extends UnitilsJU
                     "  public.TABLE_A\n" +
                     "    PK, COLUMN1, COLUMN2\n" +
                     "    \"1\", \"value1\", \"value2\"\n" +
-                    "    \"2\", \"value2\", \"value3\"\n", e.getMessage());
+                    "    \"2\", \"value2\", \"value3\"\n" +
+                    "    \"3\", \"\", \"value4\"\n", e.getMessage());
         }
     }
 
@@ -132,6 +144,7 @@ public class DbUnitUnitilsAssertExpectedDataSetIntegrationTest extends UnitilsJU
                     "    PK, COLUMN1, COLUMN2\n" +
                     "    \"1\", \"value1\", \"value2\"\n" +
                     "    \"2\", \"value2\", \"value3\"\n" +
+                    "    \"3\", \"\", \"value4\"\n" +
                     "  public.TABLE_B\n" +
                     "    COLUMN1, COLUMN2\n" +
                     "    \"aaa\", null\n" +
@@ -151,42 +164,96 @@ public class DbUnitUnitilsAssertExpectedDataSetIntegrationTest extends UnitilsJU
                     "  public.TABLE_A\n" +
                     "    PK, COLUMN1, COLUMN2\n" +
                     "    \"1\", \"value1\", \"value2\"\n" +
-                    "    \"2\", \"value2\", \"value3\"\n", e.getMessage());
+                    "    \"2\", \"value2\", \"value3\"\n" +
+                    "    \"3\", \"\", \"value4\"\n", e.getMessage());
         }
+    }
+
+    @Test
+    public void assertingNullValue() throws Exception {
+        assertExpectedDataSet(this, "DbUnitUnitilsAssertExpectedDataSetIntegrationTest-nullValue.xml");
     }
 
     @Test
     public void exceptionWhenExpectingNullValueButWasNot() throws Exception {
         try {
-            // todo implement
+            assertExpectedDataSet(this, "DbUnitUnitilsAssertExpectedDataSetIntegrationTest-notNullValue.xml");
             fail("AssertionError expected");
         } catch (AssertionError e) {
             assertEquals("Assertion failed. Differences found between the expected data set and actual database content.\n" +
-                    "Expected table to be empty but found rows for table public.TABLE_A\n" +
+                    "Found differences for table public.TABLE_A:\n" +
+                    "  Different row:\n" +
+                    "    pk, column1, column2\n" +
+                    "    \"2\", null, \"value3\"\n" +
+                    "  Best matching differences:\n" +
+                    "    column1: null <-> \"value2\"\n" +
                     "Actual database content:\n" +
                     "  public.TABLE_A\n" +
                     "    PK, COLUMN1, COLUMN2\n" +
                     "    \"1\", \"value1\", \"value2\"\n" +
-                    "    \"2\", \"value2\", \"value3\"\n", e.getMessage());
+                    "    \"2\", \"value2\", \"value3\"\n" +
+                    "    \"3\", \"\", \"value4\"\n", e.getMessage());
         }
+    }
+
+    @Test
+    public void assertingEmptyValue() throws Exception {
+        assertExpectedDataSet(this, "DbUnitUnitilsAssertExpectedDataSetIntegrationTest-emptyValue.xml");
     }
 
     @Test
     public void exceptionWhenExpectingEmptyValueButWasNot() throws Exception {
         try {
-            // todo implement
+            assertExpectedDataSet(this, "DbUnitUnitilsAssertExpectedDataSetIntegrationTest-notEmptyValue.xml");
             fail("AssertionError expected");
         } catch (AssertionError e) {
             assertEquals("Assertion failed. Differences found between the expected data set and actual database content.\n" +
-                    "Expected table to be empty but found rows for table public.TABLE_A\n" +
+                    "Found differences for table public.TABLE_A:\n" +
+                    "  Different row:\n" +
+                    "    pk, column1, column2\n" +
+                    "    \"2\", \"\", \"value3\"\n" +
+                    "  Best matching differences:\n" +
+                    "    column1: \"\" <-> \"value2\"\n" +
                     "Actual database content:\n" +
                     "  public.TABLE_A\n" +
                     "    PK, COLUMN1, COLUMN2\n" +
                     "    \"1\", \"value1\", \"value2\"\n" +
-                    "    \"2\", \"value2\", \"value3\"\n", e.getMessage());
+                    "    \"2\", \"value2\", \"value3\"\n" +
+                    "    \"3\", \"\", \"value4\"\n", e.getMessage());
         }
     }
 
+    @Test
+    public void customFactory() throws Exception {
+        assertExpectedDataSet(this, CustomDataSetFactory.class, "DbUnitUnitilsAssertExpectedDataSetIntegrationTest-emptyTable.xml");
+    }
+
+    @Test
+    public void exceptionWhenFileNotFound() throws Exception {
+        try {
+            assertExpectedDataSet(this, "xxx");
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to resolve data set with name xxx for test class class org.unitils.dbunit.DbUnitUnitilsAssertExpectedDataSetIntegrationTest\n" +
+                    "Reason: File with name org/unitils/dbunit/xxx cannot be found.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void exceptionWhenInvalidDataSet() throws Exception {
+        try {
+            assertExpectedDataSet(this, "DbUnitUnitilsAssertExpectedDataSetIntegrationTest-invalid.xml");
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to read data set file DbUnitUnitilsAssertExpectedDataSetIntegrationTest-invalid.xml\n" +
+                    "Reason: SAXParseException: Content is not allowed in prolog.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void constructionForCoverage() {
+        new DbUnitUnitils();
+    }
 
     private void createTestTable() throws SQLException {
         executeUpdate("create table TABLE_A (pk varchar(2) primary key, column1 varchar(10), column2 varchar(10))");
@@ -196,5 +263,26 @@ public class DbUnitUnitilsAssertExpectedDataSetIntegrationTest extends UnitilsJU
     private void dropTestTable() throws SQLException {
         executeUpdateQuietly("drop table TABLE_A");
         executeUpdateQuietly("drop table TABLE_B");
+    }
+
+    public static class CustomDataSetFactory implements DataSetFactory {
+
+        public String getDataSetFileExtension() {
+            return "xml";
+        }
+
+        public MultiSchemaDataSet createDataSet(List<File> dataSetFiles) {
+            DbUnitTable tableA = new DbUnitTable("table_a");
+            tableA.addColumn(new Column("pk", VARCHAR));
+            tableA.addColumn(new Column("column1", VARCHAR));
+            tableA.addRow(asList("1", "value1"));
+
+            DbUnitDataSet dataSet = new DbUnitDataSet();
+            dataSet.addTable(tableA);
+
+            MultiSchemaDataSet multiSchemaDataSet = new MultiSchemaDataSet();
+            multiSchemaDataSet.setDataSetForSchema("public", dataSet);
+            return multiSchemaDataSet;
+        }
     }
 }

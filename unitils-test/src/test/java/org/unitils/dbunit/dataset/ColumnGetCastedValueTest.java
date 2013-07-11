@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
 
+import static org.dbunit.dataset.ITable.NO_VALUE;
 import static org.dbunit.dataset.datatype.DataType.BIGINT;
 import static org.dbunit.dataset.datatype.DataType.VARCHAR;
 import static org.junit.Assert.assertEquals;
@@ -48,6 +49,14 @@ public class ColumnGetCastedValueTest {
     @Test
     public void nullWhenValueIsNull() {
         column = new Column("name", BIGINT, null);
+
+        Object result = column.getCastedValue(VARCHAR);
+        assertNull(result);
+    }
+
+    @Test
+    public void nullWhenValueIsNoValue() {
+        column = new Column("name", BIGINT, NO_VALUE);
 
         Object result = column.getCastedValue(VARCHAR);
         assertNull(result);

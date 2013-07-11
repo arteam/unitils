@@ -34,6 +34,7 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 
 import static java.util.Arrays.asList;
+import static org.dbunit.dataset.ITable.NO_VALUE;
 import static org.junit.Assert.*;
 import static org.unitils.reflectionassert.ReflectionAssert.*;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.toFile;
@@ -83,9 +84,9 @@ public class MultiSchemaXmlDataSetFactoryCreateDataSetTest extends UnitilsJUnit4
         assertEquals("1", table.getValue(0, "COLUMN_1"));
         assertEquals("2", table.getValue(0, "COLUMN_2"));
         assertEquals("3", table.getValue(0, "COLUMN_3"));
-        assertEquals(null, table.getValue(1, "COLUMN_1"));
+        assertEquals(NO_VALUE, table.getValue(1, "COLUMN_1"));
         assertEquals("4", table.getValue(1, "COLUMN_2"));
-        assertEquals(null, table.getValue(1, "COLUMN_3"));
+        assertEquals(NO_VALUE, table.getValue(1, "COLUMN_3"));
         // no more tables
         assertFalse(tableIterator.next());
     }
@@ -108,9 +109,9 @@ public class MultiSchemaXmlDataSetFactoryCreateDataSetTest extends UnitilsJUnit4
         ITable table = tableIterator.getTable();
         assertPropertyReflectionEquals("columnName", asList("COLUMN_2", "COLUMN_1", "COLUMN_3"), asList(table.getTableMetaData().getColumns()));
         assertEquals(2, table.getRowCount());
-        assertEquals(null, table.getValue(0, "COLUMN_1"));
+        assertEquals(NO_VALUE, table.getValue(0, "COLUMN_1"));
         assertEquals("4", table.getValue(0, "COLUMN_2"));
-        assertEquals(null, table.getValue(0, "COLUMN_3"));
+        assertEquals(NO_VALUE, table.getValue(0, "COLUMN_3"));
         assertEquals("1", table.getValue(1, "COLUMN_1"));
         assertEquals("2", table.getValue(1, "COLUMN_2"));
         assertEquals("3", table.getValue(1, "COLUMN_3"));
@@ -133,10 +134,10 @@ public class MultiSchemaXmlDataSetFactoryCreateDataSetTest extends UnitilsJUnit4
         assertEquals(3, tableA1.getRowCount());
         assertPropertyReflectionEquals("columnName", asList("COLUMN_1", "COLUMN_2"), asList(tableA1.getTableMetaData().getColumns()));
         assertEquals("1", tableA1.getValue(0, "COLUMN_1"));
-        assertEquals(null, tableA1.getValue(0, "COLUMN_2"));
+        assertEquals(NO_VALUE, tableA1.getValue(0, "COLUMN_2"));
         assertEquals("3", tableA1.getValue(1, "COLUMN_1"));
-        assertEquals(null, tableA1.getValue(1, "COLUMN_2"));
-        assertEquals(null, tableA1.getValue(2, "COLUMN_1"));
+        assertEquals(NO_VALUE, tableA1.getValue(1, "COLUMN_2"));
+        assertEquals(NO_VALUE, tableA1.getValue(2, "COLUMN_1"));
         assertEquals("5", tableA1.getValue(2, "COLUMN_2"));
 
         // schema B should contain table_a and table_b

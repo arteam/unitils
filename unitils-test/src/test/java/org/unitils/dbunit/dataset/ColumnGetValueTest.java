@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.unitils.dbunit.dataset;
 
 import org.junit.Test;
 
+import static org.dbunit.dataset.ITable.NO_VALUE;
 import static org.dbunit.dataset.datatype.DataType.VARCHAR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -38,6 +39,14 @@ public class ColumnGetValueTest {
     @Test
     public void nullValue() {
         Column column = new Column("name", VARCHAR, null);
+
+        Object result = column.getValue();
+        assertNull(result);
+    }
+
+    @Test
+    public void nullWhenNoValue() {
+        Column column = new Column("name", VARCHAR, NO_VALUE);
 
         Object result = column.getValue();
         assertNull(result);
