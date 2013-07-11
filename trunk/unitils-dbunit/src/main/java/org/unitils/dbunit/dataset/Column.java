@@ -20,6 +20,8 @@ import org.dbunit.dataset.datatype.TypeCastException;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbunit.dataset.comparison.ColumnDifference;
 
+import static org.dbunit.dataset.ITable.NO_VALUE;
+
 /**
  * A column in a data set row
  *
@@ -68,6 +70,9 @@ public class Column {
      * @return The actual value with a type corresponding the column type, e.g. String for varchar, can be null
      */
     public Object getValue() {
+        if (value == NO_VALUE) {
+            return null;
+        }
         return value;
     }
 
@@ -79,6 +84,7 @@ public class Column {
      * @throws UnitilsException When the value cannot be cast
      */
     public Object getCastedValue(DataType castType) {
+        Object value = getValue();
         try {
             return castType.typeCast(value);
         } catch (TypeCastException e) {
@@ -94,6 +100,10 @@ public class Column {
      * @return The difference, null if none found
      */
     public ColumnDifference compare(Column actualColumn) {
+        if (value == NO_VALUE) {
+            // skip, no value to compare
+            return null;
+        }
         if (value == actualColumn.getValue()) {
             return null;
         }

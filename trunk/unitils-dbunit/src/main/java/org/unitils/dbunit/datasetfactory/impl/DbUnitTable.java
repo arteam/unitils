@@ -63,7 +63,7 @@ public class DbUnitTable extends AbstractTable {
         int columnIndex = tableMetaData.getColumnIndex(columnName);
         List<?> row = rows.get(rowIndex);
         if (columnIndex >= row.size()) {
-            return null;
+            return NO_VALUE;
         }
         return row.get(columnIndex);
     }

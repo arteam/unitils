@@ -21,11 +21,13 @@ import org.unitils.dbunit.datasetfactory.DataSetFactory;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import org.unitilsnew.core.TestAnnotationListener;
 import org.unitilsnew.core.TestInstance;
+import org.unitilsnew.core.TestPhase;
 import org.unitilsnew.core.reflect.Annotations;
 
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.unitilsnew.core.TestPhase.SETUP;
 
 /**
  * @author Tim Ducheyne
@@ -39,6 +41,11 @@ public class DataSetTestAnnotationListener extends TestAnnotationListener<DataSe
         this.dataSetService = dataSetService;
     }
 
+
+    @Override
+    public TestPhase getTestPhase() {
+        return SETUP;
+    }
 
     @Override
     public void beforeTestMethod(TestInstance testInstance, Annotations<DataSet> annotations) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.unitils.dbunit.dataset.comparison.ColumnDifference;
 import java.math.BigInteger;
 import java.util.Date;
 
+import static org.dbunit.dataset.ITable.NO_VALUE;
 import static org.dbunit.dataset.datatype.DataType.*;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -81,6 +82,15 @@ public class ColumnCompareTest {
     @Test
     public void equalWhenCastedValueIsEqual() {
         Column column = new Column("name", VARCHAR, "111");
+        Column actualColumn = new Column("name", BIGINT, new BigInteger("111"));
+
+        ColumnDifference result = column.compare(actualColumn);
+        assertNull(result);
+    }
+
+    @Test
+    public void equalWhenNoValue() {
+        Column column = new Column("name", VARCHAR, NO_VALUE);
         Column actualColumn = new Column("name", BIGINT, new BigInteger("111"));
 
         ColumnDifference result = column.compare(actualColumn);

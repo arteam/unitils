@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static org.dbunit.dataset.ITable.NO_VALUE;
 import static org.dbunit.dataset.datatype.DataType.VARCHAR;
 import static org.junit.Assert.assertEquals;
 
@@ -45,13 +46,29 @@ public class DbUnitTableAddRowTest {
     @Test
     public void addRow() throws Exception {
         dbUnitTable.addRow(asList("111", "222"));
-        dbUnitTable.addRow(asList("333"));
+        dbUnitTable.addRow(asList("333", "444"));
 
         assertEquals(2, dbUnitTable.getRowCount());
         assertEquals("111", dbUnitTable.getValue(0, "column1"));
         assertEquals("222", dbUnitTable.getValue(0, "column2"));
         assertEquals("333", dbUnitTable.getValue(1, "column1"));
-        assertEquals(null, dbUnitTable.getValue(1, "column2"));
+        assertEquals("444", dbUnitTable.getValue(1, "column2"));
+    }
+
+    @Test
+    public void noValueWhenNoValueWasSpecified() throws Exception {
+        dbUnitTable.addRow(asList("111"));
+
+        assertEquals("111", dbUnitTable.getValue(0, "column1"));
+        assertEquals(NO_VALUE, dbUnitTable.getValue(0, "column2"));
+    }
+
+    @Test
+    public void nullValue() throws Exception {
+        dbUnitTable.addRow(asList(null, "222"));
+
+        assertEquals(null, dbUnitTable.getValue(0, "column1"));
+        assertEquals("222", dbUnitTable.getValue(0, "column2"));
     }
 
     @Test
@@ -59,7 +76,7 @@ public class DbUnitTableAddRowTest {
         dbUnitTable.addRow(emptyList());
 
         assertEquals(1, dbUnitTable.getRowCount());
-        assertEquals(null, dbUnitTable.getValue(0, "column1"));
-        assertEquals(null, dbUnitTable.getValue(0, "column2"));
+        assertEquals(NO_VALUE, dbUnitTable.getValue(0, "column1"));
+        assertEquals(NO_VALUE, dbUnitTable.getValue(0, "column2"));
     }
 }

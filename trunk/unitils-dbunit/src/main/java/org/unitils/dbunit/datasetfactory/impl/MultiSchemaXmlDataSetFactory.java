@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.dbunit.dataset.ITable.NO_VALUE;
 import static org.dbunit.dataset.datatype.DataType.UNKNOWN;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
@@ -128,7 +129,6 @@ public class MultiSchemaXmlDataSetFactory implements DataSetFactory {
         }
     }
 
-
     /**
      * Factory method for creating the SAX xml reader.
      *
@@ -221,7 +221,6 @@ public class MultiSchemaXmlDataSetFactory implements DataSetFactory {
             addRow(attributes, table);
         }
 
-
         /**
          * Gets column names and row values from the given attribute and adds a new row to the given table.
          *
@@ -238,7 +237,10 @@ public class MultiSchemaXmlDataSetFactory implements DataSetFactory {
             }
             List<Object> row = new ArrayList<Object>(10);
             for (String columnName : table.getColumnNames()) {
-                Object value = attributes.getValue(columnName);
+                Object value = NO_VALUE;
+                if (attributes.getIndex(columnName) != -1) {
+                    value = attributes.getValue(columnName);
+                }
                 row.add(value);
             }
             table.addRow(row);
