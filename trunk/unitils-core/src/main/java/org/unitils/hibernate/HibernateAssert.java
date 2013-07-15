@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ public class HibernateAssert {
      * @param databaseDialect The database dialect, not null
      * @return String[] array of DDL statements that were needed to keep the database in sync with the mapping file
      */
-    private static String[] generateDatabaseUpdateScript(Configuration configuration, Session session, Dialect databaseDialect) {
+    protected static String[] generateDatabaseUpdateScript(Configuration configuration, Session session, Dialect databaseDialect) {
         try {
             DatabaseMetadata dbm = new DatabaseMetadata(session.connection(), databaseDialect);
             return configuration.generateSchemaUpdateScript(databaseDialect, dbm);
@@ -79,14 +79,13 @@ public class HibernateAssert {
         }
     }
 
-
     /**
      * Formats the given list of messages.
      *
      * @param messageParts The different parts of the message
      * @return A formatted message, containing the different message parts.
      */
-    private static String formatErrorMessage(List<String> messageParts) {
+    protected static String formatErrorMessage(List<String> messageParts) {
         StringBuilder message = new StringBuilder();
         for (String messagePart : messageParts) {
             message.append(messagePart);
@@ -94,5 +93,4 @@ public class HibernateAssert {
         }
         return message.toString();
     }
-
 }

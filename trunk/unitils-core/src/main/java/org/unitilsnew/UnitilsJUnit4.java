@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,12 @@ import org.junit.runner.RunWith;
 
 /**
  * Base test class that will Unitils-enable your test. This base class will make sure that the
- * core unitils test listener methods are invoked in the expected order. See {@link org.unitils.core.TestListener} for
- * more information on the listener invocation order.
+ * core unitils test listener methods are invoked in the expected order.
  * <p/>
  * This actually is an empty test class that only instructs JUnit4 to use a custom test runner for the test.
  * As an alternative to subclassing this class, you could also add the @RunWith(UnitilsBlockJUnit4TestClassRunner.class) to
  * your test base class.
  * <p/>
- * <p/>
- * Tests run: 2002, Failures: 71, Errors: 168, Skipped: 2  'old' junit
- * Tests run: 2002, Failures: 92, Errors: 232, Skipped: 2 new deprecated junit.
- * Tests run: 2002, Failures: 91, Errors: 289, Skipped: 2 'new junit'
  *
  * @author Tim Ducheyne
  */

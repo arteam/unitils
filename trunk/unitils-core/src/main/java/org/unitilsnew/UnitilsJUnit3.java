@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,7 @@ import java.lang.reflect.Method;
 
 /**
  * Base test class that will Unitils-enable your test. This base class will make sure that the
- * core unitils test listener methods are invoked in the expected order. See {@link org.unitils.core.TestListener} for
- * more information on the listener invocation order.
+ * core unitils test listener methods are invoked in the expected order.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -57,7 +56,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
 
 
     /**
-     * Overridden JUnit3 method to be able to call {@link org.unitils.core.TestListener#beforeTestSetUp} and {@link org.unitils.core.TestListener#afterTestTearDown}.
+     * Overridden JUnit3 method to be able to call beforeTestSetUp and afterTestTearDown.
      *
      * @throws Throwable If an error occurs during the test
      */
@@ -96,8 +95,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
 
 
     /**
-     * Overridden JUnit3 method to be able to call {@link org.unitils.core.TestListener#beforeTestMethod} and
-     * {@link org.unitils.core.TestListener#afterTestMethod}.
+     * Overridden JUnit3 method to be able to call beforeTestMethod and afterTestMethod.
      *
      * @throws Throwable If an error occurs during the test
      */

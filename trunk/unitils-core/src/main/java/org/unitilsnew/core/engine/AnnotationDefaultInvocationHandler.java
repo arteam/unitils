@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,8 @@ import static org.apache.commons.lang.StringUtils.isBlank;
  */
 public class AnnotationDefaultInvocationHandler<A extends Annotation> implements InvocationHandler {
 
-    private List<A> annotations;
-    private Configuration configuration;
+    protected List<A> annotations;
+    protected Configuration configuration;
 
 
     public AnnotationDefaultInvocationHandler(List<A> annotations, Configuration configuration) {

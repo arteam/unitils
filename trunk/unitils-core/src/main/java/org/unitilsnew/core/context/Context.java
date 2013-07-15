@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import java.util.Map;
 public class Context {
 
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(Context.class);
+    protected static Log logger = LogFactory.getLog(Context.class);
 
     protected Configuration configuration;
     protected Map<Key, Object> instances = new HashMap<Key, Object>();
@@ -266,8 +266,8 @@ public class Context {
 
     protected static class Key {
 
-        private Class<?> type;
-        private String[] classifiers;
+        protected Class<?> type;
+        protected String[] classifiers;
 
         public Key(Class<?> type, String... classifiers) {
             this.type = type;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,7 @@ import java.lang.reflect.Method;
  *             <p/>
  *             <p/>
  *             Custom test runner that will Unitils-enable your test. This will make sure that the
- *             core unitils test listener methods are invoked in the expected order. See {@link org.unitils.core.TestListener} for
- *             more information on the listener invocation order.
+ *             core unitils test listener methods are invoked in the expected order.
  *             <p/>
  *             NOTE: if a test fails, the error is logged as debug logging. This is a temporary work-around for
  *             a problem with IntelliJ JUnit-4 runner that reports a 'Wrong test finished' error when something went wrong
@@ -142,7 +141,7 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
 
 
         /**
-         * Overriden JUnit4 method to be able to call {@link org.unitils.core.TestListener#afterTestTearDown}.
+         * Overriden JUnit4 method to be able to call afterTestTearDown.
          */
         @Override
         public void runBeforesThenTestThenAfters(Runnable test) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,7 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 public class UserPropertiesFactory implements Factory<Properties> {
 
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(UserPropertiesFactory.class);
-
+    protected static Log logger = LogFactory.getLog(UserPropertiesFactory.class);
 
     public static final String DEFAULT_UNITILS_PROPERTIES_NAME = "unitils.properties";
     public static final String DEFAULT_LOCAL_PROPERTIES_NAME = "unitils-local.properties";
@@ -111,7 +110,6 @@ public class UserPropertiesFactory implements Factory<Properties> {
     protected void addSystemProperties(Properties properties) {
         properties.putAll(System.getProperties());
     }
-
 
     /**
      * Expands all property place holders to actual values. For example
