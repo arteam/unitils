@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ public enum Defaults {
      * Defaults to the value of the org.unitils.easymock.annotation.LenientMock$Defaults configuration setting.
      */
     DEFAULT,
-
 
     /**
      * All arguments that have default values as expected values will not be checked. E.g. if a null value is recorded
