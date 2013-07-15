@@ -17,9 +17,9 @@ package org.unitils.easymock.core;
 
 import org.easymock.classextension.internal.MocksClassControl;
 import org.easymock.internal.MocksControl;
+import org.unitils.core.annotation.Property;
 import org.unitils.easymock.util.*;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
-import org.unitilsnew.core.annotation.Property;
 
 import java.util.ArrayList;
 import java.util.List;

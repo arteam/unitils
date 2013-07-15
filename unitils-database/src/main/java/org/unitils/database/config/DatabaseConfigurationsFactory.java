@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package org.unitils.database.config;
 
-import org.unitilsnew.core.Factory;
-import org.unitilsnew.core.config.Configuration;
+import org.unitils.core.Factory;
+import org.unitils.core.config.Configuration;
 
 import java.util.HashMap;
 import java.util.List;

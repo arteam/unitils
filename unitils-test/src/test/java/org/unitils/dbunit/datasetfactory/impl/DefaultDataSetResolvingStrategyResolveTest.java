@@ -17,9 +17,9 @@ package org.unitils.dbunit.datasetfactory.impl;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.util.FileResolver;
 import org.unitils.mock.Mock;
-import org.unitilsnew.UnitilsJUnit4;
 
 import java.io.File;
 

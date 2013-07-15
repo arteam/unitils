@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 package org.unitils.database;
 
 import org.springframework.beans.factory.FactoryBean;
+import org.unitils.core.Unitils;
 import org.unitils.database.core.DataSourceService;
-import org.unitilsnew.core.Unitils;
 
 import javax.sql.DataSource;
 

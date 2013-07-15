@@ -16,6 +16,8 @@
 package org.unitilsnew;
 
 
+import org.unitils.UnitilsJUnit4;
+
 /**
  * Base class for the JUnit4 test listener tests.
  *

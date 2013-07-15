@@ -17,8 +17,8 @@ package org.unitils.dbunit.datasetfactory;
 
 import org.dbunit.dataset.IDataSet;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.annotation.Dummy;
-import org.unitilsnew.UnitilsJUnit4;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;

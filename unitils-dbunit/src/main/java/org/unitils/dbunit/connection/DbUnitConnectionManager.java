@@ -20,8 +20,8 @@ import org.apache.commons.logging.LogFactory;
 import org.dbmaintain.database.Database;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
+import org.unitils.core.context.Context;
 import org.unitils.database.dbmaintain.DbMaintainWrapper;
-import org.unitilsnew.core.context.Context;
 
 import javax.sql.DataSource;
 import java.util.HashMap;

@@ -15,10 +15,10 @@
  */
 package org.unitils.dbunit.datasetfactory;
 
+import org.unitils.core.Factory;
+import org.unitils.core.annotation.Property;
 import org.unitils.core.util.FileResolver;
 import org.unitils.dbunit.datasetfactory.impl.DefaultDataSetResolvingStrategy;
-import org.unitilsnew.core.Factory;
-import org.unitilsnew.core.annotation.Property;
 
 /**
  * @author Tim Ducheyne

@@ -15,10 +15,10 @@
  */
 package org.unitils.easymock.listener;
 
+import org.unitils.core.TestInstance;
+import org.unitils.core.TestListener;
+import org.unitils.core.annotation.Property;
 import org.unitils.easymock.core.MockService;
-import org.unitilsnew.core.TestInstance;
-import org.unitilsnew.core.TestListener;
-import org.unitilsnew.core.annotation.Property;
 
 /**
  * @author Tim Ducheyne

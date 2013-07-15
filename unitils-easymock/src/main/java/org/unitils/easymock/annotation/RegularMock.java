@@ -15,10 +15,10 @@
  */
 package org.unitils.easymock.annotation;
 
+import org.unitils.core.annotation.FieldAnnotation;
 import org.unitils.easymock.listener.RegularMockFieldAnnotationListener;
 import org.unitils.easymock.util.Calls;
 import org.unitils.easymock.util.InvocationOrder;
-import org.unitilsnew.core.annotation.FieldAnnotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

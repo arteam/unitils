@@ -15,6 +15,8 @@
  */
 package org.unitilsnew;
 
+import org.unitils.UnitilsJUnit3;
+
 import static org.unitilsnew.TracingTestListener.TestInvocation.TEST_SET_UP;
 import static org.unitilsnew.TracingTestListener.TestInvocation.TEST_TEAR_DOWN;
 

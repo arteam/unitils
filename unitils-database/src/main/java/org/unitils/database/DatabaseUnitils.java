@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ package org.unitils.database;
 
 import org.dbmaintain.database.Database;
 import org.dbmaintain.database.Databases;
+import org.unitils.core.Unitils;
 import org.unitils.database.core.DataSourceService;
 import org.unitils.database.core.DataSourceWrapper;
 import org.unitils.database.core.TransactionManager;
 import org.unitils.database.dbmaintain.DbMaintainWrapper;
-import org.unitilsnew.core.Unitils;
 
 import javax.sql.DataSource;
 

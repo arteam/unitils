@@ -18,6 +18,8 @@ package org.unitils.dbunit.core;
 import org.dbunit.dataset.IDataSet;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.core.context.Context;
 import org.unitils.dbunit.connection.DbUnitConnection;
 import org.unitils.dbunit.connection.DbUnitConnectionManager;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
@@ -26,8 +28,6 @@ import org.unitils.dbunit.datasetfactory.MultiSchemaDataSet;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
-import org.unitilsnew.UnitilsJUnit4;
-import org.unitilsnew.core.context.Context;
 
 import java.io.File;
 import java.util.Collections;

@@ -17,9 +17,9 @@ package org.unitils.dbunit.connection;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
-import org.unitilsnew.UnitilsJUnit4;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

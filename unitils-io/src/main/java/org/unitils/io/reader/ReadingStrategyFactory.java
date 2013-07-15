@@ -16,8 +16,8 @@
 
 package org.unitils.io.reader;
 
+import org.unitils.core.Factory;
 import org.unitils.io.reader.impl.FileReadingStrategy;
-import org.unitilsnew.core.Factory;
 
 /**
  * @author Tim Ducheyne

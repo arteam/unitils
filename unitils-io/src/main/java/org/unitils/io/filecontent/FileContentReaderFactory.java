@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package org.unitils.io.filecontent;
 
+import org.unitils.core.Factory;
+import org.unitils.core.annotation.Property;
+import org.unitils.core.config.Configuration;
 import org.unitils.io.conversion.ConversionStrategy;
 import org.unitils.io.filecontent.impl.DefaultFileContentReader;
 import org.unitils.io.reader.ReadingStrategy;
-import org.unitilsnew.core.Factory;
-import org.unitilsnew.core.annotation.Property;
-import org.unitilsnew.core.config.Configuration;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

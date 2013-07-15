@@ -17,10 +17,10 @@ package org.unitils.dbunit.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.dbunit.dataset.Schema;
 import org.unitils.dbunit.dataset.Table;
 import org.unitils.dbunit.dataset.comparison.SchemaDifference;
-import org.unitilsnew.UnitilsJUnit4;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

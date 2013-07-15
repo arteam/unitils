@@ -1,22 +1,21 @@
 /*
+ * Copyright 2013,  Unitils.org
  *
- *  * Copyright 2010,  Unitils.org
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.unitils.mock.core;
 
+import org.unitils.core.reflect.TypeWrapper;
 import org.unitils.core.util.ObjectToInjectHolder;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.MatchStatement;
@@ -30,7 +29,6 @@ import org.unitils.mock.core.matching.impl.BehaviorDefiningMatchingInvocationHan
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.ExceptionThrowingMockBehavior;
 import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
-import org.unitilsnew.core.reflect.TypeWrapper;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -75,10 +73,10 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
 
     /**
      * Creates a mock of the given type with un-capitalized type name + Mock as name, e.g. myServiceMock.
-     *
+     * <p/>
      * There is no .class literal for generic types. Therefore you need to pass the raw type when mocking generic types.
      * E.g. Mock&lt;List&lt;String&gt;&gt; myMock = new MockObject("myMock", List.class, this);
-     *
+     * <p/>
      * If the mocked type does not correspond to the declared type, a ClassCastException will occur when the mock
      * is used.
      *
@@ -91,13 +89,13 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
 
     /**
      * Creates a mock of the given type.
-     *
+     * <p/>
      * There is no .class literal for generic types. Therefore you need to pass the raw type when mocking generic types.
      * E.g. Mock&lt;List&lt;String&gt;&gt; myMock = new MockObject("myMock", List.class, this);
-     *
+     * <p/>
      * If the mocked type does not correspond to the declared type, a ClassCastException will occur when the mock
      * is used.
-     *
+     * <p/>
      * If no name is given the un-capitalized type name + Mock is used, e.g. myServiceMock
      *
      * @param name       The name of the mock, e.g. the field-name, null for the default

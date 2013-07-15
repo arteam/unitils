@@ -16,7 +16,7 @@
 package org.unitilsnew;
 
 import junit.framework.AssertionFailedError;
-import org.unitilsnew.core.engine.UnitilsTestListener;
+import org.unitils.core.engine.UnitilsTestListener;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

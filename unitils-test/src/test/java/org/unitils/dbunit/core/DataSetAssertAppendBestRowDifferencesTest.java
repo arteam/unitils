@@ -17,6 +17,7 @@ package org.unitils.dbunit.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.util.ObjectFormatter;
 import org.unitils.dbunit.dataset.Column;
 import org.unitils.dbunit.dataset.Row;
@@ -25,7 +26,6 @@ import org.unitils.dbunit.dataset.comparison.ColumnDifference;
 import org.unitils.dbunit.dataset.comparison.RowDifference;
 import org.unitils.dbunit.dataset.comparison.TableDifference;
 import org.unitils.mock.Mock;
-import org.unitilsnew.UnitilsJUnit4;
 
 import static org.dbunit.dataset.datatype.DataType.VARCHAR;
 import static org.junit.Assert.assertEquals;

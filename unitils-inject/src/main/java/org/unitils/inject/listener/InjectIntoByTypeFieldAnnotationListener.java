@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,21 @@
 
 package org.unitils.inject.listener;
 
+import org.unitils.core.FieldAnnotationListener;
+import org.unitils.core.TestField;
+import org.unitils.core.TestInstance;
+import org.unitils.core.TestPhase;
+import org.unitils.core.reflect.Annotations;
 import org.unitils.inject.annotation.InjectIntoByType;
 import org.unitils.inject.core.InjectionByTypeService;
 import org.unitils.inject.core.ObjectToInject;
 import org.unitils.inject.core.TargetService;
-import org.unitilsnew.core.FieldAnnotationListener;
-import org.unitilsnew.core.TestField;
-import org.unitilsnew.core.TestInstance;
-import org.unitilsnew.core.TestPhase;
-import org.unitilsnew.core.reflect.Annotations;
 
 import java.lang.reflect.Type;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static org.unitilsnew.core.TestPhase.INJECTION;
+import static org.unitils.core.TestPhase.INJECTION;
 
 /**
  * @author Tim Ducheyne

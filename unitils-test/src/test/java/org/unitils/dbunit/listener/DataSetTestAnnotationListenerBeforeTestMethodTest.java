@@ -17,14 +17,14 @@ package org.unitils.dbunit.listener;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.core.TestInstance;
+import org.unitils.core.reflect.Annotations;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.core.DataSetService;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import org.unitils.mock.Mock;
-import org.unitilsnew.UnitilsJUnit4;
-import org.unitilsnew.core.TestInstance;
-import org.unitilsnew.core.reflect.Annotations;
 
 import static java.util.Arrays.asList;
 

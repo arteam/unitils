@@ -18,6 +18,7 @@ package org.unitilsnew;
 import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Result;
 import org.junit.runner.notification.RunNotifier;
+import org.unitils.UnitilsJUnit4TestClassRunner;
 
 class JUnit4TestExecutor implements TestExecutor {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package org.unitils.database.annotation;
 
+import org.unitils.core.annotation.TestAnnotation;
 import org.unitils.database.listener.TransactionalTestAnnotationListener;
 import org.unitils.database.util.TransactionMode;
-import org.unitilsnew.core.annotation.TestAnnotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

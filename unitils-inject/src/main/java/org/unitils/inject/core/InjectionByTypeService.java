@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 package org.unitils.inject.core;
 
 import org.unitils.core.UnitilsException;
-import org.unitilsnew.core.reflect.ClassWrapper;
-import org.unitilsnew.core.reflect.FieldWrapper;
-import org.unitilsnew.core.reflect.OriginalFieldValue;
+import org.unitils.core.reflect.ClassWrapper;
+import org.unitils.core.reflect.FieldWrapper;
+import org.unitils.core.reflect.OriginalFieldValue;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,21 @@
 
 package org.unitils.mock.listener;
 
-import org.unitils.core.UnitilsException;
+import org.unitils.core.*;
 import org.unitils.mock.Mock;
 import org.unitils.mock.PartialMock;
 import org.unitils.mock.annotation.AfterCreateMock;
 import org.unitils.mock.core.MockObject;
 import org.unitils.mock.core.PartialMockObject;
-import org.unitilsnew.core.TestField;
-import org.unitilsnew.core.TestInstance;
-import org.unitilsnew.core.TestListener;
-import org.unitilsnew.core.TestPhase;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
+import static org.unitils.core.TestPhase.CONSTRUCTION;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.invokeMethod;
-import static org.unitilsnew.core.TestPhase.CONSTRUCTION;
 
 /**
  * @author Tim Ducheyne
@@ -83,7 +79,7 @@ public class PartialMockTestListener extends TestListener {
 
     /**
      * todo switch to interface
-     *
+     * <p/>
      * Calls all {@link org.unitils.mock.annotation.AfterCreateMock} annotated methods on the test, passing the given mock.
      * These annotated methods must have following signature <code>void myMethod(Object mock, String name, Class type)</code>.
      * If this is not the case, a runtime exception is called.

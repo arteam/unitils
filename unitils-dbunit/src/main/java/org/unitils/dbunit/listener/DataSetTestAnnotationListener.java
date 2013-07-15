@@ -15,19 +15,19 @@
  */
 package org.unitils.dbunit.listener;
 
+import org.unitils.core.TestAnnotationListener;
+import org.unitils.core.TestInstance;
+import org.unitils.core.TestPhase;
+import org.unitils.core.reflect.Annotations;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.core.DataSetService;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
-import org.unitilsnew.core.TestAnnotationListener;
-import org.unitilsnew.core.TestInstance;
-import org.unitilsnew.core.TestPhase;
-import org.unitilsnew.core.reflect.Annotations;
 
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static org.unitilsnew.core.TestPhase.SETUP;
+import static org.unitils.core.TestPhase.SETUP;
 
 /**
  * @author Tim Ducheyne

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,17 @@
 
 package org.unitils.database.listener;
 
+import org.unitils.core.TestAnnotationListener;
+import org.unitils.core.TestInstance;
+import org.unitils.core.TestPhase;
+import org.unitils.core.reflect.Annotations;
 import org.unitils.database.annotation.Transactional;
 import org.unitils.database.core.TransactionManager;
 import org.unitils.database.util.TransactionMode;
-import org.unitilsnew.core.TestAnnotationListener;
-import org.unitilsnew.core.TestInstance;
-import org.unitilsnew.core.TestPhase;
-import org.unitilsnew.core.reflect.Annotations;
 
+import static org.unitils.core.TestPhase.INJECTION;
 import static org.unitils.database.util.TransactionMode.COMMIT;
 import static org.unitils.database.util.TransactionMode.ROLLBACK;
-import static org.unitilsnew.core.TestPhase.INJECTION;
 
 /**
  * @author Tim Ducheyne

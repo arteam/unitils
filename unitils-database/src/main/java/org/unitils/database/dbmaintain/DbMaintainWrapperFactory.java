@@ -16,8 +16,8 @@
 package org.unitils.database.dbmaintain;
 
 import org.dbmaintain.MainFactory;
-import org.unitilsnew.core.Factory;
-import org.unitilsnew.core.annotation.Property;
+import org.unitils.core.Factory;
+import org.unitils.core.annotation.Property;
 
 import java.util.Properties;
 
