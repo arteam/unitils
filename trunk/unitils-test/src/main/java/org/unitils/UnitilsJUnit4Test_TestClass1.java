@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitilsnew;
+package org.unitils;
 
 import org.junit.*;
 
-import static org.unitilsnew.TracingTestListener.TestInvocation.*;
+import static org.unitils.TracingTestListener.TestInvocation.*;
 
 /**
  * JUnit 4 test class containing 2 active and 1 ignored test method. This test test-class is used

@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitilsnew;
+package org.unitils;
 
 import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Result;
 import org.junit.runner.notification.RunNotifier;
-import org.unitils.UnitilsJUnit4TestClassRunner;
 
 class JUnit4TestExecutor implements TestExecutor {
 
