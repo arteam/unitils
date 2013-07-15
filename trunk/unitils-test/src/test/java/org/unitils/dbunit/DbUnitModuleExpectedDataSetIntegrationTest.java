@@ -19,13 +19,13 @@ import org.dbunit.dataset.Column;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
 import org.unitils.dbunit.datasetfactory.MultiSchemaDataSet;
 import org.unitils.dbunit.datasetfactory.impl.DbUnitDataSet;
 import org.unitils.dbunit.datasetfactory.impl.DbUnitTable;
-import org.unitilsnew.UnitilsJUnit4;
 
 import java.io.File;
 import java.util.List;

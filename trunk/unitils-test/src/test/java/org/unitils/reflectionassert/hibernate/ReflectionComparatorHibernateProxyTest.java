@@ -21,12 +21,12 @@ import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.database.annotation.TestDataSource;
 import org.unitils.database.annotation.Transactional;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.difference.Difference;
-import org.unitilsnew.UnitilsJUnit4;
 
 import javax.sql.DataSource;
 

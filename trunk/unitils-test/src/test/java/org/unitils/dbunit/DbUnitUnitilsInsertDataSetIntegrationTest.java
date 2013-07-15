@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import org.dbunit.dataset.Column;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
 import org.unitils.dbunit.datasetfactory.MultiSchemaDataSet;
@@ -27,7 +28,6 @@ import org.unitils.dbunit.datasetfactory.impl.DbUnitTable;
 import org.unitils.dbunit.datasetloadstrategy.impl.InsertLoadStrategy;
 import org.unitils.dbunit.datasetloadstrategy.impl.RefreshLoadStrategy;
 import org.unitils.dbunit.datasetloadstrategy.impl.UpdateLoadStrategy;
-import org.unitilsnew.UnitilsJUnit4;
 
 import java.io.File;
 import java.util.List;

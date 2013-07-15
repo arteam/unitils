@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,15 @@ package org.unitils.io.listener;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.core.TestField;
+import org.unitils.core.TestInstance;
 import org.unitils.core.UnitilsException;
+import org.unitils.core.reflect.Annotations;
 import org.unitils.io.annotation.TempFile;
 import org.unitils.io.temp.TempService;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
-import org.unitilsnew.UnitilsJUnit4;
-import org.unitilsnew.core.TestField;
-import org.unitilsnew.core.TestInstance;
-import org.unitilsnew.core.reflect.Annotations;
 
 import java.io.File;
 import java.util.Properties;

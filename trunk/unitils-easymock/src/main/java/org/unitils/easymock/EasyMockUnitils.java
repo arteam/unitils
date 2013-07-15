@@ -15,11 +15,11 @@
  */
 package org.unitils.easymock;
 
+import org.unitils.core.Unitils;
 import org.unitils.easymock.annotation.Mock;
 import org.unitils.easymock.core.MockService;
 import org.unitils.easymock.util.*;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
-import org.unitilsnew.core.Unitils;
 
 import static org.easymock.EasyMock.reportMatcher;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;

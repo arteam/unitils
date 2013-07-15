@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@ package org.unitils.database.listener;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.core.TestInstance;
+import org.unitils.core.reflect.Annotations;
 import org.unitils.database.annotation.Transactional;
 import org.unitils.database.core.TransactionManager;
 import org.unitils.mock.Mock;
-import org.unitilsnew.UnitilsJUnit4;
-import org.unitilsnew.core.TestInstance;
-import org.unitilsnew.core.reflect.Annotations;
 
 import static org.unitils.database.util.TransactionMode.*;
 

@@ -15,17 +15,17 @@
  */
 package org.unitils.easymock.listener;
 
+import org.unitils.core.FieldAnnotationListener;
+import org.unitils.core.TestField;
+import org.unitils.core.TestInstance;
+import org.unitils.core.TestPhase;
+import org.unitils.core.reflect.Annotations;
 import org.unitils.easymock.annotation.RegularMock;
 import org.unitils.easymock.core.MockService;
 import org.unitils.easymock.util.Calls;
 import org.unitils.easymock.util.InvocationOrder;
-import org.unitilsnew.core.FieldAnnotationListener;
-import org.unitilsnew.core.TestField;
-import org.unitilsnew.core.TestInstance;
-import org.unitilsnew.core.TestPhase;
-import org.unitilsnew.core.reflect.Annotations;
 
-import static org.unitilsnew.core.TestPhase.CONSTRUCTION;
+import static org.unitils.core.TestPhase.CONSTRUCTION;
 
 /**
  * @author Tim Ducheyne

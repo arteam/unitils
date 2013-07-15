@@ -17,10 +17,10 @@ package org.unitils.dbunit.datasetfactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.unitils.core.Factory;
 import org.unitils.database.core.DataSourceService;
 import org.unitils.database.core.DataSourceWrapper;
 import org.unitils.dbunit.datasetfactory.impl.MultiSchemaXmlDataSetFactory;
-import org.unitilsnew.core.Factory;
 
 import javax.xml.parsers.SAXParserFactory;
 

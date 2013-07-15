@@ -18,7 +18,7 @@ package org.unitils.inject.core;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitilsnew.core.reflect.ClassWrapper;
+import org.unitils.core.reflect.ClassWrapper;
 
 import static java.lang.reflect.Modifier.isAbstract;
 

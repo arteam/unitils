@@ -19,11 +19,11 @@ import org.dbmaintain.database.Database;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.core.context.Context;
 import org.unitils.database.dbmaintain.DbMaintainWrapper;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
-import org.unitilsnew.UnitilsJUnit4;
-import org.unitilsnew.core.context.Context;
 
 import static org.junit.Assert.assertNotSame;
 import static org.unitils.mock.ArgumentMatchers.isNull;

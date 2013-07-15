@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package org.unitils.io.reader;
 
+import org.unitils.core.Factory;
+import org.unitils.core.annotation.Property;
 import org.unitils.core.util.FileResolver;
 import org.unitils.io.reader.impl.DefaultFileResolvingStrategy;
-import org.unitilsnew.core.Factory;
-import org.unitilsnew.core.annotation.Property;
 
 /**
  * @author Tim Ducheyne

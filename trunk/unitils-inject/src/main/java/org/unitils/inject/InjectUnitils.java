@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package org.unitils.inject;
 
+import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
+import org.unitils.core.reflect.OriginalFieldValue;
 import org.unitils.inject.core.InjectionByTypeService;
 import org.unitils.inject.core.InjectionService;
 import org.unitils.inject.core.ObjectToInject;
-import org.unitilsnew.core.Unitils;
-import org.unitilsnew.core.reflect.OriginalFieldValue;
 
 /**
  * @author Tim Ducheyne

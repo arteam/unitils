@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package org.unitils.io.listener;
 
+import org.unitils.core.FieldAnnotationListener;
+import org.unitils.core.TestField;
+import org.unitils.core.TestInstance;
+import org.unitils.core.reflect.Annotations;
 import org.unitils.io.annotation.FileContent;
 import org.unitils.io.filecontent.FileContentReader;
-import org.unitilsnew.core.FieldAnnotationListener;
-import org.unitilsnew.core.TestField;
-import org.unitilsnew.core.TestInstance;
-import org.unitilsnew.core.reflect.Annotations;
 
 /**
  * Implements the behavior of the {@link FileContent} annotation.<br/>

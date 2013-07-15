@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package org.unitils.inject.annotation;
 
+import org.unitils.core.annotation.AnnotationDefault;
+import org.unitils.core.annotation.FieldAnnotation;
 import org.unitils.inject.listener.InjectIntoFieldAnnotationListener;
-import org.unitilsnew.core.annotation.AnnotationDefault;
-import org.unitilsnew.core.annotation.FieldAnnotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

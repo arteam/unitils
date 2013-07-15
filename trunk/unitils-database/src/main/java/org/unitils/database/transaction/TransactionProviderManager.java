@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package org.unitils.database.transaction;
 
+import org.unitils.core.spring.SpringTestManager;
 import org.unitils.database.transaction.impl.DefaultTransactionProvider;
 import org.unitils.database.transaction.impl.SpringApplicationContextTransactionProvider;
-import org.unitilsnew.core.spring.SpringTestManager;
 
 /**
  * @author Tim Ducheyne

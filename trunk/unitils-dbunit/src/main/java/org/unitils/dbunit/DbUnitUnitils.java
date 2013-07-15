@@ -23,8 +23,8 @@ import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.unitils.core.Unitils.getInstanceOfType;
 import static org.unitils.util.ReflectionUtils.getTestClass;
-import static org.unitilsnew.core.Unitils.getInstanceOfType;
 
 /**
  * Class providing access to the functionality of the DbUnit module using static methods. Meant

@@ -17,13 +17,13 @@ package org.unitils.dbunit.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.util.ObjectFormatter;
 import org.unitils.dbunit.dataset.Column;
 import org.unitils.dbunit.dataset.Row;
 import org.unitils.dbunit.dataset.Schema;
 import org.unitils.dbunit.dataset.Table;
 import org.unitils.mock.Mock;
-import org.unitilsnew.UnitilsJUnit4;
 
 import static org.dbunit.dataset.datatype.DataType.NUMERIC;
 import static org.dbunit.dataset.datatype.DataType.VARCHAR;

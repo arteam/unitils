@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
 
 package org.unitils.mock.listener;
 
+import org.unitils.core.FieldAnnotationListener;
+import org.unitils.core.TestField;
+import org.unitils.core.TestInstance;
+import org.unitils.core.TestPhase;
+import org.unitils.core.reflect.Annotations;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.dummy.DummyObjectFactory;
-import org.unitilsnew.core.FieldAnnotationListener;
-import org.unitilsnew.core.TestField;
-import org.unitilsnew.core.TestInstance;
-import org.unitilsnew.core.TestPhase;
-import org.unitilsnew.core.reflect.Annotations;
 
-import static org.unitilsnew.core.TestPhase.CONSTRUCTION;
+import static org.unitils.core.TestPhase.CONSTRUCTION;
 
 /**
  * @author Tim Ducheyne

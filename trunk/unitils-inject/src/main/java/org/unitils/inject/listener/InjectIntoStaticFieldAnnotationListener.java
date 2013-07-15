@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,23 @@
 
 package org.unitils.inject.listener;
 
+import org.unitils.core.FieldAnnotationListener;
+import org.unitils.core.TestField;
+import org.unitils.core.TestInstance;
+import org.unitils.core.TestPhase;
+import org.unitils.core.reflect.Annotations;
+import org.unitils.core.reflect.OriginalFieldValue;
 import org.unitils.inject.annotation.InjectIntoStatic;
 import org.unitils.inject.core.InjectionService;
 import org.unitils.inject.core.ObjectToInject;
 import org.unitils.inject.util.Restore;
-import org.unitilsnew.core.FieldAnnotationListener;
-import org.unitilsnew.core.TestField;
-import org.unitilsnew.core.TestInstance;
-import org.unitilsnew.core.TestPhase;
-import org.unitilsnew.core.reflect.Annotations;
-import org.unitilsnew.core.reflect.OriginalFieldValue;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.unitils.core.TestPhase.INJECTION;
 import static org.unitils.inject.util.Restore.NULL_OR_0_VALUE;
 import static org.unitils.inject.util.Restore.OLD_VALUE;
-import static org.unitilsnew.core.TestPhase.INJECTION;
 
 /**
  * @author Tim Ducheyne

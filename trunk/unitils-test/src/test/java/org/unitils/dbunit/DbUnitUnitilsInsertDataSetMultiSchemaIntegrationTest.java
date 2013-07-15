@@ -18,7 +18,7 @@ package org.unitils.dbunit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitilsnew.UnitilsJUnit4;
+import org.unitils.UnitilsJUnit4;
 
 import static org.unitils.database.SqlAssert.assertString;
 import static org.unitils.database.SqlUnitils.executeUpdate;

@@ -15,11 +15,11 @@
  */
 package org.unitils.dbunit.annotation;
 
+import org.unitils.core.annotation.AnnotationDefault;
+import org.unitils.core.annotation.TestAnnotation;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import org.unitils.dbunit.listener.DataSetTestAnnotationListener;
-import org.unitilsnew.core.annotation.AnnotationDefault;
-import org.unitilsnew.core.annotation.TestAnnotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

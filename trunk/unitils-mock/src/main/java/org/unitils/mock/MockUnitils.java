@@ -17,10 +17,10 @@ package org.unitils.mock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.unitils.core.Unitils;
 import org.unitils.mock.core.MockObject;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.dummy.DummyObjectFactory;
-import org.unitilsnew.core.Unitils;
 
 import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationStackTrace;
 

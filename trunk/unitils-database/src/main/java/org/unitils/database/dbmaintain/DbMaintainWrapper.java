@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import org.dbmaintain.structure.clear.DBClearer;
 import org.dbmaintain.structure.constraint.ConstraintsDisabler;
 import org.dbmaintain.structure.sequence.SequenceUpdater;
 import org.unitils.core.UnitilsException;
-import org.unitilsnew.core.annotation.Property;
+import org.unitils.core.annotation.Property;
 
 import java.util.ArrayList;
 import java.util.List;

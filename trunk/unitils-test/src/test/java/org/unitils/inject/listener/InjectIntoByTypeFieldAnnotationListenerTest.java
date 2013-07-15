@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@
 package org.unitils.inject.listener;
 
 import org.junit.Test;
-import org.unitilsnew.UnitilsJUnit4;
-import org.unitilsnew.core.TestPhase;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.core.TestPhase;
 
 import static org.junit.Assert.assertSame;
-import static org.unitilsnew.core.TestPhase.INJECTION;
+import static org.unitils.core.TestPhase.INJECTION;
 
 /**
  * @author Tim Ducheyne

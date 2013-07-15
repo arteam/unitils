@@ -17,10 +17,10 @@ package org.unitils.dbunit.datasetfactory;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.database.core.DataSourceService;
 import org.unitils.dbunit.datasetfactory.impl.MultiSchemaXmlDataSetFactory;
 import org.unitils.mock.Mock;
-import org.unitilsnew.UnitilsJUnit4;
 
 import static org.junit.Assert.assertTrue;
 import static org.unitils.mock.ArgumentMatchers.isNull;

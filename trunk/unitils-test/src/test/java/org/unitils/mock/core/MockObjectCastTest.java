@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 package org.unitils.mock.core;
 
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.PartialMock;
-import org.unitilsnew.UnitilsJUnit4;
 
 import java.util.Timer;
 import java.util.TimerTask;

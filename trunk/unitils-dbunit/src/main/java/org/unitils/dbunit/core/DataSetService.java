@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbunit.dataset.IDataSet;
 import org.unitils.core.UnitilsException;
+import org.unitils.core.context.Context;
 import org.unitils.dbunit.connection.DbUnitConnection;
 import org.unitils.dbunit.connection.DbUnitConnectionManager;
 import org.unitils.dbunit.dataset.Schema;
@@ -27,7 +28,6 @@ import org.unitils.dbunit.datasetfactory.DataSetFactory;
 import org.unitils.dbunit.datasetfactory.DataSetResolvingStrategy;
 import org.unitils.dbunit.datasetfactory.MultiSchemaDataSet;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
-import org.unitilsnew.core.context.Context;
 
 import java.io.File;
 import java.lang.reflect.Method;

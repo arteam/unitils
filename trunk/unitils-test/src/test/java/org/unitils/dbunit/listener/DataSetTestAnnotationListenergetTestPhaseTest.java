@@ -17,11 +17,11 @@ package org.unitils.dbunit.listener;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitilsnew.UnitilsJUnit4;
-import org.unitilsnew.core.TestPhase;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.core.TestPhase;
 
 import static org.junit.Assert.assertEquals;
-import static org.unitilsnew.core.TestPhase.SETUP;
+import static org.unitils.core.TestPhase.SETUP;
 
 /**
  * @author Tim Ducheyne

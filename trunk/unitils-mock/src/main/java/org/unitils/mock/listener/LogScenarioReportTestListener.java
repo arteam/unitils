@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package org.unitils.mock.listener;
 
-import org.unitilsnew.core.TestInstance;
-import org.unitilsnew.core.TestListener;
+import org.unitils.core.TestInstance;
+import org.unitils.core.TestListener;
 
 import static org.unitils.mock.MockUnitils.logFullScenarioReport;
 
