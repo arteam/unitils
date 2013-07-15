@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,10 @@ package org.unitils.easymock.util;
 /**
  * Possible values for checking the order of method invocation on the mock.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public enum InvocationOrder {
-
 
     /**
      * NONE or STRICT as defined by the default value in the configuration.
