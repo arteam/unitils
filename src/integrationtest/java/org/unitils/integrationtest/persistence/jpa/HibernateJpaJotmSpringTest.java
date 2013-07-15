@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,11 @@
  */
 package org.unitils.integrationtest.persistence.jpa;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
-import org.unitilsnew.UnitilsJUnit4;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.database.annotation.Transactional;
 import org.unitils.database.util.TransactionMode;
 import org.unitils.dbunit.annotation.DataSet;
@@ -32,37 +29,40 @@ import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.unitils.spring.annotation.SpringApplicationContext;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+
 @Transactional(TransactionMode.COMMIT)
 public class HibernateJpaJotmSpringTest extends UnitilsJUnit4 {
 
-	@SpringApplicationContext({"org/unitils/integrationtest/persistence/jpa/hibernateJpaJotmSpringTest-spring.xml"})
-	ApplicationContext applicationContext;
-	
-	@JpaEntityManagerFactory
-	EntityManagerFactory entityManagerFactory;
-	
-	EntityManager entityManager;
-	
-	Person person;
-	
+    @SpringApplicationContext({"org/unitils/integrationtest/persistence/jpa/hibernateJpaJotmSpringTest-spring.xml"})
+    ApplicationContext applicationContext;
+
+    @JpaEntityManagerFactory
+    EntityManagerFactory entityManagerFactory;
+
+    EntityManager entityManager;
+
+    Person person;
+
     @Before
     public void initializeFixture() {
-    	person = new Person(1L, "johnDoe");
-    	entityManager = EntityManagerFactoryUtils.getTransactionalEntityManager(entityManagerFactory);
+        person = new Person(1L, "johnDoe");
+        entityManager = EntityManagerFactoryUtils.getTransactionalEntityManager(entityManagerFactory);
     }
-    
+
     @Test
     @DataSet("../datasets/SinglePerson.xml")
     public void testFindById() {
-    	Person userFromDb = (Person) entityManager.find(Person.class, 1L);
-    	ReflectionAssert.assertLenientEquals(person, userFromDb);
+        Person userFromDb = (Person) entityManager.find(Person.class, 1L);
+        ReflectionAssert.assertLenientEquals(person, userFromDb);
     }
 
     @Test
     @DataSet("../datasets/NoPersons.xml")
     @ExpectedDataSet("../datasets/SinglePerson-result.xml")
     public void testPersist() {
-    	entityManager.persist(person);
+        entityManager.persist(person);
     }
 
 }

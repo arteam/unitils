@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitilsnew;
+package org.unitils;
 
 import junit.framework.AssertionFailedError;
 import org.unitils.core.engine.UnitilsTestListener;
@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.Assert.assertTrue;
-import static org.unitilsnew.TracingTestListener.InvocationSource.TEST;
-import static org.unitilsnew.TracingTestListener.InvocationSource.UNITILS;
-import static org.unitilsnew.TracingTestListener.ListenerInvocation.*;
+import static org.unitils.TracingTestListener.InvocationSource.TEST;
+import static org.unitils.TracingTestListener.InvocationSource.UNITILS;
+import static org.unitils.TracingTestListener.ListenerInvocation.*;
 
 /**
  * Test listener that records all method invocations.

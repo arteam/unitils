@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package org.unitils.integrationtest.persistence;
 
-import static junit.framework.Assert.assertTrue;
-
 import org.junit.Test;
-import org.unitilsnew.UnitilsJUnit4;
+import org.unitils.UnitilsJUnit4;
+
+import static junit.framework.Assert.assertTrue;
 
 /**
  * @author Filip Neven

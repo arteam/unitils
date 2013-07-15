@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,9 @@
  */
 package org.unitils.integrationtest.persistence.jdbc;
 
-import javax.sql.DataSource;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.unitilsnew.UnitilsJUnit4;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.database.annotation.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
@@ -28,34 +26,36 @@ import org.unitils.integrationtest.sampleproject.dao.impl.JdbcPersonDao;
 import org.unitils.integrationtest.sampleproject.model.Person;
 import org.unitils.reflectionassert.ReflectionAssert;
 
+import javax.sql.DataSource;
+
 public class JdbcTest extends UnitilsJUnit4 {
 
-	@TestDataSource
-	DataSource dataSource;
-	
-	PersonDao personDao;
-	
-	Person person;
-	
+    @TestDataSource
+    DataSource dataSource;
+
+    PersonDao personDao;
+
+    Person person;
+
     @Before
     public void initializeFixture() {
-    	personDao = new JdbcPersonDao(dataSource);
-    	
-    	person = new Person(1L, "johnDoe");
+        personDao = new JdbcPersonDao(dataSource);
+
+        person = new Person(1L, "johnDoe");
     }
-    
+
     @Test
     @DataSet("../datasets/SinglePerson.xml")
     public void testFindById() {
-    	Person userFromDb = personDao.findById(1L);
-    	ReflectionAssert.assertLenientEquals(person, userFromDb);
+        Person userFromDb = personDao.findById(1L);
+        ReflectionAssert.assertLenientEquals(person, userFromDb);
     }
 
     @Test
     @DataSet("../datasets/NoPersons.xml")
     @ExpectedDataSet("../datasets/SinglePerson-result.xml")
     public void testPersist() {
-    	personDao.persist(person);
+        personDao.persist(person);
     }
-	
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitilsnew.UnitilsJUnit4;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.integrationtest.sampleproject.model.Person;
@@ -28,30 +28,30 @@ import org.unitils.reflectionassert.ReflectionAssert;
 
 public class HibernateTest extends UnitilsJUnit4 {
 
-	@HibernateSessionFactory({"org/unitils/integrationtest/persistence/hibernate/hibernate-test.cfg.xml"})
-	SessionFactory sessionFactory;
+    @HibernateSessionFactory({"org/unitils/integrationtest/persistence/hibernate/hibernate-test.cfg.xml"})
+    SessionFactory sessionFactory;
 
-	Person person;
-	
+    Person person;
+
     @Before
     public void initializeFixture() {
-    	person = new Person(1L, "johnDoe");
+        person = new Person(1L, "johnDoe");
     }
-    
+
     @Test
     @DataSet("../datasets/SinglePerson.xml")
     public void testFindById() {
-    	Session currentSession = sessionFactory.getCurrentSession();
+        Session currentSession = sessionFactory.getCurrentSession();
         Person userFromDb = (Person) currentSession.get(Person.class, 1L);
-    	ReflectionAssert.assertLenientEquals(person, userFromDb);
+        ReflectionAssert.assertLenientEquals(person, userFromDb);
     }
 
     @Test
     @DataSet("../datasets/NoPersons.xml")
     @ExpectedDataSet("../datasets/SinglePerson-result.xml")
     public void testPersist() {
-    	Session currentSession = sessionFactory.getCurrentSession();
+        Session currentSession = sessionFactory.getCurrentSession();
         currentSession.persist(person);
     }
-	
+
 }

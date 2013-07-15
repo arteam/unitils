@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,9 @@
  */
 package org.unitils.integrationtest.persistence.jpa;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceContext;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.unitilsnew.UnitilsJUnit4;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.integrationtest.sampleproject.model.Person;
@@ -29,37 +25,41 @@ import org.unitils.orm.jpa.JpaUnitils;
 import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
 import org.unitils.reflectionassert.ReflectionAssert;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceContext;
+
 public class HibernateJpaTest extends UnitilsJUnit4 {
 
-	@JpaEntityManagerFactory(persistenceUnit = "test", configFile = "org/unitils/integrationtest/persistence/jpa/hibernate-persistence-test.xml")
-	EntityManagerFactory entityManagerFactory;
-	
-	@PersistenceContext
-	EntityManager entityManager;
-	
-	Person person;
-	
+    @JpaEntityManagerFactory(persistenceUnit = "test", configFile = "org/unitils/integrationtest/persistence/jpa/hibernate-persistence-test.xml")
+    EntityManagerFactory entityManagerFactory;
+
+    @PersistenceContext
+    EntityManager entityManager;
+
+    Person person;
+
     @Before
     public void initializeFixture() {
-    	person = new Person(1L, "johnDoe");
+        person = new Person(1L, "johnDoe");
     }
-    
+
     @Test
     @DataSet("../datasets/SinglePerson.xml")
     public void testFindById() {
-    	Person userFromDb = entityManager.find(Person.class, 1L);
-    	ReflectionAssert.assertLenientEquals(person, userFromDb);
+        Person userFromDb = entityManager.find(Person.class, 1L);
+        ReflectionAssert.assertLenientEquals(person, userFromDb);
     }
 
     @Test
     @DataSet("../datasets/NoPersons.xml")
     @ExpectedDataSet("../datasets/SinglePerson-result.xml")
     public void testPersist() {
-    	entityManager.persist(person);
+        entityManager.persist(person);
     }
-    
+
     @Test
     public void testMapping() {
-    	JpaUnitils.assertMappingWithDatabaseConsistent();
+        JpaUnitils.assertMappingWithDatabaseConsistent();
     }
 }
