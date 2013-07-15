@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotation.TestDataSource;
 import org.unitils.database.annotation.Transactional;
 import org.unitils.reflectionassert.ReflectionAssert;
@@ -30,15 +29,11 @@ import org.unitils.reflectionassert.difference.Difference;
 import org.unitilsnew.UnitilsJUnit4;
 
 import javax.sql.DataSource;
-import java.util.Properties;
 
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.unitils.database.SqlUnitils.executeUpdate;
 import static org.unitils.database.SqlUnitils.executeUpdateQuietly;
 import static org.unitils.database.util.TransactionMode.COMMIT;
-import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 
 
 /**
@@ -77,14 +72,14 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
      */
     @Before
     public void setUp() throws Exception {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-
-        testChild = new Child(1L, new Parent(1L));
-        testChild.getParent().setChildren(asList(testChild));
-
-        reflectionComparator = createRefectionComparator();
-        dropTestTables();
-        createTestTables();
+//        Properties configuration = new ConfigurationLoader().loadConfiguration();
+//
+//        testChild = new Child(1L, new Parent(1L));
+//        testChild.getParent().setChildren(asList(testChild));
+//
+//        reflectionComparator = createRefectionComparator();
+//        dropTestTables();
+//        createTestTables();
     }
 
 
@@ -105,6 +100,7 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
      */
     @Test
     public void testGetDifference_rightProxy() {
+        fail("todo implement");
         if (disabled) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;

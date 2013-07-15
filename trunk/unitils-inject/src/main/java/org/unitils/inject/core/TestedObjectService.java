@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import static java.lang.reflect.Modifier.isAbstract;
 public class TestedObjectService {
 
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(TestedObjectService.class);
+    protected static Log logger = LogFactory.getLog(TestedObjectService.class);
 
 
     /**

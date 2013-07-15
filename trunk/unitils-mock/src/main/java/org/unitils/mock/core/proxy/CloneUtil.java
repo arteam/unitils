@@ -1,19 +1,17 @@
 /*
+ * Copyright 2013,  Unitils.org
  *
- *  * Copyright 2010,  Unitils.org
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.unitils.mock.core.proxy;
 
@@ -45,10 +43,9 @@ import static org.unitils.mock.core.proxy.ProxyUtils.isProxy;
 public class CloneUtil {
 
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(CloneUtil.class);
-
+    protected static Log logger = LogFactory.getLog(CloneUtil.class);
     /* Objenesis instance for creating new instances of types */
-    private static Objenesis objenesis = new ObjenesisStd();
+    protected static Objenesis objenesis = new ObjenesisStd();
 
 
     /**
@@ -72,12 +69,12 @@ public class CloneUtil {
 
     /**
      * Actual implementation of the cloning.
-     *
+     * <p/>
      * It will try several ways to clone the object. First it will look for the simple cases: null, primitives,
      * immutables... If not it will check whether it's an array and clone it using the {@link #cloneArray} method.
      * Finally it will see whether the object is cloneable and the clone method can be used. If not, Objenisis is
      * used to create the instance. The last step is to recursively do the same operation for the inner fields.
-     *
+     * <p/>
      * An object is cloned once. All created clones are put in a cache and if an object is to be cloned a second time,
      * the cached instance is used. This way the object graph is preserved.
      *
@@ -129,7 +126,6 @@ public class CloneUtil {
         return clonedInstance;
     }
 
-
     /**
      * @param instanceToClone The instance, not null
      * @return True if the instance is immutable, e.g. a primitive
@@ -162,7 +158,6 @@ public class CloneUtil {
         return false;
     }
 
-
     /**
      * If the given value is cloneable and the cloning succeeds, the clone is returned, else null is returned.
      *
@@ -180,7 +175,6 @@ public class CloneUtil {
         }
     }
 
-
     /**
      * Tries to create an instance of the same type as the given value using Objenesis.
      *
@@ -195,7 +189,6 @@ public class CloneUtil {
             return null;
         }
     }
-
 
     /**
      * Clones all values in all fields of the given class and superclasses.
@@ -225,7 +218,6 @@ public class CloneUtil {
         cloneFields(clazz.getSuperclass(), instanceToClone, clonedInstance, cloneCache);
     }
 
-
     /**
      * Clones the given array and all it's elements.
      *
@@ -247,5 +239,4 @@ public class CloneUtil {
         }
         return clonedArray;
     }
-
 }

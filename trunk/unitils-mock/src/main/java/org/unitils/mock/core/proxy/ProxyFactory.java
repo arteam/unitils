@@ -40,7 +40,7 @@ import static org.unitils.util.ReflectionUtils.createInstanceOfType;
  */
 public class ProxyFactory {
 
-    private static Log logger = LogFactory.getLog(ProxyFactory.class);
+    protected static Log logger = LogFactory.getLog(ProxyFactory.class);
 
 
     /**
@@ -70,32 +70,6 @@ public class ProxyFactory {
      */
     public static <T> T createUninitializedProxy(String mockName, ProxyInvocationHandler invocationHandler, Class<T> proxiedClass, Class<?>... implementedInterfaces) {
         return createProxy(mockName, false, invocationHandler, proxiedClass, implementedInterfaces);
-    }
-
-
-    /**
-     * Creates a proxy object for the given type. All method invocations will be passed to the given invocation handler.
-     *
-     * @param mockName              The name of the mock, not null
-     * @param initialize            If possible, use the default constructor and initialize all fields
-     * @param implementedInterfaces Additional interfaces that the proxy must implement
-     * @param proxiedClass          The type to proxy, not null
-     * @param invocationHandler     The handler that will handle the method invocations of the proxy, not null.
-     * @return The proxy object, not null
-     */
-
-    @SuppressWarnings({"unchecked"})
-    protected static <T> T createProxy(String mockName, boolean initialize, ProxyInvocationHandler invocationHandler, Class<T> proxiedClass, Class<?>... implementedInterfaces) {
-        Class<T> enhancedClass = createEnhancedClass(proxiedClass, implementedInterfaces);
-
-        Factory proxy;
-        if (initialize && !proxiedClass.isInterface()) {
-            proxy = (Factory) createInitializedOrUninitializedInstanceOfType(enhancedClass);
-        } else {
-            proxy = (Factory) createUninitializedInstanceOfType(enhancedClass);
-        }
-        proxy.setCallbacks(new Callback[]{new CglibProxyMethodInterceptor(mockName, proxiedClass, invocationHandler)});
-        return (T) proxy;
     }
 
     /**
@@ -137,6 +111,31 @@ public class ProxyFactory {
     }
 
 
+    /**
+     * Creates a proxy object for the given type. All method invocations will be passed to the given invocation handler.
+     *
+     * @param mockName              The name of the mock, not null
+     * @param initialize            If possible, use the default constructor and initialize all fields
+     * @param implementedInterfaces Additional interfaces that the proxy must implement
+     * @param proxiedClass          The type to proxy, not null
+     * @param invocationHandler     The handler that will handle the method invocations of the proxy, not null.
+     * @return The proxy object, not null
+     */
+
+    @SuppressWarnings({"unchecked"})
+    protected static <T> T createProxy(String mockName, boolean initialize, ProxyInvocationHandler invocationHandler, Class<T> proxiedClass, Class<?>... implementedInterfaces) {
+        Class<T> enhancedClass = createEnhancedClass(proxiedClass, implementedInterfaces);
+
+        Factory proxy;
+        if (initialize && !proxiedClass.isInterface()) {
+            proxy = (Factory) createInitializedOrUninitializedInstanceOfType(enhancedClass);
+        } else {
+            proxy = (Factory) createUninitializedInstanceOfType(enhancedClass);
+        }
+        proxy.setCallbacks(new Callback[]{new CglibProxyMethodInterceptor(mockName, proxiedClass, invocationHandler)});
+        return (T) proxy;
+    }
+
     @SuppressWarnings("unchecked")
     protected static <T> Class<T> createEnhancedClass(Class<T> proxiedClass, Class<?>... implementedInterfaces) {
         Enhancer enhancer = new Enhancer();
@@ -158,5 +157,4 @@ public class ProxyFactory {
         enhancer.setUseFactory(true);
         return enhancer.createClass();
     }
-
 }

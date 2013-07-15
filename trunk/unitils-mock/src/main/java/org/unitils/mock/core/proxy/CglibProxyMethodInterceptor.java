@@ -1,19 +1,17 @@
 /*
+ * Copyright 2013,  Unitils.org
  *
- *  * Copyright 2010,  Unitils.org
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.unitils.mock.core.proxy;
 
@@ -34,12 +32,10 @@ import static org.unitils.util.MethodUtils.*;
  */
 public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
 
-    private String mockName;
-
-    private Class<T> proxiedType;
-
+    protected String mockName;
+    protected Class<T> proxiedType;
     /* The invocation handler */
-    private ProxyInvocationHandler invocationHandler;
+    protected ProxyInvocationHandler invocationHandler;
 
 
     /**
@@ -82,7 +78,6 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
         return invocationHandler.handleInvocation(invocation);
     }
 
-
     public String getMockName() {
         return mockName;
     }
@@ -94,15 +89,13 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
         return proxiedType;
     }
 
-
     /**
      * An invocation implementation that uses the cglib method proxy to be able to invoke the original behavior.
      */
     public static class CglibProxyInvocation extends ProxyInvocation {
 
         /* The cglib method proxy */
-        private MethodProxy methodProxy;
-
+        protected MethodProxy methodProxy;
 
         /**
          * Creates an invocation.
@@ -118,7 +111,6 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
             super(mockName, proxy, method, arguments, invokedAt);
             this.methodProxy = methodProxy;
         }
-
 
         /**
          * Invokes the original behavior by calling the method proxy.

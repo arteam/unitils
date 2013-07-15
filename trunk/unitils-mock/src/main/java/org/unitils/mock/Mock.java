@@ -134,6 +134,8 @@ public interface Mock<T> {
     T onceReturns(Object returnValue);
 
 
+    // todo td onceReturns does not work when chaining calls
+
     /**
      * Defines behavior for this mock so that it raises an instance of the given exception class when the invocation following
      * this call matches the observed behavior. E.g.

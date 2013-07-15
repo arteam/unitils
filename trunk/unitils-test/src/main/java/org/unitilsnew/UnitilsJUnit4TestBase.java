@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ package org.unitilsnew;
 public abstract class UnitilsJUnit4TestBase extends UnitilsJUnit4 {
 
     /* Test listener that will record all invocations */
-    private static TracingTestListener tracingTestListener;
+    protected static TracingTestListener tracingTestListener;
 
 
     /**
@@ -49,5 +49,4 @@ public abstract class UnitilsJUnit4TestBase extends UnitilsJUnit4 {
             tracingTestListener.registerTestInvocation(invocation, testClass, testMethodName);
         }
     }
-
 }

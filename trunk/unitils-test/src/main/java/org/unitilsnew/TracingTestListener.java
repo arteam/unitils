@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,21 +68,21 @@ public class TracingTestListener extends UnitilsTestListener {
 
 
     /* List that will contain a string representation of each method call */
-    private List<Call> callList;
+    protected List<Call> callList;
 
-    private Invocation exceptionMethod;
+    protected Invocation exceptionMethod;
 
-    private boolean throwAssertionFailedError;
+    protected boolean throwAssertionFailedError;
 
-    private Class<?> currentTestClass;
-    private Object currentTestObject;
-    private Method currentTestMethod;
+    protected Class<?> currentTestClass;
+    protected Object currentTestObject;
+    protected Method currentTestMethod;
 
     /*
     * Exception that was thrown during the test method that is currently executing.
     * Is reset in beforeTestSetUp
     */
-    private Throwable currentThrowable;
+    protected Throwable currentThrowable;
 
 
     public TracingTestListener() {
@@ -160,7 +160,7 @@ public class TracingTestListener extends UnitilsTestListener {
         throwExceptionIfRequested(LISTENER_AFTER_TEST_TEARDOWN);
     }
 
-    private void throwExceptionIfRequested(Invocation exceptionMethod) {
+    protected void throwExceptionIfRequested(Invocation exceptionMethod) {
         if (this.exceptionMethod == null || !this.exceptionMethod.equals(exceptionMethod)) {
             return;
         }
@@ -181,15 +181,11 @@ public class TracingTestListener extends UnitilsTestListener {
 
     public static class Call {
 
-        private InvocationSource invocationSource;
-
-        private Invocation invocation;
-
-        private Class<?> testClass;
-
-        private String testMethod;
-
-        private Throwable throwable;
+        protected InvocationSource invocationSource;
+        protected Invocation invocation;
+        protected Class<?> testClass;
+        protected String testMethod;
+        protected Throwable throwable;
 
 
         public Call(Invocation invocation, Class<?> testClass) {
