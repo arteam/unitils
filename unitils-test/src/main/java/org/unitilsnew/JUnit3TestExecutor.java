@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@ import junit.textui.TestRunner;
 
 class JUnit3TestExecutor implements TestExecutor {
 
-    private TestResult result;
+    protected TestResult result;
 
-    JUnit3TestExecutor() {
+    protected JUnit3TestExecutor() {
         super();
     }
 

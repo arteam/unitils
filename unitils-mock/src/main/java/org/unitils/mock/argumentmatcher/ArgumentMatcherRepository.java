@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import java.util.List;
 public class ArgumentMatcherRepository {
 
     /* The singleton instance */
-    private static ThreadLocal<ArgumentMatcherRepository> instance = new InheritableThreadLocal<ArgumentMatcherRepository>() {
+    protected static ThreadLocal<ArgumentMatcherRepository> instance = new InheritableThreadLocal<ArgumentMatcherRepository>() {
         protected ArgumentMatcherRepository initialValue() {
             return new ArgumentMatcherRepository();
         }
@@ -52,25 +52,19 @@ public class ArgumentMatcherRepository {
 
 
     /* The current argument matchers */
-    private List<ArgumentMatcher> argumentMatchers = new ArrayList<ArgumentMatcher>();
-
+    protected List<ArgumentMatcher> argumentMatchers = new ArrayList<ArgumentMatcher>();
     /* Determines whether the repository can accept argument matchers */
-    private boolean acceptingArgumentMatchers = false;
-
+    protected boolean acceptingArgumentMatchers = false;
     /* The begin line-nr of the invocation */
-    private int matchInvocationStartLineNr;
-
+    protected int matchInvocationStartLineNr;
     /* The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line) */
-    private int matchInvocationEndLineNr;
-
+    protected int matchInvocationEndLineNr;
     /* The index of the matcher on that line, 1 for the first, 2 for the second etc */
-    private int matchInvocationIndex;
-
+    protected int matchInvocationIndex;
     /* The name of the previous matching method we handled */
-    private String previousMatchingMethodName;
-
+    protected String previousMatchingMethodName;
     /* The line nr of the previous method we handled */
-    private int previousMatchingLineNr;
+    protected int previousMatchingLineNr;
 
 
     /**
@@ -86,7 +80,6 @@ public class ArgumentMatcherRepository {
         matchInvocationEndLineNr = Math.max(matchInvocationEndLineNr, lineNr);
         argumentMatchers.add(argumentMatcher);
     }
-
 
     /**
      * @return The current argument matchers, not null
@@ -115,7 +108,6 @@ public class ArgumentMatcherRepository {
     public int getMatchInvocationIndex() {
         return matchInvocationIndex;
     }
-
 
     /**
      * From the moment that this method is called until {@link #registerEndOfMatchingInvocation} has been called,

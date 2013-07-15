@@ -1,19 +1,17 @@
 /*
+ * Copyright 2013,  Unitils.org
  *
- *  * Copyright 2010,  Unitils.org
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.unitils.mock.core.proxy;
 
@@ -32,17 +30,17 @@ import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
 public class ProxyInvocation {
 
     /* The name of the mock, e.g. the field name */
-    private String mockName;
+    protected String mockName;
     /* The proxy on which the method was called */
-    private Object proxy;
+    protected Object proxy;
     /* The method that was called */
-    private Method method;
+    protected Method method;
     /* The arguments that were used */
-    private List<Object> arguments;
+    protected List<Object> arguments;
     /* The arguments at the time that they were used */
-    private List<Object> argumentsAtInvocationTime;
+    protected List<Object> argumentsAtInvocationTime;
     /* The trace of the invocation */
-    private StackTraceElement[] invokedAtTrace;
+    protected StackTraceElement[] invokedAtTrace;
 
 
     /**
@@ -63,10 +61,9 @@ public class ProxyInvocation {
         this.invokedAtTrace = invokedAtTrace;
     }
 
-
     /**
      * Creates a copy of the given proxy invocation.
-     *
+     * <p/>
      * The argumentsAtInvocationTime will be set as copies (deep clones) of the arguments at the time of
      * the invocation. This way the original values can still be used later-on even when changes
      * occur to the original values (pass-by-value vs pass-by-reference). If not explicitly set, this will return the
@@ -93,7 +90,6 @@ public class ProxyInvocation {
         throw new UnsupportedOperationException("Invoking of original behavior not implemented.");
     }
 
-
     /**
      * @return The nr of arguments at invocation time that were not null
      */
@@ -109,7 +105,6 @@ public class ProxyInvocation {
         }
         return count;
     }
-
 
     /**
      * @return The name of the mock, e.g. the field name, not null
@@ -139,10 +134,9 @@ public class ProxyInvocation {
         return arguments;
     }
 
-
     /**
      * The arguments at the time that they were used.
-     *
+     * <p/>
      * The argumentsAtInvocationTime can be set as copies (deep clones) of the arguments at the time of
      * the invocation. This way the original values can still be used later-on even when changes
      * occur to the original values (pass-by-value vs pass-by-reference). If not explicitly set, this will return the
@@ -154,14 +148,12 @@ public class ProxyInvocation {
         return argumentsAtInvocationTime;
     }
 
-
     /**
      * @return The trace of the invocation, not null
      */
     public StackTraceElement[] getInvokedAtTrace() {
         return invokedAtTrace;
     }
-
 
     /**
      * @return The location of the invocation, not null
@@ -170,12 +162,10 @@ public class ProxyInvocation {
         return invokedAtTrace[0];
     }
 
-
     /**
      * @return The line nr of the invocation
      */
     public int getLineNumber() {
         return getInvokedAt().getLineNumber();
     }
-
 }

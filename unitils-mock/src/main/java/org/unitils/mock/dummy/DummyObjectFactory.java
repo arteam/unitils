@@ -1,19 +1,17 @@
 /*
+ * Copyright 2013,  Unitils.org
  *
- *  * Copyright 2010,  Unitils.org
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.unitils.mock.dummy;
 
@@ -28,8 +26,8 @@ import static org.unitils.mock.core.proxy.ProxyFactory.createProxy;
  * Class for handling the dummy object behavior. A dummy object is a proxy that will return default values for every method. This can be
  * used to quickly create test objects without having to worry about correctly filling in every field.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class DummyObjectFactory {
 
@@ -55,13 +53,11 @@ public class DummyObjectFactory {
     public static class DummyObjectInvocationHandler implements ProxyInvocationHandler {
 
         /* The type of the dummy object */
-        private Class<?> dummyObjectType;
-
+        protected Class<?> dummyObjectType;
         /* The hash code that is returned when the hashCode method is called */
-        private Integer dummyObjectHashCode = new Object().hashCode();
-
+        protected Integer dummyObjectHashCode = new Object().hashCode();
         /* The behavior that will return the default values */
-        private MockBehavior dummyObjectBehavior;
+        protected MockBehavior dummyObjectBehavior;
 
 
         public DummyObjectInvocationHandler(Class<?> dummyObjectType, MockBehavior mockBehavior) {
@@ -78,7 +74,5 @@ public class DummyObjectFactory {
         public Object handleInvocation(ProxyInvocation invocation) throws Throwable {
             return dummyObjectBehavior.execute(invocation);
         }
-
     }
-
 }

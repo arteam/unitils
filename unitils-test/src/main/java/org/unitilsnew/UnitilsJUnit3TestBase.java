@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import static org.unitilsnew.TracingTestListener.TestInvocation.TEST_TEAR_DOWN;
 public abstract class UnitilsJUnit3TestBase extends UnitilsJUnit3 {
 
     /* Test listener that will record all invocations */
-    private static TracingTestListener tracingTestListener;
+    protected static TracingTestListener tracingTestListener;
 
 
     /**
@@ -49,7 +49,6 @@ public abstract class UnitilsJUnit3TestBase extends UnitilsJUnit3 {
         registerTestInvocation(TEST_SET_UP, null);
     }
 
-
     /**
      * Overidden to register the test teardown invocation.
      */
@@ -58,7 +57,6 @@ public abstract class UnitilsJUnit3TestBase extends UnitilsJUnit3 {
         super.tearDown();
         registerTestInvocation(TEST_TEAR_DOWN, null);
     }
-
 
     /**
      * Records an invocation.
@@ -71,5 +69,4 @@ public abstract class UnitilsJUnit3TestBase extends UnitilsJUnit3 {
             tracingTestListener.registerTestInvocation(invocation, getClass(), testMethod);
         }
     }
-
 }

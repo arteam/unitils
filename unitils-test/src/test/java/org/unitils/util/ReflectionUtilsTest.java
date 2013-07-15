@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,11 @@ package org.unitils.util;
 
 import junit.framework.TestCase;
 import org.unitils.core.UnitilsException;
-import static org.unitils.util.CollectionUtils.asSet;
-import static org.unitils.util.ReflectionUtils.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashSet;
+
+import static org.unitils.util.ReflectionUtils.*;
 
 /**
  * Test for {@link ReflectionUtils}.
@@ -60,7 +59,7 @@ public class ReflectionUtilsTest extends TestCase {
      * Test for creating a class instance.
      */
     public void testCreateInstanceOfType() {
-        String result = (String) createInstanceOfType("java.lang.String", false);
+        String result = createInstanceOfType("java.lang.String", false);
         assertNotNull(result);
     }
 
@@ -103,112 +102,6 @@ public class ReflectionUtilsTest extends TestCase {
         }
     }
 
-
-    /**
-     * Test for setting the value of a field.
-     */
-    public void testSetFieldValue() {
-        setFieldValue(testObject, field, "newValue");
-        assertEquals("newValue", testObject.getField());
-    }
-
-
-    /**
-     * Test for setting the value of a field. Null value.
-     */
-    public void testSetFieldValue_null() {
-        setFieldValue(testObject, field, null);
-        assertNull(testObject.getField());
-    }
-
-
-    /**
-     * Test for setting the value of a field that is not of the test object.
-     */
-    public void testSetFieldValue_unexistingField() throws Exception {
-        //get another field
-        Field anotherField = getClass().getDeclaredField("testObject");
-
-        try {
-            setFieldValue(testObject, anotherField, "newValue");
-            fail("UnitilsException expected");
-
-        } catch (UnitilsException e) {
-            //expected
-        }
-    }
-
-
-    /**
-     * Test for setting the value of a field and setter.
-     */
-    public void testSetFieldAndSetterValue_field() {
-        setFieldAndSetterValue(testObject, asSet(field), new HashSet<Method>(), "newValue");
-        assertEquals("newValue", testObject.getField());
-    }
-
-
-    /**
-     * Test for setting the value of a field and setter.
-     */
-    public void testSetFieldAndSetterValue_setter() {
-        setFieldAndSetterValue(testObject, new HashSet<Field>(), asSet(fieldSetterMethod), "newValue");
-        assertEquals("newValue", testObject.getField());
-    }
-
-
-    /**
-     * Test for setting the value of a field and setter. Null value
-     */
-    public void testSetFieldAndSetterValue_null() {
-        setFieldAndSetterValue(testObject, asSet(field), asSet(fieldSetterMethod), null);
-        assertNull(testObject.getField());
-    }
-
-
-    /**
-     * Test for setting the value of a field and setter. Field not found
-     */
-    public void testSetFieldAndSetterValue_unexistingField() throws Exception {
-        //get another field
-        Field anotherField = getClass().getDeclaredField("testObject");
-        try {
-            setFieldAndSetterValue(testObject, asSet(anotherField), asSet(fieldSetterMethod), "newValue");
-            fail("UnitilsException expected");
-        } catch (UnitilsException e) {
-            //expected
-        }
-    }
-
-
-    /**
-     * Test for setting the value of a field and setter. Method not found
-     */
-    public void testSetFieldAndSetterValue_unexistingMethod() throws Exception {
-        //get another field
-        Method anotherMethod = getClass().getDeclaredMethod("testInvokeMethod_unexistingMethod");
-        try {
-            setFieldAndSetterValue(testObject, asSet(field), asSet(anotherMethod), "newValue");
-            fail("UnitilsException expected");
-        } catch (UnitilsException e) {
-            //expected
-        }
-    }
-
-
-    /**
-     * Test for setting the value of a field that is of a wrong type.
-     */
-    public void testSetFieldValue_wrongType() throws Exception {
-        try {
-            setFieldValue(testObject, field, 0);
-            fail("UnitilsException expected");
-        } catch (UnitilsException e) {
-            //expected
-        }
-    }
-
-
     /**
      * Test for performing a method invocation.
      */
@@ -228,7 +121,6 @@ public class ReflectionUtilsTest extends TestCase {
         assertNull(testObject.getField());
     }
 
-
     /**
      * Test for performing a method invocation of a method that is not of the test object.
      */
@@ -243,7 +135,6 @@ public class ReflectionUtilsTest extends TestCase {
         }
     }
 
-
     /**
      * Test for performing a method invocation of a field that is of a wrong type.
      */
@@ -256,30 +147,6 @@ public class ReflectionUtilsTest extends TestCase {
         }
     }
 
-
-    /**
-     * Test for performing a method invocation. Null value
-     */
-    public void testGetFieldName() throws Exception {
-        String result = getPropertyName(fieldSetterMethod);
-        assertEquals("field", result);
-    }
-
-
-    /**
-     * Test for performing a method invocation. Null value
-     */
-    public void testGetFieldName_noSetter() throws Exception {
-        Method anotherMethod = getClass().getDeclaredMethod("testGetFieldName_noSetter");
-        try {
-            getPropertyName(anotherMethod);
-            fail("UnitilsException expected");
-        } catch (UnitilsException e) {
-            //expected
-        }
-    }
-
-
     /**
      * Tests creating a represenation of a method name.
      */
@@ -287,19 +154,6 @@ public class ReflectionUtilsTest extends TestCase {
         String result = getSimpleMethodName(fieldSetterMethod);
         assertEquals("TestObject.setField()", result);
     }
-    
-    public void testGetGetter(){
-    	Method result = getGetter(TestObject.class, "field", false);
-    	assertEquals("getField", result.getName());
-    	
-    }
-    
-    public void testGetGetterBooleanVersion(){
-    	Method result = getGetter(TestObject.class, "boolField", false);
-    	assertEquals("isBoolField", result.getName());
-    	
-    }
-
 
     /**
      * A test object containing a private field.
@@ -307,7 +161,7 @@ public class ReflectionUtilsTest extends TestCase {
     private static class TestObject {
 
         private String field = "testValue";
-        
+
         private boolean boolField = true;
 
         public String getField() {
@@ -318,8 +172,8 @@ public class ReflectionUtilsTest extends TestCase {
             this.field = field;
         }
 
-		public boolean isBoolField() {
-			return boolField;
-		}
+        public boolean isBoolField() {
+            return boolField;
+        }
     }
 }

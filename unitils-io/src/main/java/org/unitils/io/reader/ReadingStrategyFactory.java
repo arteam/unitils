@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,7 @@ import org.unitilsnew.core.Factory;
  */
 public class ReadingStrategyFactory implements Factory<ReadingStrategy> {
 
-
-    private FileResolvingStrategy fileResolvingStrategy;
+    protected FileResolvingStrategy fileResolvingStrategy;
 
 
     public ReadingStrategyFactory(FileResolvingStrategy fileResolvingStrategy) {

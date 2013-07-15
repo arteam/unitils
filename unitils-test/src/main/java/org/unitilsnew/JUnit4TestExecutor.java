@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import org.junit.runner.notification.RunNotifier;
 
 class JUnit4TestExecutor implements TestExecutor {
 
-    private Result result;
+    protected Result result;
 
-    JUnit4TestExecutor() {
+    protected JUnit4TestExecutor() {
         super();
     }
 

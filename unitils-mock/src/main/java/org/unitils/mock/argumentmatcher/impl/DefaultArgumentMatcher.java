@@ -1,19 +1,17 @@
 /*
+ * Copyright 2013,  Unitils.org
  *
- *  * Copyright 2010,  Unitils.org
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.unitils.mock.argumentmatcher.impl;
 
@@ -31,17 +29,16 @@ import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDE
  * expected and actual arguments refer to the same object. Otherwise, lenient reflection comparison is used (This means
  * the actual order of collections will be ignored and only fields that have a non default value will be compared)
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  * @since 15-dec-2008
  */
 public class DefaultArgumentMatcher implements ArgumentMatcher {
 
     /* The original value passed to the argument matcher */
-    private final Object value;
-
+    protected Object value;
     /* Copy of the original value */
-    private final Object valueAtInvocationTime;
+    protected Object valueAtInvocationTime;
 
     /**
      * Creates a matcher for the given value. The original value is stored and a copy of the value is taken so that it
@@ -53,6 +50,7 @@ public class DefaultArgumentMatcher implements ArgumentMatcher {
         this.value = value;
         this.valueAtInvocationTime = createDeepClone(value);
     }
+
 
     /**
      * Returns true if the given object matches the expected argument, false otherwise. If the given argument refers to

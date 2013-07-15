@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,11 @@ package org.unitils.mock.mockbehavior.impl;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
 import org.unitils.mock.core.proxy.ProxyInvocation;
-import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationStackTrace;
 import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
 
 import java.util.Arrays;
+
+import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationStackTrace;
 
 /**
  * Mock behavior that throws a given exception.
@@ -33,7 +34,7 @@ import java.util.Arrays;
 public class ExceptionThrowingMockBehavior implements ValidatableMockBehavior {
 
     /* The exception to throw */
-    private Throwable exceptionToThrow;
+    protected Throwable exceptionToThrow;
 
 
     /**
@@ -66,7 +67,6 @@ public class ExceptionThrowingMockBehavior implements ValidatableMockBehavior {
                 (exceptionTypes.length > 0 ? ", declared exceptions: " + Arrays.toString(exceptionTypes) : ", no declared exceptions"));
     }
 
-
     /**
      * Executes the mock behavior.
      *
@@ -77,5 +77,4 @@ public class ExceptionThrowingMockBehavior implements ValidatableMockBehavior {
         exceptionToThrow.setStackTrace(getInvocationStackTrace(Mock.class, false));
         throw exceptionToThrow;
     }
-
 }

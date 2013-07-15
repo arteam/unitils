@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +19,20 @@ import org.unitils.core.UnitilsException;
 import org.unitils.core.util.ObjectToInjectHolder;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
+
 import static org.unitils.util.ReflectionUtils.isAssignable;
 
 /**
  * Mock behavior that returns a given value.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  * @author Kenny Claes
  */
 public class ValueReturningMockBehavior implements ValidatableMockBehavior {
 
     /* The value to return */
-    private Object valueToReturn;
+    protected Object valueToReturn;
 
 
     /**
@@ -60,7 +61,6 @@ public class ValueReturningMockBehavior implements ValidatableMockBehavior {
         }
     }
 
-
     /**
      * Executes the mock behavior.
      *
@@ -70,7 +70,6 @@ public class ValueReturningMockBehavior implements ValidatableMockBehavior {
     public Object execute(ProxyInvocation proxyInvocation) {
         return valueToReturn;
     }
-
 
     /**
      * If the value to return is an wrapper object, e.g. a mock, this will return the wrapped instance instead
