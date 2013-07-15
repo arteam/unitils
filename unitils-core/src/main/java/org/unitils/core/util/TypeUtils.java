@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,7 +22,7 @@ import java.lang.reflect.WildcardType;
 
 /**
  * Class copied from spring-core.
- *
+ * <p/>
  * Utility to work with Java 5 generic type parameters.
  * Mainly for internal use within the framework.
  *
@@ -56,7 +56,7 @@ public abstract class TypeUtils {
         return false;
     }
 
-    private static boolean isAssignable(ParameterizedType lhsType, ParameterizedType rhsType) {
+    protected static boolean isAssignable(ParameterizedType lhsType, ParameterizedType rhsType) {
         if (lhsType.equals(rhsType)) {
             return true;
         }
@@ -76,7 +76,7 @@ public abstract class TypeUtils {
         return true;
     }
 
-    private static boolean isAssignable(WildcardType lhsType, Type rhsType) {
+    protected static boolean isAssignable(WildcardType lhsType, Type rhsType) {
         Type[] upperBounds = lhsType.getUpperBounds();
         Type[] lowerBounds = lhsType.getLowerBounds();
         for (int size = upperBounds.length, i = 0; i < size; ++i) {
@@ -91,5 +91,4 @@ public abstract class TypeUtils {
         }
         return true;
     }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,19 @@
  */
 package org.unitils.reflectionassert.report.impl;
 
-import org.unitils.reflectionassert.report.DifferenceView;
-import static org.unitils.reflectionassert.report.impl.DefaultDifferenceReport.MAX_LINE_SIZE;
-import org.unitils.reflectionassert.difference.Difference;
-import org.unitils.core.util.ObjectFormatter;
 import junit.framework.AssertionFailedError;
+import org.unitils.core.util.ObjectFormatter;
+import org.unitils.reflectionassert.difference.Difference;
+import org.unitils.reflectionassert.report.DifferenceView;
+
+import static org.unitils.reflectionassert.report.impl.DefaultDifferenceReport.MAX_LINE_SIZE;
 
 /**
  * @author Filip Neven
  */
 public class SimpleDifferenceView implements DifferenceView {
 
-    private ObjectFormatter objectFormatter = new ObjectFormatter();
+    protected ObjectFormatter objectFormatter = new ObjectFormatter();
 
     /**
      * Creates a string representation of the given difference tree.
@@ -38,7 +39,7 @@ public class SimpleDifferenceView implements DifferenceView {
         String expectedStr = objectFormatter.format(difference.getLeftValue());
         String actualStr = objectFormatter.format(difference.getRightValue());
         String formattedOnOneLine = formatOnOneLine(expectedStr, actualStr);
-        if (AssertionFailedError.class.getName().length() + 2  + formattedOnOneLine.length() < MAX_LINE_SIZE) {
+        if (AssertionFailedError.class.getName().length() + 2 + formattedOnOneLine.length() < MAX_LINE_SIZE) {
             return formattedOnOneLine;
         } else {
             return formatOnTwoLines(expectedStr, actualStr);

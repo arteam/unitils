@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,13 +32,13 @@ import java.util.Properties;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
 /**
- * @author Fabian Krueger
  * @author Tim Ducheyne
+ * @author Fabian Krueger
  */
 public class PropertiesReader {
 
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(PropertiesReader.class);
+    protected static Log logger = LogFactory.getLog(PropertiesReader.class);
 
 
     /**

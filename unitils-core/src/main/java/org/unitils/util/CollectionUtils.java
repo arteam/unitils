@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,36 +17,19 @@ package org.unitils.util;
 
 import org.apache.commons.lang.ArrayUtils;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import static java.util.Arrays.asList;
 
 /**
  * Class containing collection related utilities
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class CollectionUtils {
-
-
-    /**
-     * Gets a list containing all elements from the given index to the given index.
-     *
-     * @param list      The original list
-     * @param fromIndex The from index
-     * @param toIndex   The to index
-     * @return The sub-list, not null
-     */
-    public static <T> List<T> subList(List<T> list, int fromIndex, int toIndex) {
-        List<T> result = new ArrayList<T>();
-        if (list == null) {
-            return result;
-        }
-        for (int i = fromIndex; i < toIndex; i++) {
-            result.add(list.get(i));
-        }
-        return result;
-    }
 
 
     /**
@@ -63,7 +46,6 @@ public class CollectionUtils {
         result.addAll(asList(elements));
         return result;
     }
-
 
     /**
      * Converts the given array or collection object (possibly primitive array) to type Collection
@@ -82,7 +64,6 @@ public class CollectionUtils {
         // Convert array to collection
         return asList(objectArray);
     }
-
 
     /**
      * Converts the given array object (possibly primitive array) to type Object[]

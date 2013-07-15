@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,7 @@ import java.lang.reflect.Method;
 
 /**
  * Base test class that will Unitils-enable your test. This base class will make sure that the
- * core unitils test listener methods are invoked in the expected order. See {@link org.unitils.core.TestListener} for
- * more information on the listener invocation order.
+ * core unitils test listener methods are invoked in the expected order.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -43,7 +42,7 @@ public abstract class UnitilsTestNG implements IHookable {
 
 
     /**
-     * Called before a test of a test class is run. This is where {@link org.unitils.core.TestListener#afterCreateTestObject(Object)} is called.
+     * Called before a test of a test class is run. This is where afterCreateTestObject is called.
      */
     @BeforeClass(alwaysRun = true)
     protected void unitilsBeforeClass() {
@@ -52,7 +51,7 @@ public abstract class UnitilsTestNG implements IHookable {
 
 
     /**
-     * Called before all test setup. This is where {@link org.unitils.core.TestListener#beforeTestSetUp} is called.
+     * Called before all test setup. This is where beforeTestSetUp is called.
      *
      * @param testMethod The test method, not null
      */
@@ -64,7 +63,7 @@ public abstract class UnitilsTestNG implements IHookable {
 
 
     /**
-     * Called after all test tear down. This is where {@link org.unitils.core.TestListener#afterTestTearDown} is called.
+     * Called after all test tear down. This is where afterTestTearDown is called.
      * <p/>
      * NOTE: alwaysRun is enabled to be sure that this method is called even when an exception occurs during
      * {@link #unitilsBeforeTestSetUp}.
@@ -82,8 +81,7 @@ public abstract class UnitilsTestNG implements IHookable {
 
 
     /**
-     * Implementation of the hookable interface to be able to call {@link org.unitils.core.TestListener#beforeTestMethod} and
-     * {@link org.unitils.core.TestListener#afterTestMethod}.
+     * Implementation of the hookable interface to be able to call beforeTestMethod and afterTestMethod.
      *
      * @param callBack   the TestNG test callback, not null
      * @param testResult the TestNG test result, not null

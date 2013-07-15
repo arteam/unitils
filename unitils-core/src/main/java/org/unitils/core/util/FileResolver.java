@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,8 +45,8 @@ import java.net.URL;
  * <p/>
  * Examples:
  * <p/>
- * path prefix /c:/testfiles  --> looks for c:/testfiles/MyFile.xml on the file system
- * path prefix testfiles      --> looks for testfiles/MyFile.xml on the classpath
+ * path prefix /c:/testFiles  --> looks for c:/testFiles/MyFile.xml on the file system
+ * path prefix testFiles      --> looks for testFiles/MyFile.xml on the classpath
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -175,7 +175,7 @@ public class FileResolver {
     }
 
     /**
-     * The default name is constructed as follows: 'classname without packagename'.'extension'
+     * The default name is constructed as follows: 'classname without package name'.'extension'
      *
      * @param extension The extension of the file
      * @param testClass The test class, not null
@@ -185,5 +185,4 @@ public class FileResolver {
         String className = testClass.getName();
         return className.substring(className.lastIndexOf(".") + 1) + '.' + extension;
     }
-
 }
