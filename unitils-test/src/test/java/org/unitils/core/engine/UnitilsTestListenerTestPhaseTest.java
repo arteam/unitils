@@ -37,6 +37,7 @@ public class UnitilsTestListenerTestPhaseTest extends UnitilsJUnit4 {
 
     private Mock<WrapperForFieldAnnotationListenerFactory> wrapperForFieldAnnotationListenerFactoryMock;
     private Mock<WrapperForTestAnnotationListenerFactory> wrapperForTestAnnotationListenerFactoryMock;
+    private Mock<TestListener> initializationTestListenerMock;
     private Mock<TestListener> constructionTestListenerMock;
     private Mock<TestListener> injectionTestListenerMock;
     private Mock<TestListener> setupTestListenerMock;
@@ -47,6 +48,7 @@ public class UnitilsTestListenerTestPhaseTest extends UnitilsJUnit4 {
     public void initialize() throws Exception {
         unitilsTestListener = new UnitilsTestListener(new ArrayList<TestListener>(), wrapperForFieldAnnotationListenerFactoryMock.getMock(), wrapperForTestAnnotationListenerFactoryMock.getMock());
 
+        initializationTestListenerMock.returns(INITIALIZATION).getTestPhase();
         constructionTestListenerMock.returns(CONSTRUCTION).getTestPhase();
         injectionTestListenerMock.returns(INJECTION).getTestPhase();
         setupTestListenerMock.returns(SETUP).getTestPhase();
@@ -56,10 +58,11 @@ public class UnitilsTestListenerTestPhaseTest extends UnitilsJUnit4 {
 
     @Test
     public void beforeTestClassSortedOnTestPhase() {
-        unitilsTestListener = new UnitilsTestListener(asList(executionTestListenerMock.getMock(), setupTestListenerMock.getMock(), injectionTestListenerMock.getMock(), constructionTestListenerMock.getMock()), wrapperForFieldAnnotationListenerFactoryMock.getMock(), wrapperForTestAnnotationListenerFactoryMock.getMock());
+        unitilsTestListener = new UnitilsTestListener(asList(executionTestListenerMock.getMock(), setupTestListenerMock.getMock(), injectionTestListenerMock.getMock(), constructionTestListenerMock.getMock(), initializationTestListenerMock.getMock()), wrapperForFieldAnnotationListenerFactoryMock.getMock(), wrapperForTestAnnotationListenerFactoryMock.getMock());
 
         unitilsTestListener.beforeTestClass(null);
 
+        initializationTestListenerMock.assertInvokedInSequence().beforeTestClass(null);
         constructionTestListenerMock.assertInvokedInSequence().beforeTestClass(null);
         injectionTestListenerMock.assertInvokedInSequence().beforeTestClass(null);
         setupTestListenerMock.assertInvokedInSequence().beforeTestClass(null);

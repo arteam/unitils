@@ -21,6 +21,7 @@ package org.unitils.core;
  */
 public enum TestPhase {
 
+    INITIALIZATION,
     CONSTRUCTION,
     INJECTION,
     SETUP,
