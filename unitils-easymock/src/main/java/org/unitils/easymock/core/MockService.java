@@ -16,7 +16,6 @@
 package org.unitils.easymock.core;
 
 import org.easymock.internal.MocksControl;
-import org.easymock.internal.ReplayState;
 import org.unitils.core.UnitilsException;
 import org.unitils.easymock.annotation.AfterCreateMock;
 import org.unitils.easymock.util.*;
@@ -39,7 +38,12 @@ public class MockService {
     protected List<MocksControl> mocksControls = new ArrayList<MocksControl>();
 
 
-    public void resetMocks() {
+    public MockService(MocksControlFactory mocksControlFactory) {
+        this.mocksControlFactory = mocksControlFactory;
+    }
+
+
+    public void clearMocks() {
         mocksControls.clear();
     }
 
@@ -72,10 +76,11 @@ public class MockService {
      */
     public void verify() {
         for (MocksControl mocksControl : mocksControls) {
-            if (!(mocksControl.getState() instanceof ReplayState)) {
-                mocksControl.replay();
+            try {
+                mocksControl.verify();
+            } catch (IllegalStateException e) {
+                throw new UnitilsException("Unable to verify mocks control. Be sure to call replay before using the mock.", e);
             }
-            mocksControl.verify();
         }
     }
 
@@ -139,10 +144,10 @@ public class MockService {
                 invokeMethod(testObject, method, mock, fieldName, mockType);
 
             } catch (InvocationTargetException e) {
-                throw new UnitilsException("An exception occurred while invoking an after create mock method.", e);
+                throw new UnitilsException("Unable to invoke after create mock method: " + method, e.getTargetException());
             } catch (Exception e) {
-                throw new UnitilsException("Unable to invoke after create mock method. Ensure that this method has following signature: " +
-                        "void myMethod(Object mock, String name, Class type)", e);
+                throw new UnitilsException("Unable to invoke after create mock method: " + method + "\n" +
+                        "Ensure that this method has following signature: void myMethod(Object mock, String name, Class type)", e);
             }
         }
     }

@@ -13,29 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.easymock.util;
+package org.unitils.easymock.listener;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.core.TestPhase;
+
+import static org.junit.Assert.assertEquals;
+import static org.unitils.core.TestPhase.INITIALIZATION;
 
 /**
- * Possible values for checking the order of method invocation on the mock.
- *
  * @author Tim Ducheyne
- * @author Filip Neven
  */
-public enum InvocationOrder {
+public class ResetMocksTestListenerGetTestPhaseTest {
 
-    /**
-     * NONE or STRICT as defined by the default value in the configuration.
-     */
-    DEFAULT,
+    private ResetMocksTestListener resetMocksTestListener;
 
-    /**
-     * No order checking of method invocations.
-     */
-    NONE,
 
-    /**
-     * Strict order checking of method invocations.
-     */
-    STRICT
+    @Before
+    public void initialize() {
+        resetMocksTestListener = new ResetMocksTestListener(null);
+    }
 
+
+    @Test
+    public void getTestPhase() {
+        TestPhase result = resetMocksTestListener.getTestPhase();
+        assertEquals(INITIALIZATION, result);
+    }
 }
