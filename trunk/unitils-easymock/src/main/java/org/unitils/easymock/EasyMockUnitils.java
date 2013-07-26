@@ -151,10 +151,6 @@ public class EasyMockUnitils {
         mockService.replay();
     }
 
-    public static void reset() {
-        mockService.reset();
-    }
-
     /**
      * Unit tests can call this method to check whether all recorded expected behavior was actually observed during
      * the test.
@@ -170,5 +166,13 @@ public class EasyMockUnitils {
      */
     public static void verify() {
         mockService.verify();
+    }
+
+    public static void reset() {
+        mockService.reset();
+    }
+
+    public static void clearMocks() {
+        mockService.clearMocks();
     }
 }

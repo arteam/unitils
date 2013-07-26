@@ -17,35 +17,31 @@ package org.unitils.easymock.listener;
 
 import org.unitils.core.TestInstance;
 import org.unitils.core.TestListener;
-import org.unitils.core.annotation.Property;
+import org.unitils.core.TestPhase;
 import org.unitils.easymock.core.MockService;
+
+import static org.unitils.core.TestPhase.INITIALIZATION;
 
 /**
  * @author Tim Ducheyne
  */
-public class MockTestListener extends TestListener {
+public class ResetMocksTestListener extends TestListener {
 
     protected MockService mockService;
-    /* Indicates whether verify() is automatically called on every mock object after each test method execution */
-    protected boolean autoVerifyAfterTest;
 
 
-    public MockTestListener(MockService mockService, @Property("easymock.autoVerifyAfterTest") boolean autoVerifyAfterTest) {
+    public ResetMocksTestListener(MockService mockService) {
         this.mockService = mockService;
-        this.autoVerifyAfterTest = autoVerifyAfterTest;
     }
 
+
+    @Override
+    public TestPhase getTestPhase() {
+        return INITIALIZATION;
+    }
 
     @Override
     public void beforeTestSetUp(TestInstance testInstance) {
-        mockService.resetMocks();
-    }
-
-    @Override
-    public void afterTestMethod(TestInstance testInstance, Throwable testThrowable) {
-        if (!autoVerifyAfterTest || testThrowable != null) {
-            return;
-        }
-        mockService.verify();
+        mockService.clearMocks();
     }
 }

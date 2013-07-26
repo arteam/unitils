@@ -20,6 +20,7 @@ import org.easymock.IAnswer;
 import org.easymock.IArgumentMatcher;
 import org.easymock.classextension.internal.MocksClassControl;
 import org.easymock.internal.*;
+import org.unitils.core.UnitilsException;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
 
 import java.lang.reflect.Method;
@@ -156,8 +157,8 @@ public class LenientMocksControl extends MocksClassControl {
             List<IArgumentMatcher> matchers = LastControl.pullMatchers();
             if (matchers != null && !matchers.isEmpty()) {
                 if (matchers.size() != invocation.getArguments().length) {
-                    throw new IllegalStateException("This mock control does not support mixing of no-argument matchers and per-argument matchers. " +
-                            "Either no matchers are defined and the reflection argument matcher is used by default or all matchers are defined explicitly (Eg by using refEq()).");
+                    throw new UnitilsException("This mocks control does not support mixing of no-argument matchers and per-argument matchers.\n" +
+                            "Either no matchers are defined (the reflection argument matcher is then used by default) or all matchers are defined explicitly (Eg by using refEq()).");
                 }
                 // put all matchers back since pull removes them
                 for (IArgumentMatcher matcher : matchers) {
@@ -165,12 +166,7 @@ public class LenientMocksControl extends MocksClassControl {
                 }
                 return;
             }
-            Object[] arguments = invocation.getArguments();
-            if (arguments == null) {
-                return;
-            }
-
-            for (Object argument : arguments) {
+            for (Object argument : invocation.getArguments()) {
                 LastControl.reportMatcher(new ReflectionArgumentMatcher<Object>(argument, modes));
             }
         }
