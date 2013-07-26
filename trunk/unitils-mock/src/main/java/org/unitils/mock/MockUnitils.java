@@ -41,6 +41,8 @@ public class MockUnitils {
         MockObject.getCurrentScenario().assertNoMoreInvocations(getInvocationStackTrace(MockUnitils.class, false));
     }
 
+    // todo log error when mock chaining does not work  e.g.
+    // proxyInvocationMock.returns(String.class).getMethod().getReturnType();
 
     public static <T> T createDummy(Class<T> type) {
         return dummyObjectFactory.createDummy(type);

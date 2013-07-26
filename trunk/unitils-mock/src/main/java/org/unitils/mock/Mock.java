@@ -60,6 +60,7 @@ public interface Mock<T> {
     @MatchStatement
     T returns(Object returnValue);
 
+    // todo add returnsdummy(Class<?>)
 
     /**
      * Defines behavior for this mock so that it raises the given exception when the invocation following

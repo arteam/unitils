@@ -1,19 +1,17 @@
 /*
+ * Copyright 2013,  Unitils.org
  *
- *  * Copyright 2010,  Unitils.org
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.unitils.mock.core;
 
@@ -53,10 +51,10 @@ public class BehaviorDefiningInvocations {
      * matching score (identity match scores higher than an equals match). If there are 2 invocations with the same score,
      * we take the invocation with the lowest nr of not-null (default) arguments. If both have the same nr of not-null
      * arguments, the first one is returned. E.g.
-     *
+     * <p/>
      * myMethod(null, null);
      * myMethod("a", null);
-     *
+     * <p/>
      * The second one will be returned if the given proxy invocation has the value "a" as first argument.
      *
      * @param proxyInvocation The actual invocation to match with, not null
