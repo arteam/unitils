@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,17 @@
  */
 package org.unitils.reflectionassert;
 
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.reflectionassert.difference.Difference;
+
+import java.util.Date;
+
+import static org.junit.Assert.*;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_DATES;
-import org.unitils.reflectionassert.difference.Difference;
 import static org.unitils.reflectionassert.util.InnerDifferenceFinder.getInnerDifference;
-
-import java.util.Date;
 
 
 /**

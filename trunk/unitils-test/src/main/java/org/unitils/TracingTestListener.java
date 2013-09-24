@@ -15,14 +15,13 @@
  */
 package org.unitils;
 
-import junit.framework.AssertionFailedError;
 import org.unitils.core.engine.UnitilsTestListener;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 import static org.unitils.TracingTestListener.InvocationSource.TEST;
 import static org.unitils.TracingTestListener.InvocationSource.UNITILS;
 import static org.unitils.TracingTestListener.ListenerInvocation.*;
@@ -165,7 +164,7 @@ public class TracingTestListener extends UnitilsTestListener {
             return;
         }
         if (throwAssertionFailedError) {
-            AssertionFailedError error = new AssertionFailedError(exceptionMethod.toString());
+            AssertionError error = new AssertionError(exceptionMethod.toString());
             currentThrowable = error;
             throw error;
         }

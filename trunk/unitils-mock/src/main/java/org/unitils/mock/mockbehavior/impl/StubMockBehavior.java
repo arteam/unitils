@@ -32,6 +32,7 @@ public class StubMockBehavior extends DefaultValueReturningMockBehavior {
      *
      * @param proxyInvocation The proxy method invocation, not null
      */
+    @Override
     public void assertCanExecute(ProxyInvocation proxyInvocation) throws UnitilsException {
         // allow void methods
     }

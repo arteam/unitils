@@ -21,7 +21,6 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
 
-import static org.unitils.core.util.ObjectFormatter.MOCK_NAME_CHAIN_SEPARATOR;
 import static org.unitils.util.ReflectionUtils.getAllFields;
 import static org.unitils.util.ReflectionUtils.getFieldValue;
 
@@ -66,7 +65,7 @@ public class SuggestedAssertsReport {
     protected String getSuggestedAssertStatement(Object testObject, ObservedInvocation observedInvocation) {
         StringBuilder result = new StringBuilder();
 
-        result.append(formatMockName(observedInvocation));
+        result.append(observedInvocation.getProxyName());
         result.append(".assertInvoked().");
         result.append(observedInvocation.getMethod().getName());
         result.append("(");
@@ -132,10 +131,5 @@ public class SuggestedAssertsReport {
             }
         }
         return null;
-    }
-
-    protected String formatMockName(ObservedInvocation observedInvocation) {
-        String mockName = observedInvocation.getMockName();
-        return mockName.replaceAll(MOCK_NAME_CHAIN_SEPARATOR, ".");
     }
 }

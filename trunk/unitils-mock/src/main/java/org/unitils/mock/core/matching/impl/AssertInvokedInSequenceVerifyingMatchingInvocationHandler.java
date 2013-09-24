@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.unitils.mock.core.matching.impl;
 
 import org.unitils.mock.Mock;
 import org.unitils.mock.core.BehaviorDefiningInvocation;
-import org.unitils.mock.core.MockFactory;
+import org.unitils.mock.core.MockService;
 import org.unitils.mock.core.Scenario;
 
 
@@ -28,13 +28,13 @@ import org.unitils.mock.core.Scenario;
 public class AssertInvokedInSequenceVerifyingMatchingInvocationHandler extends AssertVerifyingMatchingInvocationHandler {
 
 
-    public AssertInvokedInSequenceVerifyingMatchingInvocationHandler(Scenario scenario, MockFactory mockFactory) {
-        super(scenario, mockFactory);
+    public AssertInvokedInSequenceVerifyingMatchingInvocationHandler(Scenario scenario, MockService mockService) {
+        super(scenario, mockService);
     }
 
 
     protected void performAssertion(Scenario scenario, BehaviorDefiningInvocation behaviorDefiningInvocation) {
-        scenario.assertInvokedInOrder(behaviorDefiningInvocation);
+        scenario.assertInvokedInSequence(behaviorDefiningInvocation);
     }
 
     protected Object performChainedAssertion(Mock<?> mock) {

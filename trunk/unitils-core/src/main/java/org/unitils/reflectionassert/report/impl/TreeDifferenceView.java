@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,15 @@
  */
 package org.unitils.reflectionassert.report.impl;
 
+import org.unitils.core.util.ObjectFormatter;
 import org.unitils.reflectionassert.difference.*;
 import org.unitils.reflectionassert.report.DifferenceView;
-import static org.unitils.reflectionassert.report.impl.DefaultDifferenceReport.MatchType.NO_MATCH;
-import org.unitils.core.util.ObjectFormatter;
-import static org.apache.commons.lang.ClassUtils.getShortClassName;
 
 import java.util.List;
 import java.util.Map;
+
+import static org.apache.commons.lang.ClassUtils.getShortClassName;
+import static org.unitils.reflectionassert.report.impl.DefaultDifferenceReport.MatchType.NO_MATCH;
 
 /**
  * Formatter that will output all objects in the difference tree. For an unordered collection difference,

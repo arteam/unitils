@@ -18,13 +18,11 @@ package org.unitils.mock.report.impl;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.mock.Mock;
-import org.unitils.mock.core.MockObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
-import static org.unitils.mock.core.MockObject.getCurrentScenario;
 
 /**
  * Tests the usage of test fields in mock invocations. The names of the fields should be shown in the report (same as for large value).
@@ -45,7 +43,8 @@ public class DetailedObservedInvocationsReportFieldNamesTest {
     @Before
     public void initialize() {
         detailedObservedInvocationsReport = new DetailedObservedInvocationsReport(this);
-        testMock = new MockObject<TestInterface>("testMock", TestInterface.class, this);
+        // todo td implement
+//        testMock = new MockObject<TestInterface>("testMock", TestInterface.class, this);
     }
 
 
@@ -54,7 +53,9 @@ public class DetailedObservedInvocationsReportFieldNamesTest {
         testMock.returns(myTestField).testMethod(null);
         testMock.getMock().testMethod(null);
 
-        String result = detailedObservedInvocationsReport.createReport(getCurrentScenario().getObservedInvocations());
+        // todo td implement
+//        String result = detailedObservedInvocationsReport.createReport(getCurrentScenario().getObservedInvocations());
+        String result = null;
         assertTrue(result.contains("1. testMock.testMethod(null) -> myTestField"));
         assertTrue(result.contains("- myTestField -> []"));
     }
@@ -64,7 +65,9 @@ public class DetailedObservedInvocationsReportFieldNamesTest {
         testMock.returns(null).testMethod(myTestField);
         testMock.getMock().testMethod(myTestField);
 
-        String result = detailedObservedInvocationsReport.createReport(getCurrentScenario().getObservedInvocations());
+        // todo td implement
+//        String result = detailedObservedInvocationsReport.createReport(getCurrentScenario().getObservedInvocations());
+        String result = null;
         assertTrue(result.contains("1. testMock.testMethod(myTestField) -> null"));
         assertTrue(result.contains("- myTestField -> []"));
     }

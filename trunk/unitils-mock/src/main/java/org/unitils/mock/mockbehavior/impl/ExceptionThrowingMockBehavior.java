@@ -18,11 +18,11 @@ package org.unitils.mock.mockbehavior.impl;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
 import org.unitils.mock.core.proxy.ProxyInvocation;
+import org.unitils.mock.core.proxy.StackTraceService;
 import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
 
 import java.util.Arrays;
 
-import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationStackTrace;
 
 /**
  * Mock behavior that throws a given exception.
@@ -35,6 +35,7 @@ public class ExceptionThrowingMockBehavior implements ValidatableMockBehavior {
 
     /* The exception to throw */
     protected Throwable exceptionToThrow;
+    protected StackTraceService stackTraceService;
 
 
     /**
@@ -42,8 +43,9 @@ public class ExceptionThrowingMockBehavior implements ValidatableMockBehavior {
      *
      * @param exceptionToThrow The exception, not null
      */
-    public ExceptionThrowingMockBehavior(Throwable exceptionToThrow) {
+    public ExceptionThrowingMockBehavior(Throwable exceptionToThrow, StackTraceService stackTraceService) {
         this.exceptionToThrow = exceptionToThrow;
+        this.stackTraceService = stackTraceService;
     }
 
 
@@ -74,7 +76,10 @@ public class ExceptionThrowingMockBehavior implements ValidatableMockBehavior {
      * @return Nothing
      */
     public Object execute(ProxyInvocation proxyInvocation) throws Throwable {
-        exceptionToThrow.setStackTrace(getInvocationStackTrace(Mock.class, false));
+        StackTraceElement[] invocationStackTraceWithoutMock = stackTraceService.getInvocationStackTrace(Mock.class, false);
+        if (invocationStackTraceWithoutMock != null) {
+            exceptionToThrow.setStackTrace(invocationStackTraceWithoutMock);
+        }
         throw exceptionToThrow;
     }
 }

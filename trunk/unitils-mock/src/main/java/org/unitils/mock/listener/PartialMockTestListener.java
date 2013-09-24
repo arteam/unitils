@@ -21,7 +21,7 @@ import org.unitils.mock.Mock;
 import org.unitils.mock.PartialMock;
 import org.unitils.mock.annotation.AfterCreateMock;
 import org.unitils.mock.core.MockObject;
-import org.unitils.mock.core.PartialMockObject;
+import org.unitils.mock.core.MockService;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -36,6 +36,13 @@ import static org.unitils.util.ReflectionUtils.invokeMethod;
  * @author Tim Ducheyne
  */
 public class PartialMockTestListener extends TestListener {
+
+    protected MockService mockService;
+
+
+    public PartialMockTestListener(MockService mockService) {
+        this.mockService = mockService;
+    }
 
 
     @Override
@@ -59,12 +66,12 @@ public class PartialMockTestListener extends TestListener {
     }
 
 
-    protected <T> Mock<T> createPartialMock(TestField testField, TestInstance testInstance) {
+    protected Mock<?> createPartialMock(TestField testField, TestInstance testInstance) {
         String mockName = testField.getName();
         Class<?> mockedClass = getMockedClass(testField);
         Object testObject = testInstance.getTestObject();
 
-        PartialMockObject<T> partialMock = new PartialMockObject<T>(mockName, mockedClass, testObject);
+        PartialMock<?> partialMock = mockService.createPartialMock(mockName, mockedClass, testObject);
         callAfterCreateMockMethods(testObject, partialMock, mockName);
         return partialMock;
     }

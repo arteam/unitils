@@ -15,12 +15,14 @@
  */
 package org.unitils.util;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 import org.unitils.core.UnitilsException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import static org.junit.Assert.*;
 import static org.unitils.util.ReflectionUtils.*;
 
 /**
@@ -29,15 +31,13 @@ import static org.unitils.util.ReflectionUtils.*;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class ReflectionUtilsTest extends TestCase {
+public class ReflectionUtilsTest {
 
 
     /* A test object instance */
     private TestObject testObject;
-
     /* A field in the test object */
     private Field field;
-
     /* A setter method in the test object */
     private Method fieldSetterMethod;
 
@@ -45,10 +45,8 @@ public class ReflectionUtilsTest extends TestCase {
     /**
      * Sets up the test fixture.
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void initialize() throws Exception {
         testObject = new TestObject();
         field = TestObject.class.getDeclaredField("field");
         fieldSetterMethod = TestObject.class.getDeclaredMethod("setField", String.class);
@@ -58,6 +56,7 @@ public class ReflectionUtilsTest extends TestCase {
     /**
      * Test for creating a class instance.
      */
+    @Test
     public void testCreateInstanceOfType() {
         String result = createInstanceOfType("java.lang.String", false);
         assertNotNull(result);
@@ -67,6 +66,7 @@ public class ReflectionUtilsTest extends TestCase {
     /**
      * Test for creating a class instance, but with an unexisting class name.
      */
+    @Test
     public void testCreateInstanceOfType_classNotFound() {
         try {
             createInstanceOfType("xxxxxx", false);
@@ -81,6 +81,7 @@ public class ReflectionUtilsTest extends TestCase {
     /**
      * Test for getting the value of a field.
      */
+    @Test
     public void testGetFieldValue() {
         Object result = getFieldValue(testObject, field);
         assertEquals("testValue", result);
@@ -90,6 +91,7 @@ public class ReflectionUtilsTest extends TestCase {
     /**
      * Test for getting the value of a field that is not of the test object.
      */
+    @Test
     public void testGetFieldValue_unexistingField() throws Exception {
         //get another field
         Field anotherField = getClass().getDeclaredField("testObject");
@@ -105,6 +107,7 @@ public class ReflectionUtilsTest extends TestCase {
     /**
      * Test for performing a method invocation.
      */
+    @Test
     public void testInvokeMethod() throws Exception {
         Object result = invokeMethod(testObject, fieldSetterMethod, "newValue");
         assertNull(result);
@@ -115,6 +118,7 @@ public class ReflectionUtilsTest extends TestCase {
     /**
      * Test for performing a method invocation. Null value
      */
+    @Test
     public void testInvokeMethod_null() throws Exception {
         Object result = invokeMethod(testObject, fieldSetterMethod, (Object) null);
         assertNull(result);
@@ -124,6 +128,7 @@ public class ReflectionUtilsTest extends TestCase {
     /**
      * Test for performing a method invocation of a method that is not of the test object.
      */
+    @Test
     public void testInvokeMethod_unexistingMethod() throws Exception {
         //get another method
         Method anotherMethod = getClass().getDeclaredMethod("testInvokeMethod_unexistingMethod");
@@ -138,6 +143,7 @@ public class ReflectionUtilsTest extends TestCase {
     /**
      * Test for performing a method invocation of a field that is of a wrong type.
      */
+    @Test
     public void testInvokeMethod_wrongType() throws Exception {
         try {
             invokeMethod(testObject, fieldSetterMethod, 0);
@@ -150,6 +156,7 @@ public class ReflectionUtilsTest extends TestCase {
     /**
      * Tests creating a represenation of a method name.
      */
+    @Test
     public void testGetSimpleMethodName() {
         String result = getSimpleMethodName(fieldSetterMethod);
         assertEquals("TestObject.setField()", result);

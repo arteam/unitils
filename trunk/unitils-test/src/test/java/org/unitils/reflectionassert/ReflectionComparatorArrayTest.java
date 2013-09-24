@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,17 @@
  */
 package org.unitils.reflectionassert;
 
-import junit.framework.TestCase;
-import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
+import org.junit.Before;
+import org.junit.Test;
 import org.unitils.reflectionassert.difference.Difference;
-import static org.unitils.reflectionassert.util.InnerDifferenceFinder.getInnerDifference;
 
 import java.util.Arrays;
 import java.util.Collection;
+
+import static org.junit.Assert.*;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
+import static org.unitils.reflectionassert.util.InnerDifferenceFinder.getInnerDifference;
 
 
 /**
@@ -32,38 +35,28 @@ import java.util.Collection;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ReflectionComparatorArrayTest extends TestCase {
+public class ReflectionComparatorArrayTest {
 
     /* Test array */
     private Element[] arrayA;
-
     /* Same as A but different instance */
     private Element[] arrayB;
-
     /* Same as A and B but different string value for element 2 */
     private Element[] arrayDifferentValue;
-
     /* Same as A and B but no 3rd element */
     private Element[] arrayDifferentSize;
-
     /* Same as A and B but different order of elements */
     private Element[] arrayDifferentOrder;
-
     /* Same as A and B but different order of elements and different string value */
     private Element[] arrayDifferentOrderDifferentValue;
-
     /* Test array with inner array for element 2 */
     private Element[] arrayInnerA;
-
     /* Same as innerA but different instance  */
     private Element[] arrayInnerB;
-
     /* Same as innerA and innerB but different string value for inner element 2 */
     private Element[] arrayInnerDifferentValue;
-
     /* Same as innerA and innerB but no 3rd inner element */
     private Element[] arrayInnerDifferentSize;
-
     /* Class under test */
     private ReflectionComparator reflectionComparator, lenientOrderComparator;
 
@@ -71,9 +64,8 @@ public class ReflectionComparatorArrayTest extends TestCase {
     /**
      * Initializes the test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void initialize() throws Exception {
         arrayA = createArray("test 2", null, true);
         arrayB = createArray("test 2", null, true);
         arrayDifferentValue = createArray("XXXXXX", null, true);
@@ -94,6 +86,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     /**
      * Test for two equal arrays.
      */
+    @Test
     public void testGetDifference_equals() {
         Difference result = reflectionComparator.getDifference(arrayA, arrayB);
         assertNull(result);
@@ -103,6 +96,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     /**
      * Test for two equal arrays as an inner field of an object.
      */
+    @Test
     public void testGetDifference_equalsInner() {
         Difference result = reflectionComparator.getDifference(arrayInnerA, arrayInnerB);
         assertNull(result);
@@ -112,6 +106,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     /**
      * Test for two arrays that contain different values.
      */
+    @Test
     public void testGetDifference_notEqualsDifferentValues() {
         Difference result = reflectionComparator.getDifference(arrayA, arrayDifferentValue);
 
@@ -124,6 +119,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     /**
      * Test for two arrays that have a different size.
      */
+    @Test
     public void testGetDifference_notEqualsDifferentSize() {
         Difference result = reflectionComparator.getDifference(arrayA, arrayDifferentSize);
 
@@ -135,6 +131,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     /**
      * Test for objects with inner arrays that contain different values.
      */
+    @Test
     public void testGetDifference_notEqualsInnerDifferentValues() {
         Difference result = reflectionComparator.getDifference(arrayInnerA, arrayInnerDifferentValue);
 
@@ -148,6 +145,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     /**
      * Tests for objects with inner arrays that have a different size.
      */
+    @Test
     public void testGetDifference_notEqualsInnerDifferentSize() {
         Difference result = reflectionComparator.getDifference(arrayInnerA, arrayInnerDifferentSize);
 
@@ -160,6 +158,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     /**
      * Tests for objects with inner arrays that have a element order.
      */
+    @Test
     public void testGetDifference_notEqualsDifferentOrderNotLenient() {
         Difference result = reflectionComparator.getDifference(arrayA, arrayDifferentOrder);
 
@@ -176,6 +175,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     /**
      * Tests for objects with inner arrays that have a element order but with lenient order checking.
      */
+    @Test
     public void testGetDifference_equalsDifferentOrderLenient() {
         Difference result = lenientOrderComparator.getDifference(arrayA, arrayDifferentOrder);
         assertNull(result);
@@ -185,6 +185,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     /**
      * Tests for objects with inner arrays that have a element order but with lenient order checking.
      */
+    @Test
     public void testGetDifference_notEqualsDifferentOrderLenientDifferentValues() {
         Difference result = lenientOrderComparator.getDifference(arrayA, arrayDifferentOrderDifferentValue);
 
@@ -196,6 +197,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     /**
      * Tests for arrays but right value is not an array.
      */
+    @Test
     public void testGetDifference_notEqualsRightNotArray() {
         Difference result = reflectionComparator.getDifference(arrayA, "Test string");
 
@@ -206,6 +208,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     /**
      * Test for an array and a collection containing equal values  (array == collection).
      */
+    @Test
     public void testGetDifference_equalsLeftCollection() {
         Difference result = reflectionComparator.getDifference(arrayA, Arrays.asList(arrayA));
         assertNull(result);
@@ -214,6 +217,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     /**
      * Test for an array and a collection containing equal values  (array == collection).
      */
+    @Test
     public void testGetDifference_equalsRightCollection() {
         Difference result = reflectionComparator.getDifference(Arrays.asList(arrayA), arrayA);
         assertNull(result);
@@ -223,6 +227,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     /**
      * Test for an array and a collection containing different values  (array != collection).
      */
+    @Test
     public void testGetDifference_notEqualsCollectionDifferentValues() {
         Difference result = reflectionComparator.getDifference(arrayA, Arrays.asList(arrayDifferentValue));
 
@@ -235,6 +240,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     /**
      * Test for an array and a collection having a different size (array != collection).
      */
+    @Test
     public void testGetDifference_notEqualsCollectionDifferentSize() {
         Collection<?> collectionDifferentSize = Arrays.asList(arrayDifferentSize);
         Difference result = reflectionComparator.getDifference(arrayA, collectionDifferentSize);
@@ -247,6 +253,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     /**
      * Tests for objects with inner arrays that have a element order but with lenient order checking.
      */
+    @Test
     public void testGetAllDifferences_equalsDifferentOrderLenient() {
         Difference result = lenientOrderComparator.getDifference(arrayA, arrayDifferentOrder);
         assertNull(result);
@@ -256,6 +263,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     /**
      * Tests for objects with inner arrays that have a element order but with lenient order checking.
      */
+    @Test
     public void testGetAllDifferences_notEqualsDifferentOrderLenientDifferentValues() {
         Difference result = lenientOrderComparator.getDifference(arrayA, arrayDifferentOrderDifferentValue);
 
@@ -268,6 +276,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     /**
      * Tests for objects with inner arrays that have a element order but with lenient order checking.
      */
+    @Test
     public void testGetAllDifferences_notEqualsDifferentOrderLenientMultipleDifferentValues() {
         arrayDifferentOrderDifferentValue[0].string = "XXXXXX";
         Difference result = lenientOrderComparator.getDifference(arrayA, arrayDifferentOrderDifferentValue);

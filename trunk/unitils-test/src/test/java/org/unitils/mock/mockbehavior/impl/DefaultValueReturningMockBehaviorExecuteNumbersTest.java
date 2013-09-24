@@ -15,14 +15,18 @@
  */
 package org.unitils.mock.mockbehavior.impl;
 
+import org.apache.commons.lang.mutable.MutableByte;
 import org.junit.Test;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
-import static org.junit.Assert.assertTrue;
+import static java.util.Collections.emptyList;
+import static org.junit.Assert.*;
 
 /**
  * @author Tim Ducheyne
@@ -39,6 +43,7 @@ public class DefaultValueReturningMockBehaviorExecuteNumbersTest {
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Integer);
+        assertEquals(0, ((Integer) result).intValue());
     }
 
     @Test
@@ -47,6 +52,7 @@ public class DefaultValueReturningMockBehaviorExecuteNumbersTest {
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Integer);
+        assertEquals(0, ((Integer) result).intValue());
     }
 
     @Test
@@ -55,6 +61,7 @@ public class DefaultValueReturningMockBehaviorExecuteNumbersTest {
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Short);
+        assertEquals(0, ((Short) result).intValue());
     }
 
     @Test
@@ -63,6 +70,7 @@ public class DefaultValueReturningMockBehaviorExecuteNumbersTest {
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Short);
+        assertEquals(0, ((Short) result).intValue());
     }
 
     @Test
@@ -71,6 +79,7 @@ public class DefaultValueReturningMockBehaviorExecuteNumbersTest {
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof BigInteger);
+        assertEquals(0, ((BigInteger) result).intValue());
     }
 
     @Test
@@ -79,6 +88,7 @@ public class DefaultValueReturningMockBehaviorExecuteNumbersTest {
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Long);
+        assertEquals(0, ((Long) result).intValue());
     }
 
     @Test
@@ -87,6 +97,7 @@ public class DefaultValueReturningMockBehaviorExecuteNumbersTest {
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Long);
+        assertEquals(0, ((Long) result).intValue());
     }
 
     @Test
@@ -95,6 +106,7 @@ public class DefaultValueReturningMockBehaviorExecuteNumbersTest {
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof BigDecimal);
+        assertEquals(0, ((BigDecimal) result).intValue());
     }
 
     @Test
@@ -103,6 +115,7 @@ public class DefaultValueReturningMockBehaviorExecuteNumbersTest {
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Double);
+        assertEquals(0, ((Double) result).intValue());
     }
 
     @Test
@@ -111,6 +124,7 @@ public class DefaultValueReturningMockBehaviorExecuteNumbersTest {
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Double);
+        assertEquals(0, ((Double) result).intValue());
     }
 
     @Test
@@ -119,6 +133,7 @@ public class DefaultValueReturningMockBehaviorExecuteNumbersTest {
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Byte);
+        assertEquals(0, ((Byte) result).intValue());
     }
 
     @Test
@@ -127,6 +142,7 @@ public class DefaultValueReturningMockBehaviorExecuteNumbersTest {
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Byte);
+        assertEquals(0, ((Byte) result).intValue());
     }
 
     @Test
@@ -135,6 +151,7 @@ public class DefaultValueReturningMockBehaviorExecuteNumbersTest {
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Float);
+        assertEquals(0, ((Float) result).intValue());
     }
 
     @Test
@@ -143,11 +160,38 @@ public class DefaultValueReturningMockBehaviorExecuteNumbersTest {
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Float);
+        assertEquals(0, ((Float) result).intValue());
+    }
+
+    @Test
+    public void atomicIntegerValue() throws Exception {
+        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("atomicIntegerMethod"));
+
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        assertTrue(result instanceof AtomicInteger);
+        assertEquals(0, ((AtomicInteger) result).intValue());
+    }
+
+    @Test
+    public void atomicLongValue() throws Exception {
+        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("atomicLongMethod"));
+
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        assertTrue(result instanceof AtomicLong);
+        assertEquals(0, ((AtomicLong) result).intValue());
+    }
+
+    @Test
+    public void nullWhenUnknownNumberType() throws Exception {
+        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("customNumberTypeMethod"));
+
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        assertNull(result);
     }
 
 
     private ProxyInvocation createProxyInvocation(Method method) {
-        return new ProxyInvocation(null, null, method, null, null);
+        return new ProxyInvocation(null, null, method, emptyList(), emptyList(), null);
     }
 
 
@@ -180,5 +224,12 @@ public class DefaultValueReturningMockBehaviorExecuteNumbersTest {
         float floatPrimitiveMethod();
 
         Float floatMethod();
+
+        AtomicInteger atomicIntegerMethod();
+
+        AtomicLong atomicLongMethod();
+
+        MutableByte customNumberTypeMethod();
+
     }
 }

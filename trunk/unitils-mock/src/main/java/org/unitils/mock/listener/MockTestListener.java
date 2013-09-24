@@ -20,6 +20,7 @@ import org.unitils.core.*;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.AfterCreateMock;
 import org.unitils.mock.core.MockObject;
+import org.unitils.mock.core.MockService;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -34,6 +35,13 @@ import static org.unitils.util.ReflectionUtils.invokeMethod;
  * @author Tim Ducheyne
  */
 public class MockTestListener extends TestListener {
+
+    protected MockService mockService;
+
+
+    public MockTestListener(MockService mockService) {
+        this.mockService = mockService;
+    }
 
 
     @Override
@@ -57,12 +65,12 @@ public class MockTestListener extends TestListener {
     }
 
 
-    protected <T> Mock<T> createMock(TestField testField, TestInstance testInstance) {
+    protected Mock<?> createMock(TestField testField, TestInstance testInstance) {
         String mockName = testField.getName();
         Class<?> mockedClass = getMockedClass(testField);
         Object testObject = testInstance.getTestObject();
 
-        MockObject<T> mock = new MockObject<T>(mockName, mockedClass, testObject);
+        Mock<?> mock = mockService.createMock(mockName, mockedClass, testObject);
         callAfterCreateMockMethods(testObject, mock, mockName);
         return mock;
     }

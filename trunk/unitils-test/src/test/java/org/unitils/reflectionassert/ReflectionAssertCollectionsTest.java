@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
  */
 package org.unitils.reflectionassert;
 
-import junit.framework.AssertionFailedError;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
+
+import static java.util.Arrays.asList;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Test class for {@link ReflectionAssert} tests for with assertProperty methods with collection arguments.
@@ -35,38 +35,29 @@ public class ReflectionAssertCollectionsTest {
 
     /* A test collection */
     private List<String> listA;
-
     /* Same as listA but different instance */
     private List<String> listB;
-
     /* Same as listA but with a different order */
     private List<String> listDifferentOrder;
-
     /* A list having same size as listA but containing different values */
     private List<String> listDifferentValues;
-
     /* A list containing 1 extra element as listA, a double of another element */
     private List<String> listDuplicateElement;
-
     /* A list with one element less than listA */
     private List<String> listOneElementLess;
-
     /* A list with one element more than listA */
     private List<String> listOneElementMore;
 
 
-    /**
-     * Initializes the test fixture.
-     */
     @Before
-    public void setUp() throws Exception {
-        listA = Arrays.asList("el1", "el2");
-        listB = Arrays.asList("el1", "el2");
-        listDifferentOrder = Arrays.asList("el2", "el1");
-        listDifferentValues = Arrays.asList("el2", "el3");
-        listDuplicateElement = Arrays.asList("el2", "el2", "el1");
-        listOneElementLess = Arrays.asList("el1");
-        listOneElementMore = Arrays.asList("el1", "el2", "el3");
+    public void initialize() throws Exception {
+        listA = asList("el1", "el2");
+        listB = asList("el1", "el2");
+        listDifferentOrder = asList("el2", "el1");
+        listDifferentValues = asList("el2", "el3");
+        listDuplicateElement = asList("el2", "el2", "el1");
+        listOneElementLess = asList("el1");
+        listOneElementMore = asList("el1", "el2", "el3");
     }
 
 
@@ -82,7 +73,7 @@ public class ReflectionAssertCollectionsTest {
     /**
      * Test for two equal collections but with different order.
      */
-    @Test(expected = AssertionFailedError.class)
+    @Test(expected = AssertionError.class)
     public void testAssertReflectionEquals_notEqualsDifferentOrder() {
         assertReflectionEquals(listA, listDifferentOrder);
     }
@@ -109,7 +100,7 @@ public class ReflectionAssertCollectionsTest {
     /**
      * Test for two collections with different elements.
      */
-    @Test(expected = AssertionFailedError.class)
+    @Test(expected = AssertionError.class)
     public void testAssertEquals_differentListSameSize() {
         assertReflectionEquals(listA, listDifferentValues);
     }
@@ -118,7 +109,7 @@ public class ReflectionAssertCollectionsTest {
     /**
      * Test for a collection with a duplicate element.
      */
-    @Test(expected = AssertionFailedError.class)
+    @Test(expected = AssertionError.class)
     public void testAssertEquals_duplicateElement() {
         assertReflectionEquals(listA, listDuplicateElement);
     }
@@ -127,7 +118,7 @@ public class ReflectionAssertCollectionsTest {
     /**
      * Test for with a collection that has one element less.
      */
-    @Test(expected = AssertionFailedError.class)
+    @Test(expected = AssertionError.class)
     public void testAssertEquals_oneElementLess() {
         assertReflectionEquals(listA, listOneElementLess);
     }
@@ -136,9 +127,8 @@ public class ReflectionAssertCollectionsTest {
     /**
      * Test for with a collection that has one element more.
      */
-    @Test(expected = AssertionFailedError.class)
+    @Test(expected = AssertionError.class)
     public void testAssertEquals_oneElementMore() {
         assertReflectionEquals(listA, listOneElementMore);
     }
-
 }

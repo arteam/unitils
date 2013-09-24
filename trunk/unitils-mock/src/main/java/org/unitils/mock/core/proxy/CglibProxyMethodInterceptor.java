@@ -24,31 +24,48 @@ import java.util.List;
 
 import static java.lang.reflect.Modifier.isAbstract;
 import static java.util.Arrays.asList;
-import static org.unitils.mock.core.proxy.ProxyUtils.getProxiedMethodStackTrace;
 import static org.unitils.util.MethodUtils.*;
 
 /**
- * A cglib method intercepter that will delegate the invocations to the given invocation hanlder.
+ * A cglib method interceptor that will delegate the invocations to the given invocation handler.
+ *
+ * @author Tim Ducheyne
  */
 public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
 
-    protected String mockName;
+    protected String proxyName;
     protected Class<T> proxiedType;
-    /* The invocation handler */
-    protected ProxyInvocationHandler invocationHandler;
+    protected ProxyInvocationHandler proxyInvocationHandler;
+
+    protected ProxyService proxyService;
+    protected CloneService cloneService;
 
 
     /**
      * Creates an interceptor.
      *
-     * @param mockName          The name of the mock, not null
-     * @param proxiedType       The proxied type, not null
-     * @param invocationHandler The handler to delegate the invocations to, not null
+     * @param proxyName              The display name of the proxy, not null
+     * @param proxiedType            The proxied type, not null
+     * @param proxyInvocationHandler The handler to delegate the invocations to, not null
      */
-    public CglibProxyMethodInterceptor(String mockName, Class<T> proxiedType, ProxyInvocationHandler invocationHandler) {
-        this.mockName = mockName;
+    public CglibProxyMethodInterceptor(String proxyName, Class<T> proxiedType, ProxyInvocationHandler proxyInvocationHandler, ProxyService proxyService, CloneService cloneService) {
+        this.proxyName = proxyName;
         this.proxiedType = proxiedType;
-        this.invocationHandler = invocationHandler;
+        this.proxyInvocationHandler = proxyInvocationHandler;
+        this.proxyService = proxyService;
+        this.cloneService = cloneService;
+    }
+
+
+    public String getProxyName() {
+        return proxyName;
+    }
+
+    /**
+     * @return The proxied type, not null
+     */
+    public Class<?> getProxiedType() {
+        return proxiedType;
     }
 
     /**
@@ -71,28 +88,21 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
         } else if (isCloneMethod(method)) {
             return proxy;
         } else if (isToStringMethod(method)) {
-            return getProxiedType().getSimpleName() + "@" + Integer.toHexString(super.hashCode());
+            return getProxiedType().getName() + "@" + Integer.toHexString(super.hashCode());
         }
 
-        ProxyInvocation invocation = new CglibProxyInvocation(mockName, method, asList(arguments), getProxiedMethodStackTrace(), proxy, methodProxy);
-        return invocationHandler.handleInvocation(invocation);
+        StackTraceElement[] proxiedMethodStackTrace = proxyService.getProxiedMethodStackTrace();
+        Object[] clonedArguments = cloneService.createDeepClone(arguments);
+
+        ProxyInvocation invocation = new CglibProxyInvocation(proxyName, method, asList(arguments), asList(clonedArguments), proxiedMethodStackTrace, proxy, methodProxy);
+        return proxyInvocationHandler.handleInvocation(invocation);
     }
 
-    public String getMockName() {
-        return mockName;
-    }
-
-    /**
-     * @return The proxied type, not null
-     */
-    public Class<?> getProxiedType() {
-        return proxiedType;
-    }
 
     /**
      * An invocation implementation that uses the cglib method proxy to be able to invoke the original behavior.
      */
-    public static class CglibProxyInvocation extends ProxyInvocation {
+    protected static class CglibProxyInvocation extends ProxyInvocation {
 
         /* The cglib method proxy */
         protected MethodProxy methodProxy;
@@ -100,15 +110,16 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
         /**
          * Creates an invocation.
          *
-         * @param mockName    The name of the mock, not null
-         * @param method      The method that was called, not null
-         * @param arguments   The arguments that were used, not null
-         * @param invokedAt   The location of the invocation, not null
-         * @param proxy       The proxy, not null
-         * @param methodProxy The cglib method proxy, not null
+         * @param proxyName                 The display name of the proxy, not null
+         * @param method                    The method that was called, not null
+         * @param arguments                 The arguments that were used, not null
+         * @param argumentsAtInvocationTime A copy of the values at the time of invocation, not null
+         * @param invokedAt                 The location of the invocation, not null
+         * @param proxy                     The proxy, not null
+         * @param methodProxy               The cglib method proxy, not null
          */
-        public CglibProxyInvocation(String mockName, Method method, List<Object> arguments, StackTraceElement[] invokedAt, Object proxy, MethodProxy methodProxy) {
-            super(mockName, proxy, method, arguments, invokedAt);
+        public CglibProxyInvocation(String proxyName, Method method, List<?> arguments, List<?> argumentsAtInvocationTime, StackTraceElement[] invokedAt, Object proxy, MethodProxy methodProxy) {
+            super(proxyName, proxy, method, arguments, argumentsAtInvocationTime, invokedAt);
             this.methodProxy = methodProxy;
         }
 
@@ -122,7 +133,7 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
         public Object invokeOriginalBehavior() throws Throwable {
             Method method = getMethod();
             if (isAbstract(method.getModifiers())) {
-                throw new UnitilsException("Unable to invoke original behavior. The method is abstract, it does not have any behavior defined: " + getMethod());
+                throw new UnitilsException("Cannot invoke original behavior of an abstract method. Method: " + getMethod());
             }
             return methodProxy.invokeSuper(getProxy(), getArguments().toArray());
         }

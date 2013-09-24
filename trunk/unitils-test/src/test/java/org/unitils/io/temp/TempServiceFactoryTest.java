@@ -1,5 +1,5 @@
 /*
- * Copyright 2011,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.unitils.io.temp;
 
 
-import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
@@ -26,6 +24,8 @@ import org.unitils.util.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Jeroen Horemans
@@ -36,8 +36,8 @@ import java.util.Properties;
 public class TempServiceFactoryTest {
 
     public static final String DIR_ONE = "target/test-classes/TempserviceFactoryTest/ONE";
-
     public static final String DIR_TWO = "target/test-classes/TempserviceFactoryTest/TWO";
+
 
     @Before
     public void setUp() {
@@ -45,16 +45,14 @@ public class TempServiceFactoryTest {
         new File(DIR_TWO).delete();
     }
 
+
     @Test
     public void createWithSysDir() {
         TempServiceFactory factory = new TempServiceFactory(null, DIR_ONE);
         TempService result = factory.create();
 
-        Assert.assertNotNull(result);
-
-        Assert.assertTrue(new File(DIR_ONE).exists());
-
-
+        assertNotNull(result);
+        assertTrue(new File(DIR_ONE).exists());
     }
 
     @Test
@@ -62,25 +60,20 @@ public class TempServiceFactoryTest {
         TempServiceFactory factory = new TempServiceFactory("", DIR_ONE);
         TempService result = factory.create();
 
-        Assert.assertNotNull(result);
-
-        Assert.assertTrue(new File(DIR_ONE).exists());
-
-
+        assertNotNull(result);
+        assertTrue(new File(DIR_ONE).exists());
     }
 
     @Test
     public void createWithRootDir() {
         Properties properties = new Properties();
 
-
         TempServiceFactory factory = new TempServiceFactory(DIR_TWO, DIR_ONE);
         TempService result = factory.create();
 
-        Assert.assertNotNull(result);
-
-        Assert.assertTrue(new File(DIR_TWO).exists());
-        Assert.assertFalse(new File(DIR_ONE).exists());
+        assertNotNull(result);
+        assertTrue(new File(DIR_TWO).exists());
+        assertFalse(new File(DIR_ONE).exists());
     }
 
     @Test
@@ -90,9 +83,8 @@ public class TempServiceFactoryTest {
         TempServiceFactory factory = new TempServiceFactory(DIR_TWO, DIR_ONE);
         TempService result = factory.create();
 
-        Assert.assertNotNull(result);
-
-        Assert.assertTrue(new File(DIR_TWO).exists());
+        assertNotNull(result);
+        assertTrue(new File(DIR_TWO).exists());
     }
 
     @Test(expected = UnitilsException.class)
@@ -102,10 +94,8 @@ public class TempServiceFactoryTest {
         TempServiceFactory factory = new TempServiceFactory(DIR_TWO, DIR_ONE);
         TempService result = factory.create();
 
-        Assert.assertNotNull(result);
-
-        Assert.assertTrue(new File(DIR_TWO).exists());
-        Assert.assertFalse(new File(DIR_ONE).exists());
+        assertNotNull(result);
+        assertTrue(new File(DIR_TWO).exists());
+        assertFalse(new File(DIR_ONE).exists());
     }
-
 }

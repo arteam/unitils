@@ -18,7 +18,6 @@ package org.unitils.mock.report.impl;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.mock.Mock;
-import org.unitils.mock.core.MockObject;
 
 import java.util.List;
 
@@ -26,7 +25,6 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.mock.core.MockObject.getCurrentScenario;
 
 /**
  * Tests the usage of test fields in mock invocations. The names of the fields should be shown in the report (same as for large value).
@@ -45,7 +43,8 @@ public class DetailedObservedInvocationsReportTest {
     @Before
     public void initialize() {
         detailedObservedInvocationsReport = new DetailedObservedInvocationsReport(this);
-        testMock = new MockObject<TestInterface>("testMock", TestInterface.class, this);
+        // todo td implement
+//        testMock = new MockObject<TestInterface>("testMock", TestInterface.class, this);
     }
 
 
@@ -54,7 +53,9 @@ public class DetailedObservedInvocationsReportTest {
         testMock.getMock().testMethod1("value1");
         testMock.getMock().testMethod2();
 
-        String result = detailedObservedInvocationsReport.createReport(getCurrentScenario().getObservedInvocations());
+        // todo td implement
+//        String result = detailedObservedInvocationsReport.createReport(getCurrentScenario().getObservedInvocations());
+        String result = null;
 
         // method with result and argument
         assertTrue(result.contains("1. testMock.testMethod1(\"value1\") -> null"));
@@ -67,7 +68,9 @@ public class DetailedObservedInvocationsReportTest {
 
     @Test
     public void noInvocations() {
-        String result = detailedObservedInvocationsReport.createReport(getCurrentScenario().getObservedInvocations());
+        // todo td implement
+//        String result = detailedObservedInvocationsReport.createReport(getCurrentScenario().getObservedInvocations());
+        String result = null;
         assertTrue(isEmpty(result));
     }
 
@@ -75,7 +78,9 @@ public class DetailedObservedInvocationsReportTest {
     public void largeArgumentValue_shouldBeReplacedByShortName() {
         testMock.getMock().testMethod1("012345678901234567891");
 
-        String result = detailedObservedInvocationsReport.createReport(getCurrentScenario().getObservedInvocations());
+        // todo td implement
+//        String result = detailedObservedInvocationsReport.createReport(getCurrentScenario().getObservedInvocations());
+        String result = null;
         assertTrue(result.contains("1. testMock.testMethod1(string1) -> null"));
         assertTrue(result.contains("- string1 -> \"012345678901234567891\""));
     }
@@ -85,7 +90,9 @@ public class DetailedObservedInvocationsReportTest {
         testMock.returns("012345678901234567891").testMethod1(null);
         testMock.getMock().testMethod1(null);
 
-        String result = detailedObservedInvocationsReport.createReport(getCurrentScenario().getObservedInvocations());
+        // todo td implement
+//        String result = detailedObservedInvocationsReport.createReport(getCurrentScenario().getObservedInvocations());
+        String result = null;
         assertTrue(result.contains("1. testMock.testMethod1(null) -> string1"));
         assertTrue(result.contains("- string1 -> \"012345678901234567891\""));
         assertTrue(result.contains("- Observed at org.unitils.mock.report.impl.DetailedObservedInvocationsReportTest.largeResultValue_shouldBeReplacedByShortName(DetailedObservedInvocationsReportTest.java:"));
@@ -98,7 +105,9 @@ public class DetailedObservedInvocationsReportTest {
         testMock.returns(largeValue).testMethod3(largeValue);
         testMock.getMock().testMethod3(largeValue);
 
-        String result = detailedObservedInvocationsReport.createReport(getCurrentScenario().getObservedInvocations());
+        // todo td implement
+//        String result = detailedObservedInvocationsReport.createReport(getCurrentScenario().getObservedInvocations());
+        String result = null;
         assertTrue(result.contains("1. testMock.testMethod3(list1) -> list1"));
         assertTrue(result.contains("- list1 -> [\"11111\", \"222222\", \"333333\"]"));
         assertTrue(result.contains("- Observed at org.unitils.mock.report.impl.DetailedObservedInvocationsReportTest.sameInstanceLargeValueInResultAndArgument_shouldUseSameName(DetailedObservedInvocationsReportTest.java:"));
@@ -111,11 +120,11 @@ public class DetailedObservedInvocationsReportTest {
 
     public static interface TestInterface {
 
-        public String testMethod1(String arg1);
+        String testMethod1(String arg1);
 
-        public void testMethod2();
+        void testMethod2();
 
-        public List<String> testMethod3(List<String> list);
+        List<String> testMethod3(List<String> list);
     }
 
 }

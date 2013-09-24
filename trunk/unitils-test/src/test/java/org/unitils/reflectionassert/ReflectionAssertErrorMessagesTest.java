@@ -15,7 +15,6 @@
  */
 package org.unitils.reflectionassert;
 
-import junit.framework.AssertionFailedError;
 import org.junit.Test;
 
 import java.util.List;
@@ -89,7 +88,7 @@ public class ReflectionAssertErrorMessagesTest {
     private void logErrorForAssertLenientEquals(String message, Object expected, Object actual) {
         try {
             assertLenientEquals(message, expected, actual);
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             System.out.println(e);
         }
     }

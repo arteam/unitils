@@ -22,7 +22,8 @@ import org.unitils.mock.PartialMock;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertNotNull;
+
 
 /**
  * Tests the casting of mock objects (UNI-168 and UNI-169).

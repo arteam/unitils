@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,5 +36,6 @@ public interface MockBehavior {
      * @param proxyInvocation The proxy method invocation, not null
      * @return The return value, null if there is no return value
      */
+    // todo td remove Throwable
     Object execute(ProxyInvocation proxyInvocation) throws Throwable;
 }

@@ -18,14 +18,12 @@ package org.unitils.mock.report.impl;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.mock.Mock;
-import org.unitils.mock.core.MockObject;
 
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.mock.core.MockObject.getCurrentScenario;
 
 /**
  * Test for the creating an overview representation of a scenario.
@@ -45,7 +43,8 @@ public class ObservedInvocationsReportTest {
     @Before
     public void initialize() {
         observedInvocationsView = new ObservedInvocationsReport(this);
-        testMock = new MockObject<TestInterface>("testMock", TestInterface.class, this);
+        // todo td implement
+//        testMock = new MockObject<TestInterface>("testMock", TestInterface.class, this);
     }
 
     @Test
@@ -53,14 +52,18 @@ public class ObservedInvocationsReportTest {
         testMock.getMock().testMethod1("value1");
         testMock.getMock().testMethod2();
 
-        String result = observedInvocationsView.createReport(getCurrentScenario().getObservedInvocations());
+        // todo td implement
+//        String result = observedInvocationsView.createReport(getCurrentScenario().getObservedInvocations());
+        String result = null;
         assertTrue(result.contains("1. testMock.testMethod1(\"value1\") -> null  .....  at org.unitils.mock.report.impl.ObservedInvocationsReportTest.twoMockInvocations(ObservedInvocationsReportTest.java:"));
         assertTrue(result.contains("2. testMock.testMethod2()  .....  at org.unitils.mock.report.impl.ObservedInvocationsReportTest.twoMockInvocations(ObservedInvocationsReportTest.java:"));
     }
 
     @Test
     public void noInvocations() {
-        String result = observedInvocationsView.createReport(getCurrentScenario().getObservedInvocations());
+        // todo td implement
+//        String result = observedInvocationsView.createReport(getCurrentScenario().getObservedInvocations());
+        String result = null;
         assertTrue(isEmpty(result));
     }
 
@@ -68,7 +71,9 @@ public class ObservedInvocationsReportTest {
     public void largeArgumentValue_shouldBeReplacedByShortName() {
         testMock.getMock().testMethod1("012345678901234567891");
 
-        String result = observedInvocationsView.createReport(getCurrentScenario().getObservedInvocations());
+        // todo td implement
+//        String result = observedInvocationsView.createReport(getCurrentScenario().getObservedInvocations());
+        String result = null;
         assertTrue(result.contains("1. testMock.testMethod1(string1) -> null  .....  at org.unitils.mock.report.impl.ObservedInvocationsReportTest.largeArgumentValue_shouldBeReplacedByShortName(ObservedInvocationsReportTest.java:"));
     }
 
@@ -77,7 +82,9 @@ public class ObservedInvocationsReportTest {
         testMock.returns("012345678901234567891").testMethod1(null);
         testMock.getMock().testMethod1(null);
 
-        String result = observedInvocationsView.createReport(getCurrentScenario().getObservedInvocations());
+        // todo td implement
+//        String result = observedInvocationsView.createReport(getCurrentScenario().getObservedInvocations());
+        String result = null;
         assertTrue(result.contains("1. testMock.testMethod1(null) -> string1  .....  at org.unitils.mock.report.impl.ObservedInvocationsReportTest.largeResultValue_shouldBeReplacedByShortName(ObservedInvocationsReportTest.java:"));
     }
 
@@ -87,7 +94,9 @@ public class ObservedInvocationsReportTest {
         testMock.returns(largeValue).testMethod3(largeValue);
         testMock.getMock().testMethod3(largeValue);
 
-        String result = observedInvocationsView.createReport(getCurrentScenario().getObservedInvocations());
+        // todo td implement
+//        String result = observedInvocationsView.createReport(getCurrentScenario().getObservedInvocations());
+        String result = null;
         assertTrue(result.contains("1. testMock.testMethod3(list1) -> list1  .....  at org.unitils.mock.report.impl.ObservedInvocationsReportTest.sameInstanceLargeValueInResultAndArgument_shouldUseSameName(ObservedInvocationsReportTest.java:"));
     }
 

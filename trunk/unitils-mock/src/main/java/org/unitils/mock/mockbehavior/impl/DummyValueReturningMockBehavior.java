@@ -19,26 +19,28 @@ import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.dummy.DummyObjectFactory;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import static java.lang.reflect.Modifier.isFinal;
 
 /**
  * Mock behavior that returns a default value. The default value for an object will be a proxy object with the same behaviour. When doing
  * the same call multiple times the same 'proxy' object will be returned each time. Doing the same method call with other parameters will
- * howerver result a new object returned.
+ * however result a new object returned.
  * <p/>
  * Following defaults are used:
  * <ul>
  * <li>Number values: 0</li>
+ * <li>String values: ""</li>
  * <li>Object values: DummyObject</li>
- * <li>Collection: DummyObject</li>
- * <li>arrays etc: empty values</li>
+ * <li>Collection: empty list</li>
+ * <li>Arrays: empty array</li>
  * </ul>
  * <p/>
  *
+ * @author Tim Ducheyne
  * @author Jeroen Horemans
  */
 public class DummyValueReturningMockBehavior extends DefaultValueReturningMockBehavior {
@@ -61,85 +63,75 @@ public class DummyValueReturningMockBehavior extends DefaultValueReturningMockBe
      * @return The default value defined by this behavior
      */
     public Object execute(ProxyInvocation proxyInvocation) {
-        Object result = null;
-
         Method method = proxyInvocation.getMethod();
         Class<?> returnType = method.getReturnType();
         MethodKey key = new MethodKey(method.getName(), proxyInvocation.getArguments());
+
         if (returnValues.containsKey(key)) {
-            result = returnValues.get(key);
+            return returnValues.get(key);
         }
-
-        if (result == null) {
-            result = super.execute(proxyInvocation);
-        }
-        if (result == null && String.class.equals(returnType)) {
-            result = "";
-        }
-
-        if (result == null && isDummyProof(returnType)) {
-            result = dummyObjectFactory.createDummy(returnType, new DummyValueReturningMockBehavior(dummyObjectFactory));
-        }
+        Object result = getReturnValue(proxyInvocation, returnType);
         returnValues.put(key, result);
-
         return result;
     }
 
 
-    protected boolean isDummyProof(Class<?> returnType) {
-        return !returnType.isPrimitive() && !(returnType == Void.TYPE) && !Modifier.isFinal(returnType.getModifiers());
+    protected Object getReturnValue(ProxyInvocation proxyInvocation, Class<?> returnType) {
+        if (String.class.equals(returnType)) {
+            return "";
+        }
+        Object result = super.execute(proxyInvocation);
+        if (result != null) {
+            return result;
+        }
+        if (cannotCreateDummy(returnType)) {
+            return null;
+        }
+        return dummyObjectFactory.createDummy(returnType, new DummyValueReturningMockBehavior(dummyObjectFactory));
     }
+
+    protected boolean cannotCreateDummy(Class<?> returnType) {
+        return returnType == Void.TYPE || isFinal(returnType.getModifiers());
+    }
+
 
     protected static class MethodKey {
 
         protected String methodName;
-        protected List<Object> arguments;
+        protected List<?> arguments;
 
-        public MethodKey(String methodName, List<Object> arguments) {
+
+        public MethodKey(String methodName, List<?> arguments) {
             this.methodName = methodName;
             this.arguments = arguments;
         }
 
+
         @Override
-        public int hashCode() {
-            return methodName.hashCode();
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            MethodKey methodKey = (MethodKey) o;
+
+            if (arguments != null ? !arguments.equals(methodKey.arguments) : methodKey.arguments != null) {
+                return false;
+            }
+            if (methodName != null ? !methodName.equals(methodKey.methodName) : methodKey.methodName != null) {
+                return false;
+            }
+            return true;
         }
 
         @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            MethodKey other = (MethodKey) obj;
-            if (methodName == null) {
-                if (other.methodName != null) {
-                    return false;
-                }
-            } else if (!methodName.equals(other.methodName)) {
-                return false;
-            }
-            if (arguments.size() != other.arguments.size()) {
-                return false;
-            }
-            if (arguments.size() > 0) {
-                Iterator<Object> it2 = other.arguments.iterator();
-                for (Iterator<Object> it1 = arguments.iterator(); it1.hasNext(); ) {
-                    Object object1 = it1.next();
-                    Object object2 = it2.next();
-                    if (object1 == null && object2 == null) {
-                        continue;
-                    } else if (object1 != null && !object1.equals(object2)) {
-                        return false;
-                    }
-                }
-            }
-            return true;
+        public int hashCode() {
+            int result = methodName != null ? methodName.hashCode() : 0;
+            result = 31 * result + (arguments != null ? arguments.hashCode() : 0);
+            return result;
         }
     }
 }

@@ -19,24 +19,21 @@ import org.unitils.core.reflect.TypeWrapper;
 import org.unitils.core.util.ObjectToInjectHolder;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.MatchStatement;
-import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
 import org.unitils.mock.core.matching.MatchingInvocationBuilder;
 import org.unitils.mock.core.matching.MatchingInvocationHandler;
 import org.unitils.mock.core.matching.impl.AssertInvokedInSequenceVerifyingMatchingInvocationHandler;
 import org.unitils.mock.core.matching.impl.AssertInvokedVerifyingMatchingInvocationHandler;
 import org.unitils.mock.core.matching.impl.AssertNotInvokedVerifyingMatchingInvocationHandler;
 import org.unitils.mock.core.matching.impl.BehaviorDefiningMatchingInvocationHandler;
+import org.unitils.mock.core.proxy.CloneService;
+import org.unitils.mock.core.proxy.ProxyService;
+import org.unitils.mock.core.proxy.StackTraceService;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.ExceptionThrowingMockBehavior;
 import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.uncapitalize;
-import static org.unitils.mock.core.proxy.ProxyFactory.createInitializedOrUninitializedInstanceOfType;
 
 /**
  * Implementation of a Mock.
@@ -45,47 +42,29 @@ import static org.unitils.mock.core.proxy.ProxyFactory.createInitializedOrUninit
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
-public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder<T> {
+public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
 
     /* The name of the mock (e.g. the name of the field) */
     protected String name;
     /* The class type that is mocked */
     protected Class<T> mockedType;
     protected MockProxy<T> mockProxy;
+    /* True if this mock object was created to support mock chaining */
+    protected boolean chainedMock;
+
+    protected Scenario scenario;
+    protected MatchingInvocationBuilder matchingInvocationBuilder;
 
     /* Mock behaviors that are removed once they have been matched */
     protected BehaviorDefiningInvocations oneTimeMatchingBehaviorDefiningInvocations;
     /* Mock behaviors that can be matched and re-used for several invocation */
     protected BehaviorDefiningInvocations alwaysMatchingBehaviorDefiningInvocations;
-    /* Created chained mocks per mock name */
-    protected Map<String, Mock<?>> chainedMocksPerName;
 
-    /* The scenario that will record all observed invocations */
-    protected static ThreadLocal<Scenario> scenarioThreadLocal = new ThreadLocal<Scenario>();
+    protected MockService mockService;
+    protected ProxyService proxyService;
+    protected StackTraceService stackTraceService;
+    protected CloneService cloneService;
 
-    protected static ThreadLocal<MatchingInvocationBuilder> matchingInvocationBuilderThreadLocal = new ThreadLocal<MatchingInvocationBuilder>();
-
-
-    public static Scenario getCurrentScenario() {
-        return scenarioThreadLocal.get();
-    }
-
-
-    /**
-     * Creates a mock of the given type with un-capitalized type name + Mock as name, e.g. myServiceMock.
-     * <p/>
-     * There is no .class literal for generic types. Therefore you need to pass the raw type when mocking generic types.
-     * E.g. Mock&lt;List&lt;String&gt;&gt; myMock = new MockObject("myMock", List.class, this);
-     * <p/>
-     * If the mocked type does not correspond to the declared type, a ClassCastException will occur when the mock
-     * is used.
-     *
-     * @param mockedType The mock type that will be proxied, use the raw type when mocking generic types, not null
-     * @param testObject The test object, not null
-     */
-    public MockObject(Class<?> mockedType, Object testObject) {
-        this(null, mockedType, testObject);
-    }
 
     /**
      * Creates a mock of the given type.
@@ -100,29 +79,31 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
      *
      * @param name       The name of the mock, e.g. the field-name, null for the default
      * @param mockedType The mock type that will be proxied, use the raw type when mocking generic types, not null
-     * @param testObject The test object, not null
      */
-    @SuppressWarnings({"unchecked"})
-    public MockObject(String name, Class<?> mockedType, Object testObject) {
-        if (isBlank(name)) {
-            this.name = uncapitalize(mockedType.getSimpleName()) + "Mock";
-        } else {
-            this.name = name;
-        }
-        this.mockedType = (Class<T>) mockedType;
-        this.oneTimeMatchingBehaviorDefiningInvocations = createOneTimeMatchingBehaviorDefiningInvocations();
-        this.alwaysMatchingBehaviorDefiningInvocations = createAlwaysMatchingBehaviorDefiningInvocations();
-        this.chainedMocksPerName = new HashMap<String, Mock<?>>();
+    public MockObject(String name, Class<T> mockedType, boolean chainedMock, Scenario scenario, MatchingInvocationBuilder matchingInvocationBuilder, MockService mockService, ProxyService proxyService, StackTraceService stackTraceService, CloneService cloneService) {
+        this.name = name;
+        this.mockedType = mockedType;
+        this.chainedMock = chainedMock;
+        this.oneTimeMatchingBehaviorDefiningInvocations = new BehaviorDefiningInvocations(true);
+        this.alwaysMatchingBehaviorDefiningInvocations = new BehaviorDefiningInvocations(false);
 
-        Scenario scenario = getScenario(testObject);
-        if (scenario.getTestObject() != testObject) {
-            scenario.reset();
-            getMatchingInvocationBuilder().reset();
-            scenario.setTestObject(testObject);
-        }
+        this.scenario = scenario;
+        this.matchingInvocationBuilder = matchingInvocationBuilder;
+        this.mockService = mockService;
+        this.proxyService = proxyService;
+        this.stackTraceService = stackTraceService;
+        this.cloneService = cloneService;
         this.mockProxy = createMockProxy();
     }
 
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean isChainedMock() {
+        return chainedMock;
+    }
 
     //
     // Implementation of the ObjectToInjectHolder interface. Implementing this interface makes sure that the 
@@ -139,7 +120,6 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
         return getMock();
     }
 
-
     /**
      * @param declaredType The declared type (e.g. type of field) of this mock object, null if not known
      * @return The type of the object to inject (i.e. the mocked type), not null.
@@ -151,6 +131,7 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
         TypeWrapper declaredTypeWrapper = new TypeWrapper(declaredType);
         return declaredTypeWrapper.getSingleGenericType();
     }
+
 
     //
     // Implementation of the Mock interfaces
@@ -166,7 +147,6 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
     public T getMock() {
         return mockProxy.getProxy();
     }
-
 
     /**
      * @return the type of the mock, not null
@@ -196,7 +176,6 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
         return startMatchingInvocation(matchingInvocationHandler);
     }
 
-
     /**
      * Defines behavior for this mock so that it raises the given exception when the invocation following
      * this call matches the observed behavior. E.g.
@@ -213,10 +192,9 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
      */
     @MatchStatement
     public T raises(Throwable exception) {
-        MatchingInvocationHandler matchingInvocationHandler = createAlwaysMatchingBehaviorDefiningMatchingInvocationHandler(new ExceptionThrowingMockBehavior(exception));
+        MatchingInvocationHandler matchingInvocationHandler = createAlwaysMatchingBehaviorDefiningMatchingInvocationHandler(new ExceptionThrowingMockBehavior(exception, stackTraceService));
         return startMatchingInvocation(matchingInvocationHandler);
     }
-
 
     /**
      * Defines behavior for this mock so that it raises the given exception when the invocation following
@@ -234,12 +212,11 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
      */
     @MatchStatement
     public T raises(Class<? extends Throwable> exceptionClass) {
-        Throwable exception = createInitializedOrUninitializedInstanceOfType(exceptionClass);
+        Throwable exception = proxyService.createInitializedOrUninitializedInstanceOfType(exceptionClass);
         exception.fillInStackTrace();
-        MatchingInvocationHandler matchingInvocationHandler = createAlwaysMatchingBehaviorDefiningMatchingInvocationHandler(new ExceptionThrowingMockBehavior(exception));
+        MatchingInvocationHandler matchingInvocationHandler = createAlwaysMatchingBehaviorDefiningMatchingInvocationHandler(new ExceptionThrowingMockBehavior(exception, stackTraceService));
         return startMatchingInvocation(matchingInvocationHandler);
     }
-
 
     /**
      * Defines behavior for this mock so that will be performed when the invocation following
@@ -260,7 +237,6 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
         MatchingInvocationHandler matchingInvocationHandler = createAlwaysMatchingBehaviorDefiningMatchingInvocationHandler(mockBehavior);
         return startMatchingInvocation(matchingInvocationHandler);
     }
-
 
     /**
      * Defines behavior for this mock so that it will return the given value when the invocation following
@@ -283,7 +259,6 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
         return startMatchingInvocation(matchingInvocationHandler);
     }
 
-
     /**
      * Defines behavior for this mock so that it raises the given exception when the invocation following
      * this call matches the observed behavior. E.g.
@@ -301,10 +276,9 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
      */
     @MatchStatement
     public T onceRaises(Throwable exception) {
-        MatchingInvocationHandler matchingInvocationHandler = createOneTimeMatchingBehaviorDefiningMatchingInvocationHandler(new ExceptionThrowingMockBehavior(exception));
+        MatchingInvocationHandler matchingInvocationHandler = createOneTimeMatchingBehaviorDefiningMatchingInvocationHandler(new ExceptionThrowingMockBehavior(exception, stackTraceService));
         return startMatchingInvocation(matchingInvocationHandler);
     }
-
 
     /**
      * Defines behavior for this mock so that it raises an instance of the given exception class when the invocation following
@@ -323,11 +297,10 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
      */
     @MatchStatement
     public T onceRaises(Class<? extends Throwable> exceptionClass) {
-        Throwable exception = createInitializedOrUninitializedInstanceOfType(exceptionClass);
-        MatchingInvocationHandler matchingInvocationHandler = createOneTimeMatchingBehaviorDefiningMatchingInvocationHandler(new ExceptionThrowingMockBehavior(exception));
+        Throwable exception = proxyService.createInitializedOrUninitializedInstanceOfType(exceptionClass);
+        MatchingInvocationHandler matchingInvocationHandler = createOneTimeMatchingBehaviorDefiningMatchingInvocationHandler(new ExceptionThrowingMockBehavior(exception, stackTraceService));
         return startMatchingInvocation(matchingInvocationHandler);
     }
-
 
     /**
      * Defines behavior for this mock so that will be performed when the invocation following
@@ -350,7 +323,6 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
         return startMatchingInvocation(matchingInvocationHandler);
     }
 
-
     /**
      * Asserts that an invocation that matches the invocation following this call has been observed
      * on this mock object during this test.
@@ -362,7 +334,6 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
         MatchingInvocationHandler matchingInvocationHandler = createAssertInvokedVerifyingMatchingInvocationHandler();
         return startMatchingInvocation(matchingInvocationHandler);
     }
-
 
     /**
      * Asserts that an invocation that matches the invocation following this call has been observed
@@ -379,7 +350,6 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
         return startMatchingInvocation(matchingInvocationHandler);
     }
 
-
     /**
      * Asserts that no invocation that matches the invocation following this call has been observed
      * on this mock object during this test.
@@ -392,7 +362,6 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
         return startMatchingInvocation(matchingInvocationHandler);
     }
 
-
     /**
      * Removes all behavior defined for this mock.
      * This will only remove the behavior, not the observed invocations for this mock.
@@ -401,98 +370,36 @@ public class MockObject<T> implements Mock<T>, MockFactory, ObjectToInjectHolder
     public void resetBehavior() {
         oneTimeMatchingBehaviorDefiningInvocations.clear();
         alwaysMatchingBehaviorDefiningInvocations.clear();
-        chainedMocksPerName.clear();
-        getMatchingInvocationBuilder().reset();
-        ArgumentMatcherRepository.getInstance().reset();
+        matchingInvocationBuilder.reset();
     }
 
-
-    @SuppressWarnings({"unchecked"})
-    public <M> Mock<M> createChainedMock(String name, Class<M> mockedType) {
-        Mock<?> chainedMock = chainedMocksPerName.get(name);
-        if (chainedMock != null) {
-            return (Mock<M>) chainedMock;
-        }
-        try {
-            if (Void.class.equals(mockedType) || mockedType.isPrimitive() || mockedType.isArray()) {
-                return null;
-            }
-            chainedMock = new MockObject<M>(name, mockedType, getCurrentScenario().getTestObject());
-            chainedMocksPerName.put(name, chainedMock);
-            return (Mock<M>) chainedMock;
-
-        } catch (Throwable t) {
-            return null;
-        }
-    }
-
-
-    public String getName() {
-        return name;
-    }
 
     protected T startMatchingInvocation(MatchingInvocationHandler matchingInvocationHandler) {
-        return getMatchingInvocationBuilder().startMatchingInvocation(name, mockedType, matchingInvocationHandler);
+        return matchingInvocationBuilder.startMatchingInvocation(name, mockedType, !chainedMock, matchingInvocationHandler);
     }
 
-    protected synchronized MatchingInvocationBuilder getMatchingInvocationBuilder() {
-        MatchingInvocationBuilder matchingInvocationBuilder = matchingInvocationBuilderThreadLocal.get();
-        if (matchingInvocationBuilder == null) {
-            matchingInvocationBuilder = createMatchingInvocationBuilder();
-            matchingInvocationBuilderThreadLocal.set(matchingInvocationBuilder);
-        }
-        return matchingInvocationBuilder;
-    }
-
-    protected synchronized Scenario getScenario(Object testObject) {
-        Scenario scenario = scenarioThreadLocal.get();
-        if (scenario == null) {
-            scenario = createScenario(testObject);
-            scenarioThreadLocal.set(scenario);
-        }
-        return scenario;
-    }
 
     protected MockProxy<T> createMockProxy() {
-        return new MockProxy<T>(name, mockedType, oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, getCurrentScenario(), getMatchingInvocationBuilder());
+        return new MockProxy<T>(name, mockedType, oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, scenario, matchingInvocationBuilder, proxyService, cloneService);
     }
 
     protected MatchingInvocationHandler createOneTimeMatchingBehaviorDefiningMatchingInvocationHandler(MockBehavior mockBehavior) {
-        return new BehaviorDefiningMatchingInvocationHandler(mockBehavior, oneTimeMatchingBehaviorDefiningInvocations, this);
+        return new BehaviorDefiningMatchingInvocationHandler(mockBehavior, oneTimeMatchingBehaviorDefiningInvocations, mockService);
     }
 
     protected MatchingInvocationHandler createAlwaysMatchingBehaviorDefiningMatchingInvocationHandler(MockBehavior mockBehavior) {
-        return new BehaviorDefiningMatchingInvocationHandler(mockBehavior, alwaysMatchingBehaviorDefiningInvocations, this);
-    }
-
-    protected BehaviorDefiningInvocations createOneTimeMatchingBehaviorDefiningInvocations() {
-        return new BehaviorDefiningInvocations(true);
-    }
-
-    protected BehaviorDefiningInvocations createAlwaysMatchingBehaviorDefiningInvocations() {
-        return new BehaviorDefiningInvocations(false);
+        return new BehaviorDefiningMatchingInvocationHandler(mockBehavior, alwaysMatchingBehaviorDefiningInvocations, mockService);
     }
 
     protected MatchingInvocationHandler createAssertInvokedVerifyingMatchingInvocationHandler() {
-        return new AssertInvokedVerifyingMatchingInvocationHandler(getCurrentScenario(), this);
+        return new AssertInvokedVerifyingMatchingInvocationHandler(scenario, mockService);
     }
 
     protected MatchingInvocationHandler createAssertInvokedInSequenceVerifyingMatchingInvocationHandler() {
-        return new AssertInvokedInSequenceVerifyingMatchingInvocationHandler(getCurrentScenario(), this);
+        return new AssertInvokedInSequenceVerifyingMatchingInvocationHandler(scenario, mockService);
     }
 
     protected MatchingInvocationHandler createAssertNotInvokedVerifyingMatchingInvocationHandler() {
-        return new AssertNotInvokedVerifyingMatchingInvocationHandler(getCurrentScenario(), this);
+        return new AssertNotInvokedVerifyingMatchingInvocationHandler(scenario, mockService);
     }
-
-
-    protected Scenario createScenario(Object testObject) {
-        return new Scenario(testObject);
-    }
-
-    protected MatchingInvocationBuilder createMatchingInvocationBuilder() {
-        return new MatchingInvocationBuilder();
-    }
-
-
 }

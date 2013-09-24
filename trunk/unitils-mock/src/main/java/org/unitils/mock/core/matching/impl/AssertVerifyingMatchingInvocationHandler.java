@@ -18,14 +18,12 @@ package org.unitils.mock.core.matching.impl;
 import org.unitils.mock.Mock;
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import org.unitils.mock.core.BehaviorDefiningInvocation;
-import org.unitils.mock.core.MockFactory;
+import org.unitils.mock.core.MockService;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.core.matching.MatchingInvocationHandler;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.util.List;
-
-import static org.unitils.core.util.ObjectFormatter.MOCK_NAME_CHAIN_SEPARATOR;
 
 
 /**
@@ -35,16 +33,16 @@ import static org.unitils.core.util.ObjectFormatter.MOCK_NAME_CHAIN_SEPARATOR;
 public abstract class AssertVerifyingMatchingInvocationHandler implements MatchingInvocationHandler {
 
     protected Scenario scenario;
-    protected MockFactory mockFactory;
+    protected MockService mockService;
 
 
-    public AssertVerifyingMatchingInvocationHandler(Scenario scenario, MockFactory mockFactory) {
+    public AssertVerifyingMatchingInvocationHandler(Scenario scenario, MockService mockService) {
         this.scenario = scenario;
-        this.mockFactory = mockFactory;
+        this.mockService = mockService;
     }
 
 
-    public Object handleInvocation(ProxyInvocation proxyInvocation, List<ArgumentMatcher> argumentMatchers) throws Throwable {
+    public Object handleInvocation(ProxyInvocation proxyInvocation, List<ArgumentMatcher> argumentMatchers) {
         BehaviorDefiningInvocation behaviorDefiningInvocation = new BehaviorDefiningInvocation(proxyInvocation, null, argumentMatchers);
         performAssertion(scenario, behaviorDefiningInvocation);
         return createChainedMock(proxyInvocation);
@@ -53,9 +51,9 @@ public abstract class AssertVerifyingMatchingInvocationHandler implements Matchi
 
     protected Object createChainedMock(ProxyInvocation proxyInvocation) {
         Class<?> innerMockType = proxyInvocation.getMethod().getReturnType();
-        String innerMockName = proxyInvocation.getMockName() + MOCK_NAME_CHAIN_SEPARATOR + proxyInvocation.getMethod().getName();
+        String innerMockName = proxyInvocation.getProxyName() + "." + proxyInvocation.getMethod().getName();
 
-        Mock<?> mock = mockFactory.createChainedMock(innerMockName, innerMockType);
+        Mock<?> mock = mockService.createChainedMock(innerMockName, innerMockType);
         if (mock == null) {
             return null;
         }

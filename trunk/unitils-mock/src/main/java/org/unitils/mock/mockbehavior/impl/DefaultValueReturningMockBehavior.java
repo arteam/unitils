@@ -23,6 +23,8 @@ import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Mock behavior that returns a default value.
@@ -89,7 +91,6 @@ public class DefaultValueReturningMockBehavior implements ValidatableMockBehavio
         return null;
     }
 
-
     /**
      * Checking for the default java implementations of Number, this avoids class cast exceptions when using them
      *
@@ -97,30 +98,36 @@ public class DefaultValueReturningMockBehavior implements ValidatableMockBehavio
      * @return The default value for that number type, e.g. 0F for floats
      */
     protected Number resolveNumber(Class<?> numberType) {
-        if (Integer.class.equals(numberType) || Integer.TYPE.equals(numberType)) {
+        if (Integer.TYPE.equals(numberType) || Integer.class.equals(numberType)) {
             return 0;
         }
-        if (Short.class.equals(numberType) || Short.TYPE.equals(numberType)) {
+        if (Short.TYPE.equals(numberType) || Short.class.equals(numberType)) {
             return (short) 0;
+        }
+        if (Long.TYPE.equals(numberType) || Long.class.equals(numberType)) {
+            return 0L;
+        }
+        if (Double.TYPE.equals(numberType) || Double.class.equals(numberType)) {
+            return 0D;
+        }
+        if (Float.TYPE.equals(numberType) || Float.class.equals(numberType)) {
+            return 0F;
+        }
+        if (Byte.TYPE.equals(numberType) || Byte.class.equals(numberType)) {
+            return (byte) 0;
         }
         if (BigInteger.class.isAssignableFrom(numberType)) {
             return BigInteger.ZERO;
         }
-        if (Long.class.equals(numberType) || Long.TYPE.equals(numberType)) {
-            return 0l;
-        }
         if (BigDecimal.class.isAssignableFrom(numberType)) {
             return BigDecimal.ZERO;
         }
-        if (Double.class.equals(numberType) || Double.TYPE.equals(numberType)) {
-            return 0d;
+        if (AtomicInteger.class.equals(numberType)) {
+            return new AtomicInteger(0);
         }
-        if (Byte.class.equals(numberType) || Byte.TYPE.equals(numberType)) {
-            return (byte) 0;
+        if (AtomicLong.class.equals(numberType)) {
+            return new AtomicLong(0);
         }
-        if (Float.class.equals(numberType) || Float.TYPE.equals(numberType)) {
-            return 0f;
-        }
-        return 0;
+        return null;
     }
 }

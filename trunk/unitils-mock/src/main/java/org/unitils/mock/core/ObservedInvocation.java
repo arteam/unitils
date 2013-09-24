@@ -18,11 +18,9 @@ package org.unitils.mock.core;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
 
-import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
-
 /**
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  * @author Kenny Claes
  */
 public class ObservedInvocation extends ProxyInvocation {
@@ -34,10 +32,6 @@ public class ObservedInvocation extends ProxyInvocation {
 
     /**
      * Creates a observed invocation for the given prosy invocation.
-     * <p/>
-     * The argumentsAtInvocationTime should be copies (deep clones) of the arguments at the time of
-     * the invocation. This way the original values can still be used later-on even when changes
-     * occur to the original values (pass-by-value vs pass-by-reference).
      *
      * @param proxyInvocation            The proxy invocation, not null
      * @param behaviorDefiningInvocation The invocation that defined the behavior, null if there is no behavior
@@ -54,11 +48,12 @@ public class ObservedInvocation extends ProxyInvocation {
      * This is set afterwards to make it possible to get the correct sequence in the report when there are nested mock
      * invocations.
      *
-     * @param result The result of the invocation
+     * @param result                 The result of the invocation (pass by reference)
+     * @param resultAtInvocationTime A copy of the result at the time of invocation (pass by value)
      */
-    public void setResult(Object result) {
+    public void setResult(Object result, Object resultAtInvocationTime) {
         this.result = result;
-        this.resultAtInvocationTime = createDeepClone(result);
+        this.resultAtInvocationTime = resultAtInvocationTime;
     }
 
     public Object getResult() {

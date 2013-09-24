@@ -15,11 +15,15 @@
  */
 package org.unitils.reflectionassert;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 import org.unitils.reflectionassert.difference.Difference;
 
 import java.util.Calendar;
 
+import static java.util.Calendar.DECEMBER;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 
 
@@ -29,14 +33,12 @@ import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRef
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ReflectionComparatorCalendarTest extends TestCase {
+public class ReflectionComparatorCalendarTest {
 
     /* Test object */
     private Calendar calendarA;
-
     /* Same as A but different instance */
     private Calendar calendarB;
-
     /* Calendar with a different value */
     private Calendar differentCalendar;
 
@@ -48,11 +50,10 @@ public class ReflectionComparatorCalendarTest extends TestCase {
     /**
      * Initializes the test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void initialize() throws Exception {
         calendarA = Calendar.getInstance();
-        calendarA.set(2000, 11, 5);
+        calendarA.set(2000, DECEMBER, 5);
         calendarB = Calendar.getInstance();
         calendarB.setTime(calendarA.getTime());
         differentCalendar = Calendar.getInstance();
@@ -64,6 +65,7 @@ public class ReflectionComparatorCalendarTest extends TestCase {
     /**
      * Test for two equal dates.
      */
+    @Test
     public void testGetDifference_equals() {
         Difference result = reflectionComparator.getDifference(calendarA, calendarB);
         assertNull(result);
@@ -72,11 +74,11 @@ public class ReflectionComparatorCalendarTest extends TestCase {
     /**
      * Test for two different dates.
      */
+    @Test
     public void testGetDifference_notEqualsDifferentValues() {
         Difference result = reflectionComparator.getDifference(calendarA, differentCalendar);
 
         assertEquals(calendarA, result.getLeftValue());
         assertEquals(differentCalendar, result.getRightValue());
     }
-
 }
