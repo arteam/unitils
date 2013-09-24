@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,13 @@ package org.unitils.reflectionassert.comparator.impl;
 
 import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.comparator.Comparator;
+import org.unitils.reflectionassert.difference.ClassDifference;
 import org.unitils.reflectionassert.difference.Difference;
 import org.unitils.reflectionassert.difference.ObjectDifference;
-import org.unitils.reflectionassert.difference.ClassDifference;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
+
 import static java.lang.reflect.Modifier.isStatic;
 import static java.lang.reflect.Modifier.isTransient;
 

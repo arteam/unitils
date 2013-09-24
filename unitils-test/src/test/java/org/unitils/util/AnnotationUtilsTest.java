@@ -15,7 +15,7 @@
  */
 package org.unitils.util;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -25,6 +25,7 @@ import java.util.Set;
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static java.util.Arrays.asList;
+import static org.junit.Assert.assertTrue;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenientEquals;
 
 /**
@@ -33,11 +34,12 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenien
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class AnnotationUtilsTest extends TestCase {
+public class AnnotationUtilsTest {
 
     /**
      * Test to get all annotated methods.
      */
+    @Test
     public void testGetMethodsAnnotatedWith() {
         Set<Method> annotatedMethods = AnnotationUtils.getMethodsAnnotatedWith(TestClass.class, TestAnnotation.class);
         assertPropertyLenientEquals("name", asList("annotatedMethod"), annotatedMethods);
@@ -47,6 +49,7 @@ public class AnnotationUtilsTest extends TestCase {
     /**
      * Test to get all annotated methods, but no methods are annotated. An empty list should be returned.
      */
+    @Test
     public void testGetMethodsAnnotatedWith_annotationNotFound() {
         Set<Method> annotatedMethods = AnnotationUtils.getMethodsAnnotatedWith(TestClassNoAnnotation.class, TestAnnotation.class);
         assertTrue(annotatedMethods.isEmpty());
@@ -56,6 +59,7 @@ public class AnnotationUtilsTest extends TestCase {
     /**
      * Test to get all annotated methods, including the methods of the annotated super class. Both methods should be returned.
      */
+    @Test
     public void testGetMethodsAnnotatedWith_methodFromSuperClass() {
         Set<Method> annotatedMethods = AnnotationUtils.getMethodsAnnotatedWith(TestSubClass.class, TestAnnotation.class);
         assertPropertyLenientEquals("name", asList("annotatedMethod", "annotatedSubMethod"), annotatedMethods);
@@ -65,6 +69,7 @@ public class AnnotationUtilsTest extends TestCase {
     /**
      * Test to get all annotated methods, excluding the methods of the annotated super class.
      */
+    @Test
     public void testGetMethodsAnnotatedWith_noMethodsFromSuperClass() {
         Set<Method> annotatedMethods = AnnotationUtils.getMethodsAnnotatedWith(TestSubClass.class, TestAnnotation.class, false);
         assertPropertyLenientEquals("name", asList("annotatedSubMethod"), annotatedMethods);

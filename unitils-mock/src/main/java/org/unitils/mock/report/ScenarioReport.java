@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,8 @@ public interface ScenarioReport {
 
     /**
      * Creates a report.
-     * @param scenario The scenario to output, not null
      *
+     * @param scenario The scenario to output, not null
      * @return the report, not null
      */
     String createReport(Scenario scenario);

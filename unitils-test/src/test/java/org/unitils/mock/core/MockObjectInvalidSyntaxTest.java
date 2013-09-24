@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,19 @@
  */
 package org.unitils.mock.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
-import static org.unitils.mock.ArgumentMatchers.notNull;
+import org.unitils.mock.Mock;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.unitils.mock.ArgumentMatchers.notNull;
 
 /**
  * Test for verifying syntax problems when defining mock behavior and assertions.
@@ -33,16 +35,10 @@ import java.util.ArrayList;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class MockObjectInvalidSyntaxTest {
+public class MockObjectInvalidSyntaxTest extends UnitilsJUnit4 {
 
     /* Class under test */
-    private MockObject<TestClass> mockObject;
-
-
-    @Before
-    public void setUp() {
-        mockObject = new MockObject<TestClass>("testMock1", TestClass.class, this);
-    }
+    private Mock<TestInterface> mockObject;
 
 
     @Test
@@ -56,11 +52,6 @@ public class MockObjectInvalidSyntaxTest {
         }
     }
 
-    private void assertCorrectTopLevelClassInStackTrace(UnitilsException e) {
-        StackTraceElement[] stackTrace = e.getStackTrace();
-        assertEquals(MockObjectInvalidSyntaxTest.class.getName(), stackTrace[0].getClassName());
-    }
-
 
     @Test
     public void incompleteBehaviorDefinition_returns_followedByActualInvocation() {
@@ -72,7 +63,6 @@ public class MockObjectInvalidSyntaxTest {
         }
     }
 
-
     @Test
     public void incompleteBehaviorDefinition_raises() {
         try {
@@ -82,7 +72,6 @@ public class MockObjectInvalidSyntaxTest {
             assertCorrectTopLevelClassInStackTrace(e);
         }
     }
-
 
     @Test
     public void incompleteBehaviorDefinition_performs() {
@@ -98,7 +87,6 @@ public class MockObjectInvalidSyntaxTest {
         }
     }
 
-
     @Test
     public void incompleteBehaviorDefinition_onceReturns() {
         try {
@@ -109,7 +97,6 @@ public class MockObjectInvalidSyntaxTest {
         }
     }
 
-
     @Test
     public void incompleteBehaviorDefinition_onceRaises() {
         try {
@@ -119,7 +106,6 @@ public class MockObjectInvalidSyntaxTest {
             assertCorrectTopLevelClassInStackTrace(e);
         }
     }
-
 
     @Test
     public void incompleteBehaviorDefinition_oncePerforms() {
@@ -135,7 +121,6 @@ public class MockObjectInvalidSyntaxTest {
         }
     }
 
-
     @Test
     public void incompleteAssertStatement_assertInvoked() {
         try {
@@ -145,7 +130,6 @@ public class MockObjectInvalidSyntaxTest {
             assertCorrectTopLevelClassInStackTrace(e);
         }
     }
-
 
     @Test
     public void incompleteAssertStatement_assertInvokedInOrder() {
@@ -157,7 +141,6 @@ public class MockObjectInvalidSyntaxTest {
         }
     }
 
-
     @Test
     public void incompleteAssertStatement_assertNotInvoked() {
         try {
@@ -167,7 +150,6 @@ public class MockObjectInvalidSyntaxTest {
             assertCorrectTopLevelClassInStackTrace(e);
         }
     }
-
 
     @Test
     public void tryToLetVoidMethodReturnValue() {
@@ -179,7 +161,6 @@ public class MockObjectInvalidSyntaxTest {
         }
     }
 
-
     @Test
     public void tryToLetMethodReturnIncompatibleReturnValue() {
         try {
@@ -189,7 +170,6 @@ public class MockObjectInvalidSyntaxTest {
             assertCorrectTopLevelClassInStackTrace(e);
         }
     }
-
 
     @Test
     public void tryToLetMethodThrowUndeclaredCheckedException() {
@@ -201,15 +181,13 @@ public class MockObjectInvalidSyntaxTest {
         }
     }
 
-
     @Test(expected = UnitilsException.class)
     public void argumentMatcherUsedOutsideBehaviorDefinition() {
         notNull(String.class);
     }
 
-
     @Test
-    public void nestedBehaviorDefintionCall() {
+    public void nestedBehaviorDefinitionCall() {
         try {
             mockObject.raises(IllegalArgumentException.class).testMethodArgument(mockObject.returns("aValue").testMethodReturningString());
         } catch (UnitilsException e) {
@@ -218,16 +196,18 @@ public class MockObjectInvalidSyntaxTest {
     }
 
 
-    /**
-     * Interface that is mocked during the tests
-     */
-    private static interface TestClass {
+    private void assertCorrectTopLevelClassInStackTrace(UnitilsException e) {
+        StackTraceElement[] stackTrace = e.getStackTrace();
+        assertEquals(MockObjectInvalidSyntaxTest.class.getName(), stackTrace[0].getClassName());
+    }
 
-        public String testMethodReturningString();
 
-        public void testMethod();
+    private static interface TestInterface {
 
-        public void testMethodArgument(String str);
+        String testMethodReturningString();
 
+        void testMethod();
+
+        void testMethodArgument(String str);
     }
 }

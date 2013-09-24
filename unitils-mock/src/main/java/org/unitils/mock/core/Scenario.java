@@ -45,11 +45,6 @@ public class Scenario {
     protected List<VerificationStatus> invocationVerificationStatuses = new ArrayList<VerificationStatus>();
 
 
-    public Scenario(Object testObject) {
-        this.testObject = testObject;
-    }
-
-
     public void reset() {
         observedInvocations.clear();
         invocationVerificationStatuses.clear();
@@ -69,7 +64,6 @@ public class Scenario {
         observedInvocations.add(mockInvocation);
         invocationVerificationStatuses.add(UNVERIFIED);
     }
-
 
     public List<ObservedInvocation> getObservedInvocations() {
         return observedInvocations;
@@ -109,27 +103,27 @@ public class Scenario {
     }
 
 
-    public void assertInvokedInOrder(BehaviorDefiningInvocation assertInvocation) {
+    public void assertInvokedInSequence(BehaviorDefiningInvocation behaviorDefiningInvocation) {
         ObservedInvocation matchingInvocation = null;
         for (int i = 0; i < observedInvocations.size(); i++) {
             ObservedInvocation observedInvocation = observedInvocations.get(i);
             VerificationStatus invocationVerificationStatus = invocationVerificationStatuses.get(i);
-            if (matchingInvocation == null && invocationVerificationStatus == UNVERIFIED && assertInvocation.matches(observedInvocation) != -1) {
+            if (matchingInvocation == null && invocationVerificationStatus == UNVERIFIED && behaviorDefiningInvocation.matches(observedInvocation) != -1) {
                 // Found a match that's not verified yet. Mark as verified in order.
                 invocationVerificationStatuses.set(i, VERIFIED_IN_ORDER);
                 matchingInvocation = observedInvocation;
                 continue;
             }
-            // If we found a match, then check if there's no subsequent observed invocation that's already verified using assertInvokedInOrder()
+            // If we found a match, then check if there's no subsequent observed invocation that's already verified using assertInvokedInSequence()
             if (matchingInvocation != null && invocationVerificationStatus == VERIFIED_IN_ORDER) {
-                AssertionError assertionError = new AssertionError(getInvokedOutOfOrderErrorMessage(matchingInvocation, observedInvocation, assertInvocation.getInvokedAt()));
-                assertionError.setStackTrace(assertInvocation.getInvokedAtTrace());
+                AssertionError assertionError = new AssertionError(getInvokedOutOfOrderErrorMessage(matchingInvocation, observedInvocation, behaviorDefiningInvocation.getInvokedAt()));
+                assertionError.setStackTrace(behaviorDefiningInvocation.getInvokedAtTrace());
                 throw assertionError;
             }
         }
         if (matchingInvocation == null) {
-            AssertionError assertionError = new AssertionError(getAssertInvokedErrorMessage(assertInvocation, assertInvocation.getInvokedAt()));
-            assertionError.setStackTrace(assertInvocation.getInvokedAtTrace());
+            AssertionError assertionError = new AssertionError(getAssertInvokedErrorMessage(behaviorDefiningInvocation, behaviorDefiningInvocation.getInvokedAt()));
+            assertionError.setStackTrace(behaviorDefiningInvocation.getInvokedAtTrace());
             throw assertionError;
         }
     }

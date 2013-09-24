@@ -16,21 +16,31 @@
 
 package org.unitils.mock.listener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.core.TestInstance;
 import org.unitils.core.TestListener;
-
-import static org.unitils.mock.MockUnitils.logFullScenarioReport;
+import org.unitils.mock.core.Scenario;
 
 /**
  * @author Tim Ducheyne
  */
 public class LogScenarioReportTestListener extends TestListener {
 
+    protected static Log logger = LogFactory.getLog(LogScenarioReportTestListener.class);
+
+    private Scenario scenario;
+
+
+    public LogScenarioReportTestListener(Scenario scenario) {
+        this.scenario = scenario;
+    }
+
+
     @Override
     public void afterTestMethod(TestInstance testInstance, Throwable testThrowable) {
         if (testThrowable != null) {
-            logFullScenarioReport();
+            logger.error("\n\n" + scenario.createFullReport());
         }
     }
-
 }

@@ -17,10 +17,9 @@ package org.unitils.mock.dummy;
 
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.proxy.ProxyInvocationHandler;
+import org.unitils.mock.core.proxy.ProxyService;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.DummyValueReturningMockBehavior;
-
-import static org.unitils.mock.core.proxy.ProxyFactory.createProxy;
 
 /**
  * Class for handling the dummy object behavior. A dummy object is a proxy that will return default values for every method. This can be
@@ -30,6 +29,14 @@ import static org.unitils.mock.core.proxy.ProxyFactory.createProxy;
  * @author Filip Neven
  */
 public class DummyObjectFactory {
+
+    protected ProxyService proxyService;
+
+
+    public DummyObjectFactory(ProxyService proxyService) {
+        this.proxyService = proxyService;
+    }
+
 
     /**
      * Creates the dummy proxy object.
@@ -43,7 +50,7 @@ public class DummyObjectFactory {
 
     public <T> T createDummy(Class<T> type, MockBehavior mockBehaviour) {
         String dummyName = type.getSimpleName();
-        return createProxy(dummyName, new DummyObjectInvocationHandler(type, mockBehaviour), type, DummyObject.class, Cloneable.class);
+        return proxyService.createProxy(dummyName, new DummyObjectInvocationHandler(type, mockBehaviour), type, DummyObject.class);
     }
 
 
@@ -65,12 +72,6 @@ public class DummyObjectFactory {
             this.dummyObjectBehavior = mockBehavior;
         }
 
-        /**
-         * Handles the given method invocation of the dummy object.
-         *
-         * @param invocation The method invocation, not null
-         * @return The result value for the method invocation
-         */
         public Object handleInvocation(ProxyInvocation invocation) throws Throwable {
             return dummyObjectBehavior.execute(invocation);
         }

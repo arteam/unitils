@@ -16,19 +16,19 @@
 package org.unitils.mock.mockbehavior.impl;
 
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.lang.reflect.Method;
 
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 /**
  * @author Tim Ducheyne
  */
-public class DefaultValueReturningMockBehaviorAssertCanExecuteTest extends UnitilsJUnit4 {
+public class DefaultValueReturningMockBehaviorAssertCanExecuteTest {
 
     private DefaultValueReturningMockBehavior defaultValueReturningMockBehavior = new DefaultValueReturningMockBehavior();
 
@@ -52,7 +52,7 @@ public class DefaultValueReturningMockBehaviorAssertCanExecuteTest extends Uniti
 
 
     private ProxyInvocation createProxyInvocation(Method method) {
-        return new ProxyInvocation(null, null, method, null, null);
+        return new ProxyInvocation(null, null, method, emptyList(), emptyList(), null);
     }
 
 

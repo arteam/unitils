@@ -50,7 +50,7 @@ public class BehaviorDefiningInvocations {
      * First we find all behavior defining invocations that have matching argument matchers and take the one with the highest
      * matching score (identity match scores higher than an equals match). If there are 2 invocations with the same score,
      * we take the invocation with the lowest nr of not-null (default) arguments. If both have the same nr of not-null
-     * arguments, the first one is returned. E.g.
+     * arguments, the last one is returned. This way you can still override behavior that was set up before. E.g.
      * <p/>
      * myMethod(null, null);
      * myMethod("a", null);
@@ -64,7 +64,9 @@ public class BehaviorDefiningInvocations {
         BehaviorDefiningInvocation bestMatchingBehaviorDefiningInvocation = null;
         int bestMatchingScore = -1;
 
-        for (BehaviorDefiningInvocation behaviorDefiningInvocation : behaviorDefiningInvocations) {
+        int count = behaviorDefiningInvocations.size();
+        for (int i = count - 1; i >= 0; i--) {
+            BehaviorDefiningInvocation behaviorDefiningInvocation = behaviorDefiningInvocations.get(i);
             int matchingScore = behaviorDefiningInvocation.matches(proxyInvocation);
             if (matchingScore == -1) {
                 // no match

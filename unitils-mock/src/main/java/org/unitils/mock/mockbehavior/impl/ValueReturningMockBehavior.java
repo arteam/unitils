@@ -54,10 +54,10 @@ public class ValueReturningMockBehavior implements ValidatableMockBehavior {
     public void assertCanExecute(ProxyInvocation proxyInvocation) throws UnitilsException {
         Class<?> returnType = proxyInvocation.getMethod().getReturnType();
         if (returnType == Void.TYPE) {
-            throw new UnitilsException("Trying to make a void method return a value");
+            throw new UnitilsException("Trying to define mock behavior that returns a value for a void method.");
         }
         if (valueToReturn != null && !isAssignable(valueToReturn.getClass(), returnType)) {
-            throw new UnitilsException("Trying to make a method return a value who's type is not compatible with the return type. Value type: " + valueToReturn.getClass() + ", return type: " + returnType);
+            throw new UnitilsException("Trying to make a method return a value that is not assignable to the return type. Return type: " + returnType + ", value type: " + valueToReturn.getClass() + ", value: " + valueToReturn);
         }
     }
 
@@ -70,6 +70,7 @@ public class ValueReturningMockBehavior implements ValidatableMockBehavior {
     public Object execute(ProxyInvocation proxyInvocation) {
         return valueToReturn;
     }
+
 
     /**
      * If the value to return is an wrapper object, e.g. a mock, this will return the wrapped instance instead

@@ -36,8 +36,9 @@ public class PartialMockObjectMockedInstanceTest {
 
     @Before
     public void setUp() {
+        // todo td implement
         TestClass mockedInstance = new TestClass("original value");
-        mockObject = new PartialMockObject<TestClass>(mockedInstance, this);
+//        mockObject = new PartialMockObject<TestClass>(mockedInstance, this);
     }
 
 
@@ -69,7 +70,9 @@ public class PartialMockObjectMockedInstanceTest {
         assertEquals(999, result);
 
         // make sure the order of the invocations is recorded correctly
-        List<ObservedInvocation> observedInvocations = mockObject.getScenario(this).getObservedInvocations();
+        // todo implement
+//        List<ObservedInvocation> observedInvocations = mockObject.getScenario(this).getObservedInvocations();
+        List<ObservedInvocation> observedInvocations = null;
         assertEquals("methodThatCallsOtherMethod", observedInvocations.get(0).getMethod().getName());
         assertEquals("methodWithArguments", observedInvocations.get(1).getMethod().getName());
     }

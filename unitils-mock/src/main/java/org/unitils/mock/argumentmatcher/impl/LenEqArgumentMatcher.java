@@ -20,7 +20,6 @@ import org.unitils.reflectionassert.ReflectionComparator;
 
 import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.MATCH;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.NO_MATCH;
-import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
@@ -39,6 +38,7 @@ public class LenEqArgumentMatcher implements ArgumentMatcher {
     /* The expected value */
     protected Object value;
 
+
     /**
      * Creates a matcher for the given value. A copy of the value is taken so that it can be compared
      * even when the value itself was modified later-on.
@@ -46,7 +46,7 @@ public class LenEqArgumentMatcher implements ArgumentMatcher {
      * @param value The expected value
      */
     public LenEqArgumentMatcher(Object value) {
-        this.value = createDeepClone(value);
+        this.value = value;
     }
 
 
@@ -57,8 +57,8 @@ public class LenEqArgumentMatcher implements ArgumentMatcher {
      * the invocation. This way the original values can still be used later-on even when changes
      * occur to the original values (pass-by-value vs pass-by-reference).
      *
-     * @param argument                 The argument that were used by reference, not null
-     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed, not null
+     * @param argument                 The argument that were used by reference
+     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed
      * @return The match result, not null
      */
     public MatchResult matches(Object argument, Object argumentAtInvocationTime) {

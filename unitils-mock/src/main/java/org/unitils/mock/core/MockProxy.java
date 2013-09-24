@@ -17,46 +17,53 @@ package org.unitils.mock.core;
 
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.core.matching.MatchingInvocationBuilder;
+import org.unitils.mock.core.proxy.CloneService;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.proxy.ProxyInvocationHandler;
+import org.unitils.mock.core.proxy.ProxyService;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
 
-import static org.unitils.mock.core.proxy.ProxyFactory.createProxy;
 
 public class MockProxy<T> {
 
     /* The mock proxy instance */
-    protected T proxy;
-
     protected BehaviorDefiningInvocations oneTimeMatchingBehaviorDefiningInvocations;
-
     protected BehaviorDefiningInvocations alwaysMatchingBehaviorDefiningInvocations;
-
     /* The scenario that will record all observed invocations */
     protected Scenario scenario;
-
     protected MatchingInvocationBuilder matchingInvocationBuilder;
+    protected CloneService cloneService;
+
+    protected T proxy;
 
 
-    public MockProxy(String mockName, Class<T> mockedType, BehaviorDefiningInvocations oneTimeMatchingBehaviorDefiningInvocations, BehaviorDefiningInvocations alwaysMatchingBehaviorDefiningInvocations, Scenario scenario, MatchingInvocationBuilder matchingInvocationBuilder) {
+    public MockProxy(String mockName, Class<T> mockedType, BehaviorDefiningInvocations oneTimeMatchingBehaviorDefiningInvocations, BehaviorDefiningInvocations alwaysMatchingBehaviorDefiningInvocations, Scenario scenario, MatchingInvocationBuilder matchingInvocationBuilder, ProxyService proxyService, CloneService cloneService) {
         this.oneTimeMatchingBehaviorDefiningInvocations = oneTimeMatchingBehaviorDefiningInvocations;
         this.alwaysMatchingBehaviorDefiningInvocations = alwaysMatchingBehaviorDefiningInvocations;
         this.scenario = scenario;
         this.matchingInvocationBuilder = matchingInvocationBuilder;
-        this.proxy = createProxy(mockName, new InvocationHandler(), mockedType, Cloneable.class);
+        this.cloneService = cloneService;
+        this.proxy = proxyService.createProxy(mockName, new InvocationHandler(), mockedType);
     }
 
 
-    @SuppressWarnings("unchecked")
     public T getProxy() {
         return proxy;
     }
 
+    // todo td implement
+    private ProxyInvocationHandler proxyInvocationHandler;
+
+    // todo td implement
+    public void setProxyInvocationHandler(ProxyInvocationHandler proxyInvocationHandler) {
+        this.proxyInvocationHandler = proxyInvocationHandler;
+    }
+
 
     protected Object handleMockInvocation(ProxyInvocation proxyInvocation) throws Throwable {
-        matchingInvocationBuilder.assertNotExpectingInvocation();
+        matchingInvocationBuilder.assertPreviousMatchingInvocationCompleted();
 
         BehaviorDefiningInvocation behaviorDefiningInvocation = getMatchingBehaviorDefiningInvocation(proxyInvocation);
         MockBehavior mockBehavior = getValidMockBehavior(proxyInvocation, behaviorDefiningInvocation);
@@ -73,7 +80,8 @@ public class MockProxy<T> {
                 throwable = t;
             }
         }
-        observedInvocation.setResult(result);
+        Object clonedResult = cloneService.createDeepClone(result);
+        observedInvocation.setResult(result, clonedResult);
 
         if (throwable != null) {
             throw throwable;
@@ -90,7 +98,6 @@ public class MockProxy<T> {
         return behaviorDefiningInvocation;
     }
 
-
     protected MockBehavior getValidMockBehavior(ProxyInvocation proxyInvocation, BehaviorDefiningInvocation behaviorDefiningInvocation) {
         if (behaviorDefiningInvocation != null) {
             MockBehavior mockBehavior = behaviorDefiningInvocation.getMockBehavior();
@@ -99,7 +106,6 @@ public class MockProxy<T> {
         }
         return getDefaultMockBehavior(proxyInvocation);
     }
-
 
     /**
      * Check whether the mock behavior can applied for this invocation
@@ -121,7 +127,6 @@ public class MockProxy<T> {
         }
     }
 
-
     protected MockBehavior getDefaultMockBehavior(ProxyInvocation proxyInvocation) {
         if (proxyInvocation.getMethod().getReturnType() == Void.TYPE) {
             return null;
@@ -129,12 +134,11 @@ public class MockProxy<T> {
         return new DefaultValueReturningMockBehavior();
     }
 
-
     protected class InvocationHandler implements ProxyInvocationHandler {
 
-        public Object handleInvocation(ProxyInvocation invocation) throws Throwable {
-            return handleMockInvocation(invocation);
+        public Object handleInvocation(ProxyInvocation proxyInvocation) throws Throwable {
+//            return proxyInvocationHandler.handleInvocation(proxyInvocation); // todo td implement
+            return handleMockInvocation(proxyInvocation);
         }
     }
-
 }

@@ -36,7 +36,8 @@ public class PartialMockObjectStubTest {
 
     @Before
     public void setUp() {
-        mockObject = new PartialMockObject<TestClass>(TestClass.class, this);
+        // todo td implement
+//        mockObject = new PartialMockObject<TestClass>(TestClass.class, this);
         TestClass.invoked = false;
     }
 

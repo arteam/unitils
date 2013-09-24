@@ -15,12 +15,16 @@
  */
 package org.unitils.reflectionassert;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 import org.unitils.reflectionassert.difference.Difference;
 
 import java.util.Calendar;
 import java.util.Date;
 
+import static java.util.Calendar.DECEMBER;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 
 
@@ -30,20 +34,16 @@ import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRef
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ReflectionComparatorDateTest extends TestCase {
+public class ReflectionComparatorDateTest {
 
     /* Test object */
     private Date dateA;
-
     /* Same as A but different instance */
     private Date dateB;
-
     /* Same as A but instance of java.sql.Date */
     private java.sql.Date sqlDate;
-
     /* Date with a different value */
     private Date differentDate;
-
 
     /* Class under test */
     private ReflectionComparator reflectionComparator;
@@ -52,11 +52,10 @@ public class ReflectionComparatorDateTest extends TestCase {
     /**
      * Initializes the test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void initialize() throws Exception {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(2000, 11, 5);
+        calendar.set(2000, DECEMBER, 5);
 
         dateA = calendar.getTime();
         dateB = new Date(dateA.getTime());
@@ -70,6 +69,7 @@ public class ReflectionComparatorDateTest extends TestCase {
     /**
      * Test for two equal dates.
      */
+    @Test
     public void testGetDifference_equals() {
         Difference result = reflectionComparator.getDifference(dateA, dateB);
         assertNull(result);
@@ -78,6 +78,7 @@ public class ReflectionComparatorDateTest extends TestCase {
     /**
      * Test for two equal dates but of different type.
      */
+    @Test
     public void testGetDifference_sqlDate() {
         Difference result = reflectionComparator.getDifference(dateA, sqlDate);
         assertNull(result);
@@ -86,11 +87,11 @@ public class ReflectionComparatorDateTest extends TestCase {
     /**
      * Test for two different dates.
      */
+    @Test
     public void testGetDifference_notEqualsDifferentValues() {
         Difference result = reflectionComparator.getDifference(dateA, differentDate);
 
         assertEquals(dateA, result.getLeftValue());
         assertEquals(differentDate, result.getRightValue());
     }
-
 }

@@ -40,8 +40,6 @@ import static org.unitils.reflectionassert.util.HibernateUtil.getUnproxiedValue;
  */
 public class ObjectFormatter {
 
-    public static final String MOCK_NAME_CHAIN_SEPARATOR = "##chained##";
-
     /* The maximum recursion depth */
     protected int maxDepth;
     /* The maximum nr of elements for arrays and collections to display */
@@ -259,7 +257,6 @@ public class ObjectFormatter {
             if (mockName == null) {
                 return false;
             }
-            mockName = mockName.replaceAll(MOCK_NAME_CHAIN_SEPARATOR, ".");
             if (isDummy(object)) {
                 result.append("Dummy<");
             } else {

@@ -18,8 +18,6 @@ package org.unitils.mock.core.proxy;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
-
 /**
  * An invocation of a proxy method.
  *
@@ -29,16 +27,16 @@ import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
  */
 public class ProxyInvocation {
 
-    /* The name of the mock, e.g. the field name */
-    protected String mockName;
+    /* The display name of the proxy */
+    protected String proxyName;
     /* The proxy on which the method was called */
     protected Object proxy;
     /* The method that was called */
     protected Method method;
     /* The arguments that were used */
-    protected List<Object> arguments;
+    protected List<?> arguments;
     /* The arguments at the time that they were used */
-    protected List<Object> argumentsAtInvocationTime;
+    protected List<?> argumentsAtInvocationTime;
     /* The trace of the invocation */
     protected StackTraceElement[] invokedAtTrace;
 
@@ -46,18 +44,19 @@ public class ProxyInvocation {
     /**
      * Creates an invocation.
      *
-     * @param mockName       The name of the mock, e.g. the field name, not null
-     * @param proxy          The proxy on which the method was called, not null
-     * @param method         The method that was called, not null
-     * @param arguments      The arguments that were used, not null
-     * @param invokedAtTrace The trace of the invocation, not null
+     * @param proxyName                 The display name of the proxy, not null
+     * @param proxy                     The proxy on which the method was called, not null
+     * @param method                    The method that was called, not null
+     * @param arguments                 The arguments that were used (pass by reference), not null
+     * @param argumentsAtInvocationTime A copy of the values at the time of invocation (pass by value), not null
+     * @param invokedAtTrace            The trace of the invocation, not null
      */
-    public ProxyInvocation(String mockName, Object proxy, Method method, List<Object> arguments, StackTraceElement[] invokedAtTrace) {
-        this.mockName = mockName;
+    public ProxyInvocation(String proxyName, Object proxy, Method method, List<?> arguments, List<?> argumentsAtInvocationTime, StackTraceElement[] invokedAtTrace) {
+        this.proxyName = proxyName;
         this.proxy = proxy;
         this.method = method;
         this.arguments = arguments;
-        this.argumentsAtInvocationTime = arguments;
+        this.argumentsAtInvocationTime = argumentsAtInvocationTime;
         this.invokedAtTrace = invokedAtTrace;
     }
 
@@ -72,12 +71,12 @@ public class ProxyInvocation {
      * @param proxyInvocation The proxy invocation to copy, not null
      */
     public ProxyInvocation(ProxyInvocation proxyInvocation) {
-        this.mockName = proxyInvocation.getMockName();
-        this.proxy = proxyInvocation.getProxy();
-        this.method = proxyInvocation.getMethod();
-        this.arguments = proxyInvocation.getArguments();
-        this.argumentsAtInvocationTime = createDeepClone(arguments);
-        this.invokedAtTrace = proxyInvocation.getInvokedAtTrace();
+        this.proxyName = proxyInvocation.proxyName;
+        this.proxy = proxyInvocation.proxy;
+        this.method = proxyInvocation.method;
+        this.arguments = proxyInvocation.arguments;
+        this.argumentsAtInvocationTime = proxyInvocation.argumentsAtInvocationTime;
+        this.invokedAtTrace = proxyInvocation.invokedAtTrace;
     }
 
 
@@ -106,11 +105,12 @@ public class ProxyInvocation {
         return count;
     }
 
+
     /**
-     * @return The name of the mock, e.g. the field name, not null
+     * @return The proxy on which the method was called, not null
      */
-    public String getMockName() {
-        return mockName;
+    public String getProxyName() {
+        return proxyName;
     }
 
     /**
@@ -130,7 +130,7 @@ public class ProxyInvocation {
     /**
      * @return The arguments that were used, not null
      */
-    public List<Object> getArguments() {
+    public List<?> getArguments() {
         return arguments;
     }
 
@@ -144,7 +144,7 @@ public class ProxyInvocation {
      *
      * @return The arguments, not null
      */
-    public List<Object> getArgumentsAtInvocationTime() {
+    public List<?> getArgumentsAtInvocationTime() {
         return argumentsAtInvocationTime;
     }
 

@@ -19,7 +19,6 @@ import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import org.unitils.reflectionassert.ReflectionComparator;
 
 import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.*;
-import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
@@ -31,7 +30,6 @@ import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDE
  *
  * @author Tim Ducheyne
  * @author Filip Neven
- * @since 15-dec-2008
  */
 public class DefaultArgumentMatcher implements ArgumentMatcher {
 
@@ -40,15 +38,16 @@ public class DefaultArgumentMatcher implements ArgumentMatcher {
     /* Copy of the original value */
     protected Object valueAtInvocationTime;
 
+
     /**
      * Creates a matcher for the given value. The original value is stored and a copy of the value is taken so that it
      * can be compared even when the value itself was modified later-on.
      *
      * @param value The expected value
      */
-    public DefaultArgumentMatcher(Object value) {
+    public DefaultArgumentMatcher(Object value, Object valueAtInvocationTime) {
         this.value = value;
-        this.valueAtInvocationTime = createDeepClone(value);
+        this.valueAtInvocationTime = valueAtInvocationTime;
     }
 
 
@@ -58,8 +57,8 @@ public class DefaultArgumentMatcher implements ArgumentMatcher {
      * value, lenient reflection comparison is used to compare the values. This means that the actual order of collections
      * will be ignored and only fields that have a non default value will be compared.
      *
-     * @param argument                 The argument that was used by reference, not null
-     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed, not null
+     * @param argument                 The argument that was used by reference
+     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed
      * @return The match result, not null
      */
     public MatchResult matches(Object argument, Object argumentAtInvocationTime) {

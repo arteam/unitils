@@ -30,8 +30,6 @@ import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.NO_MA
  */
 public class BehaviorDefiningInvocation extends ProxyInvocation {
 
-    // todo td unit tests
-
     /* The argument matchers to use when matching the invocation */
     protected List<ArgumentMatcher> argumentMatchers;
     /* The behavior to execute */
@@ -78,8 +76,8 @@ public class BehaviorDefiningInvocation extends ProxyInvocation {
      * @return A matching score for the invocation, -1 if there is no match
      */
     public int matches(ProxyInvocation proxyInvocation) {
-        if (!getMockName().equals(proxyInvocation.getMockName())) {
-            // todo is mock name unique enough => maybe better to use mock object itself
+        // todo td fix
+        if (!getProxyName().equals(proxyInvocation.getProxyName())) {
             return -1;
         }
         if (!getMethod().equals(proxyInvocation.getMethod())) {

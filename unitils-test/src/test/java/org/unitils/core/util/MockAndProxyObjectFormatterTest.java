@@ -20,7 +20,6 @@ import net.sf.cglib.proxy.NoOp;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
-import org.unitils.mock.core.MockObject;
 
 import java.util.Collection;
 
@@ -47,14 +46,18 @@ public class MockAndProxyObjectFormatterTest extends UnitilsJUnit4 {
 
     @Test
     public void formatMock() {
-        Mock<Collection> mock = new MockObject<Collection>("mockName", Collection.class, this);
+        // todo td implement
+//        Mock<Collection> mock = new MockObject<Collection>("mockName", Collection.class, this);
+        Mock<Collection> mock = null;
         String result = objectFormatter.format(mock);
         assertEquals("Mock<mockName>", result);
     }
 
     @Test
     public void formatMockProxy() {
-        Object mockProxy = new MockObject<Collection>("mockName", Collection.class, this).getMock();
+        // todo td implement
+//        Object mockProxy = new MockObject<Collection>("mockName", Collection.class, this).getMock();
+        Object mockProxy = null;
         String result = objectFormatter.format(mockProxy);
         assertEquals("Mock<mockName>", result);
     }

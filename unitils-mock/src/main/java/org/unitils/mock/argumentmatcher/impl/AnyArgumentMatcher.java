@@ -31,6 +31,7 @@ public class AnyArgumentMatcher implements ArgumentMatcher {
     /* The expected type */
     protected Class<?> type;
 
+
     /**
      * Creates a matcher for the given expected type.
      *
@@ -44,12 +45,12 @@ public class AnyArgumentMatcher implements ArgumentMatcher {
     /**
      * Returns true if the given argument is of the expected type, false otherwise.
      *
-     * @param argument                 The argument that were used by reference, not null
-     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed, not null
+     * @param argument                 The argument that were used by reference
+     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed
      * @return The match result, not null
      */
     public MatchResult matches(Object argument, Object argumentAtInvocationTime) {
-        if (argument != null && argument.getClass().equals(type)) {
+        if (type != null && argument != null && type.isAssignableFrom(argument.getClass())) {
             return MATCH;
         }
         return NO_MATCH;

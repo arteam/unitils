@@ -20,7 +20,7 @@ import org.junit.Test;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-import static junit.framework.Assert.assertNull;
+import static org.junit.Assert.assertNull;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenientEquals;
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,15 @@
  */
 package org.unitils.reflectionassert;
 
-import static org.unitils.reflectionassert.ReflectionComparatorMode.*;
 import org.unitils.reflectionassert.comparator.Comparator;
 import org.unitils.reflectionassert.comparator.impl.*;
-import static org.unitils.util.CollectionUtils.asSet;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import static org.unitils.reflectionassert.ReflectionComparatorMode.*;
+import static org.unitils.util.CollectionUtils.asSet;
 
 /**
  * A factory for creating a reflection comparator.

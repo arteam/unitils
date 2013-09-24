@@ -43,7 +43,8 @@ public class PartialMockObjectTest {
     @Before
     public void setUp() {
         TestClass.invocationCount = 0;
-        mockObject = new PartialMockObject<TestClass>("testMock", TestClass.class, this);
+        // todo td implement
+//        mockObject = new PartialMockObject<TestClass>("testMock", TestClass.class, this);
     }
 
 

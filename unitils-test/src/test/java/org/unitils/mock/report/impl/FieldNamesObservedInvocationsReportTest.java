@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,14 @@
  */
 package org.unitils.mock.report.impl;
 
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.mock.Mock;
-import org.unitils.mock.core.MockObject;
-import static org.unitils.mock.core.MockObject.getCurrentScenario;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the usage of test fields in mock invocations. The names of the fields should be shown in the report (same as for large value).
@@ -44,7 +43,9 @@ public class FieldNamesObservedInvocationsReportTest {
     @Before
     public void initialize() {
         observedInvocationsReport = new ObservedInvocationsReport(this);
-        testMock = new MockObject<TestInterface>("testMock", TestInterface.class, this);
+
+        // todo td implement
+//        testMock = new MockObject<TestInterface>("testMock", TestInterface.class, this);
     }
 
 
@@ -53,7 +54,9 @@ public class FieldNamesObservedInvocationsReportTest {
         testMock.returns(myTestField).testMethod(null);
         testMock.getMock().testMethod(null);
 
-        String result = observedInvocationsReport.createReport(getCurrentScenario().getObservedInvocations());
+        // todo td implement
+//        String result = observedInvocationsReport.createReport(getCurrentScenario().getObservedInvocations());
+        String result = null;
         assertTrue(result.contains("myTestField"));
     }
 
@@ -62,15 +65,16 @@ public class FieldNamesObservedInvocationsReportTest {
         testMock.returns(null).testMethod(myTestField);
         testMock.getMock().testMethod(myTestField);
 
-        String result = observedInvocationsReport.createReport(getCurrentScenario().getObservedInvocations());
+        // todo td implement
+//        String result = observedInvocationsReport.createReport(getCurrentScenario().getObservedInvocations());
+        String result = null;
         assertTrue(result.contains("myTestField"));
     }
 
 
     public static interface TestInterface {
 
-        public Object testMethod(Object value);
+        Object testMethod(Object value);
 
     }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,20 @@
  */
 package org.unitils.reflectionassert;
 
-import junit.framework.TestCase;
-import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
-import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
+import org.junit.Before;
+import org.junit.Test;
 import org.unitils.reflectionassert.difference.CollectionDifference;
 import org.unitils.reflectionassert.difference.Difference;
-import static org.unitils.reflectionassert.util.InnerDifferenceFinder.getInnerDifference;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+
+import static org.junit.Assert.*;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
+import static org.unitils.reflectionassert.util.InnerDifferenceFinder.getInnerDifference;
 
 
 /**
@@ -35,29 +38,22 @@ import java.util.LinkedList;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ReflectionComparatorCollectionTest extends TestCase {
+public class ReflectionComparatorCollectionTest {
 
     /* Test collection */
     private Collection<Element> collectionA;
-
     /* Same as A but different instance */
     private Collection<Element> collectionB;
-
     /* Same as A and B but different string value for element 2 */
     private Collection<Element> collectionDifferentValue;
-
     /* Same as A but in a LinkedList instead of an ArrayList */
     private Collection<Element> collectionDifferentType;
-
     /* Test collection with inner collection for element 2 */
     private Collection<Element> collectionInnerA;
-
     /* Same as innerA but different instance  */
     private Collection<Element> collectionInnerB;
-
     /* Same as innerA and innerB but different string value for inner element 2 */
     private Collection<Element> collectionInnerDifferentValue;
-
     /* Class under test */
     private ReflectionComparator reflectionComparator;
 
@@ -65,9 +61,8 @@ public class ReflectionComparatorCollectionTest extends TestCase {
     /**
      * Initializes the test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void initialize() throws Exception {
         collectionA = createCollection("test 2", null);
         collectionB = createCollection("test 2", null);
         collectionDifferentValue = createCollection("XXXXXX", null);
@@ -84,6 +79,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
     /**
      * Test for two equal collections.
      */
+    @Test
     public void testGetAllDifferences_equals() {
         Difference result = reflectionComparator.getDifference(collectionA, collectionB);
         assertNull(result);
@@ -93,6 +89,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
     /**
      * Test for two equal collections that are of a different type.
      */
+    @Test
     public void testGetAllDifferences_equalsDifferentType() {
         Difference result = reflectionComparator.getDifference(collectionA, collectionDifferentType);
         assertNull(result);
@@ -102,6 +99,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
     /**
      * Test for two equal collections as an inner field of an object.
      */
+    @Test
     public void testGetAllDifferences_equalsInner() {
         Difference result = reflectionComparator.getDifference(collectionInnerA, collectionInnerB);
         assertNull(result);
@@ -111,6 +109,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
     /**
      * Test for two collections that contain different values.
      */
+    @Test
     public void testGetAllDifferences_notEqualsDifferentValues() {
         Difference result = reflectionComparator.getDifference(collectionA, collectionDifferentValue);
 
@@ -123,6 +122,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
     /**
      * Test for two collections that have a different size. The first element was removed from the right list.
      */
+    @Test
     public void testGetAllDifferences_notEqualsFirstRightElementRemoved() {
         Iterator<?> iterator = collectionB.iterator();
         iterator.next();
@@ -145,6 +145,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
     /**
      * Test for two collections that have a different size. The first element was removed from the left list.
      */
+    @Test
     public void testGetAllDifferences_notEqualsFirstLeftElementRemoved() {
         Iterator<?> iterator = collectionA.iterator();
         iterator.next();
@@ -167,6 +168,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
     /**
      * Test for objects with inner collections that contain different values.
      */
+    @Test
     public void testGetAllDifferences_notEqualsInnerDifferentValues() {
         Difference result = reflectionComparator.getDifference(collectionInnerA, collectionInnerDifferentValue);
 
@@ -180,6 +182,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
     /**
      * Tests for objects with inner collections that have a different size.
      */
+    @Test
     public void testGetAllDifferences_notEqualsInnerDifferentSize() {
         Iterator<?> iterator = collectionB.iterator();
         iterator.next();
@@ -196,6 +199,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
     /**
      * Tests for collections but right value is not a collection.
      */
+    @Test
     public void testGetAllDifferences_notEqualsRightNotCollection() {
         Difference result = reflectionComparator.getDifference(collectionA, "Test string");
 
@@ -207,6 +211,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
     /**
      * Test for two collections that contain different values.
      */
+    @Test
     public void testGetAllDifferences_notEqualsMultipleDifferentValues() {
         collectionDifferentValue.iterator().next().string = "YYYYYY";
         Difference result = reflectionComparator.getDifference(collectionA, collectionDifferentValue);
@@ -287,6 +292,4 @@ public class ReflectionComparatorCollectionTest extends TestCase {
             return false;
         }
     }
-
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,12 @@ package org.unitils.mock.argumentmatcher;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Type;
-import static org.objectweb.asm.Type.getMethodDescriptor;
 import org.objectweb.asm.tree.*;
 import org.objectweb.asm.tree.analysis.*;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.annotation.ArgumentMatcher;
 import org.unitils.mock.annotation.MatchStatement;
 import org.unitils.mock.core.proxy.ProxyInvocation;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-import static org.unitils.util.ReflectionUtils.getClassWithName;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -33,6 +30,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static org.objectweb.asm.Type.getMethodDescriptor;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import static org.unitils.util.ReflectionUtils.getClassWithName;
 
 
 /**
@@ -54,14 +55,13 @@ public class ArgumentMatcherPositionFinder {
      * @param index           The index of the matcher on that line, 1 for the first, 2 for the second etc
      * @return The argument indexes, empty if there are no matchers
      */
-    public static List<Integer> getArgumentMatcherIndexes(ProxyInvocation proxyInvocation, int fromLineNr, int toLineNr, int index) {
+    public List<Integer> getArgumentMatcherIndexes(ProxyInvocation proxyInvocation, int fromLineNr, int toLineNr, int index) {
         Class<?> testClass = getClassWithName(proxyInvocation.getInvokedAt().getClassName());
         String testMethodName = proxyInvocation.getInvokedAt().getMethodName();
         Method method = proxyInvocation.getMethod();
 
         return getArgumentMatcherIndexes(testClass, testMethodName, method, fromLineNr, toLineNr, index);
     }
-
 
     /**
      * Locates the argument matchers for the method invocation on the given line.
@@ -76,8 +76,8 @@ public class ArgumentMatcherPositionFinder {
      * @return The argument indexes, empty if there are no matchers
      */
     @SuppressWarnings({"unchecked"})
-    public static List<Integer> getArgumentMatcherIndexes(Class<?> clazz, String methodName, Method invokedMethod, int fromLineNr, int toLineNr, int index) {
-        // read the bytecode of the test class
+    public List<Integer> getArgumentMatcherIndexes(Class<?> clazz, String methodName, Method invokedMethod, int fromLineNr, int toLineNr, int index) {
+        // read the byte code of the test class
         ClassNode restClassNode = readClass(clazz);
 
         // find the correct test method
@@ -93,18 +93,18 @@ public class ArgumentMatcherPositionFinder {
                 }
             }
         }
-        throw new UnitilsException("Unable to find indexes of argument matcher. Method not found: " + methodName);
+        throw new UnitilsException("Unable to determine argument matchers positions. Unable to find method call " + invokedMethod.getName() + " at line number " + fromLineNr + " to " + toLineNr + " and index " + index + " in " + clazz.getName() + "." + methodName);
     }
 
 
     /**
      * Uses ASM to read the byte code of the given class. This will access the class file and create some sort
-     * of DOM tree for the structure of the bytecode.
+     * of DOM tree for the structure of the byte code.
      *
      * @param clazz The class to read, not null
      * @return The structure of the class, not null
      */
-    protected static ClassNode readClass(Class<?> clazz) {
+    protected ClassNode readClass(Class<?> clazz) {
         InputStream inputStream = null;
         try {
             inputStream = clazz.getClassLoader().getResourceAsStream(clazz.getName().replace('.', '/') + ".class");
@@ -121,7 +121,6 @@ public class ArgumentMatcherPositionFinder {
         }
     }
 
-
     /**
      * Locates the argument matchers for the method invocation on the given line.
      *
@@ -135,7 +134,7 @@ public class ArgumentMatcherPositionFinder {
      * @param index                 The index of the matcher on that line, 1 for the first, 2 for the second etc
      * @return The argument indexes, null if method was not found, empty if method found but there are no matchers
      */
-    protected static List<Integer> findArgumentMatcherIndexes(ClassNode classNode, MethodNode methodNode, Class<?> interpretedClass, String interpretedMethodName, Method invokedMethod, int fromLineNr, int toLineNr, int index) {
+    protected List<Integer> findArgumentMatcherIndexes(ClassNode classNode, MethodNode methodNode, Class<?> interpretedClass, String interpretedMethodName, Method invokedMethod, int fromLineNr, int toLineNr, int index) {
         String invokedMethodName = invokedMethod.getName();
         String invokedMethodDescriptor = getMethodDescriptor(invokedMethod);
         try {
@@ -150,7 +149,7 @@ public class ArgumentMatcherPositionFinder {
             if (e.getCause() instanceof UnitilsException) {
                 throw (UnitilsException) e.getCause();
             }
-            throw new UnitilsException("Unable to find argument matchers for method invocation. Method name: " + invokedMethodName + ", method description; " + invokedMethodDescriptor + ", line nr; " + fromLineNr, e);
+            throw new UnitilsException("Unable to analyze method for finding argument matchers.", e);
         }
     }
 
@@ -164,7 +163,6 @@ public class ArgumentMatcherPositionFinder {
 
         /* The method to analyze */
         protected MethodNode methodNode;
-
         /* The interpreter to use during the analysis */
         protected MethodInterpreter methodInterpreter;
 
@@ -213,9 +211,9 @@ public class ArgumentMatcherPositionFinder {
      * operand stack.
      * <p/>
      * This interpreter works as follows to find the argument matchers: if a method call instruction is found that is
-     * an argument matcher we return an ArugmentMatcherValue. For other instructions an ArugmentMatcherValue is returned if
-     * one of its operands was a an ArugmentMatcherValue. When the actual invoked method is found, we then just
-     * have to look at the operands: if one of the operands is an ArugmentMatcherValue, we've found the index of the argument matcher.
+     * an argument matcher we return an ArgumentMatcherValue. For other instructions an ArgumentMatcherValue is returned if
+     * one of its operands was a an ArgumentMatcherValue. When the actual invoked method is found, we then just
+     * have to look at the operands: if one of the operands is an ArgumentMatcherValue, we've found the index of the argument matcher.
      * <p/>
      * For example:<br>
      * mock.methodCall(0, gt(2))   would give<br>
@@ -223,37 +221,26 @@ public class ArgumentMatcherPositionFinder {
      * .... stack ( NotAnArgumentMatcherValue )<br>
      * 2) load 2<br>
      * .... stack ( NotAnArgumentMatcherValue, NotAnArgumentMatcherValue)<br>
-     * 3) invoke argment matcher (pops last operand)<br>
+     * 3) invoke argument matcher (pops last operand)<br>
      * .... stack ( NotAnArgumentMatcherValue, ArgumentMatcherValue)<br>
      * 4) invoke mock method using last 2 operands => we've found an argument matcher as second operand
      */
     protected static class MethodInterpreter extends BasicInterpreter {
 
-
         protected Class<?> interpretedClass;
-
         protected String interpretedMethodName;
-
         /* The name of the method to look for */
         protected String invokedMethodName;
-
         /* The signature of the method to look for */
         protected String invokedMethodDescriptor;
-
         /* The line nrs between which the invocation can be found */
         protected int fromLineNr, toLineNr;
-
         protected int index;
-
         /* The line that is currently being analyzed */
         protected int currentLineNr = 0;
-
         protected int currentIndex = 1;
-
         protected Method currentMatcherMethod;
-
         protected Set<MethodInsnNode> handledMethodInsnNodes = new HashSet<MethodInsnNode>();
-
         /* The resulting indexes or null if method was not found */
         protected List<Integer> resultArgumentMatcherIndexes;
 
@@ -289,7 +276,6 @@ public class ArgumentMatcherPositionFinder {
             return resultArgumentMatcherIndexes;
         }
 
-
         /**
          * Sets the line nr that is being analyzed.
          *
@@ -299,13 +285,11 @@ public class ArgumentMatcherPositionFinder {
             this.currentLineNr = currentLineNr;
         }
 
-
         @Override
         public Value copyOperation(AbstractInsnNode insn, Value value) throws AnalyzerException {
             Value resultValue = super.copyOperation(insn, value);
             return getValue(resultValue, value);
         }
-
 
         @Override
         public Value unaryOperation(AbstractInsnNode insn, Value value) throws AnalyzerException {
@@ -313,13 +297,11 @@ public class ArgumentMatcherPositionFinder {
             return getValue(resultValue, value);
         }
 
-
         @Override
         public Value binaryOperation(AbstractInsnNode insn, Value value1, Value value2) throws AnalyzerException {
             Value resultValue = super.binaryOperation(insn, value1, value2);
             return getValue(resultValue, value1, value2);
         }
-
 
         @Override
         public Value ternaryOperation(AbstractInsnNode insn, Value value1, Value value2, Value value3) throws AnalyzerException {
@@ -327,13 +309,12 @@ public class ArgumentMatcherPositionFinder {
             return getValue(resultValue, value1, value2, value3);
         }
 
-
         /**
          * Handles an instruction of a method call.
          *
          * @param instructionNode The instruction
          * @param values          The operands
-         * @return The merged values or an ArugmentMatcherValue if an argument matcher method was found
+         * @return The merged values or an ArgumentMatcherValue if an argument matcher method was found
          */
         @Override
         @SuppressWarnings({"unchecked"})
@@ -352,10 +333,11 @@ public class ArgumentMatcherPositionFinder {
 
             if (isInvokedMethod(methodInsnNode)) {
                 if (currentIndex++ != index) {
+                    // ignore, this is another method invocation on the same line
                     return getValue(resultValue, values);
                 }
                 if (resultArgumentMatcherIndexes != null) {
-                    throwUnitilsException("Method invocation occurs more than once within the same clause. Method name: " + invokedMethodName);
+                    throwUnitilsException("Unable to determine argument matchers positions. Argument matchers cannot be used in nested method calls.");
                 }
                 // we've found the method, now check which operands are argument matchers
                 resultArgumentMatcherIndexes = getArgumentMatcherIndexes(methodInsnNode, values);
@@ -388,16 +370,13 @@ public class ArgumentMatcherPositionFinder {
             return currentLineNr < fromLineNr || toLineNr < currentLineNr;
         }
 
-
         protected boolean instructionAlreadyHandled(MethodInsnNode methodInsnNode) {
             return !handledMethodInsnNodes.add(methodInsnNode);
         }
 
-
         protected boolean isInvokedMethod(MethodInsnNode methodInsnNode) {
             return invokedMethodName.equals(methodInsnNode.name) && invokedMethodDescriptor.equals(methodInsnNode.desc);
         }
-
 
         protected List<Integer> getArgumentMatcherIndexes(MethodInsnNode methodInsnNode, List values) {
             List<Integer> result = new ArrayList<Integer>();
@@ -412,32 +391,26 @@ public class ArgumentMatcherPositionFinder {
             return result;
         }
 
-
         protected boolean isMatcherMethod(Method method) {
-            return method.getAnnotation(MatchStatement.class) != null;
+            return method.isAnnotationPresent(MatchStatement.class);
         }
-
 
         protected boolean isArgumentMatcherMethod(Method method) {
-            return method.getAnnotation(ArgumentMatcher.class) != null;
+            return method.isAnnotationPresent(ArgumentMatcher.class);
         }
 
-
         /**
-         * Throws a {@link org.unitils.core.UnitilsException} with the given error message. The stacktrace is modified, to make
+         * Throws a {@link org.unitils.core.UnitilsException} with the given error message. The stack trace is modified, to make
          * it point to the line of code that was analyzed by this class.
          *
          * @param errorMessage The error message
          */
         protected void throwUnitilsException(String errorMessage) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(errorMessage);
-            stringBuilder.append("\n at ");
-            stringBuilder.append(new StackTraceElement(interpretedClass.getName(), interpretedMethodName, interpretedClass.getName(), currentLineNr).toString());
-            stringBuilder.append("\n");
-            throw new UnitilsException(stringBuilder.toString());
+            StackTraceElement element = new StackTraceElement(interpretedClass.getName(), interpretedMethodName, interpretedClass.getName(), currentLineNr);
+            UnitilsException e = new UnitilsException(errorMessage);
+            e.setStackTrace(new StackTraceElement[]{element});
+            throw e;
         }
-
 
         /**
          * Merges two values.
@@ -454,7 +427,6 @@ public class ArgumentMatcherPositionFinder {
             }
             return resultValue;
         }
-
 
         /**
          * Finds a method using the ASM method node
@@ -478,7 +450,6 @@ public class ArgumentMatcherPositionFinder {
             return null;
         }
 
-
         /**
          * @param resultValue The result value
          * @param values      The values that can be ArgumentMatcherValues
@@ -495,17 +466,16 @@ public class ArgumentMatcherPositionFinder {
             return resultValue;
         }
 
-
         /**
          * @param resultValue The result value
          * @param values      The values that can be ArgumentMatcherValues
-         * @return The result value, or a ArgumentMatcherValue of the same type if one of the values is an ArgumentMatcherValue
+         * @return an ArgumentMatcherValue of the same type if one of the values is an ArgumentMatcherValue, the result value otherwise
          */
         protected Value getValue(Value resultValue, List<Value> values) {
-            int nrOfArgumentMatcherValues = getNrOfArgumentMacherValues(values);
+            int nrOfArgumentMatcherValues = getNrOfArgumentMatcherValues(values);
 
             if (nrOfArgumentMatcherValues > 1) {
-                throwUnitilsException("An argument matcher cannot be used in an expression.");
+                throwUnitilsException("An argument matcher cannot be used in a nested method invocation or an expression.");
             }
             if (nrOfArgumentMatcherValues == 1) {
                 return createArgumentMatcherValue(resultValue);
@@ -513,12 +483,11 @@ public class ArgumentMatcherPositionFinder {
             return resultValue;
         }
 
-
         /**
          * @param values The values that can be ArgumentMatcherValues
          * @return The nr of values that are an ArgumentMatcherValue
          */
-        protected int getNrOfArgumentMacherValues(List<Value> values) {
+        protected int getNrOfArgumentMatcherValues(List<Value> values) {
             if (values == null) {
                 return 0;
             }
@@ -531,7 +500,6 @@ public class ArgumentMatcherPositionFinder {
             }
             return count;
         }
-
 
         /**
          * @param resultValue The result value
@@ -555,5 +523,4 @@ public class ArgumentMatcherPositionFinder {
             super(type);
         }
     }
-
 }

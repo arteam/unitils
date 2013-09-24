@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,16 @@
  */
 package org.unitils.mock.annotation;
 
-import static java.lang.annotation.ElementType.METHOD;
 import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Annotation for indicating that a method is to be called after a mock was created. This method can for example
  * do some extra configuration or install the instance in a service locator.
- * <p />
+ * <p/>
  * The method should have following signature: <code>void myMethod(Object mock, String name, Class type)</code>
  * <p/>
  * The passed object is the created mock.

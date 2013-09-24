@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -111,7 +112,7 @@ public class DefaultValueReturningMockBehaviorExecuteTest {
 
 
     private ProxyInvocation createProxyInvocation(Method method) {
-        return new ProxyInvocation(null, null, method, null, null);
+        return new ProxyInvocation(null, null, method, emptyList(), emptyList(), null);
     }
 
 

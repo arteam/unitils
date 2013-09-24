@@ -24,6 +24,7 @@ import java.util.Set;
 
 import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.asList;
+import static org.springframework.util.ClassUtils.isCglibProxyClassName;
 
 /**
  * Utility methods that use reflection for instance creation or class
@@ -381,6 +382,18 @@ public class ReflectionUtils {
             return (Class) testInstanceOrClass;
         }
         return testInstanceOrClass.getClass();
+    }
+
+    /**
+     * @param instance The instance to check, not null
+     * @return True if the given instance is a jdk or cglib proxy
+     */
+    public static boolean isProxy(Object instance) {
+        if (instance == null) {
+            return false;
+        }
+        Class<?> clazz = instance.getClass();
+        return isCglibProxyClassName(clazz.getName()) || Proxy.isProxyClass(clazz);
     }
 
 

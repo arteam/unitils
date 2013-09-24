@@ -15,7 +15,6 @@
  */
 package org.unitils.reflectionassert;
 
-import junit.framework.AssertionFailedError;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
@@ -105,7 +104,7 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
     /**
      * Test for two objects that contain different values.
      */
-    @Test(expected = AssertionFailedError.class)
+    @Test(expected = AssertionError.class)
     public void testAssertReflectionEquals_notEqualsDifferentValues() {
         assertReflectionEquals(testObjectAString, testObjectDifferentValueString);
     }
@@ -114,7 +113,7 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
     /**
      * Test case for a null left-argument.
      */
-    @Test(expected = AssertionFailedError.class)
+    @Test(expected = AssertionError.class)
     public void testAssertReflectionEquals_leftNull() {
         assertReflectionEquals(null, testObjectAString);
     }
@@ -123,7 +122,7 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
     /**
      * Test case for a null right-argument.
      */
-    @Test(expected = AssertionFailedError.class)
+    @Test(expected = AssertionError.class)
     public void testAssertReflectionEquals_rightNull() {
         assertReflectionEquals(testObjectAString, null);
     }
@@ -196,7 +195,7 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
     public void testAssertLenientEquals_formatArraysMessage() {
         try {
             assertLenientEquals(new String[]{"test1", "test2"}, new Integer[]{1, 2});
-        } catch (AssertionFailedError a) {
+        } catch (AssertionError a) {
             // expected
             assertTrue(a.getMessage().contains("[\"test1\", \"test2\"]"));
             assertTrue(a.getMessage().contains("[1, 2]"));

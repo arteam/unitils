@@ -15,128 +15,144 @@
  */
 package org.unitils.mock;
 
+import org.unitils.core.Unitils;
 import org.unitils.mock.annotation.ArgumentMatcher;
-import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
-import org.unitils.mock.argumentmatcher.impl.*;
-
-import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationLineNr;
+import org.unitils.mock.argumentmatcher.ArgumentMatcherService;
 
 /**
- * todo javadoc
- *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  * @author Kenny Claes
  */
 public class ArgumentMatchers {
 
+    protected static ArgumentMatcherService argumentMatcherService = Unitils.getInstanceOfType(ArgumentMatcherService.class);
 
+
+    /**
+     * Matches when the argument is not null.
+     * <p/>
+     * Note: since null is returned this will produce a NullPointerException when used on a primitive argument.
+     * eg.  int argument and  isNull(Integer.class)
+     *
+     * @param argumentClass The argument type, not null
+     * @return null
+     */
     @ArgumentMatcher
     public static <T> T notNull(Class<T> argumentClass) {
-        registerArgumentMatcher(new NotNullArgumentMatcher());
+        argumentMatcherService.registerNotNullArgumentMatcher();
         return null;
     }
 
-
+    /**
+     * Matches when the argument is null.
+     * <p/>
+     * Note: since null is returned this will produce a NullPointerException when used on a primitive argument.
+     * eg.  int argument and  isNull(Integer.class)
+     *
+     * @param argumentClass The argument type, not null
+     * @return null
+     */
     @ArgumentMatcher
     public static <T> T isNull(Class<T> argumentClass) {
-        registerArgumentMatcher(new NullArgumentMatcher());
+        argumentMatcherService.registerNullArgumentMatcher();
         return null;
     }
 
-
+    /**
+     * Matches when the argument is the same object value.
+     * <p/>
+     * Note: do not use this matcher for primitive values, they will never match because of autoboxing
+     *
+     * @param sameAs The object to compare with
+     * @return The sameAs value
+     */
     @ArgumentMatcher
     public static <T> T same(T sameAs) {
-        registerArgumentMatcher(new SameArgumentMatcher(sameAs));
-        return null;
+        argumentMatcherService.registerSameArgumentMatcher(sameAs);
+        return sameAs;
     }
-
 
     @ArgumentMatcher
     public static <T> T eq(T equalTo) {
-        registerArgumentMatcher(new EqualsArgumentMatcher(equalTo));
-        return null;
+        argumentMatcherService.registerEqualsArgumentMatcher(equalTo);
+        return equalTo;
     }
-
 
     @ArgumentMatcher
     public static <T> T refEq(T equalTo) {
-        registerArgumentMatcher(new RefEqArgumentMatcher(equalTo));
-        return null;
+        argumentMatcherService.registerRefEqArgumentMatcher(equalTo);
+        return equalTo;
     }
-
 
     @ArgumentMatcher
     public static <T> T lenEq(T equalTo) {
-        registerArgumentMatcher(new LenEqArgumentMatcher(equalTo));
-        return null;
+        argumentMatcherService.registerLenEqArgumentMatcher(equalTo);
+        return equalTo;
     }
 
+    // todo add lenEqs(T... equalTo)  en refEqs  e.G. lenEq("1", "2")
+
+    /**
+     * Matches when the object argument is of the given type (or subtype).
+     * <p/>
+     * Note: since null is returned this will produce a NullPointerException when used on a primitive argument.
+     * eg.  int argument and  any(Integer.class)   use the anyInt matcher instead
+     *
+     * @param argumentClass The argument type, not null
+     * @return null
+     */
     @ArgumentMatcher
-    public static <T> T any(Class<T> type) {
-        registerArgumentMatcher(new AnyArgumentMatcher(type));
+    public static <T> T any(Class<T> argumentClass) {
+        argumentMatcherService.registerAnyArgumentMatcher(argumentClass);
         return null;
     }
 
     @ArgumentMatcher
     public static boolean anyBoolean() {
-        registerArgumentMatcher(new AnyArgumentMatcher(Boolean.class));
+        argumentMatcherService.registerAnyArgumentMatcher(Boolean.class);
         return false;
     }
 
-
     @ArgumentMatcher
     public static byte anyByte() {
-        registerArgumentMatcher(new AnyArgumentMatcher(Byte.class));
+        argumentMatcherService.registerAnyArgumentMatcher(Byte.class);
         return 0;
     }
-
 
     @ArgumentMatcher
     public static short anyShort() {
-        registerArgumentMatcher(new AnyArgumentMatcher(Short.class));
+        argumentMatcherService.registerAnyArgumentMatcher(Short.class);
         return 0;
     }
-
 
     @ArgumentMatcher
     public static char anyChar() {
-        registerArgumentMatcher(new AnyArgumentMatcher(Character.class));
+        argumentMatcherService.registerAnyArgumentMatcher(Character.class);
         return 0;
     }
-
 
     @ArgumentMatcher
     public static int anyInt() {
-        registerArgumentMatcher(new AnyArgumentMatcher(Integer.class));
+        argumentMatcherService.registerAnyArgumentMatcher(Integer.class);
         return 0;
     }
-
 
     @ArgumentMatcher
     public static long anyLong() {
-        registerArgumentMatcher(new AnyArgumentMatcher(Long.class));
+        argumentMatcherService.registerAnyArgumentMatcher(Long.class);
         return 0;
     }
-
 
     @ArgumentMatcher
     public static float anyFloat() {
-        registerArgumentMatcher(new AnyArgumentMatcher(Float.class));
+        argumentMatcherService.registerAnyArgumentMatcher(Float.class);
         return 0;
     }
-
 
     @ArgumentMatcher
     public static double anyDouble() {
-        registerArgumentMatcher(new AnyArgumentMatcher(Double.class));
+        argumentMatcherService.registerAnyArgumentMatcher(Double.class);
         return 0;
     }
-
-
-    protected static <T> void registerArgumentMatcher(org.unitils.mock.argumentmatcher.ArgumentMatcher argumentMatcher) {
-        ArgumentMatcherRepository argumentMatcherRepository = ArgumentMatcherRepository.getInstance();
-        argumentMatcherRepository.registerArgumentMatcher(argumentMatcher, getInvocationLineNr(ArgumentMatchers.class));
-    }
-
 }

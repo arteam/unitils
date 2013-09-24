@@ -22,14 +22,15 @@ import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.*;
 /**
  * A matcher for checking whether an argument equals a given value.
  *
+ * @author Tim Ducheyne
  * @author Kenny Claes
  * @author Filip Neven
- * @author Tim Ducheyne
  */
 public class EqualsArgumentMatcher implements ArgumentMatcher {
 
     /* The excepted value */
     protected Object value;
+
 
     /**
      * Creates a matcher for the given value.
@@ -48,18 +49,15 @@ public class EqualsArgumentMatcher implements ArgumentMatcher {
      * the invocation. This way the original values can still be used later-on even when changes
      * occur to the original values (pass-by-value vs pass-by-reference).
      *
-     * @param argument                 The argument that were used by reference, not null
-     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed, not null
+     * @param argument                 The argument that were used by reference
+     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed
      * @return The match result, not null
      */
     public MatchResult matches(Object argument, Object argumentAtInvocationTime) {
-        if (value == null) {
-            if (argument == null) {
-                return SAME;
-            }
-            return NO_MATCH;
+        if (value == argument) {
+            return SAME;
         }
-        if (value.equals(argument)) {
+        if (value != null && argument != null && value.equals(argument)) {
             return MATCH;
         }
         return NO_MATCH;

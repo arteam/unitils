@@ -20,8 +20,6 @@ import org.unitils.mock.core.ObservedInvocation;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import static org.unitils.core.util.ObjectFormatter.MOCK_NAME_CHAIN_SEPARATOR;
-
 
 /**
  * A view that displays the observed invocations and the location where they were invoked.
@@ -87,7 +85,7 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
         Method method = observedInvocation.getMethod();
 
         // append the mock and method name
-        result.append(formatMockName(observedInvocation));
+        result.append(observedInvocation.getProxyName());
         result.append('.');
         result.append(method.getName());
 
@@ -95,8 +93,8 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
         result.append('(');
         Class<?>[] argumentTypes = method.getParameterTypes();
         if (argumentTypes.length > 0) {
-            Iterator<Object> arguments = observedInvocation.getArguments().iterator();
-            Iterator<Object> argumentsAtInvocationTime = observedInvocation.getArgumentsAtInvocationTime().iterator();
+            Iterator<?> arguments = observedInvocation.getArguments().iterator();
+            Iterator<?> argumentsAtInvocationTime = observedInvocation.getArgumentsAtInvocationTime().iterator();
             for (Class<?> argumentType : argumentTypes) {
                 result.append(formatValue(argumentsAtInvocationTime.next(), arguments.next(), argumentType, currentLargeObjects, allLargeObjects, largeObjectNameIndexes));
                 result.append(", ");
@@ -116,10 +114,4 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
         }
         return result.toString();
     }
-
-    protected String formatMockName(ObservedInvocation observedInvocation) {
-        String mockName = observedInvocation.getMockName();
-        return mockName.replaceAll(MOCK_NAME_CHAIN_SEPARATOR, ".");
-    }
-
 }
