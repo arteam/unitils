@@ -18,9 +18,10 @@ package org.unitils.mock;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Unitils;
+import org.unitils.mock.core.DummyService;
+import org.unitils.mock.core.MockService;
 import org.unitils.mock.core.Scenario;
-import org.unitils.mock.core.proxy.StackTraceService;
-import org.unitils.mock.dummy.DummyObjectFactory;
+import org.unitils.mock.core.util.StackTraceService;
 
 /**
  * @author Filip Neven
@@ -34,7 +35,8 @@ public class MockUnitils {
 
     // todo move to getter functions to avoid unnecessary inits
     protected static Scenario scenario = Unitils.getInstanceOfType(Scenario.class);
-    protected static DummyObjectFactory dummyObjectFactory = Unitils.getInstanceOfType(DummyObjectFactory.class);
+    protected static MockService mockService = Unitils.getInstanceOfType(MockService.class);
+    protected static DummyService dummyService = Unitils.getInstanceOfType(DummyService.class);
     protected static StackTraceService stackTraceService = Unitils.getInstanceOfType(StackTraceService.class);
 
 
@@ -49,7 +51,11 @@ public class MockUnitils {
     // todo add createMocks method so that you no longer have to extend unitils base class
 
     public static <T> T createDummy(Class<T> type) {
-        return dummyObjectFactory.createDummy(type);
+        return createDummy(null, type);
+    }
+
+    public static <T> T createDummy(String name, Class<T> type) {
+        return dummyService.createDummy(name, type);
     }
 
 

@@ -23,7 +23,7 @@ import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
 import org.unitils.mock.core.proxy.ProxyService;
-import org.unitils.mock.core.proxy.StackTraceService;
+import org.unitils.mock.core.util.StackTraceService;
 
 import java.util.Map;
 
@@ -71,13 +71,13 @@ public class MatchingInvocationBuilderAssertPreviousMatchingInvocationCompletedT
 
     @Test
     public void okWhenInvocationStartedThatDoesNotRequireProxyInvocation() {
-        matchingInvocationBuilder.startMatchingInvocation("mockName", Map.class, false, matchingInvocationHandler);
+        matchingInvocationBuilder.startMatchingInvocation("mockName", false, matchingInvocationHandler);
         matchingInvocationBuilder.assertPreviousMatchingInvocationCompleted();
     }
 
     @Test
     public void exceptionWhenPreviousMatchingInvocationWasNotCompleted() {
-        matchingInvocationBuilder.startMatchingInvocation("mockName", Map.class, true, matchingInvocationHandler);
+        matchingInvocationBuilder.startMatchingInvocation("mockName", true, matchingInvocationHandler);
         try {
             matchingInvocationBuilder.assertPreviousMatchingInvocationCompleted();
             fail("UnitilsException expected");

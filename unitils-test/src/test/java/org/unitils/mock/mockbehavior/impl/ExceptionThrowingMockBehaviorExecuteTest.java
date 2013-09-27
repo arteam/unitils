@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
 import org.unitils.mock.core.proxy.ProxyInvocation;
-import org.unitils.mock.core.proxy.StackTraceService;
+import org.unitils.mock.core.util.StackTraceService;
 
 import java.lang.reflect.Method;
 

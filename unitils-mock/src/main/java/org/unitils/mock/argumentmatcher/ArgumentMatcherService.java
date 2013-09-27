@@ -16,7 +16,7 @@
 package org.unitils.mock.argumentmatcher;
 
 import org.unitils.mock.argumentmatcher.impl.*;
-import org.unitils.mock.core.proxy.CloneService;
+import org.unitils.mock.core.util.CloneService;
 
 /**
  * @author Tim Ducheyne

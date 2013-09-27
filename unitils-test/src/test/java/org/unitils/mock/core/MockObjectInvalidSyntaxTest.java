@@ -111,6 +111,7 @@ public class MockObjectInvalidSyntaxTest extends UnitilsJUnit4 {
     public void incompleteBehaviorDefinition_oncePerforms() {
         try {
             mockObject.oncePerforms(new MockBehavior() {
+
                 public Object execute(ProxyInvocation mockInvocation) throws Throwable {
                     return null;
                 }

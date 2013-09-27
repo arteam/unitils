@@ -42,6 +42,7 @@ public class OriginalBehaviorInvokingMockBehavior implements ValidatableMockBeha
      */
     public void assertCanExecute(ProxyInvocation proxyInvocation) throws UnitilsException {
         if (isAbstract(proxyInvocation.getMethod().getModifiers())) {
+            // todo td improve error message
             throw new UnitilsException("Unable to invoke the original method behavior: the method is an abstract method.");
         }
     }

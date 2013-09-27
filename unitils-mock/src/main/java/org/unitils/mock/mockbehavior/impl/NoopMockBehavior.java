@@ -35,5 +35,4 @@ public class NoopMockBehavior implements MockBehavior {
     public Object execute(ProxyInvocation proxyInvocation) {
         return null;
     }
-
 }

@@ -22,7 +22,7 @@ import org.unitils.core.TestInstance;
 import org.unitils.core.TestPhase;
 import org.unitils.core.reflect.Annotations;
 import org.unitils.mock.annotation.Dummy;
-import org.unitils.mock.dummy.DummyObjectFactory;
+import org.unitils.mock.core.DummyService;
 
 import static org.unitils.core.TestPhase.CONSTRUCTION;
 
@@ -31,11 +31,11 @@ import static org.unitils.core.TestPhase.CONSTRUCTION;
  */
 public class DummyFieldAnnotationListener extends FieldAnnotationListener<Dummy> {
 
-    protected DummyObjectFactory dummyObjectFactory;
+    protected DummyService dummyService;
 
 
-    public DummyFieldAnnotationListener(DummyObjectFactory dummyObjectFactory) {
-        this.dummyObjectFactory = dummyObjectFactory;
+    public DummyFieldAnnotationListener(DummyService dummyService) {
+        this.dummyService = dummyService;
     }
 
 
@@ -46,9 +46,10 @@ public class DummyFieldAnnotationListener extends FieldAnnotationListener<Dummy>
 
     @Override
     public void beforeTestSetUp(TestInstance testInstance, TestField testField, Annotations<Dummy> annotations) {
+        String dummyName = testField.getName();
         Class<?> dummyType = testField.getType();
 
-        Object dummy = dummyObjectFactory.createDummy(dummyType);
+        Object dummy = dummyService.createDummy(dummyName, dummyType);
         testField.setValue(dummy);
     }
 }

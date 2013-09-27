@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core.proxy;
+package org.unitils.mock.core.util;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +30,7 @@ import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.unitils.mock.core.proxy.CloneServiceCreateDeepCloneTest.TestEnum.VALUE;
+import static org.unitils.mock.core.util.CloneServiceCreateDeepCloneTest.TestEnum.VALUE;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 /**

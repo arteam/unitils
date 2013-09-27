@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
 import org.unitils.mock.argumentmatcher.impl.RefEqArgumentMatcher;
-import org.unitils.mock.core.proxy.CloneService;
+import org.unitils.mock.core.util.CloneService;
 
 /**
  * @author Tim Ducheyne

@@ -25,6 +25,7 @@ import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.core.MockObject;
+import org.unitils.mock.core.util.CloneService;
 
 import java.util.*;
 
@@ -200,7 +201,12 @@ public class ProxyService {
      */
     @SuppressWarnings({"unchecked"})
     protected <T> T createProxy(String name, boolean initialize, ProxyInvocationHandler invocationHandler, Class<T> proxiedClass, Class<?>... implementedInterfaces) {
-        Class<T> enhancedClass = createEnhancedClass(proxiedClass, implementedInterfaces);
+        Class<T> enhancedClass;
+        try {
+            enhancedClass = createEnhancedClass(proxiedClass, implementedInterfaces);
+        } catch (Exception e) {
+            throw new UnitilsException("Unable to create proxy with name " + name + " for type " + proxiedClass, e);
+        }
 
         Factory proxy;
         if (initialize && !proxiedClass.isInterface()) {

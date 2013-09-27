@@ -29,7 +29,6 @@ import org.unitils.mock.core.proxy.ProxyInvocation;
  */
 public interface MockBehavior {
 
-
     /**
      * Executes the mock behavior.
      *

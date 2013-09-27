@@ -15,8 +15,8 @@
  */
 package org.unitils.mock.mockbehavior.impl;
 
+import org.unitils.mock.core.DummyService;
 import org.unitils.mock.core.proxy.ProxyInvocation;
-import org.unitils.mock.dummy.DummyObjectFactory;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -45,14 +45,13 @@ import static java.lang.reflect.Modifier.isFinal;
  */
 public class DummyValueReturningMockBehavior extends DefaultValueReturningMockBehavior {
 
-    protected DummyObjectFactory dummyObjectFactory;
-
+    protected DummyService dummyService;
     /* Keeps track of what object we have returned, so that we return the "same" instance on each invocation */
     protected Map<MethodKey, Object> returnValues = new HashMap<MethodKey, Object>();
 
 
-    public DummyValueReturningMockBehavior(DummyObjectFactory dummyObjectFactory) {
-        this.dummyObjectFactory = dummyObjectFactory;
+    public DummyValueReturningMockBehavior(DummyService dummyService) {
+        this.dummyService = dummyService;
     }
 
 
@@ -87,7 +86,7 @@ public class DummyValueReturningMockBehavior extends DefaultValueReturningMockBe
         if (cannotCreateDummy(returnType)) {
             return null;
         }
-        return dummyObjectFactory.createDummy(returnType, new DummyValueReturningMockBehavior(dummyObjectFactory));
+        return dummyService.createDummy(null, returnType);
     }
 
     protected boolean cannotCreateDummy(Class<?> returnType) {
@@ -117,7 +116,6 @@ public class DummyValueReturningMockBehavior extends DefaultValueReturningMockBe
             }
 
             MethodKey methodKey = (MethodKey) o;
-
             if (arguments != null ? !arguments.equals(methodKey.arguments) : methodKey.arguments != null) {
                 return false;
             }

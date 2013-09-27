@@ -16,17 +16,16 @@
 package org.unitils.mock.core;
 
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests the mock object functionality.
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class MockMatchingBehaviorIntegrationTest {
+public class MockMatchingBehaviorIntegrationTest extends UnitilsJUnit4 {
 
     private Mock<TestInterface> mockObject;
 
@@ -50,12 +49,12 @@ public class MockMatchingBehaviorIntegrationTest {
     }
 
     @Test
-    public void firstMatchWhenMultipleBestMatches() {
+    public void lastMatchWhenMultipleBestMatches() {
         mockObject.returns(1).testMethod1("arg1", null, null);
         mockObject.returns(2).testMethod1("arg1", null, null);
 
         int result = mockObject.getMock().testMethod1("arg1", "arg2", "arg3");
-        assertEquals(1, result);
+        assertEquals(2, result);
     }
 
     @Test

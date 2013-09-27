@@ -18,7 +18,7 @@ package org.unitils.mock.mockbehavior.impl;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
 import org.unitils.mock.core.proxy.ProxyInvocation;
-import org.unitils.mock.core.proxy.StackTraceService;
+import org.unitils.mock.core.util.StackTraceService;
 import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
 
 import java.util.Arrays;

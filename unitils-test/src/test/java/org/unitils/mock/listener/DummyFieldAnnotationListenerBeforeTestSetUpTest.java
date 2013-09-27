@@ -22,7 +22,7 @@ import org.unitils.core.TestField;
 import org.unitils.core.reflect.Annotations;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
-import org.unitils.mock.dummy.DummyObjectFactory;
+import org.unitils.mock.core.DummyService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ public class DummyFieldAnnotationListenerBeforeTestSetUpTest extends UnitilsJUni
 
     private Mock<TestField> testFieldMock;
     private Mock<Annotations<Dummy>> annotationsMock;
-    private Mock<DummyObjectFactory> dummyObjectFactoryMock;
+    private Mock<DummyService> dummyServiceMock;
 
     private Dummy annotation1;
 
@@ -45,11 +45,12 @@ public class DummyFieldAnnotationListenerBeforeTestSetUpTest extends UnitilsJUni
 
     @Before
     public void initialize() {
-        dummyFieldAnnotationListener = new DummyFieldAnnotationListener(dummyObjectFactoryMock.getMock());
+        dummyFieldAnnotationListener = new DummyFieldAnnotationListener(dummyServiceMock.getMock());
 
         dummyList = new ArrayList<Object>();
-        dummyObjectFactoryMock.returns(dummyList).createDummy(List.class);
+        dummyServiceMock.returns(dummyList).createDummy("field name", List.class);
 
+        testFieldMock.returns("field name").getName();
         testFieldMock.returns(List.class).getType();
     }
 

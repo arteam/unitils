@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock.core.proxy.impl;
 
-import org.unitils.mock.core.matching.MatchingInvocationBuilder;
-import org.unitils.mock.core.proxy.CloneService;
+import org.unitils.mock.core.BehaviorDefiningInvocations;
+import org.unitils.mock.core.Scenario;
 import org.unitils.mock.core.proxy.ProxyInvocation;
-import org.unitils.mock.core.proxy.ProxyService;
+import org.unitils.mock.core.util.CloneService;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.OriginalBehaviorInvokingMockBehavior;
 
-public class PartialMockProxy<T> extends MockProxy<T> {
+public class PartialMockInvocationHandler<T> extends MockInvocationHandler<T> {
 
 
-    public PartialMockProxy(String mockName, Class<T> mockedType, BehaviorDefiningInvocations oneTimeMatchingBehaviorDefiningInvocations, BehaviorDefiningInvocations alwaysMatchingBehaviorDefiningInvocations, Scenario scenario, ProxyService proxyService, MatchingInvocationBuilder matchingInvocationBuilder, CloneService cloneService) {
-        super(mockName, mockedType, oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, scenario, matchingInvocationBuilder, proxyService, cloneService);
+    public PartialMockInvocationHandler(BehaviorDefiningInvocations oneTimeMatchingBehaviorDefiningInvocations, BehaviorDefiningInvocations alwaysMatchingBehaviorDefiningInvocations, Scenario scenario, CloneService cloneService) {
+        super(oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, scenario, cloneService);
     }
 
 
@@ -34,5 +34,4 @@ public class PartialMockProxy<T> extends MockProxy<T> {
     protected MockBehavior getDefaultMockBehavior(ProxyInvocation proxyInvocation) {
         return new OriginalBehaviorInvokingMockBehavior();
     }
-
 }
