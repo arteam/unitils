@@ -22,7 +22,7 @@ import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.proxy.ProxyInvocationHandler;
 import org.unitils.mock.core.proxy.ProxyService;
-import org.unitils.mock.core.proxy.StackTraceService;
+import org.unitils.mock.core.util.StackTraceService;
 
 import java.util.List;
 
@@ -46,7 +46,8 @@ public class MatchingInvocationBuilder {
     }
 
 
-    public <T> T startMatchingInvocation(String mockName, Class<T> mockedType, boolean proxyInvocationRequired, MatchingInvocationHandler matchingInvocationHandler) {
+    // todo remove mock name
+    public ProxyInvocationHandler startMatchingInvocation(String mockName, boolean proxyInvocationRequired, MatchingInvocationHandler matchingInvocationHandler) {
         assertPreviousMatchingInvocationCompleted();
 
         StackTraceElement[] invokedAt = stackTraceService.getInvocationStackTrace(Mock.class);
@@ -58,7 +59,7 @@ public class MatchingInvocationBuilder {
         }
 
         argumentMatcherRepository.startMatchingInvocation(invokedAt[1].getLineNumber());
-        return proxyService.createUninitializedProxy(mockName, new InvocationHandler(matchingInvocationHandler), mockedType);
+        return new InvocationHandler(matchingInvocationHandler);
     }
 
     public void assertPreviousMatchingInvocationCompleted() {

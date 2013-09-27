@@ -15,7 +15,6 @@
  */
 package org.unitils.mock.mockbehavior;
 
-import org.unitils.core.UnitilsException;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 
 
@@ -28,13 +27,12 @@ import org.unitils.mock.core.proxy.ProxyInvocation;
  */
 public interface ValidatableMockBehavior extends MockBehavior {
 
-
     /**
      * Checks whether the mock behavior can be executed for the given invocation.
      * An exception should be raised if this behavior is not suited for the given invocation.
      *
      * @param proxyInvocation The proxy method invocation, not null
      */
-    void assertCanExecute(ProxyInvocation proxyInvocation) throws UnitilsException;
+    void assertCanExecute(ProxyInvocation proxyInvocation);
 
 }

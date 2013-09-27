@@ -18,6 +18,7 @@ package org.unitils.mock.core.proxy;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.unitils.core.UnitilsException;
+import org.unitils.mock.core.util.CloneService;
 
 import java.lang.reflect.Method;
 import java.util.List;

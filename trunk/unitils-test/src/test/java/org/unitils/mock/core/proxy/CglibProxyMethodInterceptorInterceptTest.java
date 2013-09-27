@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
+import org.unitils.mock.core.util.CloneService;
 
 import java.lang.reflect.Method;
 

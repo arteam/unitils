@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core.proxy;
+package org.unitils.mock.core.util;
 
 import org.junit.Assert;
 import org.junit.Before;

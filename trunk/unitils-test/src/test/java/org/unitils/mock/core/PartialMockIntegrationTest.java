@@ -23,7 +23,7 @@ import org.unitils.mock.PartialMock;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 /**
@@ -43,11 +43,8 @@ public class PartialMockIntegrationTest extends UnitilsJUnit4 {
     }
 
 
-    /**
-     * Tests setting a return behavior for the mock. The behavior of the test class should not have been invoked.
-     */
     @Test
-    public void testReturns() {
+    public void returns() {
         mockObject.returns("aValue").testMethod();
 
         String result = mockObject.getMock().testMethod();
@@ -55,22 +52,15 @@ public class PartialMockIntegrationTest extends UnitilsJUnit4 {
         assertLenientEquals(0, TestClass.invocationCount);
     }
 
-    /**
-     * Tests the return behavior when no behavior was defined. The original behavior of the test class should
-     * have been invoked.
-     */
     @Test
-    public void testReturns_originalBehavior() {
+    public void originalBehavior() {
         String result = mockObject.getMock().testMethod();
         assertLenientEquals("original", result);
         assertLenientEquals(1, TestClass.invocationCount);
     }
 
-    /**
-     * Tests setting an exception behavior for the mock. The behavior of the test class should not have been invoked.
-     */
     @Test
-    public void testRaises() {
+    public void raises() {
         mockObject.raises(new ThreadDeath()).testMethod();
 
         boolean exception = false;
@@ -83,11 +73,8 @@ public class PartialMockIntegrationTest extends UnitilsJUnit4 {
         assertLenientEquals(0, TestClass.invocationCount);
     }
 
-    /**
-     * Tests setting a peforms behavior for the mock. The behavior of the test class should not have been invoked.
-     */
     @Test
-    public void testPerforms() {
+    public void performs() {
         TestMockBehavior testMockBehavior = new TestMockBehavior();
         mockObject.performs(testMockBehavior).testMethod();
 
@@ -96,30 +83,18 @@ public class PartialMockIntegrationTest extends UnitilsJUnit4 {
         assertLenientEquals(0, TestClass.invocationCount);
     }
 
-    /**
-     * Tests invoking a method for with no behavior was defined. The behavior of the test class should have been invoked.
-     */
     @Test
-    public void testOriginalBehavior() {
-        String result = mockObject.getMock().testMethod();
-        assertLenientEquals("original", result);
-        assertLenientEquals(1, TestClass.invocationCount);
-    }
-
-    /**
-     * Tests invoking a method for with no behavior was defined, but the method is an abstract method.
-     * An exception should have been raised
-     */
-    @Test(expected = UnitilsException.class)
-    public void testOriginalBehavior_abstractMethod() {
-        mockObject.getMock().abstractMethod();
+    public void exceptionWhenNoBehaviorSetForAbstractMethod() {
+        try {
+            mockObject.getMock().abstractMethod();
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Cannot invoke original behavior of an abstract method. Method: public abstract void org.unitils.mock.core.PartialMockIntegrationTest$TestClass.abstractMethod()", e.getMessage());
+        }
     }
 
 
-    /**
-     * Class that is mocked during the tests. The test method counts how many times it was invoked.
-     */
-    private static abstract class TestClass {
+    public static abstract class TestClass {
 
         public static int invocationCount = 0;
 
@@ -131,10 +106,7 @@ public class PartialMockIntegrationTest extends UnitilsJUnit4 {
         public abstract void abstractMethod();
     }
 
-    /**
-     * Dummy mock behavior that counts how many times it was invoked.
-     */
-    private static class TestMockBehavior implements MockBehavior {
+    public static class TestMockBehavior implements MockBehavior {
 
         public int invocationCount = 0;
 

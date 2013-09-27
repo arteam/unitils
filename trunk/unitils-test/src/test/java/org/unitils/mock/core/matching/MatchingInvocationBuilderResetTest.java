@@ -22,7 +22,7 @@ import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
 import org.unitils.mock.core.proxy.ProxyService;
-import org.unitils.mock.core.proxy.StackTraceService;
+import org.unitils.mock.core.util.StackTraceService;
 
 import java.util.Map;
 
@@ -57,7 +57,7 @@ public class MatchingInvocationBuilderResetTest extends UnitilsJUnit4 {
 
     @Test
     public void reset() {
-        matchingInvocationBuilder.startMatchingInvocation("mockName", Map.class, true, matchingInvocationHandler);
+        matchingInvocationBuilder.startMatchingInvocation("mockName", true, matchingInvocationHandler);
 
         matchingInvocationBuilder.reset();
         matchingInvocationBuilder.assertPreviousMatchingInvocationCompleted();

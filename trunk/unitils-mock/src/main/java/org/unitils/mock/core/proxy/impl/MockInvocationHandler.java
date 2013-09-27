@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock.core.proxy.impl;
 
-import org.unitils.core.UnitilsException;
-import org.unitils.mock.core.matching.MatchingInvocationBuilder;
-import org.unitils.mock.core.proxy.CloneService;
+import org.unitils.mock.core.BehaviorDefiningInvocation;
+import org.unitils.mock.core.BehaviorDefiningInvocations;
+import org.unitils.mock.core.ObservedInvocation;
+import org.unitils.mock.core.Scenario;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.proxy.ProxyInvocationHandler;
-import org.unitils.mock.core.proxy.ProxyService;
+import org.unitils.mock.core.util.CloneService;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
@@ -31,22 +32,18 @@ public class MockInvocationHandler<T> implements ProxyInvocationHandler {
     protected BehaviorDefiningInvocations oneTimeMatchingBehaviorDefiningInvocations;
     protected BehaviorDefiningInvocations alwaysMatchingBehaviorDefiningInvocations;
     protected Scenario scenario;
-    protected MatchingInvocationBuilder matchingInvocationBuilder; // todo td move to getMock()
     protected CloneService cloneService;
 
 
-    public MockInvocationHandler(String mockName, Class<T> mockedType, BehaviorDefiningInvocations oneTimeMatchingBehaviorDefiningInvocations, BehaviorDefiningInvocations alwaysMatchingBehaviorDefiningInvocations, Scenario scenario, MatchingInvocationBuilder matchingInvocationBuilder, ProxyService proxyService, CloneService cloneService) {
+    public MockInvocationHandler(BehaviorDefiningInvocations oneTimeMatchingBehaviorDefiningInvocations, BehaviorDefiningInvocations alwaysMatchingBehaviorDefiningInvocations, Scenario scenario, CloneService cloneService) {
         this.oneTimeMatchingBehaviorDefiningInvocations = oneTimeMatchingBehaviorDefiningInvocations;
         this.alwaysMatchingBehaviorDefiningInvocations = alwaysMatchingBehaviorDefiningInvocations;
         this.scenario = scenario;
-        this.matchingInvocationBuilder = matchingInvocationBuilder;
         this.cloneService = cloneService;
     }
 
 
     public Object handleInvocation(ProxyInvocation proxyInvocation) throws Throwable {
-        matchingInvocationBuilder.assertPreviousMatchingInvocationCompleted();
-
         BehaviorDefiningInvocation behaviorDefiningInvocation = getMatchingBehaviorDefiningInvocation(proxyInvocation);
         MockBehavior mockBehavior = getValidMockBehavior(proxyInvocation, behaviorDefiningInvocation);
 
@@ -81,32 +78,17 @@ public class MockInvocationHandler<T> implements ProxyInvocationHandler {
     }
 
     protected MockBehavior getValidMockBehavior(ProxyInvocation proxyInvocation, BehaviorDefiningInvocation behaviorDefiningInvocation) {
+        MockBehavior mockBehavior;
         if (behaviorDefiningInvocation != null) {
-            MockBehavior mockBehavior = behaviorDefiningInvocation.getMockBehavior();
-            assertCanExecute(mockBehavior, proxyInvocation, behaviorDefiningInvocation);
-            return mockBehavior;
+            mockBehavior = behaviorDefiningInvocation.getMockBehavior();
+        } else {
+            mockBehavior = getDefaultMockBehavior(proxyInvocation);
         }
-        return getDefaultMockBehavior(proxyInvocation);
-    }
-
-    /**
-     * Check whether the mock behavior can applied for this invocation
-     *
-     * @param mockBehavior               The behavior to verify, not null
-     * @param proxyInvocation            The invocation, not null
-     * @param behaviorDefiningInvocation The invocation that defined the behavior, not null
-     */
-    protected void assertCanExecute(MockBehavior mockBehavior, ProxyInvocation proxyInvocation, BehaviorDefiningInvocation behaviorDefiningInvocation) {
-        if (!(mockBehavior instanceof ValidatableMockBehavior)) {
-            return;
-        }
-        ValidatableMockBehavior validatableMockBehavior = (ValidatableMockBehavior) mockBehavior;
-        try {
+        if (mockBehavior instanceof ValidatableMockBehavior) {
+            ValidatableMockBehavior validatableMockBehavior = (ValidatableMockBehavior) mockBehavior;
             validatableMockBehavior.assertCanExecute(proxyInvocation);
-        } catch (UnitilsException e) {
-            e.setStackTrace(behaviorDefiningInvocation.getInvokedAtTrace());
-            throw e;
         }
+        return mockBehavior;
     }
 
     protected MockBehavior getDefaultMockBehavior(ProxyInvocation proxyInvocation) {

@@ -18,9 +18,9 @@ package org.unitils.mock.core;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
-import org.unitils.mock.core.proxy.CloneService;
-import org.unitils.mock.core.proxy.ObjectFactory;
 import org.unitils.mock.core.proxy.ProxyInvocation;
+import org.unitils.mock.core.util.CloneService;
+import org.unitils.mock.core.util.ObjectFactory;
 import org.unitils.mock.mockbehavior.MockBehavior;
 
 import java.lang.reflect.InvocationHandler;

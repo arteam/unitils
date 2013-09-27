@@ -18,9 +18,9 @@ package org.unitils.mock.core;
 import org.unitils.mock.Mock;
 import org.unitils.mock.PartialMock;
 import org.unitils.mock.core.matching.MatchingInvocationBuilder;
-import org.unitils.mock.core.proxy.CloneService;
 import org.unitils.mock.core.proxy.ProxyService;
-import org.unitils.mock.core.proxy.StackTraceService;
+import org.unitils.mock.core.util.CloneService;
+import org.unitils.mock.core.util.StackTraceService;
 
 import java.lang.reflect.Modifier;
 import java.util.HashMap;

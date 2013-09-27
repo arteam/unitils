@@ -22,13 +22,15 @@ import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
+import org.unitils.mock.core.proxy.ProxyInvocationHandler;
 import org.unitils.mock.core.proxy.ProxyService;
-import org.unitils.mock.core.proxy.StackTraceService;
+import org.unitils.mock.core.util.StackTraceService;
 
 import java.util.Map;
 
-import static org.junit.Assert.*;
-import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyReflectionEquals;
 
 /**
  * @author Tim Ducheyne
@@ -65,28 +67,16 @@ public class MatchingInvocationBuilderStartMatchingInvocationTest extends Unitil
 
     @Test
     public void startMatchingInvocation() {
-        Map result = matchingInvocationBuilder.startMatchingInvocation("mockName", Map.class, false, matchingInvocationHandler);
+        ProxyInvocationHandler result = matchingInvocationBuilder.startMatchingInvocation("mockName", false, matchingInvocationHandler);
         argumentMatcherRepositoryMock.assertInvoked().startMatchingInvocation(222);
-        assertSame(proxy, result);
-    }
-
-    @Test
-    public void exceptionWhenPreviousMatchingInvocationWasNotCompleted() {
-        matchingInvocationBuilder.startMatchingInvocation("mockName", Map.class, true, matchingInvocationHandler);
-        try {
-            matchingInvocationBuilder.startMatchingInvocation("mockName", Map.class, false, matchingInvocationHandler);
-            fail("UnitilsException expected");
-        } catch (UnitilsException e) {
-            assertEquals("Invalid syntax: mockName.method1() must be followed by a method invocation on the returned proxy. E.g. mockName.method1().myMethod();", e.getMessage());
-            assertReflectionEquals(stackTraceWithoutFirst, e.getStackTrace());
-        }
+        assertPropertyReflectionEquals("matchingInvocationHandler", matchingInvocationHandler, result);
     }
 
     @Test
     public void exceptionWhenNotCalledFromMock() {
         stackTraceServiceMock.returns(null).getInvocationStackTrace(Mock.class);
         try {
-            matchingInvocationBuilder.startMatchingInvocation("mockName", Map.class, false, matchingInvocationHandler);
+            matchingInvocationBuilder.startMatchingInvocation("mockName", false, matchingInvocationHandler);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Unable to start matching invocation. The matching invocation builder only supports calls from a mock object.", e.getMessage());

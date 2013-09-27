@@ -19,9 +19,12 @@ import org.unitils.mock.PartialMock;
 import org.unitils.mock.annotation.MatchStatement;
 import org.unitils.mock.core.matching.MatchingInvocationBuilder;
 import org.unitils.mock.core.matching.MatchingInvocationHandler;
-import org.unitils.mock.core.proxy.CloneService;
 import org.unitils.mock.core.proxy.ProxyService;
-import org.unitils.mock.core.proxy.StackTraceService;
+import org.unitils.mock.core.proxy.impl.MockInvocationHandler;
+import org.unitils.mock.core.proxy.impl.MockProxyInvocationHandler;
+import org.unitils.mock.core.proxy.impl.PartialMockInvocationHandler;
+import org.unitils.mock.core.util.CloneService;
+import org.unitils.mock.core.util.StackTraceService;
 import org.unitils.mock.mockbehavior.impl.StubMockBehavior;
 
 import static org.unitils.util.ReflectionUtils.copyFields;
@@ -30,8 +33,8 @@ import static org.unitils.util.ReflectionUtils.copyFields;
  * Implementation of a PartialMock.
  * For a partial mock, if a method is called that is not mocked, the original behavior will be called.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  * @author Kenny Claes
  */
 public class PartialMockObject<T> extends MockObject<T> implements PartialMock<T> {
@@ -97,9 +100,13 @@ public class PartialMockObject<T> extends MockObject<T> implements PartialMock<T
         return startMatchingInvocation(matchingInvocationHandler);
     }
 
+    @Override
+    protected T createProxy(MockProxyInvocationHandler mockProxyInvocationHandler) {
+        return proxyService.createProxy(name, mockProxyInvocationHandler, mockedType);
+    }
 
     @Override
-    protected MockProxy<T> createMockProxy() {
-        return new PartialMockProxy<T>(name, mockedType, oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, scenario, proxyService, matchingInvocationBuilder, cloneService);
+    protected MockInvocationHandler<T> createMockInvocationHandler() {
+        return new PartialMockInvocationHandler<T>(oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, scenario, cloneService);
     }
 }

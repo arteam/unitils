@@ -22,8 +22,8 @@ import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.argumentmatcher.impl.DefaultArgumentMatcher;
-import org.unitils.mock.core.proxy.CloneService;
 import org.unitils.mock.core.proxy.ProxyInvocation;
+import org.unitils.mock.core.util.CloneService;
 
 import java.lang.reflect.Method;
 import java.util.List;

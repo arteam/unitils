@@ -25,9 +25,11 @@ import org.unitils.mock.core.matching.impl.AssertInvokedInSequenceVerifyingMatch
 import org.unitils.mock.core.matching.impl.AssertInvokedVerifyingMatchingInvocationHandler;
 import org.unitils.mock.core.matching.impl.AssertNotInvokedVerifyingMatchingInvocationHandler;
 import org.unitils.mock.core.matching.impl.BehaviorDefiningMatchingInvocationHandler;
-import org.unitils.mock.core.proxy.CloneService;
 import org.unitils.mock.core.proxy.ProxyService;
-import org.unitils.mock.core.proxy.StackTraceService;
+import org.unitils.mock.core.proxy.impl.MockInvocationHandler;
+import org.unitils.mock.core.proxy.impl.MockProxyInvocationHandler;
+import org.unitils.mock.core.util.CloneService;
+import org.unitils.mock.core.util.StackTraceService;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.ExceptionThrowingMockBehavior;
 import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
@@ -93,12 +95,19 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
         this.proxyService = proxyService;
         this.stackTraceService = stackTraceService;
         this.cloneService = cloneService;
-        this.mockProxy = createMockProxy();
+        this.mockProxy = createMockProxy();         // todo td move out
     }
 
 
     public String getName() {
         return name;
+    }
+
+    /**
+     * @return the type of the mock, not null
+     */
+    public Class<?> getMockedType() {
+        return mockedType;
     }
 
     public boolean isChainedMock() {
@@ -147,14 +156,6 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
     public T getMock() {
         return mockProxy.getProxy();
     }
-
-    /**
-     * @return the type of the mock, not null
-     */
-    public Class<?> getMockedType() {
-        return mockedType;
-    }
-
 
     /**
      * Defines behavior for this mock so that it will return the given value when the invocation following
@@ -375,12 +376,22 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
 
 
     protected T startMatchingInvocation(MatchingInvocationHandler matchingInvocationHandler) {
-        return matchingInvocationBuilder.startMatchingInvocation(name, mockedType, !chainedMock, matchingInvocationHandler);
+        return mockProxy.startMatchingInvocation(name, chainedMock, matchingInvocationHandler);
     }
 
-
     protected MockProxy<T> createMockProxy() {
-        return new MockProxy<T>(name, mockedType, oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, scenario, matchingInvocationBuilder, proxyService, cloneService);
+        MockInvocationHandler<T> mockInvocationHandler = createMockInvocationHandler();
+        MockProxyInvocationHandler mockProxyInvocationHandler = new MockProxyInvocationHandler(mockInvocationHandler, matchingInvocationBuilder);
+        T proxy = createProxy(mockProxyInvocationHandler);
+        return new MockProxy<T>(proxy, mockProxyInvocationHandler);
+    }
+
+    protected T createProxy(MockProxyInvocationHandler mockProxyInvocationHandler) {
+        return proxyService.createUninitializedProxy(name, mockProxyInvocationHandler, mockedType);
+    }
+
+    protected MockInvocationHandler<T> createMockInvocationHandler() {
+        return new MockInvocationHandler<T>(oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, scenario, cloneService);
     }
 
     protected MatchingInvocationHandler createOneTimeMatchingBehaviorDefiningMatchingInvocationHandler(MockBehavior mockBehavior) {

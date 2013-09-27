@@ -19,8 +19,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
-import org.unitils.mock.core.proxy.CloneService;
 import org.unitils.mock.core.proxy.ProxyInvocation;
+import org.unitils.mock.core.util.CloneService;
 
 import java.lang.reflect.Method;
 import java.util.List;

@@ -56,7 +56,7 @@ public class MockAndProxyObjectFormatterTest extends UnitilsJUnit4 {
     @Test
     public void formatMockProxy() {
         // todo td implement
-//        Object mockProxy = new MockObject<Collection>("mockName", Collection.class, this).getMock();
+//        Object mockProxyInvocationHandler = new MockObject<Collection>("mockName", Collection.class, this).getMock();
         Object mockProxy = null;
         String result = objectFormatter.format(mockProxy);
         assertEquals("Mock<mockName>", result);

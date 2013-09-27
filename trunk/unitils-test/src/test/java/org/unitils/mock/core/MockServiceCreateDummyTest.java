@@ -13,12 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.dummy;
+package org.unitils.mock.core;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.mock.Mock;
+import org.unitils.mock.core.proxy.ProxyService;
+
+import static org.junit.Assert.fail;
 
 /**
- * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface DummyObject {
+public class MockServiceCreateDummyTest extends UnitilsJUnit4 {
 
+    private MockService mockService;
+
+    private Mock<ProxyService> proxyServiceMock;
+
+
+    @Before
+    public void initialize() {
+    }
+
+
+    @Test
+    public void createDummy() {
+        fail("todo");
+    }
 }

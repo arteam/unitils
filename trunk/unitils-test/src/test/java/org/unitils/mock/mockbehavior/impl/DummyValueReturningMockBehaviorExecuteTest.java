@@ -19,14 +19,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
+import org.unitils.mock.core.DummyService;
 import org.unitils.mock.core.proxy.ProxyInvocation;
-import org.unitils.mock.dummy.DummyObjectFactory;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
 import static org.junit.Assert.*;
+import static org.unitils.mock.ArgumentMatchers.isNull;
 
 /**
  * @author Tim Ducheyne
@@ -35,12 +36,12 @@ public class DummyValueReturningMockBehaviorExecuteTest extends UnitilsJUnit4 {
 
     private DummyValueReturningMockBehavior dummyValueReturningMockBehavior;
 
-    private Mock<DummyObjectFactory> dummyObjectFactoryMock;
+    private Mock<DummyService> dummyServiceMock;
 
 
     @Before
     public void initialize() {
-        dummyValueReturningMockBehavior = new DummyValueReturningMockBehavior(dummyObjectFactoryMock.getMock());
+        dummyValueReturningMockBehavior = new DummyValueReturningMockBehavior(dummyServiceMock.getMock());
     }
 
 
@@ -81,7 +82,7 @@ public class DummyValueReturningMockBehaviorExecuteTest extends UnitilsJUnit4 {
     public void dummyWhenObjectReturnType() throws Exception {
         ProxyInvocation proxyInvocation = createProxyInvocation(TestInterface.class.getMethod("dummyMethod"));
         TestClass dummy = new TestClass();
-        dummyObjectFactoryMock.returns(dummy).createDummy(TestClass.class, new DummyValueReturningMockBehavior(dummyObjectFactoryMock.getMock()));
+        dummyServiceMock.returns(dummy).createDummy(isNull(String.class), TestClass.class);
 
         Object result = dummyValueReturningMockBehavior.execute(proxyInvocation);
         assertSame(dummy, result);
