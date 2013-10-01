@@ -70,11 +70,9 @@
         <dbunit.version>2.4.9</dbunit.version>
         <easymock.version>2.3</easymock.version>
         <easymockclassextension.version>2.3</easymockclassextension.version>
-        <cglib.version>2.2</cglib.version>
-        <asm.version>3.1</asm.version>
-        <asm-analysis.version>3.1</asm-analysis.version>
-        <asm-tree.version>3.1</asm-tree.version>
-        <objenesis.version>1.1</objenesis.version>
+        <cglib.version>3.0</cglib.version>
+        <asm.version>4.0</asm.version>
+        <objenesis.version>2.0</objenesis.version>
         <hibernate.version>3.2.5.ga</hibernate.version>
 
         <project.build.java.target>1.5</project.build.java.target>
@@ -223,19 +221,9 @@
                 <version>${cglib.version}</version>
             </dependency>
             <dependency>
-                <groupId>asm</groupId>
-                <artifactId>asm</artifactId>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm-debug-all</artifactId>
                 <version>${asm.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>asm</groupId>
-                <artifactId>asm-analysis</artifactId>
-                <version>${asm-analysis.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>asm</groupId>
-                <artifactId>asm-tree</artifactId>
-                <version>${asm-tree.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.objenesis</groupId>

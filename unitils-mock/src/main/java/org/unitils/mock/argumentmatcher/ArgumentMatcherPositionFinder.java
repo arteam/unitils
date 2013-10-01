@@ -159,7 +159,7 @@ public class ArgumentMatcherPositionFinder {
      * By default an analyzer filters out the line number instructions. This analyzer intercepts these instructions and
      * sets the current line nr on the interpreter.
      */
-    protected static class MethodAnalyzer extends Analyzer {
+    protected static class MethodAnalyzer extends Analyzer<BasicValue> {
 
         /* The method to analyze */
         protected MethodNode methodNode;
@@ -286,26 +286,26 @@ public class ArgumentMatcherPositionFinder {
         }
 
         @Override
-        public Value copyOperation(AbstractInsnNode insn, Value value) throws AnalyzerException {
-            Value resultValue = super.copyOperation(insn, value);
+        public BasicValue copyOperation(AbstractInsnNode insn, BasicValue value) throws AnalyzerException {
+            BasicValue resultValue = super.copyOperation(insn, value);
             return getValue(resultValue, value);
         }
 
         @Override
-        public Value unaryOperation(AbstractInsnNode insn, Value value) throws AnalyzerException {
-            Value resultValue = super.unaryOperation(insn, value);
+        public BasicValue unaryOperation(AbstractInsnNode insn, BasicValue value) throws AnalyzerException {
+            BasicValue resultValue = super.unaryOperation(insn, value);
             return getValue(resultValue, value);
         }
 
         @Override
-        public Value binaryOperation(AbstractInsnNode insn, Value value1, Value value2) throws AnalyzerException {
-            Value resultValue = super.binaryOperation(insn, value1, value2);
+        public BasicValue binaryOperation(AbstractInsnNode insn, BasicValue value1, BasicValue value2) throws AnalyzerException {
+            BasicValue resultValue = super.binaryOperation(insn, value1, value2);
             return getValue(resultValue, value1, value2);
         }
 
         @Override
-        public Value ternaryOperation(AbstractInsnNode insn, Value value1, Value value2, Value value3) throws AnalyzerException {
-            Value resultValue = super.ternaryOperation(insn, value1, value2, value3);
+        public BasicValue ternaryOperation(AbstractInsnNode insn, BasicValue value1, BasicValue value2, BasicValue value3) throws AnalyzerException {
+            BasicValue resultValue = super.ternaryOperation(insn, value1, value2, value3);
             return getValue(resultValue, value1, value2, value3);
         }
 
@@ -317,9 +317,8 @@ public class ArgumentMatcherPositionFinder {
          * @return The merged values or an ArgumentMatcherValue if an argument matcher method was found
          */
         @Override
-        @SuppressWarnings({"unchecked"})
-        public Value naryOperation(AbstractInsnNode instructionNode, List values) throws AnalyzerException {
-            Value resultValue = super.naryOperation(instructionNode, values);
+        public BasicValue naryOperation(AbstractInsnNode instructionNode, List<? extends BasicValue> values) throws AnalyzerException {
+            BasicValue resultValue = super.naryOperation(instructionNode, values);
 
             if (!(instructionNode instanceof MethodInsnNode)) {
                 return getValue(resultValue, values);
@@ -360,7 +359,6 @@ public class ArgumentMatcherPositionFinder {
                     return createArgumentMatcherValue(resultValue);
                 }
             }
-
             // nothing special found
             return getValue(resultValue, values);
         }
@@ -420,8 +418,8 @@ public class ArgumentMatcherPositionFinder {
          * @return The merged value
          */
         @Override
-        public Value merge(Value value1, Value value2) {
-            Value resultValue = super.merge(value1, value2);
+        public BasicValue merge(BasicValue value1, BasicValue value2) {
+            BasicValue resultValue = super.merge(value1, value2);
             if (value1 instanceof ArgumentMatcherValue || value2 instanceof ArgumentMatcherValue) {
                 return createArgumentMatcherValue(resultValue);
             }
@@ -455,7 +453,7 @@ public class ArgumentMatcherPositionFinder {
          * @param values      The values that can be ArgumentMatcherValues
          * @return The result value, or a ArgumentMatcherValue of the same type if one of the values is an ArgumentMatcherValue
          */
-        protected Value getValue(Value resultValue, Value... values) {
+        protected BasicValue getValue(BasicValue resultValue, BasicValue... values) {
             if (values != null) {
                 for (Value value : values) {
                     if (value instanceof ArgumentMatcherValue) {
@@ -471,7 +469,7 @@ public class ArgumentMatcherPositionFinder {
          * @param values      The values that can be ArgumentMatcherValues
          * @return an ArgumentMatcherValue of the same type if one of the values is an ArgumentMatcherValue, the result value otherwise
          */
-        protected Value getValue(Value resultValue, List<Value> values) {
+        protected BasicValue getValue(BasicValue resultValue, List<? extends BasicValue> values) {
             int nrOfArgumentMatcherValues = getNrOfArgumentMatcherValues(values);
 
             if (nrOfArgumentMatcherValues > 1) {
@@ -487,7 +485,7 @@ public class ArgumentMatcherPositionFinder {
          * @param values The values that can be ArgumentMatcherValues
          * @return The nr of values that are an ArgumentMatcherValue
          */
-        protected int getNrOfArgumentMatcherValues(List<Value> values) {
+        protected int getNrOfArgumentMatcherValues(List<? extends BasicValue> values) {
             if (values == null) {
                 return 0;
             }
