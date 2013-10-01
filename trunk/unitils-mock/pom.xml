@@ -44,9 +44,7 @@
                     <artifactSet>
                         <includes>
                             <include>cglib:cglib</include>
-                            <include>asm:asm</include>
-                            <include>asm:asm-analysis</include>
-                            <include>asm:asm-tree</include>
+                            <include>org.ow2.asm:asm-debug-all</include>
                             <include>org.objenesis:objenesis</include>
                         </includes>
                     </artifactSet>
@@ -56,8 +54,8 @@
                             <shadedPattern>thirdparty.net.sf.cglib</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>org.objectweb</pattern>
-                            <shadedPattern>thirdparty.org.objectweb</shadedPattern>
+                            <pattern>org.ow2.asm</pattern>
+                            <shadedPattern>thirdparty.org.ow2.asm</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>org.objenesis</pattern>
@@ -78,18 +76,16 @@
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm-analysis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm-tree</artifactId>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-debug-all</artifactId>
         </dependency>
         <dependency>
             <groupId>org.objenesis</groupId>
