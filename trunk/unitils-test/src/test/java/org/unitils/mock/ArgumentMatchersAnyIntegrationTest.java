@@ -59,7 +59,7 @@ public class ArgumentMatchersAnyIntegrationTest extends UnitilsJUnit4 {
 
     @Test
     public void noMatchForNull() {
-        mockObject.returns(true).method(any(TestClass.class));
+        mockObject.returns("ok").method(any(TestClass.class));
 
         String result = mockObject.getMock().method(null);
         assertNull(result);
@@ -68,7 +68,7 @@ public class ArgumentMatchersAnyIntegrationTest extends UnitilsJUnit4 {
 
     @Test
     public void noMatchWhenNullClass() {
-        mockObject.returns(true).method(any((Class<TestClass>) null));
+        mockObject.returns("ok").method(any((Class<TestClass>) null));
 
         String result = mockObject.getMock().method(new TestClass());
         assertNull(result);

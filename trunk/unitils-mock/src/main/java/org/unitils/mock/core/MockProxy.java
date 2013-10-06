@@ -16,26 +16,39 @@
 package org.unitils.mock.core;
 
 import org.unitils.mock.core.matching.MatchingInvocationHandler;
-import org.unitils.mock.core.proxy.impl.MockProxyInvocationHandler;
+import org.unitils.mock.core.proxy.impl.MatchingProxyInvocationHandler;
 
 public class MockProxy<T> {
 
+    protected String name;
+    protected Class<T> type;
     protected T proxy;
-    protected MockProxyInvocationHandler mockProxyInvocationHandler;
+    protected T matchingProxy;
+    protected MatchingProxyInvocationHandler matchingProxyInvocationHandler;
 
 
-    public MockProxy(T proxy, MockProxyInvocationHandler mockProxyInvocationHandler) {
+    public MockProxy(String name, Class<T> type, T proxy, T matchingProxy, MatchingProxyInvocationHandler matchingProxyInvocationHandler) {
+        this.name = name;
+        this.type = type;
         this.proxy = proxy;
-        this.mockProxyInvocationHandler = mockProxyInvocationHandler;
+        this.matchingProxy = matchingProxy;
+        this.matchingProxyInvocationHandler = matchingProxyInvocationHandler;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public Class<T> getType() {
+        return type;
+    }
 
     public T getProxy() {
         return proxy;
     }
 
-    public T startMatchingInvocation(String mockName, boolean chainedMock, MatchingInvocationHandler matchingInvocationHandler) {
-        mockProxyInvocationHandler.startMatchingInvocation(mockName, chainedMock, matchingInvocationHandler);
-        return proxy;
+    public T startMatchingInvocation(boolean chained, MatchingInvocationHandler matchingInvocationHandler) {
+        matchingProxyInvocationHandler.startMatchingInvocation(name, chained, matchingInvocationHandler);
+        return matchingProxy;
     }
 }

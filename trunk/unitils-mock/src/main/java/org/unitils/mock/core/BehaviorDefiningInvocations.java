@@ -27,24 +27,17 @@ import java.util.List;
  */
 public class BehaviorDefiningInvocations {
 
-    protected boolean removeWhenUsed;
+    /* Mock behaviors that are removed once they have been matched */
     protected List<BehaviorDefiningInvocation> behaviorDefiningInvocations = new ArrayList<BehaviorDefiningInvocation>();
-
-
-    public BehaviorDefiningInvocations(boolean removeWhenUsed) {
-        this.removeWhenUsed = removeWhenUsed;
-    }
 
 
     public void addBehaviorDefiningInvocation(BehaviorDefiningInvocation behaviorDefiningInvocation) {
         behaviorDefiningInvocations.add(behaviorDefiningInvocation);
     }
 
-
     public void clear() {
         behaviorDefiningInvocations.clear();
     }
-
 
     /**
      * First we find all behavior defining invocations that have matching argument matchers and take the one with the highest
@@ -87,12 +80,18 @@ public class BehaviorDefiningInvocations {
                 int nrOfNotNullArguments = behaviorDefiningInvocation.getNrOfNotNullArguments();
                 int bestMatchingNrOfNotNullArguments = bestMatchingBehaviorDefiningInvocation.getNrOfNotNullArguments();
                 if (nrOfNotNullArguments > bestMatchingNrOfNotNullArguments) {
-                    bestMatchingScore = matchingScore;
                     bestMatchingBehaviorDefiningInvocation = behaviorDefiningInvocation;
+                    continue;
+                }
+                // same score, one time matcher wins
+                if (nrOfNotNullArguments == bestMatchingNrOfNotNullArguments) {
+                    if (behaviorDefiningInvocation.isOneTimeMatch() && !bestMatchingBehaviorDefiningInvocation.isOneTimeMatch()) {
+                        bestMatchingBehaviorDefiningInvocation = behaviorDefiningInvocation;
+                    }
                 }
             }
         }
-        if (removeWhenUsed && bestMatchingBehaviorDefiningInvocation != null) {
+        if (bestMatchingBehaviorDefiningInvocation != null && bestMatchingBehaviorDefiningInvocation.isOneTimeMatch()) {
             behaviorDefiningInvocations.remove(bestMatchingBehaviorDefiningInvocation);
         }
         return bestMatchingBehaviorDefiningInvocation;

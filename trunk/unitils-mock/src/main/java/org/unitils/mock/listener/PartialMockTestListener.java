@@ -20,7 +20,6 @@ import org.unitils.core.*;
 import org.unitils.mock.Mock;
 import org.unitils.mock.PartialMock;
 import org.unitils.mock.annotation.AfterCreateMock;
-import org.unitils.mock.core.MockObject;
 import org.unitils.mock.core.MockService;
 
 import java.lang.reflect.InvocationTargetException;
@@ -68,11 +67,11 @@ public class PartialMockTestListener extends TestListener {
 
     protected Mock<?> createPartialMock(TestField testField, TestInstance testInstance) {
         String mockName = testField.getName();
-        Class<?> mockedClass = getMockedClass(testField);
+        Class<?> mockedType = getMockedClass(testField);
         Object testObject = testInstance.getTestObject();
 
-        PartialMock<?> partialMock = mockService.createPartialMock(mockName, mockedClass, testObject);
-        callAfterCreateMockMethods(testObject, partialMock, mockName);
+        PartialMock<?> partialMock = mockService.createPartialMock(mockName, mockedType, testObject);
+        callAfterCreateMockMethods(testObject, partialMock, mockName, mockedType);
         return partialMock;
     }
 
@@ -95,11 +94,11 @@ public class PartialMockTestListener extends TestListener {
      * @param mockObject the mock, not null
      * @param name       the field(=mock) name, not null
      */
-    protected void callAfterCreateMockMethods(Object testObject, Mock<?> mockObject, String name) {
+    protected void callAfterCreateMockMethods(Object testObject, Mock<?> mockObject, String name, Class<?> mockedType) {
         Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), AfterCreateMock.class);
         for (Method method : methods) {
             try {
-                invokeMethod(testObject, method, mockObject, name, ((MockObject<?>) mockObject).getMockedType());
+                invokeMethod(testObject, method, mockObject, name, mockedType);
 
             } catch (InvocationTargetException e) {
                 throw new UnitilsException("An exception occurred while invoking an after create mock method.", e);

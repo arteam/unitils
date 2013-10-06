@@ -58,11 +58,11 @@ public class BehaviorDefiningMatchingInvocationHandlerHandleInvocationTest exten
 
     @Before
     public void initialize() throws Exception {
-        behaviorDefiningMatchingInvocationHandler = new BehaviorDefiningMatchingInvocationHandler(mockBehaviorMock.getMock(), behaviorDefiningInvocationsMock.getMock(), mockServiceMock.getMock());
+        behaviorDefiningMatchingInvocationHandler = new BehaviorDefiningMatchingInvocationHandler(mockBehaviorMock.getMock(), true, behaviorDefiningInvocationsMock.getMock(), mockServiceMock.getMock());
 
         Method method = MyInterface.class.getMethod("method");
         proxyInvocation = new ProxyInvocation("mock", null, method, emptyList(), emptyList(), null);
-        behaviorDefiningInvocation = new BehaviorDefiningInvocation(proxyInvocation, mockBehaviorMock.getMock(), asList(argumentMatcher));
+        behaviorDefiningInvocation = new BehaviorDefiningInvocation(proxyInvocation, mockBehaviorMock.getMock(), asList(argumentMatcher), true);
     }
 
 
@@ -87,7 +87,7 @@ public class BehaviorDefiningMatchingInvocationHandlerHandleInvocationTest exten
 
     @Test
     public void installChainWhenInvocationOnChainedMockBehavior() {
-        behaviorDefiningMatchingInvocationHandler = new BehaviorDefiningMatchingInvocationHandler(chainedMockBehavior.getMock(), behaviorDefiningInvocationsMock.getMock(), mockServiceMock.getMock());
+        behaviorDefiningMatchingInvocationHandler = new BehaviorDefiningMatchingInvocationHandler(chainedMockBehavior.getMock(), true, behaviorDefiningInvocationsMock.getMock(), mockServiceMock.getMock());
 
         behaviorDefiningMatchingInvocationHandler.handleInvocation(proxyInvocation, asList(argumentMatcher));
         chainedMockBehavior.assertInvoked().installChain();

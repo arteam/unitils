@@ -50,6 +50,27 @@ public class MockUnitils {
 
     // todo add createMocks method so that you no longer have to extend unitils base class
 
+    public static <T> Mock<T> createMock(Class<T> type, Object testObject) {
+        return createMock(null, type, testObject);
+    }
+
+    public static <T> Mock<T> createMock(String name, Class<T> type, Object testObject) {
+        return mockService.createMock(name, type, testObject);
+    }
+
+    public static <T> PartialMock<T> createPartialMock(Class<T> type, Object testObject) {
+        return createPartialMock(null, type, testObject);
+    }
+
+    public static <T> PartialMock<T> createPartialMock(String name, Class<T> type, Object testObject) {
+        return mockService.createPartialMock(name, type, testObject);
+    }
+
+    public static <T> PartialMock<T> createPartialMock(String name, T mockPrototype, Object testObject) {
+        return mockService.createPartialMock(name, mockPrototype, testObject);
+    }
+
+
     public static <T> T createDummy(Class<T> type) {
         return createDummy(null, type);
     }

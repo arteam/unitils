@@ -65,7 +65,7 @@ public class AssertVerifyingMatchingInvocationHandlerHandleInvocationTest extend
 
         Object result = assertVerifyingMatchingInvocationHandler.handleInvocation(proxyInvocation, asList(argumentMatcher));
         assertSame(chainedProxy, result);
-        scenarioMock.assertInvoked().assertInvokedInSequence(new BehaviorDefiningInvocation(proxyInvocation, null, asList(argumentMatcher)));
+        scenarioMock.assertInvoked().assertInvokedInSequence(new BehaviorDefiningInvocation(proxyInvocation, null, asList(argumentMatcher), true));
     }
 
     @Test
@@ -74,7 +74,7 @@ public class AssertVerifyingMatchingInvocationHandlerHandleInvocationTest extend
 
         Object result = assertVerifyingMatchingInvocationHandler.handleInvocation(proxyInvocation, asList(argumentMatcher));
         assertNull(result);
-        scenarioMock.assertInvoked().assertInvokedInSequence(new BehaviorDefiningInvocation(proxyInvocation, null, asList(argumentMatcher)));
+        scenarioMock.assertInvoked().assertInvokedInSequence(new BehaviorDefiningInvocation(proxyInvocation, null, asList(argumentMatcher), true));
     }
 
 

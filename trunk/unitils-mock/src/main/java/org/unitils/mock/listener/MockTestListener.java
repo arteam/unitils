@@ -19,7 +19,6 @@ package org.unitils.mock.listener;
 import org.unitils.core.*;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.AfterCreateMock;
-import org.unitils.mock.core.MockObject;
 import org.unitils.mock.core.MockService;
 
 import java.lang.reflect.InvocationTargetException;
@@ -67,12 +66,12 @@ public class MockTestListener extends TestListener {
 
     protected Mock<?> createMock(TestField testField, TestInstance testInstance) {
         String mockName = testField.getName();
-        Class<?> mockedClass = getMockedClass(testField);
+        Class<?> mockedType = getMockedClass(testField);
         Object testObject = testInstance.getTestObject();
 
-        Mock<?> mock = mockService.createMock(mockName, mockedClass, testObject);
-        callAfterCreateMockMethods(testObject, mock, mockName);
-        return mock;
+        Mock<?> mockObject = mockService.createMock(mockName, mockedType, testObject);
+        callAfterCreateMockMethods(testObject, mockObject, mockName, mockedType);
+        return mockObject;
     }
 
     protected Class<?> getMockedClass(TestField testField) {
@@ -92,13 +91,14 @@ public class MockTestListener extends TestListener {
      *
      * @param testObject the test, not null
      * @param mockObject the mock, not null
-     * @param name       the field(=mock) name, not null
+     * @param name       the mock name, not null
+     * @param mockedType the mock type, not null
      */
-    protected void callAfterCreateMockMethods(Object testObject, Mock<?> mockObject, String name) {
+    protected void callAfterCreateMockMethods(Object testObject, Mock<?> mockObject, String name, Class<?> mockedType) {
         Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), AfterCreateMock.class);
         for (Method method : methods) {
             try {
-                invokeMethod(testObject, method, mockObject, name, ((MockObject<?>) mockObject).getMockedType());
+                invokeMethod(testObject, method, mockObject, name, mockedType);
 
             } catch (InvocationTargetException e) {
                 throw new UnitilsException("An exception occurred while invoking an after create mock method.", e);

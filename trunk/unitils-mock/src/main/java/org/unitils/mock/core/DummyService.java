@@ -46,13 +46,14 @@ public class DummyService {
     public <T> T createDummy(String name, Class<T> type) {
         String dummyName = getDummyName(name, type);
         DummyValueReturningMockBehavior mockBehaviour = new DummyValueReturningMockBehavior(this);
-        return proxyService.createUninitializedProxy(dummyName, new DummyProxyInvocationHandler(type, mockBehaviour), type);
+        DummyProxyInvocationHandler dummyProxyInvocationHandler = new DummyProxyInvocationHandler(type, mockBehaviour);
+        return proxyService.createProxy(dummyName, false, dummyProxyInvocationHandler, type);
     }
 
 
     protected <T> String getDummyName(String name, Class<T> dummyType) {
         if (isBlank(name)) {
-            return uncapitalize(dummyType.getSimpleName()) + "Dummy";
+            return uncapitalize(dummyType.getSimpleName());
         }
         return name;
     }
