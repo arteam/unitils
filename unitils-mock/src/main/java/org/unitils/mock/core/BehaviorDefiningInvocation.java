@@ -34,6 +34,8 @@ public class BehaviorDefiningInvocation extends ProxyInvocation {
     protected List<ArgumentMatcher> argumentMatchers;
     /* The behavior to execute */
     protected MockBehavior mockBehavior;
+    /* When true, the behavior will only match once */
+    protected boolean oneTimeMatch;
 
 
     /**
@@ -46,11 +48,13 @@ public class BehaviorDefiningInvocation extends ProxyInvocation {
      * @param proxyInvocation  The proxy invocation, not null
      * @param mockBehavior     The behavior to execute, not null
      * @param argumentMatchers The argument matchers to use when matching the invocation, not null
+     * @param oneTimeMatch     When true, the behavior will only match once
      */
-    public BehaviorDefiningInvocation(ProxyInvocation proxyInvocation, MockBehavior mockBehavior, List<ArgumentMatcher> argumentMatchers) {
+    public BehaviorDefiningInvocation(ProxyInvocation proxyInvocation, MockBehavior mockBehavior, List<ArgumentMatcher> argumentMatchers, boolean oneTimeMatch) {
         super(proxyInvocation);
         this.argumentMatchers = argumentMatchers;
         this.mockBehavior = mockBehavior;
+        this.oneTimeMatch = oneTimeMatch;
     }
 
 
@@ -66,6 +70,10 @@ public class BehaviorDefiningInvocation extends ProxyInvocation {
      */
     public void setMockBehavior(MockBehavior mockBehavior) {
         this.mockBehavior = mockBehavior;
+    }
+
+    public boolean isOneTimeMatch() {
+        return oneTimeMatch;
     }
 
 
@@ -103,5 +111,4 @@ public class BehaviorDefiningInvocation extends ProxyInvocation {
         }
         return matchingScore;
     }
-
 }

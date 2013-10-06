@@ -15,37 +15,36 @@
  */
 package org.unitils.mock.core.proxy.impl;
 
+import org.unitils.core.UnitilsException;
 import org.unitils.mock.core.matching.MatchingInvocationBuilder;
 import org.unitils.mock.core.matching.MatchingInvocationHandler;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.proxy.ProxyInvocationHandler;
 
 
-public class MockProxyInvocationHandler implements ProxyInvocationHandler {
+public class MatchingProxyInvocationHandler implements ProxyInvocationHandler {
 
-    protected MockInvocationHandler mockInvocationHandler;
     protected MatchingInvocationBuilder matchingInvocationBuilder;
+    protected ProxyInvocationHandler proxyInvocationHandler;
 
-    protected ProxyInvocationHandler matchingProxyInvocationHandler;
 
-
-    public MockProxyInvocationHandler(MockInvocationHandler mockInvocationHandler, MatchingInvocationBuilder matchingInvocationBuilder) {
-        this.mockInvocationHandler = mockInvocationHandler;
+    public MatchingProxyInvocationHandler(MatchingInvocationBuilder matchingInvocationBuilder) {
         this.matchingInvocationBuilder = matchingInvocationBuilder;
     }
 
 
-    public void startMatchingInvocation(String mockName, boolean chainedMock, MatchingInvocationHandler matchingInvocationHandler) {
-        this.matchingProxyInvocationHandler = matchingInvocationBuilder.startMatchingInvocation(mockName, !chainedMock, matchingInvocationHandler);
+    public void startMatchingInvocation(String mockName, boolean chained, MatchingInvocationHandler matchingInvocationHandler) {
+        this.proxyInvocationHandler = matchingInvocationBuilder.startMatchingInvocation(mockName, !chained, matchingInvocationHandler);
     }
 
+
     public Object handleInvocation(ProxyInvocation proxyInvocation) throws Throwable {
-        if (matchingProxyInvocationHandler != null) {
-            ProxyInvocationHandler handler = matchingProxyInvocationHandler;
-            matchingProxyInvocationHandler = null;
-            return handler.handleInvocation(proxyInvocation);
+        if (proxyInvocationHandler == null) {
+            // todo td implement => merge builder with this handler
+            throw new UnitilsException("todo");
         }
-        matchingInvocationBuilder.assertPreviousMatchingInvocationCompleted();
-        return mockInvocationHandler.handleInvocation(proxyInvocation);
+        Object result = proxyInvocationHandler.handleInvocation(proxyInvocation);
+        proxyInvocationHandler = null;
+        return result;
     }
 }

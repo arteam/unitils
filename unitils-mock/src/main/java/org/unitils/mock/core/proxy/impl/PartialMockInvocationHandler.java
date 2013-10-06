@@ -17,6 +17,7 @@ package org.unitils.mock.core.proxy.impl;
 
 import org.unitils.mock.core.BehaviorDefiningInvocations;
 import org.unitils.mock.core.Scenario;
+import org.unitils.mock.core.matching.MatchingInvocationBuilder;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.util.CloneService;
 import org.unitils.mock.mockbehavior.MockBehavior;
@@ -25,8 +26,8 @@ import org.unitils.mock.mockbehavior.impl.OriginalBehaviorInvokingMockBehavior;
 public class PartialMockInvocationHandler<T> extends MockInvocationHandler<T> {
 
 
-    public PartialMockInvocationHandler(BehaviorDefiningInvocations oneTimeMatchingBehaviorDefiningInvocations, BehaviorDefiningInvocations alwaysMatchingBehaviorDefiningInvocations, Scenario scenario, CloneService cloneService) {
-        super(oneTimeMatchingBehaviorDefiningInvocations, alwaysMatchingBehaviorDefiningInvocations, scenario, cloneService);
+    public PartialMockInvocationHandler(BehaviorDefiningInvocations behaviorDefiningInvocations1, Scenario scenario, CloneService cloneService, MatchingInvocationBuilder matchingInvocationBuilder) {
+        super(behaviorDefiningInvocations1, scenario, cloneService, matchingInvocationBuilder);
     }
 
 

@@ -54,31 +54,31 @@ public class ProxyService {
 
     /**
      * Creates a proxy object for the given type. All method invocations will be passed to the given invocation handler.
-     * If possible, the default constructor (can be private) will be used. If there is no default constructor,
-     * no constructor will be called.
      *
      * @param name                  A display name for the proxy, not null
-     * @param invocationHandler     The handler that will handle the method invocations of the proxy, not null.
-     * @param proxiedClass          The type to proxy, not null
+     * @param initialize            If possible, use the default constructor and initialize all fields
      * @param implementedInterfaces Additional interfaces that the proxy must implement
+     * @param proxiedClass          The type to proxy, not null
+     * @param invocationHandler     The handler that will handle the method invocations of the proxy, not null.
      * @return The proxy object, not null
      */
-    public <T> T createProxy(String name, ProxyInvocationHandler invocationHandler, Class<T> proxiedClass, Class<?>... implementedInterfaces) {
-        return createProxy(name, true, invocationHandler, proxiedClass, implementedInterfaces);
-    }
+    @SuppressWarnings("unchecked")
+    public <T> T createProxy(String name, boolean initialize, ProxyInvocationHandler invocationHandler, Class<T> proxiedClass, Class<?>... implementedInterfaces) {
+        Class<T> enhancedClass;
+        try {
+            enhancedClass = createEnhancedClass(proxiedClass, implementedInterfaces);
+        } catch (Exception e) {
+            throw new UnitilsException("Unable to create proxy with name " + name + " for type " + proxiedClass, e);
+        }
 
-    /**
-     * Creates a proxy object for the given type. All method invocations will be passed to the given invocation handler.
-     * No constructor or class-initialization will be called.
-     *
-     * @param name                  A display name for the proxy, not null
-     * @param invocationHandler     The handler that will handle the method invocations of the proxy, not null.
-     * @param proxiedClass          The type to proxy, not null
-     * @param implementedInterfaces Additional interfaces that the proxy must implement
-     * @return The proxy object, not null
-     */
-    public <T> T createUninitializedProxy(String name, ProxyInvocationHandler invocationHandler, Class<T> proxiedClass, Class<?>... implementedInterfaces) {
-        return createProxy(name, false, invocationHandler, proxiedClass, implementedInterfaces);
+        Factory proxy;
+        if (initialize && !proxiedClass.isInterface()) {
+            proxy = (Factory) createInitializedOrUninitializedInstanceOfType(enhancedClass);
+        } else {
+            proxy = (Factory) createUninitializedInstanceOfType(enhancedClass);
+        }
+        proxy.setCallbacks(new Callback[]{new CglibProxyMethodInterceptor<T>(name, proxiedClass, invocationHandler, this, cloneService)});
+        return (T) proxy;
     }
 
     /**
@@ -109,11 +109,10 @@ public class ProxyService {
      * @param clazz The class for which an instance is requested
      * @return An instance of the given class
      */
-    @SuppressWarnings("unchecked")
     public <T> T createUninitializedInstanceOfType(Class<T> clazz) {
         try {
             Objenesis objenesis = new ObjenesisStd();
-            return (T) objenesis.newInstance(clazz);
+            return objenesis.newInstance(clazz);
         } catch (Exception e) {
             throw new UnitilsException("Unable to create instance of type " + clazz, e);
         }
@@ -145,13 +144,14 @@ public class ProxyService {
      * @param object The object to check
      * @return The proxied type, null if the object is not a proxy or mock
      */
+    // todo td remove
     @SuppressWarnings({"UnusedDeclaration"})
     public String getMockName(Object object) {
         if (object == null) {
             return null;
         }
         if (object instanceof MockObject) {
-            return ((MockObject) object).getName();
+            return object.toString();
         }
         if (object instanceof Factory) {
             Callback callback = ((Factory) object).getCallback(0);
@@ -188,35 +188,6 @@ public class ProxyService {
         return stackTrace.toArray(new StackTraceElement[stackTrace.size()]);
     }
 
-
-    /**
-     * Creates a proxy object for the given type. All method invocations will be passed to the given invocation handler.
-     *
-     * @param name                  A display name for the proxy, not null
-     * @param initialize            If possible, use the default constructor and initialize all fields
-     * @param implementedInterfaces Additional interfaces that the proxy must implement
-     * @param proxiedClass          The type to proxy, not null
-     * @param invocationHandler     The handler that will handle the method invocations of the proxy, not null.
-     * @return The proxy object, not null
-     */
-    @SuppressWarnings({"unchecked"})
-    protected <T> T createProxy(String name, boolean initialize, ProxyInvocationHandler invocationHandler, Class<T> proxiedClass, Class<?>... implementedInterfaces) {
-        Class<T> enhancedClass;
-        try {
-            enhancedClass = createEnhancedClass(proxiedClass, implementedInterfaces);
-        } catch (Exception e) {
-            throw new UnitilsException("Unable to create proxy with name " + name + " for type " + proxiedClass, e);
-        }
-
-        Factory proxy;
-        if (initialize && !proxiedClass.isInterface()) {
-            proxy = (Factory) createInitializedOrUninitializedInstanceOfType(enhancedClass);
-        } else {
-            proxy = (Factory) createUninitializedInstanceOfType(enhancedClass);
-        }
-        proxy.setCallbacks(new Callback[]{new CglibProxyMethodInterceptor(name, proxiedClass, invocationHandler, this, cloneService)});
-        return (T) proxy;
-    }
 
     @SuppressWarnings("unchecked")
     protected <T> Class<T> createEnhancedClass(Class<T> proxiedClass, Class<?>... implementedInterfaces) {

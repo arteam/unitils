@@ -39,5 +39,4 @@ public class AssertNotInvokedVerifyingMatchingInvocationHandler extends AssertVe
     protected Object performChainedAssertion(Mock<?> mock) {
         return mock.assertNotInvoked();
     }
-
 }

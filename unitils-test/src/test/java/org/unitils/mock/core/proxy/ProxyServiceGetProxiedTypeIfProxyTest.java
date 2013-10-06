@@ -39,7 +39,7 @@ public class ProxyServiceGetProxiedTypeIfProxyTest {
 
     @Test
     public void proxyInterface() {
-        Object proxy = proxyService.createUninitializedProxy(null, new MyProxyInvocationHandler(), TestInterface.class);
+        Object proxy = proxyService.createProxy(null, false, new MyProxyInvocationHandler(), TestInterface.class);
 
         Class<?> result = proxyService.getProxiedTypeIfProxy(proxy);
         assertEquals(TestInterface.class, result);
@@ -47,7 +47,7 @@ public class ProxyServiceGetProxiedTypeIfProxyTest {
 
     @Test
     public void proxyClass() {
-        Object proxy = proxyService.createUninitializedProxy(null, new MyProxyInvocationHandler(), TestClass.class);
+        Object proxy = proxyService.createProxy(null, false, new MyProxyInvocationHandler(), TestClass.class);
 
         Class<?> result = proxyService.getProxiedTypeIfProxy(proxy);
         assertEquals(TestClass.class, result);

@@ -32,6 +32,10 @@ import org.unitils.mock.mockbehavior.MockBehavior;
  */
 public interface Mock<T> {
 
+    // todo add returnsdummy(Class<?>)
+    // todo td onceReturns does not work when chaining calls
+    // todo td assertInvoked + int times
+    // todo td assertNoMoreInvocations
 
     /**
      * Gets the mock proxy instance. This is the instance that can be used to perform the test.
@@ -41,7 +45,6 @@ public interface Mock<T> {
      * @return The proxy instance, not null
      */
     T getMock();
-
 
     /**
      * Defines behavior for this mock so that it will return the given value when the invocation following
@@ -60,8 +63,6 @@ public interface Mock<T> {
     @MatchStatement
     T returns(Object returnValue);
 
-    // todo add returnsdummy(Class<?>)
-
     /**
      * Defines behavior for this mock so that it raises the given exception when the invocation following
      * this call matches the observed behavior. E.g.
@@ -78,7 +79,6 @@ public interface Mock<T> {
      */
     @MatchStatement
     T raises(Throwable exception);
-
 
     /**
      * Defines behavior for this mock so that it raises an instance of the given exception class when the invocation following
@@ -97,7 +97,6 @@ public interface Mock<T> {
     @MatchStatement
     T raises(Class<? extends Throwable> exceptionClass);
 
-
     /**
      * Defines behavior for this mock so that will be performed when the invocation following
      * this call matches the observed behavior. E.g.
@@ -114,7 +113,6 @@ public interface Mock<T> {
      */
     @MatchStatement
     T performs(MockBehavior mockBehavior);
-
 
     /**
      * Defines behavior for this mock so that it will return the given value when the invocation following
@@ -134,9 +132,6 @@ public interface Mock<T> {
     @MatchStatement
     T onceReturns(Object returnValue);
 
-
-    // todo td onceReturns does not work when chaining calls
-
     /**
      * Defines behavior for this mock so that it raises an instance of the given exception class when the invocation following
      * this call matches the observed behavior. E.g.
@@ -154,7 +149,6 @@ public interface Mock<T> {
      */
     @MatchStatement
     T onceRaises(Throwable exception);
-
 
     /**
      * Defines behavior for this mock so that it raises an instance of the given exception class when the invocation following
@@ -174,7 +168,6 @@ public interface Mock<T> {
     @MatchStatement
     T onceRaises(Class<? extends Throwable> exceptionClass);
 
-
     /**
      * Defines behavior for this mock so that will be performed when the invocation following
      * this call matches the observed behavior. E.g.
@@ -193,7 +186,6 @@ public interface Mock<T> {
     @MatchStatement
     T oncePerforms(MockBehavior mockBehavior);
 
-
     /**
      * Asserts that an invocation that matches the invocation following this call has been observed
      * on this mock object during this test.
@@ -202,8 +194,6 @@ public interface Mock<T> {
      */
     @MatchStatement
     T assertInvoked();
-
-    // todo td assertInvoked + int times
 
     /**
      * Asserts that an invocation that matches the invocation following this call has been observed
@@ -217,7 +207,6 @@ public interface Mock<T> {
     @MatchStatement
     T assertInvokedInSequence();
 
-
     /**
      * Asserts that no invocation that matches the invocation following this call has been observed
      * on this mock object during this test.
@@ -226,8 +215,6 @@ public interface Mock<T> {
      */
     @MatchStatement
     T assertNotInvoked();
-
-    // todo td assertNoMoreInvocations
 
     /**
      * Removes all behavior defined for this mock.

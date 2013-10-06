@@ -86,7 +86,7 @@ public class ArgumentMatcherRepositoryRegisterArgumentMatcherTest extends Unitil
             argumentMatcherRepository.registerArgumentMatcher(argumentMatcher);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to register argument matcher. Argument matchers can only be used when defining behavior for a mock (e.g. returns) or when doing an assert on a mock. Argument matcher: " + argumentMatcher, e.getMessage());
+            assertEquals("Unable to register argument matcher. Argument matchers can only be used when defining behavior for a mock (e.g. returns) or when doing an assert on a mock. Argument matcher: " + argumentMatcher.getClass(), e.getMessage());
         }
     }
 

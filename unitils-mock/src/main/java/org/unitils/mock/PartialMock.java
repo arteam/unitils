@@ -26,6 +26,8 @@ import org.unitils.mock.core.MockObject;
  * If Unitils encounters a field declared as {@link PartialMock}, a {@link MockObject} is automatically instantiated and
  * assigned to the declared field. This mock object will use the original implementation of each method as default
  * behavior.
+ *
+ * @author Tim Ducheyne
  */
 public interface PartialMock<T> extends Mock<T> {
 

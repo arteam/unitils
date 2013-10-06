@@ -80,7 +80,7 @@ public class ArgumentMatcherRepository {
             return;
         }
         if (matchInvocationLineNr == -1) {
-            throw new UnitilsException("Unable to register argument matcher. Argument matchers can only be used when defining behavior for a mock (e.g. returns) or when doing an assert on a mock. Argument matcher: " + argumentMatcher);
+            throw new UnitilsException("Unable to register argument matcher. Argument matchers can only be used when defining behavior for a mock (e.g. returns) or when doing an assert on a mock. Argument matcher: " + argumentMatcher.getClass());
         }
         argumentMatchers.add(argumentMatcher);
     }

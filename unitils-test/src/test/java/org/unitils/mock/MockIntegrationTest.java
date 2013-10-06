@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock;
 
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.mock.Mock;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.util.CloneService;
 import org.unitils.mock.core.util.ObjectFactory;
@@ -31,6 +30,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.unitils.mock.ArgumentMatchers.notNull;
+import static org.unitils.mock.MockUnitils.createMock;
 
 /**
  * @author Tim Ducheyne
@@ -97,32 +97,17 @@ public class MockIntegrationTest extends UnitilsJUnit4 {
         assertEquals(mockObject.getMock(), clone);
     }
 
-
     @Test
     public void useRawTypeWhenMockingGenericTypes() {
-        // todo td implement
-//        MockObject<List<String>> mockObject = new MockObject<List<String>>("testMock", List.class, this);
-        MockObject<List<String>> mockObject = null;
-
-        mockObject.returns("value").get(0);
-        assertEquals("value", mockObject.getMock().get(0));
-    }
-
-
-    @Test(expected = ClassCastException.class)
-    public void typeMismatch() {
-        // todo td implement
-//        MockObject<List<String>> mockObject = new MockObject<List<String>>("testMock", Map.class, this);
-        MockObject<List<String>> mockObject = null;
-        mockObject.returns("value").get(0);  //raises classcast
+        Mock<List> mock = createMock("testMock", List.class, this);
+        mock.returns("value").get(0);
+        assertEquals("value", mock.getMock().get(0));
     }
 
     @Test
     public void defaultMockName() {
-        // todo td implement
-//        MockObject<TestInterface> mockObject = new MockObject<TestInterface>(TestInterface.class, this);
-        MockObject<TestInterface> mockObject = null;
-        assertEquals("testClassMock", mockObject.getName());
+        Mock<TestInterface> mock = createMock(TestInterface.class, this);
+        assertEquals("testInterfaceMock", mock.toString());
     }
 
     @Test
@@ -133,12 +118,10 @@ public class MockIntegrationTest extends UnitilsJUnit4 {
             }
         });
 
-        // todo td implement
-//        MockObject<TestInterface> mockObject = new MockObject<TestInterface>(TestInterface.class, this);
-        MockObject<TestInterface> mockObject = null;
-        mockObject.returns(proxy).doSomething(proxy);
+        Mock<TestInterface> mock = createMock(TestInterface.class, this);
+        mock.returns(proxy).doSomething(proxy);
 
-        Object result = mockObject.getMock().doSomething(proxy);
+        Object result = mock.getMock().doSomething(proxy);
         assertSame(proxy, result);
     }
 

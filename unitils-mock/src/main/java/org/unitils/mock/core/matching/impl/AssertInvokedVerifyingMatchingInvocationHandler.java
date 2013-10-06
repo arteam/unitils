@@ -40,6 +40,4 @@ public class AssertInvokedVerifyingMatchingInvocationHandler extends AssertVerif
     protected Object performChainedAssertion(Mock<?> mock) {
         return mock.assertInvoked();
     }
-
-
 }

@@ -51,7 +51,7 @@ public class MatchingInvocationBuilderResetTest extends UnitilsJUnit4 {
         StackTraceElement[] stackTrace = new StackTraceElement[]{stackTraceElement1, stackTraceElement2};
         stackTraceServiceMock.returns(stackTrace).getInvocationStackTrace(Mock.class);
 
-        proxyServiceMock.returns(proxy).createUninitializedProxy("mockName", null, Map.class);
+        proxyServiceMock.returns(proxy).createProxy("mockName", false, null, Map.class);
     }
 
 

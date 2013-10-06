@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock;
 
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.mock.Mock;
 
 import static org.junit.Assert.assertEquals;
 
@@ -61,18 +60,20 @@ public class MockMatchingBehaviorIntegrationTest extends UnitilsJUnit4 {
     public void betterMatchIfMoreSpecific() {
         mockObject.returns(1).testMethod1("arg1", null, null);
         mockObject.returns(2).testMethod1("arg1", "arg2", null);
+        mockObject.onceReturns(3).testMethod1(null, "arg2", null);
 
         int result = mockObject.getMock().testMethod1("arg1", "arg2", "arg3");
         assertEquals(2, result);
     }
 
     @Test
-    public void oneTimeMatchingPrecedesAlwaysMatching() {
-        mockObject.onceReturns(1).testMethod1("arg1", null, null);
-        mockObject.returns(2).testMethod1("arg1", "arg2", null);
+    public void oneTimeMatchingPrecedesWhenMutlipleBestMatch() {
+        mockObject.returns(1).testMethod1("arg1", "arg2", null);
+        mockObject.onceReturns(2).testMethod1("arg1", "arg2", null);
+        mockObject.returns(3).testMethod1("arg1", "arg2", null);
 
         int result = mockObject.getMock().testMethod1("arg1", "arg2", "arg3");
-        assertEquals(1, result);
+        assertEquals(2, result);
     }
 
     @Test

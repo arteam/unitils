@@ -61,7 +61,7 @@ public class MatchingInvocationBuilderStartMatchingInvocationTest extends Unitil
         stackTraceServiceMock.returns(stackTrace).getInvocationStackTrace(Mock.class);
         stackTraceServiceMock.returns(stackTraceWithoutFirst).getStackTraceStartingFrom(stackTrace, 1);
 
-        proxyServiceMock.returns(proxy).createUninitializedProxy("mockName", null, Map.class);
+        proxyServiceMock.returns(proxy).createProxy("mockName", false, null, Map.class);
     }
 
 

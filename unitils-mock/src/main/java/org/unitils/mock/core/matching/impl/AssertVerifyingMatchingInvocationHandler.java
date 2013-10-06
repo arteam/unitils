@@ -43,7 +43,7 @@ public abstract class AssertVerifyingMatchingInvocationHandler implements Matchi
 
 
     public Object handleInvocation(ProxyInvocation proxyInvocation, List<ArgumentMatcher> argumentMatchers) {
-        BehaviorDefiningInvocation behaviorDefiningInvocation = new BehaviorDefiningInvocation(proxyInvocation, null, argumentMatchers);
+        BehaviorDefiningInvocation behaviorDefiningInvocation = new BehaviorDefiningInvocation(proxyInvocation, null, argumentMatchers, true);
         performAssertion(scenario, behaviorDefiningInvocation);
         return createChainedMock(proxyInvocation);
     }
