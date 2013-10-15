@@ -47,7 +47,7 @@ public class SimpleDifferenceView implements DifferenceView {
     }
 
     protected String formatOnOneLine(String expectedStr, String actualStr) {
-        return new StringBuilder().append("Expected: ").append(expectedStr).append(", actual: ").append(actualStr).toString();
+        return "Expected: " + expectedStr + ", actual: " + actualStr;
     }
 
     protected String formatOnTwoLines(String expectedStr, String actualStr) {

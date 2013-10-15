@@ -173,8 +173,11 @@ public class DefaultDifferenceView implements DifferenceView {
 
         result.append(fieldName == null ? "" : fieldName + ": ");
         if (unorderedCollectionDifference.getRightList().size() != unorderedCollectionDifference.getLeftList().size()) {
-            result.append("Collections have a different size: Expected " + unorderedCollectionDifference.getLeftList().size() + ", actual " +
-                    unorderedCollectionDifference.getRightList().size() + ".\n");
+            result.append("Collections have a different size: Expected ");
+            result.append(unorderedCollectionDifference.getLeftList().size());
+            result.append(", actual ");
+            result.append(unorderedCollectionDifference.getRightList().size());
+            result.append(".\n");
         }
 
         Map<Integer, Integer> bestMatchingIndexes = unorderedCollectionDifference.getBestMatchingIndexes();
