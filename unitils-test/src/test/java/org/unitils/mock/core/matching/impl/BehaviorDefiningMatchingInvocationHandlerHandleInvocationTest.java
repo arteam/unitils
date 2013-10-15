@@ -23,7 +23,7 @@ import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import org.unitils.mock.core.BehaviorDefiningInvocation;
 import org.unitils.mock.core.BehaviorDefiningInvocations;
-import org.unitils.mock.core.MockService;
+import org.unitils.mock.core.MockFactory;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.ChainedMockBehavior;
@@ -44,7 +44,7 @@ public class BehaviorDefiningMatchingInvocationHandlerHandleInvocationTest exten
     private BehaviorDefiningMatchingInvocationHandler behaviorDefiningMatchingInvocationHandler;
 
     private Mock<MockBehavior> mockBehaviorMock;
-    private Mock<MockService> mockServiceMock;
+    private Mock<MockFactory> mockServiceMock;
     private Mock<BehaviorDefiningInvocations> behaviorDefiningInvocationsMock;
     private Mock<Mock<Map>> chainedMock;
     private Mock<ChainedMockBehavior> chainedMockBehavior;

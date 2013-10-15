@@ -22,6 +22,7 @@ import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
 import org.unitils.mock.core.proxy.ProxyService;
+import org.unitils.mock.core.proxy.impl.MatchingProxyInvocationHandler;
 import org.unitils.mock.core.util.StackTraceService;
 
 import java.util.Map;
@@ -29,9 +30,9 @@ import java.util.Map;
 /**
  * @author Tim Ducheyne
  */
-public class MatchingInvocationBuilderResetTest extends UnitilsJUnit4 {
+public class MatchingProxyInvocationHandlerResetTest extends UnitilsJUnit4 {
 
-    private MatchingInvocationBuilder matchingInvocationBuilder;
+    private MatchingProxyInvocationHandler matchingProxyInvocationHandler;
 
     private Mock<ArgumentMatcherRepository> argumentMatcherRepositoryMock;
     private Mock<ProxyService> proxyServiceMock;
@@ -44,7 +45,7 @@ public class MatchingInvocationBuilderResetTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        matchingInvocationBuilder = new MatchingInvocationBuilder(argumentMatcherRepositoryMock.getMock(), proxyServiceMock.getMock(), stackTraceServiceMock.getMock());
+        matchingProxyInvocationHandler = new MatchingProxyInvocationHandler(argumentMatcherRepositoryMock.getMock(), proxyServiceMock.getMock(), stackTraceServiceMock.getMock());
 
         StackTraceElement stackTraceElement1 = new StackTraceElement("class1", "method1", "file1", 111);
         StackTraceElement stackTraceElement2 = new StackTraceElement("class2", "method2", "file2", 222);
@@ -57,10 +58,10 @@ public class MatchingInvocationBuilderResetTest extends UnitilsJUnit4 {
 
     @Test
     public void reset() {
-        matchingInvocationBuilder.startMatchingInvocation("mockName", true, matchingInvocationHandler);
+        matchingProxyInvocationHandler.startMatchingInvocation("mockName", true, matchingInvocationHandler);
 
-        matchingInvocationBuilder.reset();
-        matchingInvocationBuilder.assertPreviousMatchingInvocationCompleted();
+        matchingProxyInvocationHandler.reset();
+        matchingProxyInvocationHandler.assertPreviousMatchingInvocationCompleted();
         argumentMatcherRepositoryMock.assertInvoked().reset();
     }
 }

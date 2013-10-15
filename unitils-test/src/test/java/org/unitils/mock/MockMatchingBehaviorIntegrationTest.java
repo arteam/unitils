@@ -48,12 +48,25 @@ public class MockMatchingBehaviorIntegrationTest extends UnitilsJUnit4 {
     }
 
     @Test
-    public void lastMatchWhenMultipleBestMatches() {
+    public void lastAlwaysMatchOverridesPreviousWhenMultipleBestMatches() {
         mockObject.returns(1).testMethod1("arg1", null, null);
         mockObject.returns(2).testMethod1("arg1", null, null);
 
-        int result = mockObject.getMock().testMethod1("arg1", "arg2", "arg3");
-        assertEquals(2, result);
+        int result1 = mockObject.getMock().testMethod1("arg1", "arg2", "arg3");
+        int result2 = mockObject.getMock().testMethod1("arg1", "arg2", "arg3");
+        assertEquals(2, result1);
+        assertEquals(2, result2);
+    }
+
+    @Test
+    public void oneTimeMatchersKeepSequence() {
+        mockObject.onceReturns(1).testMethod1("arg1", "arg2", null);
+        mockObject.onceReturns(2).testMethod1("arg1", "arg2", null);
+
+        int result1 = mockObject.getMock().testMethod1("arg1", "arg2", "arg3");
+        int result2 = mockObject.getMock().testMethod1("arg1", "arg2", "arg3");
+        assertEquals(1, result1);
+        assertEquals(2, result2);
     }
 
     @Test
@@ -67,7 +80,7 @@ public class MockMatchingBehaviorIntegrationTest extends UnitilsJUnit4 {
     }
 
     @Test
-    public void oneTimeMatchingPrecedesWhenMutlipleBestMatch() {
+    public void oneTimeMatchingPrecedesWhenMultipleBestMatch() {
         mockObject.returns(1).testMethod1("arg1", "arg2", null);
         mockObject.onceReturns(2).testMethod1("arg1", "arg2", null);
         mockObject.returns(3).testMethod1("arg1", "arg2", null);
@@ -98,6 +111,19 @@ public class MockMatchingBehaviorIntegrationTest extends UnitilsJUnit4 {
         assertEquals(2, result2);
     }
 
+    @Test
+    public void oneTimeMatchersOnlyMatchedOnce() {
+        mockObject.onceReturns(1).testMethod3();
+        mockObject.returns(2).testMethod3();
+
+        int result1 = mockObject.getMock().testMethod3();
+        int result2 = mockObject.getMock().testMethod3();
+        int result3 = mockObject.getMock().testMethod3();
+        assertEquals(1, result1);
+        assertEquals(2, result2);
+        assertEquals(2, result3);
+    }
+
 
     private static interface TestInterface {
 
@@ -105,6 +131,7 @@ public class MockMatchingBehaviorIntegrationTest extends UnitilsJUnit4 {
 
         int testMethod2(Value value);
 
+        int testMethod3();
     }
 
     private static class Value {

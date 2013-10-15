@@ -19,10 +19,8 @@ import org.unitils.mock.core.proxy.ProxyInvocation;
 
 
 /**
- * todo javadoc
- *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  * @author Kenny Claes
  */
 public interface ValidatableMockBehavior extends MockBehavior {
@@ -34,5 +32,4 @@ public interface ValidatableMockBehavior extends MockBehavior {
      * @param proxyInvocation The proxy method invocation, not null
      */
     void assertCanExecute(ProxyInvocation proxyInvocation);
-
 }

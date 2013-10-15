@@ -13,33 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
-import org.unitils.mock.Mock;
-import org.unitils.mock.core.proxy.ProxyService;
-
-import static org.junit.Assert.fail;
+package org.unitils.core.util;
 
 /**
  * @author Tim Ducheyne
  */
-public class MockServiceCreateDummyTest extends UnitilsJUnit4 {
+public interface ObjectToFormat {
 
-    private MockService mockService;
-
-    private Mock<ProxyService> proxyServiceMock;
-
-
-    @Before
-    public void initialize() {
-    }
-
-
-    @Test
-    public void createDummy() {
-        fail("todo");
-    }
+    /**
+     * Note: a $ is added to the name to avoid name clashes when used in proxies
+     *
+     * @return The name to display when formatted by the {@link org.unitils.core.util.ObjectFormatter}
+     */
+    String $formatObject();
 }

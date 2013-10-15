@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
-import org.unitils.mock.core.MockService;
+import org.unitils.mock.core.MockFactory;
 
 import java.util.Map;
 
@@ -33,7 +33,7 @@ public class AssertInvokedVerifyingMatchingInvocationHandlerPerformChainedAssert
 
     private AssertInvokedVerifyingMatchingInvocationHandler assertInvokedVerifyingMatchingInvocationHandler;
 
-    private Mock<MockService> mockServiceMock;
+    private Mock<MockFactory> mockServiceMock;
     private Mock<Mock<Map>> mockMock;
     @Dummy
     private Map mockProxy;

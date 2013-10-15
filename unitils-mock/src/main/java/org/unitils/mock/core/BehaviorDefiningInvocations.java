@@ -42,13 +42,26 @@ public class BehaviorDefiningInvocations {
     /**
      * First we find all behavior defining invocations that have matching argument matchers and take the one with the highest
      * matching score (identity match scores higher than an equals match). If there are 2 invocations with the same score,
-     * we take the invocation with the lowest nr of not-null (default) arguments. If both have the same nr of not-null
-     * arguments, the last one is returned. This way you can still override behavior that was set up before. E.g.
+     * we take the invocation with the lowest nr of not-null (default) arguments.  E.g.
      * <p/>
      * myMethod(null, null);
      * myMethod("a", null);
      * <p/>
      * The second one will be returned if the given proxy invocation has the value "a" as first argument.
+     * If both have the same nr of not-null arguments, the last one is returned for always matching behavior.
+     * This way you can still override behavior that was set up before.
+     * For one time matching behavior we always return the first match.
+     * E.g.
+     * <p/>
+     * myMock.returns(1).myMethod();
+     * myMock.returns(2).myMethod();
+     * <p/>
+     * Will always return 2 since the behavior is overridden (last one wins)
+     * <p/>
+     * myMock.onceReturns(1).myMethod();
+     * myMock.onceReturns(2).myMethod();
+     * <p/>
+     * Will first return 1 and then return 2 (order is kept)
      *
      * @param proxyInvocation The actual invocation to match with, not null
      * @return The behavior defining invocation that matches best with the actual invocation, null if none found
@@ -83,9 +96,9 @@ public class BehaviorDefiningInvocations {
                     bestMatchingBehaviorDefiningInvocation = behaviorDefiningInvocation;
                     continue;
                 }
-                // same score, one time matcher wins
+                // same score, one time matcher wins over always matcher + first one time matcher wins
                 if (nrOfNotNullArguments == bestMatchingNrOfNotNullArguments) {
-                    if (behaviorDefiningInvocation.isOneTimeMatch() && !bestMatchingBehaviorDefiningInvocation.isOneTimeMatch()) {
+                    if (behaviorDefiningInvocation.isOneTimeMatch()) {
                         bestMatchingBehaviorDefiningInvocation = behaviorDefiningInvocation;
                     }
                 }

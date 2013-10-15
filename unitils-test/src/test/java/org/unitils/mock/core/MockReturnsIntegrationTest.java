@@ -33,6 +33,7 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 public class MockReturnsIntegrationTest extends UnitilsJUnit4 {
 
     private Mock<TestInterface> mockObject;
+    private Mock<Set> otherMock;
 
 
     @Test
@@ -56,44 +57,41 @@ public class MockReturnsIntegrationTest extends UnitilsJUnit4 {
     }
 
     @Test
-    public void defaultBehaviorObject() {
+    public void returnsNullWhenNoBehaviorDefinedForObjectMethod() {
         String result = mockObject.getMock().testMethodString();
         assertLenientEquals(null, result);
     }
 
     @Test
-    public void defaultBehaviorNumber() {
+    public void returnsZeroWhenNoBehaviorDefinedForNumberMethod() {
         int result = mockObject.getMock().testMethodNumber();
         assertLenientEquals(0, result);
     }
 
     @Test
-    public void defaultBehaviorList() {
+    public void returnsEmptyListWhenNoBehaviorDefinedForListMethod() {
         List<String> result = mockObject.getMock().testMethodList();
         assertLenientEquals(0, result.size());
     }
 
     @Test
-    public void defaultBehaviorSet() {
+    public void returnsEmptySetWhenNoBehaviorDefinedForSetMethod() {
         Set<String> result = mockObject.getMock().testMethodSet();
         assertLenientEquals(0, result.size());
     }
 
     @Test
-    public void defaultBehaviorMap() {
+    public void returnsEmptyMapWhenNoBehaviorDefinedForMapMethod() {
         Map<String, String> result = mockObject.getMock().testMethodMap();
         assertLenientEquals(0, result.size());
     }
 
     @Test
-    public void returnsMock() {
-        // todo td implement
-//        MockObject<Set> mockedSet = new MockObject<Set>("mock", Set.class, this);
-        MockObject<Set> mockedSet = null;
-        mockObject.returns(mockedSet).testMethodSet();
+    public void returnsProxyWhenReturningOtherMock() {
+        mockObject.returns(otherMock).testMethodSet();
 
         Set<String> result = mockObject.getMock().testMethodSet();
-        assertSame(mockedSet.getMock(), result);
+        assertSame(otherMock.getMock(), result);
     }
 
     @Test

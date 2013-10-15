@@ -24,20 +24,15 @@ import org.unitils.mock.mockbehavior.MockBehavior;
  */
 public class DummyProxyInvocationHandler implements ProxyInvocationHandler {
 
-    /* The type of the dummy object */
-    protected Class<?> dummyObjectType;
-    /* The hash code that is returned when the hashCode method is called */
-    protected Integer dummyObjectHashCode = new Object().hashCode();
     /* The behavior that will return the default values */
-    protected MockBehavior dummyObjectBehavior;
+    protected MockBehavior mockBehavior;
 
 
-    public DummyProxyInvocationHandler(Class<?> dummyObjectType, MockBehavior mockBehavior) {
-        this.dummyObjectType = dummyObjectType;
-        this.dummyObjectBehavior = mockBehavior;
+    public DummyProxyInvocationHandler(MockBehavior mockBehavior) {
+        this.mockBehavior = mockBehavior;
     }
 
     public Object handleInvocation(ProxyInvocation invocation) throws Throwable {
-        return dummyObjectBehavior.execute(invocation);
+        return mockBehavior.execute(invocation);
     }
 }

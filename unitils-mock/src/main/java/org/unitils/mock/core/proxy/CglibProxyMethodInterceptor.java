@@ -58,10 +58,6 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
     }
 
 
-    public String getProxyName() {
-        return proxyName;
-    }
-
     /**
      * @return The proxied type, not null
      */
@@ -90,6 +86,8 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
             return proxy;
         } else if (isToStringMethod(method)) {
             return getProxiedType().getName() + "@" + Integer.toHexString(super.hashCode());
+        } else if (isFormatObjectMethod(method)) {
+            return "Proxy<" + proxyName + ">";
         }
 
         StackTraceElement[] proxiedMethodStackTrace = proxyService.getProxiedMethodStackTrace();

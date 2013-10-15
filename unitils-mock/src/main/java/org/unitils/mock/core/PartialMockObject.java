@@ -17,8 +17,8 @@ package org.unitils.mock.core;
 
 import org.unitils.mock.PartialMock;
 import org.unitils.mock.annotation.MatchStatement;
-import org.unitils.mock.core.matching.MatchingInvocationHandler;
 import org.unitils.mock.core.matching.MatchingInvocationHandlerFactory;
+import org.unitils.mock.core.proxy.impl.MatchingProxyInvocationHandler;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.MockBehaviorFactory;
 
@@ -33,8 +33,8 @@ import org.unitils.mock.mockbehavior.MockBehaviorFactory;
 public class PartialMockObject<T> extends MockObject<T> implements PartialMock<T> {
 
 
-    public PartialMockObject(MockProxy<T> mockProxy, boolean chained, BehaviorDefiningInvocations behaviorDefiningInvocations, MockBehaviorFactory mockBehaviorFactory, MatchingInvocationHandlerFactory matchingInvocationHandlerFactory) {
-        super(mockProxy, chained, behaviorDefiningInvocations, mockBehaviorFactory, matchingInvocationHandlerFactory);
+    public PartialMockObject(String name, Class<T> type, T proxy, T matchingProxy, boolean chained, BehaviorDefiningInvocations behaviorDefiningInvocations, MatchingProxyInvocationHandler matchingProxyInvocationHandler, MockBehaviorFactory mockBehaviorFactory, MatchingInvocationHandlerFactory matchingInvocationHandlerFactory) {
+        super(name, type, proxy, matchingProxy, chained, behaviorDefiningInvocations, matchingProxyInvocationHandler, mockBehaviorFactory, matchingInvocationHandlerFactory);
     }
 
 
@@ -57,7 +57,6 @@ public class PartialMockObject<T> extends MockObject<T> implements PartialMock<T
     @MatchStatement
     public T stub() {
         MockBehavior mockBehavior = mockBehaviorFactory.createStubMockBehavior();
-        MatchingInvocationHandler matchingInvocationHandler = matchingInvocationHandlerFactory.createBehaviorDefiningMatchingInvocationHandler(mockBehavior, false, behaviorDefiningInvocations);
-        return mockProxy.startMatchingInvocation(chained, matchingInvocationHandler);
+        return startBehaviorMatchingInvocation(mockBehavior, false);
     }
 }

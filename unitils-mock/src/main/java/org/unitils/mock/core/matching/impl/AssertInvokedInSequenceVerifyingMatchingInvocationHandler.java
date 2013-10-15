@@ -17,7 +17,7 @@ package org.unitils.mock.core.matching.impl;
 
 import org.unitils.mock.Mock;
 import org.unitils.mock.core.BehaviorDefiningInvocation;
-import org.unitils.mock.core.MockService;
+import org.unitils.mock.core.MockFactory;
 import org.unitils.mock.core.Scenario;
 
 
@@ -28,8 +28,8 @@ import org.unitils.mock.core.Scenario;
 public class AssertInvokedInSequenceVerifyingMatchingInvocationHandler extends AssertVerifyingMatchingInvocationHandler {
 
 
-    public AssertInvokedInSequenceVerifyingMatchingInvocationHandler(Scenario scenario, MockService mockService) {
-        super(scenario, mockService);
+    public AssertInvokedInSequenceVerifyingMatchingInvocationHandler(Scenario scenario, MockFactory mockFactory) {
+        super(scenario, mockFactory);
     }
 
 

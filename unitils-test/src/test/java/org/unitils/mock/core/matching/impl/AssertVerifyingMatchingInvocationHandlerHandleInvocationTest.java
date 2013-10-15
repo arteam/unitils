@@ -22,7 +22,7 @@ import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import org.unitils.mock.core.BehaviorDefiningInvocation;
-import org.unitils.mock.core.MockService;
+import org.unitils.mock.core.MockFactory;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 
@@ -42,7 +42,7 @@ public class AssertVerifyingMatchingInvocationHandlerHandleInvocationTest extend
     private AssertVerifyingMatchingInvocationHandler assertVerifyingMatchingInvocationHandler;
 
     private Mock<Scenario> scenarioMock;
-    private Mock<MockService> mockServiceMock;
+    private Mock<MockFactory> mockServiceMock;
     private ProxyInvocation proxyInvocation;
     @Dummy
     private Map chainedProxy;

@@ -16,11 +16,13 @@
 package org.unitils.mock.core;
 
 import org.unitils.core.reflect.TypeWrapper;
+import org.unitils.core.util.ObjectToFormat;
 import org.unitils.core.util.ObjectToInjectHolder;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.MatchStatement;
 import org.unitils.mock.core.matching.MatchingInvocationHandler;
 import org.unitils.mock.core.matching.MatchingInvocationHandlerFactory;
+import org.unitils.mock.core.proxy.impl.MatchingProxyInvocationHandler;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.MockBehaviorFactory;
 
@@ -32,14 +34,18 @@ import java.lang.reflect.Type;
  * @author Filip Neven
  * @author Kenny Claes
  */
-public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
+public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T>, ObjectToFormat {
 
     /* The proxy instance */
-    protected MockProxy<T> mockProxy;
+    protected String name;
+    protected Class<T> type;
+    protected T proxy;
+    protected T matchingProxy;
     /* True if this mock object was created to support mock chaining */
     protected boolean chained;
     protected BehaviorDefiningInvocations behaviorDefiningInvocations;
     protected MockBehaviorFactory mockBehaviorFactory;
+    protected MatchingProxyInvocationHandler matchingProxyInvocationHandler;
     protected MatchingInvocationHandlerFactory matchingInvocationHandlerFactory;
 
 
@@ -54,10 +60,14 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
      * <p/>
      * If no name is given the un-capitalized type name + Mock is used, e.g. myServiceMock
      */
-    public MockObject(MockProxy<T> mockProxy, boolean chained, BehaviorDefiningInvocations behaviorDefiningInvocations, MockBehaviorFactory mockBehaviorFactory, MatchingInvocationHandlerFactory matchingInvocationHandlerFactory) {
-        this.mockProxy = mockProxy;
+    public MockObject(String name, Class<T> type, T proxy, T matchingProxy, boolean chained, BehaviorDefiningInvocations behaviorDefiningInvocations, MatchingProxyInvocationHandler matchingProxyInvocationHandler, MockBehaviorFactory mockBehaviorFactory, MatchingInvocationHandlerFactory matchingInvocationHandlerFactory) {
+        this.name = name;
+        this.type = type;
+        this.proxy = proxy;
+        this.matchingProxy = matchingProxy;
         this.chained = chained;
         this.behaviorDefiningInvocations = behaviorDefiningInvocations;
+        this.matchingProxyInvocationHandler = matchingProxyInvocationHandler;
         this.mockBehaviorFactory = mockBehaviorFactory;
         this.matchingInvocationHandlerFactory = matchingInvocationHandlerFactory;
     }
@@ -79,15 +89,25 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
      */
     public Type getObjectToInjectType(Type declaredType) {
         if (declaredType == null) {
-            return mockProxy.getType();
+            return type;
         }
         TypeWrapper declaredTypeWrapper = new TypeWrapper(declaredType);
         return declaredTypeWrapper.getSingleGenericType();
     }
 
+    /**
+     * @return The name of the mock, not null
+     */
     @Override
     public String toString() {
-        return mockProxy.getName();
+        return name;
+    }
+
+    /**
+     * @return The name to display when formatted by the {@link org.unitils.core.util.ObjectFormatter}
+     */
+    public String $formatObject() {
+        return "Mock<" + name + ">";
     }
 
     /**
@@ -98,7 +118,7 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
      * @return The proxy instance, not null
      */
     public T getMock() {
-        return mockProxy.getProxy();
+        return proxy;
     }
 
     /**
@@ -118,8 +138,7 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
     @MatchStatement
     public T returns(Object returnValue) {
         MockBehavior mockBehavior = mockBehaviorFactory.createValueReturningMockBehavior(returnValue);
-        MatchingInvocationHandler matchingInvocationHandler = matchingInvocationHandlerFactory.createBehaviorDefiningMatchingInvocationHandler(mockBehavior, false, behaviorDefiningInvocations);
-        return mockProxy.startMatchingInvocation(chained, matchingInvocationHandler);
+        return startBehaviorMatchingInvocation(mockBehavior, false);
     }
 
     /**
@@ -139,8 +158,7 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
     @MatchStatement
     public T raises(Throwable exception) {
         MockBehavior mockBehavior = mockBehaviorFactory.createExceptionThrowingMockBehavior(exception);
-        MatchingInvocationHandler matchingInvocationHandler = matchingInvocationHandlerFactory.createBehaviorDefiningMatchingInvocationHandler(mockBehavior, false, behaviorDefiningInvocations);
-        return mockProxy.startMatchingInvocation(chained, matchingInvocationHandler);
+        return startBehaviorMatchingInvocation(mockBehavior, false);
     }
 
     /**
@@ -160,8 +178,7 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
     @MatchStatement
     public T raises(Class<? extends Throwable> exceptionClass) {
         MockBehavior mockBehavior = mockBehaviorFactory.createExceptionThrowingMockBehavior(exceptionClass);
-        MatchingInvocationHandler matchingInvocationHandler = matchingInvocationHandlerFactory.createBehaviorDefiningMatchingInvocationHandler(mockBehavior, false, behaviorDefiningInvocations);
-        return mockProxy.startMatchingInvocation(chained, matchingInvocationHandler);
+        return startBehaviorMatchingInvocation(mockBehavior, false);
     }
 
     /**
@@ -180,8 +197,7 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
      */
     @MatchStatement
     public T performs(MockBehavior mockBehavior) {
-        MatchingInvocationHandler matchingInvocationHandler = matchingInvocationHandlerFactory.createBehaviorDefiningMatchingInvocationHandler(mockBehavior, false, behaviorDefiningInvocations);
-        return mockProxy.startMatchingInvocation(chained, matchingInvocationHandler);
+        return startBehaviorMatchingInvocation(mockBehavior, false);
     }
 
     /**
@@ -202,8 +218,7 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
     @MatchStatement
     public T onceReturns(Object returnValue) {
         MockBehavior mockBehavior = mockBehaviorFactory.createValueReturningMockBehavior(returnValue);
-        MatchingInvocationHandler matchingInvocationHandler = matchingInvocationHandlerFactory.createBehaviorDefiningMatchingInvocationHandler(mockBehavior, true, behaviorDefiningInvocations);
-        return mockProxy.startMatchingInvocation(chained, matchingInvocationHandler);
+        return startBehaviorMatchingInvocation(mockBehavior, true);
     }
 
     /**
@@ -224,8 +239,7 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
     @MatchStatement
     public T onceRaises(Throwable exception) {
         MockBehavior mockBehavior = mockBehaviorFactory.createExceptionThrowingMockBehavior(exception);
-        MatchingInvocationHandler matchingInvocationHandler = matchingInvocationHandlerFactory.createBehaviorDefiningMatchingInvocationHandler(mockBehavior, true, behaviorDefiningInvocations);
-        return mockProxy.startMatchingInvocation(chained, matchingInvocationHandler);
+        return startBehaviorMatchingInvocation(mockBehavior, true);
     }
 
     /**
@@ -246,8 +260,7 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
     @MatchStatement
     public T onceRaises(Class<? extends Throwable> exceptionClass) {
         MockBehavior mockBehavior = mockBehaviorFactory.createExceptionThrowingMockBehavior(exceptionClass);
-        MatchingInvocationHandler matchingInvocationHandler = matchingInvocationHandlerFactory.createBehaviorDefiningMatchingInvocationHandler(mockBehavior, true, behaviorDefiningInvocations);
-        return mockProxy.startMatchingInvocation(chained, matchingInvocationHandler);
+        return startBehaviorMatchingInvocation(mockBehavior, true);
     }
 
     /**
@@ -267,8 +280,7 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
      */
     @MatchStatement
     public T oncePerforms(MockBehavior mockBehavior) {
-        MatchingInvocationHandler matchingInvocationHandler = matchingInvocationHandlerFactory.createBehaviorDefiningMatchingInvocationHandler(mockBehavior, true, behaviorDefiningInvocations);
-        return mockProxy.startMatchingInvocation(chained, matchingInvocationHandler);
+        return startBehaviorMatchingInvocation(mockBehavior, true);
     }
 
     /**
@@ -280,7 +292,7 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
     @MatchStatement
     public T assertInvoked() {
         MatchingInvocationHandler matchingInvocationHandler = matchingInvocationHandlerFactory.createAssertInvokedVerifyingMatchingInvocationHandler();
-        return mockProxy.startMatchingInvocation(chained, matchingInvocationHandler);
+        return startAssertMatchingInvocation(matchingInvocationHandler);
     }
 
     /**
@@ -295,7 +307,7 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
     @MatchStatement
     public T assertInvokedInSequence() {
         MatchingInvocationHandler matchingInvocationHandler = matchingInvocationHandlerFactory.createAssertInvokedInSequenceVerifyingMatchingInvocationHandler();
-        return mockProxy.startMatchingInvocation(chained, matchingInvocationHandler);
+        return startAssertMatchingInvocation(matchingInvocationHandler);
     }
 
     /**
@@ -307,7 +319,7 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
     @MatchStatement
     public T assertNotInvoked() {
         MatchingInvocationHandler matchingInvocationHandler = matchingInvocationHandlerFactory.createAssertNotInvokedVerifyingMatchingInvocationHandler();
-        return mockProxy.startMatchingInvocation(chained, matchingInvocationHandler);
+        return startAssertMatchingInvocation(matchingInvocationHandler);
     }
 
     /**
@@ -316,5 +328,17 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T> {
      */
     public void resetBehavior() {
         behaviorDefiningInvocations.clear();
+    }
+
+
+    protected T startBehaviorMatchingInvocation(MockBehavior mockBehavior, boolean oneTimeMatch) {
+        MatchingInvocationHandler matchingInvocationHandler = matchingInvocationHandlerFactory.createBehaviorDefiningMatchingInvocationHandler(mockBehavior, oneTimeMatch, behaviorDefiningInvocations);
+        matchingProxyInvocationHandler.startMatchingInvocation(name, !chained, matchingInvocationHandler);
+        return matchingProxy;
+    }
+
+    protected T startAssertMatchingInvocation(MatchingInvocationHandler matchingInvocationHandler) {
+        matchingProxyInvocationHandler.startMatchingInvocation(name, !chained, matchingInvocationHandler);
+        return matchingProxy;
     }
 }

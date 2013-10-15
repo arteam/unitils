@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock;
 
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
-import org.unitils.mock.Mock;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
 
@@ -33,50 +32,50 @@ import static org.unitils.mock.ArgumentMatchers.notNull;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class MockObjectInvalidSyntaxTest extends UnitilsJUnit4 {
+public class MockInvalidSyntaxIntegrationTest extends UnitilsJUnit4 {
 
     private Mock<TestInterface> mockObject;
 
 
     @Test
     public void exceptionWhenPreviousReturnsWasNotCompleted() {
-        mockObject.returns("aValue"); // 43
+        mockObject.returns("aValue"); // 42
         try {
             mockObject.returns("aValue");
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Invalid syntax: mockObject.returns() must be followed by a method invocation on the returned proxy. E.g. mockObject.returns().myMethod();", e.getMessage());
-            assertFirstStackTraceElement("exceptionWhenPreviousReturnsWasNotCompleted", 43, e);
+            assertFirstStackTraceElement("exceptionWhenPreviousReturnsWasNotCompleted", 42, e);
         }
     }
 
     @Test
     public void exceptionWhenMockCallAndPreviousReturnsWasNotCompleted() {
-        mockObject.returns("aValue"); // 55
+        mockObject.returns("aValue"); // 54
         try {
             mockObject.getMock().testMethod();
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Invalid syntax: mockObject.returns() must be followed by a method invocation on the returned proxy. E.g. mockObject.returns().myMethod();", e.getMessage());
-            assertFirstStackTraceElement("exceptionWhenMockCallAndPreviousReturnsWasNotCompleted", 55, e);
+            assertFirstStackTraceElement("exceptionWhenMockCallAndPreviousReturnsWasNotCompleted", 54, e);
         }
     }
 
     @Test
     public void exceptionWhenPreviousRaisesWasNotCompleted() {
-        mockObject.raises(new RuntimeException()); // 67
+        mockObject.raises(new RuntimeException()); // 66
         try {
             mockObject.returns("aValue");
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Invalid syntax: mockObject.raises() must be followed by a method invocation on the returned proxy. E.g. mockObject.raises().myMethod();", e.getMessage());
-            assertFirstStackTraceElement("exceptionWhenPreviousRaisesWasNotCompleted", 67, e);
+            assertFirstStackTraceElement("exceptionWhenPreviousRaisesWasNotCompleted", 66, e);
         }
     }
 
     @Test
     public void exceptionWhenPreviousPerformsWasNotCompleted() {
-        mockObject.performs(new MockBehavior() { // 79
+        mockObject.performs(new MockBehavior() { // 78
             public Object execute(ProxyInvocation mockInvocation) throws Throwable {
                 return null;
             }
@@ -86,37 +85,37 @@ public class MockObjectInvalidSyntaxTest extends UnitilsJUnit4 {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Invalid syntax: mockObject.performs() must be followed by a method invocation on the returned proxy. E.g. mockObject.performs().myMethod();", e.getMessage());
-            assertFirstStackTraceElement("exceptionWhenPreviousPerformsWasNotCompleted", 79, e);
+            assertFirstStackTraceElement("exceptionWhenPreviousPerformsWasNotCompleted", 78, e);
         }
     }
 
     @Test
     public void exceptionWhenPreviousOnceReturnsWasNotCompleted() {
-        mockObject.onceReturns("aValue"); // 95
+        mockObject.onceReturns("aValue"); // 94
         try {
             mockObject.returns("aValue");
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Invalid syntax: mockObject.onceReturns() must be followed by a method invocation on the returned proxy. E.g. mockObject.onceReturns().myMethod();", e.getMessage());
-            assertFirstStackTraceElement("exceptionWhenPreviousOnceReturnsWasNotCompleted", 95, e);
+            assertFirstStackTraceElement("exceptionWhenPreviousOnceReturnsWasNotCompleted", 94, e);
         }
     }
 
     @Test
     public void exceptionWhenPreviousOnceRaisesWasNotCompleted() {
-        mockObject.onceRaises(new RuntimeException()); // 107
+        mockObject.onceRaises(new RuntimeException()); // 106
         try {
             mockObject.returns("aValue");
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Invalid syntax: mockObject.onceRaises() must be followed by a method invocation on the returned proxy. E.g. mockObject.onceRaises().myMethod();", e.getMessage());
-            assertFirstStackTraceElement("exceptionWhenPreviousOnceRaisesWasNotCompleted", 107, e);
+            assertFirstStackTraceElement("exceptionWhenPreviousOnceRaisesWasNotCompleted", 106, e);
         }
     }
 
     @Test
     public void exceptionWhenPreviousOncePerformsWasNotCompleted() {
-        mockObject.oncePerforms(new MockBehavior() { // 119
+        mockObject.oncePerforms(new MockBehavior() { // 118
             public Object execute(ProxyInvocation mockInvocation) throws Throwable {
                 return null;
             }
@@ -126,96 +125,99 @@ public class MockObjectInvalidSyntaxTest extends UnitilsJUnit4 {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Invalid syntax: mockObject.oncePerforms() must be followed by a method invocation on the returned proxy. E.g. mockObject.oncePerforms().myMethod();", e.getMessage());
-            assertFirstStackTraceElement("exceptionWhenPreviousOncePerformsWasNotCompleted", 119, e);
+            assertFirstStackTraceElement("exceptionWhenPreviousOncePerformsWasNotCompleted", 118, e);
         }
     }
 
     @Test
     public void exceptionWhenPreviousAssertInvokedWasNotCompleted() {
-        mockObject.assertInvoked(); // 135
+        mockObject.assertInvoked(); // 134
         try {
             mockObject.assertInvoked();
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Invalid syntax: mockObject.assertInvoked() must be followed by a method invocation on the returned proxy. E.g. mockObject.assertInvoked().myMethod();", e.getMessage());
-            assertFirstStackTraceElement("exceptionWhenPreviousAssertInvokedWasNotCompleted", 135, e);
+            assertFirstStackTraceElement("exceptionWhenPreviousAssertInvokedWasNotCompleted", 134, e);
         }
     }
 
     @Test
     public void exceptionWhenPreviousAssertInvokedInSequenceWasNotCompleted() {
-        mockObject.assertInvokedInSequence(); // 147
+        mockObject.assertInvokedInSequence(); // 146
         try {
             mockObject.assertInvoked();
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Invalid syntax: mockObject.assertInvokedInSequence() must be followed by a method invocation on the returned proxy. E.g. mockObject.assertInvokedInSequence().myMethod();", e.getMessage());
-            assertFirstStackTraceElement("exceptionWhenPreviousAssertInvokedInSequenceWasNotCompleted", 147, e);
+            assertFirstStackTraceElement("exceptionWhenPreviousAssertInvokedInSequenceWasNotCompleted", 146, e);
         }
     }
 
     @Test
     public void exceptionWhenPreviousAssertNotInvokedWasNotCompleted() {
-        mockObject.assertNotInvoked(); // 159
+        mockObject.assertNotInvoked(); // 158
         try {
             mockObject.assertNotInvoked();
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Invalid syntax: mockObject.assertNotInvoked() must be followed by a method invocation on the returned proxy. E.g. mockObject.assertNotInvoked().myMethod();", e.getMessage());
-            assertFirstStackTraceElement("exceptionWhenPreviousAssertNotInvokedWasNotCompleted", 159, e);
+            assertFirstStackTraceElement("exceptionWhenPreviousAssertNotInvokedWasNotCompleted", 158, e);
         }
     }
 
     @Test
     public void exceptionWhenAssertInvokedCallAndPreviousReturnsWasNotCompleted() {
-        mockObject.returns("aValue"); // 171
+        mockObject.returns("aValue"); // 170
         try {
             mockObject.assertInvoked();
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Invalid syntax: mockObject.returns() must be followed by a method invocation on the returned proxy. E.g. mockObject.returns().myMethod();", e.getMessage());
-            assertFirstStackTraceElement("exceptionWhenAssertInvokedCallAndPreviousReturnsWasNotCompleted", 171, e);
+            assertFirstStackTraceElement("exceptionWhenAssertInvokedCallAndPreviousReturnsWasNotCompleted", 170, e);
         }
     }
 
     @Test
     public void exceptionWhenReturnsCallAndPreviousAssertInvokedWasNotCompleted() {
-        mockObject.assertInvoked(); // 183
+        mockObject.assertInvoked(); // 182
         try {
             mockObject.returns("aValue");
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Invalid syntax: mockObject.assertInvoked() must be followed by a method invocation on the returned proxy. E.g. mockObject.assertInvoked().myMethod();", e.getMessage());
-            assertFirstStackTraceElement("exceptionWhenReturnsCallAndPreviousAssertInvokedWasNotCompleted", 183, e);
+            assertFirstStackTraceElement("exceptionWhenReturnsCallAndPreviousAssertInvokedWasNotCompleted", 182, e);
         }
     }
 
     @Test
     public void exceptionWhenReturningValueForVoidMethod() {
+        mockObject.returns("value").testMethod(); // 194
         try {
-            mockObject.returns("value").testMethod(); // 196
+            mockObject.getMock().testMethod();
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Trying to define mock behavior that returns a value for a void method.", e.getMessage());
-            assertFirstStackTraceElement("exceptionWhenReturningValueForVoidMethod", 196, e);
+            assertFirstStackTraceElement("exceptionWhenReturningValueForVoidMethod", 194, e);
         }
     }
 
     @Test
     public void exceptionWhenReturningValueOfWrongType() {
+        mockObject.returns(new ArrayList<String>()).testMethodReturningString(); // 206
         try {
-            mockObject.returns(new ArrayList<String>()).testMethodReturningString(); // 207
+            mockObject.getMock().testMethodReturningString();
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Trying to make a method return a value that is not assignable to the return type. Return type: class java.lang.String, value type: class java.util.ArrayList, value: []", e.getMessage());
-            assertFirstStackTraceElement("exceptionWhenReturningValueOfWrongType", 207, e);
+            assertFirstStackTraceElement("exceptionWhenReturningValueOfWrongType", 206, e);
         }
     }
 
     @Test
     public void exceptionWhenRaisingExceptionThatIsNotDeclared() {
+        mockObject.raises(IOException.class).testMethod(); // 218
         try {
-            mockObject.raises(IOException.class).testMethod(); // 218
+            mockObject.getMock().testMethod();
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Trying to make a method throw an exception that it doesn't declare. Exception type: class java.io.IOException, no declared exceptions", e.getMessage());
@@ -224,7 +226,7 @@ public class MockObjectInvalidSyntaxTest extends UnitilsJUnit4 {
     }
 
     @Test
-    public void argumentMatcherUsedOutsideBehaviorDefinition() {
+    public void ignoreArgumentMatcherUsedOutsideBehaviorDefinition() {
         try {
             notNull(String.class);
             fail("UnitilsException expected");
@@ -234,20 +236,32 @@ public class MockObjectInvalidSyntaxTest extends UnitilsJUnit4 {
     }
 
     @Test
-    public void nestedBehaviorDefinitionCall() {
+    public void exceptionWhenNestedBehaviorDefinitionCall() {
         try {
-            mockObject.raises(IllegalArgumentException.class).testMethodArgument(mockObject.returns("aValue").testMethodReturningString()); // 239
+            mockObject.raises(IllegalArgumentException.class).testMethodArgument(mockObject.returns("aValue").testMethodReturningString()); // 241
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Invalid syntax: mockObject.raises() must be followed by a method invocation on the returned proxy. E.g. mockObject.raises().myMethod();", e.getMessage());
-            assertFirstStackTraceElement("nestedBehaviorDefinitionCall", 239, e);
+            assertFirstStackTraceElement("exceptionWhenNestedBehaviorDefinitionCall", 241, e);
+        }
+    }
+
+    @Test
+    public void exceptionWhenInvalidInvocationOnProxy() {
+        TestInterface proxy = mockObject.returns("aValue");
+        proxy.testMethodReturningString();
+        try {
+            proxy.testMethodReturningString();
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unexpected matching proxy invocation. Expected following syntax 'mock'.'matching method'.'method'. E.g. myMock.returns().myMethod();", e.getMessage());
         }
     }
 
 
     private void assertFirstStackTraceElement(String methodName, int lineNr, UnitilsException e) {
         StackTraceElement stackTraceElement = e.getStackTrace()[0];
-        assertEquals(MockObjectInvalidSyntaxTest.class.getName(), stackTraceElement.getClassName());
+        assertEquals(MockInvalidSyntaxIntegrationTest.class.getName(), stackTraceElement.getClassName());
         assertEquals(methodName, stackTraceElement.getMethodName());
         assertEquals(lineNr, stackTraceElement.getLineNumber());
     }

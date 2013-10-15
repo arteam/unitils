@@ -27,8 +27,6 @@ import static org.junit.Assert.assertEquals;
 
 
 /**
- * Tests the formatting of proxies and mocks.
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
@@ -36,6 +34,7 @@ public class MockAndProxyObjectFormatterTest extends UnitilsJUnit4 {
 
     private ObjectFormatter objectFormatter = new ObjectFormatter();
 
+    private Mock<Collection> myMock;
 
     @Test
     public void formatCgLibProxy() {
@@ -46,28 +45,21 @@ public class MockAndProxyObjectFormatterTest extends UnitilsJUnit4 {
 
     @Test
     public void formatMock() {
-        // todo td implement
-//        Mock<Collection> mock = new MockObject<Collection>("mockName", Collection.class, this);
-        Mock<Collection> mock = null;
-        String result = objectFormatter.format(mock);
-        assertEquals("Mock<mockName>", result);
+        String result = objectFormatter.format(myMock);
+        assertEquals("Mock<myMock>", result);
     }
 
     @Test
     public void formatMockProxy() {
-        // todo td implement
-//        Object mockProxyInvocationHandler = new MockObject<Collection>("mockName", Collection.class, this).getMock();
-        Object mockProxy = null;
-        String result = objectFormatter.format(mockProxy);
-        assertEquals("Mock<mockName>", result);
+        String result = objectFormatter.format(myMock.getMock());
+        assertEquals("Proxy<myMock>", result);
     }
 
 
     private Object createCgLibProxy() {
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(Collection.class);
-        enhancer.setCallback(new NoOp() {
-        });
+        enhancer.setCallback(NoOp.INSTANCE);
         return enhancer.create();
     }
 }

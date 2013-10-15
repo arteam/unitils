@@ -18,7 +18,7 @@ package org.unitils.mock.core.matching.impl;
 import org.unitils.mock.Mock;
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import org.unitils.mock.core.BehaviorDefiningInvocation;
-import org.unitils.mock.core.MockService;
+import org.unitils.mock.core.MockFactory;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.core.matching.MatchingInvocationHandler;
 import org.unitils.mock.core.proxy.ProxyInvocation;
@@ -33,12 +33,12 @@ import java.util.List;
 public abstract class AssertVerifyingMatchingInvocationHandler implements MatchingInvocationHandler {
 
     protected Scenario scenario;
-    protected MockService mockService;
+    protected MockFactory mockFactory;
 
 
-    public AssertVerifyingMatchingInvocationHandler(Scenario scenario, MockService mockService) {
+    public AssertVerifyingMatchingInvocationHandler(Scenario scenario, MockFactory mockFactory) {
         this.scenario = scenario;
-        this.mockService = mockService;
+        this.mockFactory = mockFactory;
     }
 
 
@@ -53,7 +53,7 @@ public abstract class AssertVerifyingMatchingInvocationHandler implements Matchi
         Class<?> innerMockType = proxyInvocation.getMethod().getReturnType();
         String innerMockName = proxyInvocation.getProxyName() + "." + proxyInvocation.getMethod().getName();
 
-        Mock<?> mock = mockService.createChainedMock(innerMockName, innerMockType);
+        Mock<?> mock = mockFactory.createChainedMock(innerMockName, innerMockType);
         if (mock == null) {
             return null;
         }

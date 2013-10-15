@@ -15,7 +15,7 @@
  */
 package org.unitils.mock.mockbehavior.impl;
 
-import org.unitils.mock.core.DummyService;
+import org.unitils.mock.core.MockFactory;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.lang.reflect.Method;
@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.reflect.Modifier.isFinal;
+import static org.apache.commons.lang.StringUtils.uncapitalize;
 
 /**
  * Mock behavior that returns a default value. The default value for an object will be a proxy object with the same behaviour. When doing
@@ -45,13 +46,13 @@ import static java.lang.reflect.Modifier.isFinal;
  */
 public class DummyValueReturningMockBehavior extends DefaultValueReturningMockBehavior {
 
-    protected DummyService dummyService;
+    protected MockFactory mockFactory;
     /* Keeps track of what object we have returned, so that we return the "same" instance on each invocation */
     protected Map<MethodKey, Object> returnValues = new HashMap<MethodKey, Object>();
 
 
-    public DummyValueReturningMockBehavior(DummyService dummyService) {
-        this.dummyService = dummyService;
+    public DummyValueReturningMockBehavior(MockFactory mockFactory) {
+        this.mockFactory = mockFactory;
     }
 
 
@@ -86,7 +87,8 @@ public class DummyValueReturningMockBehavior extends DefaultValueReturningMockBe
         if (cannotCreateDummy(returnType)) {
             return null;
         }
-        return dummyService.createDummy(null, returnType);
+        String dummyName = uncapitalize(returnType.getSimpleName());
+        return mockFactory.createDummy(dummyName, returnType);
     }
 
     protected boolean cannotCreateDummy(Class<?> returnType) {

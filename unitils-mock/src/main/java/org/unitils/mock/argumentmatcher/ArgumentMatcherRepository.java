@@ -32,8 +32,8 @@ import java.util.*;
  * For this we need to store the current argument matchers so that they can be linked to the method invocation that
  * will follow.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  * @author Kenny Claes
  */
 public class ArgumentMatcherRepository {
@@ -47,8 +47,6 @@ public class ArgumentMatcherRepository {
     protected int matchInvocationLineNr = -1;
     /* The name of the previous matching method we handled */
     protected Map<Method, Integer> indexesPerMatchingMethods = new HashMap<Method, Integer>(2);
-    /* The line nr of the previous method we handled */
-    protected int previousMatchingLineNr = -1;
 
 
     public ArgumentMatcherRepository(ArgumentMatcherPositionFinder argumentMatcherPositionFinder, CloneService cloneService) {
@@ -66,6 +64,9 @@ public class ArgumentMatcherRepository {
      */
     public void startMatchingInvocation(int lineNr) {
         argumentMatchers.clear();
+        if (lineNr != matchInvocationLineNr) {
+            indexesPerMatchingMethods.clear();
+        }
         matchInvocationLineNr = lineNr;
     }
 
@@ -96,7 +97,7 @@ public class ArgumentMatcherRepository {
      */
     public List<ArgumentMatcher> finishMatchingInvocation(ProxyInvocation proxyInvocation) {
         Method method = proxyInvocation.getMethod();
-        int proxyInvocationLineNr = proxyInvocation.getLineNumber();
+        int lineNr = proxyInvocation.getLineNumber();
         List<?> arguments = proxyInvocation.getArguments();
 
         if (matchInvocationLineNr == -1) {
@@ -106,7 +107,7 @@ public class ArgumentMatcherRepository {
         }
 
         Integer index = null;
-        if (proxyInvocationLineNr != previousMatchingLineNr) {
+        if (lineNr != matchInvocationLineNr) {
             indexesPerMatchingMethods.clear();
         } else {
             index = indexesPerMatchingMethods.get(method);
@@ -117,13 +118,12 @@ public class ArgumentMatcherRepository {
             index++;
         }
         indexesPerMatchingMethods.put(method, index);
-        previousMatchingLineNr = proxyInvocationLineNr;
 
-        List<Integer> argumentMatcherIndexes = argumentMatcherPositionFinder.getArgumentMatcherIndexes(proxyInvocation, matchInvocationLineNr, proxyInvocationLineNr, index);
+        List<Integer> argumentMatcherIndexes = argumentMatcherPositionFinder.getArgumentMatcherIndexes(proxyInvocation, matchInvocationLineNr, lineNr, index);
         List<ArgumentMatcher> result = createArgumentMatchers(arguments, argumentMatcherIndexes);
 
+        matchInvocationLineNr = lineNr;
         argumentMatchers.clear();
-        matchInvocationLineNr = -1;
         return result;
     }
 
@@ -132,10 +132,8 @@ public class ArgumentMatcherRepository {
      * be called again to be able to register argument matchers.
      */
     public void reset() {
-        argumentMatchers.clear();
         matchInvocationLineNr = -1;
-
-        previousMatchingLineNr = -1;
+        argumentMatchers.clear();
         indexesPerMatchingMethods.clear();
     }
 

@@ -18,8 +18,7 @@ package org.unitils.mock;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Unitils;
-import org.unitils.mock.core.DummyService;
-import org.unitils.mock.core.MockService;
+import org.unitils.mock.core.MockFactory;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.core.util.StackTraceService;
 
@@ -35,8 +34,7 @@ public class MockUnitils {
 
     // todo move to getter functions to avoid unnecessary inits
     protected static Scenario scenario = Unitils.getInstanceOfType(Scenario.class);
-    protected static MockService mockService = Unitils.getInstanceOfType(MockService.class);
-    protected static DummyService dummyService = Unitils.getInstanceOfType(DummyService.class);
+    protected static MockFactory mockFactory = Unitils.getInstanceOfType(MockFactory.class);
     protected static StackTraceService stackTraceService = Unitils.getInstanceOfType(StackTraceService.class);
 
 
@@ -55,7 +53,7 @@ public class MockUnitils {
     }
 
     public static <T> Mock<T> createMock(String name, Class<T> type, Object testObject) {
-        return mockService.createMock(name, type, testObject);
+        return mockFactory.createMock(name, type, testObject);
     }
 
     public static <T> PartialMock<T> createPartialMock(Class<T> type, Object testObject) {
@@ -63,11 +61,11 @@ public class MockUnitils {
     }
 
     public static <T> PartialMock<T> createPartialMock(String name, Class<T> type, Object testObject) {
-        return mockService.createPartialMock(name, type, testObject);
+        return mockFactory.createPartialMock(name, type, testObject);
     }
 
     public static <T> PartialMock<T> createPartialMock(String name, T mockPrototype, Object testObject) {
-        return mockService.createPartialMock(name, mockPrototype, testObject);
+        return mockFactory.createPartialMock(name, mockPrototype, testObject);
     }
 
 
@@ -76,7 +74,7 @@ public class MockUnitils {
     }
 
     public static <T> T createDummy(String name, Class<T> type) {
-        return dummyService.createDummy(name, type);
+        return mockFactory.createDummy(name, type);
     }
 
 

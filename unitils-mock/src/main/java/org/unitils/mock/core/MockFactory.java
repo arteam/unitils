@@ -17,13 +17,16 @@ package org.unitils.mock.core;
 
 import org.unitils.mock.Mock;
 import org.unitils.mock.PartialMock;
-import org.unitils.mock.core.matching.MatchingInvocationBuilder;
+import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
 import org.unitils.mock.core.matching.MatchingInvocationHandlerFactory;
 import org.unitils.mock.core.proxy.ProxyService;
+import org.unitils.mock.core.proxy.impl.DummyProxyInvocationHandler;
 import org.unitils.mock.core.proxy.impl.MatchingProxyInvocationHandler;
-import org.unitils.mock.core.proxy.impl.MockInvocationHandler;
+import org.unitils.mock.core.proxy.impl.MockProxyInvocationHandler;
+import org.unitils.mock.core.proxy.impl.PartialMockProxyInvocationHandler;
 import org.unitils.mock.core.util.CloneService;
 import org.unitils.mock.core.util.StackTraceService;
+import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.MockBehaviorFactory;
 
 import java.lang.reflect.Modifier;
@@ -37,10 +40,10 @@ import static org.unitils.util.ReflectionUtils.copyFields;
 /**
  * @author Tim Ducheyne
  */
-public class MockService {
+public class MockFactory {
 
     protected Scenario scenario;
-    protected MatchingInvocationBuilder matchingInvocationBuilder;
+    protected ArgumentMatcherRepository argumentMatcherRepository;
     protected ProxyService proxyService;
     protected StackTraceService stackTraceService;
     protected CloneService cloneService;
@@ -50,9 +53,9 @@ public class MockService {
     protected Map<String, Mock<?>> chainedMocksPerName = new HashMap<String, Mock<?>>();
 
 
-    public MockService(Scenario scenario, MatchingInvocationBuilder matchingInvocationBuilder, ProxyService proxyService, StackTraceService stackTraceService, CloneService cloneService, MockBehaviorFactory mockBehaviorFactory) {
+    public MockFactory(Scenario scenario, ArgumentMatcherRepository argumentMatcherRepository, MockBehaviorFactory mockBehaviorFactory, ProxyService proxyService, StackTraceService stackTraceService, CloneService cloneService) {
         this.scenario = scenario;
-        this.matchingInvocationBuilder = matchingInvocationBuilder;
+        this.argumentMatcherRepository = argumentMatcherRepository;
         this.proxyService = proxyService;
         this.stackTraceService = stackTraceService;
         this.cloneService = cloneService;
@@ -61,8 +64,8 @@ public class MockService {
 
 
     public <T> Mock<T> createMock(String name, Class<T> mockedType, Object testObject) {
-        String mockName = getMockName(name, mockedType);
-        resetScenarioIfNeeded(testObject);
+        String mockName = getName(name, mockedType);
+        resetIfNewTestObject(testObject);
         return createMockObject(mockName, mockedType, false);
     }
 
@@ -78,8 +81,8 @@ public class MockService {
      * If no name is given the un-capitalized type name + Mock is used, e.g. myServiceMock
      */
     public <T> PartialMock<T> createPartialMock(String name, Class<T> mockedType, Object testObject) {
-        String mockName = getMockName(name, mockedType);
-        resetScenarioIfNeeded(testObject);
+        String mockName = getName(name, mockedType);
+        resetIfNewTestObject(testObject);
         return createPartialMockObject(mockName, mockedType, false);
     }
 
@@ -106,10 +109,10 @@ public class MockService {
 
 
     @SuppressWarnings({"unchecked"})
-    public <M> Mock<M> createChainedMock(String name, Class<M> mockedType) {
-        Mock<?> chainedMock = chainedMocksPerName.get(name);  // todo   not per name !!
+    public <T> Mock<T> createChainedMock(String name, Class<T> mockedType) {
+        Mock<T> chainedMock = (Mock<T>) chainedMocksPerName.get(name);  // todo   not per name !!
         if (chainedMock != null) {
-            return (Mock<M>) chainedMock;
+            return chainedMock;
         }
         if (Void.class.equals(mockedType) || mockedType.isPrimitive() || mockedType.isArray() || Modifier.isFinal(mockedType.getModifiers())) {
             return null;
@@ -121,61 +124,82 @@ public class MockService {
             return null;
         }
         chainedMocksPerName.put(name, chainedMock);
-        return (Mock<M>) chainedMock;
+        return chainedMock;
+    }
+
+    /**
+     * Creates a dummy of the given type. A dummy object is a proxy that will return default values for every method. This can be
+     * used to quickly create test objects without having to worry about correctly filling in every field.
+     *
+     * @param name      The name for the dummy, use null for the default typeDummy name
+     * @param dummyType The type for the proxy, not null
+     * @return The proxy, not null
+     */
+    public <T> T createDummy(String name, Class<T> dummyType) {
+        String dummyName = getName(name, dummyType);
+        MockBehavior mockBehaviour = mockBehaviorFactory.createDummyValueReturningMockBehavior(this);
+        DummyProxyInvocationHandler dummyProxyInvocationHandler = createDummyProxyInvocationHandler(mockBehaviour);
+        return proxyService.createProxy(dummyName, false, dummyProxyInvocationHandler, dummyType);
     }
 
 
-    public <T> MockObject<T> createMockObject(String name, Class<T> mockedType, boolean chained) {
+    protected <T> MockObject<T> createMockObject(String name, Class<T> mockedType, boolean chained) {
         BehaviorDefiningInvocations behaviorDefiningInvocations = createBehaviorDefiningInvocations();
-        MockProxy<T> mockProxy = createMockProxy(name, mockedType, false, behaviorDefiningInvocations);
-        MatchingInvocationHandlerFactory matchingInvocationHandlerFactory = createMatchingInvocationHandlerFactory();
-        return new MockObject<T>(mockProxy, chained, behaviorDefiningInvocations, mockBehaviorFactory, matchingInvocationHandlerFactory);
-    }
-
-    public <T> PartialMockObject<T> createPartialMockObject(String name, Class<T> mockedType, boolean chained) {
-        BehaviorDefiningInvocations behaviorDefiningInvocations = createBehaviorDefiningInvocations();
-        MockProxy<T> mockProxy = createMockProxy(name, mockedType, true, behaviorDefiningInvocations);
-        MatchingInvocationHandlerFactory matchingInvocationHandlerFactory = createMatchingInvocationHandlerFactory();
-        return new PartialMockObject<T>(mockProxy, chained, behaviorDefiningInvocations, mockBehaviorFactory, matchingInvocationHandlerFactory);
-    }
-
-
-    protected <T> MockProxy<T> createMockProxy(String name, Class<T> mockedType, boolean initialize, BehaviorDefiningInvocations behaviorDefiningInvocations) {
-        MockInvocationHandler<T> mockProxyInvocationHandler = createMockProxyInvocationHandler(behaviorDefiningInvocations);
         MatchingProxyInvocationHandler matchingProxyInvocationHandler = createMatchingProxyInvocationHandler();
-        T proxy = proxyService.createProxy(name, initialize, mockProxyInvocationHandler, mockedType);
-        T matchingProxy = proxyService.createProxy(name, initialize, matchingProxyInvocationHandler, mockedType);
-        return new MockProxy<T>(name, mockedType, proxy, matchingProxy, matchingProxyInvocationHandler);
+        MockProxyInvocationHandler<T> mockProxyInvocationHandler = createMockProxyInvocationHandler(behaviorDefiningInvocations, matchingProxyInvocationHandler);
+        T proxy = proxyService.createProxy(name, false, mockProxyInvocationHandler, mockedType);
+        T matchingProxy = proxyService.createProxy(name, false, matchingProxyInvocationHandler, mockedType);
+        MatchingInvocationHandlerFactory matchingInvocationHandlerFactory = createMatchingInvocationHandlerFactory();
+        return new MockObject<T>(name, mockedType, proxy, matchingProxy, chained, behaviorDefiningInvocations, matchingProxyInvocationHandler, mockBehaviorFactory, matchingInvocationHandlerFactory);
     }
+
+    protected <T> PartialMockObject<T> createPartialMockObject(String name, Class<T> mockedType, boolean chained) {
+        BehaviorDefiningInvocations behaviorDefiningInvocations = createBehaviorDefiningInvocations();
+        MatchingProxyInvocationHandler matchingProxyInvocationHandler = createMatchingProxyInvocationHandler();
+        MockProxyInvocationHandler<T> mockProxyInvocationHandler = createPartialMockProxyInvocationHandler(behaviorDefiningInvocations, matchingProxyInvocationHandler);
+        T proxy = proxyService.createProxy(name, true, mockProxyInvocationHandler, mockedType);
+        T matchingProxy = proxyService.createProxy(name, false, matchingProxyInvocationHandler, mockedType);
+        MatchingInvocationHandlerFactory matchingInvocationHandlerFactory = createMatchingInvocationHandlerFactory();
+        return new PartialMockObject<T>(name, mockedType, proxy, matchingProxy, chained, behaviorDefiningInvocations, matchingProxyInvocationHandler, mockBehaviorFactory, matchingInvocationHandlerFactory);
+    }
+
 
     protected BehaviorDefiningInvocations createBehaviorDefiningInvocations() {
         return new BehaviorDefiningInvocations();
     }
 
-    protected <T> MockInvocationHandler<T> createMockProxyInvocationHandler(BehaviorDefiningInvocations behaviorDefiningInvocations) {
-        return new MockInvocationHandler<T>(behaviorDefiningInvocations, scenario, cloneService, matchingInvocationBuilder);
+    protected <T> MockProxyInvocationHandler<T> createMockProxyInvocationHandler(BehaviorDefiningInvocations behaviorDefiningInvocations, MatchingProxyInvocationHandler matchingProxyInvocationHandler) {
+        return new MockProxyInvocationHandler<T>(behaviorDefiningInvocations, scenario, cloneService, matchingProxyInvocationHandler);
+    }
+
+    protected <T> PartialMockProxyInvocationHandler<T> createPartialMockProxyInvocationHandler(BehaviorDefiningInvocations behaviorDefiningInvocations, MatchingProxyInvocationHandler matchingProxyInvocationHandler) {
+        return new PartialMockProxyInvocationHandler<T>(behaviorDefiningInvocations, scenario, cloneService, matchingProxyInvocationHandler);
+    }
+
+    protected <T> DummyProxyInvocationHandler createDummyProxyInvocationHandler(MockBehavior mockBehaviour) {
+        return new DummyProxyInvocationHandler(mockBehaviour);
     }
 
     protected <T> MatchingProxyInvocationHandler createMatchingProxyInvocationHandler() {
-        return new MatchingProxyInvocationHandler(matchingInvocationBuilder);
+        return new MatchingProxyInvocationHandler(argumentMatcherRepository, proxyService, stackTraceService);
     }
 
     protected MatchingInvocationHandlerFactory createMatchingInvocationHandlerFactory() {
         return new MatchingInvocationHandlerFactory(scenario, this);
     }
 
-    protected void resetScenarioIfNeeded(Object testObject) {
+    protected void resetIfNewTestObject(Object testObject) {
         if (scenario.getTestObject() == testObject) {
             return;
         }
         scenario.reset();
         scenario.setTestObject(testObject);
-        matchingInvocationBuilder.reset();
+        argumentMatcherRepository.reset();
     }
 
-    protected <T> String getMockName(String name, Class<T> mockedType) {
+    protected <T> String getName(String name, Class<T> type) {
         if (isBlank(name)) {
-            return uncapitalize(mockedType.getSimpleName()) + "Mock";
+            return uncapitalize(type.getSimpleName());
         }
         return name;
     }
