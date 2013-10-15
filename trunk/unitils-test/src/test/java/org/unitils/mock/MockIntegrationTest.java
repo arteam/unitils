@@ -107,7 +107,7 @@ public class MockIntegrationTest extends UnitilsJUnit4 {
     @Test
     public void defaultMockName() {
         Mock<TestInterface> mock = createMock(TestInterface.class, this);
-        assertEquals("testInterfaceMock", mock.toString());
+        assertEquals("testInterface", mock.toString());
     }
 
     @Test

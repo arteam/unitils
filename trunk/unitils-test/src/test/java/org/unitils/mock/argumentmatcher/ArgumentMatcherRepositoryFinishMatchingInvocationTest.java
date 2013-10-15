@@ -62,7 +62,7 @@ public class ArgumentMatcherRepositoryFinishMatchingInvocationTest extends Uniti
 
 
     @Test
-    public void registerEndOfMatchingInvocation() {
+    public void finishMatchingInvocation() {
         ProxyInvocation proxyInvocation = createProxyInvocation(method1, 333, "arg1", "arg2");
         argumentMatcherPositionFinderMock.returns(asList(0, 1)).getArgumentMatcherIndexes(proxyInvocation, 111, 333, 1);
 
@@ -101,10 +101,10 @@ public class ArgumentMatcherRepositoryFinishMatchingInvocationTest extends Uniti
 
     @Test
     public void increaseIndexWhenTwoInvocationsOfSameMethodOnSameLine() {
-        ProxyInvocation proxyInvocation1 = createProxyInvocation(method1, 333, "a");
-        ProxyInvocation proxyInvocation2 = createProxyInvocation(method1, 333, "b");
-        ProxyInvocation proxyInvocation3 = createProxyInvocation(method2, 333, "c");
-        ProxyInvocation proxyInvocation4 = createProxyInvocation(method1, 333, "d");
+        ProxyInvocation proxyInvocation1 = createProxyInvocation(method1, 111, "a");
+        ProxyInvocation proxyInvocation2 = createProxyInvocation(method1, 111, "b");
+        ProxyInvocation proxyInvocation3 = createProxyInvocation(method2, 111, "c");
+        ProxyInvocation proxyInvocation4 = createProxyInvocation(method1, 111, "d");
 
         argumentMatcherRepository.startMatchingInvocation(111);
         argumentMatcherRepository.finishMatchingInvocation(proxyInvocation1);
@@ -118,10 +118,10 @@ public class ArgumentMatcherRepositoryFinishMatchingInvocationTest extends Uniti
         argumentMatcherRepository.startMatchingInvocation(111);
         argumentMatcherRepository.finishMatchingInvocation(proxyInvocation4);
 
-        argumentMatcherPositionFinderMock.assertInvoked().getArgumentMatcherIndexes(proxyInvocation1, 111, 333, 1);
-        argumentMatcherPositionFinderMock.assertInvoked().getArgumentMatcherIndexes(proxyInvocation2, 111, 333, 2);
-        argumentMatcherPositionFinderMock.assertInvoked().getArgumentMatcherIndexes(proxyInvocation3, 111, 333, 1);
-        argumentMatcherPositionFinderMock.assertInvoked().getArgumentMatcherIndexes(proxyInvocation4, 111, 333, 3);
+        argumentMatcherPositionFinderMock.assertInvoked().getArgumentMatcherIndexes(proxyInvocation1, 111, 111, 1);
+        argumentMatcherPositionFinderMock.assertInvoked().getArgumentMatcherIndexes(proxyInvocation2, 111, 111, 2);
+        argumentMatcherPositionFinderMock.assertInvoked().getArgumentMatcherIndexes(proxyInvocation3, 111, 111, 1);
+        argumentMatcherPositionFinderMock.assertInvoked().getArgumentMatcherIndexes(proxyInvocation4, 111, 111, 3);
     }
 
 

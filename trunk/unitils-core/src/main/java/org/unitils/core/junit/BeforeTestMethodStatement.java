@@ -13,26 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils;
+package org.unitils.core.junit;
 
-import static org.unitils.TracingTestListener.TestInvocation.TEST_METHOD;
-
+import org.junit.runners.model.Statement;
+import org.unitils.core.engine.UnitilsTestListener;
 
 /**
- * JUnit 3 test class containing 2 test methods. This test test-class is used in the
- * {@link JUnitUnitilsInvocationTest} and {@link UnitilsInvocationExceptionTest} tests.
- *
  * @author Tim Ducheyne
- * @author Filip Neven
  */
-public class UnitilsJUnit3Test_TestClass1 extends UnitilsJUnit3TestBase {
+public class BeforeTestMethodStatement extends Statement {
 
-    public void test1() {
-        registerTestInvocation(TEST_METHOD, "test1");
+    protected UnitilsTestListener unitilsTestListener;
+    protected Statement nextStatement;
+
+
+    public BeforeTestMethodStatement(UnitilsTestListener unitilsTestListener, Statement nextStatement) {
+        this.unitilsTestListener = unitilsTestListener;
+        this.nextStatement = nextStatement;
     }
 
 
-    public void test2() {
-        registerTestInvocation(TEST_METHOD, "test2");
+    @Override
+    public void evaluate() throws Throwable {
+        unitilsTestListener.beforeTestMethod();
+        nextStatement.evaluate();
     }
 }

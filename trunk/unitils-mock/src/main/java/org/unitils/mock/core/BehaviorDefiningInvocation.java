@@ -84,10 +84,6 @@ public class BehaviorDefiningInvocation extends ProxyInvocation {
      * @return A matching score for the invocation, -1 if there is no match
      */
     public int matches(ProxyInvocation proxyInvocation) {
-        // todo td fix
-        if (!getProxyName().equals(proxyInvocation.getProxyName())) {
-            return -1;
-        }
         if (!getMethod().equals(proxyInvocation.getMethod())) {
             return -1;
         }

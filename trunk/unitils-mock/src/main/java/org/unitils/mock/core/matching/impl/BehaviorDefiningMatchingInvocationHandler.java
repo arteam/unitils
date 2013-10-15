@@ -15,16 +15,14 @@
  */
 package org.unitils.mock.core.matching.impl;
 
-import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import org.unitils.mock.core.BehaviorDefiningInvocation;
 import org.unitils.mock.core.BehaviorDefiningInvocations;
-import org.unitils.mock.core.MockService;
+import org.unitils.mock.core.MockFactory;
 import org.unitils.mock.core.matching.MatchingInvocationHandler;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
-import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
 import org.unitils.mock.mockbehavior.impl.ChainedMockBehavior;
 
 import java.util.List;
@@ -39,29 +37,20 @@ public class BehaviorDefiningMatchingInvocationHandler implements MatchingInvoca
     protected MockBehavior mockBehavior;
     protected boolean oneTimeMatch;
     protected BehaviorDefiningInvocations behaviorDefiningInvocations;
-    protected MockService mockService;
+    protected MockFactory mockFactory;
 
 
-    public BehaviorDefiningMatchingInvocationHandler(MockBehavior mockBehavior, boolean oneTimeMatch, BehaviorDefiningInvocations behaviorDefiningInvocations, MockService mockService) {
+    public BehaviorDefiningMatchingInvocationHandler(MockBehavior mockBehavior, boolean oneTimeMatch, BehaviorDefiningInvocations behaviorDefiningInvocations, MockFactory mockFactory) {
         this.mockBehavior = mockBehavior;
         this.oneTimeMatch = oneTimeMatch;
         this.behaviorDefiningInvocations = behaviorDefiningInvocations;
-        this.mockService = mockService;
+        this.mockFactory = mockFactory;
     }
 
 
     public Object handleInvocation(ProxyInvocation proxyInvocation, List<ArgumentMatcher> argumentMatchers) {
         if (mockBehavior instanceof ChainedMockBehavior) {
             ((ChainedMockBehavior) mockBehavior).installChain();
-        }
-        if (mockBehavior instanceof ValidatableMockBehavior) {
-            try {
-                ValidatableMockBehavior validatableMockBehavior = (ValidatableMockBehavior) mockBehavior;
-                validatableMockBehavior.assertCanExecute(proxyInvocation);
-            } catch (UnitilsException e) {
-                e.setStackTrace(proxyInvocation.getInvokedAtTrace());
-                throw e;
-            }
         }
         BehaviorDefiningInvocation behaviorDefiningInvocation = new BehaviorDefiningInvocation(proxyInvocation, mockBehavior, argumentMatchers, oneTimeMatch);
         behaviorDefiningInvocations.addBehaviorDefiningInvocation(behaviorDefiningInvocation);
@@ -73,7 +62,7 @@ public class BehaviorDefiningMatchingInvocationHandler implements MatchingInvoca
         Class<?> innerMockType = proxyInvocation.getMethod().getReturnType();
         String innerMockName = proxyInvocation.getProxyName() + "." + proxyInvocation.getMethod().getName();
 
-        Mock<?> mock = mockService.createChainedMock(innerMockName, innerMockType);
+        Mock<?> mock = mockFactory.createChainedMock(innerMockName, innerMockType);
         if (mock == null) {
             return null;
         }

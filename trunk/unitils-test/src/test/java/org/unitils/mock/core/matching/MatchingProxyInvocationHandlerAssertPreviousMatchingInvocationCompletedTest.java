@@ -22,22 +22,22 @@ import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
-import org.unitils.mock.core.proxy.ProxyInvocationHandler;
 import org.unitils.mock.core.proxy.ProxyService;
+import org.unitils.mock.core.proxy.impl.MatchingProxyInvocationHandler;
 import org.unitils.mock.core.util.StackTraceService;
 
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyReflectionEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 /**
  * @author Tim Ducheyne
  */
-public class MatchingInvocationBuilderStartMatchingInvocationTest extends UnitilsJUnit4 {
+public class MatchingProxyInvocationHandlerAssertPreviousMatchingInvocationCompletedTest extends UnitilsJUnit4 {
 
-    private MatchingInvocationBuilder matchingInvocationBuilder;
+    private MatchingProxyInvocationHandler matchingProxyInvocationHandler;
 
     private Mock<ArgumentMatcherRepository> argumentMatcherRepositoryMock;
     private Mock<ProxyService> proxyServiceMock;
@@ -52,7 +52,7 @@ public class MatchingInvocationBuilderStartMatchingInvocationTest extends Unitil
 
     @Before
     public void initialize() {
-        matchingInvocationBuilder = new MatchingInvocationBuilder(argumentMatcherRepositoryMock.getMock(), proxyServiceMock.getMock(), stackTraceServiceMock.getMock());
+        matchingProxyInvocationHandler = new MatchingProxyInvocationHandler(argumentMatcherRepositoryMock.getMock(), proxyServiceMock.getMock(), stackTraceServiceMock.getMock());
 
         StackTraceElement stackTraceElement1 = new StackTraceElement("class1", "method1", "file1", 111);
         StackTraceElement stackTraceElement2 = new StackTraceElement("class2", "method2", "file2", 222);
@@ -66,20 +66,27 @@ public class MatchingInvocationBuilderStartMatchingInvocationTest extends Unitil
 
 
     @Test
-    public void startMatchingInvocation() {
-        ProxyInvocationHandler result = matchingInvocationBuilder.startMatchingInvocation("mockName", false, matchingInvocationHandler);
-        argumentMatcherRepositoryMock.assertInvoked().startMatchingInvocation(222);
-        assertPropertyReflectionEquals("matchingInvocationHandler", matchingInvocationHandler, result);
+    public void okWhenNoInvocationStarted() {
+        matchingProxyInvocationHandler.assertPreviousMatchingInvocationCompleted();
     }
 
     @Test
-    public void exceptionWhenNotCalledFromMock() {
-        stackTraceServiceMock.returns(null).getInvocationStackTrace(Mock.class);
+    public void okWhenInvocationStartedThatDoesNotRequireProxyInvocation() {
+        matchingProxyInvocationHandler.startMatchingInvocation("mockName", false, matchingInvocationHandler);
+        matchingProxyInvocationHandler.assertPreviousMatchingInvocationCompleted();
+    }
+
+    @Test
+    public void exceptionWhenPreviousMatchingInvocationWasNotCompleted() {
+        matchingProxyInvocationHandler.startMatchingInvocation("mockName", true, matchingInvocationHandler);
         try {
-            matchingInvocationBuilder.startMatchingInvocation("mockName", false, matchingInvocationHandler);
+            matchingProxyInvocationHandler.assertPreviousMatchingInvocationCompleted();
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to start matching invocation. The matching invocation builder only supports calls from a mock object.", e.getMessage());
+            assertEquals("Invalid syntax: mockName.method1() must be followed by a method invocation on the returned proxy. E.g. mockName.method1().myMethod();", e.getMessage());
+            assertReflectionEquals(stackTraceWithoutFirst, e.getStackTrace());
+            // behavior is reset after exception
+            matchingProxyInvocationHandler.assertPreviousMatchingInvocationCompleted();
         }
     }
 }

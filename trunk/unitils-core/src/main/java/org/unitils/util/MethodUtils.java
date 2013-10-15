@@ -55,7 +55,19 @@ public class MethodUtils {
         return "clone".equals(method.getName()) && 0 == method.getParameterTypes().length;
     }
 
+    /**
+     * @param method The method to check, not null
+     * @return True if the given method is the {@link Object#finalize} method
+     */
     public static boolean isFinalizeMethod(Method method) {
         return "finalize".equals(method.getName()) && 0 == method.getParameterTypes().length;
+    }
+
+    /**
+     * @param method The method to check, not null
+     * @return True if the given method is the {@link org.unitils.core.util.ObjectToFormat#$formatObject()} method
+     */
+    public static boolean isFormatObjectMethod(Method method) {
+        return "$formatObject".equals(method.getName()) && 0 == method.getParameterTypes().length;
     }
 }

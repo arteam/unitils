@@ -43,6 +43,8 @@ import java.lang.reflect.Method;
 
 public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
 
+    // todo td migrate to BlockJUnit4ClassRunner
+    // todo td  timeout spawns new thread for method => does not work when unitils is thread local
 
     /**
      * Creates a test runner that runs all test methods in the given class.

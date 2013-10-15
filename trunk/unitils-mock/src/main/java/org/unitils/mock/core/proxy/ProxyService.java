@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 import org.unitils.core.UnitilsException;
-import org.unitils.mock.core.MockObject;
+import org.unitils.core.util.ObjectToFormat;
 import org.unitils.mock.core.util.CloneService;
 
 import java.util.*;
@@ -139,32 +139,8 @@ public class ProxyService {
     }
 
     /**
-     * note: don't remove, used through reflection from {@link org.unitils.core.util.ObjectFormatter}
-     *
-     * @param object The object to check
-     * @return The proxied type, null if the object is not a proxy or mock
-     */
-    // todo td remove
-    @SuppressWarnings({"UnusedDeclaration"})
-    public String getMockName(Object object) {
-        if (object == null) {
-            return null;
-        }
-        if (object instanceof MockObject) {
-            return object.toString();
-        }
-        if (object instanceof Factory) {
-            Callback callback = ((Factory) object).getCallback(0);
-            if (callback instanceof CglibProxyMethodInterceptor) {
-                return ((CglibProxyMethodInterceptor) callback).getProxyName();
-            }
-        }
-        return null;
-    }
-
-    /**
      * First finds a trace element in which a cglib proxy method was invoked. Then it returns the rest of the stack trace following that
-     * element. The stack trace starts with the element rh  r is the method call that was proxied by the proxy method.
+     * element. The stack trace starts with the element is the method call that was proxied by the proxy method.
      *
      * @return The proxied method trace, not null
      */
@@ -195,6 +171,7 @@ public class ProxyService {
 
         Set<Class<?>> interfaces = new HashSet<Class<?>>();
         interfaces.add(Cloneable.class);
+        interfaces.add(ObjectToFormat.class);
         if (proxiedClass.isInterface()) {
             enhancer.setSuperclass(Object.class);
             interfaces.add(proxiedClass);

@@ -13,32 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core.proxy;
+package org.unitils.core.junit;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.runners.model.Statement;
+import org.unitils.core.engine.UnitilsTestListener;
 
 /**
  * @author Tim Ducheyne
  */
-public class CglibProxyMethodInterceptorGetProxyNameTest {
+public class AfterTestTearDownStatement extends Statement {
 
-    private CglibProxyMethodInterceptor<Map> cglibProxyMethodInterceptor;
+    protected UnitilsTestListener unitilsTestListener;
+    protected Statement nextStatement;
 
 
-    @Before
-    public void initialize() throws Exception {
-        cglibProxyMethodInterceptor = new CglibProxyMethodInterceptor<Map>("proxyName", null, null, null, null);
+    public AfterTestTearDownStatement(UnitilsTestListener unitilsTestListener, Statement nextStatement) {
+        this.unitilsTestListener = unitilsTestListener;
+        this.nextStatement = nextStatement;
     }
 
 
-    @Test
-    public void getProxyName() throws Throwable {
-        String result = cglibProxyMethodInterceptor.getProxyName();
-        assertEquals("proxyName", result);
+    @Override
+    public void evaluate() throws Throwable {
+        nextStatement.evaluate();
+        unitilsTestListener.afterTestTearDown();
     }
 }

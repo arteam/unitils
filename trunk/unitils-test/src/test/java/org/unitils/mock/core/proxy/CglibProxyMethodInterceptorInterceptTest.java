@@ -19,6 +19,7 @@ import net.sf.cglib.proxy.MethodProxy;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.core.util.ObjectToFormat;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.core.util.CloneService;
@@ -47,10 +48,11 @@ public class CglibProxyMethodInterceptorInterceptTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() throws Exception {
-        cglibProxyMethodInterceptor = new CglibProxyMethodInterceptor<MyClass>("mockName", MyClass.class, proxyInvocationHandlerMock.getMock(), proxyServiceMock.getMock(), cloneServiceMock.getMock());
+        cglibProxyMethodInterceptor = new CglibProxyMethodInterceptor<MyClass>("myProxy", MyClass.class, proxyInvocationHandlerMock.getMock(), proxyServiceMock.getMock(), cloneServiceMock.getMock());
 
         stackTrace = new StackTraceElement[]{new StackTraceElement("class", "method", "file", 10)};
         proxyServiceMock.returns(stackTrace).getProxiedMethodStackTrace();
+        cloneServiceMock.returns(new Object[0]).createDeepClone(new Object[0]);
 
         methodProxy = MethodProxy.create(MyClass.class, MyClass.class, "", "", "");
     }
@@ -84,7 +86,7 @@ public class CglibProxyMethodInterceptorInterceptTest extends UnitilsJUnit4 {
     public void hashCodeReturnsHashCodeOfInterceptor() throws Throwable {
         Method method = MyClass.class.getDeclaredMethod("hashCode");
 
-        Object result = cglibProxyMethodInterceptor.intercept(proxy, method, new Object[]{new MyClass()}, methodProxy);
+        Object result = cglibProxyMethodInterceptor.intercept(proxy, method, new Object[0], methodProxy);
         assertEquals(cglibProxyMethodInterceptor.hashCode(), result);
     }
 
@@ -92,7 +94,7 @@ public class CglibProxyMethodInterceptorInterceptTest extends UnitilsJUnit4 {
     public void cloneReturnsProxyItself() throws Throwable {
         Method method = MyClass.class.getDeclaredMethod("clone");
 
-        Object result = cglibProxyMethodInterceptor.intercept(proxy, method, new Object[]{new MyClass()}, methodProxy);
+        Object result = cglibProxyMethodInterceptor.intercept(proxy, method, new Object[0], methodProxy);
         assertSame(proxy, result);
     }
 
@@ -100,22 +102,30 @@ public class CglibProxyMethodInterceptorInterceptTest extends UnitilsJUnit4 {
     public void toStringReturnsNameAndHashCode() throws Throwable {
         Method method = MyClass.class.getDeclaredMethod("toString");
 
-        Object result = cglibProxyMethodInterceptor.intercept(proxy, method, new Object[]{new MyClass()}, methodProxy);
+        Object result = cglibProxyMethodInterceptor.intercept(proxy, method, new Object[0], methodProxy);
         assertEquals(MyClass.class.getName() + "@" + Integer.toHexString(cglibProxyMethodInterceptor.hashCode()), result);
+    }
+
+    @Test
+    public void formatObjectReturnsDisplayName() throws Throwable {
+        Method method = MyClass.class.getDeclaredMethod("$formatObject");
+
+        Object result = cglibProxyMethodInterceptor.intercept(proxy, method, new Object[0], methodProxy);
+        assertEquals("Proxy<myProxy>", result);
     }
 
     @Test
     public void methodInvocation() throws Throwable {
         Method method = MyClass.class.getDeclaredMethod("method");
-        cloneServiceMock.returns("cloned arg").createDeepClone("arg");
-        proxyInvocationHandlerMock.returns("result").handleInvocation(new CglibProxyInvocation("mockName", method, asList("arg"), asList("cloned arg"), stackTrace, proxy, methodProxy));
+        cloneServiceMock.returns(new Object[]{"cloned arg"}).createDeepClone(new Object[]{"arg"});
+        proxyInvocationHandlerMock.returns("result").handleInvocation(new CglibProxyInvocation("myProxy", method, asList("arg"), asList("cloned arg"), stackTrace, proxy, methodProxy));
 
         Object result = cglibProxyMethodInterceptor.intercept(proxy, method, new Object[]{"arg"}, methodProxy);
         assertEquals("result", result);
     }
 
 
-    public static class MyClass {
+    public static class MyClass implements ObjectToFormat {
 
         @Override
         protected void finalize() {
@@ -142,6 +152,10 @@ public class CglibProxyMethodInterceptorInterceptTest extends UnitilsJUnit4 {
         }
 
         public String method() {
+            return null;
+        }
+
+        public String $formatObject() {
             return null;
         }
     }

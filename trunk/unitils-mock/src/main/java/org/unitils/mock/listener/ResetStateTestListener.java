@@ -20,7 +20,6 @@ import org.unitils.core.TestInstance;
 import org.unitils.core.TestListener;
 import org.unitils.core.TestPhase;
 import org.unitils.mock.core.Scenario;
-import org.unitils.mock.core.matching.MatchingInvocationBuilder;
 
 import static org.unitils.core.TestPhase.INITIALIZATION;
 
@@ -30,12 +29,10 @@ import static org.unitils.core.TestPhase.INITIALIZATION;
 public class ResetStateTestListener extends TestListener {
 
     protected Scenario scenario;
-    protected MatchingInvocationBuilder matchingInvocationBuilder;
 
 
-    public ResetStateTestListener(Scenario scenario, MatchingInvocationBuilder matchingInvocationBuilder) {
+    public ResetStateTestListener(Scenario scenario) {
         this.scenario = scenario;
-        this.matchingInvocationBuilder = matchingInvocationBuilder;
     }
 
 
@@ -48,6 +45,5 @@ public class ResetStateTestListener extends TestListener {
     @Override
     public void beforeTestSetUp(TestInstance testInstance) {
         scenario.reset();
-        matchingInvocationBuilder.reset();
     }
 }

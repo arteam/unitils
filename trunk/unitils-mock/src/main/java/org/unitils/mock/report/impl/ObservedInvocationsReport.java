@@ -20,7 +20,6 @@ import org.unitils.mock.core.ObservedInvocation;
 import java.lang.reflect.Method;
 import java.util.*;
 
-
 /**
  * A view that displays the observed invocations and the location where they were invoked.
  * The arguments are shown inline when the length is small enough, else the argument is named using the
@@ -32,9 +31,9 @@ import java.util.*;
  * 3.  mock.anotherMethod(myClass1)  ..... at MyTest.testMethod(MyTest.java:64)
  * <code></pre>
  *
+ * @author Tim Ducheyne
  * @author Kenny Claes
  * @author Filip Neven
- * @author Tim Ducheyne
  */
 public class ObservedInvocationsReport extends ProxyInvocationsReport {
 

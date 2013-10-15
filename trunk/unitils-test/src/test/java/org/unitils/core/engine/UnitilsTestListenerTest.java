@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import static java.util.Arrays.asList;
+import static org.unitils.core.TestPhase.EXECUTION;
 
 /**
  * @author Tim Ducheyne
@@ -64,6 +65,9 @@ public class UnitilsTestListenerTest extends UnitilsJUnit4 {
 
         classWrapper = new ClassWrapper(MyClass.class);
         testInstance = new TestInstance(classWrapper, testObject, testMethod);
+
+        testListener1Mock.returns(EXECUTION).getTestPhase();
+        testListener2Mock.returns(EXECUTION).getTestPhase();
     }
 
 

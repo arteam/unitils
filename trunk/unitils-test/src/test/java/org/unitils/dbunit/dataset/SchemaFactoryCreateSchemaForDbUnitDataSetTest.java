@@ -134,15 +134,11 @@ public class SchemaFactoryCreateSchemaForDbUnitDataSetTest extends UnitilsJUnit4
 
     @Test
     public void onlyIncludedTables() throws Exception {
-        // todo fix mocking framework => this does not seem to work
-
         tableIteratorMock.onceReturns(true).next();
-        tableIteratorMock.onceReturns(tableMock1).getTable();
         tableIteratorMock.onceReturns(tableMetaDataMock1).getTableMetaData();
         tableIteratorMock.onceReturns(true).next();
-        tableIteratorMock.onceReturns(tableMock3).getTable();
-        tableIteratorMock.onceReturns(tableMetaDataMock3).getTableMetaData();
         tableIteratorMock.returns(tableMock3).getTable();
+        tableIteratorMock.returns(tableMetaDataMock3).getTableMetaData();
         tableIteratorMock.onceReturns(false).next();
 
         Schema result = schemaFactory.createSchemaForDbUnitDataSet("name", dataSetMock.getMock(), asList("TABLE3"));

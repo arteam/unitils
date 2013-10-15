@@ -15,37 +15,21 @@
  */
 package org.unitils.mock.core;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.PartialMock;
 
 import static org.junit.Assert.*;
 
 /**
- * Tests the initialistation of a partial mock.
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class PartialMockConstructorTest {
+public class PartialMockConstructionIntegrationTest extends UnitilsJUnit4 {
 
-    /* Class under test */
     private PartialMock<TestClass> mockObject;
-
-    /* Class under test */
     private PartialMock<TestClassNoDefaultConstructor> mockObjectNoDefaultConstructor;
-
-    /* Class under test */
     private PartialMock<TestInterface> mockObjectInterface;
-
-
-    @Before
-    public void initialize() {
-        // todo td implement
-//        mockObject = new PartialMockObject<TestClass>("testMock", TestClass.class, this);
-//        mockObjectNoDefaultConstructor = new PartialMockObject<TestClassNoDefaultConstructor>("testMock", TestClassNoDefaultConstructor.class, this);
-//        mockObjectInterface = new PartialMockObject<TestInterface>("testMock", TestInterface.class, this);
-    }
 
 
     @Test
@@ -56,12 +40,8 @@ public class PartialMockConstructorTest {
         assertFalse(result.otherConstructorCalled);
     }
 
-    /**
-     * If there is no default constructor, the proxy will be created without calling a constructor`and will
-     * not initialize the instance fields, i.e. they will have java default values.
-     */
     @Test
-    public void noDefaultConstructor() {
+    public void fieldsNotInitializedWhenThereIsNoDefaultConstructor() {
         TestClassNoDefaultConstructor result = mockObjectNoDefaultConstructor.getMock();
         assertEquals(0, result.initializedValue);
         assertFalse(result.otherConstructorCalled);
@@ -77,11 +57,8 @@ public class PartialMockConstructorTest {
     public static abstract class TestClass {
 
         private boolean defaultConstructorCalled;
-
         private boolean otherConstructorCalled;
-
         private int initializedValue = 999;
-
 
         public TestClass() {
             this.defaultConstructorCalled = true;
@@ -92,22 +69,16 @@ public class PartialMockConstructorTest {
         }
     }
 
-
     public static abstract class TestClassNoDefaultConstructor {
 
         private boolean otherConstructorCalled;
-
         private int initializedValue = 999;
-
 
         public TestClassNoDefaultConstructor(String value) {
             this.otherConstructorCalled = true;
         }
     }
 
-
     public static interface TestInterface {
-
     }
-
 }

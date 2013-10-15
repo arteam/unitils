@@ -44,8 +44,8 @@ public class ObjectFormatter {
     protected int maxDepth;
     /* The maximum nr of elements for arrays and collections to display */
     protected int maxNrArrayOrCollectionElements;
-
     protected ArrayAndCollectionFormatter arrayAndCollectionFormatter;
+
 
     /**
      * Creates a formatter with a maximum recursion depth of 3.
@@ -53,7 +53,6 @@ public class ObjectFormatter {
     public ObjectFormatter() {
         this(3, 15);
     }
-
 
     /**
      * Creates a formatter with the given maximum recursion depth.
@@ -105,13 +104,13 @@ public class ObjectFormatter {
             return;
         }
         Class<?> type = object.getClass();
+        if (formatObjectToFormat(object, type, result)) {
+            return;
+        }
         if (formatCharacter(object, type, result)) {
             return;
         }
         if (formatPrimitiveOrEnum(object, type, result)) {
-            return;
-        }
-        if (formatMock(object, result)) {
             return;
         }
         if (formatProxy(object, type, result)) {
@@ -143,6 +142,13 @@ public class ObjectFormatter {
         formatObject(object, currentDepth, result);
     }
 
+    private boolean formatObjectToFormat(Object object, Class<?> type, StringBuilder result) {
+        if (object instanceof ObjectToFormat) {
+            result.append(((ObjectToFormat) object).$formatObject());
+            return true;
+        }
+        return false;
+    }
 
     protected boolean formatJavaLang(Object object, StringBuilder result, Class<?> type) {
         if (type.getName().startsWith("java.lang")) {
@@ -188,7 +194,6 @@ public class ObjectFormatter {
         return false;
     }
 
-
     /**
      * Formats the given object by formatting the inner fields.
      *
@@ -203,7 +208,6 @@ public class ObjectFormatter {
         formatFields(object, type, currentDepth, result);
         result.append(">");
     }
-
 
     /**
      * Formats the field values of the given object.
@@ -246,37 +250,6 @@ public class ObjectFormatter {
         }
     }
 
-
-    protected boolean formatMock(Object object, StringBuilder result) {
-        try {
-            Class<?> proxyUtilsClass = getProxyUtilsClass();
-            if (proxyUtilsClass == null) {
-                return false;
-            }
-            String mockName = (String) proxyUtilsClass.getMethod("getMockName", Object.class).invoke(null, object);
-            if (mockName == null) {
-                return false;
-            }
-            if (isDummy(object)) {
-                result.append("Dummy<");
-            } else {
-                result.append("Mock<");
-            }
-            result.append(mockName);
-            result.append(">");
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    protected boolean isDummy(Object object) {
-        Class<?> clazz = object.getClass();
-        Class<?> dummyObjectClass = getDummyObjectClass();
-        return dummyObjectClass != null && dummyObjectClass.isAssignableFrom(clazz);
-    }
-
-
     protected boolean formatProxy(Object object, Class<?> type, StringBuilder result) {
         if (Proxy.isProxyClass(type)) {
             result.append("Proxy<?>");
@@ -302,29 +275,4 @@ public class ObjectFormatter {
         }
         return false;
     }
-
-    /**
-     * @return The interface that represents a dummy object. If the DummyObject interface is not in the
-     *         classpath, null is returned.
-     */
-    protected Class<?> getDummyObjectClass() {
-        try {
-            return Class.forName("org.unitils.mock.dummy.DummyObject");
-        } catch (ClassNotFoundException e) {
-            return null;
-        }
-    }
-
-
-    /**
-     * @return The proxy utils. null if not in classpath
-     */
-    protected Class<?> getProxyUtilsClass() {
-        try {
-            return Class.forName("org.unitils.mock.core.proxy.ProxyUtils");
-        } catch (ClassNotFoundException e) {
-            return null;
-        }
-    }
-
 }
