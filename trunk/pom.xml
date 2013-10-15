@@ -272,8 +272,8 @@
                 <configuration>
                     <outputDirectory>${project.build.directory}/dist</outputDirectory>
                     <descriptors>
-                        <descriptor>tools/maven/assembly-unitils.xml</descriptor>
-                        <descriptor>tools/maven/assembly-unitils-with-dependencies.xml</descriptor>
+                        <descriptor>main/assembly/assembly-unitils.xml</descriptor>
+                        <descriptor>main/assembly/assembly-unitils-with-dependencies.xml</descriptor>
                     </descriptors>
                 </configuration>
             </plugin>
