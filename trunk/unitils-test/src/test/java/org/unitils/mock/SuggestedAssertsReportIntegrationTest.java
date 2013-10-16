@@ -13,104 +13,73 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.report.impl;
+package org.unitils.mock;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.mock.Mock;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.mock.report.impl.SuggestedAssertsReport;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.unitils.mock.MockUnitils.getObservedInvocations;
 
 /**
- * Test for the report that shows the suggested assert statements.
- *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
-public class SuggestedAssertsReportTest {
+public class SuggestedAssertsReportIntegrationTest extends UnitilsJUnit4 {
 
-    /* class under test */
     private SuggestedAssertsReport suggestedAssertsReport;
 
-    /* Test mock that uses the scenario */
     private Mock<TestInterface> testMock;
-
-    /* Proxy of the testMock */
     private TestInterface testProxy;
-
-    /* Test data, which is a field of this class: if used, the suggested assert must refer to this field */
     private String testDataStr = "someString";
 
 
-    /**
-     * Initializes the test.
-     */
     @Before
-    public void setUp() {
+    public void initialize() {
         suggestedAssertsReport = new SuggestedAssertsReport();
-        // todo td implement
-//        testMock = new MockObject<TestInterface>("testMock", TestInterface.class, this);
         testProxy = testMock.getMock();
     }
 
 
-    /**
-     * Simple values like strings and integers must be showed directly in the suggested assert
-     */
     @Test
     public void simpleValues() {
         testProxy.testMethodString("someValue");
         testProxy.testMethodInt(2);
         testProxy.testMethodInteger(3);
 
-        // todo td implement
-//        String report = suggestedAssertsReport.createReport(this, getCurrentScenario().getObservedInvocations());
-        String report = null;
+        String report = suggestedAssertsReport.createReport(this, getObservedInvocations());
         assertTrue(report.contains("testMock.assertInvoked().testMethodString(\"someValue\");"));
         assertTrue(report.contains("testMock.assertInvoked().testMethodInt(2);"));
         assertTrue(report.contains("testMock.assertInvoked().testMethodInteger(3);"));
     }
 
-    /**
-     * If an argument refers to the same object as a field of the test object, the test object's field must be used
-     */
     @Test
-    public void testObjectFields() {
+    public void useFieldNamesInReport() {
         testProxy.testMethodString(testDataStr);
 
-        // todo td implement
-//        String report = suggestedAssertsReport.createReport(this, getCurrentScenario().getObservedInvocations());
-        String report = null;
+        String report = suggestedAssertsReport.createReport(this, getObservedInvocations());
         assertTrue(report.contains("testMock.assertInvoked().testMethodString(testDataStr);"));
     }
 
-    /**
-     * Objects that are not simple values are replaced by null in the suggested assert
-     */
     @Test
-    public void objects() {
+    public void objectsThatAreNotSimpleValuesAreReplacedByNull() {
         testProxy.testMethodObject(new ArrayList<String>());
 
-        // todo td implement
-//        String report = suggestedAssertsReport.createReport(this, getCurrentScenario().getObservedInvocations());
-        String report = null;
+        String report = suggestedAssertsReport.createReport(this, getObservedInvocations());
         assertTrue(report.contains("testMock.assertInvoked().testMethodObject(null);"));
     }
 
-    /**
-     * Methods that return something are not included in the report
-     */
     @Test
-    public void onlySuggestAssertsForVoids() {
+    public void onlySuggestAssertsForVoidMethods() {
         testProxy.testMethodReturnsString();
 
-        // todo td implement
-//        String report = suggestedAssertsReport.createReport(this, getCurrentScenario().getObservedInvocations());
-        String report = null;
+        String report = suggestedAssertsReport.createReport(this, getObservedInvocations());
         assertFalse(report.contains("testMock.assertInvoked().testMethodReturnsString()"));
     }
 
@@ -127,5 +96,4 @@ public class SuggestedAssertsReportTest {
 
         void testMethodObject(List<String> arg1);
     }
-
 }

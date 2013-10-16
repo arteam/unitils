@@ -13,46 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.core.UnitilsException;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 /**
- * Tests the mock object functionality for partial mocks.
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class PartialMockObjectTest {
+public class PartialMockIntegrationTest extends UnitilsJUnit4 {
 
-    /* Class under test */
-    private PartialMockObject<TestClass> mockObject;
+    private PartialMock<TestClass> mockObject;
 
 
-    /**
-     * Initializes the test by creating a partial mock object
-     */
     @Before
-    public void setUp() {
+    public void initialize() {
         TestClass.invocationCount = 0;
-        // todo td implement
-//        mockObject = new PartialMockObject<TestClass>("testMock", TestClass.class, this);
     }
 
 
-    /**
-     * Tests setting a return behavior for the mock. The behavior of the test class should not have been invoked.
-     */
     @Test
-    public void testReturns() {
+    public void returns() {
         mockObject.returns("aValue").testMethod();
 
         String result = mockObject.getMock().testMethod();
@@ -60,24 +51,15 @@ public class PartialMockObjectTest {
         assertLenientEquals(0, TestClass.invocationCount);
     }
 
-
-    /**
-     * Tests the return behavior when no behavior was defined. The original behavior of the test class should
-     * have been invoked.
-     */
     @Test
-    public void testReturns_originalBehavior() {
+    public void originalBehavior() {
         String result = mockObject.getMock().testMethod();
         assertLenientEquals("original", result);
         assertLenientEquals(1, TestClass.invocationCount);
     }
 
-
-    /**
-     * Tests setting an exception behavior for the mock. The behavior of the test class should not have been invoked.
-     */
     @Test
-    public void testRaises() {
+    public void raises() {
         mockObject.raises(new ThreadDeath()).testMethod();
 
         boolean exception = false;
@@ -90,12 +72,8 @@ public class PartialMockObjectTest {
         assertLenientEquals(0, TestClass.invocationCount);
     }
 
-
-    /**
-     * Tests setting a performs behavior for the mock. The behavior of the test class should not have been invoked.
-     */
     @Test
-    public void testPerforms() {
+    public void performs() {
         TestMockBehavior testMockBehavior = new TestMockBehavior();
         mockObject.performs(testMockBehavior).testMethod();
 
@@ -104,25 +82,15 @@ public class PartialMockObjectTest {
         assertLenientEquals(0, TestClass.invocationCount);
     }
 
-
-    /**
-     * Tests invoking a method for with no behavior was defined. The behavior of the test class should have been invoked.
-     */
     @Test
-    public void originalBehavior() {
-        String result = mockObject.getMock().testMethod();
-        assertLenientEquals("original", result);
-        assertLenientEquals(1, TestClass.invocationCount);
+    public void ignoredWhenNoBehaviorSetForVoidAbstractMethod() {
+        mockObject.getMock().voidAbstractMethod();
     }
 
-
-    /**
-     * Tests invoking a method for with no behavior was defined, but the method is an abstract method.
-     * An exception should have been raised
-     */
-    @Test(expected = UnitilsException.class)
-    public void originalBehavior_abstractMethod() {
-        mockObject.getMock().abstractMethod();
+    @Test
+    public void defaultValueForAbstractMethodWithReturnValue() {
+        List result = mockObject.getMock().returnAbstractMethod();
+        assertTrue(result instanceof List);
     }
 
     @Test
@@ -140,9 +108,6 @@ public class PartialMockObjectTest {
     }
 
 
-    /**
-     * Class that is mocked during the tests. The test method counts how many times it was invoked.
-     */
     public static abstract class TestClass {
 
         public static int invocationCount = 0;
@@ -160,13 +125,11 @@ public class PartialMockObjectTest {
             return methodWithArguments(a, b);
         }
 
-        public abstract void abstractMethod();
+        public abstract void voidAbstractMethod();
+
+        public abstract List returnAbstractMethod();
     }
 
-
-    /**
-     * Dummy mock behavior that counts how many times it was invoked.
-     */
     private static class TestMockBehavior implements MockBehavior {
 
         public int invocationCount = 0;

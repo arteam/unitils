@@ -19,8 +19,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Unitils;
 import org.unitils.mock.core.MockFactory;
+import org.unitils.mock.core.ObservedInvocation;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.core.util.StackTraceService;
+
+import java.util.List;
 
 /**
  * @author Filip Neven
@@ -64,6 +67,10 @@ public class MockUnitils {
         return mockFactory.createPartialMock(name, type, testObject);
     }
 
+    public static <T> PartialMock<T> createPartialMock(T mockPrototype, Object testObject) {
+        return createPartialMock(null, mockPrototype, testObject);
+    }
+
     public static <T> PartialMock<T> createPartialMock(String name, T mockPrototype, Object testObject) {
         return mockFactory.createPartialMock(name, mockPrototype, testObject);
     }
@@ -92,5 +99,9 @@ public class MockUnitils {
 
     public static void logSuggestedAsserts() {
         logger.info("\n\nSuggested assert statements:\n\n" + scenario.createSuggestedAssertsReport());
+    }
+
+    public static List<ObservedInvocation> getObservedInvocations() {
+        return scenario.getObservedInvocations();
     }
 }

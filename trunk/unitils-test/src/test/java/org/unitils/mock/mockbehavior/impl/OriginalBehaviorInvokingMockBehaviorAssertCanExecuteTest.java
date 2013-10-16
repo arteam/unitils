@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 /**
  * @author Tim Ducheyne
@@ -53,13 +54,15 @@ public class OriginalBehaviorInvokingMockBehaviorAssertCanExecuteTest {
             originalBehaviorInvokingMockBehavior.assertCanExecute(proxyInvocation);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to invoke the original method behavior: the method is an abstract method.", e.getMessage());
+            assertEquals("Unable to invoke the original method behavior. Invoked method is abstract: public abstract void org.unitils.mock.mockbehavior.impl.OriginalBehaviorInvokingMockBehaviorAssertCanExecuteTest$MyClass.abstractMethod()", e.getMessage());
+            assertReflectionEquals(proxyInvocation.getInvokedAtTrace(), e.getStackTrace());
         }
     }
 
 
     private ProxyInvocation createProxyInvocation(Method method) {
-        return new ProxyInvocation(null, null, method, emptyList(), emptyList(), null);
+        StackTraceElement[] stackTrace = new StackTraceElement[]{new StackTraceElement("class", "method", "file", 0)};
+        return new ProxyInvocation(null, null, method, emptyList(), emptyList(), stackTrace);
     }
 
 

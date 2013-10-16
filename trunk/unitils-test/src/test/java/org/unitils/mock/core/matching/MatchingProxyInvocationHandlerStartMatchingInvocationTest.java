@@ -77,18 +77,18 @@ public class MatchingProxyInvocationHandlerStartMatchingInvocationTest extends U
             matchingProxyInvocationHandler.startMatchingInvocation("mockName", false, matchingInvocationHandler);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to start matching invocation. The matching invocation builder only supports calls from a mock object.", e.getMessage());
+            assertEquals("Unable to start matching invocation. Matching invocations are only supported from a Mock instance", e.getMessage());
         }
     }
 
     @Test
     public void exceptionWhenPreviousMatchingInvocationNotFinished() {
-        matchingProxyInvocationHandler.startMatchingInvocation("mockName", false, matchingInvocationHandler);
+        matchingProxyInvocationHandler.startMatchingInvocation("mockName", true, matchingInvocationHandler);
         try {
-            matchingProxyInvocationHandler.startMatchingInvocation("mockName", false, matchingInvocationHandler);
+            matchingProxyInvocationHandler.startMatchingInvocation("mockName", true, matchingInvocationHandler);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to start matching invocation. The matching invocation builder only supports calls from a mock object.", e.getMessage());
+            assertEquals("Invalid syntax: mockName.method1() must be followed by a method invocation on the returned proxy. E.g. mockName.method1().myMethod();", e.getMessage());
         }
     }
 }
