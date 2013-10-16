@@ -13,39 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.io.annotation;
+package org.unitils.mock;
 
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 
-import java.io.File;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.assertNull;
 
 /**
- * @author Jeroen Horemans
  * @author Tim Ducheyne
- * @author Thomas De Rycke
+ * @author Filip Neven
  */
-public class TempFileIntegrationTest extends UnitilsJUnit4 {
+public class MockResetIntegrationTest extends UnitilsJUnit4 {
 
-    @TempFile
-    private File defaultFile;
-    @TempFile(value = "customFile.tmp")
-    private File customFile;
+    private Mock<TestInterface> mockObject;
 
 
     @Test
-    public void defaultTempFile() {
-        assertTrue(defaultFile.isFile());
-        assertEquals(TempFileIntegrationTest.class.getName() + "-defaultTempFile.tmp", defaultFile.getName());
+    public void resetBehavior() {
+        mockObject.onceReturns("aValue").testMethod();
+        mockObject.returns("aValue").testMethod();
+
+        mockObject.resetBehavior();
+
+        String result = mockObject.getMock().testMethod();
+        assertNull(result);
     }
 
-    @Test
-    public void customTempFile() {
-        assertTrue(customFile.isFile());
-        assertEquals("customFile.tmp", customFile.getName());
+
+    private static interface TestInterface {
+
+        String testMethod();
     }
 }

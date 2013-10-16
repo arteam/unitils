@@ -13,37 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock;
 
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.mock.Mock;
 
-import static org.junit.Assert.assertNull;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import static org.junit.Assert.assertNotNull;
+
 
 /**
+ * Tests the casting of mock objects (UNI-168 and UNI-169).
+ *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class MockResetIntegrationTest extends UnitilsJUnit4 {
+@SuppressWarnings({"RedundantCast"})
+public class MockObjectCastIntegrationTest extends UnitilsJUnit4 {
 
-    private Mock<TestInterface> mockObject;
+    private PartialMock<MyTimerTask> myTimerTask;
 
 
     @Test
-    public void resetBehavior() {
-        mockObject.onceReturns("aValue").testMethod();
-        mockObject.returns("aValue").testMethod();
+    public void testCasting() throws Exception {
+        assertNotNull((TimerTask) myTimerTask.getMock());
 
-        mockObject.resetBehavior();
-
-        String result = mockObject.getMock().testMethod();
-        assertNull(result);
+        Timer timer = new Timer();
+        timer.schedule(myTimerTask.getMock(), 0);
     }
 
 
-    private static interface TestInterface {
-
-        String testMethod();
+    public static class MyTimerTask extends TimerTask {
+        public void run() {
+        }
     }
+
 }

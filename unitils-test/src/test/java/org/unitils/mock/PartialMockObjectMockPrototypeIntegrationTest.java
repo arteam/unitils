@@ -13,32 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.mock.core.ObservedInvocation;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests the mock object functionality for partial mocks that wrap around an existing instance.
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class PartialMockObjectMockedInstanceTest {
+public class PartialMockObjectMockPrototypeIntegrationTest {
 
-    /* Class under test */
-    private PartialMockObject<TestClass> mockObject;
+    private PartialMock<TestClass> mockObject;
 
 
     @Before
-    public void setUp() {
-        // todo td implement
-        TestClass mockedInstance = new TestClass("original value");
-//        mockObject = new PartialMockObject<TestClass>(mockedInstance, this);
+    public void initialize() {
+        TestClass prototype = new TestClass("original value");
+        mockObject = MockUnitils.createPartialMock(prototype, this);
     }
 
 
@@ -68,13 +65,9 @@ public class PartialMockObjectMockedInstanceTest {
 
         int result = mockObject.getMock().methodThatCallsOtherMethod(3, 4);
         assertEquals(999, result);
-
-        // make sure the order of the invocations is recorded correctly
-        // todo implement
-//        List<ObservedInvocation> observedInvocations = mockObject.getScenario(this).getObservedInvocations();
         List<ObservedInvocation> observedInvocations = null;
-        assertEquals("methodThatCallsOtherMethod", observedInvocations.get(0).getMethod().getName());
-        assertEquals("methodWithArguments", observedInvocations.get(1).getMethod().getName());
+        mockObject.assertInvokedInSequence().methodThatCallsOtherMethod(3, 4);
+        mockObject.assertInvokedInSequence().methodWithArguments(3, 4);
     }
 
 
@@ -98,7 +91,5 @@ public class PartialMockObjectMockedInstanceTest {
         public int methodThatCallsOtherMethod(int a, int b) {
             return methodWithArguments(a, b);
         }
-
     }
-
 }

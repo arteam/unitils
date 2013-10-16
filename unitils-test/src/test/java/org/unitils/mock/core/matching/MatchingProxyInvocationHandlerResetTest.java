@@ -62,6 +62,5 @@ public class MatchingProxyInvocationHandlerResetTest extends UnitilsJUnit4 {
 
         matchingProxyInvocationHandler.reset();
         matchingProxyInvocationHandler.assertPreviousMatchingInvocationCompleted();
-        argumentMatcherRepositoryMock.assertInvoked().reset();
     }
 }

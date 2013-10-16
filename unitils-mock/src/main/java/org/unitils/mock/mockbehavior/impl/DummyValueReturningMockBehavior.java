@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.reflect.Modifier.isFinal;
-import static org.apache.commons.lang.StringUtils.uncapitalize;
 
 /**
  * Mock behavior that returns a default value. The default value for an object will be a proxy object with the same behaviour. When doing
@@ -87,8 +86,7 @@ public class DummyValueReturningMockBehavior extends DefaultValueReturningMockBe
         if (cannotCreateDummy(returnType)) {
             return null;
         }
-        String dummyName = uncapitalize(returnType.getSimpleName());
-        return mockFactory.createDummy(dummyName, returnType);
+        return mockFactory.createDummy(null, returnType);
     }
 
     protected boolean cannotCreateDummy(Class<?> returnType) {

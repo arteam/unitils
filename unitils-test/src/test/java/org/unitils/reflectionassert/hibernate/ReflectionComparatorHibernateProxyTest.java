@@ -21,6 +21,8 @@ import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.database.annotation.TestDataSource;
 import org.unitils.database.annotation.Transactional;
@@ -30,64 +32,49 @@ import org.unitils.reflectionassert.difference.Difference;
 
 import javax.sql.DataSource;
 
-import static org.junit.Assert.*;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.unitils.database.SqlUnitils.executeUpdate;
 import static org.unitils.database.SqlUnitils.executeUpdateQuietly;
 import static org.unitils.database.util.TransactionMode.COMMIT;
-
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 
 /**
- * Test class for Hibernate proxy related tests of the {@link ReflectionComparator} .
- * <p/>
- * Currently this is only implemented for HsqlDb.
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 @Transactional(COMMIT)
+@ContextConfiguration
 public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
 
-    /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(ReflectionComparatorHibernateProxyTest.class);
+
+    private ReflectionComparator reflectionComparator;
 
     /* A test hibernate entity, with a link to a lazily loaded parent class */
     private Child testChild;
-
     @TestDataSource
     protected DataSource dataSource;
-
-    // todo implement
-    // @HibernateSessionFactory("org/unitils/reflectionassert/hibernate/hibernate.cfg.xml")
+    @Autowired
     protected SessionFactory sessionFactory;
-
-    /* Class under test */
-    private ReflectionComparator reflectionComparator;
-
     /* True if current test is not for the current dialect */
     private boolean disabled;
 
 
-    /**
-     * Initializes the test fixture.
-     */
     @Before
-    public void setUp() throws Exception {
-//        Properties configuration = new ConfigurationLoader().loadConfiguration();
-//
-//        testChild = new Child(1L, new Parent(1L));
-//        testChild.getParent().setChildren(asList(testChild));
-//
-//        reflectionComparator = createRefectionComparator();
-//        dropTestTables();
-//        createTestTables();
+    public void initialize() throws Exception {
+        testChild = new Child(1L, new Parent(1L));
+        testChild.getParent().setChildren(asList(testChild));
+
+        reflectionComparator = createRefectionComparator();
+        dropTestTables();
+        createTestTables();
     }
 
 
-    /**
-     * Removes the test database tables from the test database, to avoid inference with other tests
-     */
     @After
-    public void tearDown() throws Exception {
+    public void cleanUp() throws Exception {
         if (disabled) {
             return;
         }
@@ -95,12 +82,8 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
     }
 
 
-    /**
-     * Test comparing 2 values with the right one containing a Hibernate proxy.
-     */
     @Test
-    public void testGetDifference_rightProxy() {
-        fail("todo implement");
+    public void nullWhenEqualsAndRightSideIsHibernateProxy() {
         if (disabled) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
@@ -110,12 +93,8 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
         assertNull(result);
     }
 
-
-    /**
-     * Test comparing 2 values with the left one containing a Hibernate proxy.
-     */
     @Test
-    public void testGetDifference_leftProxy() {
+    public void nullWhenEqualsAndLeftSideIsHibernateProxy() {
         if (disabled) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
@@ -127,13 +106,8 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
         assertNull(result);
     }
 
-
-    /**
-     * Test comparing 2 values with both containing a Hibernate proxy. The identifiers should have been used
-     * to compare the proxy values.
-     */
     @Test
-    public void testGetDifference_bothProxy() {
+    public void nullWhenBothSidesAreHibernateProxiesAndIdentifiersAreEqual() {
         if (disabled) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
@@ -145,13 +119,8 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
         assertNull(result);
     }
 
-
-    /**
-     * Test comparing 2 values with both containing a different hibnerate proxy. The identifiers should have been used
-     * to compare the proxy values.
-     */
     @Test
-    public void testGetDifference_bothProxyDifferentValue() {
+    public void differenceWhenBothSidesAreHibernateProxiesAndDifferentIdentifiers() {
         if (disabled) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
@@ -164,9 +133,6 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
     }
 
 
-    /**
-     * Creates the test tables.
-     */
     private void createTestTables() {
         executeUpdate("create table PARENT (id bigint not null, primary key (id))");
         executeUpdate("create table CHILD (id bigint not null, parent_id bigint not null, primary key (id))");
@@ -177,10 +143,6 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
         executeUpdate("insert into CHILD (id, parent_id) values (2, 2)");
     }
 
-
-    /**
-     * Removes the test tables
-     */
     private void dropTestTables() {
         executeUpdateQuietly("drop table CHILD");
         executeUpdateQuietly("drop table PARENT");

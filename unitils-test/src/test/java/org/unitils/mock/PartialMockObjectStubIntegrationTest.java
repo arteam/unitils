@@ -13,37 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 
 import java.util.List;
 
 import static org.junit.Assert.*;
 
 /**
- * Tests the mock object functionality for partial mocks that wrap around an existing instance.
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class PartialMockObjectStubTest {
+public class PartialMockObjectStubIntegrationTest extends UnitilsJUnit4 {
 
-    /* Class under test */
-    private PartialMockObject<TestClass> mockObject;
+    private PartialMock<TestClass> mockObject;
 
 
     @Before
-    public void setUp() {
-        // todo td implement
-//        mockObject = new PartialMockObject<TestClass>(TestClass.class, this);
+    public void initialize() {
         TestClass.invoked = false;
     }
 
 
     @Test
-    public void stubMethod() {
+    public void methodCodeNotInvokedWhenStubbed() {
         mockObject.stub().method();
 
         mockObject.getMock().method();
@@ -69,8 +65,8 @@ public class PartialMockObjectStubTest {
 
         mockObject.getMock().methodThatCallsOtherMethod();
         assertFalse(TestClass.invoked);
-        mockObject.assertInvoked().method();
-        mockObject.assertInvoked().methodThatCallsOtherMethod();
+        mockObject.assertInvokedInSequence().methodThatCallsOtherMethod();
+        mockObject.assertInvokedInSequence().method();
     }
 
 
@@ -90,7 +86,5 @@ public class PartialMockObjectStubTest {
             invoked = true;
             return null;
         }
-
     }
-
 }

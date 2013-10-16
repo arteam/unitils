@@ -78,7 +78,7 @@ public class DummyIntegrationTest extends UnitilsJUnit4 {
             MockUnitils.createDummy(FinalTestClass.class);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to create proxy with name finalTestClassDummy for type class org.unitils.mock.dummy.DummyIntegrationTest$FinalTestClass\n" +
+            assertEquals("Unable to create proxy with name finalTestClass for type class org.unitils.mock.dummy.DummyIntegrationTest$FinalTestClass\n" +
                     "Reason: IllegalArgumentException: Cannot subclass final class class org.unitils.mock.dummy.DummyIntegrationTest$FinalTestClass", e.getMessage());
         }
     }

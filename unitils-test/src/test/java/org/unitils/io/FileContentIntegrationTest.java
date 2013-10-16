@@ -13,42 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.io;
 
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.mock.PartialMock;
+import org.unitils.io.annotation.FileContent;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Properties;
 
-import static org.junit.Assert.assertNotNull;
-
+import static org.junit.Assert.assertEquals;
 
 /**
- * Tests the casting of mock objects (UNI-168 and UNI-169).
- *
  * @author Tim Ducheyne
- * @author Filip Neven
+ * @author Jeroen Horemans
+ * @author Thomas De Rycke
  */
-@SuppressWarnings({"RedundantCast"})
-public class MockObjectCastTest extends UnitilsJUnit4 {
+public class FileContentIntegrationTest extends UnitilsJUnit4 {
 
-    private PartialMock<MyTimerTask> myTimerTask;
+    @FileContent
+    protected String fileContent;
+    @FileContent
+    protected Properties propertiesContent;
 
 
     @Test
-    public void testCasting() throws Exception {
-        assertNotNull((TimerTask) myTimerTask.getMock());
-
-        Timer timer = new Timer();
-        timer.schedule(myTimerTask.getMock(), 0);
+    public void filledUpValuesTest() {
+        assertEquals("testFile", fileContent);
+        assertEquals("testFile", propertiesContent.getProperty("testFile"));
     }
-
-
-    public static class MyTimerTask extends TimerTask {
-        public void run() {
-        }
-    }
-
 }

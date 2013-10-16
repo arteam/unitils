@@ -18,6 +18,8 @@ package org.unitils.mock.core.proxy;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import static java.lang.reflect.Modifier.isAbstract;
+
 /**
  * An invocation of a proxy method.
  *
@@ -132,6 +134,20 @@ public class ProxyInvocation {
      */
     public List<?> getArguments() {
         return arguments;
+    }
+
+    /**
+     * @return True if the invoked method is an abstract method or a method of an interface
+     */
+    public boolean isAbstractMethod() {
+        return isAbstract(method.getModifiers());
+    }
+
+    /**
+     * @return True if the method does not have a return value
+     */
+    public boolean isVoidMethod() {
+        return method.getReturnType() == Void.TYPE;
     }
 
     /**

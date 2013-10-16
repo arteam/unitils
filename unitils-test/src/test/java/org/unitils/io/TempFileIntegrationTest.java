@@ -13,32 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.io.annotation;
+package org.unitils.io;
 
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.io.annotation.TempFile;
 
-import java.util.Properties;
+import java.io.File;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 
 /**
  * @author Jeroen Horemans
  * @author Tim Ducheyne
  * @author Thomas De Rycke
  */
-public class FileContentIntegrationTest extends UnitilsJUnit4 {
+public class TempFileIntegrationTest extends UnitilsJUnit4 {
 
-    @FileContent
-    protected String fileContent;
-    @FileContent
-    protected Properties propertiesContent;
+    @TempFile
+    private File defaultFile;
+    @TempFile(value = "customFile.tmp")
+    private File customFile;
 
 
     @Test
-    public void filledUpValuesTest() {
-        assertEquals("testFile", fileContent);
-        assertEquals("testFile", propertiesContent.getProperty("testFile"));
+    public void defaultTempFile() {
+        assertTrue(defaultFile.isFile());
+        assertEquals(TempFileIntegrationTest.class.getName() + "-defaultTempFile.tmp", defaultFile.getName());
     }
 
+    @Test
+    public void customTempFile() {
+        assertTrue(customFile.isFile());
+        assertEquals("customFile.tmp", customFile.getName());
+    }
 }

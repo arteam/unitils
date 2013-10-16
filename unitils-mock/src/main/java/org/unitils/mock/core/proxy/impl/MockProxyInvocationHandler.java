@@ -84,7 +84,9 @@ public class MockProxyInvocationHandler<T> implements ProxyInvocationHandler {
                 ValidatableMockBehavior validatableMockBehavior = (ValidatableMockBehavior) mockBehavior;
                 validatableMockBehavior.assertCanExecute(proxyInvocation);
             } catch (UnitilsException e) {
-                e.setStackTrace(behaviorDefiningInvocation.getInvokedAtTrace());
+                if (behaviorDefiningInvocation != null) {
+                    e.setStackTrace(behaviorDefiningInvocation.getInvokedAtTrace());
+                }
                 throw e;
             }
         }
@@ -92,7 +94,7 @@ public class MockProxyInvocationHandler<T> implements ProxyInvocationHandler {
     }
 
     protected MockBehavior getDefaultMockBehavior(ProxyInvocation proxyInvocation) {
-        if (proxyInvocation.getMethod().getReturnType() == Void.TYPE) {
+        if (proxyInvocation.isVoidMethod()) {
             return null;
         }
         return new DefaultValueReturningMockBehavior();
