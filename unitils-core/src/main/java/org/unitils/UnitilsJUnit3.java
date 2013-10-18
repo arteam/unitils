@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,28 +17,30 @@ package org.unitils;
 
 import junit.framework.TestCase;
 import org.apache.commons.lang.StringUtils;
+import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-import org.unitils.core.engine.UnitilsTestListener;
 
 import java.lang.reflect.Method;
 
 /**
  * Base test class that will Unitils-enable your test. This base class will make sure that the
- * core unitils test listener methods are invoked in the expected order.
+ * core unitils test listener methods are invoked in the expected order. See {@link TestListener} for
+ * more information on the listener invocation order.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-// todo unit test
 public abstract class UnitilsJUnit3 extends TestCase {
 
-    /* Keeps track of the test class for which tests are currently being executed. */
-    protected static Class<?> currentTestClass;
+    /**
+     * Keeps track of the test class for which tests are currently being executed.
+     */
+    private static Class<?> currentTestClass;
 
 
     /**
-     * Creates a test without a name. Be sure to call {@link junit.framework.TestCase#setName} afterwards.
+     * Creates a test without a name. Be sure to call {@link TestCase#setName} afterwards.
      */
     public UnitilsJUnit3() {
         this(null);
@@ -56,7 +58,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
 
 
     /**
-     * Overridden JUnit3 method to be able to call beforeTestSetUp and afterTestTearDown.
+     * Overriden JUnit3 method to be able to call {@link TestListener#beforeTestSetUp} and {@link TestListener#afterTestTearDown}.
      *
      * @throws Throwable If an error occurs during the test
      */
@@ -64,12 +66,13 @@ public abstract class UnitilsJUnit3 extends TestCase {
     public void runBare() throws Throwable {
         if (!getClass().equals(currentTestClass)) {
             currentTestClass = getClass();
-            getUnitilsTestListener().beforeTestClass(getClass());
+            getTestListener().beforeTestClass(getClass());
         }
+        getTestListener().afterCreateTestObject(this);
 
         Throwable firstThrowable = null;
         try {
-            getUnitilsTestListener().beforeTestSetUp(this, getCurrentTestMethod());
+            getTestListener().beforeTestSetUp(this, getCurrentTestMethod());
             super.runBare();
 
         } catch (Throwable t) {
@@ -78,7 +81,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
         }
 
         try {
-            getUnitilsTestListener().afterTestTearDown();
+            getTestListener().afterTestTearDown(this, getCurrentTestMethod());
 
         } catch (Throwable t) {
             // first exception is typically the most meaningful, so ignore second exception
@@ -95,7 +98,8 @@ public abstract class UnitilsJUnit3 extends TestCase {
 
 
     /**
-     * Overridden JUnit3 method to be able to call beforeTestMethod and afterTestMethod.
+     * Overriden JUnit3 method to be able to call {@link TestListener#beforeTestMethod} and
+     * {@link TestListener#afterTestMethod}.
      *
      * @throws Throwable If an error occurs during the test
      */
@@ -103,7 +107,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
     protected void runTest() throws Throwable {
         Throwable firstThrowable = null;
         try {
-            getUnitilsTestListener().beforeTestMethod();
+            getTestListener().beforeTestMethod(this, getCurrentTestMethod());
             super.runTest();
 
         } catch (Throwable t) {
@@ -112,7 +116,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
         }
 
         try {
-            getUnitilsTestListener().afterTestMethod(firstThrowable);
+            getTestListener().afterTestMethod(this, getCurrentTestMethod(), firstThrowable);
 
         } catch (Throwable t) {
             // first exception is typically the most meaningful, so ignore second exception
@@ -121,10 +125,23 @@ public abstract class UnitilsJUnit3 extends TestCase {
             }
         }
 
-        // if an exception occurred during beforeTestMethod, the test or afterTestMethod, throw it
+        // if an exception occured during beforeTestMethod, the test or afterTestMethod, throw it
         if (firstThrowable != null) {
             throw firstThrowable;
         }
+    }
+
+
+    /**
+     * This will return the default singleton instance by calling {@link Unitils#getInstance()}.
+     * <p/>
+     * You can override this method to let it create and set your own singleton instance. For example, you
+     * can let it create an instance of your own Unitils subclass and set it by using {@link Unitils#setInstance}.
+     *
+     * @return the unitils core instance, not null
+     */
+    protected Unitils getUnitils() {
+        return Unitils.getInstance();
     }
 
 
@@ -152,7 +169,8 @@ public abstract class UnitilsJUnit3 extends TestCase {
     /**
      * @return The unitils test listener
      */
-    protected UnitilsTestListener getUnitilsTestListener() {
-        return Unitils.getUnitilsTestListener();
+    protected TestListener getTestListener() {
+        return getUnitils().getTestListener();
     }
+
 }

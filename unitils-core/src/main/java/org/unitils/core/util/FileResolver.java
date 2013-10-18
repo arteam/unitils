@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2011,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.unitils.core.util;
 
-import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
 
 import java.io.File;
@@ -45,8 +44,8 @@ import java.net.URL;
  * <p/>
  * Examples:
  * <p/>
- * path prefix /c:/testFiles  --> looks for c:/testFiles/MyFile.xml on the file system
- * path prefix testFiles      --> looks for testFiles/MyFile.xml on the classpath
+ * path prefix /c:/testfiles  --> looks for c:/testfiles/MyFile.xml on the file system
+ * path prefix testfiles      --> looks for testfiles/MyFile.xml on the classpath
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -101,14 +100,14 @@ public class FileResolver {
      * @return The file, not null
      */
     public URI resolveFileName(String fileName, Class<?> testClass) {
-        // construct file name 
+        // construct file name
         String fullFileName = constructFullFileName(fileName, testClass);
 
         // if name starts with / treat it as absolute path
         if (fullFileName.startsWith("/")) {
             File file = new File(fullFileName);
             if (!file.exists()) {
-                throw new UnitilsException("File with name " + file.getAbsolutePath() + " cannot be found.");
+                throw new UnitilsException("File with name " + fullFileName + " cannot be found.");
             }
             return file.toURI();
         }
@@ -150,7 +149,7 @@ public class FileResolver {
             fileName = fileName.substring(1);
         }
         // add configured prefix
-        if (!StringUtils.isEmpty(pathPrefix)) {
+        if (pathPrefix != null) {
             fileName = pathPrefix + '/' + fileName;
         }
         return fileName;
@@ -175,7 +174,7 @@ public class FileResolver {
     }
 
     /**
-     * The default name is constructed as follows: 'classname without package name'.'extension'
+     * The default name is constructed as follows: 'classname without packagename'.'extension'
      *
      * @param extension The extension of the file
      * @param testClass The test class, not null
@@ -185,4 +184,5 @@ public class FileResolver {
         String className = testClass.getName();
         return className.substring(className.lastIndexOf(".") + 1) + '.' + extension;
     }
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,20 @@
  */
 package org.unitils.easymock.util;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.fail;
 import static org.unitils.easymock.EasyMockUnitils.lenEq;
 import static org.unitils.easymock.EasyMockUnitils.refEq;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Test for {@link org.unitils.easymock.util.ReflectionArgumentMatcher}.

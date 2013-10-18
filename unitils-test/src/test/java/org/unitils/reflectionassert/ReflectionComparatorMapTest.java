@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,15 @@
  */
 package org.unitils.reflectionassert;
 
-import org.junit.Before;
-import org.junit.Test;
+import junit.framework.TestCase;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import org.unitils.reflectionassert.difference.Difference;
 import org.unitils.reflectionassert.difference.MapDifference;
+import static org.unitils.reflectionassert.util.InnerDifferenceFinder.getInnerDifference;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import static org.junit.Assert.*;
-import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
-import static org.unitils.reflectionassert.util.InnerDifferenceFinder.getInnerDifference;
 
 
 /**
@@ -36,7 +33,7 @@ import static org.unitils.reflectionassert.util.InnerDifferenceFinder.getInnerDi
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ReflectionComparatorMapTest {
+public class ReflectionComparatorMapTest extends TestCase {
 
     /* Test map */
     private Map<String, Element> mapA;
@@ -75,8 +72,9 @@ public class ReflectionComparatorMapTest {
     /**
      * Initializes the test fixture.
      */
-    @Before
-    public void initialize() throws Exception {
+    protected void setUp() throws Exception {
+        super.setUp();
+
         mapA = createMap("key 2", "test 2", null);
         mapB = createMap("key 2", "test 2", null);
         mapDifferentValue = createMap("key 2", "XXXXXX", null);
@@ -97,7 +95,6 @@ public class ReflectionComparatorMapTest {
     /**
      * Test for two equal maps.
      */
-    @Test
     public void testGetDifference_equals() {
         Difference result = reflectionComparator.getDifference(mapA, mapB);
         assertNull(result);
@@ -107,7 +104,6 @@ public class ReflectionComparatorMapTest {
     /**
      * Test for two equal maps as an inner field of an object.
      */
-    @Test
     public void testGetDifference_equalsInner() {
         Difference result = reflectionComparator.getDifference(mapInnerA, mapInnerB);
         assertNull(result);
@@ -117,7 +113,6 @@ public class ReflectionComparatorMapTest {
     /**
      * Test for two maps that contain different values.
      */
-    @Test
     public void testGetDifference_notEqualsDifferentValues() {
         Difference result = reflectionComparator.getDifference(mapA, mapDifferentValue);
 
@@ -130,7 +125,6 @@ public class ReflectionComparatorMapTest {
     /**
      * Test for two maps that have a different size. The first element was removed from the left map
      */
-    @Test
     public void testGetDifference_notEqualsLeftElementRemoved() {
         mapA.remove("key 1");
         Difference result = reflectionComparator.getDifference(mapA, mapB);
@@ -142,7 +136,6 @@ public class ReflectionComparatorMapTest {
     /**
      * Test for two maps that have a different size. The first element was removed from the right map
      */
-    @Test
     public void testGetDifference_notEqualsRightElementRemoved() {
         mapB.remove("key 1");
         Difference result = reflectionComparator.getDifference(mapA, mapB);
@@ -154,7 +147,6 @@ public class ReflectionComparatorMapTest {
     /**
      * Test for objects with inner maps that contain different values.
      */
-    @Test
     public void testGetDifference_notEqualsInnerDifferentValues() {
         Difference result = reflectionComparator.getDifference(mapInnerA, mapInnerDifferentValue);
 
@@ -168,7 +160,6 @@ public class ReflectionComparatorMapTest {
     /**
      * Test for maps that contain different keys.
      */
-    @Test
     public void testGetDifference_notEqualsDifferentKeys() {
         Difference result = reflectionComparator.getDifference(mapA, mapDifferentKey);
 
@@ -180,7 +171,6 @@ public class ReflectionComparatorMapTest {
     /**
      * Tests for objects with inner maps that have a different size.
      */
-    @Test
     public void testGetDifference_notEqualsInnerDifferentSize() {
         Iterator<?> iterator = mapB.entrySet().iterator();
         iterator.next();
@@ -197,7 +187,6 @@ public class ReflectionComparatorMapTest {
     /**
      * Tests for maps but right value is not a map.
      */
-    @Test
     public void testGetDifference_notEqualsRightNotMap() {
         Difference result = reflectionComparator.getDifference(mapA, "Test string");
 
@@ -210,7 +199,6 @@ public class ReflectionComparatorMapTest {
      * Tests for equal maps for which the keys are not equals() but are equal using reflection.
      * The reflection comparator uses strict reflection compare on keys.
      */
-    @Test
     public void testGetDifference_equalsMapComparingKeysUsingReflection() {
         Difference result = reflectionComparator.getDifference(mapReflectionCompareKeyA, mapReflectionCompareKeyB);
         assertNull(result);
@@ -221,7 +209,6 @@ public class ReflectionComparatorMapTest {
      * Tests for using reflection on key values with a different value for one of the keys.
      * The reflection comparator uses strict reflection compare on keys.
      */
-    @Test
     public void testGetDifference_notEqualsMapComparingKeysUsingReflection() {
         Difference result = reflectionComparator.getDifference(mapReflectionCompareKeyA, mapReflectionCompareDifferentKey);
 
@@ -312,4 +299,6 @@ public class ReflectionComparatorMapTest {
             return false;
         }
     }
+
+
 }

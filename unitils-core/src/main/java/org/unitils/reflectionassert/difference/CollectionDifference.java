@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,15 +29,19 @@ import java.util.Map;
 public class CollectionDifference extends Difference {
 
     /* The differences per index */
-    protected Map<Integer, Difference> elementDifferences = new HashMap<Integer, Difference>();
+    private Map<Integer, Difference> elementDifferences = new HashMap<Integer, Difference>();
+
     /* The indexes of the left elements that were missing in the right collection */
-    protected List<Integer> leftMissingIndexes = new ArrayList<Integer>();
+    private List<Integer> leftMissingIndexes = new ArrayList<Integer>();
+
     /* The indexes of the right elements that were missing in the left collection */
-    protected List<Integer> rightMissingIndexes = new ArrayList<Integer>();
+    private List<Integer> rightMissingIndexes = new ArrayList<Integer>();
+
     /* The left object as a list */
-    protected List<?> leftList;
+    private List<?> leftList;
+
     /* The right object as a list */
-    protected List<?> rightList;
+    private List<?> rightList;
 
 
     /**
@@ -66,6 +70,7 @@ public class CollectionDifference extends Difference {
         elementDifferences.put(index, difference);
     }
 
+
     /**
      * Gets all element differences per index.
      *
@@ -74,6 +79,7 @@ public class CollectionDifference extends Difference {
     public Map<Integer, Difference> getElementDifferences() {
         return elementDifferences;
     }
+
 
     /**
      * Adds an index of a left element that is missing in the right collection.
@@ -84,6 +90,7 @@ public class CollectionDifference extends Difference {
         leftMissingIndexes.add(index);
     }
 
+
     /**
      * Gets the indexes of the left elements that were missing in the right collection.
      *
@@ -92,6 +99,7 @@ public class CollectionDifference extends Difference {
     public List<Integer> getLeftMissingIndexes() {
         return leftMissingIndexes;
     }
+
 
     /**
      * Adds an index of a right element that is missing in the left collection.
@@ -102,6 +110,7 @@ public class CollectionDifference extends Difference {
         rightMissingIndexes.add(index);
     }
 
+
     /**
      * Gets the indexes of the right elements that were missing in the left collection.
      *
@@ -111,6 +120,7 @@ public class CollectionDifference extends Difference {
         return rightMissingIndexes;
     }
 
+
     /**
      * @return The left instance as a list
      */
@@ -118,12 +128,14 @@ public class CollectionDifference extends Difference {
         return leftList;
     }
 
+
     /**
      * @return The right instance as a list
      */
     public List<?> getRightList() {
         return rightList;
     }
+
 
     /**
      * Double dispatch method. Dispatches back to the given visitor.
@@ -138,4 +150,5 @@ public class CollectionDifference extends Difference {
     public <T, A> T accept(DifferenceVisitor<T, A> visitor, A argument) {
         return visitor.visit(this, argument);
     }
+
 }

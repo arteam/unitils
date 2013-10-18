@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,12 @@ import org.unitils.reflectionassert.comparator.Comparator;
 import org.unitils.reflectionassert.difference.Difference;
 import org.unitils.reflectionassert.difference.UnorderedCollectionDifference;
 import org.unitils.reflectionassert.util.MatchingScoreCalculator;
+import static org.unitils.util.CollectionUtils.convertToCollection;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-
-import static org.unitils.util.CollectionUtils.convertToCollection;
 
 
 /**
@@ -227,7 +226,6 @@ public class LenientOrderCollectionComparator implements Comparator {
                 if (elementDifference == null) {
                     rightIterator.remove();
                     leftIterator.remove();
-                    break;
                 }
             }
         }

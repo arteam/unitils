@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import java.util.Map;
 public class ObjectDifference extends Difference {
 
     /* The differences per field name */
-    protected Map<String, Difference> fieldDifferences = new HashMap<String, Difference>();
+    private Map<String, Difference> fieldDifferences = new HashMap<String, Difference>();
 
 
     /**
@@ -52,6 +52,7 @@ public class ObjectDifference extends Difference {
         fieldDifferences.put(fieldName, difference);
     }
 
+
     /**
      * Gets all differences per field name.
      *
@@ -60,6 +61,7 @@ public class ObjectDifference extends Difference {
     public Map<String, Difference> getFieldDifferences() {
         return fieldDifferences;
     }
+
 
     /**
      * Double dispatch method. Dispatches back to the given visitor.
@@ -74,4 +76,5 @@ public class ObjectDifference extends Difference {
     public <T, A> T accept(DifferenceVisitor<T, A> visitor, A argument) {
         return visitor.visit(this, argument);
     }
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import javax.persistence.ManyToOne;
 import java.io.Serializable;
 
 /**
+ * todo javadoc
+ *
  * @author Tim Peeters
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -30,12 +32,14 @@ import java.io.Serializable;
 public class Child implements Serializable {
 
     private Long id;
+
     private Parent parent;
 
 
     public Child() {
         this(null, null);
     }
+
 
     public Child(Long id, Parent parent) {
         this.id = id;
@@ -48,14 +52,17 @@ public class Child implements Serializable {
         return id;
     }
 
+
     public void setId(Long id) {
         this.id = id;
     }
+
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     public Parent getParent() {
         return parent;
     }
+
 
     public void setParent(Parent parent) {
         this.parent = parent;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,13 @@ package org.unitils.reflectionassert.difference;
 public class Difference {
 
     /* The left result value */
-    protected Object leftValue;
+    private Object leftValue;
+
     /* The right result value */
-    protected Object rightValue;
+    private Object rightValue;
+
     /* A message describing the difference */
-    protected String message;
+    private String message;
 
 
     /**
@@ -54,6 +56,7 @@ public class Difference {
         return leftValue;
     }
 
+
     /**
      * Gets the right value.
      *
@@ -63,6 +66,7 @@ public class Difference {
         return rightValue;
     }
 
+
     /**
      * Gets the message indicating the kind of difference.
      *
@@ -71,6 +75,7 @@ public class Difference {
     public String getMessage() {
         return message;
     }
+
 
     /**
      * Double dispatch method. Dispatches back to the given visitor.
@@ -84,4 +89,6 @@ public class Difference {
     public <T, A> T accept(DifferenceVisitor<T, A> visitor, A argument) {
         return visitor.visit(this, argument);
     }
+
+
 }

@@ -1,17 +1,19 @@
 /*
- * Copyright 2013,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock.core;
 
@@ -27,41 +29,35 @@ import java.util.List;
  */
 public class BehaviorDefiningInvocations {
 
-    /* Mock behaviors that are removed once they have been matched */
+    protected boolean removeWhenUsed;
     protected List<BehaviorDefiningInvocation> behaviorDefiningInvocations = new ArrayList<BehaviorDefiningInvocation>();
+
+
+    public BehaviorDefiningInvocations(boolean removeWhenUsed) {
+        this.removeWhenUsed = removeWhenUsed;
+    }
 
 
     public void addBehaviorDefiningInvocation(BehaviorDefiningInvocation behaviorDefiningInvocation) {
         behaviorDefiningInvocations.add(behaviorDefiningInvocation);
     }
 
+
     public void clear() {
         behaviorDefiningInvocations.clear();
     }
 
+
     /**
      * First we find all behavior defining invocations that have matching argument matchers and take the one with the highest
      * matching score (identity match scores higher than an equals match). If there are 2 invocations with the same score,
-     * we take the invocation with the lowest nr of not-null (default) arguments.  E.g.
-     * <p/>
+     * we take the invocation with the lowest nr of not-null (default) arguments. If both have the same nr of not-null
+     * arguments, the first one is returned. E.g.
+     *
      * myMethod(null, null);
      * myMethod("a", null);
-     * <p/>
+     *
      * The second one will be returned if the given proxy invocation has the value "a" as first argument.
-     * If both have the same nr of not-null arguments, the last one is returned for always matching behavior.
-     * This way you can still override behavior that was set up before.
-     * For one time matching behavior we always return the first match.
-     * E.g.
-     * <p/>
-     * myMock.returns(1).myMethod();
-     * myMock.returns(2).myMethod();
-     * <p/>
-     * Will always return 2 since the behavior is overridden (last one wins)
-     * <p/>
-     * myMock.onceReturns(1).myMethod();
-     * myMock.onceReturns(2).myMethod();
-     * <p/>
-     * Will first return 1 and then return 2 (order is kept)
      *
      * @param proxyInvocation The actual invocation to match with, not null
      * @return The behavior defining invocation that matches best with the actual invocation, null if none found
@@ -70,9 +66,7 @@ public class BehaviorDefiningInvocations {
         BehaviorDefiningInvocation bestMatchingBehaviorDefiningInvocation = null;
         int bestMatchingScore = -1;
 
-        int count = behaviorDefiningInvocations.size();
-        for (int i = count - 1; i >= 0; i--) {
-            BehaviorDefiningInvocation behaviorDefiningInvocation = behaviorDefiningInvocations.get(i);
+        for (BehaviorDefiningInvocation behaviorDefiningInvocation : behaviorDefiningInvocations) {
             int matchingScore = behaviorDefiningInvocation.matches(proxyInvocation);
             if (matchingScore == -1) {
                 // no match
@@ -93,18 +87,12 @@ public class BehaviorDefiningInvocations {
                 int nrOfNotNullArguments = behaviorDefiningInvocation.getNrOfNotNullArguments();
                 int bestMatchingNrOfNotNullArguments = bestMatchingBehaviorDefiningInvocation.getNrOfNotNullArguments();
                 if (nrOfNotNullArguments > bestMatchingNrOfNotNullArguments) {
+                    bestMatchingScore = matchingScore;
                     bestMatchingBehaviorDefiningInvocation = behaviorDefiningInvocation;
-                    continue;
-                }
-                // same score, one time matcher wins over always matcher + first one time matcher wins
-                if (nrOfNotNullArguments == bestMatchingNrOfNotNullArguments) {
-                    if (behaviorDefiningInvocation.isOneTimeMatch()) {
-                        bestMatchingBehaviorDefiningInvocation = behaviorDefiningInvocation;
-                    }
                 }
             }
         }
-        if (bestMatchingBehaviorDefiningInvocation != null && bestMatchingBehaviorDefiningInvocation.isOneTimeMatch()) {
+        if (removeWhenUsed && bestMatchingBehaviorDefiningInvocation != null) {
             behaviorDefiningInvocations.remove(bestMatchingBehaviorDefiningInvocation);
         }
         return bestMatchingBehaviorDefiningInvocation;

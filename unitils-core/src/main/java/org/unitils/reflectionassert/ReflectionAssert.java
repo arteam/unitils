@@ -1,17 +1,19 @@
 /*
- * Copyright 2013,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.reflectionassert;
 
@@ -97,6 +99,7 @@ public class ReflectionAssert {
         assertReflectionEquals(null, expected, actual, modes);
     }
 
+
     /**
      * Asserts that two objects are equal. Reflection is used to compare all fields of these values.
      * If they are not equal an AssertionFailedError is thrown.
@@ -112,6 +115,7 @@ public class ReflectionAssert {
     public static void assertLenientEquals(String message, Object expected, Object actual) throws AssertionFailedError {
         assertReflectionEquals(message, expected, actual, LENIENT_ORDER, IGNORE_DEFAULTS);
     }
+
 
     /**
      * Asserts that two objects are equal. Reflection is used to compare all fields of these values.
@@ -133,6 +137,20 @@ public class ReflectionAssert {
         }
     }
 
+
+    /**
+     * @param message    a custom user-provided message, null if the user didn't provide a message
+     * @param difference the difference, not null
+     * @return a failure message describing the difference found
+     */
+    protected static String getFailureMessage(String message, Difference difference) {
+        StringBuilder failureMessage = new StringBuilder();
+        failureMessage.append(message == null ? "" : message + "\n");
+        failureMessage.append(new DefaultDifferenceReport().createReport(difference));
+        return failureMessage.toString();
+    }
+
+
     /**
      * Asserts that the value of a property of an object is equal to the given value.
      * <p/>
@@ -151,7 +169,6 @@ public class ReflectionAssert {
         assertPropertyLenientEquals(null, propertyName, expectedPropertyValue, actualObject);
     }
 
-    // todo property lenient equals does not work with arrays (only with collections)
 
     /**
      * Asserts that the value of a property of an object is equal to the given value.
@@ -171,6 +188,7 @@ public class ReflectionAssert {
         assertPropertyReflectionEquals(null, propertyName, expectedPropertyValue, actualObject, modes);
     }
 
+
     /**
      * Asserts that the value of a property of an object is equal to the given value.
      * <p/>
@@ -189,6 +207,7 @@ public class ReflectionAssert {
     public static void assertPropertyLenientEquals(String message, String propertyName, Object expectedPropertyValue, Object actualObject) throws AssertionFailedError {
         assertPropertyReflectionEquals(message, propertyName, expectedPropertyValue, actualObject, LENIENT_ORDER, IGNORE_DEFAULTS);
     }
+
 
     /**
      * Asserts that the value of a property of an object is equal to the given value.
@@ -212,6 +231,7 @@ public class ReflectionAssert {
         assertReflectionEquals(formattedMessage, expectedPropertyValue, propertyValue, modes);
     }
 
+
     /**
      * Asserts that a property of all objects in the collection are equal to the given values.
      * <p/>
@@ -233,6 +253,7 @@ public class ReflectionAssert {
         assertPropertyLenientEquals(null, propertyName, expectedPropertyValues, actualObjects);
     }
 
+
     /**
      * Asserts that a property of all objects in the collection are equal to the given values.
      * <p/>
@@ -253,6 +274,7 @@ public class ReflectionAssert {
     public static void assertPropertyReflectionEquals(String propertyName, Collection<?> expectedPropertyValues, Collection<?> actualObjects, ReflectionComparatorMode... modes) throws AssertionFailedError {
         assertPropertyReflectionEquals(null, propertyName, expectedPropertyValues, actualObjects, modes);
     }
+
 
     /**
      * Asserts that a property of all objects in the collection are equal to the given values.
@@ -281,9 +303,9 @@ public class ReflectionAssert {
      * Private fields are also checked.
      * This is NOT recursive, only the values of the first object will be checked.
      * An assertion error will be thrown when a property is null.
-     *
-     * @param message a message for when the assertion fails
-     * @param object  the object that will be checked for null values.
+     * 
+     * @param message    a message for when the assertion fails
+     * @param object     the object that will be checked for null values.
      */
     public static void assertPropertiesNotNull(String message, Object object) {
         Set<Field> fields = ReflectionUtils.getAllFields(object.getClass());
@@ -295,7 +317,8 @@ public class ReflectionAssert {
         }
 
     }
-
+    
+    
     /**
      * Asserts that a property of all objects in the collection are equal to the given values.
      * <p/>
@@ -322,18 +345,6 @@ public class ReflectionAssert {
 
 
     /**
-     * @param message    a custom user-provided message, null if the user didn't provide a message
-     * @param difference the difference, not null
-     * @return a failure message describing the difference found
-     */
-    protected static String getFailureMessage(String message, Difference difference) {
-        StringBuilder failureMessage = new StringBuilder();
-        failureMessage.append(message == null ? "" : message + "\n");
-        failureMessage.append(new DefaultDifferenceReport().createReport(difference));
-        return failureMessage.toString();
-    }
-
-    /**
      * Formats the exception message.
      *
      * @param suppliedMessage the user supplied message
@@ -346,6 +357,7 @@ public class ReflectionAssert {
         }
         return suppliedMessage + "\n" + specificMessage;
     }
+
 
     /**
      * Evaluates the given OGNL expression, and returns the corresponding property value from the given object.
@@ -373,7 +385,7 @@ public class ReflectionAssert {
     protected static class OgnlTransformer implements Transformer {
 
         /* The ognl expression */
-        protected String ognlExpression;
+        private String ognlExpression;
 
         /**
          * Creates  a transformer with the given ognl expression.
@@ -397,4 +409,5 @@ public class ReflectionAssert {
             return getProperty(object, ognlExpression);
         }
     }
+
 }

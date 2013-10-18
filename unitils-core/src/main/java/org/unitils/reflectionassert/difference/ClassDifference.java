@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 package org.unitils.reflectionassert.difference;
 
 /**
- * @author Tim Ducheyne
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class ClassDifference extends Difference {
 
-    protected Class<?> leftClass;
-    protected Class<?> rightClass;
+    private Class<?> leftClass;
+    private Class<?> rightClass;
 
     /**
      * Creates a difference.
@@ -46,7 +46,7 @@ public class ClassDifference extends Difference {
     }
 
     @Override
-    public <T, A> T accept(DifferenceVisitor<T, A> visitor, A argument) {
+     public <T, A> T accept(DifferenceVisitor<T, A> visitor, A argument) {
         return visitor.visit(this, argument);
     }
 }

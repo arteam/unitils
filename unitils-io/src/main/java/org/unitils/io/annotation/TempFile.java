@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2011,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,6 @@
 
 package org.unitils.io.annotation;
 
-import org.unitils.core.annotation.FieldAnnotation;
-import org.unitils.io.listener.TempFileFieldAnnotationListener;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -31,12 +28,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * A optional name can be specified for file. If no name is specified, a default name 'class-name'-'method-name'.tmp will be used.
  * <p/>
  * The parent directory for this file can be
- * specified by setting the {@link org.unitils.io.temp.TempService#ROOT_TEMP_DIR_PROPERTY} property.
+ * specified by setting the {@link org.unitils.io.temp.impl.DefaultTempServiceFactory#ROOT_TEMP_DIR} property.
  * If no root temp dir is specified the default user temp dir will be used.
  * <p/>
  * Watch out: if the file already exists, it will first be deleted.
  * <p/>
- * By default, the file will not be removed after the test. You can set the {@link org.unitils.io.listener.TempFileFieldAnnotationListener#CLEANUP_AFTER_TEST_PROPERTY}
+ * By default, the file will not be removed after the test. You can set the {@link org.unitils.io.IOModule#CLEANUP_AFTER_TEST}
  * property to true if you want unitils to delete the files automatically after each test.
  *
  * @author Jeroen Horemans
@@ -46,7 +43,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
-@FieldAnnotation(value = TempFileFieldAnnotationListener.class)
 public @interface TempFile {
 
     /**

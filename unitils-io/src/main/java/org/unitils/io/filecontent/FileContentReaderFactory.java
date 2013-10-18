@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2011,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,65 +16,15 @@
 
 package org.unitils.io.filecontent;
 
-import org.unitils.core.Factory;
-import org.unitils.core.annotation.Property;
-import org.unitils.core.config.Configuration;
-import org.unitils.io.conversion.ConversionStrategy;
-import org.unitils.io.filecontent.impl.DefaultFileContentReader;
-import org.unitils.io.reader.ReadingStrategy;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+import java.util.Properties;
 
 /**
  * @author Tim Ducheyne
  * @author Jeroen Horemans
  * @since 3.3
  */
-public class FileContentReaderFactory implements Factory<FileContentReader> {
+public interface FileContentReaderFactory {
 
-    public static final String DEFAULT_CONVERSION_STRATEGY_PROPERTY = "io.conversion.default";
-    public static final String CUSTOM_CONVERSION_STRATEGY_PROPERTY = "io.conversion.custom";
-    public static final String DEFAULT_FILE_ENCODING_PROPERTY = "io.encoding.default";
+    FileContentReader createFileContentReader(Properties configuration);
 
-    protected Configuration configuration;
-    protected String defaultEncoding;
-    protected ReadingStrategy readingStrategy;
-
-
-    public FileContentReaderFactory(Configuration configuration, @Property(DEFAULT_FILE_ENCODING_PROPERTY) String defaultEncoding, ReadingStrategy readingStrategy) {
-        this.configuration = configuration;
-        this.defaultEncoding = defaultEncoding;
-        this.readingStrategy = readingStrategy;
-    }
-
-
-    public FileContentReader create() {
-        List<ConversionStrategy<?>> conversionStrategies = createConversionStrategies(configuration);
-        return new DefaultFileContentReader(readingStrategy, conversionStrategies, defaultEncoding);
-    }
-
-
-    protected List<ConversionStrategy<?>> createConversionStrategies(Configuration configuration) {
-        List<ConversionStrategy<?>> conversionStrategies = new LinkedList<ConversionStrategy<?>>();
-        conversionStrategies.addAll(createConversionStrategies(configuration.getOptionalStringList(CUSTOM_CONVERSION_STRATEGY_PROPERTY)));
-        conversionStrategies.addAll(createConversionStrategies(configuration.getStringList(DEFAULT_CONVERSION_STRATEGY_PROPERTY)));
-        return conversionStrategies;
-    }
-
-    protected List<ConversionStrategy<?>> createConversionStrategies(List<String> conversionStrategyClassNames) {
-        if (conversionStrategyClassNames == null || conversionStrategyClassNames.isEmpty()) {
-            return new LinkedList<ConversionStrategy<?>>();
-        }
-        List<ConversionStrategy<?>> conversionStrategies = new ArrayList<ConversionStrategy<?>>(conversionStrategyClassNames.size());
-
-        for (String conversionStrategyClassName : conversionStrategyClassNames) {
-            ConversionStrategy<?> conversionStrategy = createInstanceOfType(conversionStrategyClassName, false);
-            conversionStrategies.add(conversionStrategy);
-        }
-        return conversionStrategies;
-    }
 }

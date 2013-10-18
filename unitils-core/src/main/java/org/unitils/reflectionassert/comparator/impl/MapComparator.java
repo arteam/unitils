@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.unitils.reflectionassert.comparator.impl;
 
 import org.unitils.reflectionassert.ReflectionComparator;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import org.unitils.reflectionassert.comparator.Comparator;
 import org.unitils.reflectionassert.difference.Difference;
 import org.unitils.reflectionassert.difference.MapDifference;
@@ -23,8 +24,6 @@ import org.unitils.reflectionassert.difference.MapDifference;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 
 /**
  * Comparator for maps. This will compare all values with corresponding keys.

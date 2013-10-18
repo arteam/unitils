@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ public class ReflectionComparator {
     /**
      * A cache of results, so that comparisons are only performed once and infinite loops because of cycles are avoided
      * A different cache is used dependent on whether only the first difference is required or whether we need all
-     * differences, since the resulting {@link Difference} objects differ.
+     * differences, since the resulting {@link Difference} objects differ. 
      */
     protected Map<Object, Map<Object, Difference>> firstDifferenceCachedResults = new IdentityHashMap<Object, Map<Object, Difference>>();
     protected Map<Object, Map<Object, Difference>> allDifferencesCachedResults = new IdentityHashMap<Object, Map<Object, Difference>>();

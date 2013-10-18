@@ -1,24 +1,26 @@
 /*
- * Copyright 2013,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock.core.proxy;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
-import static java.lang.reflect.Modifier.isAbstract;
+import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
 
 /**
  * An invocation of a proxy method.
@@ -29,42 +31,42 @@ import static java.lang.reflect.Modifier.isAbstract;
  */
 public class ProxyInvocation {
 
-    /* The display name of the proxy */
-    protected String proxyName;
+    /* The name of the mock, e.g. the field name */
+    private String mockName;
     /* The proxy on which the method was called */
-    protected Object proxy;
+    private Object proxy;
     /* The method that was called */
-    protected Method method;
+    private Method method;
     /* The arguments that were used */
-    protected List<?> arguments;
+    private List<Object> arguments;
     /* The arguments at the time that they were used */
-    protected List<?> argumentsAtInvocationTime;
+    private List<Object> argumentsAtInvocationTime;
     /* The trace of the invocation */
-    protected StackTraceElement[] invokedAtTrace;
+    private StackTraceElement[] invokedAtTrace;
 
 
     /**
      * Creates an invocation.
      *
-     * @param proxyName                 The display name of the proxy, not null
-     * @param proxy                     The proxy on which the method was called, not null
-     * @param method                    The method that was called, not null
-     * @param arguments                 The arguments that were used (pass by reference), not null
-     * @param argumentsAtInvocationTime A copy of the values at the time of invocation (pass by value), not null
-     * @param invokedAtTrace            The trace of the invocation, not null
+     * @param mockName       The name of the mock, e.g. the field name, not null
+     * @param proxy          The proxy on which the method was called, not null
+     * @param method         The method that was called, not null
+     * @param arguments      The arguments that were used, not null
+     * @param invokedAtTrace The trace of the invocation, not null
      */
-    public ProxyInvocation(String proxyName, Object proxy, Method method, List<?> arguments, List<?> argumentsAtInvocationTime, StackTraceElement[] invokedAtTrace) {
-        this.proxyName = proxyName;
+    public ProxyInvocation(String mockName, Object proxy, Method method, List<Object> arguments, StackTraceElement[] invokedAtTrace) {
+        this.mockName = mockName;
         this.proxy = proxy;
         this.method = method;
         this.arguments = arguments;
-        this.argumentsAtInvocationTime = argumentsAtInvocationTime;
+        this.argumentsAtInvocationTime = arguments;
         this.invokedAtTrace = invokedAtTrace;
     }
 
+
     /**
      * Creates a copy of the given proxy invocation.
-     * <p/>
+     *
      * The argumentsAtInvocationTime will be set as copies (deep clones) of the arguments at the time of
      * the invocation. This way the original values can still be used later-on even when changes
      * occur to the original values (pass-by-value vs pass-by-reference). If not explicitly set, this will return the
@@ -73,12 +75,12 @@ public class ProxyInvocation {
      * @param proxyInvocation The proxy invocation to copy, not null
      */
     public ProxyInvocation(ProxyInvocation proxyInvocation) {
-        this.proxyName = proxyInvocation.proxyName;
-        this.proxy = proxyInvocation.proxy;
-        this.method = proxyInvocation.method;
-        this.arguments = proxyInvocation.arguments;
-        this.argumentsAtInvocationTime = proxyInvocation.argumentsAtInvocationTime;
-        this.invokedAtTrace = proxyInvocation.invokedAtTrace;
+        this.mockName = proxyInvocation.getMockName();
+        this.proxy = proxyInvocation.getProxy();
+        this.method = proxyInvocation.getMethod();
+        this.arguments = proxyInvocation.getArguments();
+        this.argumentsAtInvocationTime = createDeepClone(arguments);
+        this.invokedAtTrace = proxyInvocation.getInvokedAtTrace();
     }
 
 
@@ -90,6 +92,7 @@ public class ProxyInvocation {
     public Object invokeOriginalBehavior() throws Throwable {
         throw new UnsupportedOperationException("Invoking of original behavior not implemented.");
     }
+
 
     /**
      * @return The nr of arguments at invocation time that were not null
@@ -109,10 +112,10 @@ public class ProxyInvocation {
 
 
     /**
-     * @return The proxy on which the method was called, not null
+     * @return The name of the mock, e.g. the field name, not null
      */
-    public String getProxyName() {
-        return proxyName;
+    public String getMockName() {
+        return mockName;
     }
 
     /**
@@ -132,27 +135,14 @@ public class ProxyInvocation {
     /**
      * @return The arguments that were used, not null
      */
-    public List<?> getArguments() {
+    public List<Object> getArguments() {
         return arguments;
     }
 
-    /**
-     * @return True if the invoked method is an abstract method or a method of an interface
-     */
-    public boolean isAbstractMethod() {
-        return isAbstract(method.getModifiers());
-    }
-
-    /**
-     * @return True if the method does not have a return value
-     */
-    public boolean isVoidMethod() {
-        return method.getReturnType() == Void.TYPE;
-    }
 
     /**
      * The arguments at the time that they were used.
-     * <p/>
+     *
      * The argumentsAtInvocationTime can be set as copies (deep clones) of the arguments at the time of
      * the invocation. This way the original values can still be used later-on even when changes
      * occur to the original values (pass-by-value vs pass-by-reference). If not explicitly set, this will return the
@@ -160,9 +150,10 @@ public class ProxyInvocation {
      *
      * @return The arguments, not null
      */
-    public List<?> getArgumentsAtInvocationTime() {
+    public List<Object> getArgumentsAtInvocationTime() {
         return argumentsAtInvocationTime;
     }
+
 
     /**
      * @return The trace of the invocation, not null
@@ -171,6 +162,7 @@ public class ProxyInvocation {
         return invokedAtTrace;
     }
 
+
     /**
      * @return The location of the invocation, not null
      */
@@ -178,10 +170,12 @@ public class ProxyInvocation {
         return invokedAtTrace[0];
     }
 
+
     /**
      * @return The line nr of the invocation
      */
     public int getLineNumber() {
         return getInvokedAt().getLineNumber();
     }
+
 }

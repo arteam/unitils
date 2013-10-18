@@ -1,17 +1,19 @@
 /*
- * Copyright 2013,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock.core;
 
@@ -39,10 +41,16 @@ public class Scenario {
         UNVERIFIED, VERIFIED, VERIFIED_IN_ORDER
     }
 
+    protected List<ObservedInvocation> observedInvocations = new ArrayList<ObservedInvocation>();
+
+    protected List<VerificationStatus> invocationVerificationStatuses = new ArrayList<VerificationStatus>();
+
     protected Object testObject;
 
-    protected List<ObservedInvocation> observedInvocations = new ArrayList<ObservedInvocation>();
-    protected List<VerificationStatus> invocationVerificationStatuses = new ArrayList<VerificationStatus>();
+
+    public Scenario(Object testObject) {
+        this.testObject = testObject;
+    }
 
 
     public void reset() {
@@ -64,6 +72,7 @@ public class Scenario {
         observedInvocations.add(mockInvocation);
         invocationVerificationStatuses.add(UNVERIFIED);
     }
+
 
     public List<ObservedInvocation> getObservedInvocations() {
         return observedInvocations;
@@ -103,27 +112,27 @@ public class Scenario {
     }
 
 
-    public void assertInvokedInSequence(BehaviorDefiningInvocation behaviorDefiningInvocation) {
+    public void assertInvokedInOrder(BehaviorDefiningInvocation assertInvocation) {
         ObservedInvocation matchingInvocation = null;
         for (int i = 0; i < observedInvocations.size(); i++) {
             ObservedInvocation observedInvocation = observedInvocations.get(i);
             VerificationStatus invocationVerificationStatus = invocationVerificationStatuses.get(i);
-            if (matchingInvocation == null && invocationVerificationStatus == UNVERIFIED && behaviorDefiningInvocation.matches(observedInvocation) != -1) {
+            if (matchingInvocation == null && invocationVerificationStatus == UNVERIFIED && assertInvocation.matches(observedInvocation) != -1) {
                 // Found a match that's not verified yet. Mark as verified in order.
                 invocationVerificationStatuses.set(i, VERIFIED_IN_ORDER);
                 matchingInvocation = observedInvocation;
                 continue;
             }
-            // If we found a match, then check if there's no subsequent observed invocation that's already verified using assertInvokedInSequence()
+            // If we found a match, then check if there's no subsequent observed invocation that's already verified using assertInvokedInOrder()
             if (matchingInvocation != null && invocationVerificationStatus == VERIFIED_IN_ORDER) {
-                AssertionError assertionError = new AssertionError(getInvokedOutOfOrderErrorMessage(matchingInvocation, observedInvocation, behaviorDefiningInvocation.getInvokedAt()));
-                assertionError.setStackTrace(behaviorDefiningInvocation.getInvokedAtTrace());
+                AssertionError assertionError = new AssertionError(getInvokedOutOfOrderErrorMessage(matchingInvocation, observedInvocation, assertInvocation.getInvokedAt()));
+                assertionError.setStackTrace(assertInvocation.getInvokedAtTrace());
                 throw assertionError;
             }
         }
         if (matchingInvocation == null) {
-            AssertionError assertionError = new AssertionError(getAssertInvokedErrorMessage(behaviorDefiningInvocation, behaviorDefiningInvocation.getInvokedAt()));
-            assertionError.setStackTrace(behaviorDefiningInvocation.getInvokedAtTrace());
+            AssertionError assertionError = new AssertionError(getAssertInvokedErrorMessage(assertInvocation, assertInvocation.getInvokedAt()));
+            assertionError.setStackTrace(assertInvocation.getInvokedAtTrace());
             throw assertionError;
         }
     }

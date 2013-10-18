@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<dataset>
-
-    <TABLE_A pk="1" column1="value1" column2="xxxx"/>
-    <TABLE_B column1="yyyy"/>
-
-</dataset>

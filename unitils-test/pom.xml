@@ -1,89 +1,110 @@
 <!--
-  ~ Copyright 2013,  Unitils.org
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
+  ~ /*
+  ~  * Copyright 2010,  Unitils.org
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  * you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  *     http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.unitils</groupId>
         <artifactId>unitils</artifactId>
-        <version>4.0-SNAPSHOT</version>
+        <version>3.3</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>unitils-test</artifactId>
     <packaging>jar</packaging>
     <name>JUnit tests for Unitils</name>
 
-    <properties>
-        <spring.test.version>3.1.1.RELEASE</spring.test.version>
-    </properties>
-
     <dependencies>
+
+        <!-- There is a mismatch in the version of cglib that hibernate and unitils-mock uses. -->
+        <!-- Make sure we use the same version as the unitils-mock module -->
+        <!-- In the final artifacts this mismatch is resolved by bundling and repackaging cglib into unitils-mock -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-attrs</artifactId>
+            <version>2.2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>2.2</version>
         </dependency>
 
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-core</artifactId>
-            <version>${project.version}</version>
+            <version>${pom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-database</artifactId>
-            <version>${project.version}</version>
+            <version>${pom.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-dbmaintainer</artifactId>
+            <version>${pom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-dbunit</artifactId>
-            <version>${project.version}</version>
+            <version>${pom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-easymock</artifactId>
-            <version>${project.version}</version>
+            <version>${pom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-inject</artifactId>
-            <version>${project.version}</version>
+            <version>${pom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-mock</artifactId>
-            <version>${project.version}</version>
+            <version>${pom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.unitils</groupId>
+            <artifactId>unitils-orm</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+         <dependency>
+            <groupId>org.unitils</groupId>
             <artifactId>unitils-io</artifactId>
-            <version>${project.version}</version>
+            <version>${pom.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-spring</artifactId>
+            <version>${pom.version}</version>
         </dependency>
 
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.8</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.5</version>
         </dependency>
         <dependency>
             <groupId>hsqldb</groupId>
@@ -93,18 +114,11 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate</artifactId>
+            <version>3.2.5.ga</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.transaction</groupId>
                     <artifactId>jta</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>asm</groupId>
-                    <artifactId>asm</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>asm</groupId>
-                    <artifactId>asm-attrs</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -122,27 +136,6 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jta_1.1_spec</artifactId>
             <version>1.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>${spring.test.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.test.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>${spring.test.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-orm</artifactId>
-            <version>${spring.test.version}</version>
         </dependency>
     </dependencies>
 

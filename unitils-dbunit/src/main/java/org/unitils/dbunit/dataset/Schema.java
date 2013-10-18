@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2006-2009,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,10 @@ import java.util.List;
 public class Schema {
 
     /* The name of the data set schema, not null */
-    protected String name;
+    private String name;
+
     /* The tables in the schema, not null */
-    protected List<Table> tables = new ArrayList<Table>();
+    private List<Table> tables = new ArrayList<Table>();
 
 
     /**
@@ -45,6 +46,7 @@ public class Schema {
         this.name = name;
     }
 
+
     /**
      * @return The name of the data set schema, not null
      */
@@ -52,12 +54,14 @@ public class Schema {
         return name;
     }
 
+
     /**
      * @return The tables of the schema, not null
      */
     public List<Table> getTables() {
         return tables;
     }
+
 
     /**
      * @return The names of the tables of the schema, not null
@@ -69,6 +73,7 @@ public class Schema {
         }
         return tableNames;
     }
+
 
     /**
      * Gets the table for the given name. The name is case insensitive.
@@ -85,6 +90,7 @@ public class Schema {
         return null;
     }
 
+
     /**
      * Adds a table to the schema. Only one table with a same name can be added.
      *
@@ -98,6 +104,7 @@ public class Schema {
         }
         tables.add(table);
     }
+
 
     /**
      * Compares the schema with the given actual schema.
@@ -124,4 +131,5 @@ public class Schema {
         }
         return schemaDifference;
     }
+
 }

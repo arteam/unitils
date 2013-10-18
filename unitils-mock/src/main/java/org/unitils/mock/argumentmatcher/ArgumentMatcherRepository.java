@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,9 @@
 package org.unitils.mock.argumentmatcher;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.mock.argumentmatcher.impl.DefaultArgumentMatcher;
-import org.unitils.mock.core.proxy.ProxyInvocation;
-import org.unitils.mock.core.util.CloneService;
 
-import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A repository for holding the current set of argument matchers.
@@ -32,131 +29,138 @@ import java.util.*;
  * For this we need to store the current argument matchers so that they can be linked to the method invocation that
  * will follow.
  *
- * @author Tim Ducheyne
  * @author Filip Neven
+ * @author Tim Ducheyne
  * @author Kenny Claes
  */
 public class ArgumentMatcherRepository {
 
-    protected ArgumentMatcherPositionFinder argumentMatcherPositionFinder;
-    protected CloneService cloneService;
+    /* The singleton instance */
+    private static ThreadLocal<ArgumentMatcherRepository> instance = new InheritableThreadLocal<ArgumentMatcherRepository>() {
+        protected ArgumentMatcherRepository initialValue() {
+            return new ArgumentMatcherRepository();
+        }
+    };
+
+
+    /**
+     * @return The singleton instance, not null
+     */
+    public static ArgumentMatcherRepository getInstance() {
+        return instance.get();
+    }
+
 
     /* The current argument matchers */
-    protected List<ArgumentMatcher> argumentMatchers = new ArrayList<ArgumentMatcher>();
-    /* The begin line-nr of the matching invocation, -1 if not started */
-    protected int matchInvocationLineNr = -1;
+    private List<ArgumentMatcher> argumentMatchers = new ArrayList<ArgumentMatcher>();
+
+    /* Determines whether the repository can accept argument matchers */
+    private boolean acceptingArgumentMatchers = false;
+
+    /* The begin line-nr of the invocation */
+    private int matchInvocationStartLineNr;
+
+    /* The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line) */
+    private int matchInvocationEndLineNr;
+
+    /* The index of the matcher on that line, 1 for the first, 2 for the second etc */
+    private int matchInvocationIndex;
+
     /* The name of the previous matching method we handled */
-    protected Map<Method, Integer> indexesPerMatchingMethods = new HashMap<Method, Integer>(2);
+    private String previousMatchingMethodName;
+
+    /* The line nr of the previous method we handled */
+    private int previousMatchingLineNr;
 
 
-    public ArgumentMatcherRepository(ArgumentMatcherPositionFinder argumentMatcherPositionFinder, CloneService cloneService) {
-        this.argumentMatcherPositionFinder = argumentMatcherPositionFinder;
-        this.cloneService = cloneService;
+    /**
+     * Registers an argument matcher at the given line nr.
+     *
+     * @param argumentMatcher The matcher, not null
+     * @param lineNr          The line number on which the argument matcher was registered.
+     */
+    public void registerArgumentMatcher(ArgumentMatcher argumentMatcher, int lineNr) {
+        if (!acceptingArgumentMatchers) {
+            throw new UnitilsException("Argument matchers cannot be used outside the context of a behavior definition or assert statement");
+        }
+        matchInvocationEndLineNr = Math.max(matchInvocationEndLineNr, lineNr);
+        argumentMatchers.add(argumentMatcher);
     }
 
 
     /**
-     * From the moment that this method is called until {@link #finishMatchingInvocation} has been called,
+     * @return The current argument matchers, not null
+     */
+    public List<ArgumentMatcher> getArgumentMatchers() {
+        return argumentMatchers;
+    }
+
+    /**
+     * @return The begin line-nr of the invocation
+     */
+    public int getMatchInvocationStartLineNr() {
+        return matchInvocationStartLineNr;
+    }
+
+    /**
+     * @return The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line)
+     */
+    public int getMatchInvocationEndLineNr() {
+        return matchInvocationEndLineNr;
+    }
+
+    /**
+     * @return The index of the matcher on that line, 1 for the first, 2 for the second etc
+     */
+    public int getMatchInvocationIndex() {
+        return matchInvocationIndex;
+    }
+
+
+    /**
+     * From the moment that this method is called until {@link #registerEndOfMatchingInvocation} has been called,
      * argument matchers can be registered.
      *
      * @param lineNr The line number at which the matching invocation starts, i.e. the line number at which the performs, assertInvoked, etc.
      *               statement occurs.
      */
-    public void startMatchingInvocation(int lineNr) {
-        argumentMatchers.clear();
-        if (lineNr != matchInvocationLineNr) {
-            indexesPerMatchingMethods.clear();
-        }
-        matchInvocationLineNr = lineNr;
+    public void registerStartOfMatchingInvocation(int lineNr) {
+        acceptingArgumentMatchers = true;
+        matchInvocationStartLineNr = lineNr;
+        matchInvocationEndLineNr = lineNr;
     }
 
     /**
-     * Registers an argument matcher at the given line nr.
+     * Stops the registering of argument matchers.
+     * The argument matchers can now be retrieved using {@link #getArgumentMatchers()}.
      *
-     * @param argumentMatcher The matcher, ignored when null
+     * @param lineNr     The current line nr
+     * @param methodName The current method, not null
      */
-    public void registerArgumentMatcher(ArgumentMatcher argumentMatcher) {
-        if (argumentMatcher == null) {
-            // nothing to register
-            return;
+    public void registerEndOfMatchingInvocation(int lineNr, String methodName) {
+        matchInvocationStartLineNr = Math.min(lineNr, matchInvocationStartLineNr);
+        matchInvocationEndLineNr = Math.max(lineNr, matchInvocationEndLineNr);
+
+        if (lineNr == previousMatchingLineNr && methodName.equals(previousMatchingMethodName)) {
+            // this is the same method as last time, increase the index
+            matchInvocationIndex++;
+        } else {
+            matchInvocationIndex = 1;
+            previousMatchingMethodName = methodName;
+            previousMatchingLineNr = lineNr;
         }
-        if (matchInvocationLineNr == -1) {
-            throw new UnitilsException("Unable to register argument matcher. Argument matchers can only be used when defining behavior for a mock (e.g. returns) or when doing an assert on a mock. Argument matcher: " + argumentMatcher.getClass());
-        }
-        argumentMatchers.add(argumentMatcher);
     }
 
-    /**
-     * Finish the matching invocation and returns all registered argument matchers. A default argument matcher is
-     * returned for an argument when no argument matcher was used.
-     * <p/>
-     * An exception is raised when the matching invocation was not started
-     *
-     * @param proxyInvocation The matching invocation, not null
-     * @return The argument matchers, empty when none found
-     */
-    public List<ArgumentMatcher> finishMatchingInvocation(ProxyInvocation proxyInvocation) {
-        Method method = proxyInvocation.getMethod();
-        int lineNr = proxyInvocation.getLineNumber();
-        List<?> arguments = proxyInvocation.getArguments();
-
-        if (matchInvocationLineNr == -1) {
-            UnitilsException exception = new UnitilsException("Unable to finish matching invocation: the matching invocation was not started first. Proxy method: " + method.getName());
-            exception.setStackTrace(proxyInvocation.getInvokedAtTrace());
-            throw exception;
-        }
-
-        Integer index = null;
-        if (lineNr != matchInvocationLineNr) {
-            indexesPerMatchingMethods.clear();
-        } else {
-            index = indexesPerMatchingMethods.get(method);
-        }
-        if (index == null) {
-            index = 1;
-        } else {
-            index++;
-        }
-        indexesPerMatchingMethods.put(method, index);
-
-        List<Integer> argumentMatcherIndexes = argumentMatcherPositionFinder.getArgumentMatcherIndexes(proxyInvocation, matchInvocationLineNr, lineNr, index);
-        List<ArgumentMatcher> result = createArgumentMatchers(arguments, argumentMatcherIndexes);
-
-        matchInvocationLineNr = lineNr;
-        argumentMatchers.clear();
-        return result;
-    }
 
     /**
-     * Clears the current argument matchers. After this method is called, {@link #startMatchingInvocation} must
+     * Clears the current argument matchers. After this method is called, {@link #registerStartOfMatchingInvocation} must
      * be called again to be able to register argument matchers.
      */
     public void reset() {
-        matchInvocationLineNr = -1;
         argumentMatchers.clear();
-        indexesPerMatchingMethods.clear();
-    }
-
-
-    protected List<ArgumentMatcher> createArgumentMatchers(List<?> arguments, List<Integer> argumentMatcherIndexes) {
-        List<ArgumentMatcher> result = new ArrayList<ArgumentMatcher>();
-
-        int argumentIndex = 0;
-        Iterator<ArgumentMatcher> argumentMatcherIterator = argumentMatchers.iterator();
-        for (Object argument : arguments) {
-            ArgumentMatcher argumentMatcher;
-            if (argumentMatcherIndexes.contains(argumentIndex++)) {
-                argumentMatcher = argumentMatcherIterator.next();
-            } else {
-                argumentMatcher = createDefaultArgumentMatcher(argument);
-            }
-            result.add(argumentMatcher);
-        }
-        return result;
-    }
-
-    protected ArgumentMatcher createDefaultArgumentMatcher(Object value) {
-        Object clonedValue = cloneService.createDeepClone(value);
-        return new DefaultArgumentMatcher(value, clonedValue);
+        acceptingArgumentMatchers = false;
+        matchInvocationIndex = 1;
+        previousMatchingMethodName = null;
+        previousMatchingLineNr = 0;
     }
 }

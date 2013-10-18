@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
  */
 package org.unitils.reflectionassert;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.Test;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 import org.unitils.reflectionassert.difference.UnorderedCollectionDifference;
 
 import static java.util.Arrays.binarySearch;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
 
 /**
@@ -49,7 +49,7 @@ public class ReflectionComparatorLenientOrderCollectionsTest {
      * Test for UNI-156: ReflectionAssert.assertReflectionEquals is leading to an endless loop
      */
     @Test
-    public void lenientOrderPerformance() {
+    public void lenientOrderPeformance() {
         String[] expected = {"1", "2", "3", "4", "17", "18", "19", "20", "22", "23", "50"};
         String[] actual = {"1", "3", "4", "2", "17", "18", "19", "20", "21", "22", "23"};
 

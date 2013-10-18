@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2006-2009,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,4 +39,5 @@ public class AssertNotInvokedVerifyingMatchingInvocationHandler extends AssertVe
     protected Object performChainedAssertion(Mock<?> mock) {
         return mock.assertNotInvoked();
     }
+
 }

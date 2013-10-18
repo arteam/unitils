@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ * todo javadoc
+ *
  * @author Tim Peeters
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -30,12 +32,14 @@ import java.util.List;
 public class Parent implements Serializable {
 
     private Long id;
+
     private List<Child> children;
 
 
     public Parent() {
         this(null);
     }
+
 
     public Parent(Long id) {
         this.id = id;
@@ -47,14 +51,17 @@ public class Parent implements Serializable {
         return id;
     }
 
+
     public void setId(Long id) {
         this.id = id;
     }
+
 
     @OneToMany(mappedBy = "parent")
     public List<Child> getChildren() {
         return children;
     }
+
 
     public void setChildren(List<Child> children) {
         this.children = children;

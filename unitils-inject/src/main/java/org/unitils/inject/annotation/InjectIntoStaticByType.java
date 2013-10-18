@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,13 @@
  */
 package org.unitils.inject.annotation;
 
-import org.unitils.core.annotation.AnnotationDefault;
-import org.unitils.core.annotation.FieldAnnotation;
-import org.unitils.inject.listener.InjectIntoStaticByTypeFieldAnnotationListener;
+import org.unitils.inject.util.PropertyAccess;
 import org.unitils.inject.util.Restore;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
 import static java.lang.annotation.ElementType.FIELD;
+import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.unitils.inject.util.Restore.DEFAULT;
+import java.lang.annotation.Target;
 
 /**
  * Annotation indicating that the {@link org.unitils.inject.InjectModule} should try to inject the object assigned to
@@ -45,7 +41,6 @@ import static org.unitils.inject.util.Restore.DEFAULT;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
-@FieldAnnotation(InjectIntoStaticByTypeFieldAnnotationListener.class)
 public @interface InjectIntoStaticByType {
 
     /**
@@ -56,13 +51,18 @@ public @interface InjectIntoStaticByType {
     Class<?> target();
 
     /**
+     * The property access that is used for injection
+     *
+     * @return the access type, not null
+     */
+    PropertyAccess propertyAccess() default PropertyAccess.DEFAULT;
+
+    /**
      * The action that needs to be performed after the test was performed. Should the old value be put back,
      * should it be set to a java default value (null) or should nothing be done.
      *
      * @return the reset type, not null
      */
-    @AnnotationDefault("inject.defaultRestore") Restore restore() default DEFAULT;
-
-    @AnnotationDefault("inject.failWhenNoMatch") boolean failWhenNoMatch() default true;
+    Restore restore() default Restore.DEFAULT;
 
 }

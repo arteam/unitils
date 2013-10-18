@@ -1,158 +1,144 @@
 /*
- * Copyright 2013,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock;
 
-import org.unitils.core.Unitils;
 import org.unitils.mock.annotation.ArgumentMatcher;
-import org.unitils.mock.argumentmatcher.ArgumentMatcherService;
+import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
+import org.unitils.mock.argumentmatcher.impl.*;
+
+import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationLineNr;
 
 /**
- * @author Tim Ducheyne
+ * todo javadoc
+ *
  * @author Filip Neven
+ * @author Tim Ducheyne
  * @author Kenny Claes
  */
 public class ArgumentMatchers {
 
-    protected static ArgumentMatcherService argumentMatcherService = Unitils.getInstanceOfType(ArgumentMatcherService.class);
 
-
-    /**
-     * Matches when the argument is not null.
-     * <p/>
-     * Note: since null is returned this will produce a NullPointerException when used on a primitive argument.
-     * eg.  int argument and  isNull(Integer.class)
-     *
-     * @param argumentClass The argument type, not null
-     * @return null
-     */
     @ArgumentMatcher
     public static <T> T notNull(Class<T> argumentClass) {
-        argumentMatcherService.registerNotNullArgumentMatcher();
+        registerArgumentMatcher(new NotNullArgumentMatcher());
         return null;
     }
 
-    /**
-     * Matches when the argument is null.
-     * <p/>
-     * Note: since null is returned this will produce a NullPointerException when used on a primitive argument.
-     * eg.  int argument and  isNull(Integer.class)
-     *
-     * @param argumentClass The argument type, not null
-     * @return null
-     */
+
     @ArgumentMatcher
     public static <T> T isNull(Class<T> argumentClass) {
-        argumentMatcherService.registerNullArgumentMatcher();
+        registerArgumentMatcher(new NullArgumentMatcher());
         return null;
     }
 
-    /**
-     * Matches when the argument is the same object value.
-     * <p/>
-     * Note: do not use this matcher for primitive values, they will never match because of autoboxing
-     *
-     * @param sameAs The object to compare with
-     * @return The sameAs value
-     */
+
     @ArgumentMatcher
     public static <T> T same(T sameAs) {
-        argumentMatcherService.registerSameArgumentMatcher(sameAs);
-        return sameAs;
+        registerArgumentMatcher(new SameArgumentMatcher(sameAs));
+        return null;
     }
+
 
     @ArgumentMatcher
     public static <T> T eq(T equalTo) {
-        argumentMatcherService.registerEqualsArgumentMatcher(equalTo);
-        return equalTo;
+        registerArgumentMatcher(new EqualsArgumentMatcher(equalTo));
+        return null;
     }
+
 
     @ArgumentMatcher
     public static <T> T refEq(T equalTo) {
-        argumentMatcherService.registerRefEqArgumentMatcher(equalTo);
-        return equalTo;
+        registerArgumentMatcher(new RefEqArgumentMatcher(equalTo));
+        return null;
     }
+
 
     @ArgumentMatcher
     public static <T> T lenEq(T equalTo) {
-        argumentMatcherService.registerLenEqArgumentMatcher(equalTo);
-        return equalTo;
+        registerArgumentMatcher(new LenEqArgumentMatcher(equalTo));
+        return null;
     }
 
-    // todo add lenEqs(T... equalTo)  en refEqs  e.G. lenEq("1", "2")
-
-    /**
-     * Matches when the object argument is of the given type (or subtype).
-     * <p/>
-     * Note: since null is returned this will produce a NullPointerException when used on a primitive argument.
-     * eg.  int argument and  any(Integer.class)   use the anyInt matcher instead
-     *
-     * @param argumentClass The argument type, not null
-     * @return null
-     */
     @ArgumentMatcher
-    public static <T> T any(Class<T> argumentClass) {
-        argumentMatcherService.registerAnyArgumentMatcher(argumentClass);
+    public static <T> T any(Class<T> type) {
+        registerArgumentMatcher(new AnyArgumentMatcher(type));
         return null;
     }
 
     @ArgumentMatcher
     public static boolean anyBoolean() {
-        argumentMatcherService.registerAnyArgumentMatcher(Boolean.class);
+        registerArgumentMatcher(new AnyArgumentMatcher(Boolean.class));
         return false;
     }
 
+
     @ArgumentMatcher
     public static byte anyByte() {
-        argumentMatcherService.registerAnyArgumentMatcher(Byte.class);
+        registerArgumentMatcher(new AnyArgumentMatcher(Byte.class));
         return 0;
     }
+
 
     @ArgumentMatcher
     public static short anyShort() {
-        argumentMatcherService.registerAnyArgumentMatcher(Short.class);
+        registerArgumentMatcher(new AnyArgumentMatcher(Short.class));
         return 0;
     }
+
 
     @ArgumentMatcher
     public static char anyChar() {
-        argumentMatcherService.registerAnyArgumentMatcher(Character.class);
+        registerArgumentMatcher(new AnyArgumentMatcher(Character.class));
         return 0;
     }
+
 
     @ArgumentMatcher
     public static int anyInt() {
-        argumentMatcherService.registerAnyArgumentMatcher(Integer.class);
+        registerArgumentMatcher(new AnyArgumentMatcher(Integer.class));
         return 0;
     }
+
 
     @ArgumentMatcher
     public static long anyLong() {
-        argumentMatcherService.registerAnyArgumentMatcher(Long.class);
+        registerArgumentMatcher(new AnyArgumentMatcher(Long.class));
         return 0;
     }
+
 
     @ArgumentMatcher
     public static float anyFloat() {
-        argumentMatcherService.registerAnyArgumentMatcher(Float.class);
+        registerArgumentMatcher(new AnyArgumentMatcher(Float.class));
         return 0;
     }
 
+
     @ArgumentMatcher
     public static double anyDouble() {
-        argumentMatcherService.registerAnyArgumentMatcher(Double.class);
+        registerArgumentMatcher(new AnyArgumentMatcher(Double.class));
         return 0;
     }
+
+
+    protected static <T> void registerArgumentMatcher(org.unitils.mock.argumentmatcher.ArgumentMatcher argumentMatcher) {
+        ArgumentMatcherRepository argumentMatcherRepository = ArgumentMatcherRepository.getInstance();
+        argumentMatcherRepository.registerArgumentMatcher(argumentMatcher, getInvocationLineNr(ArgumentMatchers.class));
+    }
+
 }

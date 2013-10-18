@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,8 @@
  */
 package org.unitils.reflectionassert;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenientEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyReflectionEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
@@ -29,13 +27,18 @@ import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAU
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ReflectionAssertPropertiesTest {
+public class ReflectionAssertPropertiesTest extends TestCase {
 
+    /* Test object */
     private TestObject testObject;
 
 
-    @Before
-    public void initialize() {
+    /**
+     * Initializes the test fixture.
+     */
+    protected void setUp() throws Exception {
+        super.setUp();
+
         testObject = new TestObject(1, "stringValue");
     }
 
@@ -43,7 +46,6 @@ public class ReflectionAssertPropertiesTest {
     /**
      * Test for equal property value.
      */
-    @Test
     public void testAssertPropertyReflectionEquals_equals() {
         assertPropertyReflectionEquals("stringProperty", "stringValue", testObject);
     }
@@ -52,7 +54,6 @@ public class ReflectionAssertPropertiesTest {
     /**
      * Test for equal property value (message version).
      */
-    @Test
     public void testAssertPropertyReflectionEquals_equalsMessage() {
         assertPropertyReflectionEquals("a message", "stringProperty", "stringValue", testObject);
     }
@@ -61,7 +62,6 @@ public class ReflectionAssertPropertiesTest {
     /**
      * Test for equal property value.
      */
-    @Test
     public void testAssertPropertyLenientEquals_equals() {
         assertPropertyLenientEquals("stringProperty", "stringValue", testObject);
     }
@@ -70,7 +70,6 @@ public class ReflectionAssertPropertiesTest {
     /**
      * Test for equal property value (message version).
      */
-    @Test
     public void testAssertPropertyLenientEquals_equalsMessage() {
         assertPropertyLenientEquals("a message", "stringProperty", "stringValue", testObject);
     }
@@ -79,7 +78,6 @@ public class ReflectionAssertPropertiesTest {
     /**
      * Test for equal primitive property value.
      */
-    @Test
     public void testAssertPropertyReflectionEquals_equalsPrimitive() {
         assertPropertyReflectionEquals("primitiveProperty", 1L, testObject);
     }
@@ -88,12 +86,11 @@ public class ReflectionAssertPropertiesTest {
     /**
      * Test for different property value.
      */
-    @Test
     public void testAssertPropertyReflectionEquals_notEqualsDifferentValues() {
         try {
             assertPropertyReflectionEquals("stringProperty", "xxxxxx", testObject);
             fail("Expected AssertionFailedError");
-        } catch (AssertionError a) {
+        } catch (AssertionFailedError a) {
             // expected
         }
     }
@@ -101,12 +98,11 @@ public class ReflectionAssertPropertiesTest {
     /**
      * Test case for a null left-argument.
      */
-    @Test
     public void testAssertPropertyReflectionEquals_leftNull() {
         try {
             assertPropertyReflectionEquals("stringProperty", null, testObject);
             fail("Expected AssertionFailedError");
-        } catch (AssertionError a) {
+        } catch (AssertionFailedError a) {
             // expected
         }
     }
@@ -115,13 +111,12 @@ public class ReflectionAssertPropertiesTest {
     /**
      * Test case for a null right-argument.
      */
-    @Test
     public void testAssertPropertyReflectionEquals_rightNull() {
         testObject.setStringProperty(null);
         try {
             assertPropertyReflectionEquals("stringProperty", "stringValue", testObject);
             fail("Expected AssertionFailedError");
-        } catch (AssertionError a) {
+        } catch (AssertionFailedError a) {
             // expected
         }
     }
@@ -130,12 +125,11 @@ public class ReflectionAssertPropertiesTest {
     /**
      * Test case for null as actual object argument.
      */
-    @Test
     public void testAssertPropertyReflectionEquals_actualObjectNull() {
         try {
             assertPropertyReflectionEquals("aProperty", "aValue", null);
             fail("Expected AssertionFailedError");
-        } catch (AssertionError a) {
+        } catch (AssertionFailedError a) {
             // expected
         }
     }
@@ -144,7 +138,6 @@ public class ReflectionAssertPropertiesTest {
     /**
      * Test case for both null arguments.
      */
-    @Test
     public void testAssertPropertyReflectionEquals_null() {
         testObject.setStringProperty(null);
         assertPropertyReflectionEquals("stringProperty", null, testObject);
@@ -154,7 +147,6 @@ public class ReflectionAssertPropertiesTest {
     /**
      * Test for ignored default left value.
      */
-    @Test
     public void testAssertPropertyReflectionEquals_equalsIgnoredDefault() {
         assertPropertyReflectionEquals("a message", "stringProperty", null, testObject, IGNORE_DEFAULTS);
     }
@@ -163,7 +155,6 @@ public class ReflectionAssertPropertiesTest {
     /**
      * Test for ignored default left value.
      */
-    @Test
     public void testAssertPropertyLenientEquals_equalsIgnoredDefault() {
         assertPropertyLenientEquals("stringProperty", null, testObject);
     }
@@ -172,9 +163,10 @@ public class ReflectionAssertPropertiesTest {
     /**
      * Test class with failing equals containing test properties.
      */
-    public static class TestObject {
+    public class TestObject {
 
         private long primitiveProperty;
+
         private String stringProperty;
 
         public TestObject(long primitiveProperty, String stringProperty) {
@@ -198,4 +190,5 @@ public class ReflectionAssertPropertiesTest {
             this.stringProperty = stringProperty;
         }
     }
+
 }

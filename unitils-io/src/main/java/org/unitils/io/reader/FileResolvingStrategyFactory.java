@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2011,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,14 @@
 
 package org.unitils.io.reader;
 
-import org.unitils.core.Factory;
-import org.unitils.core.annotation.Property;
-import org.unitils.core.util.FileResolver;
-import org.unitils.io.reader.impl.DefaultFileResolvingStrategy;
+import java.util.Properties;
 
 /**
  * @author Tim Ducheyne
  * @author Jeroen Horemans
  * @since 3.3
  */
-public class FileResolvingStrategyFactory implements Factory<FileResolvingStrategy> {
+public interface FileResolvingStrategyFactory {
 
-    public static final String PREFIX_WITH_PACKAGE_NAME_PROPERTY = "io.file.prefixWithPackageName";
-    public static final String PATH_PREFIX_PROPERTY = "io.file.pathPrefix";
-
-    protected Boolean prefixWithPackageName;
-    protected String pathPrefix;
-
-
-    public FileResolvingStrategyFactory(@Property(PREFIX_WITH_PACKAGE_NAME_PROPERTY) String prefixWithPackageName, @Property(value = PATH_PREFIX_PROPERTY, optional = true) String pathPrefix) {
-        this.prefixWithPackageName = Boolean.valueOf(prefixWithPackageName);
-        this.pathPrefix = pathPrefix;
-    }
-
-
-    public FileResolvingStrategy create() {
-        FileResolver fileResolver = new FileResolver(prefixWithPackageName, pathPrefix);
-        return new DefaultFileResolvingStrategy(fileResolver);
-    }
+    FileResolvingStrategy createFileResolvingStrategy(Properties configuration);
 }

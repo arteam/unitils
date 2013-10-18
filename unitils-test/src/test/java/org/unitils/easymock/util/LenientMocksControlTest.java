@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,6 @@
  */
 package org.unitils.easymock.util;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.unitils.core.UnitilsException;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.replay;
@@ -33,26 +25,41 @@ import static org.junit.Assert.fail;
 import static org.unitils.easymock.EasyMockUnitils.refEq;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+
 /**
+ * A test for {@link LenientMocksControl}.
+ *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public class LenientMocksControlTest {
 
+    /* Class under test, with mock type LENIENT and ignore defaults */
     private LenientMocksControl lenientMocksControl;
 
-    private MockedClass mock;
 
-
+    /**
+     * Initializes the test fixture.
+     */
     @Before
-    public void initialize() throws Exception {
+    public void setUp() throws Exception {
         lenientMocksControl = new LenientMocksControl(DEFAULT, IGNORE_DEFAULTS);
-        mock = lenientMocksControl.createMock(MockedClass.class);
     }
 
 
+    /**
+     * Test for a mocked method call that is invoked with the expected arguments.
+     */
     @Test
-    public void equalArguments() {
+    public void testLenientMocksControl_equals() {
+
+        MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
         expect(mock.someBehavior(true, 999, "Test", new ArrayList<Object>())).andReturn("Result");
         replay(mock);
 
@@ -62,8 +69,14 @@ public class LenientMocksControlTest {
         verify(mock);
     }
 
+
+    /**
+     * Test for a mocked method call that has no arguments.
+     */
     @Test
-    public void equalsNoArguments() {
+    public void testLenientMocksControl_equalsNoArguments() {
+
+        MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
         mock.someBehavior();
         replay(mock);
 
@@ -72,8 +85,14 @@ public class LenientMocksControlTest {
         verify(mock);
     }
 
+
+    /**
+     * Test for a invoking a mocked method call more than once.
+     */
     @Test
-    public void equalsDoubleInvocation() {
+    public void testLenientMocksControl_equalsDoubleInvocation() {
+
+        MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
         expect(mock.someBehavior(true, 111, "Test1", Arrays.asList("1"))).andReturn("Result1");
         expect(mock.someBehavior(false, 222, "Test2", Arrays.asList("2"))).andReturn("Result2");
         replay(mock);
@@ -86,8 +105,14 @@ public class LenientMocksControlTest {
         assertEquals("Result2", result2);
     }
 
+
+    /**
+     * Test for ignoring a default value for an argument.
+     */
     @Test
-    public void equalsIgnoreDefaults() {
+    public void testLenientMocksControl_equalsIgnoreDefaults() {
+
+        MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
         expect(mock.someBehavior(false, 0, null, null)).andReturn("Result");
         replay(mock);
 
@@ -97,36 +122,52 @@ public class LenientMocksControlTest {
         verify(mock);
     }
 
+
+    /**
+     * Test for a mocked method that is expected but was never called.
+     */
     @Test
-    public void exceptionWhenNotCalled() {
+    public void testLenientMocksControl_notEqualsNotCalled() {
+
+        MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
         expect(mock.someBehavior(true, 999, "XXXX", new ArrayList<Object>())).andReturn("Result");
         replay(mock);
+
         try {
             verify(mock);
-            fail("AssertionError expected");
+            fail();
         } catch (AssertionError e) {
-            assertEquals("\n" +
-                    "  Expectation failure on verify:\n" +
-                    "    someBehavior(true, 999, \"XXXX\", []): expected: 1, actual: 0", e.getMessage());
+            //expected
         }
     }
 
+
+    /**
+     * Test for a mocked method call that is invoked with the different arguments.
+     */
     @Test
-    public void exceptionWhenDifferentArguments() {
+    public void testLenientMocksControl_notEqualsDifferentArguments() {
+
+        MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
         expect(mock.someBehavior(true, 999, "XXXX", new ArrayList<Object>())).andReturn("Result");
         replay(mock);
+
         try {
             mock.someBehavior(true, 999, "Test", new ArrayList<Object>());
-            fail("AssertionError expected");
+            fail();
         } catch (AssertionError e) {
-            assertEquals("\n" +
-                    "  Unexpected method call someBehavior(true, 999, \"Test\", []):\n" +
-                    "    someBehavior(true, 999, \"XXXX\", []): expected: 1, actual: 0", e.getMessage());
+            //expected
         }
     }
 
+
+    /**
+     * Test for using argument matchers (refEq and EasyMocks eq).
+     */
     @Test
-    public void argumentMatchers() {
+    public void testLenientMocksControl_mixingArgumentMatchers() {
+
+        MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
         expect(mock.someBehavior(eq(true), refEq(999), eq("Test"), refEq(new ArrayList<Object>()))).andReturn("Result");
         replay(mock);
 
@@ -136,19 +177,14 @@ public class LenientMocksControlTest {
         verify(mock);
     }
 
-    @Test
-    public void exceptionWhenMixingArgumentMatchers() {
-        try {
-            expect(mock.someBehavior(eq(true), refEq(999), "Test", new ArrayList<Object>())).andReturn("Result");
-            fail("UnitilsException expected");
-        } catch (UnitilsException e) {
-            assertEquals("This mocks control does not support mixing of no-argument matchers and per-argument matchers.\n" +
-                    "Either no matchers are defined (the reflection argument matcher is then used by default) or all matchers are defined explicitly (Eg by using refEq()).", e.getMessage());
-        }
-    }
 
+    /**
+     * Test for a invoking a mocked method call with a enum argument.
+     */
     @Test
-    public void equalsEnumArgument() {
+    public void testLenientMocksControl_equalsEnumArgument() {
+
+        MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
         expect(mock.someBehavior(MockedClass.TestEnum.TEST1)).andStubReturn("Result1");
         expect(mock.someBehavior(MockedClass.TestEnum.TEST2)).andStubReturn("Result2");
         replay(mock);
@@ -162,6 +198,9 @@ public class LenientMocksControlTest {
     }
 
 
+    /**
+     * The test class that is going to be mocked.
+     */
     private static class MockedClass {
 
         public enum TestEnum {
@@ -179,4 +218,5 @@ public class LenientMocksControlTest {
             return null;
         }
     }
+
 }

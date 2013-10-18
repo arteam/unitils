@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,15 +29,19 @@ import java.util.Map;
 public class MapDifference extends Difference {
 
     /* The differences per key */
-    protected Map<Object, Difference> valueDifferences = new IdentityHashMap<Object, Difference>();
+    private Map<Object, Difference> valueDifferences = new IdentityHashMap<Object, Difference>();
+
     /* The keys of the left map that were missing in the right map */
-    protected List<Object> leftMissingKeys = new ArrayList<Object>();
+    private List<Object> leftMissingKeys = new ArrayList<Object>();
+
     /* The keys of the right map that were missing in the left map */
-    protected List<Object> rightMissingKeys = new ArrayList<Object>();
+    private List<Object> rightMissingKeys = new ArrayList<Object>();
+
     /* The left object as a map */
-    protected Map<?, ?> leftMap;
+    private Map<?, ?> leftMap;
+
     /* The right object as a map */
-    protected Map<?, ?> rightMap;
+    private Map<?, ?> rightMap;
 
     /**
      * Creates a difference.
@@ -65,6 +69,7 @@ public class MapDifference extends Difference {
         valueDifferences.put(key, difference);
     }
 
+
     /**
      * Gets all element differences per key.
      *
@@ -73,6 +78,7 @@ public class MapDifference extends Difference {
     public Map<Object, Difference> getValueDifferences() {
         return valueDifferences;
     }
+
 
     /**
      * Adds a key of the left map that is missing in the right map.
@@ -83,6 +89,7 @@ public class MapDifference extends Difference {
         leftMissingKeys.add(key);
     }
 
+
     /**
      * Gets the keys of the left maps that were missing in the right map.
      *
@@ -91,6 +98,7 @@ public class MapDifference extends Difference {
     public List<Object> getLeftMissingKeys() {
         return leftMissingKeys;
     }
+
 
     /**
      * Adds a key of the right map that is missing in the left map.
@@ -101,6 +109,7 @@ public class MapDifference extends Difference {
         rightMissingKeys.add(key);
     }
 
+
     /**
      * Gets the keys of the left maps that were missing in the right map.
      *
@@ -110,6 +119,7 @@ public class MapDifference extends Difference {
         return rightMissingKeys;
     }
 
+
     /**
      * @return The left instance as a map
      */
@@ -117,12 +127,14 @@ public class MapDifference extends Difference {
         return leftMap;
     }
 
+
     /**
      * @return The right instance as a map
      */
     public Map<?, ?> getRightMap() {
         return rightMap;
     }
+
 
     /**
      * Double dispatch method. Dispatches back to the given visitor.
@@ -137,4 +149,5 @@ public class MapDifference extends Difference {
     public <T, A> T accept(DifferenceVisitor<T, A> visitor, A argument) {
         return visitor.visit(this, argument);
     }
+
 }

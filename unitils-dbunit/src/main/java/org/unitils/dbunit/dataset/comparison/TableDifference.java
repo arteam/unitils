@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2006-2009,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,13 +29,16 @@ import java.util.*;
 public class TableDifference {
 
     /* The expected table, not null */
-    protected Table table;
+    private Table table;
+
     /* The actual table, not null */
-    protected Table actualTable;
+    private Table actualTable;
+
     /* The rows for which no other row was found in the actual table, empty if none found */
-    protected List<Row> missingRows = new ArrayList<Row>();
+    private List<Row> missingRows = new ArrayList<Row>();
+
     /* The best differences of the comparisons between the rows of the tables */
-    protected Map<Row, RowDifference> bestRowDifferences = new HashMap<Row, RowDifference>();
+    private Map<Row, RowDifference> bestRowDifferences = new HashMap<Row, RowDifference>();
 
 
     /**
@@ -57,6 +60,7 @@ public class TableDifference {
         return table;
     }
 
+
     /**
      * @return The actual table, null if the table was not found
      */
@@ -64,12 +68,14 @@ public class TableDifference {
         return actualTable;
     }
 
+
     /**
      * @return The rows for which no other row was found in the actual table, empty if none found
      */
     public List<Row> getMissingRows() {
         return missingRows;
     }
+
 
     /**
      * Adds a rows for which no other row was found in the actual table.
@@ -80,12 +86,14 @@ public class TableDifference {
         missingRows.add(missingRow);
     }
 
+
     /**
      * @return The best results in the comparison between the rows, not null
      */
     public List<RowDifference> getBestRowDifferences() {
         return new ArrayList<RowDifference>(bestRowDifferences.values());
     }
+
 
     /**
      * @param row The row to get the difference for, not null
@@ -94,6 +102,7 @@ public class TableDifference {
     public RowDifference getBestRowDifference(Row row) {
         return bestRowDifferences.get(row);
     }
+
 
     /**
      * Indicates a match for the given row.
@@ -112,6 +121,7 @@ public class TableDifference {
         }
     }
 
+
     /**
      * Sets the given difference as best row difference if it is better than the current best row difference.
      *
@@ -123,6 +133,7 @@ public class TableDifference {
             bestRowDifferences.put(rowDifference.getRow(), rowDifference);
         }
     }
+
 
     /**
      * @return True if both tables are a match

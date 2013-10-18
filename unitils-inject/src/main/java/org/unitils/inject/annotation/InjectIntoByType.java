@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,12 @@
  */
 package org.unitils.inject.annotation;
 
-import org.unitils.core.annotation.AnnotationDefault;
-import org.unitils.core.annotation.FieldAnnotation;
-import org.unitils.inject.listener.InjectIntoByTypeFieldAnnotationListener;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import org.unitils.inject.util.PropertyAccess;
 
 import static java.lang.annotation.ElementType.FIELD;
+import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Target;
 
 /**
  * Annotation indicating that the the {@link org.unitils.inject.InjectModule} should try to inject the object assigned to
@@ -38,18 +35,21 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
-@FieldAnnotation(InjectIntoByTypeFieldAnnotationListener.class)
 public @interface InjectIntoByType {
 
+    /**
+     * The name of the field that references the object to which the object in the annotated field should be injected.
+     * If not specified, the target is defined by the field annotated with {@link TestedObject}
+     *
+     * @return the target field, null for tested object
+     */
+    String target() default "";
 
     /**
-     * The name(s) of the field(s) that references the object to which the object in the annotated field should be injected.
-     * If not specified, the targets are defined by the fields annotated with {@link TestedObject}
+     * The property access that should be used for injection.
      *
-     * @return the target field(s), null for tested objects
+     * @return the access type, not null
      */
-    String[] target() default {};
-
-    @AnnotationDefault("inject.failWhenNoMatch") boolean failWhenNoMatch() default true;
+    PropertyAccess propertyAccess() default PropertyAccess.DEFAULT;
 
 }

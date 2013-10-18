@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,8 @@
  */
 package org.unitils.util;
 
-import org.junit.Test;
+import junit.framework.TestCase;
 import org.unitils.core.UnitilsException;
-
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
 
 /**
  * Test for {@link ReflectionUtils} that use enumeration values.
@@ -27,14 +24,14 @@ import static org.junit.Assert.fail;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ReflectionUtilsEnumTest {
+public class ReflectionUtilsEnumTest extends TestCase {
 
 
     /**
      * Test for get enum value.
      */
-    @Test
     public void testGetEnumValue() {
+
         TestEnum result = ReflectionUtils.getEnumValue(TestEnum.class, "VALUE1");
         assertSame(TestEnum.VALUE1, result);
     }
@@ -43,8 +40,8 @@ public class ReflectionUtilsEnumTest {
     /**
      * Test for get enum value with different case.
      */
-    @Test
     public void testGetEnumValue_differentCase() {
+
         TestEnum result = ReflectionUtils.getEnumValue(TestEnum.class, "Value1");
         assertSame(TestEnum.VALUE1, result);
     }
@@ -54,8 +51,8 @@ public class ReflectionUtilsEnumTest {
      * Test for get enum value, but an unknown value name.
      * Should fail with a runtime exception.
      */
-    @Test
     public void testGetEnumValue_unexisting() {
+
         try {
             ReflectionUtils.getEnumValue(TestEnum.class, "xxxxxxxxx");
             fail("Expected UnitilsException");

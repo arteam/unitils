@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,45 +15,28 @@
  */
 package org.unitils.dbunit.datasetloadstrategy.impl;
 
+import org.dbunit.DatabaseUnitException;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.operation.DatabaseOperation;
-import org.dbunit.operation.UpdateOperation;
-import org.unitils.core.UnitilsException;
-import org.unitils.dbunit.connection.DbUnitConnection;
-import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
+import org.unitils.dbunit.util.DbUnitDatabaseConnection;
+import org.unitils.dbunit.datasetloadstrategy.impl.BaseDataSetLoadStrategy;
+
+import java.sql.SQLException;
 
 /**
- * {@link DataSetLoadStrategy} that updates the contents of the database with the contents of the data set. This means
- * that data of existing rows is updated. Fails if the data set contains records that are not in the database (i.e. a records having the same value for the
+ * {@link org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy} that updates the contents of the database with the contents of the dataset. This means
+ * that data of existing rows is updated. Fails if the dataset contains records that are not in the database (i.e. a records having the same value for the
  * primary key column).
  *
- * @author Tim Ducheyne
  * @author Filip Neven
+ * @author Tim Ducheyne
  * @see DatabaseOperation#UPDATE
  */
-public class UpdateLoadStrategy implements DataSetLoadStrategy {
+public class UpdateLoadStrategy extends BaseDataSetLoadStrategy {
 
-    protected UpdateOperation updateOperation;
-
-
-    public UpdateLoadStrategy(UpdateOperation updateOperation) {
-        this.updateOperation = updateOperation;
-    }
-
-
-    /**
-     * Loads the data set using DbUnit's update strategy
-     *
-     * @param dbUnitConnection DbUnit class providing access to the database, not null
-     * @param dataSet          The dbunit data set, not null
-     */
-    public void loadDataSet(DbUnitConnection dbUnitConnection, IDataSet dataSet) {
-        try {
-            updateOperation.execute(dbUnitConnection, dataSet);
-
-        } catch (Exception e) {
-            throw new UnitilsException("Unable to update data set.", e);
-        }
+    @Override
+    protected void doExecute(DbUnitDatabaseConnection dbUnitDatabaseConnection, IDataSet dataSet) throws DatabaseUnitException, SQLException {
+        DatabaseOperation.UPDATE.execute(dbUnitDatabaseConnection, dataSet);
     }
 
 }

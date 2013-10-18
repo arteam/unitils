@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.unitils.reflectionassert;
 
+import junit.framework.AssertionFailedError;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -76,7 +77,7 @@ public class ReflectionAssertTraversedInstanceTest {
      * Same as doubleCheckTest(), but showing a case when assert should actually fail, but it doesn't.
      * This test case is highly dependent on order of fields in collection returned by {@link Class#getDeclaredFields()}
      */
-    @Test(expected = AssertionError.class)
+    @Test(expected = AssertionFailedError.class)
     public void doubleCheckTestShouldFail() {
         Parent root1 = new Parent("root");
         Parent root2 = new Parent("root");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,16 @@
  */
 package org.unitils.easymock.annotation;
 
+import static java.lang.annotation.ElementType.METHOD;
 import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
 /**
- * @author Tim Ducheyne
+ * Annotation that is called after a mock object has been created by the {@link org.unitils.easymock.EasyMockModule}
+ *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 @Target(METHOD)
 @Retention(RUNTIME)

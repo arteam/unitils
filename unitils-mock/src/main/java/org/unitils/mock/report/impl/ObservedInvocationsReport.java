@@ -1,17 +1,19 @@
 /*
- * Copyright 2013,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock.report.impl;
 
@@ -19,6 +21,9 @@ import org.unitils.mock.core.ObservedInvocation;
 
 import java.lang.reflect.Method;
 import java.util.*;
+
+import static org.unitils.core.util.ObjectFormatter.MOCK_NAME_CHAIN_SEPARATOR;
+
 
 /**
  * A view that displays the observed invocations and the location where they were invoked.
@@ -31,9 +36,9 @@ import java.util.*;
  * 3.  mock.anotherMethod(myClass1)  ..... at MyTest.testMethod(MyTest.java:64)
  * <code></pre>
  *
- * @author Tim Ducheyne
  * @author Kenny Claes
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class ObservedInvocationsReport extends ProxyInvocationsReport {
 
@@ -84,7 +89,7 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
         Method method = observedInvocation.getMethod();
 
         // append the mock and method name
-        result.append(observedInvocation.getProxyName());
+        result.append(formatMockName(observedInvocation));
         result.append('.');
         result.append(method.getName());
 
@@ -92,8 +97,8 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
         result.append('(');
         Class<?>[] argumentTypes = method.getParameterTypes();
         if (argumentTypes.length > 0) {
-            Iterator<?> arguments = observedInvocation.getArguments().iterator();
-            Iterator<?> argumentsAtInvocationTime = observedInvocation.getArgumentsAtInvocationTime().iterator();
+            Iterator<Object> arguments = observedInvocation.getArguments().iterator();
+            Iterator<Object> argumentsAtInvocationTime = observedInvocation.getArgumentsAtInvocationTime().iterator();
             for (Class<?> argumentType : argumentTypes) {
                 result.append(formatValue(argumentsAtInvocationTime.next(), arguments.next(), argumentType, currentLargeObjects, allLargeObjects, largeObjectNameIndexes));
                 result.append(", ");
@@ -113,4 +118,10 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
         }
         return result.toString();
     }
+
+    protected String formatMockName(ObservedInvocation observedInvocation) {
+        String mockName = observedInvocation.getMockName();
+        return mockName.replaceAll(MOCK_NAME_CHAIN_SEPARATOR, ".");
+    }
+
 }

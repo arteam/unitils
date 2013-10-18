@@ -1,17 +1,19 @@
 /*
- * Copyright 2013,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock.argumentmatcher.impl;
 
@@ -19,6 +21,7 @@ import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import org.unitils.reflectionassert.ReflectionComparator;
 
 import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.*;
+import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
@@ -28,16 +31,17 @@ import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDE
  * expected and actual arguments refer to the same object. Otherwise, lenient reflection comparison is used (This means
  * the actual order of collections will be ignored and only fields that have a non default value will be compared)
  *
- * @author Tim Ducheyne
  * @author Filip Neven
+ * @author Tim Ducheyne
+ * @since 15-dec-2008
  */
 public class DefaultArgumentMatcher implements ArgumentMatcher {
 
     /* The original value passed to the argument matcher */
-    protected Object value;
-    /* Copy of the original value */
-    protected Object valueAtInvocationTime;
+    private final Object value;
 
+    /* Copy of the original value */
+    private final Object valueAtInvocationTime;
 
     /**
      * Creates a matcher for the given value. The original value is stored and a copy of the value is taken so that it
@@ -45,11 +49,10 @@ public class DefaultArgumentMatcher implements ArgumentMatcher {
      *
      * @param value The expected value
      */
-    public DefaultArgumentMatcher(Object value, Object valueAtInvocationTime) {
+    public DefaultArgumentMatcher(Object value) {
         this.value = value;
-        this.valueAtInvocationTime = valueAtInvocationTime;
+        this.valueAtInvocationTime = createDeepClone(value);
     }
-
 
     /**
      * Returns true if the given object matches the expected argument, false otherwise. If the given argument refers to
@@ -57,8 +60,8 @@ public class DefaultArgumentMatcher implements ArgumentMatcher {
      * value, lenient reflection comparison is used to compare the values. This means that the actual order of collections
      * will be ignored and only fields that have a non default value will be compared.
      *
-     * @param argument                 The argument that was used by reference
-     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed
+     * @param argument                 The argument that was used by reference, not null
+     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed, not null
      * @return The match result, not null
      */
     public MatchResult matches(Object argument, Object argumentAtInvocationTime) {

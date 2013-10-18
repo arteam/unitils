@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2011,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.unitils.io.conversion.impl;
 
 import org.unitils.io.conversion.ConversionStrategy;
-import org.unitils.util.ReaderInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,10 +37,8 @@ public class PropertiesConversionStrategy implements ConversionStrategy<Properti
 
 
     public Properties convertContent(InputStream inputStream, String encoding) throws IOException {
-        InputStream readerInputStream = new ReaderInputStream(new InputStreamReader(inputStream, encoding));
-
         Properties result = new Properties();
-        result.load(readerInputStream);
+        result.load(new InputStreamReader(inputStream, encoding));
         return result;
     }
 

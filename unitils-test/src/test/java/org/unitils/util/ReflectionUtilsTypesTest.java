@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,16 @@
  */
 package org.unitils.util;
 
+import static junit.framework.Assert.*;
 import org.junit.Test;
+import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenientEquals;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import static java.util.Arrays.asList;
+import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.assertNull;
-import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenientEquals;
+import java.util.Set;
 
 /**
  * Test for {@link ReflectionUtils} working with field types, eg assignable from.
@@ -30,6 +33,264 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenien
  * @author Tim Ducheyne
  */
 public class ReflectionUtilsTypesTest {
+
+
+    /**
+     * Test for getting all non-static fields assignable from.
+     */
+    @Test
+    public void testGetFieldsAssignableFrom() {
+        Set<Field> fields = ReflectionUtils.getFieldsAssignableFrom(TestSubClass.class, String.class, false);
+        assertPropertyLenientEquals("name", asList("objectField", "stringField", "subClassObjectField", "subClassStringField"), fields);
+    }
+
+
+    /**
+     * Test for getting all static fields assignable from.
+     */
+    @Test
+    public void testGetFieldsAssignableFrom_static() {
+        Set<Field> fields = ReflectionUtils.getFieldsAssignableFrom(TestSubClass.class, String.class, true);
+        assertPropertyLenientEquals("name", asList("staticObjectField", "staticStringField", "subClassStaticObjectField", "subClassStaticStringField"), fields);
+    }
+
+
+    /**
+     * Test for getting all non-static fields but no assignable from found. An empty list should be returned.
+     * A list should not contain a field of type test object.
+     */
+    @Test
+    public void testGetFieldsAssignableFrom_noneFound() {
+        Set<Field> fields = ReflectionUtils.getFieldsAssignableFrom(List.class, TestSubClass.class, false);
+        assertTrue(fields.isEmpty());
+    }
+
+
+    /**
+     * Test for getting all non-static primitive fields assignable from.
+     * Note: {@link Integer#TYPE} is the class type of a primitive int.
+     */
+    @Test
+    public void testGetFieldsAssignableFrom_primitive() {
+        Set<Field> fields = ReflectionUtils.getFieldsAssignableFrom(TestSubClass.class, Integer.TYPE, false);
+        assertPropertyLenientEquals("name", asList("intField", "subClassIntField"), fields);
+    }
+
+
+    /**
+     * Test for getting the first non-static field having exact same type.
+     */
+    @Test
+    public void testGetFieldsOfType() {
+        Set<Field> fields = ReflectionUtils.getFieldsOfType(TestSubClass.class, String.class, false);
+        assertPropertyLenientEquals("name", asList("stringField", "subClassStringField"), fields);
+    }
+
+
+    /**
+     * Test for getting the first static field having exact same type.
+     */
+    @Test
+    public void testGetFieldsOfType_static() {
+        Set<Field> field = ReflectionUtils.getFieldsOfType(TestSubClass.class, String.class, true);
+        assertPropertyLenientEquals("name", asList("staticStringField", "subClassStaticStringField"), field);
+    }
+
+
+    /**
+     * Test for getting the first non-static field but none has exact same type.
+     */
+    @Test
+    public void testGetFieldsOfType_noneFound() {
+        Set<Field> fields = ReflectionUtils.getFieldsOfType(TestSubClass.class, List.class, false);
+        assertEquals(0, fields.size());
+    }
+
+
+    /**
+     * Test for getting the first non-static primitive field.
+     * Note: {@link Integer#TYPE} is the class type of a primitive int.
+     */
+    @Test
+    public void testGetFieldsOfType_primitive() {
+        Set<Field> fields = ReflectionUtils.getFieldsOfType(TestSubClass.class, Integer.TYPE, false);
+        assertPropertyLenientEquals("name", asList("intField", "subClassIntField"), fields);
+    }
+
+
+    /**
+     * Test for getting all non-static setters for fields assignable from.
+     */
+    @Test
+    public void testGetSettersAssignableFrom() {
+        Set<Method> methods = ReflectionUtils.getSettersAssignableFrom(TestSubClass.class, String.class, false);
+        assertPropertyLenientEquals("name", asList("setObjectField", "setStringField", "setSubClassObjectField", "setSubClassStringField"), methods);
+    }
+
+
+    /**
+     * Test for getting all static setters for fields assignable from.
+     */
+    @Test
+    public void testGetSettersAssignableFrom_static() {
+        Set<Method> methods = ReflectionUtils.getSettersAssignableFrom(TestSubClass.class, String.class, true);
+        assertPropertyLenientEquals("name", asList("setStaticObjectField", "setStaticStringField", "setSubClassStaticObjectField", "setSubClassStaticStringField"), methods);
+    }
+
+
+    /**
+     * Test for getting all non-static setters for fields but no assignable from found. An empty list should be returned.
+     * A list should not contain a field of type test object.
+     */
+    @Test
+    public void testGetSettersAssignableFrom_noneFound() {
+        Set<Method> methods = ReflectionUtils.getSettersAssignableFrom(List.class, TestSubClass.class, false);
+        assertTrue(methods.isEmpty());
+    }
+
+
+    /**
+     * Test for getting all non-static setters for primitive fields assignable from.
+     * Note: {@link Integer#TYPE} is the class type of a primitive int.
+     */
+    @Test
+    public void testGetSettersAssignableFrom_primitive() {
+        Set<Method> methods = ReflectionUtils.getSettersAssignableFrom(TestSubClass.class, Integer.TYPE, false);
+        assertPropertyLenientEquals("name", asList("setIntField", "setSubClassIntField"), methods);
+    }
+
+
+    /**
+     * Test for getting the first non-static setter for a field having exact same type.
+     */
+    @Test
+    public void testGetFirstSetterOfType() {
+        Set<Method> methods = ReflectionUtils.getSettersOfType(TestSubClass.class, String.class, false);
+        assertPropertyLenientEquals("name", asList("setStringField", "setSubClassStringField"), methods);
+    }
+
+
+    /**
+     * Test for getting the first static setter for a field having exact same type.
+     */
+    @Test
+    public void testGetFirstSetterOfType_static() {
+        Set<Method> methods = ReflectionUtils.getSettersOfType(TestSubClass.class, String.class, true);
+        assertPropertyLenientEquals("name", asList("setStaticStringField", "setSubClassStaticStringField"), methods);
+    }
+
+
+    /**
+     * Test for getting the first non-static primitive setter for a field but none has exact same type.
+     */
+    @Test
+    public void testGetFirstSetterOfType_noneFound() {
+        Set<Method> methods = ReflectionUtils.getSettersOfType(TestSubClass.class, List.class, false);
+        assertEquals(0, methods.size());
+    }
+
+
+    /**
+     * Test for getting the first non-static primitive setter for a field having exact same type.
+     */
+    @Test
+    public void testGetSettersOfType_primitive() {
+        Set<Method> methods = ReflectionUtils.getSettersOfType(TestSubClass.class, Integer.TYPE, false);
+        assertPropertyLenientEquals("name", asList("setIntField", "setSubClassIntField"), methods);
+    }
+
+
+    /**
+     * Test for getting a setter of a property.
+     */
+    @Test
+    public void testGetSetter() {
+        Method method = ReflectionUtils.getSetter(TestSubClass.class, "stringField", false);
+        assertPropertyLenientEquals("name", "setStringField", method);
+    }
+
+
+    /**
+     * Test for getting a setter of a static property.
+     */
+    @Test
+    public void testGetSetter_static() {
+        Method method = ReflectionUtils.getSetter(TestSubClass.class, "staticStringField", true);
+        assertPropertyLenientEquals("name", "setStaticStringField", method);
+    }
+
+
+    /**
+     * Test for getting a setter of an unexisting property. Null should be returned.
+     */
+    @Test
+    public void testGetSetter_unexistingField() {
+        Method method = ReflectionUtils.getSetter(TestSubClass.class, "xxxx", false);
+        assertNull(method);
+    }
+
+
+    /**
+     * Test for getting a getter of a property.
+     */
+    @Test
+    public void testGetGetter() {
+        Method method = ReflectionUtils.getGetter(TestSubClass.class, "stringField", false);
+        assertPropertyLenientEquals("name", "getStringField", method);
+    }
+
+
+    /**
+     * Test for getting a getter of a static property.
+     */
+    @Test
+    public void testGetGetter_static() {
+        Method method = ReflectionUtils.getGetter(TestSubClass.class, "staticStringField", true);
+        assertPropertyLenientEquals("name", "getStaticStringField", method);
+    }
+
+
+    /**
+     * Test for getting a getter of an unexisting property. Null should be returned.
+     */
+    @Test
+    public void testGetGetter_unexistingField() {
+        Method method = ReflectionUtils.getGetter(TestSubClass.class, "xxxx", false);
+        assertNull(method);
+    }
+
+    /**
+     * Test for getting a getter for a setter method.
+     */
+    @Test
+    public void testGetGetterForSetter() {
+        Method setter = ReflectionUtils.getSetter(TestSubClass.class, "stringField", false);
+        Method method = ReflectionUtils.getGetter(setter, false);
+        assertPropertyLenientEquals("name", "getStringField", method);
+    }
+
+
+    /**
+     * Test for getting a getter for a static setter method.
+     */
+    @Test
+    public void testGetGetterForSetter_static() {
+        Method setter = ReflectionUtils.getSetter(TestSubClass.class, "staticStringField", true);
+        Method method = ReflectionUtils.getGetter(setter, true);
+        assertPropertyLenientEquals("name", "getStaticStringField", method);
+    }
+
+
+    /**
+     * Test for getting a unexisting getter of a setter. Null should be returned.
+     * The setterOnlyStringField has no getter method.
+     */
+    @Test
+    public void testGetGetterForSetter_unexistingGetter() {
+        Method setter = ReflectionUtils.getSetter(TestSubClass.class, "setterOnlyField", false);
+        Method method = ReflectionUtils.getGetter(setter, false);
+        assertNull(method);
+    }
 
     /**
      * Test for getting a field.

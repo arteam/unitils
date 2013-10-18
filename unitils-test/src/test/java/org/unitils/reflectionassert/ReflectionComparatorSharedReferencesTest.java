@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,9 @@
  */
 package org.unitils.reflectionassert;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.unitils.reflectionassert.difference.Difference;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import junit.framework.TestCase;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
+import org.unitils.reflectionassert.difference.Difference;
 
 /**
  * Tests for cases that contain cycles and multiple references to the same instances.
@@ -29,28 +25,38 @@ import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRef
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class ReflectionComparatorSharedReferencesTest {
+public class ReflectionComparatorSharedReferencesTest extends TestCase {
 
     /* Class under test */
     private ReflectionComparator reflectionComparator;
+
     /* Leafs in the test object tree */
     private References leaf1, leaf2;
+
     /* Same as leaf1 but different instance */
     private References leaf1Copy;
+
     /* References leaf1 2 times */
     private References doubleReferenced;
+
     /* References leaf1 and leaf1Copy, should be equal to doubleReferenced */
     private References equalToDoubleReferenced;
+
     /* References leaf1 and another leaf, should not be equal to doubleReferenced */
     private References notEqualToDoubleReferenced;
+
     /* References left1 2 times in a nested reference */
     private References nestedDoubleReferenced;
+
     /* References leaf1Copy 2 times, should be equal to nestedDoubleReferenced */
     private References equalToNestedDoubleReferenced;
+
     /* References leaf1 and another leaf, should not be equal to nestedDoubleReferenced */
     private References notEqualToNestedDoubleReferenced1;
+
     /* Contains a cycle */
     private References circularReferenced;
+
     /* Also contains a cycle but first references circularReferenced, should be equal to nestedDoubleReferenced */
     private References equalToCircularReferenced;
 
@@ -58,8 +64,9 @@ public class ReflectionComparatorSharedReferencesTest {
     /**
      * Initializes the test fixture.
      */
-    @Before
-    public void initialize() throws Exception {
+    protected void setUp() throws Exception {
+        super.setUp();
+
         reflectionComparator = createRefectionComparator();
 
         // Create circular reference
@@ -84,7 +91,6 @@ public class ReflectionComparatorSharedReferencesTest {
     /**
      * Test for two equal objects referenced more than once.
      */
-    @Test
     public void testDoubleReferenced_equal() {
         Difference result = reflectionComparator.getDifference(doubleReferenced, equalToDoubleReferenced);
         assertNull(result);
@@ -94,7 +100,6 @@ public class ReflectionComparatorSharedReferencesTest {
     /**
      * Test for two different objects referenced more than once.
      */
-    @Test
     public void testDoubleReferenced_notEqual() {
         Difference result = reflectionComparator.getDifference(doubleReferenced, notEqualToDoubleReferenced);
         assertNotNull(result);
@@ -104,7 +109,6 @@ public class ReflectionComparatorSharedReferencesTest {
     /**
      * Test for two equal objects referenced more than once in a nested reference.
      */
-    @Test
     public void testNestedDoubleReferenced_equal() {
         Difference result = reflectionComparator.getDifference(nestedDoubleReferenced, equalToNestedDoubleReferenced);
         assertNull(result);
@@ -114,7 +118,6 @@ public class ReflectionComparatorSharedReferencesTest {
     /**
      * Test for two different objects referenced more than once in a nested reference.
      */
-    @Test
     public void testNestedDoubleReferenced_notEqual() {
         Difference result = reflectionComparator.getDifference(nestedDoubleReferenced, notEqualToNestedDoubleReferenced1);
         assertNotNull(result);
@@ -124,7 +127,6 @@ public class ReflectionComparatorSharedReferencesTest {
     /**
      * Test for two equal objects that contain a cycle.
      */
-    @Test
     public void testCircularReferenced_equal() {
         Difference result = reflectionComparator.getDifference(circularReferenced, equalToCircularReferenced);
         assertNull(result);
@@ -134,7 +136,6 @@ public class ReflectionComparatorSharedReferencesTest {
     /**
      * Test for two different objects of which the first contains a cycle.
      */
-    @Test
     public void testCircularReferenced_notEqual() {
         Difference result = reflectionComparator.getDifference(circularReferenced, nestedDoubleReferenced);
         assertNotNull(result);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2006-2009,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,10 @@ import org.unitils.dbunit.dataset.Column;
 public class ColumnDifference {
 
     /* The expected column, not null */
-    protected Column column;
+    private Column column;
+
     /* The actual column, not null */
-    protected Column actualColumn;
+    private Column actualColumn;
 
 
     /**
@@ -42,6 +43,7 @@ public class ColumnDifference {
         this.actualColumn = actualColumn;
     }
 
+
     /**
      * @return The expected value, not null
      */
@@ -49,10 +51,12 @@ public class ColumnDifference {
         return column;
     }
 
+
     /**
      * @return The actual value, null if the value was not found
      */
     public Column getActualColumn() {
         return actualColumn;
     }
+
 }

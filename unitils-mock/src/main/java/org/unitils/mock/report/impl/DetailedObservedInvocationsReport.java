@@ -1,17 +1,19 @@
 /*
- * Copyright 2013,  Unitils.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright 2010,  Unitils.org
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.unitils.mock.report.impl;
 
@@ -33,14 +35,14 @@ import java.util.*;
  * </ul>
  * Example: <pre><code>
  * 1. mock.method1() -> string1
- * <p/>
+ *
  * - string1 -> "1234567891234567890"
  * - Observed at MyTest.testMethod(MyTest.java:75)
  * - Behavior defined at MyTest.myTest(MyTest.java:37)
- * <p/>
- * <p/>
+ *
+ *
  * 2. mock.method1("value", 4) -> null
- * <p/>
+ *
  * - Observed at MyTest.testMethod(MyTest.java:77)
  * - No behavior defined, returned default value.
  * <code></pre>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2011,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,14 @@
 
 package org.unitils.io.reader;
 
-import org.unitils.core.Factory;
-import org.unitils.io.reader.impl.FileReadingStrategy;
+import java.util.Properties;
 
 /**
  * @author Tim Ducheyne
  * @author Jeroen Horemans
  * @since 3.3
  */
-public class ReadingStrategyFactory implements Factory<ReadingStrategy> {
+public interface ReadingStrategyFactory {
 
-    protected FileResolvingStrategy fileResolvingStrategy;
-
-
-    public ReadingStrategyFactory(FileResolvingStrategy fileResolvingStrategy) {
-        this.fileResolvingStrategy = fileResolvingStrategy;
-    }
-
-
-    public ReadingStrategy create() {
-        return new FileReadingStrategy(fileResolvingStrategy);
-    }
+    ReadingStrategy createReadingStrategy(Properties configuration);
 }

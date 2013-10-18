@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,43 +15,40 @@
  */
 package org.unitils;
 
-import org.junit.internal.runners.*;
-import org.junit.runner.Description;
-import org.junit.runner.notification.Failure;
-import org.junit.runner.notification.RunNotifier;
-import org.unitils.core.Unitils;
-import org.unitils.core.engine.UnitilsTestListener;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.junit.internal.runners.ClassRoadie;
+import org.junit.internal.runners.InitializationError;
+import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.internal.runners.MethodRoadie;
+import org.junit.internal.runners.TestMethod;
+import org.junit.runner.Description;
+import org.junit.runner.notification.Failure;
+import org.junit.runner.notification.RunNotifier;
+import org.unitils.core.TestListener;
+import org.unitils.core.Unitils;
+
 /**
+ * Custom test runner that will Unitils-enable your test. This will make sure that the
+ * core unitils test listener methods are invoked in the expected order. See {@link TestListener} for
+ * more information on the listener invocation order.
+ * <p/>
+ * NOTE: if a test fails, the error is logged as debug logging. This is a temporary work-around for
+ * a problem with IntelliJ JUnit-4 runner that reports a 'Wrong test finished' error when something went wrong
+ * in the before. [IDEA-12498]
+ *
  * @author Tim Ducheyne
  * @author Filip Neven
- * @deprecated The {@link JUnit4ClassRunner} is deprececated and marked for deletion in future. As soon as its deleted with
- *             junit and we have to upgrade that version we will have to delete this file To. The new class to use is the
- *             {@link UnitilsBlockJUnit4TestClassRunner}
- *             <p/>
- *             <p/>
- *             Custom test runner that will Unitils-enable your test. This will make sure that the
- *             core unitils test listener methods are invoked in the expected order.
- *             <p/>
- *             NOTE: if a test fails, the error is logged as debug logging. This is a temporary work-around for
- *             a problem with IntelliJ JUnit-4 runner that reports a 'Wrong test finished' error when something went wrong
- *             in the before. [IDEA-12498]
  */
-
 public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
 
-    // todo td migrate to BlockJUnit4ClassRunner
-    // todo td  timeout spawns new thread for method => does not work when unitils is thread local
 
     /**
      * Creates a test runner that runs all test methods in the given class.
      *
      * @param testClass the class, not null
-     * @throws org.junit.internal.runners.InitializationError
-     *
+     * @throws InitializationError
      */
     public UnitilsJUnit4TestClassRunner(Class<?> testClass) throws InitializationError {
         super(testClass);
@@ -67,7 +64,7 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
         });
 
         try {
-            getUnitilsTestListener().beforeTestClass(getTestClass().getJavaClass());
+        	getTestListener().beforeTestClass(getTestClass().getJavaClass());
             classRoadie.runProtected();
         } catch (Throwable t) {
             notifier.fireTestFailure(new Failure(getDescription(), t));
@@ -85,13 +82,16 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
         try {
             testObject = createTest();
         } catch (InvocationTargetException e) {
-            notifier.fireTestFailure(new Failure(description, e.getCause()));
+            notifier.testAborted(description, e.getCause());
             return;
         } catch (Exception e) {
-            notifier.fireTestFailure(new Failure(description, e));
+            notifier.testAborted(description, e);
             return;
         }
         TestMethod testMethod = wrapMethod(method);
+        if (!testMethod.isIgnored()) {
+            getTestListener().afterCreateTestObject(testObject);
+        }
         createMethodRoadie(testObject, method, testMethod, notifier, description).run();
     }
 
@@ -143,12 +143,12 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
 
 
         /**
-         * Overriden JUnit4 method to be able to call afterTestTearDown.
+         * Overriden JUnit4 method to be able to call {@link TestListener#afterTestTearDown}.
          */
         @Override
         public void runBeforesThenTestThenAfters(Runnable test) {
             try {
-                getUnitilsTestListener().beforeTestSetUp(testObject, testMethod);
+                getTestListener().beforeTestSetUp(testObject, testMethod);
             } catch (Throwable t) {
                 addFailure(t);
             }
@@ -156,7 +156,7 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
                 super.runBeforesThenTestThenAfters(test);
             }
             try {
-                getUnitilsTestListener().afterTestTearDown();
+                getTestListener().afterTestTearDown(testObject, testMethod);
             } catch (Throwable t) {
                 addFailure(t);
             }
@@ -166,7 +166,7 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
         @Override
         protected void runTestMethod() {
             try {
-                getUnitilsTestListener().beforeTestMethod();
+                getTestListener().beforeTestMethod(testObject, testMethod);
             } catch (Throwable t) {
                 addFailure(t);
             }
@@ -174,7 +174,7 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
                 super.runTestMethod();
             }
             try {
-                getUnitilsTestListener().afterTestMethod(throwable);
+                getTestListener().afterTestMethod(testObject, testMethod, throwable);
             } catch (Throwable t) {
                 addFailure(t);
             }
@@ -200,8 +200,18 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
     /**
      * @return The unitils test listener
      */
-    protected UnitilsTestListener getUnitilsTestListener() {
-        return Unitils.getUnitilsTestListener();
+    protected TestListener getTestListener() {
+        return getUnitils().getTestListener();
+    }
+
+
+    /**
+     * Returns the default singleton instance of Unitils
+     *
+     * @return the Unitils instance, not null
+     */
+    protected Unitils getUnitils() {
+        return Unitils.getInstance();
     }
 }
 

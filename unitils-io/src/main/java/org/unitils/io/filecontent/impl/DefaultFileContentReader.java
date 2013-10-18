@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2011,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.unitils.io.filecontent.impl;
 
 import org.unitils.core.UnitilsException;
@@ -45,7 +46,6 @@ public class DefaultFileContentReader implements FileContentReader {
         this.defaultEncoding = defaultEncoding;
     }
 
-
     @SuppressWarnings({"unchecked"})
     public <T> T readFileContent(String fileName, Class<T> targetType, String encoding, Class<?> testClass) {
         ConversionStrategy<?> conversionStrategy = determineConversionStrategy(targetType);
@@ -54,7 +54,6 @@ public class DefaultFileContentReader implements FileContentReader {
         }
         InputStream inputStream = null;
         try {
-
             if (isBlank(fileName)) {
                 inputStream = readingStrategy.getDefaultInputStream(conversionStrategy.getDefaultFileExtension(), testClass);
             } else {
@@ -63,8 +62,7 @@ public class DefaultFileContentReader implements FileContentReader {
             return (T) conversionStrategy.convertContent(inputStream, encoding);
 
         } catch (Exception e) {
-            String name = isBlank(fileName) ? "default file name" : "file with name '" + fileName + "'";
-            throw new UnitilsException("Unable to read file content for " + name + " and target type " + targetType.getSimpleName(), e);
+            throw new UnitilsException("Unable to read file content for file " + fileName + " and target type " + targetType.getSimpleName(), e);
         } finally {
             closeQuietly(inputStream);
         }
@@ -72,7 +70,7 @@ public class DefaultFileContentReader implements FileContentReader {
 
 
     protected ConversionStrategy<?> determineConversionStrategy(Class<?> targetType) {
-        for (ConversionStrategy<?> conversionStrategy : conversionStrategies) {
+        for (ConversionStrategy conversionStrategy : conversionStrategies) {
             if (conversionStrategy.getTargetType().isAssignableFrom(targetType)) {
                 return conversionStrategy;
             }

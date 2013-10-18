@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2006-2007,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ package org.unitils.mock.core.proxy;
  * @author Kenny Claes
  */
 public interface ProxyInvocationHandler {
+
 
     /**
      * Handles the given method invocation of the proxy.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,18 @@
  */
 package org.unitils.reflectionassert;
 
+import junit.framework.AssertionFailedError;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertTrue;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 import static org.unitils.util.CollectionUtils.asSet;
+
+import static java.util.Arrays.asList;
 
 
 /**
@@ -104,7 +105,7 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
     /**
      * Test for two objects that contain different values.
      */
-    @Test(expected = AssertionError.class)
+    @Test(expected = AssertionFailedError.class)
     public void testAssertReflectionEquals_notEqualsDifferentValues() {
         assertReflectionEquals(testObjectAString, testObjectDifferentValueString);
     }
@@ -113,7 +114,7 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
     /**
      * Test case for a null left-argument.
      */
-    @Test(expected = AssertionError.class)
+    @Test(expected = AssertionFailedError.class)
     public void testAssertReflectionEquals_leftNull() {
         assertReflectionEquals(null, testObjectAString);
     }
@@ -122,7 +123,7 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
     /**
      * Test case for a null right-argument.
      */
-    @Test(expected = AssertionError.class)
+    @Test(expected = AssertionFailedError.class)
     public void testAssertReflectionEquals_rightNull() {
         assertReflectionEquals(testObjectAString, null);
     }
@@ -195,14 +196,14 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
     public void testAssertLenientEquals_formatArraysMessage() {
         try {
             assertLenientEquals(new String[]{"test1", "test2"}, new Integer[]{1, 2});
-        } catch (AssertionError a) {
+        } catch (AssertionFailedError a) {
             // expected
             assertTrue(a.getMessage().contains("[\"test1\", \"test2\"]"));
             assertTrue(a.getMessage().contains("[1, 2]"));
         }
     }
-
-
+    
+    
     @Test
     public void assertPropertiesNotNullTest_fullySetObject() {
         ReflectionAssert.assertPropertiesNotNull("properties parentObject ar not fully set", new TestObjectString("", ""));

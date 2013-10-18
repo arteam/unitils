@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2011,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,7 @@
 
 package org.unitils.io.temp;
 
-import org.unitils.core.Factory;
-import org.unitils.core.UnitilsException;
-import org.unitils.core.annotation.Property;
-import org.unitils.io.temp.impl.DefaultTempService;
-
-import java.io.File;
-
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.unitils.io.temp.TempService.ROOT_TEMP_DIR_PROPERTY;
+import java.util.Properties;
 
 /**
  * @author Jeroen Horemans
@@ -32,37 +24,8 @@ import static org.unitils.io.temp.TempService.ROOT_TEMP_DIR_PROPERTY;
  * @author Thomas De Rycke
  * @since 3.3
  */
-public class TempServiceFactory implements Factory<TempService> {
+public interface TempServiceFactory {
 
-    protected String systemTempDirName;
-    protected String rootTempDirName;
+    TempService createTempService(Properties configuration);
 
-
-    public TempServiceFactory(@Property(value = ROOT_TEMP_DIR_PROPERTY, optional = true) String rootTempDirName, @Property("java.io.tmpdir") String systemTempDirName) {
-        this.systemTempDirName = systemTempDirName;
-        this.rootTempDirName = rootTempDirName;
-    }
-
-
-    public TempService create() {
-        File rootTempDir = getRootTempDir();
-        return new DefaultTempService(rootTempDir);
-    }
-
-
-    protected File getRootTempDir() {
-        String tempDir;
-        if (isBlank(rootTempDirName)) {
-            tempDir = systemTempDirName;
-        } else {
-            tempDir = rootTempDirName;
-        }
-
-        File rootTempDir = new File(tempDir);
-        if (rootTempDir.isFile()) {
-            throw new UnitilsException("Root temp dir " + rootTempDirName + " is not a directory. Please fill in a directory for property " + ROOT_TEMP_DIR_PROPERTY);
-        }
-        rootTempDir.mkdirs();
-        return rootTempDir;
-    }
 }

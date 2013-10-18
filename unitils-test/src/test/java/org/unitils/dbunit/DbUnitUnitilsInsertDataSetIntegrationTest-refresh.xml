@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<dataset>
-
-    <table_b pk="2" dataset="DbUnitUnitilsInsertDataSetIntegrationTest-refresh-a.xml"/>
-    <table_b pk="9" dataset="DbUnitUnitilsInsertDataSetIntegrationTest-refresh-b.xml"/>
-
-</dataset>

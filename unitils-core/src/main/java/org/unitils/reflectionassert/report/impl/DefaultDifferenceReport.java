@@ -1,5 +1,5 @@
 /*
- * Copyright 2013,  Unitils.org
+ * Copyright 2008,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.unitils.reflectionassert.report.impl;
 
+import org.apache.commons.lang.StringUtils;
 import org.unitils.reflectionassert.difference.Difference;
 import org.unitils.reflectionassert.report.DifferenceReport;
 
@@ -30,9 +31,7 @@ public class DefaultDifferenceReport implements DifferenceReport {
 
     public static final int MAX_LINE_SIZE = 110;
 
-    public static enum MatchType {NO_MATCH}
-
-    ;
+    public static enum MatchType {NO_MATCH};
 
     /**
      * Creates a report.
