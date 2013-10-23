@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Tests chaining of methods when defining behavior and assertions (UNI-153).
@@ -68,12 +69,34 @@ public class MockChainingIntegrationTest extends UnitilsJUnit4 {
         mockObject.assertNotInvoked().getTestClass().getValue();
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void chainedAssertNotInvokedButInvoked() {
         mockObject.returns("value").getTestClass().getValue();
-
         mockObject.getMock().getTestClass().getValue();
-        mockObject.assertNotInvoked().getTestClass().getValue();
+        try {
+            mockObject.assertNotInvoked().getTestClass().getValue();
+            fail("AssertionError expected");
+        } catch (AssertionError e) {
+            assertEquals("Expected no invocation of TestInterface.getTestClass(), but it did occur\n" +
+                    "at org.unitils.mock.MockChainingIntegrationTest.chainedAssertNotInvokedButInvoked(MockChainingIntegrationTest.java:75)\n" +
+                    "Asserted at org.unitils.mock.MockChainingIntegrationTest.chainedAssertNotInvokedButInvoked(MockChainingIntegrationTest.java:77)\n" +
+                    "\n" +
+                    "Observed scenario:\n" +
+                    "\n" +
+                    "1. mockObject.getTestClass() -> Proxy<mockObject.getTestClass>  .....  at org.unitils.mock.MockChainingIntegrationTest.chainedAssertNotInvokedButInvoked(MockChainingIntegrationTest.java:75)\n" +
+                    "2. mockObject.getTestClass.getValue() -> \"value\"  .....  at org.unitils.mock.MockChainingIntegrationTest.chainedAssertNotInvokedButInvoked(MockChainingIntegrationTest.java:75)\n" +
+                    "\n" +
+                    "Detailed scenario:\n" +
+                    "\n" +
+                    "1. mockObject.getTestClass() -> Proxy<mockObject.getTestClass>\n" +
+                    "- Observed at org.unitils.mock.MockChainingIntegrationTest.chainedAssertNotInvokedButInvoked(MockChainingIntegrationTest.java:75)\n" +
+                    "- Behavior defined at org.unitils.mock.MockChainingIntegrationTest.chainedAssertNotInvokedButInvoked(MockChainingIntegrationTest.java:74)\n" +
+                    "\n" +
+                    "2. mockObject.getTestClass.getValue() -> \"value\"\n" +
+                    "- Observed at org.unitils.mock.MockChainingIntegrationTest.chainedAssertNotInvokedButInvoked(MockChainingIntegrationTest.java:75)\n" +
+                    "- Behavior defined at org.unitils.mock.MockChainingIntegrationTest.chainedAssertNotInvokedButInvoked(MockChainingIntegrationTest.java:74)\n" +
+                    "\n", e.getMessage());
+        }
     }
 
     @Test
@@ -86,13 +109,34 @@ public class MockChainingIntegrationTest extends UnitilsJUnit4 {
         mockObject.assertInvokedInSequence().getTestClass().getValue();
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void chainedAssertInvokedInSequenceButNotInvoked() {
         mockObject.returns("value").getTestClass().getValue();
-
         mockObject.getMock().getTestClass().getValue();
         mockObject.assertInvokedInSequence().getTestClass().getValue();
-        mockObject.assertInvokedInSequence().getTestClass().getValue();
+        try {
+            mockObject.assertInvokedInSequence().getTestClass().getValue();
+            fail("AssertionError expected");
+        } catch (AssertionError e) {
+            assertEquals("Expected invocation of TestInterface.getTestClass(), but it didn't occur.\n" +
+                    "Asserted at org.unitils.mock.MockChainingIntegrationTest.chainedAssertInvokedInSequenceButNotInvoked(MockChainingIntegrationTest.java:118)\n" +
+                    "\n" +
+                    "Observed scenario:\n" +
+                    "\n" +
+                    "1. mockObject.getTestClass() -> Proxy<mockObject.getTestClass>  .....  at org.unitils.mock.MockChainingIntegrationTest.chainedAssertInvokedInSequenceButNotInvoked(MockChainingIntegrationTest.java:115)\n" +
+                    "2. mockObject.getTestClass.getValue() -> \"value\"  .....  at org.unitils.mock.MockChainingIntegrationTest.chainedAssertInvokedInSequenceButNotInvoked(MockChainingIntegrationTest.java:115)\n" +
+                    "\n" +
+                    "Detailed scenario:\n" +
+                    "\n" +
+                    "1. mockObject.getTestClass() -> Proxy<mockObject.getTestClass>\n" +
+                    "- Observed at org.unitils.mock.MockChainingIntegrationTest.chainedAssertInvokedInSequenceButNotInvoked(MockChainingIntegrationTest.java:115)\n" +
+                    "- Behavior defined at org.unitils.mock.MockChainingIntegrationTest.chainedAssertInvokedInSequenceButNotInvoked(MockChainingIntegrationTest.java:114)\n" +
+                    "\n" +
+                    "2. mockObject.getTestClass.getValue() -> \"value\"\n" +
+                    "- Observed at org.unitils.mock.MockChainingIntegrationTest.chainedAssertInvokedInSequenceButNotInvoked(MockChainingIntegrationTest.java:115)\n" +
+                    "- Behavior defined at org.unitils.mock.MockChainingIntegrationTest.chainedAssertInvokedInSequenceButNotInvoked(MockChainingIntegrationTest.java:114)\n" +
+                    "\n", e.getMessage());
+        }
     }
 
     @Test

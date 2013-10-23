@@ -16,9 +16,13 @@
 package org.unitils.mock.core.matching.impl;
 
 import org.unitils.mock.Mock;
-import org.unitils.mock.core.BehaviorDefiningInvocation;
+import org.unitils.mock.core.MatchingInvocation;
 import org.unitils.mock.core.MockFactory;
+import org.unitils.mock.core.ObservedInvocation;
 import org.unitils.mock.core.Scenario;
+import org.unitils.mock.report.ScenarioReport;
+
+import static org.unitils.util.ReflectionUtils.getSimpleMethodName;
 
 
 /**
@@ -27,17 +31,35 @@ import org.unitils.mock.core.Scenario;
  */
 public class AssertInvokedVerifyingMatchingInvocationHandler extends AssertVerifyingMatchingInvocationHandler {
 
+    protected Scenario scenario;
 
-    public AssertInvokedVerifyingMatchingInvocationHandler(Scenario scenario, MockFactory mockFactory) {
-        super(scenario, mockFactory);
+
+    public AssertInvokedVerifyingMatchingInvocationHandler(Scenario scenario, MockFactory mockFactory, ScenarioReport scenarioReport) {
+        super(mockFactory, scenarioReport);
+        this.scenario = scenario;
     }
 
 
-    protected void performAssertion(Scenario scenario, BehaviorDefiningInvocation behaviorDefiningInvocation) {
-        scenario.assertInvoked(behaviorDefiningInvocation);
+    protected String performAssertion(MatchingInvocation matchingInvocation) {
+        ObservedInvocation observedInvocation = scenario.verifyInvocation(matchingInvocation);
+        if (observedInvocation == null) {
+            return getAssertInvokedErrorMessage(matchingInvocation);
+        }
+        return null;
     }
 
     protected Object performChainedAssertion(Mock<?> mock) {
         return mock.assertInvoked();
+    }
+
+
+    protected String getAssertInvokedErrorMessage(MatchingInvocation matchingInvocation) {
+        String simpleMethodName = getSimpleMethodName(matchingInvocation.getMethod());
+
+        StringBuilder message = new StringBuilder();
+        message.append("Expected invocation of ");
+        message.append(simpleMethodName);
+        message.append(", but it didn't occur.");
+        return message.toString();
     }
 }

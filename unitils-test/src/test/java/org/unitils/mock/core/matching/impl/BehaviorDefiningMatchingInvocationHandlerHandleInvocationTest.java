@@ -20,9 +20,9 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
-import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import org.unitils.mock.core.BehaviorDefiningInvocation;
 import org.unitils.mock.core.BehaviorDefiningInvocations;
+import org.unitils.mock.core.MatchingInvocation;
 import org.unitils.mock.core.MockFactory;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
@@ -31,7 +31,6 @@ import org.unitils.mock.mockbehavior.impl.ChainedMockBehavior;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -48,12 +47,10 @@ public class BehaviorDefiningMatchingInvocationHandlerHandleInvocationTest exten
     private Mock<BehaviorDefiningInvocations> behaviorDefiningInvocationsMock;
     private Mock<Mock<Map>> chainedMock;
     private Mock<ChainedMockBehavior> chainedMockBehavior;
-    private ProxyInvocation proxyInvocation;
+    private MatchingInvocation matchingInvocation;
     private BehaviorDefiningInvocation behaviorDefiningInvocation;
     @Dummy
     private Map chainedProxy;
-    @Dummy
-    private ArgumentMatcher argumentMatcher;
 
 
     @Before
@@ -61,26 +58,27 @@ public class BehaviorDefiningMatchingInvocationHandlerHandleInvocationTest exten
         behaviorDefiningMatchingInvocationHandler = new BehaviorDefiningMatchingInvocationHandler(mockBehaviorMock.getMock(), true, behaviorDefiningInvocationsMock.getMock(), mockServiceMock.getMock());
 
         Method method = MyInterface.class.getMethod("method");
-        proxyInvocation = new ProxyInvocation("mock", null, method, emptyList(), emptyList(), null);
-        behaviorDefiningInvocation = new BehaviorDefiningInvocation(proxyInvocation, mockBehaviorMock.getMock(), asList(argumentMatcher), true);
+        ProxyInvocation proxyInvocation = new ProxyInvocation("mock", null, method, emptyList(), emptyList(), null);
+        matchingInvocation = new MatchingInvocation(proxyInvocation, null);
+        behaviorDefiningInvocation = new BehaviorDefiningInvocation(matchingInvocation, mockBehaviorMock.getMock(), true);
     }
 
 
     @Test
-    public void handleInvocation() {
-        mockServiceMock.returns(chainedMock).createChainedMock("mock.method", Map.class);
+    public void mockChainingStartedWhenAssertionOk() {
+        mockServiceMock.returns(chainedMock).createChainedMock(behaviorDefiningInvocation);
         chainedMock.returns(chainedProxy).performs(new ChainedMockBehavior(chainedMock.getMock(), behaviorDefiningInvocation));
 
-        Object result = behaviorDefiningMatchingInvocationHandler.handleInvocation(proxyInvocation, asList(argumentMatcher));
+        Object result = behaviorDefiningMatchingInvocationHandler.handleInvocation(matchingInvocation);
         assertSame(chainedProxy, result);
         behaviorDefiningInvocationsMock.assertInvoked().addBehaviorDefiningInvocation(behaviorDefiningInvocation);
     }
 
     @Test
     public void nullProxyWhenUnableToCreateChainedMock() throws Throwable {
-        mockServiceMock.returns(null).createChainedMock("mock.method", Map.class);
+        mockServiceMock.returns(null).createChainedMock(behaviorDefiningInvocation);
 
-        Object result = behaviorDefiningMatchingInvocationHandler.handleInvocation(proxyInvocation, asList(argumentMatcher));
+        Object result = behaviorDefiningMatchingInvocationHandler.handleInvocation(matchingInvocation);
         assertNull(result);
         behaviorDefiningInvocationsMock.assertInvoked().addBehaviorDefiningInvocation(behaviorDefiningInvocation);
     }
@@ -89,7 +87,7 @@ public class BehaviorDefiningMatchingInvocationHandlerHandleInvocationTest exten
     public void installChainWhenInvocationOnChainedMockBehavior() {
         behaviorDefiningMatchingInvocationHandler = new BehaviorDefiningMatchingInvocationHandler(chainedMockBehavior.getMock(), true, behaviorDefiningInvocationsMock.getMock(), mockServiceMock.getMock());
 
-        behaviorDefiningMatchingInvocationHandler.handleInvocation(proxyInvocation, asList(argumentMatcher));
+        behaviorDefiningMatchingInvocationHandler.handleInvocation(matchingInvocation);
         chainedMockBehavior.assertInvoked().installChain();
     }
 

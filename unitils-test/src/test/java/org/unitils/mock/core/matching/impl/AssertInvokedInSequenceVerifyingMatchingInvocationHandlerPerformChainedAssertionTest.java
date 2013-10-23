@@ -41,7 +41,7 @@ public class AssertInvokedInSequenceVerifyingMatchingInvocationHandlerPerformCha
 
     @Before
     public void initialize() throws Exception {
-        assertInvokedInSequenceVerifyingMatchingInvocationHandler = new AssertInvokedInSequenceVerifyingMatchingInvocationHandler(null, mockServiceMock.getMock());
+        assertInvokedInSequenceVerifyingMatchingInvocationHandler = new AssertInvokedInSequenceVerifyingMatchingInvocationHandler(null, mockServiceMock.getMock(), null);
     }
 
 

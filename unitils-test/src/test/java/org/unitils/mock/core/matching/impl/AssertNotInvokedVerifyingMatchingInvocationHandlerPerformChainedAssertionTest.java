@@ -41,7 +41,7 @@ public class AssertNotInvokedVerifyingMatchingInvocationHandlerPerformChainedAss
 
     @Before
     public void initialize() {
-        assertNotInvokedVerifyingMatchingInvocationHandler = new AssertNotInvokedVerifyingMatchingInvocationHandler(null, mockServiceMock.getMock());
+        assertNotInvokedVerifyingMatchingInvocationHandler = new AssertNotInvokedVerifyingMatchingInvocationHandler(null, mockServiceMock.getMock(), null);
     }
 
 

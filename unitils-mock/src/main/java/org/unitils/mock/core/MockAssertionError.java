@@ -13,11 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core.matching;
+package org.unitils.mock.core;
 
-import org.unitils.mock.core.MatchingInvocation;
+/**
+ * @author Tim Ducheyne
+ */
+public class MockAssertionError extends AssertionError {
 
-public interface MatchingInvocationHandler {
+    public MockAssertionError(String message) {
+        super(message);
+    }
 
-    Object handleInvocation(MatchingInvocation matchingInvocation);
+    public MockAssertionError(String message, StackTraceElement[] stackTrace) {
+        super(message);
+        setStackTrace(stackTrace);
+    }
 }

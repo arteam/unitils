@@ -20,7 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.TestInstance;
 import org.unitils.core.TestListener;
-import org.unitils.mock.core.Scenario;
+import org.unitils.mock.core.MockAssertionError;
+import org.unitils.mock.report.ScenarioReport;
 
 /**
  * @author Tim Ducheyne
@@ -29,18 +30,21 @@ public class LogScenarioReportTestListener extends TestListener {
 
     protected static Log logger = LogFactory.getLog(LogScenarioReportTestListener.class);
 
-    private Scenario scenario;
+    private ScenarioReport scenarioReport;
 
 
-    public LogScenarioReportTestListener(Scenario scenario) {
-        this.scenario = scenario;
+    public LogScenarioReportTestListener(ScenarioReport scenarioReport) {
+        this.scenarioReport = scenarioReport;
     }
 
 
     @Override
     public void afterTestMethod(TestInstance testInstance, Throwable testThrowable) {
-        if (testThrowable != null) {
-            logger.error("\n\n" + scenario.createFullReport());
+        if (testThrowable == null || testThrowable instanceof MockAssertionError) {
+            // only log the scenario when there an exception occurred
+            return;
         }
+        String report = scenarioReport.createReport();
+        logger.error("\n\n" + report);
     }
 }

@@ -44,12 +44,39 @@ public class MockAssertInvokedIntegrationTest extends UnitilsJUnit4 {
             fail("AssertionError expected");
         } catch (AssertionError e) {
             assertEquals("Expected invocation of TestInterface.testMethod(), but it didn't occur.\n" +
-                    "asserted at org.unitils.mock.MockAssertInvokedIntegrationTest.exceptionWhenMethodWasNotInvoked(MockAssertInvokedIntegrationTest.java:43)\n" +
+                    "Asserted at org.unitils.mock.MockAssertInvokedIntegrationTest.exceptionWhenMethodWasNotInvoked(MockAssertInvokedIntegrationTest.java:43)\n" +
                     "\n" +
-                    "No invocations observed.\n", e.getMessage());
+                    "No invocations observed.\n" +
+                    "\n", e.getMessage());
             StackTraceElement topOfStackTrace = e.getStackTrace()[0];
             assertEquals(MockAssertInvokedIntegrationTest.class.getName(), topOfStackTrace.getClassName());
             assertEquals("exceptionWhenMethodWasNotInvoked", topOfStackTrace.getMethodName());
+        }
+    }
+
+    @Test
+    public void exceptionWhenMethodAssertedMoreThanInvoked() {
+        mockObject.getMock().testMethod();
+        mockObject.assertInvoked().testMethod();
+        try {
+            mockObject.assertInvoked().testMethod();
+            fail("AssertionError expected");
+        } catch (AssertionError e) {
+            assertEquals("Expected invocation of TestInterface.testMethod(), but it didn't occur.\n" +
+                    "Asserted at org.unitils.mock.MockAssertInvokedIntegrationTest.exceptionWhenMethodAssertedMoreThanInvoked(MockAssertInvokedIntegrationTest.java:62)\n" +
+                    "\n" +
+                    "Observed scenario:\n" +
+                    "\n" +
+                    "1. mockObject.testMethod()  .....  at org.unitils.mock.MockAssertInvokedIntegrationTest.exceptionWhenMethodAssertedMoreThanInvoked(MockAssertInvokedIntegrationTest.java:59)\n" +
+                    "\n" +
+                    "Detailed scenario:\n" +
+                    "\n" +
+                    "1. mockObject.testMethod()\n" +
+                    "- Observed at org.unitils.mock.MockAssertInvokedIntegrationTest.exceptionWhenMethodAssertedMoreThanInvoked(MockAssertInvokedIntegrationTest.java:59)\n" +
+                    "\n", e.getMessage());
+            StackTraceElement topOfStackTrace = e.getStackTrace()[0];
+            assertEquals(MockAssertInvokedIntegrationTest.class.getName(), topOfStackTrace.getClassName());
+            assertEquals("exceptionWhenMethodAssertedMoreThanInvoked", topOfStackTrace.getMethodName());
         }
     }
 

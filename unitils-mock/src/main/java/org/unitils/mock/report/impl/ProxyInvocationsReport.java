@@ -51,15 +51,7 @@ public abstract class ProxyInvocationsReport {
      */
     public static int MAX_INLINE_PARAMETER_LENGTH = 50;
 
-
     protected ObjectFormatter objectFormatter = new ObjectFormatter(OBJECT_FORMATTER_MAX_RECURSION_DEPT, OBJECT_FORMATTER_MAX_NR_ARRAY_OR_COLLECTION_ELEMENTS);
-
-    protected Map<Object, String> testedObjectFieldValuesAndNames;
-
-
-    public ProxyInvocationsReport(Object testedObject) {
-        testedObjectFieldValuesAndNames = getFieldValuesAndNames(testedObject);
-    }
 
 
     /**
@@ -85,9 +77,10 @@ public abstract class ProxyInvocationsReport {
      * @param currentLargeObjects    The current the large values, not null
      * @param allLargeObjects        All large values per value, not null
      * @param largeObjectNameIndexes The current indexes to use for the large value names (per value type), not null
+     * @param fieldValuesAndNames    The values and name of the instance fields in the test object
      * @return The value or the replaced name, not null
      */
-    protected String formatValue(Object valueAtInvocationTime, Object value, Class<?> type, List<FormattedObject> currentLargeObjects, Map<Object, FormattedObject> allLargeObjects, Map<Class<?>, Integer> largeObjectNameIndexes) {
+    protected String formatValue(Object valueAtInvocationTime, Object value, Class<?> type, List<FormattedObject> currentLargeObjects, Map<Object, FormattedObject> allLargeObjects, Map<Class<?>, Integer> largeObjectNameIndexes, Map<Object, String> fieldValuesAndNames) {
         if (allLargeObjects.containsKey(valueAtInvocationTime)) {
             FormattedObject formattedObject = allLargeObjects.get(valueAtInvocationTime);
             currentLargeObjects.add(formattedObject);
@@ -96,7 +89,7 @@ public abstract class ProxyInvocationsReport {
 
         String objectRepresentation = formatObject(valueAtInvocationTime);
 
-        String valueName = testedObjectFieldValuesAndNames.get(value);
+        String valueName = fieldValuesAndNames.get(value);
         if (valueName == null) {
             if (objectRepresentation.length() <= MAX_INLINE_PARAMETER_LENGTH) {
                 // The object representation is small enough to be shown inline

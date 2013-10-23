@@ -19,9 +19,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
-import org.unitils.mock.annotation.Dummy;
-import org.unitils.mock.core.BehaviorDefiningInvocation;
+import org.unitils.mock.core.MatchingInvocation;
+import org.unitils.mock.core.ObservedInvocation;
 import org.unitils.mock.core.Scenario;
+
+import java.lang.reflect.Method;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Tim Ducheyne
@@ -31,19 +36,44 @@ public class AssertNotInvokedVerifyingMatchingInvocationHandlerPerformAssertionT
     private AssertNotInvokedVerifyingMatchingInvocationHandler assertNotInvokedVerifyingMatchingInvocationHandler;
 
     private Mock<Scenario> scenarioMock;
-    @Dummy
-    private BehaviorDefiningInvocation behaviorDefiningInvocation;
+    private Mock<MatchingInvocation> matchingInvocationMock;
+    private Mock<ObservedInvocation> observedInvocationMock;
 
 
     @Before
-    public void initialize() {
-        assertNotInvokedVerifyingMatchingInvocationHandler = new AssertNotInvokedVerifyingMatchingInvocationHandler(scenarioMock.getMock(), null);
+    public void initialize() throws Exception {
+        assertNotInvokedVerifyingMatchingInvocationHandler = new AssertNotInvokedVerifyingMatchingInvocationHandler(scenarioMock.getMock(), null, null);
+
+        Method testMethod1 = TestInterface.class.getMethod("testMethod1");
+        Method testMethod2 = TestInterface.class.getMethod("testMethod2");
+        matchingInvocationMock.returns(testMethod1).getMethod();
+        observedInvocationMock.returns(testMethod2).getMethod();
+        observedInvocationMock.returns(new StackTraceElement("class2", "method2", "file2", 222)).getInvokedAt();
     }
 
 
     @Test
-    public void performAssertion() {
-        assertNotInvokedVerifyingMatchingInvocationHandler.performAssertion(scenarioMock.getMock(), behaviorDefiningInvocation);
-        scenarioMock.assertInvoked().assertNotInvoked(behaviorDefiningInvocation);
+    public void nullWhenNoInvocationFound() {
+        scenarioMock.returns(null).verifyInvocation(matchingInvocationMock.getMock());
+
+        String result = assertNotInvokedVerifyingMatchingInvocationHandler.performAssertion(matchingInvocationMock.getMock());
+        assertNull(result);
+    }
+
+    @Test
+    public void errorMessageWhenInvocationFound() {
+        scenarioMock.returns(observedInvocationMock).verifyInvocation(matchingInvocationMock.getMock());
+
+        String result = assertNotInvokedVerifyingMatchingInvocationHandler.performAssertion(matchingInvocationMock.getMock());
+        assertEquals("Expected no invocation of TestInterface.testMethod1(), but it did occur\n" +
+                "at class2.method2(file2:222)", result);
+    }
+
+
+    private interface TestInterface {
+
+        void testMethod1();
+
+        void testMethod2();
     }
 }

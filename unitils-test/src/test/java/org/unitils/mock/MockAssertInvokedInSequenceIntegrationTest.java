@@ -49,14 +49,15 @@ public class MockAssertInvokedInSequenceIntegrationTest extends UnitilsJUnit4 {
             mockObject.assertInvokedInSequence().testMethod1();
             fail("AssertionError expected");
         } catch (AssertionError e) {
-            assertEquals("Invocation of MyInterface.testMethod1() was expected to be performed after MyInterface.testMethod2() but actually occurred before it.\n" +
-                    "asserted at org.unitils.mock.MockAssertInvokedInSequenceIntegrationTest.exceptionWhenInvokedOutOfSequence(MockAssertInvokedInSequenceIntegrationTest.java:49)\n" +
+            assertEquals("Invocation of MyInterface.testMethod1() invoked at org.unitils.mock.MockAssertInvokedInSequenceIntegrationTest.exceptionWhenInvokedOutOfSequence(MockAssertInvokedInSequenceIntegrationTest.java:44)\n" +
+                    "was expected to be performed after MyInterface.testMethod2() invoked at org.unitils.mock.MockAssertInvokedInSequenceIntegrationTest.exceptionWhenInvokedOutOfSequence(MockAssertInvokedInSequenceIntegrationTest.java:45)\n" +
+                    "but actually occurred before it.\n" +
+                    "Asserted at org.unitils.mock.MockAssertInvokedInSequenceIntegrationTest.exceptionWhenInvokedOutOfSequence(MockAssertInvokedInSequenceIntegrationTest.java:49)\n" +
                     "\n" +
                     "Observed scenario:\n" +
                     "\n" +
                     "1. mockObject.testMethod1()  .....  at org.unitils.mock.MockAssertInvokedInSequenceIntegrationTest.exceptionWhenInvokedOutOfSequence(MockAssertInvokedInSequenceIntegrationTest.java:44)\n" +
                     "2. mockObject.testMethod2()  .....  at org.unitils.mock.MockAssertInvokedInSequenceIntegrationTest.exceptionWhenInvokedOutOfSequence(MockAssertInvokedInSequenceIntegrationTest.java:45)\n" +
-                    "\n" +
                     "\n" +
                     "Detailed scenario:\n" +
                     "\n" +
@@ -69,6 +70,32 @@ public class MockAssertInvokedInSequenceIntegrationTest extends UnitilsJUnit4 {
             StackTraceElement topOfStackTrace = e.getStackTrace()[0];
             assertEquals(MockAssertInvokedInSequenceIntegrationTest.class.getName(), topOfStackTrace.getClassName());
             assertEquals("exceptionWhenInvokedOutOfSequence", topOfStackTrace.getMethodName());
+        }
+    }
+
+    @Test
+    public void exceptionWhenNotInvoked() {
+        mockObject.getMock().testMethod2();
+
+        try {
+            mockObject.assertInvokedInSequence().testMethod1();
+            fail("AssertionError expected");
+        } catch (AssertionError e) {
+            assertEquals("Expected invocation of MyInterface.testMethod1(), but it didn't occur.\n" +
+                    "Asserted at org.unitils.mock.MockAssertInvokedInSequenceIntegrationTest.exceptionWhenNotInvoked(MockAssertInvokedInSequenceIntegrationTest.java:81)\n" +
+                    "\n" +
+                    "Observed scenario:\n" +
+                    "\n" +
+                    "1. mockObject.testMethod2()  .....  at org.unitils.mock.MockAssertInvokedInSequenceIntegrationTest.exceptionWhenNotInvoked(MockAssertInvokedInSequenceIntegrationTest.java:78)\n" +
+                    "\n" +
+                    "Detailed scenario:\n" +
+                    "\n" +
+                    "1. mockObject.testMethod2()\n" +
+                    "- Observed at org.unitils.mock.MockAssertInvokedInSequenceIntegrationTest.exceptionWhenNotInvoked(MockAssertInvokedInSequenceIntegrationTest.java:78)\n" +
+                    "\n", e.getMessage());
+            StackTraceElement topOfStackTrace = e.getStackTrace()[0];
+            assertEquals(MockAssertInvokedInSequenceIntegrationTest.class.getName(), topOfStackTrace.getClassName());
+            assertEquals("exceptionWhenNotInvoked", topOfStackTrace.getMethodName());
         }
     }
 

@@ -57,13 +57,11 @@ public class MockUnitilsAssertNoMoreInvocationsIntegrationTest extends UnitilsJU
         } catch (AssertionError e) {
             assertEquals("No more invocations expected, yet observed following calls:\n" +
                     "1. mockObject.testMethod()  .....  at org.unitils.mock.MockUnitilsAssertNoMoreInvocationsIntegrationTest.exceptionWhenStillMoreInvocations(MockUnitilsAssertNoMoreInvocationsIntegrationTest.java:51)\n" +
-                    "asserted at org.unitils.mock.MockUnitilsAssertNoMoreInvocationsIntegrationTest.exceptionWhenStillMoreInvocations(MockUnitilsAssertNoMoreInvocationsIntegrationTest.java:55)\n" +
                     "\n" +
                     "Observed scenario:\n" +
                     "\n" +
                     "1. mockObject.testMethod()  .....  at org.unitils.mock.MockUnitilsAssertNoMoreInvocationsIntegrationTest.exceptionWhenStillMoreInvocations(MockUnitilsAssertNoMoreInvocationsIntegrationTest.java:50)\n" +
                     "2. mockObject.testMethod()  .....  at org.unitils.mock.MockUnitilsAssertNoMoreInvocationsIntegrationTest.exceptionWhenStillMoreInvocations(MockUnitilsAssertNoMoreInvocationsIntegrationTest.java:51)\n" +
-                    "\n" +
                     "\n" +
                     "Detailed scenario:\n" +
                     "\n" +
@@ -73,9 +71,6 @@ public class MockUnitilsAssertNoMoreInvocationsIntegrationTest extends UnitilsJU
                     "2. mockObject.testMethod()\n" +
                     "- Observed at org.unitils.mock.MockUnitilsAssertNoMoreInvocationsIntegrationTest.exceptionWhenStillMoreInvocations(MockUnitilsAssertNoMoreInvocationsIntegrationTest.java:51)\n" +
                     "\n", e.getMessage());
-            StackTraceElement topOfStackTrace = e.getStackTrace()[0];
-            assertEquals(MockUnitilsAssertNoMoreInvocationsIntegrationTest.class.getName(), topOfStackTrace.getClassName());
-            assertEquals("exceptionWhenStillMoreInvocations", topOfStackTrace.getMethodName());
         }
     }
 

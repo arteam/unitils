@@ -23,16 +23,19 @@ import org.unitils.mock.core.matching.impl.AssertInvokedVerifyingMatchingInvocat
 import org.unitils.mock.core.matching.impl.AssertNotInvokedVerifyingMatchingInvocationHandler;
 import org.unitils.mock.core.matching.impl.BehaviorDefiningMatchingInvocationHandler;
 import org.unitils.mock.mockbehavior.MockBehavior;
+import org.unitils.mock.report.ScenarioReport;
 
 public class MatchingInvocationHandlerFactory {
 
     protected Scenario scenario;
     protected MockFactory mockFactory;
+    protected ScenarioReport scenarioReport;
 
 
-    public MatchingInvocationHandlerFactory(Scenario scenario, MockFactory mockFactory) {
+    public MatchingInvocationHandlerFactory(Scenario scenario, MockFactory mockFactory, ScenarioReport scenarioReport) {
         this.scenario = scenario;
         this.mockFactory = mockFactory;
+        this.scenarioReport = scenarioReport;
     }
 
 
@@ -41,14 +44,14 @@ public class MatchingInvocationHandlerFactory {
     }
 
     public MatchingInvocationHandler createAssertInvokedVerifyingMatchingInvocationHandler() {
-        return new AssertInvokedVerifyingMatchingInvocationHandler(scenario, mockFactory);
+        return new AssertInvokedVerifyingMatchingInvocationHandler(scenario, mockFactory, scenarioReport);
     }
 
     public MatchingInvocationHandler createAssertInvokedInSequenceVerifyingMatchingInvocationHandler() {
-        return new AssertInvokedInSequenceVerifyingMatchingInvocationHandler(scenario, mockFactory);
+        return new AssertInvokedInSequenceVerifyingMatchingInvocationHandler(scenario, mockFactory, scenarioReport);
     }
 
     public MatchingInvocationHandler createAssertNotInvokedVerifyingMatchingInvocationHandler() {
-        return new AssertNotInvokedVerifyingMatchingInvocationHandler(scenario, mockFactory);
+        return new AssertNotInvokedVerifyingMatchingInvocationHandler(scenario, mockFactory, scenarioReport);
     }
 }
