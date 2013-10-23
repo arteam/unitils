@@ -42,14 +42,13 @@ public class MockAssertNotInvokedIntegrationTest extends UnitilsJUnit4 {
             mockObject.assertNotInvoked().testMethod();
             fail("AssertionError expected");
         } catch (AssertionError e) {
-            assertEquals("Expected no invocation of TestInterface.testMethod(), but it did occur.\n" +
+            assertEquals("Expected no invocation of TestInterface.testMethod(), but it did occur\n" +
                     "at org.unitils.mock.MockAssertNotInvokedIntegrationTest.exceptionWhenMethodWasInvoked(MockAssertNotInvokedIntegrationTest.java:40)\n" +
-                    "asserted at org.unitils.mock.MockAssertNotInvokedIntegrationTest.exceptionWhenMethodWasInvoked(MockAssertNotInvokedIntegrationTest.java:42)\n" +
+                    "Asserted at org.unitils.mock.MockAssertNotInvokedIntegrationTest.exceptionWhenMethodWasInvoked(MockAssertNotInvokedIntegrationTest.java:42)\n" +
                     "\n" +
                     "Observed scenario:\n" +
                     "\n" +
                     "1. mockObject.testMethod()  .....  at org.unitils.mock.MockAssertNotInvokedIntegrationTest.exceptionWhenMethodWasInvoked(MockAssertNotInvokedIntegrationTest.java:40)\n" +
-                    "\n" +
                     "\n" +
                     "Detailed scenario:\n" +
                     "\n" +
@@ -60,6 +59,14 @@ public class MockAssertNotInvokedIntegrationTest extends UnitilsJUnit4 {
             assertEquals(MockAssertNotInvokedIntegrationTest.class.getName(), topOfStackTrace.getClassName());
             assertEquals("exceptionWhenMethodWasInvoked", topOfStackTrace.getMethodName());
         }
+    }
+
+    @Test
+    public void okWhenAssertedMoreThanInvoked() {
+        mockObject.getMock().testMethod();
+        mockObject.assertInvoked().testMethod();
+
+        mockObject.assertNotInvoked().testMethod();
     }
 
 

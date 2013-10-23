@@ -40,7 +40,7 @@ public class DetailedObservedInvocationsReportIntegrationTest extends UnitilsJUn
 
     @Before
     public void initialize() {
-        detailedObservedInvocationsReport = new DetailedObservedInvocationsReport(this);
+        detailedObservedInvocationsReport = new DetailedObservedInvocationsReport();
     }
 
 
@@ -49,7 +49,7 @@ public class DetailedObservedInvocationsReportIntegrationTest extends UnitilsJUn
         testMock.getMock().testMethod1("value1");
         testMock.getMock().testMethod2();
 
-        String result = detailedObservedInvocationsReport.createReport(getObservedInvocations());
+        String result = detailedObservedInvocationsReport.createReport(getObservedInvocations(), this);
         // method with result and argument
         assertTrue(result.contains("1. testMock.testMethod1(\"value1\") -> null"));
         assertTrue(result.contains("- Observed at org.unitils.mock.DetailedObservedInvocationsReportIntegrationTest.twoMockInvocations(DetailedObservedInvocationsReportIntegrationTest.java:"));
@@ -61,7 +61,7 @@ public class DetailedObservedInvocationsReportIntegrationTest extends UnitilsJUn
 
     @Test
     public void emptyWhenNoInvocations() {
-        String result = detailedObservedInvocationsReport.createReport(getObservedInvocations());
+        String result = detailedObservedInvocationsReport.createReport(getObservedInvocations(), this);
         assertTrue(isEmpty(result));
     }
 
@@ -69,7 +69,7 @@ public class DetailedObservedInvocationsReportIntegrationTest extends UnitilsJUn
     public void useShortNameWhenArgumentValueLongerThan50() {
         testMock.getMock().testMethod1("01234567890123456789012345678901234567890123456789x");
 
-        String result = detailedObservedInvocationsReport.createReport(getObservedInvocations());
+        String result = detailedObservedInvocationsReport.createReport(getObservedInvocations(), this);
         assertTrue(result.contains("1. testMock.testMethod1(string1) -> null"));
         assertTrue(result.contains("- string1 -> \"01234567890123456789012345678901234567890123456789x\""));
     }
@@ -79,7 +79,7 @@ public class DetailedObservedInvocationsReportIntegrationTest extends UnitilsJUn
         testMock.returns("01234567890123456789012345678901234567890123456789x").testMethod1(null);
         testMock.getMock().testMethod1(null);
 
-        String result = detailedObservedInvocationsReport.createReport(getObservedInvocations());
+        String result = detailedObservedInvocationsReport.createReport(getObservedInvocations(), this);
         assertTrue(result.contains("1. testMock.testMethod1(null) -> string1"));
         assertTrue(result.contains("- string1 -> \"01234567890123456789012345678901234567890123456789x\""));
         assertTrue(result.contains("- Observed at org.unitils.mock.DetailedObservedInvocationsReportIntegrationTest.useShortNameWhenResultValueLongerThan50(DetailedObservedInvocationsReportIntegrationTest.java:"));
@@ -92,7 +92,7 @@ public class DetailedObservedInvocationsReportIntegrationTest extends UnitilsJUn
         testMock.returns(largeValue).testMethod3(largeValue);
         testMock.getMock().testMethod3(largeValue);
 
-        String result = detailedObservedInvocationsReport.createReport(getObservedInvocations());
+        String result = detailedObservedInvocationsReport.createReport(getObservedInvocations(), this);
         assertTrue(result.contains("1. testMock.testMethod3(list1) -> list1"));
         assertTrue(result.contains("- list1 -> [\"11111\", \"222222\", \"333333\", \"444444\", \"555555\", \"666666\"]"));
         assertTrue(result.contains("- Observed at org.unitils.mock.DetailedObservedInvocationsReportIntegrationTest.useSameNameWhenLargeValueInResultAndArgument(DetailedObservedInvocationsReportIntegrationTest.java:"));

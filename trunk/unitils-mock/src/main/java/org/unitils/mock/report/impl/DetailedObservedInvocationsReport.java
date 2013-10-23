@@ -52,20 +52,17 @@ import java.util.*;
 public class DetailedObservedInvocationsReport extends ObservedInvocationsReport {
 
 
-    public DetailedObservedInvocationsReport(Object testedObject) {
-        super(testedObject);
-    }
-
-
     /**
      * Creates a string representation of the given scenario as described in the class javadoc.
      *
+     * @param observedInvocations The invocations for which to create a report, not null
+     * @param testObject          The test instance
      * @return The string representation, not null
      */
     @Override
-    public String createReport(List<ObservedInvocation> observedInvocations) {
+    public String createReport(List<ObservedInvocation> observedInvocations, Object testObject) {
         StringBuilder result = new StringBuilder();
-
+        Map<Object, String> fieldValuesAndNames = getFieldValuesAndNames(testObject);
         Map<Object, FormattedObject> allLargeObjects = new IdentityHashMap<Object, FormattedObject>();
         Map<Class<?>, Integer> largeObjectNameIndexes = new HashMap<Class<?>, Integer>();
 
@@ -76,7 +73,7 @@ public class DetailedObservedInvocationsReport extends ObservedInvocationsReport
 
             result.append(invocationIndex++);
             result.append(". ");
-            result.append(formatObservedInvocation(observedInvocation, currentLargeObjects, allLargeObjects, largeObjectNameIndexes));
+            result.append(formatObservedInvocation(observedInvocation, currentLargeObjects, allLargeObjects, largeObjectNameIndexes, fieldValuesAndNames));
             result.append("\n");
             result.append(formatLargeObjects(currentLargeObjects));
             result.append(formatInvokedAt(observedInvocation));

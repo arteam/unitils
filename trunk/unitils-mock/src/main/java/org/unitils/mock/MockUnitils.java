@@ -19,9 +19,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Unitils;
 import org.unitils.mock.core.MockFactory;
+import org.unitils.mock.core.MockService;
 import org.unitils.mock.core.ObservedInvocation;
 import org.unitils.mock.core.Scenario;
-import org.unitils.mock.core.util.StackTraceService;
+import org.unitils.mock.report.ScenarioReport;
 
 import java.util.List;
 
@@ -37,19 +38,17 @@ public class MockUnitils {
 
     // todo move to getter functions to avoid unnecessary inits
     protected static Scenario scenario = Unitils.getInstanceOfType(Scenario.class);
+    protected static MockService mockService = Unitils.getInstanceOfType(MockService.class);
     protected static MockFactory mockFactory = Unitils.getInstanceOfType(MockFactory.class);
-    protected static StackTraceService stackTraceService = Unitils.getInstanceOfType(StackTraceService.class);
+    protected static ScenarioReport scenarioReport = Unitils.getInstanceOfType(ScenarioReport.class);
 
 
     public static void assertNoMoreInvocations() {
-        StackTraceElement[] invocationStackTrace = stackTraceService.getInvocationStackTrace(MockUnitils.class, false);
-        scenario.assertNoMoreInvocations(invocationStackTrace);
+        mockService.assertNoMoreInvocations();
     }
 
     // todo log error when mock chaining does not work  e.g.
     // proxyInvocationMock.returns(String.class).getMethod().getReturnType();
-
-    // todo add createMocks method so that you no longer have to extend unitils base class
 
     public static <T> Mock<T> createMock(Class<T> type, Object testObject) {
         return createMock(null, type, testObject);
@@ -85,20 +84,9 @@ public class MockUnitils {
     }
 
 
-    public static void logFullScenarioReport() {
-        logger.info("\n\n" + scenario.createFullReport());
-    }
-
-    public static void logObservedScenario() {
-        logger.info("\n\nObserved scenario:\n\n" + scenario.createObservedInvocationsReport());
-    }
-
-    public static void logDetailedObservedScenario() {
-        logger.info("\n\nDetailed observed scenario:\n\n" + scenario.createDetailedObservedInvocationsReport());
-    }
-
-    public static void logSuggestedAsserts() {
-        logger.info("\n\nSuggested assert statements:\n\n" + scenario.createSuggestedAssertsReport());
+    public static void logScenarioReport() {
+        String report = scenarioReport.createReport();
+        logger.info(report);
     }
 
     public static List<ObservedInvocation> getObservedInvocations() {

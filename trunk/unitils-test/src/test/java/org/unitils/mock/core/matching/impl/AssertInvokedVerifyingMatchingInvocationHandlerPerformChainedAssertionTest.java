@@ -41,7 +41,7 @@ public class AssertInvokedVerifyingMatchingInvocationHandlerPerformChainedAssert
 
     @Before
     public void initialize() throws Exception {
-        assertInvokedVerifyingMatchingInvocationHandler = new AssertInvokedVerifyingMatchingInvocationHandler(null, mockServiceMock.getMock());
+        assertInvokedVerifyingMatchingInvocationHandler = new AssertInvokedVerifyingMatchingInvocationHandler(null, mockServiceMock.getMock(), null);
     }
 
 

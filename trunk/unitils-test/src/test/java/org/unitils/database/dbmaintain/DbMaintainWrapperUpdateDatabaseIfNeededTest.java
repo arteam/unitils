@@ -25,7 +25,7 @@ import org.unitils.mock.Mock;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.mock.MockUnitils.assertNoMoreInvocations;
+import static org.unitils.mock.ArgumentMatchers.anyBoolean;
 
 /**
  * @author Tim Ducheyne
@@ -67,7 +67,7 @@ public class DbMaintainWrapperUpdateDatabaseIfNeededTest extends UnitilsJUnit4 {
         boolean result2 = dbMaintainWrapper.updateDatabaseIfNeeded();
 
         dbMaintainerMock.assertInvoked().updateDatabase(false);
-        assertNoMoreInvocations();
+        dbMaintainerMock.assertNotInvoked().updateDatabase(anyBoolean());
         assertTrue(result1);
         assertFalse(result2);
     }

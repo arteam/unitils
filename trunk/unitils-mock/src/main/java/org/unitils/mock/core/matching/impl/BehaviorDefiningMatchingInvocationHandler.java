@@ -16,16 +16,13 @@
 package org.unitils.mock.core.matching.impl;
 
 import org.unitils.mock.Mock;
-import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import org.unitils.mock.core.BehaviorDefiningInvocation;
 import org.unitils.mock.core.BehaviorDefiningInvocations;
+import org.unitils.mock.core.MatchingInvocation;
 import org.unitils.mock.core.MockFactory;
 import org.unitils.mock.core.matching.MatchingInvocationHandler;
-import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.ChainedMockBehavior;
-
-import java.util.List;
 
 
 /**
@@ -48,21 +45,18 @@ public class BehaviorDefiningMatchingInvocationHandler implements MatchingInvoca
     }
 
 
-    public Object handleInvocation(ProxyInvocation proxyInvocation, List<ArgumentMatcher> argumentMatchers) {
+    public Object handleInvocation(MatchingInvocation matchingInvocation) {
         if (mockBehavior instanceof ChainedMockBehavior) {
             ((ChainedMockBehavior) mockBehavior).installChain();
         }
-        BehaviorDefiningInvocation behaviorDefiningInvocation = new BehaviorDefiningInvocation(proxyInvocation, mockBehavior, argumentMatchers, oneTimeMatch);
+        BehaviorDefiningInvocation behaviorDefiningInvocation = new BehaviorDefiningInvocation(matchingInvocation, mockBehavior, oneTimeMatch);
         behaviorDefiningInvocations.addBehaviorDefiningInvocation(behaviorDefiningInvocation);
-        return createChainedMock(proxyInvocation, behaviorDefiningInvocation);
+        return createChainedMock(behaviorDefiningInvocation);
     }
 
 
-    protected Object createChainedMock(ProxyInvocation proxyInvocation, BehaviorDefiningInvocation behaviorDefiningInvocation) {
-        Class<?> innerMockType = proxyInvocation.getMethod().getReturnType();
-        String innerMockName = proxyInvocation.getProxyName() + "." + proxyInvocation.getMethod().getName();
-
-        Mock<?> mock = mockFactory.createChainedMock(innerMockName, innerMockType);
+    protected Object createChainedMock(BehaviorDefiningInvocation behaviorDefiningInvocation) {
+        Mock<?> mock = mockFactory.createChainedMock(behaviorDefiningInvocation);
         if (mock == null) {
             return null;
         }

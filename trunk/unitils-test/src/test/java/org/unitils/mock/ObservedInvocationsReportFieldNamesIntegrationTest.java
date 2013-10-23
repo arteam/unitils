@@ -40,7 +40,7 @@ public class ObservedInvocationsReportFieldNamesIntegrationTest extends UnitilsJ
 
     @Before
     public void initialize() {
-        observedInvocationsReport = new ObservedInvocationsReport(this);
+        observedInvocationsReport = new ObservedInvocationsReport();
     }
 
 
@@ -49,7 +49,7 @@ public class ObservedInvocationsReportFieldNamesIntegrationTest extends UnitilsJ
         testMock.returns(myTestField).testMethod(null);
         testMock.getMock().testMethod(null);
 
-        String result = observedInvocationsReport.createReport(getObservedInvocations());
+        String result = observedInvocationsReport.createReport(getObservedInvocations(), this);
         assertTrue(result.contains("myTestField"));
     }
 
@@ -58,7 +58,7 @@ public class ObservedInvocationsReportFieldNamesIntegrationTest extends UnitilsJ
         testMock.returns(null).testMethod(myTestField);
         testMock.getMock().testMethod(myTestField);
 
-        String result = observedInvocationsReport.createReport(getObservedInvocations());
+        String result = observedInvocationsReport.createReport(getObservedInvocations(), this);
         assertTrue(result.contains("myTestField"));
     }
 

@@ -19,6 +19,7 @@ import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
+import org.unitils.mock.core.MatchingInvocation;
 import org.unitils.mock.core.matching.MatchingInvocationHandler;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.proxy.ProxyInvocationHandler;
@@ -74,7 +75,7 @@ public class MatchingProxyInvocationHandler implements ProxyInvocationHandler {
         previousMatchingInvocationNotCompletedException = null;
     }
 
-    public Object handleInvocation(ProxyInvocation proxyInvocation) throws Throwable {
+    public Object handleInvocation(ProxyInvocation proxyInvocation) {
         try {
             if (matchingInvocationHandler == null) {
                 UnitilsException e = new UnitilsException("Unexpected matching proxy invocation. Expected following syntax 'mock'.'matching method'.'method'. E.g. myMock.returns().myMethod();");
@@ -82,7 +83,9 @@ public class MatchingProxyInvocationHandler implements ProxyInvocationHandler {
                 throw e;
             }
             List<ArgumentMatcher> argumentMatchers = argumentMatcherRepository.finishMatchingInvocation(proxyInvocation);
-            return matchingInvocationHandler.handleInvocation(proxyInvocation, argumentMatchers);
+            MatchingInvocation matchingInvocation = new MatchingInvocation(proxyInvocation, argumentMatchers);
+            return matchingInvocationHandler.handleInvocation(matchingInvocation);
+
         } finally {
             reset();
         }

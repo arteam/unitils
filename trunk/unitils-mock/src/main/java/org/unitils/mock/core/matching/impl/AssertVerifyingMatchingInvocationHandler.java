@@ -16,15 +16,11 @@
 package org.unitils.mock.core.matching.impl;
 
 import org.unitils.mock.Mock;
-import org.unitils.mock.argumentmatcher.ArgumentMatcher;
-import org.unitils.mock.core.BehaviorDefiningInvocation;
+import org.unitils.mock.core.MatchingInvocation;
+import org.unitils.mock.core.MockAssertionError;
 import org.unitils.mock.core.MockFactory;
-import org.unitils.mock.core.Scenario;
 import org.unitils.mock.core.matching.MatchingInvocationHandler;
-import org.unitils.mock.core.proxy.ProxyInvocation;
-
-import java.util.List;
-
+import org.unitils.mock.report.ScenarioReport;
 
 /**
  * @author Tim Ducheyne
@@ -32,35 +28,46 @@ import java.util.List;
  */
 public abstract class AssertVerifyingMatchingInvocationHandler implements MatchingInvocationHandler {
 
-    protected Scenario scenario;
     protected MockFactory mockFactory;
+    protected ScenarioReport scenarioReport;
 
 
-    public AssertVerifyingMatchingInvocationHandler(Scenario scenario, MockFactory mockFactory) {
-        this.scenario = scenario;
+    public AssertVerifyingMatchingInvocationHandler(MockFactory mockFactory, ScenarioReport scenarioReport) {
         this.mockFactory = mockFactory;
+        this.scenarioReport = scenarioReport;
     }
 
 
-    public Object handleInvocation(ProxyInvocation proxyInvocation, List<ArgumentMatcher> argumentMatchers) {
-        BehaviorDefiningInvocation behaviorDefiningInvocation = new BehaviorDefiningInvocation(proxyInvocation, null, argumentMatchers, true);
-        performAssertion(scenario, behaviorDefiningInvocation);
-        return createChainedMock(proxyInvocation);
+    public Object handleInvocation(MatchingInvocation matchingInvocation) {
+        String assertionErrorMessage = performAssertion(matchingInvocation);
+        if (assertionErrorMessage != null) {
+            throw createAssertionError(assertionErrorMessage, matchingInvocation);
+        }
+        return createChainedMock(matchingInvocation);
     }
 
 
-    protected Object createChainedMock(ProxyInvocation proxyInvocation) {
-        Class<?> innerMockType = proxyInvocation.getMethod().getReturnType();
-        String innerMockName = proxyInvocation.getProxyName() + "." + proxyInvocation.getMethod().getName();
+    protected AssertionError createAssertionError(String assertionErrorMessage, MatchingInvocation matchingInvocation) {
+        String report = scenarioReport.createReport();
+        StackTraceElement assertedAt = matchingInvocation.getInvokedAt();
 
-        Mock<?> mock = mockFactory.createChainedMock(innerMockName, innerMockType);
+        StringBuilder message = new StringBuilder(assertionErrorMessage);
+        message.append("\nAsserted at ");
+        message.append(assertedAt);
+        message.append("\n\n");
+        message.append(report);
+        throw new MockAssertionError(message.toString(), matchingInvocation.getInvokedAtTrace());
+    }
+
+    protected Object createChainedMock(MatchingInvocation matchingInvocation) {
+        Mock<?> mock = mockFactory.createChainedMock(matchingInvocation);
         if (mock == null) {
             return null;
         }
         return performChainedAssertion(mock);
     }
 
-    protected abstract void performAssertion(Scenario scenario, BehaviorDefiningInvocation behaviorDefiningInvocation);
+    protected abstract String performAssertion(MatchingInvocation matchingInvocation);
 
     protected abstract Object performChainedAssertion(Mock<?> mock);
 }

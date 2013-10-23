@@ -40,7 +40,7 @@ public class DetailedObservedInvocationsReportFieldNamesIntegrationTest extends 
 
     @Before
     public void initialize() {
-        detailedObservedInvocationsReport = new DetailedObservedInvocationsReport(this);
+        detailedObservedInvocationsReport = new DetailedObservedInvocationsReport();
     }
 
 
@@ -49,7 +49,7 @@ public class DetailedObservedInvocationsReportFieldNamesIntegrationTest extends 
         testMock.returns(myTestField).testMethod(null);
         testMock.getMock().testMethod(null);
 
-        String result = detailedObservedInvocationsReport.createReport(getObservedInvocations());
+        String result = detailedObservedInvocationsReport.createReport(getObservedInvocations(), this);
         assertTrue(result.contains("1. testMock.testMethod(null) -> myTestField"));
         assertTrue(result.contains("- myTestField -> []"));
     }
@@ -59,7 +59,7 @@ public class DetailedObservedInvocationsReportFieldNamesIntegrationTest extends 
         testMock.returns(null).testMethod(myTestField);
         testMock.getMock().testMethod(myTestField);
 
-        String result = detailedObservedInvocationsReport.createReport(getObservedInvocations());
+        String result = detailedObservedInvocationsReport.createReport(getObservedInvocations(), this);
         assertTrue(result.contains("1. testMock.testMethod(myTestField) -> null"));
         assertTrue(result.contains("- myTestField -> []"));
     }

@@ -19,62 +19,86 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
+import org.unitils.mock.MockUnitils;
+import org.unitils.mock.PartialMock;
 import org.unitils.mock.annotation.Dummy;
-import org.unitils.mock.argumentmatcher.ArgumentMatcher;
-import org.unitils.mock.core.BehaviorDefiningInvocation;
+import org.unitils.mock.core.MatchingInvocation;
 import org.unitils.mock.core.MockFactory;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.core.proxy.ProxyInvocation;
+import org.unitils.mock.report.ScenarioReport;
 
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 /**
  * @author Tim Ducheyne
  */
 public class AssertVerifyingMatchingInvocationHandlerHandleInvocationTest extends UnitilsJUnit4 {
 
-    private AssertVerifyingMatchingInvocationHandler assertVerifyingMatchingInvocationHandler;
+    private PartialMock<AssertVerifyingMatchingInvocationHandler> assertVerifyingMatchingInvocationHandler;
 
     private Mock<Scenario> scenarioMock;
     private Mock<MockFactory> mockServiceMock;
-    private ProxyInvocation proxyInvocation;
+    private Mock<ScenarioReport> scenarioReportMock;
+    private MatchingInvocation matchingInvocation;
+    @Dummy
+    private Mock<Map> chainedMock;
     @Dummy
     private Map chainedProxy;
-    @Dummy
-    private ArgumentMatcher argumentMatcher;
 
 
     @Before
     public void initialize() throws Exception {
-        assertVerifyingMatchingInvocationHandler = new AssertInvokedInSequenceVerifyingMatchingInvocationHandler(scenarioMock.getMock(), mockServiceMock.getMock());
+        AssertVerifyingMatchingInvocationHandler mockPrototype = new AssertInvokedInSequenceVerifyingMatchingInvocationHandler(scenarioMock.getMock(), mockServiceMock.getMock(), scenarioReportMock.getMock());
+        assertVerifyingMatchingInvocationHandler = MockUnitils.createPartialMock(mockPrototype, this);
+
+        StackTraceElement element1 = new StackTraceElement("class1", "method1", "file1", 111);
+        StackTraceElement element2 = new StackTraceElement("class2", "method2", "file2", 222);
+        StackTraceElement[] stackTrace = new StackTraceElement[]{element1, element2};
 
         Method method = MyInterface.class.getMethod("method");
-        proxyInvocation = new ProxyInvocation("mock", null, method, emptyList(), emptyList(), null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation("mock", null, method, emptyList(), emptyList(), stackTrace);
+        matchingInvocation = new MatchingInvocation(proxyInvocation, null);
+
+        scenarioReportMock.returns("scenario report").createReport();
     }
 
 
     @Test
-    public void handleInvocation() {
-        mockServiceMock.returns(chainedProxy).createChainedMock("mock.method", Map.class).assertInvokedInSequence();
+    public void mockChainingStartedWhenAssertionOk() {
+        assertVerifyingMatchingInvocationHandler.returns(null).performAssertion(matchingInvocation);
+        mockServiceMock.returns(chainedMock).createChainedMock(matchingInvocation);
+        assertVerifyingMatchingInvocationHandler.returns(chainedProxy).performChainedAssertion(chainedMock);
 
-        Object result = assertVerifyingMatchingInvocationHandler.handleInvocation(proxyInvocation, asList(argumentMatcher));
+        Object result = assertVerifyingMatchingInvocationHandler.getMock().handleInvocation(matchingInvocation);
         assertSame(chainedProxy, result);
-        scenarioMock.assertInvoked().assertInvokedInSequence(new BehaviorDefiningInvocation(proxyInvocation, null, asList(argumentMatcher), true));
+    }
+
+    @Test
+    public void assertionErrorWhenAssertionFailed() {
+        assertVerifyingMatchingInvocationHandler.returns("assertion failed").performAssertion(matchingInvocation);
+        try {
+            assertVerifyingMatchingInvocationHandler.getMock().handleInvocation(matchingInvocation);
+            fail("AssertionError expected");
+        } catch (AssertionError e) {
+            assertEquals("assertion failed\n" +
+                    "Asserted at class1.method1(file1:111)\n" +
+                    "\n" +
+                    "scenario report", e.getMessage());
+        }
     }
 
     @Test
     public void nullProxyWhenUnableToCreateChainedMock() {
-        mockServiceMock.returns(null).createChainedMock("mock.method", Map.class);
+        assertVerifyingMatchingInvocationHandler.returns(null).performAssertion(matchingInvocation);
+        mockServiceMock.returns(null).createChainedMock(matchingInvocation);
 
-        Object result = assertVerifyingMatchingInvocationHandler.handleInvocation(proxyInvocation, asList(argumentMatcher));
+        Object result = assertVerifyingMatchingInvocationHandler.getMock().handleInvocation(matchingInvocation);
         assertNull(result);
-        scenarioMock.assertInvoked().assertInvokedInSequence(new BehaviorDefiningInvocation(proxyInvocation, null, asList(argumentMatcher), true));
     }
 
 

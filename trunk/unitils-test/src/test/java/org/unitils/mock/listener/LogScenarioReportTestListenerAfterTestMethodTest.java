@@ -18,8 +18,12 @@ package org.unitils.mock.listener;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.core.TestInstance;
 import org.unitils.mock.Mock;
-import org.unitils.mock.core.Scenario;
+import org.unitils.mock.annotation.Dummy;
+import org.unitils.mock.report.ScenarioReport;
+
+import java.util.Properties;
 
 /**
  * @author Tim Ducheyne
@@ -28,24 +32,29 @@ public class LogScenarioReportTestListenerAfterTestMethodTest extends UnitilsJUn
 
     private LogScenarioReportTestListener logScenarioReportTestListener;
 
-    private Mock<Scenario> scenarioMock;
+    private Mock<TestInstance> testInstanceMock;
+    private Mock<ScenarioReport> scenarioReportMock;
+    @Dummy
+    private Properties testObject;
 
 
     @Before
     public void initialize() {
-        logScenarioReportTestListener = new LogScenarioReportTestListener(scenarioMock.getMock());
+        logScenarioReportTestListener = new LogScenarioReportTestListener(scenarioReportMock.getMock());
+
+        testInstanceMock.returns(testObject).getTestObject();
     }
 
 
     @Test
     public void logScenarioReportWhenException() {
-        logScenarioReportTestListener.afterTestMethod(null, new NullPointerException());
-        scenarioMock.assertInvoked().createFullReport();
+        logScenarioReportTestListener.afterTestMethod(testInstanceMock.getMock(), new NullPointerException());
+        scenarioReportMock.assertInvoked().createReport();
     }
 
     @Test
     public void ignoreWhenNoException() {
-        logScenarioReportTestListener.afterTestMethod(null, null);
-        scenarioMock.assertNotInvoked().createFullReport();
+        logScenarioReportTestListener.afterTestMethod(testInstanceMock.getMock(), null);
+        scenarioReportMock.assertNotInvoked().createReport();
     }
 }

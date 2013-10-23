@@ -44,7 +44,7 @@ public class MockFactoryCreateDummyTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        mockFactory = new MockFactory(null, null, mockBehaviorFactoryMock.getMock(), proxyServiceMock.getMock(), null, null);
+        mockFactory = new MockFactory(null, null, mockBehaviorFactoryMock.getMock(), proxyServiceMock.getMock(), null, null, null);
     }
 
 

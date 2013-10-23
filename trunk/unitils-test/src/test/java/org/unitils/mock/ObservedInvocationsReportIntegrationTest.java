@@ -41,7 +41,7 @@ public class ObservedInvocationsReportIntegrationTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        observedInvocationsView = new ObservedInvocationsReport(this);
+        observedInvocationsView = new ObservedInvocationsReport();
     }
 
 
@@ -50,14 +50,14 @@ public class ObservedInvocationsReportIntegrationTest extends UnitilsJUnit4 {
         testMock.getMock().testMethod1("value1");
         testMock.getMock().testMethod2();
 
-        String result = observedInvocationsView.createReport(getObservedInvocations());
+        String result = observedInvocationsView.createReport(getObservedInvocations(), this);
         assertTrue(result.contains("1. testMock.testMethod1(\"value1\") -> null  .....  at org.unitils.mock.ObservedInvocationsReportIntegrationTest.twoMockInvocations(ObservedInvocationsReportIntegrationTest.java:"));
         assertTrue(result.contains("2. testMock.testMethod2()  .....  at org.unitils.mock.ObservedInvocationsReportIntegrationTest.twoMockInvocations(ObservedInvocationsReportIntegrationTest.java:"));
     }
 
     @Test
     public void noInvocations() {
-        String result = observedInvocationsView.createReport(getObservedInvocations());
+        String result = observedInvocationsView.createReport(getObservedInvocations(), this);
         assertTrue(isEmpty(result));
     }
 
@@ -65,7 +65,7 @@ public class ObservedInvocationsReportIntegrationTest extends UnitilsJUnit4 {
     public void useShortNameWhenArgumentValueLongerThan50() {
         testMock.getMock().testMethod1("01234567890123456789012345678901234567890123456789x");
 
-        String result = observedInvocationsView.createReport(getObservedInvocations());
+        String result = observedInvocationsView.createReport(getObservedInvocations(), this);
         assertTrue(result.contains("1. testMock.testMethod1(string1) -> null  .....  at org.unitils.mock.ObservedInvocationsReportIntegrationTest.useShortNameWhenArgumentValueLongerThan50(ObservedInvocationsReportIntegrationTest.java:"));
     }
 
@@ -74,7 +74,7 @@ public class ObservedInvocationsReportIntegrationTest extends UnitilsJUnit4 {
         testMock.returns("01234567890123456789012345678901234567890123456789x").testMethod1(null);
         testMock.getMock().testMethod1(null);
 
-        String result = observedInvocationsView.createReport(getObservedInvocations());
+        String result = observedInvocationsView.createReport(getObservedInvocations(), this);
         assertTrue(result.contains("1. testMock.testMethod1(null) -> string1  .....  at org.unitils.mock.ObservedInvocationsReportIntegrationTest.useShortNameWhenResultValueLongerThan50(ObservedInvocationsReportIntegrationTest.java:"));
     }
 
@@ -84,7 +84,7 @@ public class ObservedInvocationsReportIntegrationTest extends UnitilsJUnit4 {
         testMock.returns(largeValue).testMethod3(largeValue);
         testMock.getMock().testMethod3(largeValue);
 
-        String result = observedInvocationsView.createReport(getObservedInvocations());
+        String result = observedInvocationsView.createReport(getObservedInvocations(), this);
         assertTrue(result.contains("1. testMock.testMethod3(list1) -> list1  .....  at org.unitils.mock.ObservedInvocationsReportIntegrationTest.useSameNameWhenLargeValueInResultAndArgument(ObservedInvocationsReportIntegrationTest.java:"));
     }
 

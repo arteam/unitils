@@ -51,7 +51,7 @@ public class MockProxyInvocationHandler<T> implements ProxyInvocationHandler {
         MockBehavior mockBehavior = getValidMockBehavior(proxyInvocation, behaviorDefiningInvocation);
 
         ObservedInvocation observedInvocation = new ObservedInvocation(proxyInvocation, behaviorDefiningInvocation, mockBehavior);
-        scenario.addObservedMockInvocation(observedInvocation);
+        scenario.addObservedInvocation(observedInvocation);
 
         Throwable throwable = null;
         Object result = null;

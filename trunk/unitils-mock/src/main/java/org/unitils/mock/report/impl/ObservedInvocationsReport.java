@@ -38,20 +38,16 @@ import java.util.*;
 public class ObservedInvocationsReport extends ProxyInvocationsReport {
 
 
-    public ObservedInvocationsReport(Object testedObject) {
-        super(testedObject);
-    }
-
-
     /**
      * Creates a string representation of the given invocations as described in the class javadoc.
      *
      * @param observedInvocations The invocations for which to create a report, not null
+     * @param testObject          The test instance
      * @return The string representation, not null
      */
-    public String createReport(List<ObservedInvocation> observedInvocations) {
+    public String createReport(List<ObservedInvocation> observedInvocations, Object testObject) {
         StringBuilder result = new StringBuilder();
-
+        Map<Object, String> fieldValuesAndNames = getFieldValuesAndNames(testObject);
         List<FormattedObject> currentLargeObjects = new ArrayList<FormattedObject>();
         Map<Object, FormattedObject> allLargeObjects = new IdentityHashMap<Object, FormattedObject>();
         Map<Class<?>, Integer> largeObjectNameIndexes = new HashMap<Class<?>, Integer>();
@@ -60,7 +56,7 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
         int invocationIndex = 0;
         for (ObservedInvocation observedInvocation : observedInvocations) {
             result.append(formatInvocationIndex(++invocationIndex, observedInvocations.size()));
-            result.append(formatObservedInvocation(observedInvocation, currentLargeObjects, allLargeObjects, largeObjectNameIndexes));
+            result.append(formatObservedInvocation(observedInvocation, currentLargeObjects, allLargeObjects, largeObjectNameIndexes, fieldValuesAndNames));
             result.append(formatInvokedAt(observedInvocation));
             result.append("\n");
         }
@@ -77,9 +73,10 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
      * @param currentLargeObjects    The current the large values, not null
      * @param allLargeObjects        All large values per value, not null
      * @param largeObjectNameIndexes The current indexes to use for the large value names (per value type), not null
+     * @param fieldValuesAndNames    The values and name of the instance fields in the test object
      * @return The string representation, not null
      */
-    protected String formatObservedInvocation(ObservedInvocation observedInvocation, List<FormattedObject> currentLargeObjects, Map<Object, FormattedObject> allLargeObjects, Map<Class<?>, Integer> largeObjectNameIndexes) {
+    protected String formatObservedInvocation(ObservedInvocation observedInvocation, List<FormattedObject> currentLargeObjects, Map<Object, FormattedObject> allLargeObjects, Map<Class<?>, Integer> largeObjectNameIndexes, Map<Object, String> fieldValuesAndNames) {
         StringBuilder result = new StringBuilder();
         Method method = observedInvocation.getMethod();
 
@@ -95,7 +92,7 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
             Iterator<?> arguments = observedInvocation.getArguments().iterator();
             Iterator<?> argumentsAtInvocationTime = observedInvocation.getArgumentsAtInvocationTime().iterator();
             for (Class<?> argumentType : argumentTypes) {
-                result.append(formatValue(argumentsAtInvocationTime.next(), arguments.next(), argumentType, currentLargeObjects, allLargeObjects, largeObjectNameIndexes));
+                result.append(formatValue(argumentsAtInvocationTime.next(), arguments.next(), argumentType, currentLargeObjects, allLargeObjects, largeObjectNameIndexes, fieldValuesAndNames));
                 result.append(", ");
             }
             // remove the last comma
@@ -109,7 +106,7 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
             result.append(" -> ");
             Object resultValue = observedInvocation.getResult();
             Object resultAtInvocationTime = observedInvocation.getResultAtInvocationTime();
-            result.append(formatValue(resultAtInvocationTime, resultValue, resultType, currentLargeObjects, allLargeObjects, largeObjectNameIndexes));
+            result.append(formatValue(resultAtInvocationTime, resultValue, resultType, currentLargeObjects, allLargeObjects, largeObjectNameIndexes, fieldValuesAndNames));
         }
         return result.toString();
     }

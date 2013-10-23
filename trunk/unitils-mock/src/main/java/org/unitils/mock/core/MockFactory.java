@@ -28,9 +28,11 @@ import org.unitils.mock.core.util.CloneService;
 import org.unitils.mock.core.util.StackTraceService;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.MockBehaviorFactory;
+import org.unitils.mock.report.ScenarioReport;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -48,18 +50,20 @@ public class MockFactory {
     protected StackTraceService stackTraceService;
     protected CloneService cloneService;
     protected MockBehaviorFactory mockBehaviorFactory;
+    protected ScenarioReport scenarioReport;
 
-    /* Created chained mocks per mock name */
-    protected Map<String, Mock<?>> chainedMocksPerName = new HashMap<String, Mock<?>>();
+    /* Created chained mocks per proxy and per method */
+    protected Map<Object, Map<Method, Mock<?>>> chainedMocks = new IdentityHashMap<Object, Map<Method, Mock<?>>>();
 
 
-    public MockFactory(Scenario scenario, ArgumentMatcherRepository argumentMatcherRepository, MockBehaviorFactory mockBehaviorFactory, ProxyService proxyService, StackTraceService stackTraceService, CloneService cloneService) {
+    public MockFactory(Scenario scenario, ArgumentMatcherRepository argumentMatcherRepository, MockBehaviorFactory mockBehaviorFactory, ProxyService proxyService, StackTraceService stackTraceService, CloneService cloneService, ScenarioReport scenarioReport) {
         this.scenario = scenario;
         this.argumentMatcherRepository = argumentMatcherRepository;
         this.proxyService = proxyService;
         this.stackTraceService = stackTraceService;
         this.cloneService = cloneService;
         this.mockBehaviorFactory = mockBehaviorFactory;
+        this.scenarioReport = scenarioReport;
     }
 
 
@@ -108,22 +112,30 @@ public class MockFactory {
     }
 
 
-    @SuppressWarnings({"unchecked"})
-    public <T> Mock<T> createChainedMock(String name, Class<T> mockedType) {
-        Mock<T> chainedMock = (Mock<T>) chainedMocksPerName.get(name);  // todo   not per name !!
+    public Mock<?> createChainedMock(MatchingInvocation matchingInvocation) {
+        Object matchingProxy = matchingInvocation.getProxy();
+        Map<Method, Mock<?>> chainedMocksForProxy = chainedMocks.get(matchingProxy);
+        if (chainedMocksForProxy == null) {
+            chainedMocksForProxy = new IdentityHashMap<Method, Mock<?>>();
+            chainedMocks.put(matchingProxy, chainedMocksForProxy);
+        }
+        Method method = matchingInvocation.getMethod();
+        Mock<?> chainedMock = chainedMocksForProxy.get(method);
         if (chainedMock != null) {
             return chainedMock;
         }
+        Class<?> mockedType = matchingInvocation.getReturnType();
         if (Void.class.equals(mockedType) || mockedType.isPrimitive() || mockedType.isArray() || Modifier.isFinal(mockedType.getModifiers())) {
             return null;
         }
         try {
+            String name = matchingInvocation.getInnerMockName();
             chainedMock = createMockObject(name, mockedType, true);
         } catch (Exception e) {
             // chaining not supported, return type cannot be mocked
             return null;
         }
-        chainedMocksPerName.put(name, chainedMock);
+        chainedMocksForProxy.put(method, chainedMock);
         return chainedMock;
     }
 
@@ -185,7 +197,7 @@ public class MockFactory {
     }
 
     protected MatchingInvocationHandlerFactory createMatchingInvocationHandlerFactory() {
-        return new MatchingInvocationHandlerFactory(scenario, this);
+        return new MatchingInvocationHandlerFactory(scenario, this, scenarioReport);
     }
 
     protected void resetIfNewTestObject(Object testObject) {
@@ -195,6 +207,7 @@ public class MockFactory {
         scenario.reset();
         scenario.setTestObject(testObject);
         argumentMatcherRepository.reset();
+        chainedMocks.clear();
     }
 
     protected <T> String getName(String name, Class<T> type) {
