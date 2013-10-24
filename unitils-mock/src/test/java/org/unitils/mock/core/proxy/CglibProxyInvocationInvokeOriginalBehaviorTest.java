@@ -18,7 +18,6 @@ package org.unitils.mock.core.proxy;
 import net.sf.cglib.proxy.MethodProxy;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 
 import java.lang.reflect.Method;
@@ -31,9 +30,12 @@ import static org.objectweb.asm.Type.getMethodDescriptor;
 import static org.unitils.mock.core.proxy.CglibProxyMethodInterceptor.CglibProxyInvocation;
 
 /**
+ * Note: this class cannot be moved to unitils-test.
+ * Compilation will fail since ASM classes are shaded during package phase.
+ *
  * @author Tim Ducheyne
  */
-public class CglibProxyInvocationInvokeOriginalBehaviorTest extends UnitilsJUnit4 {
+public class CglibProxyInvocationInvokeOriginalBehaviorTest {
 
     private CglibProxyInvocation cglibProxyInvocation;
 

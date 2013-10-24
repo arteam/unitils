@@ -75,6 +75,10 @@
         <objenesis.version>2.0</objenesis.version>
         <hibernate.version>3.2.5.ga</hibernate.version>
 
+        <maven-gpg-plugin.version>1.4</maven-gpg-plugin.version>
+        <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
+        <maven-shade-plugin.version>2.1</maven-shade-plugin.version>
+
         <project.build.java.target>1.5</project.build.java.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -244,7 +248,6 @@
         </dependencies>
     </dependencyManagement>
 
-    <!-- Build Settings -->
     <build>
         <testResources>
             <testResource>
@@ -257,33 +260,77 @@
                 <directory>src/test/resources</directory>
             </testResource>
         </testResources>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                        <source>${project.build.java.target}</source>
+                        <target>${project.build.java.target}</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <configuration>
+                        <outputDirectory>${project.build.directory}/dist</outputDirectory>
+                        <descriptors>
+                            <descriptor>main/assembly/assembly-unitils.xml</descriptor>
+                            <descriptor>main/assembly/assembly-unitils-with-dependencies.xml</descriptor>
+                        </descriptors>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <configuration>
+                        <goals>deploy package assembly:assembly javadoc:aggregate</goals>
+                        <tagBase>https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases</tagBase>
+                        <mavenExecutorId>forked-path</mavenExecutorId>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>${maven-gpg-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>${maven-shade-plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                    <source>${project.build.java.target}</source>
-                    <target>${project.build.java.target}</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <outputDirectory>${project.build.directory}/dist</outputDirectory>
-                    <descriptors>
-                        <descriptor>main/assembly/assembly-unitils.xml</descriptor>
-                        <descriptor>main/assembly/assembly-unitils-with-dependencies.xml</descriptor>
-                    </descriptors>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <goals>deploy package assembly:assembly javadoc:aggregate</goals>
-                    <tagBase>https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases</tagBase>
-                    <mavenExecutorId>forked-path</mavenExecutorId>
-                </configuration>
-            </plugin>
+            <!--<plugin>-->
+            <!--<artifactId>maven-compiler-plugin</artifactId>-->
+            <!--<version>${maven-compiler-plugin.version}</version>-->
+            <!--<configuration>-->
+            <!--<encoding>${project.build.sourceEncoding}</encoding>-->
+            <!--<source>${project.build.java.target}</source>-->
+            <!--<target>${project.build.java.target}</target>-->
+            <!--</configuration>-->
+            <!--</plugin>-->
+            <!--<plugin>-->
+            <!--<artifactId>maven-assembly-plugin</artifactId>-->
+            <!--<configuration>-->
+            <!--<outputDirectory>${project.build.directory}/dist</outputDirectory>-->
+            <!--<descriptors>-->
+            <!--<descriptor>main/assembly/assembly-unitils.xml</descriptor>-->
+            <!--<descriptor>main/assembly/assembly-unitils-with-dependencies.xml</descriptor>-->
+            <!--</descriptors>-->
+            <!--</configuration>-->
+            <!--</plugin>-->
+            <!--<plugin>-->
+            <!--<artifactId>maven-release-plugin</artifactId>-->
+            <!--<configuration>-->
+            <!--<goals>deploy package assembly:assembly javadoc:aggregate</goals>-->
+            <!--<tagBase>https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases</tagBase>-->
+            <!--<mavenExecutorId>forked-path</mavenExecutorId>-->
+            <!--</configuration>-->
+            <!--</plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>

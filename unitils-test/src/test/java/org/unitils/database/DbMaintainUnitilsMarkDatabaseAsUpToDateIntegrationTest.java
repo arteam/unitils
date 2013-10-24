@@ -18,6 +18,8 @@ package org.unitils.database;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.io.annotation.TempDir;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -30,15 +32,15 @@ import static org.unitils.database.SqlUnitils.executeUpdateQuietly;
 /**
  * @author Tim Ducheyne
  */
-public class DbMaintainUnitilsMarkDatabaseAsUpToDateIntegrationTest {
+public class DbMaintainUnitilsMarkDatabaseAsUpToDateIntegrationTest extends UnitilsJUnit4 {
 
+    @TempDir("unitils-test/scripts")
     private File scriptsDir;
     private File script1;
 
 
     @Before
-    public void initialize() {
-        scriptsDir = new File("unitils-test/src/test/resources/scripts");
+    public void initialize() throws Exception {
         script1 = new File(scriptsDir, "01_insert.sql");
 
         cleanup();

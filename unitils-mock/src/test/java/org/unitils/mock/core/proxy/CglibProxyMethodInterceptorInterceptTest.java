@@ -31,6 +31,9 @@ import static org.junit.Assert.*;
 import static org.unitils.mock.core.proxy.CglibProxyMethodInterceptor.CglibProxyInvocation;
 
 /**
+ * Note: this class cannot be moved to unitils-test.
+ * Compilation will fail since ASM classes are shaded during package phase.
+ *
  * @author Tim Ducheyne
  */
 public class CglibProxyMethodInterceptorInterceptTest extends UnitilsJUnit4 {

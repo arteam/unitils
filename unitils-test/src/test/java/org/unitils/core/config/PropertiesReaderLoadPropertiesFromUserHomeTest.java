@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.unitils.core.UnitilsException;
 
 import java.io.File;
-import java.io.IOException;
+import java.net.URL;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
@@ -73,10 +73,10 @@ public class PropertiesReaderLoadPropertiesFromUserHomeTest {
     }
 
 
-    private void copyDummyPropertiesFileToUserHome() throws IOException {
+    private void copyDummyPropertiesFileToUserHome() throws Exception {
         String userHome = System.getProperty("user.home");
-        String classPath = this.getClass().getClassLoader().getResource(".").getPath();
-        copyFileToDirectory(new File(classPath + "/" + TEST_FILE), new File(userHome));
+        URL url = this.getClass().getResource("/" + TEST_FILE);
+        copyFileToDirectory(new File(url.toURI()), new File(userHome));
     }
 
     private void deleteDummyPropertiesFileFromUserHome() {
