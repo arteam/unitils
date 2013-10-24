@@ -19,6 +19,8 @@ import org.dbmaintain.util.DbMaintainException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.io.annotation.TempDir;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,8 +35,9 @@ import static org.unitils.database.SqlUnitils.executeUpdateQuietly;
 /**
  * @author Tim Ducheyne
  */
-public class DbMaintainUnitilsUpdateDatabaseIntegrationTest {
+public class DbMaintainUnitilsUpdateDatabaseIntegrationTest extends UnitilsJUnit4 {
 
+    @TempDir("unitils-test/scripts")
     private File scriptsDir;
     private File script1;
     private File script2;
@@ -43,7 +46,7 @@ public class DbMaintainUnitilsUpdateDatabaseIntegrationTest {
 
     @Before
     public void initialize() {
-        scriptsDir = new File("unitils-test/src/test/resources/scripts");
+        System.out.println("scriptsDir = " + scriptsDir);
         script1 = new File(scriptsDir, "01_insert.sql");
         script2 = new File(scriptsDir, "02_insert.sql");
         script3 = new File(scriptsDir, "03_insert.sql");

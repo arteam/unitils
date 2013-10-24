@@ -52,7 +52,6 @@ public class DbMaintainWrapperUpdateDatabaseIfNeededTest extends UnitilsJUnit4 {
     public void updateDatabase() {
         dbMaintainerMock.returns(true).updateDatabase(false);
 
-
         boolean result = dbMaintainWrapper.updateDatabaseIfNeeded();
 
         dbMaintainerMock.assertInvoked().updateDatabase(false);
