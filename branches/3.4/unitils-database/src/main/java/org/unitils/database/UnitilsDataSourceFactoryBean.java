@@ -31,7 +31,7 @@ import javax.sql.DataSource;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class UnitilsDataSourceFactoryBean implements FactoryBean {
+public class UnitilsDataSourceFactoryBean implements FactoryBean<Object> {
 
 
     /**
@@ -41,7 +41,17 @@ public class UnitilsDataSourceFactoryBean implements FactoryBean {
      */
     public Object getObject() throws Exception {
         DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-        return databaseModule.getTransactionalDataSourceAndActivateTransactionIfNeeded(databaseModule.getTestObject());
+        return databaseModule.getDefaultDataSourceWrapper().getTransactionalDataSourceAndActivateTransactionIfNeeded(databaseModule.getTestObject());
+    }
+    
+    /**
+     * Gets the data source instance.
+     *
+     * @return The data source, not null
+     */
+    public Object getObject(String databaseName) throws Exception {
+        DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+        return databaseModule.getDataSourceWrapper(databaseName).getTransactionalDataSourceAndActivateTransactionIfNeeded(databaseModule.getTestObject());
     }
 
 

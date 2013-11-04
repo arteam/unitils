@@ -15,6 +15,8 @@
  */
 package org.unitils.database.config;
 
+import java.util.Properties;
+
 import javax.sql.DataSource;
 
 import org.unitils.core.util.Configurable;
@@ -33,5 +35,19 @@ public interface DataSourceFactory extends Configurable {
      * @return The DataSource, not null
      */
     DataSource createDataSource();
+    
+    /**
+     * Configure the default database by {@link DatabaseConfiguration}
+     * @param tempConfig
+     */
+    void init(DatabaseConfiguration tempConfig);
+    
+    /**
+     * Initializes the database operation class with the given {@link Properties}
+     *
+     * @param configuration The configuration, not null
+     * @param databaseName
+     */
+    public void init(Properties configuration, String databaseName);
 
 }
