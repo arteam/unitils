@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.util;
+package org.unitils.orm.common.util;
 
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
@@ -28,6 +28,7 @@ import org.unitils.core.UnitilsException;
 import org.unitils.core.util.ResourceConfig;
 import org.unitils.core.util.ResourceConfigLoader;
 import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
+import org.unitils.util.AnnotationUtils;
 
 /**
  * Loads the configuration of a resource that is configured on a test object, by reading class, method or field

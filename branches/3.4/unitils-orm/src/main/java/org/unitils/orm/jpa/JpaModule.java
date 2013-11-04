@@ -112,7 +112,7 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
     	
     	// Make sure that a spring JpaTransactionManager is used for transaction management in the database module, if the
     	// current test object defines a JPA EntityManagerFactory
-    	getDatabaseModule().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
+    	getDatabaseModule().getTransactionHandler().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
     		
     		public boolean isApplicableFor(Object testObject) {
     			return isPersistenceUnitConfiguredFor(testObject);
@@ -127,7 +127,7 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
 			}
             
             public boolean isTransactionalResourceAvailable(Object testObject) {
-                return getDatabaseModule().isDataSourceLoaded();
+                return getDatabaseModule().getDefaultDataSourceWrapper().isDataSourceLoaded();
             }
 
             public Integer getPreference() {
@@ -268,7 +268,7 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
     
     
     protected DataSource getDataSource() {
-    	return getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded();
+    	return getDatabaseModule().getDefaultDataSourceWrapper().getDataSourceAndActivateTransactionIfNeeded();
     }
     
     

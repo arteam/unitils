@@ -92,7 +92,7 @@ public class HibernateModule extends OrmModule<SessionFactory, Session, Configur
     	
     	// Make sure that a spring HibernateTransactionManager is used for transaction management in the database module, if the
     	// current test object defines a hibernate SessionFactory
-    	getDatabaseModule().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
+    	getDatabaseModule().getTransactionHandler().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
     		
     		public boolean isApplicableFor(Object testObject) {
     			return isPersistenceUnitConfiguredFor(testObject);
@@ -106,7 +106,7 @@ public class HibernateModule extends OrmModule<SessionFactory, Session, Configur
 			}
 
             public boolean isTransactionalResourceAvailable(Object testObject) {
-                return getDatabaseModule().isDataSourceLoaded();
+                return getDatabaseModule().getDefaultDataSourceWrapper().isDataSourceLoaded();
             }
 
             public Integer getPreference() {
@@ -213,7 +213,7 @@ public class HibernateModule extends OrmModule<SessionFactory, Session, Configur
 
 
     protected DataSource getDataSource() {
-    	return getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded();
+    	return getDatabaseModule().getDefaultDataSourceWrapper().getDataSourceAndActivateTransactionIfNeeded();
     }
     
     
