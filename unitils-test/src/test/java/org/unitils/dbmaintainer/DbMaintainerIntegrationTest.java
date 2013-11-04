@@ -17,6 +17,7 @@ package org.unitils.dbmaintainer;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
@@ -28,19 +29,24 @@ import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
+
 import static org.unitils.core.util.SQLTestUtils.dropTestTables;
+
 import org.unitils.database.SQLUnitils;
 import org.unitils.database.annotations.TestDataSource;
+
 import static org.unitils.dbmaintainer.DBMaintainer.PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED;
 import static org.unitils.dbmaintainer.DBMaintainer.PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED;
 import static org.unitils.dbmaintainer.script.impl.DefaultScriptSource.PROPKEY_SCRIPT_LOCATIONS;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import static org.unitils.dbmaintainer.version.impl.DefaultExecutedScriptInfoSource.PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE;
+
 import org.unitils.thirdparty.org.apache.commons.io.FileUtils;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
+
 import java.io.*;
 import java.util.Properties;
 import java.util.Set;
@@ -62,7 +68,7 @@ public class DbMaintainerIntegrationTest extends UnitilsJUnit4 {
     private static final String SECOND_LOCATION_INCREMENTAL = "second_location_incremental";
     private static final String SECOND_LOCATION_REPEATABLE = "second_location_repeatable";
     private static final String BEFORE_INITIAL_TABLE = "before_initial";
-
+    private static String dialect = "h2";
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DbMaintainerIntegrationTest.class);
 
@@ -95,7 +101,7 @@ public class DbMaintainerIntegrationTest extends UnitilsJUnit4 {
         configuration.put(PROPKEY_SCRIPT_LOCATIONS, scriptsLocation1.getAbsolutePath());
         configuration.put(PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED, "false");
 
-        dbSupport = DbSupportFactory.getDefaultDbSupport(configuration, new DefaultSQLHandler(dataSource));
+        dbSupport = DbSupportFactory.getDefaultDbSupport(configuration, new DefaultSQLHandler(dataSource), dialect);
         clearScriptsDirectory();
         clearTestDatabase();
     }
@@ -489,7 +495,7 @@ public class DbMaintainerIntegrationTest extends UnitilsJUnit4 {
     }
 
     private void updateDatabase() {
-        DBMaintainer dbMaintainer = new DBMaintainer(configuration, new DefaultSQLHandler(dataSource));
+        DBMaintainer dbMaintainer = new DBMaintainer(configuration, new DefaultSQLHandler(dataSource), dialect);
         dbMaintainer.updateDatabase();
     }
 

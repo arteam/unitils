@@ -16,19 +16,24 @@
 package org.unitils.dbmaintainer.script.impl;
 
 import org.junit.After;
+
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
+
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.database.SQLUnitils.isEmpty;
+
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptContentHandle.UrlScriptContentHandle;
 
 import javax.sql.DataSource;
+
 import java.util.Properties;
 
 /**
@@ -51,6 +56,8 @@ public class DefaultScriptRunnerTest extends UnitilsJUnit4 {
 
     /* A test script that will create 1 table: table3 */
     private Script script2;
+    
+    private static String dialect = "h2";
 
 
     /**
@@ -61,7 +68,7 @@ public class DefaultScriptRunnerTest extends UnitilsJUnit4 {
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         defaultScriptRunner = new DefaultScriptRunner();
-        defaultScriptRunner.init(configuration, new DefaultSQLHandler(dataSource));
+        defaultScriptRunner.init(configuration, new DefaultSQLHandler(dataSource), dialect);
 
         script1 = new Script("test-script1.sql", 0L, new UrlScriptContentHandle(getClass().getResource("DefaultScriptRunnerTest/test-script1.sql")));
         script2 = new Script("test-script2.sql", 0L, new UrlScriptContentHandle(getClass().getResource("DefaultScriptRunnerTest/test-script2.sql")));

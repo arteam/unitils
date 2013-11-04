@@ -63,7 +63,7 @@ public class DefaultDBClearerMultiSchemaPreserveTest extends UnitilsJUnit4 {
 	/* True if current test is not for the current dialect */
 	private boolean disabled;
 
-
+	private static String dialect = "h2";
 	/**
 	 * Configures the tested object. Creates a test table, index, view and sequence
 	 */
@@ -82,10 +82,10 @@ public class DefaultDBClearerMultiSchemaPreserveTest extends UnitilsJUnit4 {
 		// configure 3 schemas
 		configuration.setProperty(DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, \"SCHEMA_B\", schema_c");
 		SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-		dbSupportPublic = getDbSupport(configuration, sqlHandler, "PUBLIC");
-		dbSupportSchemaA = getDbSupport(configuration, sqlHandler, "SCHEMA_A");
-		dbSupportSchemaB = getDbSupport(configuration, sqlHandler, "SCHEMA_B");
-		dbSupportSchemaC = getDbSupport(configuration, sqlHandler, "SCHEMA_C");
+		dbSupportPublic = getDbSupport(configuration, sqlHandler, "PUBLIC", dialect);
+		dbSupportSchemaA = getDbSupport(configuration, sqlHandler, "SCHEMA_A", dialect);
+		dbSupportSchemaB = getDbSupport(configuration, sqlHandler, "SCHEMA_B", dialect);
+		dbSupportSchemaC = getDbSupport(configuration, sqlHandler, "SCHEMA_C", dialect);
 		// configure items to preserve
 		configuration.setProperty(PROPKEY_PRESERVE_SCHEMAS, "schema_c");
 		configuration.setProperty(PROPKEY_PRESERVE_TABLES, "test_table, " + dbSupportSchemaA.quoted("SCHEMA_A") + "." + dbSupportSchemaA.quoted("TEST_TABLE"));
@@ -93,7 +93,7 @@ public class DefaultDBClearerMultiSchemaPreserveTest extends UnitilsJUnit4 {
 		configuration.setProperty(PROPKEY_PRESERVE_SEQUENCES, "test_sequence, " + dbSupportSchemaA.quoted("SCHEMA_A") + ".test_sequence");
 		// create clearer instance
 		defaultDbClearer = new DefaultDBClearer();
-		defaultDbClearer.init(configuration, sqlHandler);
+		defaultDbClearer.init(configuration, sqlHandler, dialect);
 	}
 
 

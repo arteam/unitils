@@ -19,8 +19,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hsqldb.Trigger;
 import org.junit.After;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
@@ -29,14 +31,19 @@ import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+
 import org.unitils.core.dbsupport.DefaultSQLHandler;
+
 import static org.unitils.core.util.SQLTestUtils.*;
 import static org.unitils.database.SQLUnitils.executeUpdate;
+
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.DBClearer;
+
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.*;
 
 import javax.sql.DataSource;
+
 import java.util.Properties;
 
 /**
@@ -60,6 +67,8 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
 
     /* The DbSupport object */
     private DbSupport dbSupport;
+    
+    private static String dialect = "h2";
 
 
     /**
@@ -69,7 +78,7 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect);
 
         // first create database, otherwise items to preserve do not yet exist
         cleanupTestDatabase();
@@ -89,7 +98,7 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
         }
         // create clearer instance
         defaultDbClearer = new DefaultDBClearer();
-        defaultDbClearer.init(configuration, sqlHandler);
+        defaultDbClearer.init(configuration, sqlHandler, dialect);
     }
 
 

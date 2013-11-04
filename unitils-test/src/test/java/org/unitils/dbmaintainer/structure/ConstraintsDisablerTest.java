@@ -16,7 +16,9 @@
 package org.unitils.dbmaintainer.structure;
 
 import org.junit.After;
+
 import static org.junit.Assert.fail;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
@@ -26,13 +28,18 @@ import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+
 import org.unitils.core.dbsupport.DefaultSQLHandler;
+
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+
 import org.unitils.database.annotations.TestDataSource;
+
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 
 import javax.sql.DataSource;
+
 import java.util.Properties;
 
 /**
@@ -54,6 +61,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit4 {
     @TestDataSource
     protected DataSource dataSource = null;
 
+    private static String dialect = "h2";
 
     /**
      * Test fixture. Configures the ConstraintsDisabler with the implementation that matches the configured database
@@ -63,8 +71,8 @@ public class ConstraintsDisablerTest extends UnitilsJUnit4 {
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
-        constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, sqlHandler);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect);
+        constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, sqlHandler, dialect);
 
         cleanupTestDatabase();
         createTestTables();

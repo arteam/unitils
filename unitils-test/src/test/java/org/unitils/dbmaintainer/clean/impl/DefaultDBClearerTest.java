@@ -19,7 +19,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hsqldb.Trigger;
 import org.junit.After;
+
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
@@ -28,14 +30,19 @@ import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+
 import org.unitils.core.dbsupport.DefaultSQLHandler;
+
 import static org.unitils.core.util.SQLTestUtils.*;
 import static org.unitils.database.SQLUnitils.executeUpdate;
+
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.DBClearer;
+
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_VERSION_TABLE_NAME;
 
 import javax.sql.DataSource;
+
 import java.util.Properties;
 
 /**
@@ -63,6 +70,7 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
     /* The name of the version tabel */
     private String versionTableName;
 
+    private static String dialect = "h2";
 
     /**
      * Configures the tested object. Creates a test table, index, view and sequence
@@ -71,10 +79,10 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect);
         // create clearer instance
         defaultDbClearer = new DefaultDBClearer();
-        defaultDbClearer.init(configuration, sqlHandler);
+        defaultDbClearer.init(configuration, sqlHandler, dialect);
         versionTableName = configuration.getProperty(PROPKEY_VERSION_TABLE_NAME);
 
         cleanupTestDatabase();

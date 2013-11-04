@@ -16,19 +16,28 @@
 package org.unitils.database;
 
 import static org.easymock.EasyMock.*;
+import static org.easymock.classextension.EasyMock.createMock;
+
+import org.easymock.classextension.EasyMock;
 import org.junit.After;
+
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.jdbc.datasource.ConnectionProxy;
 import org.unitils.core.Unitils;
 import org.unitils.database.annotations.Transactional;
+import org.unitils.database.transaction.TransactionHandler;
+
 import static org.unitils.database.util.TransactionMode.*;
 
 import javax.sql.DataSource;
+
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 
 /**
  * Tests verifying whether the SimpleTransactionManager functions correctly.
@@ -45,6 +54,8 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
     private RollbackTest rollbackTest;
 
     private CommitTest commitTest;
+    
+    private DatabaseMetaData metaData = createMock(DatabaseMetaData.class);;
 
 
     /**
@@ -77,17 +88,26 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
     @Test
     public void testWithTransactionsDisabled() throws Exception {
         mockConnection1.close();
+        EasyMock.expect(mockConnection1.getMetaData()).andReturn(metaData);
+        EasyMock.expect(metaData.storesUpperCaseIdentifiers()).andReturn(false).times(2);
+        EasyMock.expect(metaData.storesLowerCaseIdentifiers()).andReturn(true).times(2);
+        EasyMock.expect(metaData.getIdentifierQuoteString()).andReturn("test").times(2);
+        
         mockConnection2.close();
+        EasyMock.expect(mockConnection2.getMetaData()).andReturn(metaData);
         replay(mockConnection1, mockConnection2);
 
         Method testMethod = TransactionsDisabledTest.class.getMethod("test", new Class[]{});
-        databaseModule.startTransactionForTestMethod(transactionsDisabledTest, testMethod);
-        Connection conn1 = databaseModule.getDataSourceAndActivateTransactionIfNeeded().getConnection();
+        TransactionHandler transactionHandler = databaseModule.getTransactionHandler();
+        transactionHandler.startTransactionForTestMethod(transactionsDisabledTest, testMethod);
+        DataSourceWrapper wrapper = databaseModule.getDefaultDataSourceWrapper();
+        
+        Connection conn1 = wrapper.getDataSourceAndActivateTransactionIfNeeded().getConnection();
         conn1.close();
-        Connection conn2 = databaseModule.getDataSourceAndActivateTransactionIfNeeded().getConnection();
+        Connection conn2 = wrapper.getDataSourceAndActivateTransactionIfNeeded().getConnection();
         conn2.close();
         assertNotSame(conn1, conn2);
-        databaseModule.endTransactionForTestMethod(transactionsDisabledTest, testMethod);
+        transactionHandler.endTransactionForTestMethod(transactionsDisabledTest, testMethod);
 
         verify(mockConnection1, mockConnection2);
     }
@@ -105,8 +125,10 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
         replay(mockConnection1, mockConnection2);
 
         Method testMethod = RollbackTest.class.getMethod("test", new Class[]{});
-        DataSource dataSource = databaseModule.getTransactionalDataSourceAndActivateTransactionIfNeeded(rollbackTest);
-        databaseModule.startTransactionForTestMethod(rollbackTest, testMethod);
+        DataSourceWrapper wrapper = databaseModule.getDefaultDataSourceWrapper();
+        TransactionHandler transactionHandler = databaseModule.getTransactionHandler();
+        DataSource dataSource = wrapper.getTransactionalDataSourceAndActivateTransactionIfNeeded(rollbackTest);
+        transactionHandler.startTransactionForTestMethod(rollbackTest, testMethod);
         Connection connection1 = dataSource.getConnection();
         Connection targetConnection1 = ((ConnectionProxy) connection1).getTargetConnection();
         connection1.close();
@@ -114,7 +136,7 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
         Connection targetConnection2 = ((ConnectionProxy) connection2).getTargetConnection();
         connection2.close();
         assertSame(targetConnection1, targetConnection2);
-        databaseModule.endTransactionForTestMethod(rollbackTest, testMethod);
+        transactionHandler.endTransactionForTestMethod(rollbackTest, testMethod);
 
         verify(mockConnection1, mockConnection2);
     }
@@ -132,8 +154,10 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
         replay(mockConnection1, mockConnection2);
 
         Method testMethod = CommitTest.class.getMethod("test", new Class[]{});
-        DataSource dataSource = databaseModule.getTransactionalDataSourceAndActivateTransactionIfNeeded(commitTest);
-        databaseModule.startTransactionForTestMethod(commitTest, testMethod);
+        DataSourceWrapper wrapper = databaseModule.getDefaultDataSourceWrapper();
+        TransactionHandler transactionHandler = databaseModule.getTransactionHandler();
+        DataSource dataSource = wrapper.getTransactionalDataSourceAndActivateTransactionIfNeeded(commitTest);
+        transactionHandler.startTransactionForTestMethod(commitTest, testMethod);
         Connection connection1 = dataSource.getConnection();
         Connection targetConnection1 = ((ConnectionProxy) connection1).getTargetConnection();
         connection1.close();
@@ -141,7 +165,7 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
         Connection targetConnection2 = ((ConnectionProxy) connection2).getTargetConnection();
         connection2.close();
         assertSame(targetConnection1, targetConnection2);
-        databaseModule.endTransactionForTestMethod(commitTest, testMethod);
+        transactionHandler.endTransactionForTestMethod(commitTest, testMethod);
 
         verify(mockConnection1, mockConnection2);
     }

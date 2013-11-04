@@ -15,24 +15,32 @@
  */
 package org.unitils.dbunit;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.unitils.database.SQLUnitils.executeUpdate;
+import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import static org.unitils.database.SQLUnitils.getItemAsLong;
+import static org.unitils.database.SQLUnitils.getItemAsString;
+import static org.unitils.database.SQLUnitils.getItemsAsStringSet;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
+
+import java.io.File;
+import java.util.Properties;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
-import static org.unitils.database.SQLUnitils.*;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.datasetfactory.impl.MultiSchemaXmlDataSetFactory;
 import org.unitils.dbunit.datasetloadstrategy.impl.CleanInsertLoadStrategy;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
-
-import javax.sql.DataSource;
-import java.io.File;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * Test class for loading of data sets using the {@link DbUnitModule}.
@@ -77,7 +85,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit4 {
      */
     @Test
     public void testInsertDefaultDataSet() throws Exception {
-        dbUnitModule.insertDefaultDataSet(DataSetTestSubClass_dataSetAnnotationOnSubClass.class);
+        dbUnitModule.insertDefaultDataSet(DataSetTestSubClass_dataSetAnnotationOnSubClass.class, "");
         assertLoadedDataSet("DbUnitModuleDataSetTest$DataSetTestSubClass_dataSetAnnotationOnSubClass.xml");
     }
 
@@ -165,8 +173,8 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit4 {
      */
     @Test
     public void testInsertDataSet_directCall() throws Exception {
-        File dataSetFile = new File(this.getClass().getResource("CustomDataSet.xml").getPath());
-        dbUnitModule.insertDataSet(dataSetFile, MultiSchemaXmlDataSetFactory.class, CleanInsertLoadStrategy.class);
+        File dataSetFile = new File("src/test/java/org/unitils/dbunit/CustomDataSet.xml");
+        dbUnitModule.insertDataSet(dataSetFile, MultiSchemaXmlDataSetFactory.class, CleanInsertLoadStrategy.class, "");
         assertLoadedDataSet("CustomDataSet.xml");
     }
 
@@ -179,7 +187,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit4 {
     @Test
     public void testInsertDataSet_elementsWithDifferentColumns() throws Exception {
         File dataSetFile = new File(this.getClass().getResource("DifferentColumnsDataSet.xml").getPath());
-        dbUnitModule.insertDataSet(dataSetFile, MultiSchemaXmlDataSetFactory.class, CleanInsertLoadStrategy.class);
+        dbUnitModule.insertDataSet(dataSetFile, MultiSchemaXmlDataSetFactory.class, CleanInsertLoadStrategy.class, "");
         assertLenientEquals(3, getItemAsLong("select count(1) from test", dataSource));
     }
 
@@ -247,7 +255,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit4 {
      * Utility method to create the test table.
      */
     private void createTestTables() {
-        executeUpdate("create table test (dataset varchar(100), anotherColumn varchar(100))", dataSource);
+        executeUpdate("create table TEST (dataset varchar(100), anotherColumn varchar(100))", dataSource);
         executeUpdate("create table test1 (dataset varchar(100))", dataSource);
     }
 

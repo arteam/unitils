@@ -17,20 +17,26 @@ package org.unitils.dbmaintainer.clean.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import static org.junit.Assert.fail;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
+
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.DBClearer;
+
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.*;
 
 import javax.sql.DataSource;
+
 import java.util.Properties;
 
 /**
@@ -57,7 +63,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest extends UnitilsJUnit4 {
     /* The sql statement handler */
     private SQLHandler sqlHandler;
 
-
+    private static String dialect = "h2";
     /**
      * Configures the tested object.
      * <p/>
@@ -77,7 +83,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest extends UnitilsJUnit4 {
     @Test(expected = UnitilsException.class)
     public void testClearSchemas_schemasToPreserveDoNotExist() throws Exception {
         configuration.setProperty(PROPKEY_PRESERVE_SCHEMAS, "unexisting_schema1, unexisting_schema2");
-        defaultDbClearer.init(configuration, sqlHandler);
+        defaultDbClearer.init(configuration, sqlHandler, dialect);
     }
 
 
@@ -87,7 +93,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest extends UnitilsJUnit4 {
     @Test(expected = UnitilsException.class)
     public void testClearSchemas_tablesToPreserveDoNotExist() throws Exception {
         configuration.setProperty(PROPKEY_PRESERVE_TABLES, "unexisting_table1, unexisting_table2");
-        defaultDbClearer.init(configuration, sqlHandler);
+        defaultDbClearer.init(configuration, sqlHandler, dialect);
     }
 
 
@@ -97,7 +103,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest extends UnitilsJUnit4 {
     @Test(expected = UnitilsException.class)
     public void testClearSchemas_viewsToPreserveDoNotExist() throws Exception {
         configuration.setProperty(PROPKEY_PRESERVE_VIEWS, "unexisting_view1, unexisting_view2");
-        defaultDbClearer.init(configuration, sqlHandler);
+        defaultDbClearer.init(configuration, sqlHandler, dialect);
     }
 
 
@@ -107,7 +113,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest extends UnitilsJUnit4 {
     @Test(expected = UnitilsException.class)
     public void testClearSchemas_materializedViewsToPreserveDoNotExist() throws Exception {
         configuration.setProperty(PROPKEY_PRESERVE_MATERIALIZED_VIEWS, "unexisting_materializedView1, unexisting_materializedView2");
-        defaultDbClearer.init(configuration, sqlHandler);
+        defaultDbClearer.init(configuration, sqlHandler, dialect);
     }
 
 
@@ -116,13 +122,13 @@ public class DefaultDBClearerPreserveDoesNotExistTest extends UnitilsJUnit4 {
      */
     @Test
     public void testClearSchemas_sequencesToPreserveDoNotExist() throws Exception {
-        if (!getDefaultDbSupport(configuration, sqlHandler).supportsSequences()) {
+        if (!getDefaultDbSupport(configuration, sqlHandler, dialect).supportsSequences()) {
             logger.warn("Current dialect does not support sequences. Skipping test.");
             return;
         }
         try {
             configuration.setProperty(PROPKEY_PRESERVE_SEQUENCES, "unexisting_sequence1, unexisting_sequence2");
-            defaultDbClearer.init(configuration, sqlHandler);
+            defaultDbClearer.init(configuration, sqlHandler, dialect);
             fail("UnitilsException expected.");
         } catch (UnitilsException e) {
             // expected
@@ -135,13 +141,13 @@ public class DefaultDBClearerPreserveDoesNotExistTest extends UnitilsJUnit4 {
      */
     @Test
     public void testClearSchemas_synonymsToPreserveDoNotExist() throws Exception {
-        if (!getDefaultDbSupport(configuration, sqlHandler).supportsSynonyms()) {
+        if (!getDefaultDbSupport(configuration, sqlHandler, dialect).supportsSynonyms()) {
             logger.warn("Current dialect does not support synonyms. Skipping test.");
             return;
         }
         try {
             configuration.setProperty(PROPKEY_PRESERVE_SYNONYMS, "unexisting_synonym1, unexisting_synonym2");
-            defaultDbClearer.init(configuration, sqlHandler);
+            defaultDbClearer.init(configuration, sqlHandler, dialect);
             fail("UnitilsException expected.");
         } catch (UnitilsException e) {
             // expected

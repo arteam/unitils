@@ -64,7 +64,7 @@ public class DbSupportTest extends UnitilsJUnit4 {
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler, "hsqldb");
 
         cleanupTestDatabase();
         createTestDatabase();
@@ -483,7 +483,9 @@ public class DbSupportTest extends UnitilsJUnit4 {
             createTestDatabaseDerby();
         } else if ("mssql".equals(dialect)) {
             createTestDatabaseMsSql();
-        } else {
+        } else if ("h2".equals(dialect)) {
+			createTestDatabaseH2();
+		} else {
             fail("This test is not implemented for current dialect: " + dialect);
         }
     }
@@ -508,7 +510,9 @@ public class DbSupportTest extends UnitilsJUnit4 {
             cleanupTestDatabaseDerby();
         } else if ("mssql".equals(dialect)) {
             cleanupTestDatabaseMsSql();
-        }
+        } else if ("h2".equals(dialect)) {
+			cleanupTestDatabaseH2();
+		}
     }
 
     //
@@ -778,6 +782,49 @@ public class DbSupportTest extends UnitilsJUnit4 {
         dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
         dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
         dropTestTables(dbSupport, "\"Test_CASE_Table\"", "test_table");
+        dropTestTypes(dbSupport, "test_type", "\"Test_CASE_Type\"");
+    }
+    
+    //
+    // Database setup for H2
+    //
+    
+    /**
+     * Creates all test database structures (view, tables...)
+     */
+    private void createTestDatabaseH2() throws Exception {
+        // create tables
+    	// create tables
+        executeUpdate("create table test_table (col1 varchar(10) not null primary key, col2 varchar(12) not null)", dataSource);
+        executeUpdate("create table \"Test_CASE_Table\" (col1 varchar(10), foreign key (col1) references test_table(col1))", dataSource);
+        // create views
+        executeUpdate("create view test_view as select col1 from test_table", dataSource);
+        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
+        // create synonyms
+        //executeUpdate("create synonym test_synonym for test_table", dataSource);
+        //executeUpdate("create synonym \"Test_CASE_Synonym\" for \"Test_CASE_Table\"", dataSource);
+        // create sequences
+        executeUpdate("create sequence test_sequence", dataSource);
+        executeUpdate("create sequence \"Test_CASE_Sequence\"", dataSource);
+        // create triggers
+        executeUpdate("create or replace trigger test_trigger before insert on \"Test_CASE_Table\" begin dbms_output.put_line('test'); end test_trigger", dataSource);
+        executeUpdate("create or replace trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" begin dbms_output.put_line('test'); end \"Test_CASE_Trigger\"", dataSource);
+        // create types
+        executeUpdate("create type test_type AS (col1 int)", dataSource);
+        executeUpdate("create type \"Test_CASE_Type\" AS (col1 int)", dataSource);
+    }
+
+
+    /**
+     * Drops all created test database structures (views, tables...) First drop the views, since Derby doesn't support
+     * "drop table ... cascade" (yet, as of Derby 10.3)
+     */
+    private void cleanupTestDatabaseH2() throws Exception {
+    	dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"");
+        dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
+        //dropTestSynonyms(dbSupport, "test_synonym", "\"Test_CASE_Synonym\"");
+        dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
+        dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
         dropTestTypes(dbSupport, "test_type", "\"Test_CASE_Type\"");
     }
 }
