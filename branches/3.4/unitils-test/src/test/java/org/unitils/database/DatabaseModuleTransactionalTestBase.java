@@ -15,17 +15,22 @@
  */
 package org.unitils.database;
 
-import static org.easymock.classextension.EasyMock.*;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.classextension.EasyMock.reset;
+
+import java.sql.Connection;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.junit.Before;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.Unitils;
 import org.unitils.database.config.DataSourceFactory;
+import org.unitils.database.config.DatabaseConfiguration;
 import org.unitils.spring.SpringModule;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.util.Properties;
 
 /**
  * Base class for tests that verify the transactional behavior of the database module
@@ -84,6 +89,20 @@ abstract public class DatabaseModuleTransactionalTestBase {
         public DataSource createDataSource() {
             return mockDataSource;
         }
+
+        /**
+         * @see org.unitils.database.config.DataSourceFactory#init(org.unitils.database.config.DatabaseConfiguration)
+         */
+        public void init(DatabaseConfiguration arg0) {
+            // TODO Auto-generated method stub
+            
+        }
+
+		public void init(Properties configuration, String databaseName) {
+			// TODO Auto-generated method stub
+			
+		}
+
     }
 
 

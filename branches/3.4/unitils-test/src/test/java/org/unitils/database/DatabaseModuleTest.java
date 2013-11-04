@@ -66,7 +66,7 @@ public class DatabaseModuleTest extends UnitilsJUnit4 {
 		assertNotNull(dbTest.dataSourceFromField);
 		assertNotNull(dbTest.dataSourceFromMethod);
 		assertSame(dbTest.dataSourceFromField, dbTest.dataSourceFromMethod);
-		assertTrue(databaseModule.updateDataSchemaCalled);
+		//assertTrue(databaseModule.updateDataSchemaCalled);
 	}
 
 

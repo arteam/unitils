@@ -16,15 +16,23 @@
 package org.unitils.util;
 
 import static junit.framework.Assert.*;
+
+import org.junit.Before;
 import org.junit.Test;
+import org.unitils.reflectionassert.ReflectionAssert;
+
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenientEquals;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
 import static java.util.Arrays.asList;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import junit.framework.Assert;
 
 /**
  * Test for {@link ReflectionUtils} working with field types, eg assignable from.
@@ -33,6 +41,14 @@ import java.util.Set;
  * @author Tim Ducheyne
  */
 public class ReflectionUtilsTypesTest {
+    
+    private TestClass1 testclass;
+
+    /** */
+    @Before
+    public void setUp() {
+        testclass = new TestClass1();
+    }
 
 
     /**
@@ -229,6 +245,72 @@ public class ReflectionUtilsTypesTest {
         assertNull(method);
     }
 
+    /**
+     * @throws SecurityException
+     * @throws NoSuchFieldException
+     */
+    @Test
+    public void testString() throws SecurityException, NoSuchFieldException {
+        ReflectionUtils.setFieldValue(testclass, "stringTest", "test");
+        Assert.assertEquals("test", testclass.getStringTest());
+    }
+
+
+    /**
+     * @throws SecurityException
+     * @throws NoSuchFieldException
+     */
+    @Test
+    public void testInt() throws SecurityException, NoSuchFieldException{
+        ReflectionUtils.setFieldValue(testclass, "intTest", 5);
+        Assert.assertEquals(5, testclass.getIntTest());
+    }
+
+
+    /**
+     * @throws SecurityException
+     * @throws NoSuchFieldException
+     */
+    @Test
+    public void testByte() throws SecurityException, NoSuchFieldException{
+        ReflectionUtils.setFieldValue(testclass, "byteTest", new Byte("125"));
+        ReflectionAssert.assertLenientEquals(new Byte("125"), testclass.getByteTest());
+    }
+
+    /**
+     * @throws SecurityException
+     * @throws NoSuchFieldException
+     */
+    @Test
+    public void testObject() throws SecurityException, NoSuchFieldException{
+        Person expected = new Person("testName", "testSurname");
+        ReflectionUtils.setFieldValue(testclass, "personTest", expected);
+        ReflectionAssert.assertLenientEquals(expected, testclass.getPersonTest());
+    }
+
+    /**
+     * @throws SecurityException
+     * @throws NoSuchFieldException
+     */
+    @Test
+    public void testArray() throws SecurityException, NoSuchFieldException{
+        String[] expected = new String[]{"test1", "test2", "test3", "test4", "test5"};
+        ReflectionUtils.setFieldValue(testclass, "arrTest", expected);
+        ReflectionAssert.assertLenientEquals(expected, testclass.getArrTest());
+    }
+
+    @Test
+    public void testGetAllMethods() {
+        Set<Method> actual = ReflectionUtils.getAllMethods(Person.class, false, String.class);
+        Assert.assertEquals(2, actual.size());
+        
+    }
+    
+    @Test
+    public void testGetAllMethodsStatic() {
+        ReflectionUtils.getAllMethods(Person.class, true);
+    }
+
 
     /**
      * Test for getting a getter of a property.
@@ -319,6 +401,15 @@ public class ReflectionUtilsTypesTest {
     public void testGetFieldWithName_unexistingField() {
         Field field = ReflectionUtils.getFieldWithName(TestSubClass.class, "xxxx", false);
         assertNull(field);
+    }
+    
+    /**
+     * @throws SecurityException
+     * @throws NoSuchFieldException
+     */
+    @Test(expected = NoSuchFieldException.class)
+    public void testError() throws SecurityException, NoSuchFieldException {
+        ReflectionUtils.setFieldValue(testclass, "testtest", "test");
     }
 
 
@@ -465,6 +556,120 @@ public class ReflectionUtilsTypesTest {
 
         public void setSubClassSetterOnlyField(Map<?, ?> setterOnlyField) {
             this.subClassSetterOnlyField = setterOnlyField;
+        }
+    }
+    
+    /**
+     * 
+     * Just a testclass.
+     * 
+     * @author Jeroen Horemans
+     * @author Thomas De Rycke
+     * @author Willemijn Wouters
+     * 
+     * @since 3.4
+     *
+     */
+    private class TestClass1 {
+        private String stringTest;
+        private int intTest;
+        private byte byteTest;
+        private Person personTest;
+        private String[] arrTest;
+
+        /**
+         * @return the stringTest
+         */
+        public String getStringTest() {
+            return stringTest;
+        }
+
+        /**
+         * @return the intTest
+         */
+        public int getIntTest() {
+            return intTest;
+        }
+
+        /**
+         * @return the byteTest
+         */
+        public byte getByteTest() {
+            return byteTest;
+        }
+
+        /**
+         * @return the personTest
+         */
+        public Person getPersonTest() {
+            return personTest;
+        }
+
+        /**
+         * @return the arrTest
+         */
+        public String[] getArrTest() {
+            return arrTest;
+        }
+
+
+
+
+
+    }
+    @SuppressWarnings("unused")
+    private static class Person {
+        private static int countPersons = 0;
+        private String name;
+        private String surname;
+        private boolean female;
+        /**
+         * @param name
+         * @param surname
+         */
+        public Person(String name, String surname) {
+            super();
+            this.name = name;
+            this.surname = surname;
+        }
+        
+        
+        /**
+         * @return the name
+         */
+        public String getName() {
+            return name;
+        }
+        
+        
+        /**
+         * @return the surname
+         */
+        public String getSurname() {
+            return surname;
+        }
+        
+        
+        /**
+         * @param name the name to set
+         */
+        public void setName(String name) {
+            this.name = name;
+        }
+        
+        /**
+         * @param surname the surname to set
+         */
+        public void setSurname(String surname) {
+            this.surname = surname;
+        }
+        
+        
+        /**
+         * @return the countPersons
+         */
+        public static int getCountPersons() {
+            return countPersons;
         }
     }
 }

@@ -73,6 +73,7 @@ public class DefaultDBClearerMultiSchemaTest extends UnitilsJUnit4 {
 	/* True if current test is not for the current dialect */
 	private boolean disabled;
 
+	private static String dialect = "h2";
 
 	/**
 	 * Configures the tested object. Creates a test table, index, view and sequence
@@ -88,12 +89,12 @@ public class DefaultDBClearerMultiSchemaTest extends UnitilsJUnit4 {
 		// configure 3 schemas
 		configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, SCHEMA_B");
 		SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-		dbSupportPublic = getDbSupport(configuration, sqlHandler, "PUBLIC");
-		dbSupportSchemaA = getDbSupport(configuration, sqlHandler, "SCHEMA_A");
-		dbSupportSchemaB = getDbSupport(configuration, sqlHandler, "SCHEMA_B");
+		dbSupportPublic = getDbSupport(configuration, sqlHandler, "PUBLIC", dialect);
+		dbSupportSchemaA = getDbSupport(configuration, sqlHandler, "SCHEMA_A", dialect);
+		dbSupportSchemaB = getDbSupport(configuration, sqlHandler, "SCHEMA_B", dialect);
 		// create clearer instance
 		defaultDbClearer = new DefaultDBClearer();
-		defaultDbClearer.init(configuration, sqlHandler);
+		defaultDbClearer.init(configuration, sqlHandler, dialect);
 
 		dropTestDatabase();
 		createTestDatabase();

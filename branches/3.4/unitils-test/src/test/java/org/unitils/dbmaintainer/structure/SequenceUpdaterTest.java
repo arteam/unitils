@@ -18,8 +18,10 @@ package org.unitils.dbmaintainer.structure;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
+
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
@@ -28,16 +30,21 @@ import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+
 import org.unitils.core.dbsupport.DefaultSQLHandler;
+
 import static org.unitils.core.util.SQLTestUtils.dropTestSequences;
 import static org.unitils.core.util.SQLTestUtils.dropTestTables;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.getItemAsLong;
+
 import org.unitils.database.annotations.TestDataSource;
+
 import static org.unitils.dbmaintainer.structure.impl.DefaultSequenceUpdater.PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 
 import javax.sql.DataSource;
+
 import java.util.Properties;
 
 /**
@@ -67,6 +74,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
     /* DbSupport instance */
     private DbSupport dbSupport;
 
+    private static String dialect = "h2";
 
     /**
      * Test fixture. Configures the implementation of the SequenceUpdater that matches the currenlty configured dialect.
@@ -78,8 +86,8 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
         configuration.setProperty(PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, "1000");
 
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, sqlHandler);
-        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
+        sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, sqlHandler, dialect);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect);
 
         cleanupTestDatabase();
         createTestDatabase();

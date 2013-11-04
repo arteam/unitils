@@ -2,8 +2,10 @@ package org.unitils.dbmaintainer.structure;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.After;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
@@ -13,12 +15,15 @@ import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator;
+
 import static org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator.PROPKEY_DTD_FILENAME;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
+
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 
 import javax.sql.DataSource;
+
 import java.io.File;
 import java.io.FileReader;
 import java.sql.Connection;
@@ -44,7 +49,8 @@ public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
     @TestDataSource
     private DataSource dataSource = null;
 
-
+    private static String dialect = "h2";
+    
     /**
      * Initializes the test by creating following tables in the test database:
      * tableOne(columnA not null, columnB not null, columnC) and
@@ -59,8 +65,8 @@ public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
         configuration.setProperty(PROPKEY_DTD_FILENAME, dtdFile.getPath());
 
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler);
-        DBClearer dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler);
+        dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler, dialect);
+        DBClearer dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler, dialect);
 
         dbClearer.clearSchemas();
         createTestTables();

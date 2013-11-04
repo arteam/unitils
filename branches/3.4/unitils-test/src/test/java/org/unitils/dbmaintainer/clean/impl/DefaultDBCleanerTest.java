@@ -16,8 +16,10 @@
 package org.unitils.dbmaintainer.clean.impl;
 
 import org.junit.After;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
@@ -26,15 +28,20 @@ import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+
 import org.unitils.core.dbsupport.DefaultSQLHandler;
+
 import static org.unitils.core.util.SQLTestUtils.dropTestTables;
 import static org.unitils.core.util.SQLTestUtils.dropTestViews;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.isEmpty;
+
 import org.unitils.database.annotations.TestDataSource;
+
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.*;
 
 import javax.sql.DataSource;
+
 import java.util.Properties;
 
 /**
@@ -57,6 +64,8 @@ public class DefaultDBCleanerTest extends UnitilsJUnit4 {
 
     /* The name of the version tabel */
     private String versionTableName;
+    
+    private static String dialect = "h2";
 
 
     /**
@@ -67,14 +76,14 @@ public class DefaultDBCleanerTest extends UnitilsJUnit4 {
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect);
 
         // items to preserve
         configuration.setProperty(PROPKEY_PRESERVE_DATA_TABLES, "Test_table_Preserve");
         configuration.setProperty(PROPKEY_PRESERVE_TABLES, dbSupport.quoted("Test_CASE_Table_Preserve"));
         // create cleaner instance
         defaultDbCleaner = new DefaultDBCleaner();
-        defaultDbCleaner.init(configuration, sqlHandler);
+        defaultDbCleaner.init(configuration, sqlHandler, dialect);
         versionTableName = configuration.getProperty(PROPKEY_VERSION_TABLE_NAME);
 
         cleanupTestDatabase();

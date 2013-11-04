@@ -67,6 +67,8 @@ public class DefaultDBCleanerMultiSchemaPreserveTest extends UnitilsJUnit4 {
 
 	/* True if current test is not for the current dialect */
 	private boolean disabled;
+	
+	private static String dialect = "h2";
 
 
 	/**
@@ -83,12 +85,12 @@ public class DefaultDBCleanerMultiSchemaPreserveTest extends UnitilsJUnit4 {
 		// configure 3 schemas
 		configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, \"SCHEMA_B\", schema_c");
 		SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-		dbSupport = getDefaultDbSupport(configuration, sqlHandler);
+		dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect);
 		// items to preserve
 		configuration.setProperty(PROPKEY_PRESERVE_DATA_SCHEMAS, "schema_c");
 		configuration.setProperty(PROPKEY_PRESERVE_DATA_TABLES, "test, " + dbSupport.quoted("SCHEMA_A") + "." + dbSupport.quoted("TEST"));
 		defaultDbCleaner = new DefaultDBCleaner();
-		defaultDbCleaner.init(configuration, sqlHandler);
+		defaultDbCleaner.init(configuration, sqlHandler, dialect);
 
 		dropTestTables();
 		createTestTables();

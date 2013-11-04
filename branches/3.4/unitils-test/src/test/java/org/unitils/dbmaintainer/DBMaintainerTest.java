@@ -16,10 +16,15 @@
 package org.unitils.dbmaintainer;
 
 import static org.junit.Assert.fail;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
+import org.unitils.database.DataSourceWrapper;
+import org.unitils.database.DatabaseModule;
 import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.script.ExecutedScript;
 import org.unitils.dbmaintainer.script.Script;
@@ -35,12 +40,17 @@ import org.unitils.inject.annotation.TestedObject;
 import org.unitils.mock.ArgumentMatchers;
 import org.unitils.mock.Mock;
 import org.unitils.mock.MockUnitils;
+import org.unitils.mock.annotation.Dummy;
+
 import static org.unitils.mock.MockUnitils.assertNoMoreInvocations;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Tests the main algorithm of the DBMaintainer, using mocks for all implementation classes.
@@ -70,6 +80,8 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 
     @InjectIntoByType
     private Mock<DataSetStructureGenerator> mockDataSetStructureGenerator;
+    
+    
 
     @TestedObject
     private DBMaintainer dbMaintainer;
@@ -87,7 +99,14 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
      */
     @Before
     public void setUp() throws Exception {
-        dbMaintainer = new DBMaintainer();
+    	File file = new File("src/test/resources/org/unitils/database/config/testconfigMultipleDatabases.properties");
+        Properties prop = Unitils.getInstance().getConfiguration();
+        prop.load(new FileInputStream(file));
+        DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+        databaseModule.init(prop);
+        databaseModule.afterInit();
+		DataSourceWrapper wrapper = databaseModule.getDefaultDataSourceWrapper();
+		dbMaintainer = new DBMaintainer(prop, new DefaultSQLHandler(wrapper.createDataSource()), "hsqldb");
         dbMaintainer.fromScratchEnabled = true;
         dbMaintainer.keepRetryingAfterError = true;
         dbMaintainer.disableConstraintsEnabled = true;
