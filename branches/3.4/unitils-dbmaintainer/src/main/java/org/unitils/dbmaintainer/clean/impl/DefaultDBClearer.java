@@ -372,7 +372,7 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
         Map<String, Set<String>> tablesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_TABLES);
         for (Map.Entry<String, Set<String>> entry : tablesToPreserve.entrySet()) {
             String schemaName = entry.getKey();
-            Set<String> tableNames = getDbSupport(schemaName).getTableNames();
+            Set<String> tableNames = getDbSupport(schemaName, dialect).getTableNames();
 
             for (String tableToPreserve : entry.getValue()) {
                 if (!itemToPreserveExists(tableToPreserve, tableNames)) {
@@ -410,7 +410,7 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
         Map<String, Set<String>> viewsToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_VIEWS);
         for (Map.Entry<String, Set<String>> entry : viewsToPreserve.entrySet()) {
             String schemaName = entry.getKey();
-            Set<String> viewNames = getDbSupport(schemaName).getViewNames();
+            Set<String> viewNames = getDbSupport(schemaName, dialect).getViewNames();
 
             for (String viewToPreserve : entry.getValue()) {
                 if (!itemToPreserveExists(viewToPreserve, viewNames)) {
@@ -435,7 +435,7 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
         for (Map.Entry<String, Set<String>> entry : materializedViewsToPreserve.entrySet()) {
             String schemaName = entry.getKey();
 
-            DbSupport dbSupport = getDbSupport(schemaName);
+            DbSupport dbSupport = getDbSupport(schemaName, dialect);
             Set<String> materializedViewNames;
             if (!dbSupport.supportsMaterializedViews()) {
                 materializedViewNames = new HashSet<String>();
@@ -465,7 +465,7 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
         for (Map.Entry<String, Set<String>> entry : sequencesToPreserve.entrySet()) {
             String schemaName = entry.getKey();
 
-            DbSupport dbSupport = getDbSupport(schemaName);
+            DbSupport dbSupport = getDbSupport(schemaName, dialect);
             Set<String> sequenceNames;
             if (!dbSupport.supportsSequences()) {
                 sequenceNames = new HashSet<String>();
@@ -495,7 +495,7 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
         for (Map.Entry<String, Set<String>> entry : synonymsToPreserve.entrySet()) {
             String schemaName = entry.getKey();
 
-            DbSupport dbSupport = getDbSupport(schemaName);
+            DbSupport dbSupport = getDbSupport(schemaName, dialect);
             Set<String> synonymNames;
             if (!dbSupport.supportsSynonyms()) {
                 synonymNames = new HashSet<String>();
@@ -525,7 +525,7 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
         for (Map.Entry<String, Set<String>> entry : triggersToPreserve.entrySet()) {
             String schemaName = entry.getKey();
 
-            DbSupport dbSupport = getDbSupport(schemaName);
+            DbSupport dbSupport = getDbSupport(schemaName, dialect);
             Set<String> triggerNames;
             if (!dbSupport.supportsTriggers()) {
                 triggerNames = new HashSet<String>();
@@ -555,7 +555,7 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
         for (Map.Entry<String, Set<String>> entry : typesToPreserve.entrySet()) {
             String schemaName = entry.getKey();
 
-            DbSupport dbSupport = getDbSupport(schemaName);
+            DbSupport dbSupport = getDbSupport(schemaName, dialect);
             Set<String> typeNames;
             if (!dbSupport.supportsTypes()) {
                 typeNames = new HashSet<String>();
@@ -635,7 +635,7 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
                 dbSupport = defaultDbSupport;
             } else {
                 String schemaName = itemToPreserve.substring(0, index);
-                dbSupport = getDbSupport(schemaName);
+                dbSupport = getDbSupport(schemaName, dialect);
                 itemToPreserve = itemToPreserve.substring(index + 1);
             }
 
