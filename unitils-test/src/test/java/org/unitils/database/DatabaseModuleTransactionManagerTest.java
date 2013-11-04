@@ -66,6 +66,7 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
         configuration.setProperty("unitils.module.spring.enabled", "false");
         Unitils.getInstance().init(configuration);
         databaseModule = getDatabaseModule();
+        //SQLUnitils.executeUpdate("create table DBMAINTAIN_SCRIPTS ( FILE_NAME VARCHAR2(150), FILE_LAST_MODIFIED_AT INTEGER, CHECKSUM VARCHAR2(50), EXECUTED_AT VARCHAR2(20), SUCCEEDED INTEGER ) ", getDatabaseModule().getDefaultDataSourceWrapper().getDataSource());
 
         transactionsDisabledTest = new TransactionsDisabledTest();
         rollbackTest = new RollbackTest();

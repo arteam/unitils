@@ -37,17 +37,18 @@ import org.unitils.reflectionassert.ReflectionAssert;
 public class DatabaseModuleMultipleDatabasesTest {
 
 
-    @TestedObject
+    //@TestedObject
     private DatabaseModule module;
 
     @Before
     public void setUp() throws FileNotFoundException, IOException {
-    	
-        module = new DatabaseModule();
-        File file = new File("src/test/resources/org/unitils/database/config/testconfigMultipleDatabases.properties");
+    	module = new DatabaseModule();
+        File file = new File("src\\test\\resources\\org\\unitils\\database\\config\\testconfigMultipleDatabases.properties");
         Properties prop = Unitils.getInstance().getConfiguration();
         prop.load(new FileInputStream(file));
         module.init(prop);
+        
+        
     }
     @Test
     public void testGetdefaultDatabaseWrapper() {
@@ -60,6 +61,7 @@ public class DatabaseModuleMultipleDatabasesTest {
         TestClassDatabase1 obj = new TestClassDatabase1();
 
         module.injectDataSource(obj);
+        
         Assert.assertNotNull(obj.dataSource);
         Assert.assertEquals("jdbc:hsqldb:mem:unitils1", obj.dataSource.getConnection().getMetaData().getURL());
 
