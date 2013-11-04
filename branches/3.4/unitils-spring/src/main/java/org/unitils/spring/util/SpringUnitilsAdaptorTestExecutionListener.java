@@ -55,4 +55,16 @@ public class SpringUnitilsAdaptorTestExecutionListener implements TestExecutionL
         return Unitils.getInstance();
     }
 
+
+	public void afterTestClass(TestContext arg0) throws Exception {
+		//do nothing
+		
+	}
+
+
+	public void beforeTestClass(TestContext arg0) throws Exception {
+		//do nothing
+		
+	}
+
 }
