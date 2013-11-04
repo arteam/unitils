@@ -29,7 +29,9 @@ import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
 import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
+
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
+
 import org.unitils.dbmaintainer.version.ExecutedScriptInfoSource;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.util.PropertyUtils;
@@ -167,14 +169,6 @@ public class DBMaintainer {
      */
     protected boolean keepRetryingAfterError;
 
-
-    /**
-     * Default constructor for testing.
-     */
-    protected DBMaintainer() {
-    }
-
-
     /**
      * Create a new instance of <code>DBMaintainer</code>, The concrete implementations of all
      * helper classes are derived from the given <code>Configuration</code> object.
@@ -182,34 +176,34 @@ public class DBMaintainer {
      * @param configuration the configuration, not null
      * @param sqlHandler    the data source, not null
      */
-    public DBMaintainer(Properties configuration, SQLHandler sqlHandler) {
+    public DBMaintainer(Properties configuration, SQLHandler sqlHandler, String dialect) {
         try {
-            scriptRunner = getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, sqlHandler);
-            versionSource = getConfiguredDatabaseTaskInstance(ExecutedScriptInfoSource.class, configuration, sqlHandler);
+            scriptRunner = getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, sqlHandler, dialect);
+            versionSource = getConfiguredDatabaseTaskInstance(ExecutedScriptInfoSource.class, configuration, sqlHandler, dialect);
             scriptSource = ConfigUtils.getConfiguredInstanceOf(ScriptSource.class, configuration);
 
             boolean cleanDbEnabled = PropertyUtils.getBoolean(PROPKEY_DB_CLEANER_ENABLED, configuration);
             if (cleanDbEnabled) {
-                dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, sqlHandler);
+                dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, sqlHandler, dialect);
             }
 
             fromScratchEnabled = PropertyUtils.getBoolean(PROPKEY_FROM_SCRATCH_ENABLED, configuration);
             keepRetryingAfterError = PropertyUtils.getBoolean(PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED, configuration);
             if (fromScratchEnabled) {
-                dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler);
+                dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler, dialect);
             }
 
             disableConstraintsEnabled = PropertyUtils.getBoolean(PROPKEY_DISABLE_CONSTRAINTS_ENABLED, configuration);
-            constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, sqlHandler);
+            constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, sqlHandler, dialect);
 
             boolean updateSequences = PropertyUtils.getBoolean(PROPKEY_UPDATE_SEQUENCES_ENABLED, configuration);
             if (updateSequences) {
-                sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, sqlHandler);
+                sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, sqlHandler, dialect);
             }
 
             boolean generateDtd = PropertyUtils.getBoolean(PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED, configuration);
             if (generateDtd) {
-                dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler);
+                dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler, dialect);
             }
         } catch (UnitilsException e) {
             logger.error("Error while initializing DbMaintainer", e);
