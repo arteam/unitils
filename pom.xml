@@ -16,7 +16,8 @@
   ~  */
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -27,7 +28,7 @@
 
     <groupId>org.unitils</groupId>
     <artifactId>unitils</artifactId>
-    <version>3.3</version>
+    <version>3.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -64,7 +65,7 @@
     </licenses>
 
     <properties>
-        <spring.version>2.5.2</spring.version>
+        <spring.version>3.1.1.RELEASE</spring.version>
         <project.build.java.target>1.5</project.build.java.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -75,9 +76,9 @@
         <url>http://jira.unitils.org/browse/UNI</url>
     </issueManagement>
     <scm>
-        <connection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases/unitils-3.3</connection>
-        <developerConnection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases/unitils-3.3</developerConnection>
-        <url>https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases/unitils-3.3</url>
+        <connection>scm:svn:https://svn.code.sf.net/p/unitils/code/branches/3.4</connection>
+        <developerConnection>scm:svn:https://svn.code.sf.net/p/unitils/code/branches/3.4</developerConnection>
+        <url>https://svn.code.sf.net/p/unitils/code/branches/3.4</url>
     </scm>
     <mailingLists>
         <mailingList>
@@ -110,7 +111,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.0.2</version>
+                <version>3.1</version>
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <source>${project.build.java.target}</source>
@@ -138,6 +139,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.4</version>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
