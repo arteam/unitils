@@ -180,7 +180,7 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
         if (configuredPersistenceUnit == null) {
             configuredPersistenceUnit = ormPersistenceUnitLoader.getConfiguredOrmPersistenceUnit(testObject, persistenceUnitConfig);
             configuredOrmPersistenceUnitCache.put(persistenceUnitConfig, configuredPersistenceUnit);
-            getDatabaseModule().activateTransactionIfNeeded();
+            getDatabaseModule().getDefaultDataSourceWrapper().activateTransactionIfNeeded();
         }
         return configuredPersistenceUnit;
     }
