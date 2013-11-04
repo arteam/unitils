@@ -24,8 +24,10 @@ import ognl.DefaultMemberAccess;
 import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.reflectionassert.difference.Difference;
@@ -33,6 +35,7 @@ import org.unitils.reflectionassert.report.impl.DefaultDifferenceReport;
 import org.unitils.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Set;
@@ -377,6 +380,32 @@ public class ReflectionAssert {
         }
     }
 
+    /**
+     * All fields that have a getter with the same name will be checked by an assertNotNull.
+     * Other fields will be ignored
+     * 
+     * @param message
+     * @param object
+     */
+    public static void assertAccessablePropertiesNotNull(String message, Object object) {
+
+        Set<Field> fields = ReflectionUtils.getAllFields(object.getClass());
+        for (Field field : fields) {
+            Method getter = ReflectionUtils.getGetter(object.getClass(), field.getName(), false);
+            if (getter != null) {
+                Object result = null;
+
+                try {
+                    result = getter.invoke(object, ArrayUtils.EMPTY_OBJECT_ARRAY);
+                } catch (Exception e) {
+                    throw new UnitilsException(e);
+                }
+                String formattedMessage = formatMessage(message, "Property '" + field.getName() + "' in object '" + object.toString() + "' is null ");
+                assertNotNull(formattedMessage, result);
+            }
+
+        }
+    }
 
     /**
      * A commons collections transformer that takes an object and returns the value of the property that is
