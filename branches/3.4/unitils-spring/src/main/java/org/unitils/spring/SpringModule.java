@@ -16,7 +16,6 @@
 package org.unitils.spring;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.unitils.database.util.TransactionMode.DEFAULT;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
@@ -99,7 +98,7 @@ public class SpringModule implements Module {
         // Make sure that, if a custom transaction manager is configured in the spring ApplicationContext associated with
         // the current test, it is used for managing transactions. 
         if (isDatabaseModuleEnabled()) {
-            getDatabaseModule().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
+            getDatabaseModule().getTransactionHandler().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
                 
                 public boolean isApplicableFor(Object testObject) {
                     if (!isApplicationContextConfiguredFor(testObject)) {
@@ -113,7 +112,7 @@ public class SpringModule implements Module {
                 public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
                     ApplicationContext context = getApplicationContext(testObject);
                     Class<?> platformTransactionManagerClass = getPlatformTransactionManagerClass();
-                    Map<String, PlatformTransactionManager> platformTransactionManagers = context.getBeansOfType(platformTransactionManagerClass);
+                    Map<String, PlatformTransactionManager> platformTransactionManagers = (Map<String, PlatformTransactionManager>) context.getBeansOfType(platformTransactionManagerClass);
                     if (platformTransactionManagers.size() == 0) {
                         throw new UnitilsException("Could not find a bean of type " + platformTransactionManagerClass.getSimpleName()
                                 + " in the spring ApplicationContext for this class");
@@ -180,8 +179,7 @@ public class SpringModule implements Module {
      * @param type       The type, not null
      * @return The bean, not null
      */
-    @SuppressWarnings("unchecked")
-	public <T> T getSpringBeanByType(Object testObject, Class<T> type) {
+    public <T> T getSpringBeanByType(Object testObject, Class<T> type) {
         Map<String, T> beans = getApplicationContext(testObject).getBeansOfType(type);
         if (beans == null || beans.size() == 0) {
             throw new UnitilsException("Unable to get Spring bean by type. No Spring bean found for type " + type.getSimpleName());
@@ -428,6 +426,13 @@ public class SpringModule implements Module {
     	this.testContext = testContext;
 	}*/
     
+    protected void closeApplicationContextIfNeeded(Object testObject) {
+        SpringModule module = Unitils.getInstance().getModulesRepository().getModuleOfType(SpringModule.class);
+
+        if (module != null && module.isApplicationContextConfiguredFor(testObject)) {
+            module.invalidateApplicationContext(testObject.getClass());
+        }
+    }
     
     protected boolean isDatabaseModuleEnabled() {
         return Unitils.getInstance().getModulesRepository().isModuleEnabled(DatabaseModule.class);
@@ -458,6 +463,14 @@ public class SpringModule implements Module {
             injectSpringBeans(testObject);
             injectSpringBeansByType(testObject);
             injectSpringBeansByName(testObject);
+        }
+        
+        /**
+         * @see org.unitils.core.TestListener#afterTestTearDown(java.lang.Object, java.lang.reflect.Method)
+         */
+        @Override
+        public void afterTestTearDown(Object testObject, Method testMethod) {
+            closeApplicationContextIfNeeded(testObject);
         }
     }
 

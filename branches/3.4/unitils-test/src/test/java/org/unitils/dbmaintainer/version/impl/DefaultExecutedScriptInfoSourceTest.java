@@ -32,6 +32,7 @@ import org.unitils.dbmaintainer.script.ExecutedScript;
 import org.unitils.dbmaintainer.script.Script;
 
 import javax.sql.DataSource;
+
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Date;
@@ -73,7 +74,7 @@ public class DefaultExecutedScriptInfoSourceTest extends UnitilsJUnit4 {
 
     ExecutedScript executedScript1, executedScript2;
 
-
+    private static String dialect = "h2";
     /**
      * Initialize test fixture and creates a test version table.
      */
@@ -81,15 +82,15 @@ public class DefaultExecutedScriptInfoSourceTest extends UnitilsJUnit4 {
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        defaultDbSupport = getDefaultDbSupport(configuration, sqlHandler);
+        defaultDbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect);
 
         configuration.setProperty(PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE, "false");
         dbVersionSource = new DefaultExecutedScriptInfoSource();
-        dbVersionSource.init(configuration, sqlHandler);
+        dbVersionSource.init(configuration, sqlHandler, dialect);
 
         configuration.setProperty(PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE, "true");
         dbVersionSourceAutoCreate = new DefaultExecutedScriptInfoSource();
-        dbVersionSourceAutoCreate.init(configuration, sqlHandler);
+        dbVersionSourceAutoCreate.init(configuration, sqlHandler, dialect);
 
         dropExecutedScriptsTable();
         createExecutedScriptsTable();
