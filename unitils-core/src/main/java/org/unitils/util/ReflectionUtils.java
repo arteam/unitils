@@ -187,6 +187,23 @@ public class ReflectionUtils {
 			throw new UnitilsException("Error while trying to access field " + field, e);
 		}
 	}
+	
+	/**
+	 * Sets the given value to the given field on the given object
+     * @param obj
+     * @param nameField
+     * @param newObject
+     * @throws SecurityException
+     * @throws NoSuchFieldException
+     */
+    public static void setFieldValue(Object obj, String nameField, Object newObject) throws SecurityException, NoSuchFieldException {
+
+        Field field = obj.getClass().getDeclaredField(nameField);
+        field.setAccessible(true);
+        setFieldValue(obj, field, newObject);
+        
+
+    }
 
 	/**
 	 * Sets the given value to the given field and setters on the given object.
@@ -424,6 +441,45 @@ public class ReflectionUtils {
 
 		return result;
 	}
+	
+	/**
+     * Gets all methods of the given class and all its super-classes.
+     * 
+     * @param clazz The class
+     * @param isStatic 
+     * @return The methods, not null
+     */
+    public static Set<Method> getAllMethods(Class<?> clazz, boolean isStatic) {
+        Set<Method> result = new HashSet<Method>();
+        Set<Method> allMethods = getAllMethods(clazz);
+        if (isStatic) {
+            for (Method method : allMethods) {
+                if (Modifier.isStatic(method.getModifiers())) {
+                    result.add(method);
+                }
+            }
+            return result;
+        }
+        return allMethods;
+    }
+
+    /**
+     * Gets all methods of the given class and all its super-classes.
+     * @param clazz
+     * @param isStatic
+     * @param returnType
+     * @return Set<Method>
+     */
+    public static Set<Method> getAllMethods(Class<?> clazz, boolean isStatic, Class<?> returnType) {
+        Set<Method> result = new HashSet<Method>();
+        Set<Method> allMethods = getAllMethods(clazz, isStatic);
+        for (Method method : allMethods) {
+            if (method.getReturnType().equals(returnType)) {
+                result.add(method);
+            }
+        }
+        return result;
+    }
 
 	/**
 	 * From the given class, returns the getter for the given setter method. If

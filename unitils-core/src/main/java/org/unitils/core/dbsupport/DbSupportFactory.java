@@ -34,7 +34,7 @@ public class DbSupportFactory {
 
 
     /** Property key of the SQL dialect of the underlying DBMS implementation */
-    public static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
+    //public static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
 
     /** Property key for the database schema names */
     public static final String PROPKEY_DATABASE_SCHEMA_NAMES = "database.schemaNames";
@@ -49,11 +49,12 @@ public class DbSupportFactory {
      *
      * @param configuration The config, not null
      * @param sqlHandler    The sql handler, not null
+     * @param dialect 
      * @return The dbms specific instance of {@link DbSupport}, not null
      */
-    public static DbSupport getDefaultDbSupport(Properties configuration, SQLHandler sqlHandler) {
+    public static DbSupport getDefaultDbSupport(Properties configuration, SQLHandler sqlHandler, String dialect) {
         String defaultSchemaName = getStringList(PROPKEY_DATABASE_SCHEMA_NAMES, configuration, true).get(0);
-        return getDbSupport(configuration, sqlHandler, defaultSchemaName);
+        return getDbSupport(configuration, sqlHandler, defaultSchemaName, dialect);
     }
 
 
@@ -65,15 +66,15 @@ public class DbSupportFactory {
      * @param schemaName    The schema name, not null
      * @return The dbms specific instance of {@link DbSupport}, not null
      */
-    public static DbSupport getDbSupport(Properties configuration, SQLHandler sqlHandler, String schemaName) {
+    public static DbSupport getDbSupport(Properties configuration, SQLHandler sqlHandler, String schemaName, String dialect) {
         // try to retrieve from cache
         DbSupport dbSupport = dbSupportCache.get(schemaName);
         if (dbSupport != null) {
             return dbSupport;
         }
         // create new instance
-        String databaseDialect = getString(PROPKEY_DATABASE_DIALECT, configuration);
-        dbSupport = getInstanceOf(DbSupport.class, configuration, databaseDialect);
+        //String databaseDialect = getString(PROPKEY_DATABASE_DIALECT, configuration);
+        dbSupport = getInstanceOf(DbSupport.class, configuration, dialect);
         dbSupport.init(configuration, sqlHandler, schemaName);
         // add to cache
         dbSupportCache.put(schemaName, dbSupport);
@@ -86,13 +87,14 @@ public class DbSupportFactory {
      *
      * @param configuration The config, not null
      * @param sqlHandler    The sql handler, not null
+     * @param dialect 
      * @return The dbms specific {@link DbSupport}, not null
      */
-    public static List<DbSupport> getDbSupports(Properties configuration, SQLHandler sqlHandler) {
+    public static List<DbSupport> getDbSupports(Properties configuration, SQLHandler sqlHandler, String dialect) {
         List<DbSupport> result = new ArrayList<DbSupport>();
         List<String> schemaNames = getStringList(PROPKEY_DATABASE_SCHEMA_NAMES, configuration, true);
         for (String schemaName : schemaNames) {
-            DbSupport dbSupport = getDbSupport(configuration, sqlHandler, schemaName);
+            DbSupport dbSupport = getDbSupport(configuration, sqlHandler, schemaName, dialect);
             result.add(dbSupport);
         }
         return result;
