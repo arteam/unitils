@@ -15,13 +15,14 @@
  */
 package org.unitils.database.config;
 
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import static org.unitils.util.PropertyUtils.getString;
-
-import javax.sql.DataSource;
-import java.util.Properties;
+import org.unitils.core.config.Configuration;
 
 /**
  * A {@link DataSourceFactory} that loads the necessary information from a properties file.
@@ -33,52 +34,47 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(PropertiesDataSourceFactory.class);
-
-    /* Propery key of the database driver class name */
-    public static final String PROPKEY_DATASOURCE_DRIVERCLASSNAME = "database.driverClassName";
-
-    /* Property key of the datasource url */
-    public static final String PROPKEY_DATASOURCE_URL = "database.url";
-
-    /* Property key of the datasource connect username */
-    public static final String PROPKEY_DATASOURCE_USERNAME = "database.userName";
-
-    /* Property key of the datasource connect password */
-    public static final String PROPKEY_DATASOURCE_PASSWORD = "database.password";
-
-    /* The name of the <code>java.sql.Driver</code> class. */
-    private String driverClassName;
-
-    /* The url of the database. */
-    private String databaseUrl;
-
-    /* The database username. */
-    private String userName;
-
-    /* The database password. */
-    private String password;
+    
+    //Configuration
+    private DatabaseConfiguration config;
+    
+    private String databaseName;
+    
 
 
     /**
-     * Initializes itself using the properties in the given <code>Properties</code> object.
+     * Initialises itself using the properties in the given <code>Properties</code> object.
+     *
+     * @param configuration The config, not null
+     * @param databaseName 
+     */
+    public void init(Properties configuration, String databaseName) {
+        DatabaseConfigurations factory = new DatabaseConfigurationsFactory(new Configuration(configuration)).create();
+		config = factory.getDatabaseConfiguration(databaseName);
+    }
+    
+    /**
+     * Initialises itself using the properties in the given <code>Properties</code> object.
      *
      * @param configuration The config, not null
      */
     public void init(Properties configuration) {
-        driverClassName = getString(PROPKEY_DATASOURCE_DRIVERCLASSNAME, configuration);
-        databaseUrl = getString(PROPKEY_DATASOURCE_URL, configuration);
-        userName = getString(PROPKEY_DATASOURCE_USERNAME, null, configuration);
-        password = getString(PROPKEY_DATASOURCE_PASSWORD, null, configuration);
+    	DatabaseConfigurations factory = new DatabaseConfigurationsFactory(new Configuration(configuration)).create();
+		config = factory.getDatabaseConfiguration();
+		
+	}
+    public void init(DatabaseConfiguration tempConfig) {
+        this.config = tempConfig;
     }
 
 
     public DataSource createDataSource() {
-        logger.info("Creating data source. Driver: " + driverClassName + ", url: " + databaseUrl + ", user: " + userName + ", password: <not shown>");
+        logger.info("Creating data source. Driver: " + config.getDriverClassName() + ", url: " + config.getUrl() + ", user: " + config.getUserName() + ", password: <not shown>");
         BasicDataSource dataSource = getNewDataSource();
-        dataSource.setDriverClassName(driverClassName);
-        dataSource.setUsername(userName);
-        dataSource.setPassword(password);
-        dataSource.setUrl(databaseUrl);
+        dataSource.setDriverClassName(config.getDriverClassName());
+        dataSource.setUsername(config.getUserName());
+        dataSource.setPassword(config.getPassword());
+        dataSource.setUrl(config.getUrl());
         return dataSource;
 
     }
@@ -93,4 +89,6 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
     protected BasicDataSource getNewDataSource() {
         return new BasicDataSource();
     }
+	
+	
 }

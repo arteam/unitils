@@ -56,7 +56,21 @@ public abstract class SqlAssert {
      * @param row
      */
     public static void assertSingleRowSqlResult(String sql, String[] row) {
-        assertSingleRowSqlResult(sql, getDataSourceFromUnitils(), row);
+        assertSingleRowSqlResult(sql, getDefaultDataSourceFromUnitils(), row);
+    }
+    
+    /**
+     * To be succesfull the result of the SQL should only return one row, this row should be identical to the given parameter. The sequence
+     * of the values is not important.
+     *
+     * The datasource will be fetched from the database module of unitils ({@link DatabaseModule}).
+     *
+     * @param sql
+     * @param row
+     * @param databaseName
+     */
+    public static void assertSingleRowSqlResult(String sql, String[] row, String databaseName) {
+        assertSingleRowSqlResult(sql, getDataSourceFromUnitils(databaseName), row);
     }
 
     /**
@@ -69,7 +83,21 @@ public abstract class SqlAssert {
      * @param rows
      */
     public static void assertMultipleRowSqlResult(String sql, String[]... rows) {
-        assertMultipleRowSqlResult(sql, getDataSourceFromUnitils(), rows);
+        assertMultipleRowSqlResult(sql, getDefaultDataSourceFromUnitils(), rows);
+    }
+    
+    /**
+     * To be succesfull the result of the SQL should return as many rows as the two dimensional arrey has, each row should be identical to
+     * the given parameter. The sequence of the values is not important nor is the order of the rows.
+     *
+     * The datasource will be fetched from the database module of unitils ({@link DatabaseModule}).
+     *
+     * @param sql
+     * @param databaseName
+     * @param rows
+     */
+    public static void assertMultipleRowSqlResult(String sql, String databaseName, String[]... rows) {
+        assertMultipleRowSqlResult(sql, getDataSourceFromUnitils(databaseName), rows);
     }
 
     /**
@@ -82,7 +110,21 @@ public abstract class SqlAssert {
      * @param countResult
      */
     public static void assertCountSqlResult(String sql, Long countResult) {
-        assertCountSqlResult(sql, getDataSourceFromUnitils(), countResult);
+        assertCountSqlResult(sql, getDefaultDataSourceFromUnitils(), countResult);
+    }
+    
+    /**
+     * The SQL given should only return one row with one column, this column should be a number (preferred a count(*)). The result is
+     * asserted with the countResult parameter.
+     *
+     * The datasource will be fetched from the database module of unitils ({@link DatabaseModule}).
+     *
+     * @param sql
+     * @param countResult
+     * @param databaseName
+     */
+    public static void assertCountSqlResult(String sql, Long countResult, String databaseName) {
+        assertCountSqlResult(sql, getDataSourceFromUnitils(databaseName), countResult);
     }
 
     /**
@@ -169,9 +211,16 @@ public abstract class SqlAssert {
      *
      * @return DataSource
      */
-    private static DataSource getDataSourceFromUnitils() {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class).getDataSource();
+    private static DataSource getDefaultDataSourceFromUnitils() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class).getDefaultDataSourceWrapper().getDataSource();
     }
 
-
+    /**
+     * Returns the {@link DataSource} fetched from the unitils {@link DatabaseModule}
+     *
+     * @return DataSource
+     */
+    private static DataSource getDataSourceFromUnitils(String databaseName) {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class).getDataSourceWrapper(databaseName).getDataSource();
+    }
 }
