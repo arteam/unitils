@@ -15,19 +15,15 @@
  */
 package org.unitils;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-import org.junit.internal.runners.ClassRoadie;
-import org.junit.internal.runners.InitializationError;
-import org.junit.internal.runners.JUnit4ClassRunner;
-import org.junit.internal.runners.MethodRoadie;
-import org.junit.internal.runners.TestMethod;
+import org.junit.internal.runners.*;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * Custom test runner that will Unitils-enable your test. This will make sure that the
@@ -64,7 +60,7 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
         });
 
         try {
-        	getTestListener().beforeTestClass(getTestClass().getJavaClass());
+            getTestListener().beforeTestClass(getTestClass().getJavaClass());
             classRoadie.runProtected();
         } catch (Throwable t) {
             notifier.fireTestFailure(new Failure(getDescription(), t));
@@ -82,10 +78,10 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
         try {
             testObject = createTest();
         } catch (InvocationTargetException e) {
-            notifier.testAborted(description, e.getCause());
+            testAborted(notifier, description, e.getCause());
             return;
         } catch (Exception e) {
-            notifier.testAborted(description, e);
+            testAborted(notifier, description, e);
             return;
         }
         TestMethod testMethod = wrapMethod(method);
@@ -93,6 +89,13 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
             getTestListener().afterCreateTestObject(testObject);
         }
         createMethodRoadie(testObject, method, testMethod, notifier, description).run();
+    }
+
+    private void testAborted(RunNotifier notifier, Description description,
+                             Throwable e) {
+        notifier.fireTestStarted(description);
+        notifier.fireTestFailure(new Failure(description, e));
+        notifier.fireTestFinished(description);
     }
 
 
