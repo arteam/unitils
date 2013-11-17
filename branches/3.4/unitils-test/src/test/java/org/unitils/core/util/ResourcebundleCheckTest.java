@@ -32,7 +32,7 @@ public class ResourcebundleCheckTest {
         ResourcebundleCheck.testAllTheKeys("resourcebundle/invoice", new Locale("nl"), new Locale("fr"), new Locale("de"));
     }
     
-    @Test(expected = MissingResourceException.class)
+    @Test(expected = MissingKeysException.class)
     public void testBadBundleDoesNotExist() throws Exception {
         ResourcebundleCheck.testAllTheKeys("resourcebundle/invoice", new Locale("fr"), new Locale("nl"), new Locale("de"), new Locale("sq"));
     }
