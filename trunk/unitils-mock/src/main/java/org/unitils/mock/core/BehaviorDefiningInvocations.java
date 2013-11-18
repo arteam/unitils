@@ -31,11 +31,15 @@ public class BehaviorDefiningInvocations {
     protected List<BehaviorDefiningInvocation> behaviorDefiningInvocations = new ArrayList<BehaviorDefiningInvocation>();
 
 
+    public List<BehaviorDefiningInvocation> getBehaviorDefiningInvocations() {
+        return behaviorDefiningInvocations;
+    }
+
     public void addBehaviorDefiningInvocation(BehaviorDefiningInvocation behaviorDefiningInvocation) {
         behaviorDefiningInvocations.add(behaviorDefiningInvocation);
     }
 
-    public void clear() {
+    public void reset() {
         behaviorDefiningInvocations.clear();
     }
 
@@ -104,8 +108,11 @@ public class BehaviorDefiningInvocations {
                 }
             }
         }
-        if (bestMatchingBehaviorDefiningInvocation != null && bestMatchingBehaviorDefiningInvocation.isOneTimeMatch()) {
-            behaviorDefiningInvocations.remove(bestMatchingBehaviorDefiningInvocation);
+        if (bestMatchingBehaviorDefiningInvocation != null) {
+            bestMatchingBehaviorDefiningInvocation.matched(proxyInvocation);
+            if (bestMatchingBehaviorDefiningInvocation.isOneTimeMatch()) {
+                behaviorDefiningInvocations.remove(bestMatchingBehaviorDefiningInvocation);
+            }
         }
         return bestMatchingBehaviorDefiningInvocation;
     }

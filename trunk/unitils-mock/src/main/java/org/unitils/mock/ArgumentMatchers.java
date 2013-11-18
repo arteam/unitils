@@ -18,6 +18,7 @@ package org.unitils.mock;
 import org.unitils.core.Unitils;
 import org.unitils.mock.annotation.ArgumentMatcher;
 import org.unitils.mock.argumentmatcher.ArgumentMatcherService;
+import org.unitils.mock.argumentmatcher.Capture;
 
 /**
  * @author Tim Ducheyne
@@ -40,7 +41,7 @@ public class ArgumentMatchers {
      */
     @ArgumentMatcher
     public static <T> T notNull(Class<T> argumentClass) {
-        argumentMatcherService.registerNotNullArgumentMatcher();
+        argumentMatcherService.registerNotNullArgumentMatcher(argumentClass);
         return null;
     }
 
@@ -55,7 +56,7 @@ public class ArgumentMatchers {
      */
     @ArgumentMatcher
     public static <T> T isNull(Class<T> argumentClass) {
-        argumentMatcherService.registerNullArgumentMatcher();
+        argumentMatcherService.registerNullArgumentMatcher(argumentClass);
         return null;
     }
 
@@ -105,6 +106,13 @@ public class ArgumentMatchers {
     @ArgumentMatcher
     public static <T> T any(Class<T> argumentClass) {
         argumentMatcherService.registerAnyArgumentMatcher(argumentClass);
+        return null;
+    }
+
+    // todo td test
+    @ArgumentMatcher
+    public static <T> T get(Capture<T> capture) {
+        argumentMatcherService.registerCaptureArgumentMatcher(capture);
         return null;
     }
 

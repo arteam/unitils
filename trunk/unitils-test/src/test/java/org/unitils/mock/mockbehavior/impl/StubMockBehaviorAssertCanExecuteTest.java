@@ -21,8 +21,6 @@ import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.lang.reflect.Method;
 
-import static java.util.Collections.emptyList;
-
 /**
  * @author Tim Ducheyne
  */
@@ -39,13 +37,10 @@ public class StubMockBehaviorAssertCanExecuteTest {
 
     @Test
     public void alwaysAllowed() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(MyInterface.class.getMethod("voidMethod"));
+        Method method = MyInterface.class.getMethod("voidMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+
         stubMockBehavior.assertCanExecute(proxyInvocation);
-    }
-
-
-    private ProxyInvocation createProxyInvocation(Method method) {
-        return new ProxyInvocation(null, null, method, emptyList(), emptyList(), null);
     }
 
 

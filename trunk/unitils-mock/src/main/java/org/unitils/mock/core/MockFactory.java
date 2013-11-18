@@ -32,6 +32,7 @@ import org.unitils.mock.report.ScenarioReport;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -111,12 +112,11 @@ public class MockFactory {
         return partialMock;
     }
 
-
     public Mock<?> createChainedMock(MatchingInvocation matchingInvocation) {
         Object matchingProxy = matchingInvocation.getProxy();
         Map<Method, Mock<?>> chainedMocksForProxy = chainedMocks.get(matchingProxy);
         if (chainedMocksForProxy == null) {
-            chainedMocksForProxy = new IdentityHashMap<Method, Mock<?>>();
+            chainedMocksForProxy = new HashMap<Method, Mock<?>>();
             chainedMocks.put(matchingProxy, chainedMocksForProxy);
         }
         Method method = matchingInvocation.getMethod();
@@ -175,6 +175,23 @@ public class MockFactory {
         return new PartialMockObject<T>(name, mockedType, proxy, matchingProxy, chained, behaviorDefiningInvocations, matchingProxyInvocationHandler, mockBehaviorFactory, matchingInvocationHandlerFactory);
     }
 
+    protected void resetIfNewTestObject(Object testObject) {
+        if (scenario.getTestObject() == testObject) {
+            return;
+        }
+        scenario.reset();
+        scenario.setTestObject(testObject);
+        argumentMatcherRepository.reset();
+        chainedMocks.clear();
+    }
+
+    protected <T> String getName(String name, Class<T> type) {
+        if (isBlank(name)) {
+            return uncapitalize(type.getSimpleName());
+        }
+        return name;
+    }
+
 
     protected BehaviorDefiningInvocations createBehaviorDefiningInvocations() {
         return new BehaviorDefiningInvocations();
@@ -198,22 +215,5 @@ public class MockFactory {
 
     protected MatchingInvocationHandlerFactory createMatchingInvocationHandlerFactory() {
         return new MatchingInvocationHandlerFactory(scenario, this, scenarioReport);
-    }
-
-    protected void resetIfNewTestObject(Object testObject) {
-        if (scenario.getTestObject() == testObject) {
-            return;
-        }
-        scenario.reset();
-        scenario.setTestObject(testObject);
-        argumentMatcherRepository.reset();
-        chainedMocks.clear();
-    }
-
-    protected <T> String getName(String name, Class<T> type) {
-        if (isBlank(name)) {
-            return uncapitalize(type.getSimpleName());
-        }
-        return name;
     }
 }

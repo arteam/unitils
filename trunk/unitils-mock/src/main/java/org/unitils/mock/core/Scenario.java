@@ -21,8 +21,8 @@ import java.util.List;
 import static org.unitils.mock.core.Scenario.VerificationStatus.*;
 
 /**
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  * @author Kenny Claes
  */
 public class Scenario {
@@ -81,6 +81,7 @@ public class Scenario {
             if (invocationVerificationStatus == UNVERIFIED && matchingInvocation.matches(observedInvocation) != -1) {
                 // Found a match that's not verified yet. Mark as verified and proceed.
                 invocationVerificationStatuses.set(i, VERIFIED);
+                matchingInvocation.matched(observedInvocation);
                 return observedInvocation;
             }
         }

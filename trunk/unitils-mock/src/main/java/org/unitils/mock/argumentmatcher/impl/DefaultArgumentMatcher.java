@@ -16,6 +16,7 @@
 package org.unitils.mock.argumentmatcher.impl;
 
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+import org.unitils.mock.core.proxy.Argument;
 import org.unitils.reflectionassert.ReflectionComparator;
 
 import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.*;
@@ -31,12 +32,12 @@ import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDE
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DefaultArgumentMatcher implements ArgumentMatcher {
+public class DefaultArgumentMatcher<T> extends ArgumentMatcher<T> {
 
     /* The original value passed to the argument matcher */
-    protected Object value;
+    protected T value;
     /* Copy of the original value */
-    protected Object valueAtInvocationTime;
+    protected T valueAtInvocationTime;
 
 
     /**
@@ -45,7 +46,7 @@ public class DefaultArgumentMatcher implements ArgumentMatcher {
      *
      * @param value The expected value
      */
-    public DefaultArgumentMatcher(Object value, Object valueAtInvocationTime) {
+    public DefaultArgumentMatcher(T value, T valueAtInvocationTime) {
         this.value = value;
         this.valueAtInvocationTime = valueAtInvocationTime;
     }
@@ -57,12 +58,13 @@ public class DefaultArgumentMatcher implements ArgumentMatcher {
      * value, lenient reflection comparison is used to compare the values. This means that the actual order of collections
      * will be ignored and only fields that have a non default value will be compared.
      *
-     * @param argument                 The argument that was used by reference
-     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed
+     * @param argument The argument to match, not null
      * @return The match result, not null
      */
-    public MatchResult matches(Object argument, Object argumentAtInvocationTime) {
-        if (value == argument) {
+    @Override
+    public MatchResult matches(Argument<T> argument) {
+        T argumentValue = argument.getValue();
+        if (value == argumentValue) {
             return SAME;
         }
         ReflectionComparator reflectionComparator;
@@ -71,7 +73,8 @@ public class DefaultArgumentMatcher implements ArgumentMatcher {
         } else {
             reflectionComparator = createRefectionComparator(LENIENT_ORDER, IGNORE_DEFAULTS);
         }
-        if (reflectionComparator.isEqual(valueAtInvocationTime, argumentAtInvocationTime)) {
+        T argumentValueAtInvocationTime = argument.getValueAtInvocationTime();
+        if (reflectionComparator.isEqual(valueAtInvocationTime, argumentValueAtInvocationTime)) {
             return MATCH;
         }
         return NO_MATCH;

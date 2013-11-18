@@ -16,6 +16,7 @@
 package org.unitils.mock.argumentmatcher.impl;
 
 import org.junit.Test;
+import org.unitils.mock.core.proxy.Argument;
 
 import java.util.List;
 
@@ -29,55 +30,59 @@ import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.*;
  */
 public class EqualsArgumentMatcherMatchesTest {
 
-    private EqualsArgumentMatcher equalsArgumentMatcher;
-
 
     @Test
     public void matchWhenEquals() {
-        equalsArgumentMatcher = new EqualsArgumentMatcher(asList("1", "2"));
+        Argument<List> argument = new Argument<List>(asList("1", "2"), null, List.class);
+        EqualsArgumentMatcher<List> equalsArgumentMatcher = new EqualsArgumentMatcher<List>(asList("1", "2"));
 
-        MatchResult result = equalsArgumentMatcher.matches(asList("1", "2"), null);
+        MatchResult result = equalsArgumentMatcher.matches(argument);
         assertEquals(MATCH, result);
     }
 
     @Test
     public void noMatchWhenNotEquals() {
-        equalsArgumentMatcher = new EqualsArgumentMatcher(asList("1", "2"));
+        Argument<List> argument = new Argument<List>(asList("1", "2", "3"), null, List.class);
+        EqualsArgumentMatcher<List> equalsArgumentMatcher = new EqualsArgumentMatcher<List>(asList("1", "2"));
 
-        MatchResult result = equalsArgumentMatcher.matches(asList("1", "2", "3"), null);
+        MatchResult result = equalsArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 
     @Test
     public void sameWhenBothNull() {
-        equalsArgumentMatcher = new EqualsArgumentMatcher(null);
+        Argument<String> argument = new Argument<String>(null, null, String.class);
+        EqualsArgumentMatcher<String> equalsArgumentMatcher = new EqualsArgumentMatcher<String>(null);
 
-        MatchResult result = equalsArgumentMatcher.matches(null, null);
+        MatchResult result = equalsArgumentMatcher.matches(argument);
         assertEquals(SAME, result);
     }
 
     @Test
     public void sameWhenSameValue() {
         List<String> list = asList("1", "2");
-        equalsArgumentMatcher = new EqualsArgumentMatcher(list);
+        Argument<List> argument = new Argument<List>(list, null, List.class);
+        EqualsArgumentMatcher<List> equalsArgumentMatcher = new EqualsArgumentMatcher<List>(list);
 
-        MatchResult result = equalsArgumentMatcher.matches(list, null);
+        MatchResult result = equalsArgumentMatcher.matches(argument);
         assertEquals(SAME, result);
     }
 
     @Test
     public void noMatchWhenNullExpected() {
-        equalsArgumentMatcher = new EqualsArgumentMatcher(null);
+        Argument<String> argument = new Argument<String>("value", null, String.class);
+        EqualsArgumentMatcher<String> equalsArgumentMatcher = new EqualsArgumentMatcher<String>(null);
 
-        MatchResult result = equalsArgumentMatcher.matches("value", null);
+        MatchResult result = equalsArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 
     @Test
     public void noMatchWhenNullArgument() {
-        equalsArgumentMatcher = new EqualsArgumentMatcher("value");
+        Argument<String> argument = new Argument<String>(null, null, String.class);
+        EqualsArgumentMatcher<String> equalsArgumentMatcher = new EqualsArgumentMatcher<String>("value");
 
-        MatchResult result = equalsArgumentMatcher.matches(null, null);
+        MatchResult result = equalsArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 }

@@ -52,6 +52,10 @@ public class SimpleCasesComparator implements Comparator {
         if ((left instanceof Character || left instanceof Number) && (right instanceof Character || right instanceof Number)) {
             return true;
         }
+        if (left instanceof Throwable || right instanceof Throwable) {
+            // use object comparator for exceptions
+            return false;
+        }
         if (left.getClass().getName().startsWith("java.lang") || right.getClass().getName().startsWith("java.lang")) {
             return true;
         }

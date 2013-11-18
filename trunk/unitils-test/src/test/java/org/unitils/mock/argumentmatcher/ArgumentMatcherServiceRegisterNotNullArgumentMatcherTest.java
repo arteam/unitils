@@ -41,7 +41,7 @@ public class ArgumentMatcherServiceRegisterNotNullArgumentMatcherTest extends Un
 
     @Test
     public void registerNotNullArgumentMatcher() {
-        argumentMatcherService.registerNotNullArgumentMatcher();
+        argumentMatcherService.registerNotNullArgumentMatcher(String.class);
         argumentMatcherRepositoryMock.assertInvoked().registerArgumentMatcher(any(NotNullArgumentMatcher.class));
     }
 }

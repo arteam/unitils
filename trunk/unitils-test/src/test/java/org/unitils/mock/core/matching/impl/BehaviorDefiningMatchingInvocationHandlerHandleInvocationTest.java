@@ -24,14 +24,16 @@ import org.unitils.mock.core.BehaviorDefiningInvocation;
 import org.unitils.mock.core.BehaviorDefiningInvocations;
 import org.unitils.mock.core.MatchingInvocation;
 import org.unitils.mock.core.MockFactory;
+import org.unitils.mock.core.proxy.Argument;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.ChainedMockBehavior;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
@@ -58,7 +60,8 @@ public class BehaviorDefiningMatchingInvocationHandlerHandleInvocationTest exten
         behaviorDefiningMatchingInvocationHandler = new BehaviorDefiningMatchingInvocationHandler(mockBehaviorMock.getMock(), true, behaviorDefiningInvocationsMock.getMock(), mockServiceMock.getMock());
 
         Method method = MyInterface.class.getMethod("method");
-        ProxyInvocation proxyInvocation = new ProxyInvocation("mock", null, method, emptyList(), emptyList(), null);
+        List<Argument<?>> arguments = new ArrayList<Argument<?>>();
+        ProxyInvocation proxyInvocation = new ProxyInvocation("mock", null, method, arguments, null);
         matchingInvocation = new MatchingInvocation(proxyInvocation, null);
         behaviorDefiningInvocation = new BehaviorDefiningInvocation(matchingInvocation, mockBehaviorMock.getMock(), true);
     }

@@ -21,7 +21,6 @@ import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.lang.reflect.Method;
 
-import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertNull;
 
 /**
@@ -40,15 +39,11 @@ public class StubMockBehaviorExecuteTest {
 
     @Test
     public void nullWhenVoidMethod() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(MyInterface.class.getMethod("voidMethod"));
+        Method method = MyInterface.class.getMethod("voidMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
 
         Object result = stubMockBehavior.execute(proxyInvocation);
         assertNull(result);
-    }
-
-
-    private ProxyInvocation createProxyInvocation(Method method) {
-        return new ProxyInvocation(null, null, method, emptyList(), emptyList(), null);
     }
 
 

@@ -62,6 +62,14 @@ public class TypeWrapper {
         return wrappedType instanceof ParameterizedType;
     }
 
+    public boolean hasRawType(Type rawType) {
+        if (wrappedType instanceof ParameterizedType) {
+            Type rawWrappedType = ((ParameterizedType) wrappedType).getRawType();
+            return rawWrappedType.equals(rawType);
+        }
+        return wrappedType.equals(rawType);
+    }
+
 
     public boolean isOfType(Type type) {
         return wrappedType.equals(type);

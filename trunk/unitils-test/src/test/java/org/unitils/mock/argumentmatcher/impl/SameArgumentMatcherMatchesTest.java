@@ -16,6 +16,7 @@
 package org.unitils.mock.argumentmatcher.impl;
 
 import org.junit.Test;
+import org.unitils.mock.core.proxy.Argument;
 
 import java.util.List;
 
@@ -30,24 +31,26 @@ import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.SAME;
  */
 public class SameArgumentMatcherMatchesTest {
 
-    private SameArgumentMatcher sameArgumentMatcher;
+    private SameArgumentMatcher<List> sameArgumentMatcher;
 
 
     @Test
     public void sameWhenSame() {
         List<String> list = asList("1", "2");
-        sameArgumentMatcher = new SameArgumentMatcher(list);
+        Argument<List> argument = new Argument<List>(list, null, List.class);
+        sameArgumentMatcher = new SameArgumentMatcher<List>(list);
 
-        MatchResult result = sameArgumentMatcher.matches(list, null);
+        MatchResult result = sameArgumentMatcher.matches(argument);
         assertEquals(SAME, result);
     }
 
     @Test
     public void noMatchWhenNotSame() {
         List<String> list = asList("1", "2");
-        sameArgumentMatcher = new SameArgumentMatcher(list);
+        Argument<List> argument = new Argument<List>(asList("1", "2"), null, List.class);
+        sameArgumentMatcher = new SameArgumentMatcher<List>(list);
 
-        MatchResult result = sameArgumentMatcher.matches(asList("1", "2"), null);
+        MatchResult result = sameArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 }

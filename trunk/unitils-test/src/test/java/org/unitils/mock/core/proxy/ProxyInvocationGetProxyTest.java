@@ -13,26 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.mockbehavior.impl;
+package org.unitils.mock.core.proxy;
 
-import org.unitils.mock.core.proxy.ProxyInvocation;
-import org.unitils.mock.mockbehavior.MockBehavior;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.Properties;
+
+import static org.junit.Assert.assertSame;
 
 /**
- * Mock behavior that does nothing.
- *
  * @author Tim Ducheyne
- * @author Filip Neven
  */
-public class NoopMockBehavior implements MockBehavior {
+public class ProxyInvocationGetProxyTest {
 
-    /**
-     * Empty mock behavior.
-     *
-     * @param proxyInvocation The proxy method invocation, not null
-     * @return null
-     */
-    public Object execute(ProxyInvocation proxyInvocation) {
-        return null;
+    private ProxyInvocation proxyInvocation;
+
+    private Object proxy;
+
+
+    @Before
+    public void initialize() {
+        proxy = new Properties();
+        proxyInvocation = new ProxyInvocation(null, proxy, null, null, null);
+    }
+
+
+    @Test
+    public void getProxy() throws Throwable {
+        Object result = proxyInvocation.getProxy();
+        assertSame(proxy, result);
     }
 }

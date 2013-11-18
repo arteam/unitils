@@ -101,8 +101,6 @@ public class CloneServiceCreateDeepCloneTest extends UnitilsJUnit4 {
 
         assertReflectionEquals(aList, result);
         assertNotSame(aList, result);
-        assertSame(aList.get(0), result.get(0));
-        assertSame(aList.get(1), result.get(1));
     }
 
     @Test
@@ -209,6 +207,16 @@ public class CloneServiceCreateDeepCloneTest extends UnitilsJUnit4 {
 
         MyClass result = cloneService.createDeepClone(instance);
         assertSame(instance, result);
+    }
+
+    @Test
+    public void cloneRegularClass() {
+        objectFactoryMock.returns(new MyClass("xxx")).createWithoutCallingConstructor(MyClass.class);
+        MyClass instance = new MyClass("value");
+
+        MyClass result = cloneService.createDeepClone(instance);
+        assertReflectionEquals(instance, result);
+        assertNotSame(instance, result);
     }
 
     @Test
@@ -320,6 +328,7 @@ public class CloneServiceCreateDeepCloneTest extends UnitilsJUnit4 {
     protected static class MyClass {
 
         private String value = "test";
+        public static String staticValue = "static";
 
         public MyClass(String value) {
             this.value = value;

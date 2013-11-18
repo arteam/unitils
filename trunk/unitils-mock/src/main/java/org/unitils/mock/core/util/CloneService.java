@@ -21,7 +21,6 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -147,10 +146,6 @@ public class CloneService {
      * @return True if the instance is should not be cloned, e.g. a java lang class or a data source
      */
     protected boolean isJdkClass(Object instanceToClone) {
-        if (instanceToClone instanceof Collection || instanceToClone instanceof Map) {
-            // make sure to clone collections
-            return false;
-        }
         String className = instanceToClone.getClass().getName();
         if (className.startsWith("java.")) {
             return true;

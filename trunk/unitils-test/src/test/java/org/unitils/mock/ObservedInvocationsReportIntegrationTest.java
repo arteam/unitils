@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.report.impl.ObservedInvocationsReport;
+import org.unitils.mock.report.impl.ObservedInvocationsReportFactory;
 
 import java.util.List;
 
@@ -41,7 +42,8 @@ public class ObservedInvocationsReportIntegrationTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        observedInvocationsView = new ObservedInvocationsReport();
+        ObservedInvocationsReportFactory observedInvocationsReportFactory = new ObservedInvocationsReportFactory(null, null, null);
+        observedInvocationsView = observedInvocationsReportFactory.create();
     }
 
 

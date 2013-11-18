@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 
-import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -38,33 +37,36 @@ public class ExceptionThrowingMockBehaviorAssertCanExecuteTest {
 
     @Test
     public void canExecuteWhenError() throws Exception {
+        Method method = MyInterface.class.getMethod("method");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
         exceptionThrowingMockBehavior = new ExceptionThrowingMockBehavior(new AbstractMethodError(), null);
 
-        ProxyInvocation proxyInvocation = createProxyInvocation(MyInterface.class.getMethod("method"));
         exceptionThrowingMockBehavior.assertCanExecute(proxyInvocation);
     }
 
     @Test
     public void canExecuteWhenRuntimeException() throws Exception {
+        Method method = MyInterface.class.getMethod("method");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
         exceptionThrowingMockBehavior = new ExceptionThrowingMockBehavior(new RuntimeException(), null);
 
-        ProxyInvocation proxyInvocation = createProxyInvocation(MyInterface.class.getMethod("method"));
         exceptionThrowingMockBehavior.assertCanExecute(proxyInvocation);
     }
 
     @Test
     public void canExecuteWhenExceptionIsDeclaredInThrowsClause() throws Exception {
+        Method method = MyInterface.class.getMethod("exceptionMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
         exceptionThrowingMockBehavior = new ExceptionThrowingMockBehavior(new IOException(), null);
 
-        ProxyInvocation proxyInvocation = createProxyInvocation(MyInterface.class.getMethod("exceptionMethod"));
         exceptionThrowingMockBehavior.assertCanExecute(proxyInvocation);
     }
 
     @Test
     public void exceptionWhenCheckedExceptionAndNoThrowsClause() throws Exception {
+        Method method = MyInterface.class.getMethod("method");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
         exceptionThrowingMockBehavior = new ExceptionThrowingMockBehavior(new SAXException(), null);
-
-        ProxyInvocation proxyInvocation = createProxyInvocation(MyInterface.class.getMethod("method"));
         try {
             exceptionThrowingMockBehavior.assertCanExecute(proxyInvocation);
             fail("UnitilsException expected");
@@ -75,20 +77,15 @@ public class ExceptionThrowingMockBehaviorAssertCanExecuteTest {
 
     @Test
     public void exceptionWhenCheckedExceptionNotNotDeclaredInThrowsClause() throws Exception {
+        Method method = MyInterface.class.getMethod("exceptionMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
         exceptionThrowingMockBehavior = new ExceptionThrowingMockBehavior(new SAXException(), null);
-
-        ProxyInvocation proxyInvocation = createProxyInvocation(MyInterface.class.getMethod("exceptionMethod"));
         try {
             exceptionThrowingMockBehavior.assertCanExecute(proxyInvocation);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Trying to make a method throw an exception that it doesn't declare. Exception type: class org.xml.sax.SAXException, declared exceptions: [class java.sql.SQLException, class java.io.IOException]", e.getMessage());
         }
-    }
-
-
-    private ProxyInvocation createProxyInvocation(Method method) {
-        return new ProxyInvocation(null, null, method, emptyList(), emptyList(), null);
     }
 
 

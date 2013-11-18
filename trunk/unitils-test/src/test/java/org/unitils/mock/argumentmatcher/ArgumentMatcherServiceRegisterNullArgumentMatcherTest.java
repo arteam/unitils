@@ -41,7 +41,7 @@ public class ArgumentMatcherServiceRegisterNullArgumentMatcherTest extends Uniti
 
     @Test
     public void registerNullArgumentMatcher() {
-        argumentMatcherService.registerNullArgumentMatcher();
+        argumentMatcherService.registerNullArgumentMatcher(String.class);
         argumentMatcherRepositoryMock.assertInvoked().registerArgumentMatcher(any(NullArgumentMatcher.class));
     }
 }

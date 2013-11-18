@@ -20,12 +20,13 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
 import org.unitils.mock.core.MockFactory;
+import org.unitils.mock.core.proxy.Argument;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Collections.emptyList;
 import static org.junit.Assert.*;
 import static org.unitils.mock.ArgumentMatchers.isNull;
 
@@ -47,7 +48,8 @@ public class DummyValueReturningMockBehaviorExecuteTest extends UnitilsJUnit4 {
 
     @Test
     public void defaultValue() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestInterface.class.getMethod("intMethod"));
+        Method method = TestInterface.class.getMethod("intMethod");
+        ProxyInvocation proxyInvocation = createProxyInvocation(method);
 
         Object result = dummyValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Integer);
@@ -56,7 +58,8 @@ public class DummyValueReturningMockBehaviorExecuteTest extends UnitilsJUnit4 {
 
     @Test
     public void stringDefaultsToEmptyString() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestInterface.class.getMethod("stringMethod"));
+        Method method = TestInterface.class.getMethod("stringMethod");
+        ProxyInvocation proxyInvocation = createProxyInvocation(method);
 
         Object result = dummyValueReturningMockBehavior.execute(proxyInvocation);
         assertEquals("", result);
@@ -64,7 +67,8 @@ public class DummyValueReturningMockBehaviorExecuteTest extends UnitilsJUnit4 {
 
     @Test
     public void nullWhenVoidMethod() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestInterface.class.getMethod("voidMethod"));
+        Method method = TestInterface.class.getMethod("voidMethod");
+        ProxyInvocation proxyInvocation = createProxyInvocation(method);
 
         Object result = dummyValueReturningMockBehavior.execute(proxyInvocation);
         assertNull(result);
@@ -72,7 +76,8 @@ public class DummyValueReturningMockBehaviorExecuteTest extends UnitilsJUnit4 {
 
     @Test
     public void nullWhenReturnTypeIsFinalClass() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestInterface.class.getMethod("finalClassMethod"));
+        Method method = TestInterface.class.getMethod("finalClassMethod");
+        ProxyInvocation proxyInvocation = createProxyInvocation(method);
 
         Object result = dummyValueReturningMockBehavior.execute(proxyInvocation);
         assertNull(result);
@@ -80,7 +85,8 @@ public class DummyValueReturningMockBehaviorExecuteTest extends UnitilsJUnit4 {
 
     @Test
     public void dummyWhenObjectReturnType() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestInterface.class.getMethod("dummyMethod"));
+        Method method = TestInterface.class.getMethod("dummyMethod");
+        ProxyInvocation proxyInvocation = createProxyInvocation(method);
         TestClass dummy = new TestClass();
         mockFactoryMock.returns(dummy).createDummy(isNull(String.class), TestClass.class);
 
@@ -90,7 +96,8 @@ public class DummyValueReturningMockBehaviorExecuteTest extends UnitilsJUnit4 {
 
     @Test
     public void sameInstanceIsReturnedForEachCall() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestInterface.class.getMethod("listMethod"));
+        Method method = TestInterface.class.getMethod("listMethod");
+        ProxyInvocation proxyInvocation = createProxyInvocation(method);
 
         Object result1 = dummyValueReturningMockBehavior.execute(proxyInvocation);
         Object result2 = dummyValueReturningMockBehavior.execute(proxyInvocation);
@@ -99,7 +106,8 @@ public class DummyValueReturningMockBehaviorExecuteTest extends UnitilsJUnit4 {
 
 
     private ProxyInvocation createProxyInvocation(Method method) {
-        return new ProxyInvocation(null, null, method, emptyList(), emptyList(), null);
+        List<Argument<?>> arguments = new ArrayList<Argument<?>>();
+        return new ProxyInvocation(null, null, method, arguments, null);
     }
 
 

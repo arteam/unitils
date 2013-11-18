@@ -15,6 +15,8 @@
  */
 package org.unitils.mock.argumentmatcher;
 
+import org.unitils.mock.core.proxy.Argument;
+
 /**
  * A matcher that can check whether a given argument matches certain criteria.
  *
@@ -22,7 +24,7 @@ package org.unitils.mock.argumentmatcher;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface ArgumentMatcher {
+public abstract class ArgumentMatcher<T> {
 
     public static enum MatchResult {
 
@@ -42,16 +44,21 @@ public interface ArgumentMatcher {
     }
 
     /**
-     * Returns true if the given object matches this object's expected argument, false otherwise.
-     * <p/>
-     * The argumentAtInvocationTime is a copy (deep clone) of the arguments at the time of
-     * the invocation. This way the original values can still be used later-on even when changes
-     * occur to the original values (pass-by-value vs pass-by-reference).
+     * Returns NO_MATCH if the given argument does not match,
+     * SAME if it is an exact match (e.g. same instance),
+     * MATCH if it is a match (e.g. not null).
      *
-     * @param argument                 The argument that was used by reference
-     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed
+     * @param argument The argument to match, not null
      * @return The match result, not null
      */
-    MatchResult matches(Object argument, Object argumentAtInvocationTime);
+    public abstract MatchResult matches(Argument<T> argument);
 
+    /**
+     * Hook method. Called when the given argument resulted in the best match.
+     *
+     * @param argument The argument that was matched, not null
+     */
+    public void matched(Argument<T> argument) {
+        // ignore by default
+    }
 }

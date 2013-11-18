@@ -25,13 +25,15 @@ import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.core.MatchingInvocation;
 import org.unitils.mock.core.MockFactory;
 import org.unitils.mock.core.Scenario;
+import org.unitils.mock.core.proxy.Argument;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.report.ScenarioReport;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import static java.util.Collections.emptyList;
 import static org.junit.Assert.*;
 
 /**
@@ -61,7 +63,8 @@ public class AssertVerifyingMatchingInvocationHandlerHandleInvocationTest extend
         StackTraceElement[] stackTrace = new StackTraceElement[]{element1, element2};
 
         Method method = MyInterface.class.getMethod("method");
-        ProxyInvocation proxyInvocation = new ProxyInvocation("mock", null, method, emptyList(), emptyList(), stackTrace);
+        List<Argument<?>> arguments = new ArrayList<Argument<?>>();
+        ProxyInvocation proxyInvocation = new ProxyInvocation("mock", null, method, arguments, stackTrace);
         matchingInvocation = new MatchingInvocation(proxyInvocation, null);
 
         scenarioReportMock.returns("scenario report").createReport();

@@ -32,6 +32,7 @@ public class DummyProxyInvocationHandler implements ProxyInvocationHandler {
         this.mockBehavior = mockBehavior;
     }
 
+
     public Object handleInvocation(ProxyInvocation invocation) throws Throwable {
         return mockBehavior.execute(invocation);
     }
