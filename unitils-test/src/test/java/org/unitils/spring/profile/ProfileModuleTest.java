@@ -1,8 +1,9 @@
 package org.unitils.spring.profile;
 
-import junit.framework.Assert;
+import static org.unitils.database.SQLUnitils.executeUpdate;
 
 import org.easymock.EasyMock;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.env.StandardEnvironment;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.unitils.UnitilsJUnit4TestClassRunner;
 import org.unitils.core.UnitilsException;
 import org.unitils.easymock.EasyMockUnitils;
@@ -24,6 +28,8 @@ import org.unitils.spring.annotation.SpringApplicationContext;
 /**
  * ProfileModuleTest.
  * 
+ * @author Jeroen Horemans
+ * @author Thomas De Rycke
  * @author Willemijn Wouters
  * 
  * @since 3.4
@@ -164,6 +170,10 @@ public class ProfileModuleTest {
     public void testGetProfileWithAnnotations() {
         profileModule.getProfile(TestClass6.class);
         ReflectionAssert.assertLenientEquals("Test if the actual context is a GenericXmlApplicationContext", AnnotationConfigApplicationContext.class, profileModule.getCtx().getClass());
+    
+    
+        //drop table DummyTable
+        dropTableDummyTable();
     }
     
     
@@ -177,13 +187,13 @@ public class ProfileModuleTest {
     }
     
     @ConfigureProfile("dev")
-    @SpringApplicationContext("classpath:applicationContext-dao-test.xml")
+    @SpringApplicationContext("classpath:org/unitils/spring/profile/applicationContext-dao-test.xml")
     private class TestClass3 {
         //just a test class
     }
     
     @ConfigureProfile("")
-    @SpringApplicationContext("classpath:applicationContext-dao-test.xml")
+    @SpringApplicationContext("classpath:org/unitils/spring/profile/applicationContext-dao-test.xml")
     private class TestClass4 {
         //just a test class
     }
@@ -207,6 +217,15 @@ public class ProfileModuleTest {
         public TestClass4 getTestClzz() {
             return testClzz;
         }
+    }
+    
+    private void dropTableDummyTable() {
+        EmbeddedDatabase dataSource = new EmbeddedDatabaseBuilder()
+        .setType(EmbeddedDatabaseType.HSQL)
+        .addScript("classpath:org/unitils/database/DatabaseUnitilsTest.sql")
+        .build();
+        
+        executeUpdate("drop table DUMMYTABLE", dataSource);
     }
    
 

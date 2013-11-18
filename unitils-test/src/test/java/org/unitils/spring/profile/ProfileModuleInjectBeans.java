@@ -1,18 +1,25 @@
 package org.unitils.spring.profile;
 
-import junit.framework.Assert;
+import static org.unitils.database.SQLUnitils.executeUpdate;
 
+import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.unitils.UnitilsJUnit4TestClassRunner;
 
 
 /**
  * ProfileModuleInjectBeans.
  * 
+ * @author Jeroen Horemans
+ * @author Thomas De Rycke
  * @author Willemijn Wouters
  * 
  * @since 3.4
@@ -26,6 +33,11 @@ public class ProfileModuleInjectBeans {
     @Before
     public void init() {
         this.module = new ProfileModule();
+    }
+    
+    @After
+    public void tearDown() {
+        dropTestTables();
     }
 
     @Test
@@ -57,5 +69,12 @@ public class ProfileModuleInjectBeans {
         ctx.scan("org.unitils.spring.profile"); // register all @Configuration classes
         ctx.refresh();
         return ctx;
+    }
+    
+    private void dropTestTables() {
+        EmbeddedDatabase dataSource = new EmbeddedDatabaseBuilder()
+        .setType(EmbeddedDatabaseType.HSQL)
+        .build();
+        executeUpdate("drop table DOSSIER", dataSource);
     }
 }

@@ -2,8 +2,7 @@ package org.unitils.spring.profile;
 
 import javax.sql.DataSource;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +14,15 @@ import org.unitils.spring.annotation.SpringApplicationContext;
 /**
  * ProfilesModuleSpringApplicationContextIntegrationTest.
  * 
+ * @author Jeroen Horemans
+ * @author Thomas De Rycke
  * @author Willemijn Wouters
  * 
  * @since 3.4
  * 
  */
 @RunWith(UnitilsJUnit4TestClassRunner.class)
-@SpringApplicationContext("classpath:applicationContext-dao-test.xml")
+@SpringApplicationContext("classpath:org/unitils/spring/profile/applicationContext-dao-test.xml")
 @ConfigureProfile(value = "dev", configuration = TypeConfiguration.APPLICATIONCONTEXT)
 public class ProfilesModuleSpringApplicationContextIntegrationTest {
 

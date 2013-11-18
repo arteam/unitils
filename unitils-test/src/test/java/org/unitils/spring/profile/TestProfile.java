@@ -26,7 +26,7 @@ public class TestProfile {
     public DataSource dataSource() {
         return new EmbeddedDatabaseBuilder()
             .setType(EmbeddedDatabaseType.HSQL)
-            .addScript("classpath:org/unitils/dbscripts/001_Initial_create.sql")
+            .addScript("classpath:org/unitils/database/DatabaseUnitilsTest.sql")
             .build();
     }
     
