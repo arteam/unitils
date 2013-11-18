@@ -26,7 +26,7 @@ public class TestProfile1 {
     public DataSource dataSource() {
         return new EmbeddedDatabaseBuilder()
             .setType(EmbeddedDatabaseType.HSQL)
-            .addScript("classpath:org/unitils/dbscripts/002_Initial_create.sql")
+            .addScript("classpath:org/unitils/spring/profile/DummyTable.sql")
             .build();
     }
     

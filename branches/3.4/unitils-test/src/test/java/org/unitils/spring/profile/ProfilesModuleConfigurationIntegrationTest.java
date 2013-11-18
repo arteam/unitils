@@ -3,8 +3,7 @@ package org.unitils.spring.profile;
 
 import javax.sql.DataSource;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,8 @@ import org.unitils.spring.annotation.ConfigureProfile;
 /**
  * ProfilesModuleIntegrationTest.
  * 
+ * @author Jeroen Horemans
+ * @author Thomas De Rycke
  * @author Willemijn Wouters
  * 
  * @since 3.4
