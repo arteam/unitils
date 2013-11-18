@@ -64,7 +64,8 @@ public class DummyValueReturningMockBehavior extends DefaultValueReturningMockBe
     public Object execute(ProxyInvocation proxyInvocation) {
         Method method = proxyInvocation.getMethod();
         Class<?> returnType = method.getReturnType();
-        MethodKey key = new MethodKey(method.getName(), proxyInvocation.getArguments());
+        List<?> argumentValues = proxyInvocation.getArgumentValues();
+        MethodKey key = new MethodKey(method.getName(), argumentValues);
 
         if (returnValues.containsKey(key)) {
             return returnValues.get(key);

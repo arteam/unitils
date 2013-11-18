@@ -33,34 +33,23 @@ public class ArgumentMatcherService {
     }
 
 
-    public void registerNotNullArgumentMatcher() {
-        ArgumentMatcher argumentMatcher = new NotNullArgumentMatcher();
+    public <T> void registerNotNullArgumentMatcher(Class<T> argumentClass) {
+        ArgumentMatcher<T> argumentMatcher = new NotNullArgumentMatcher<T>();
         argumentMatcherRepository.registerArgumentMatcher(argumentMatcher);
     }
 
-    public void registerNullArgumentMatcher() {
-        ArgumentMatcher argumentMatcher = new NullArgumentMatcher();
+    public <T> void registerNullArgumentMatcher(Class<T> argumentClass) {
+        ArgumentMatcher<T> argumentMatcher = new NullArgumentMatcher<T>();
         argumentMatcherRepository.registerArgumentMatcher(argumentMatcher);
     }
 
-    public void registerSameArgumentMatcher(Object sameAs) {
-        ArgumentMatcher argumentMatcher = new SameArgumentMatcher(sameAs);
+    public <T> void registerSameArgumentMatcher(T sameAs) {
+        ArgumentMatcher<T> argumentMatcher = new SameArgumentMatcher<T>(sameAs);
         argumentMatcherRepository.registerArgumentMatcher(argumentMatcher);
     }
 
-    public void registerEqualsArgumentMatcher(Object equalTo) {
-        ArgumentMatcher argumentMatcher = new EqualsArgumentMatcher(equalTo);
-        argumentMatcherRepository.registerArgumentMatcher(argumentMatcher);
-    }
-
-    /**
-     * A copy of the value is taken so that it can be compared even when the value itself was modified later-on.
-     *
-     * @param equalTo The value to compare to
-     */
-    public void registerRefEqArgumentMatcher(Object equalTo) {
-        Object clonedEqualTo = cloneService.createDeepClone(equalTo);
-        ArgumentMatcher argumentMatcher = new RefEqArgumentMatcher(clonedEqualTo);
+    public <T> void registerEqualsArgumentMatcher(T equalTo) {
+        ArgumentMatcher<T> argumentMatcher = new EqualsArgumentMatcher<T>(equalTo);
         argumentMatcherRepository.registerArgumentMatcher(argumentMatcher);
     }
 
@@ -69,14 +58,31 @@ public class ArgumentMatcherService {
      *
      * @param equalTo The value to compare to
      */
-    public void registerLenEqArgumentMatcher(Object equalTo) {
-        Object clonedEqualTo = cloneService.createDeepClone(equalTo);
-        ArgumentMatcher argumentMatcher = new LenEqArgumentMatcher(clonedEqualTo);
+    public <T> void registerRefEqArgumentMatcher(T equalTo) {
+        T clonedEqualTo = cloneService.createDeepClone(equalTo);
+        ArgumentMatcher<T> argumentMatcher = new RefEqArgumentMatcher<T>(clonedEqualTo);
         argumentMatcherRepository.registerArgumentMatcher(argumentMatcher);
     }
 
-    public void registerAnyArgumentMatcher(Class<?> argumentClass) {
-        ArgumentMatcher argumentMatcher = new AnyArgumentMatcher(argumentClass);
+    /**
+     * A copy of the value is taken so that it can be compared even when the value itself was modified later-on.
+     *
+     * @param equalTo The value to compare to
+     */
+    public <T> void registerLenEqArgumentMatcher(T equalTo) {
+        T clonedEqualTo = cloneService.createDeepClone(equalTo);
+        ArgumentMatcher<T> argumentMatcher = new LenEqArgumentMatcher<T>(clonedEqualTo);
+        argumentMatcherRepository.registerArgumentMatcher(argumentMatcher);
+    }
+
+    public <T> void registerAnyArgumentMatcher(Class<T> argumentClass) {
+        ArgumentMatcher<T> argumentMatcher = new AnyArgumentMatcher<T>(argumentClass);
+        argumentMatcherRepository.registerArgumentMatcher(argumentMatcher);
+    }
+
+    // todo td test
+    public <T> void registerCaptureArgumentMatcher(Capture<T> capture) {
+        ArgumentMatcher<T> argumentMatcher = new CaptureArgumentMatcher<T>(capture);
         argumentMatcherRepository.registerArgumentMatcher(argumentMatcher);
     }
 }

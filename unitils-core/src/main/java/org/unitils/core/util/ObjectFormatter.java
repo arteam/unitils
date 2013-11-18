@@ -51,7 +51,7 @@ public class ObjectFormatter {
      * Creates a formatter with a maximum recursion depth of 3.
      */
     public ObjectFormatter() {
-        this(3, 15);
+        this(null, null);
     }
 
     /**
@@ -62,10 +62,10 @@ public class ObjectFormatter {
      * @param maxDepth                       The max depth > 0
      * @param maxNrArrayOrCollectionElements The maximum nr of elements for arrays and collections to display  > 0
      */
-    public ObjectFormatter(int maxDepth, int maxNrArrayOrCollectionElements) {
-        this.maxDepth = maxDepth;
-        this.maxNrArrayOrCollectionElements = maxNrArrayOrCollectionElements;
-        this.arrayAndCollectionFormatter = new ArrayAndCollectionFormatter(maxNrArrayOrCollectionElements, this);
+    public ObjectFormatter(Integer maxDepth, Integer maxNrArrayOrCollectionElements) {
+        this.maxDepth = maxDepth == null ? 3 : maxDepth;
+        this.maxNrArrayOrCollectionElements = maxNrArrayOrCollectionElements == null ? 15 : maxNrArrayOrCollectionElements;
+        this.arrayAndCollectionFormatter = new ArrayAndCollectionFormatter(this.maxNrArrayOrCollectionElements, this);
     }
 
 

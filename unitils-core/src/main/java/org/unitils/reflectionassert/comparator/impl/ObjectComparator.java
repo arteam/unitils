@@ -50,7 +50,6 @@ public class ObjectComparator implements Comparator {
         return true;
     }
 
-
     /**
      * Compares the given objects by iterating over the fields and comparing the corresponding values.
      * If both objects are of a different type, a difference is returned.
@@ -122,6 +121,4 @@ public class ObjectComparator implements Comparator {
             superclazz = superclazz.getSuperclass();
         }
     }
-
-
 }

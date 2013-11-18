@@ -33,7 +33,7 @@ public class ProxyInvocationIsAbstractMethodTest {
     @Test
     public void trueWhenAbstractMethod() throws Exception {
         Method method = TestClass.class.getMethod("abstractMethod");
-        proxyInvocation = new ProxyInvocation(null, null, method, null, null, null);
+        proxyInvocation = new ProxyInvocation(null, null, method, null, null);
 
         boolean result = proxyInvocation.isAbstractMethod();
         assertTrue(result);
@@ -42,7 +42,7 @@ public class ProxyInvocationIsAbstractMethodTest {
     @Test
     public void trueWhenInterfaceMethod() throws Exception {
         Method method = TestInterface.class.getMethod("interfaceMethod");
-        proxyInvocation = new ProxyInvocation(null, null, method, null, null, null);
+        proxyInvocation = new ProxyInvocation(null, null, method, null, null);
 
         boolean result = proxyInvocation.isAbstractMethod();
         assertTrue(result);
@@ -51,7 +51,7 @@ public class ProxyInvocationIsAbstractMethodTest {
     @Test
     public void falseWhenRegularMethod() throws Exception {
         Method method = TestClass.class.getMethod("regularMethod");
-        proxyInvocation = new ProxyInvocation(null, null, method, null, null, null);
+        proxyInvocation = new ProxyInvocation(null, null, method, null, null);
 
         boolean result = proxyInvocation.isAbstractMethod();
         assertFalse(result);

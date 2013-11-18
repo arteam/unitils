@@ -16,6 +16,9 @@
 package org.unitils.mock.argumentmatcher.impl;
 
 import org.junit.Test;
+import org.unitils.mock.core.proxy.Argument;
+
+import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
@@ -28,86 +31,93 @@ import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.NO_MA
  */
 public class RefEqArgumentMatcherMatchesTest {
 
-    private RefEqArgumentMatcher refEqArgumentMatcher;
-
-
     @Test
     public void matchWhenEqual() {
-        refEqArgumentMatcher = new RefEqArgumentMatcher(asList("1", "2"));
+        Argument<List> argument = new Argument<List>(asList("1", "2", "3"), asList("1", "2"), List.class);
+        RefEqArgumentMatcher<List> refEqArgumentMatcher = new RefEqArgumentMatcher<List>(asList("1", "2"));
 
-        MatchResult result = refEqArgumentMatcher.matches(asList("1", "2", "3"), asList("1", "2"));
+        MatchResult result = refEqArgumentMatcher.matches(argument);
         assertEquals(MATCH, result);
     }
 
     @Test
     public void matchWhenEqualByReflection() {
-        refEqArgumentMatcher = new RefEqArgumentMatcher(new TestClass("value"));
+        Argument<TestClass> argument = new Argument<TestClass>(new TestClass("value"), new TestClass("value"), TestClass.class);
+        RefEqArgumentMatcher<TestClass> refEqArgumentMatcher = new RefEqArgumentMatcher<TestClass>(new TestClass("value"));
 
-        MatchResult result = refEqArgumentMatcher.matches(new TestClass("value"), new TestClass("value"));
+        MatchResult result = refEqArgumentMatcher.matches(argument);
         assertEquals(MATCH, result);
     }
 
     @Test
     public void noMatchWhenNotEqual() {
-        refEqArgumentMatcher = new RefEqArgumentMatcher("111");
+        Argument<String> argument = new Argument<String>("222", "222", String.class);
+        RefEqArgumentMatcher<String> refEqArgumentMatcher = new RefEqArgumentMatcher<String>("111");
 
-        MatchResult result = refEqArgumentMatcher.matches("222", "222");
+        MatchResult result = refEqArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 
     @Test
     public void noMatchWhenNotEqualByReflection() {
-        refEqArgumentMatcher = new RefEqArgumentMatcher(new TestClass("value"));
+        Argument<TestClass> argument = new Argument<TestClass>(new TestClass("xxx"), new TestClass("xxx"), TestClass.class);
+        RefEqArgumentMatcher<TestClass> refEqArgumentMatcher = new RefEqArgumentMatcher<TestClass>(new TestClass("value"));
 
-        MatchResult result = refEqArgumentMatcher.matches(new TestClass("xxx"), new TestClass("xxx"));
+        MatchResult result = refEqArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 
     @Test
     public void zeroCharacterIsNotIgnored() {
-        refEqArgumentMatcher = new RefEqArgumentMatcher((char) 0);
+        Argument<Character> argument = new Argument<Character>((char) 5, (char) 5, Character.class);
+        RefEqArgumentMatcher<Character> refEqArgumentMatcher = new RefEqArgumentMatcher<Character>((char) 0);
 
-        MatchResult result = refEqArgumentMatcher.matches((char) 5, (char) 5);
+        MatchResult result = refEqArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 
     @Test
     public void zeroIsNotIgnored() {
-        refEqArgumentMatcher = new RefEqArgumentMatcher(0);
+        Argument<Integer> argument = new Argument<Integer>(5, 5, Integer.class);
+        RefEqArgumentMatcher<Integer> refEqArgumentMatcher = new RefEqArgumentMatcher<Integer>(0);
 
-        MatchResult result = refEqArgumentMatcher.matches(5, 5);
+        MatchResult result = refEqArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 
     @Test
     public void falseIsNotIgnored() {
-        refEqArgumentMatcher = new RefEqArgumentMatcher(false);
+        Argument<Boolean> argument = new Argument<Boolean>(true, true, Boolean.class);
+        RefEqArgumentMatcher<Boolean> refEqArgumentMatcher = new RefEqArgumentMatcher<Boolean>(false);
 
-        MatchResult result = refEqArgumentMatcher.matches(true, true);
+        MatchResult result = refEqArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 
     @Test
     public void nullIsNotIgnored() {
-        refEqArgumentMatcher = new RefEqArgumentMatcher(null);
+        Argument<String> argument = new Argument<String>("value", "value", String.class);
+        RefEqArgumentMatcher<String> refEqArgumentMatcher = new RefEqArgumentMatcher<String>(null);
 
-        MatchResult result = refEqArgumentMatcher.matches("value", "value");
+        MatchResult result = refEqArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 
     @Test
     public void orderIsNotIgnored() {
-        refEqArgumentMatcher = new RefEqArgumentMatcher(asList("1", "2", "3"));
+        Argument<List> argument = new Argument<List>(asList("3", "2", "1"), asList("3", "2", "1"), List.class);
+        RefEqArgumentMatcher<List> refEqArgumentMatcher = new RefEqArgumentMatcher<List>(asList("1", "2", "3"));
 
-        MatchResult result = refEqArgumentMatcher.matches(asList("3", "2", "1"), asList("3", "2", "1"));
+        MatchResult result = refEqArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 
     @Test
     public void defaultsAreNotIgnored() {
-        refEqArgumentMatcher = new RefEqArgumentMatcher(new TestClass(null));
+        Argument<TestClass> argument = new Argument<TestClass>(new TestClass("value"), new TestClass("value"), TestClass.class);
+        RefEqArgumentMatcher<TestClass> refEqArgumentMatcher = new RefEqArgumentMatcher<TestClass>(new TestClass(null));
 
-        MatchResult result = refEqArgumentMatcher.matches(new TestClass("value"), new TestClass("value"));
+        MatchResult result = refEqArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 

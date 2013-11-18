@@ -22,10 +22,12 @@ import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.argumentmatcher.impl.DefaultArgumentMatcher;
+import org.unitils.mock.core.proxy.Argument;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.util.CloneService;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -65,7 +67,7 @@ public class ArgumentMatcherRepositoryRegisterArgumentMatcherTest extends Unitil
         argumentMatcherRepository.startMatchingInvocation(111);
 
         argumentMatcherRepository.registerArgumentMatcher(argumentMatcher);
-        List<ArgumentMatcher> result = argumentMatcherRepository.finishMatchingInvocation(proxyInvocation);
+        List<ArgumentMatcher<?>> result = argumentMatcherRepository.finishMatchingInvocation(proxyInvocation);
         assertEquals(asList(argumentMatcher), result);
     }
 
@@ -76,8 +78,8 @@ public class ArgumentMatcherRepositoryRegisterArgumentMatcherTest extends Unitil
         argumentMatcherRepository.startMatchingInvocation(111);
 
         argumentMatcherRepository.registerArgumentMatcher(argumentMatcher);
-        List<ArgumentMatcher> result = argumentMatcherRepository.finishMatchingInvocation(proxyInvocation);
-        assertReflectionEquals(asList(new DefaultArgumentMatcher("arg1", "cloned arg1"), argumentMatcher, new DefaultArgumentMatcher("arg3", "cloned arg3")), result);
+        List<ArgumentMatcher<?>> result = argumentMatcherRepository.finishMatchingInvocation(proxyInvocation);
+        assertReflectionEquals(asList(new DefaultArgumentMatcher<String>("arg1", "cloned arg1"), argumentMatcher, new DefaultArgumentMatcher<String>("arg3", "cloned arg3")), result);
     }
 
     @Test
@@ -96,10 +98,14 @@ public class ArgumentMatcherRepositoryRegisterArgumentMatcherTest extends Unitil
     }
 
 
-    private ProxyInvocation createProxyInvocation(Method method, int lineNr, String... arguments) {
+    private ProxyInvocation createProxyInvocation(Method method, int lineNr, String... argumentValues) {
         StackTraceElement element = new StackTraceElement(MyInterface.class.getName(), "method1", "file", lineNr);
         StackTraceElement[] stackTrace = new StackTraceElement[]{element};
-        return new ProxyInvocation("mockName", null, method, asList(arguments), asList(arguments), stackTrace);
+        List<Argument<?>> arguments = new ArrayList<Argument<?>>();
+        for (String argumentValue : argumentValues) {
+            arguments.add(new Argument<String>(argumentValue, argumentValue, String.class));
+        }
+        return new ProxyInvocation("mockName", null, method, arguments, stackTrace);
     }
 
     private static interface MyInterface {

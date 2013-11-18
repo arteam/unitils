@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.report.impl.DetailedObservedInvocationsReport;
+import org.unitils.mock.report.impl.DetailedObservedInvocationsReportFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,8 @@ public class DetailedObservedInvocationsReportFieldNamesIntegrationTest extends 
 
     @Before
     public void initialize() {
-        detailedObservedInvocationsReport = new DetailedObservedInvocationsReport();
+        DetailedObservedInvocationsReportFactory detailedObservedInvocationsReportFactory = new DetailedObservedInvocationsReportFactory(null, null, null);
+        detailedObservedInvocationsReport = detailedObservedInvocationsReportFactory.create();
     }
 
 

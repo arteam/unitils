@@ -18,11 +18,13 @@ package org.unitils.mock.mockbehavior.impl;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
+import org.unitils.mock.core.proxy.Argument;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
-import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
@@ -62,7 +64,8 @@ public class OriginalBehaviorInvokingMockBehaviorAssertCanExecuteTest {
 
     private ProxyInvocation createProxyInvocation(Method method) {
         StackTraceElement[] stackTrace = new StackTraceElement[]{new StackTraceElement("class", "method", "file", 0)};
-        return new ProxyInvocation(null, null, method, emptyList(), emptyList(), stackTrace);
+        List<Argument<?>> arguments = new ArrayList<Argument<?>>();
+        return new ProxyInvocation(null, null, method, arguments, stackTrace);
     }
 
 

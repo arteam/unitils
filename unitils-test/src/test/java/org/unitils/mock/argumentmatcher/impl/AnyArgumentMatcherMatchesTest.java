@@ -16,6 +16,7 @@
 package org.unitils.mock.argumentmatcher.impl;
 
 import org.junit.Test;
+import org.unitils.mock.core.proxy.Argument;
 
 import static org.junit.Assert.assertEquals;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult;
@@ -27,46 +28,51 @@ import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.NO_MA
  */
 public class AnyArgumentMatcherMatchesTest {
 
-    private AnyArgumentMatcher anyArgumentMatcher;
+    private AnyArgumentMatcher<TestClass> anyArgumentMatcher;
 
 
     @Test
     public void matchWhenSameType() {
-        anyArgumentMatcher = new AnyArgumentMatcher(TestClass.class);
+        Argument<TestClass> argument = new Argument<TestClass>(new TestClass(), null, TestClass.class);
+        anyArgumentMatcher = new AnyArgumentMatcher<TestClass>(TestClass.class);
 
-        MatchResult result = anyArgumentMatcher.matches(new TestClass(), null);
+        MatchResult result = anyArgumentMatcher.matches(argument);
         assertEquals(MATCH, result);
     }
 
     @Test
     public void matchWhenSubType() {
-        anyArgumentMatcher = new AnyArgumentMatcher(SuperClass.class);
+        Argument<SuperClass> argument = new Argument<SuperClass>(new TestClass(), null, TestClass.class);
+        AnyArgumentMatcher<SuperClass> anyArgumentMatcher = new AnyArgumentMatcher<SuperClass>(SuperClass.class);
 
-        MatchResult result = anyArgumentMatcher.matches(new TestClass(), null);
+        MatchResult result = anyArgumentMatcher.matches(argument);
         assertEquals(MATCH, result);
     }
 
     @Test
     public void noMatchWhenSuperType() {
-        anyArgumentMatcher = new AnyArgumentMatcher(TestClass.class);
+        Argument<SuperClass> argument = new Argument<SuperClass>(new SuperClass(), null, SuperClass.class);
+        AnyArgumentMatcher<SuperClass> anyArgumentMatcher = new AnyArgumentMatcher<SuperClass>(TestClass.class);
 
-        MatchResult result = anyArgumentMatcher.matches(new SuperClass(), null);
+        MatchResult result = anyArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 
     @Test
     public void noMatchWhenNullType() {
-        anyArgumentMatcher = new AnyArgumentMatcher(null);
+        Argument<TestClass> argument = new Argument<TestClass>(new TestClass(), null, TestClass.class);
+        anyArgumentMatcher = new AnyArgumentMatcher<TestClass>(null);
 
-        MatchResult result = anyArgumentMatcher.matches(new TestClass(), null);
+        MatchResult result = anyArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 
     @Test
     public void noMatchWhenNullArgument() {
-        anyArgumentMatcher = new AnyArgumentMatcher(TestClass.class);
+        Argument<TestClass> argument = new Argument<TestClass>(null, null, TestClass.class);
+        anyArgumentMatcher = new AnyArgumentMatcher<TestClass>(TestClass.class);
 
-        MatchResult result = anyArgumentMatcher.matches(null, null);
+        MatchResult result = anyArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 

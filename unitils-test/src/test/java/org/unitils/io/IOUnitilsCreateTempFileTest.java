@@ -59,4 +59,8 @@ public class IOUnitilsCreateTempFileTest {
         assertEquals(0, result.length());
     }
 
+    @Test
+    public void constructionForCoverage() {
+        new IOUnitils();
+    }
 }

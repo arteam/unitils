@@ -17,6 +17,7 @@ package org.unitils.mock.argumentmatcher;
 
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.argumentmatcher.impl.DefaultArgumentMatcher;
+import org.unitils.mock.core.proxy.Argument;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.util.CloneService;
 
@@ -42,7 +43,7 @@ public class ArgumentMatcherRepository {
     protected CloneService cloneService;
 
     /* The current argument matchers */
-    protected List<ArgumentMatcher> argumentMatchers = new ArrayList<ArgumentMatcher>();
+    protected List<ArgumentMatcher<?>> argumentMatchers = new ArrayList<ArgumentMatcher<?>>();
     /* The begin line-nr of the matching invocation, -1 if not started */
     protected int matchInvocationLineNr = -1;
     /* The name of the previous matching method we handled */
@@ -95,10 +96,10 @@ public class ArgumentMatcherRepository {
      * @param proxyInvocation The matching invocation, not null
      * @return The argument matchers, empty when none found
      */
-    public List<ArgumentMatcher> finishMatchingInvocation(ProxyInvocation proxyInvocation) {
+    public List<ArgumentMatcher<?>> finishMatchingInvocation(ProxyInvocation proxyInvocation) {
         Method method = proxyInvocation.getMethod();
         int lineNr = proxyInvocation.getLineNumber();
-        List<?> arguments = proxyInvocation.getArguments();
+        List<Argument<?>> arguments = proxyInvocation.getArguments();
 
         if (matchInvocationLineNr == -1) {
             UnitilsException exception = new UnitilsException("Unable to finish matching invocation: the matching invocation was not started first. Proxy method: " + method.getName());
@@ -120,7 +121,7 @@ public class ArgumentMatcherRepository {
         indexesPerMatchingMethods.put(method, index);
 
         List<Integer> argumentMatcherIndexes = argumentMatcherPositionFinder.getArgumentMatcherIndexes(proxyInvocation, matchInvocationLineNr, lineNr, index);
-        List<ArgumentMatcher> result = createArgumentMatchers(arguments, argumentMatcherIndexes);
+        List<ArgumentMatcher<?>> result = createArgumentMatchers(arguments, argumentMatcherIndexes);
 
         matchInvocationLineNr = lineNr;
         argumentMatchers.clear();
@@ -138,13 +139,13 @@ public class ArgumentMatcherRepository {
     }
 
 
-    protected List<ArgumentMatcher> createArgumentMatchers(List<?> arguments, List<Integer> argumentMatcherIndexes) {
-        List<ArgumentMatcher> result = new ArrayList<ArgumentMatcher>();
+    protected List<ArgumentMatcher<?>> createArgumentMatchers(List<Argument<?>> arguments, List<Integer> argumentMatcherIndexes) {
+        List<ArgumentMatcher<?>> result = new ArrayList<ArgumentMatcher<?>>();
 
         int argumentIndex = 0;
-        Iterator<ArgumentMatcher> argumentMatcherIterator = argumentMatchers.iterator();
-        for (Object argument : arguments) {
-            ArgumentMatcher argumentMatcher;
+        Iterator<ArgumentMatcher<?>> argumentMatcherIterator = argumentMatchers.iterator();
+        for (Argument<?> argument : arguments) {
+            ArgumentMatcher<?> argumentMatcher;
             if (argumentMatcherIndexes.contains(argumentIndex++)) {
                 argumentMatcher = argumentMatcherIterator.next();
             } else {
@@ -155,8 +156,9 @@ public class ArgumentMatcherRepository {
         return result;
     }
 
-    protected ArgumentMatcher createDefaultArgumentMatcher(Object value) {
-        Object clonedValue = cloneService.createDeepClone(value);
-        return new DefaultArgumentMatcher(value, clonedValue);
+    protected <T> ArgumentMatcher<T> createDefaultArgumentMatcher(Argument<T> argument) {
+        T argumentValue = argument.getValue();
+        T clonedValue = cloneService.createDeepClone(argumentValue);
+        return new DefaultArgumentMatcher<T>(argumentValue, clonedValue);
     }
 }

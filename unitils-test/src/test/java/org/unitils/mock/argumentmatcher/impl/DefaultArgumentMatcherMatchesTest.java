@@ -16,6 +16,7 @@
 package org.unitils.mock.argumentmatcher.impl;
 
 import org.junit.Test;
+import org.unitils.mock.core.proxy.Argument;
 
 import java.util.List;
 
@@ -29,95 +30,104 @@ import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.*;
  */
 public class DefaultArgumentMatcherMatchesTest {
 
-    private DefaultArgumentMatcher defaultArgumentMatcher;
-
 
     @Test
     public void sameWhenSame() {
         List<String> list = asList("1", "2");
-        defaultArgumentMatcher = new DefaultArgumentMatcher(list, null);
+        Argument<List> argument = new Argument<List>(list, null, List.class);
+        DefaultArgumentMatcher<List> defaultArgumentMatcher = new DefaultArgumentMatcher<List>(list, null);
 
-        MatchResult result = defaultArgumentMatcher.matches(list, list);
+        MatchResult result = defaultArgumentMatcher.matches(argument);
         assertEquals(SAME, result);
     }
 
     @Test
     public void matchWhenEqualAtInvocationTime() {
-        defaultArgumentMatcher = new DefaultArgumentMatcher(null, asList("1", "2"));
+        Argument<List> argument = new Argument<List>(asList("1", "2", "3"), asList("1", "2"), List.class);
+        DefaultArgumentMatcher<List> defaultArgumentMatcher = new DefaultArgumentMatcher<List>(null, asList("1", "2"));
 
-        MatchResult result = defaultArgumentMatcher.matches(asList("1", "2", "3"), asList("1", "2"));
+        MatchResult result = defaultArgumentMatcher.matches(argument);
         assertEquals(MATCH, result);
     }
 
     @Test
     public void matchWhenEqualByReflectionAtInvocationTime() {
-        defaultArgumentMatcher = new DefaultArgumentMatcher(null, new TestClass("222"));
+        Argument<TestClass> argument = new Argument<TestClass>(new TestClass("111"), new TestClass("222"), TestClass.class);
+        DefaultArgumentMatcher<TestClass> defaultArgumentMatcher = new DefaultArgumentMatcher<TestClass>(null, new TestClass("222"));
 
-        MatchResult result = defaultArgumentMatcher.matches(new TestClass("111"), new TestClass("222"));
+        MatchResult result = defaultArgumentMatcher.matches(argument);
         assertEquals(MATCH, result);
     }
 
     @Test
     public void noMatchWhenNotEqualAtInvocationTime() {
-        defaultArgumentMatcher = new DefaultArgumentMatcher(null, "111");
+        Argument<String> argument = new Argument<String>("111", "222", String.class);
+        DefaultArgumentMatcher<String> defaultArgumentMatcher = new DefaultArgumentMatcher<String>(null, "111");
 
-        MatchResult result = defaultArgumentMatcher.matches("111", "222");
+        MatchResult result = defaultArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 
     @Test
     public void noMatchWhenNotEqualByReflectionAtInvocationTime() {
-        defaultArgumentMatcher = new DefaultArgumentMatcher(new TestClass("xxx"), new TestClass("value"));
+        Argument<TestClass> argument = new Argument<TestClass>(new TestClass("xxx"), new TestClass("xxx"), TestClass.class);
+        DefaultArgumentMatcher<TestClass> defaultArgumentMatcher = new DefaultArgumentMatcher<TestClass>(new TestClass("xxx"), new TestClass("value"));
 
-        MatchResult result = defaultArgumentMatcher.matches(new TestClass("xxx"), new TestClass("xxx"));
+        MatchResult result = defaultArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 
     @Test
     public void zeroCharacterIsNotIgnored() {
-        defaultArgumentMatcher = new DefaultArgumentMatcher(null, (char) 0);
+        Argument<Character> argument = new Argument<Character>((char) 5, (char) 5, Character.class);
+        DefaultArgumentMatcher<Character> defaultArgumentMatcher = new DefaultArgumentMatcher<Character>(null, (char) 0);
 
-        MatchResult result = defaultArgumentMatcher.matches((char) 5, (char) 5);
+        MatchResult result = defaultArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 
     @Test
     public void zeroIsNotIgnored() {
-        defaultArgumentMatcher = new DefaultArgumentMatcher(null, 0);
+        Argument<Integer> argument = new Argument<Integer>(5, 5, Integer.class);
+        DefaultArgumentMatcher<Integer> defaultArgumentMatcher = new DefaultArgumentMatcher<Integer>(null, 0);
 
-        MatchResult result = defaultArgumentMatcher.matches(5, 5);
+        MatchResult result = defaultArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 
     @Test
     public void falseIsNotIgnored() {
-        defaultArgumentMatcher = new DefaultArgumentMatcher(false, false);
+        Argument<Boolean> argument = new Argument<Boolean>(true, true, Boolean.class);
+        DefaultArgumentMatcher<Boolean> defaultArgumentMatcher = new DefaultArgumentMatcher<Boolean>(false, false);
 
-        MatchResult result = defaultArgumentMatcher.matches(true, true);
+        MatchResult result = defaultArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 
     @Test
     public void nullIsIgnored() {
-        defaultArgumentMatcher = new DefaultArgumentMatcher(null, null);
+        Argument<String> argument = new Argument<String>("value", "value", String.class);
+        DefaultArgumentMatcher<String> defaultArgumentMatcher = new DefaultArgumentMatcher<String>(null, null);
 
-        MatchResult result = defaultArgumentMatcher.matches("value", "value");
+        MatchResult result = defaultArgumentMatcher.matches(argument);
         assertEquals(MATCH, result);
     }
 
     @Test
     public void orderIsIgnored() {
-        defaultArgumentMatcher = new DefaultArgumentMatcher(null, asList("1", "2", "3"));
+        Argument<List> argument = new Argument<List>(asList("3", "2", "1"), asList("3", "2", "1"), List.class);
+        DefaultArgumentMatcher<List> defaultArgumentMatcher = new DefaultArgumentMatcher<List>(null, asList("1", "2", "3"));
 
-        MatchResult result = defaultArgumentMatcher.matches(asList("3", "2", "1"), asList("3", "2", "1"));
+        MatchResult result = defaultArgumentMatcher.matches(argument);
         assertEquals(MATCH, result);
     }
 
     @Test
     public void defaultsAreIgnored() {
-        defaultArgumentMatcher = new DefaultArgumentMatcher(null, new TestClass(null));
+        Argument<TestClass> argument = new Argument<TestClass>(new TestClass("value"), new TestClass("value"), TestClass.class);
+        DefaultArgumentMatcher<TestClass> defaultArgumentMatcher = new DefaultArgumentMatcher<TestClass>(null, new TestClass(null));
 
-        MatchResult result = defaultArgumentMatcher.matches(new TestClass("value"), new TestClass("value"));
+        MatchResult result = defaultArgumentMatcher.matches(argument);
         assertEquals(MATCH, result);
     }
 

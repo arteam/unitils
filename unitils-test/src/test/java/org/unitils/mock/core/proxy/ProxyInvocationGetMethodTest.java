@@ -13,31 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.mockbehavior.impl;
+package org.unitils.mock.core.proxy;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNull;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertSame;
 
 /**
  * @author Tim Ducheyne
  */
-public class NoopMockBehaviorExecuteTest {
+public class ProxyInvocationGetMethodTest {
 
-    private NoopMockBehavior noopMockBehavior;
+    private ProxyInvocation proxyInvocation;
+
+    private Method method;
 
 
     @Before
     public void initialize() throws Exception {
-        noopMockBehavior = new NoopMockBehavior();
+        method = MyInterface.class.getMethod("method");
+        List<Argument<?>> arguments = new ArrayList<Argument<?>>();
+        proxyInvocation = new ProxyInvocation(null, null, method, arguments, null);
     }
 
 
     @Test
-    public void doesNothingAndReturnsNull() throws Exception {
-        Object result = noopMockBehavior.execute(null);
-        assertNull(result);
+    public void getMethod() throws Throwable {
+        Method result = proxyInvocation.getMethod();
+        assertSame(method, result);
+    }
+
+
+    private static interface MyInterface {
+
+        void method();
     }
 }
-

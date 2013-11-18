@@ -16,6 +16,7 @@
 package org.unitils.mock.argumentmatcher.impl;
 
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+import org.unitils.mock.core.proxy.Argument;
 import org.unitils.reflectionassert.ReflectionComparator;
 
 import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.MATCH;
@@ -33,10 +34,10 @@ import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDE
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class LenEqArgumentMatcher implements ArgumentMatcher {
+public class LenEqArgumentMatcher<T> extends ArgumentMatcher<T> {
 
     /* The expected value */
-    protected Object value;
+    protected T value;
 
 
     /**
@@ -45,7 +46,7 @@ public class LenEqArgumentMatcher implements ArgumentMatcher {
      *
      * @param value The expected value
      */
-    public LenEqArgumentMatcher(Object value) {
+    public LenEqArgumentMatcher(T value) {
         this.value = value;
     }
 
@@ -57,18 +58,19 @@ public class LenEqArgumentMatcher implements ArgumentMatcher {
      * the invocation. This way the original values can still be used later-on even when changes
      * occur to the original values (pass-by-value vs pass-by-reference).
      *
-     * @param argument                 The argument that were used by reference
-     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed
+     * @param argument The argument to match, not null
      * @return The match result, not null
      */
-    public MatchResult matches(Object argument, Object argumentAtInvocationTime) {
+    @Override
+    public MatchResult matches(Argument<T> argument) {
         ReflectionComparator reflectionComparator;
         if (value instanceof Character || value instanceof Number || value instanceof Boolean) {
             reflectionComparator = createRefectionComparator();
         } else {
             reflectionComparator = createRefectionComparator(LENIENT_ORDER, IGNORE_DEFAULTS);
         }
-        if (reflectionComparator.isEqual(value, argumentAtInvocationTime)) {
+        T argumentValueAtInvocationTime = argument.getValueAtInvocationTime();
+        if (reflectionComparator.isEqual(value, argumentValueAtInvocationTime)) {
             return MATCH;
         }
         return NO_MATCH;

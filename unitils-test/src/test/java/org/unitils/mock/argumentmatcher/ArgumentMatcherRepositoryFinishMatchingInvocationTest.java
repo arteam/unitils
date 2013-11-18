@@ -22,10 +22,12 @@ import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.argumentmatcher.impl.DefaultArgumentMatcher;
+import org.unitils.mock.core.proxy.Argument;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.util.CloneService;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -70,7 +72,7 @@ public class ArgumentMatcherRepositoryFinishMatchingInvocationTest extends Uniti
         argumentMatcherRepository.registerArgumentMatcher(argumentMatcher1);
         argumentMatcherRepository.registerArgumentMatcher(argumentMatcher2);
 
-        List<ArgumentMatcher> result = argumentMatcherRepository.finishMatchingInvocation(proxyInvocation);
+        List<ArgumentMatcher<?>> result = argumentMatcherRepository.finishMatchingInvocation(proxyInvocation);
         assertEquals(asList(argumentMatcher1, argumentMatcher2), result);
     }
 
@@ -82,8 +84,8 @@ public class ArgumentMatcherRepositoryFinishMatchingInvocationTest extends Uniti
         argumentMatcherRepository.startMatchingInvocation(111);
         argumentMatcherRepository.registerArgumentMatcher(argumentMatcher1);
 
-        List<ArgumentMatcher> result = argumentMatcherRepository.finishMatchingInvocation(proxyInvocation);
-        assertReflectionEquals(asList(new DefaultArgumentMatcher("arg1", "cloned arg1"), argumentMatcher1, new DefaultArgumentMatcher("arg3", "cloned arg3")), result);
+        List<ArgumentMatcher<?>> result = argumentMatcherRepository.finishMatchingInvocation(proxyInvocation);
+        assertReflectionEquals(asList(new DefaultArgumentMatcher<String>("arg1", "cloned arg1"), argumentMatcher1, new DefaultArgumentMatcher<String>("arg3", "cloned arg3")), result);
     }
 
     @Test
@@ -92,9 +94,9 @@ public class ArgumentMatcherRepositoryFinishMatchingInvocationTest extends Uniti
         ProxyInvocation proxyInvocation2 = createProxyInvocation(method1, 333, "arg1", "arg2");
 
         argumentMatcherRepository.startMatchingInvocation(111);
-        List<ArgumentMatcher> result1 = argumentMatcherRepository.finishMatchingInvocation(proxyInvocation1);
+        List<ArgumentMatcher<?>> result1 = argumentMatcherRepository.finishMatchingInvocation(proxyInvocation1);
         argumentMatcherRepository.startMatchingInvocation(222);
-        List<ArgumentMatcher> result2 = argumentMatcherRepository.finishMatchingInvocation(proxyInvocation2);
+        List<ArgumentMatcher<?>> result2 = argumentMatcherRepository.finishMatchingInvocation(proxyInvocation2);
         assertEquals(1, result1.size());
         assertEquals(2, result2.size());
     }
@@ -161,7 +163,11 @@ public class ArgumentMatcherRepositoryFinishMatchingInvocationTest extends Uniti
     private ProxyInvocation createProxyInvocation(Method method, int lineNr, String... arguments) {
         StackTraceElement element = new StackTraceElement(MyInterface.class.getName(), "method1", "file", lineNr);
         StackTraceElement[] stackTrace = new StackTraceElement[]{element};
-        return new ProxyInvocation("mockName", null, method, asList(arguments), asList(arguments), stackTrace);
+        List<Argument<?>> argumentList = new ArrayList<Argument<?>>();
+        for (String argument : arguments) {
+            argumentList.add(new Argument<Object>(argument, argument, String.class));
+        }
+        return new ProxyInvocation("mockName", null, method, argumentList, stackTrace);
     }
 
 

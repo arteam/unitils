@@ -21,10 +21,10 @@ import org.unitils.core.UnitilsException;
 import org.unitils.mock.core.util.CloneService;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.reflect.Modifier.isAbstract;
-import static java.util.Arrays.asList;
 import static org.unitils.util.MethodUtils.*;
 
 /**
@@ -90,13 +90,29 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
             return "Proxy<" + proxyName + ">";
         }
 
+        Class<?>[] argumentTypes = method.getParameterTypes();
         StackTraceElement[] proxiedMethodStackTrace = proxyService.getProxiedMethodStackTrace();
-        Object[] clonedArguments = cloneService.createDeepClone(arguments);
+        List<Argument<?>> argumentsList = getArguments(arguments, argumentTypes);
 
-        ProxyInvocation invocation = new CglibProxyInvocation(proxyName, method, asList(arguments), asList(clonedArguments), proxiedMethodStackTrace, proxy, methodProxy);
+        ProxyInvocation invocation = new CglibProxyInvocation(proxyName, method, argumentsList, proxiedMethodStackTrace, proxy, methodProxy);
         return proxyInvocationHandler.handleInvocation(invocation);
     }
 
+
+    @SuppressWarnings("unchecked")
+    protected List<Argument<?>> getArguments(Object[] values, Class<?>[] types) {
+        int nrOfValues = values.length;
+        List<Argument<?>> arguments = new ArrayList<Argument<?>>(nrOfValues);
+        for (int i = 0; i < nrOfValues; i++) {
+            Object value = values[i];
+            Object clonedValue = cloneService.createDeepClone(value);
+            Class<?> type = types[i];
+
+            Argument<?> argument = new Argument(value, clonedValue, type);
+            arguments.add(argument);
+        }
+        return arguments;
+    }
 
     /**
      * An invocation implementation that uses the cglib method proxy to be able to invoke the original behavior.
@@ -109,16 +125,15 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
         /**
          * Creates an invocation.
          *
-         * @param proxyName                 The display name of the proxy, not null
-         * @param method                    The method that was called, not null
-         * @param arguments                 The arguments that were used, not null
-         * @param argumentsAtInvocationTime A copy of the values at the time of invocation, not null
-         * @param invokedAt                 The location of the invocation, not null
-         * @param proxy                     The proxy, not null
-         * @param methodProxy               The cglib method proxy, not null
+         * @param proxyName   The display name of the proxy, not null
+         * @param method      The method that was called, not null
+         * @param arguments   The arguments that were used, not null
+         * @param invokedAt   The location of the invocation, not null
+         * @param proxy       The proxy, not null
+         * @param methodProxy The cglib method proxy, not null
          */
-        public CglibProxyInvocation(String proxyName, Method method, List<?> arguments, List<?> argumentsAtInvocationTime, StackTraceElement[] invokedAt, Object proxy, MethodProxy methodProxy) {
-            super(proxyName, proxy, method, arguments, argumentsAtInvocationTime, invokedAt);
+        public CglibProxyInvocation(String proxyName, Method method, List<Argument<?>> arguments, StackTraceElement[] invokedAt, Object proxy, MethodProxy methodProxy) {
+            super(proxyName, proxy, method, arguments, invokedAt);
             this.methodProxy = methodProxy;
         }
 
@@ -134,7 +149,8 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
             if (isAbstract(method.getModifiers())) {
                 throw new UnitilsException("Cannot invoke original behavior of an abstract method. Method: " + getMethod());
             }
-            return methodProxy.invokeSuper(getProxy(), getArguments().toArray());
+            List<?> argumentValues = getArgumentValues();
+            return methodProxy.invokeSuper(getProxy(), argumentValues.toArray());
         }
     }
 }

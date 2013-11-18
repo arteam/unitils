@@ -92,6 +92,9 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T>, ObjectTo
             return type;
         }
         TypeWrapper declaredTypeWrapper = new TypeWrapper(declaredType);
+        if (!declaredTypeWrapper.hasRawType(Mock.class)) {
+            return type;
+        }
         return declaredTypeWrapper.getSingleGenericType();
     }
 
@@ -327,7 +330,7 @@ public class MockObject<T> implements Mock<T>, ObjectToInjectHolder<T>, ObjectTo
      * This will only remove the behavior, not the observed invocations for this mock.
      */
     public void resetBehavior() {
-        behaviorDefiningInvocations.clear();
+        behaviorDefiningInvocations.reset();
     }
 
 

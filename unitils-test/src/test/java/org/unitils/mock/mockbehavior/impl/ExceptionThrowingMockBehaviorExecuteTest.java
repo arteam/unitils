@@ -24,7 +24,6 @@ import org.unitils.mock.core.util.StackTraceService;
 
 import java.lang.reflect.Method;
 
-import static java.util.Collections.emptyList;
 import static org.junit.Assert.*;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
@@ -46,7 +45,8 @@ public class ExceptionThrowingMockBehaviorExecuteTest extends UnitilsJUnit4 {
         exception = new NullPointerException("exception");
         exceptionThrowingMockBehavior = new ExceptionThrowingMockBehavior(exception, stackTraceServiceMock.getMock());
 
-        proxyInvocation = createProxyInvocation(MyInterface.class.getMethod("method"));
+        Method method = MyInterface.class.getMethod("method");
+        proxyInvocation = new ProxyInvocation(null, null, method, null, null);
         stackTrace = new StackTraceElement[]{new StackTraceElement("class", "method", "file", 333)};
     }
 
@@ -74,11 +74,6 @@ public class ExceptionThrowingMockBehaviorExecuteTest extends UnitilsJUnit4 {
             assertEquals(ExceptionThrowingMockBehaviorExecuteTest.class.getName(), stackTrace[0].getClassName());
             assertEquals("initialize", stackTrace[0].getMethodName());
         }
-    }
-
-
-    private ProxyInvocation createProxyInvocation(Method method) {
-        return new ProxyInvocation(null, null, method, emptyList(), emptyList(), null);
     }
 
 

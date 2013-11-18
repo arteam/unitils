@@ -21,7 +21,6 @@ import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.lang.reflect.Method;
 
-import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -35,24 +34,21 @@ public class DefaultValueReturningMockBehaviorAssertCanExecuteTest {
 
     @Test
     public void canExecute() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(MyInterface.class.getMethod("method"));
+        Method method = MyInterface.class.getMethod("method");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
         defaultValueReturningMockBehavior.assertCanExecute(proxyInvocation);
     }
 
     @Test
     public void exceptionWhenVoidReturnType() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(MyInterface.class.getMethod("voidMethod"));
+        Method method = MyInterface.class.getMethod("voidMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
         try {
             defaultValueReturningMockBehavior.assertCanExecute(proxyInvocation);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Trying to define mock behavior that returns a value for a void method.", e.getMessage());
         }
-    }
-
-
-    private ProxyInvocation createProxyInvocation(Method method) {
-        return new ProxyInvocation(null, null, method, emptyList(), emptyList(), null);
     }
 
 

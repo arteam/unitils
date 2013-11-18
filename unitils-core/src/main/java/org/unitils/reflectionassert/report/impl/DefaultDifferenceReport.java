@@ -32,7 +32,6 @@ public class DefaultDifferenceReport implements DifferenceReport {
 
     public static enum MatchType {NO_MATCH}
 
-    ;
 
     /**
      * Creates a report.

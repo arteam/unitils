@@ -44,8 +44,9 @@ public class ScenarioReport {
         this.detailedObservedInvocationsReport = detailedObservedInvocationsReport;
     }
 
+
     /**
-     * Creates a report.
+     * Creates a report by using the ObservedInvocationsReport and DetailsObservedInvocationsReport.
      *
      * @return the report, not null
      */

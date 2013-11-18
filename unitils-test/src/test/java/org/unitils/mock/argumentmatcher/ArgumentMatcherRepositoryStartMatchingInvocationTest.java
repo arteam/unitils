@@ -19,13 +19,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
+import org.unitils.mock.core.proxy.Argument;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.util.CloneService;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -46,14 +47,15 @@ public class ArgumentMatcherRepositoryStartMatchingInvocationTest extends Unitil
 
         Method method = MyInterface.class.getMethod("method");
         StackTraceElement element = new StackTraceElement(MyInterface.class.getName(), "method1", "file", 222);
-        proxyInvocation = new ProxyInvocation("mockName", null, method, emptyList(), emptyList(), new StackTraceElement[]{element});
+        List<Argument<?>> arguments = new ArrayList<Argument<?>>();
+        proxyInvocation = new ProxyInvocation("mockName", null, method, arguments, new StackTraceElement[]{element});
     }
 
 
     @Test
     public void startMatchingInvocation() {
         argumentMatcherRepository.startMatchingInvocation(111);
-        List<ArgumentMatcher> result = argumentMatcherRepository.finishMatchingInvocation(proxyInvocation);
+        List<ArgumentMatcher<?>> result = argumentMatcherRepository.finishMatchingInvocation(proxyInvocation);
         assertTrue(result.isEmpty());
         argumentMatcherPositionFinderMock.assertInvoked().getArgumentMatcherIndexes(proxyInvocation, 111, 222, 1);
     }

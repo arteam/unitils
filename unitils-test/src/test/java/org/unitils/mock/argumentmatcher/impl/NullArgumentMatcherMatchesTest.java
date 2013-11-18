@@ -16,6 +16,7 @@
 package org.unitils.mock.argumentmatcher.impl;
 
 import org.junit.Test;
+import org.unitils.mock.core.proxy.Argument;
 
 import static org.junit.Assert.assertEquals;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult;
@@ -27,18 +28,22 @@ import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.SAME;
  */
 public class NullArgumentMatcherMatchesTest {
 
-    private NullArgumentMatcher nullArgumentMatcher = new NullArgumentMatcher();
+    private NullArgumentMatcher<String> nullArgumentMatcher = new NullArgumentMatcher<String>();
 
 
     @Test
     public void sameWhenNull() {
-        MatchResult result = nullArgumentMatcher.matches(null, null);
+        Argument<String> argument = new Argument<String>(null, null, String.class);
+
+        MatchResult result = nullArgumentMatcher.matches(argument);
         assertEquals(SAME, result);
     }
 
     @Test
     public void noMatchWhenNotNull() {
-        MatchResult result = nullArgumentMatcher.matches("value", null);
+        Argument<String> argument = new Argument<String>("value", null, String.class);
+
+        MatchResult result = nullArgumentMatcher.matches(argument);
         assertEquals(NO_MATCH, result);
     }
 }

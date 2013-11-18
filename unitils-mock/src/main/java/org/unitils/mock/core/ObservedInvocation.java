@@ -30,6 +30,7 @@ public class ObservedInvocation extends ProxyInvocation {
     protected BehaviorDefiningInvocation behaviorDefiningInvocation;
     protected MockBehavior mockBehavior;
 
+
     /**
      * Creates a observed invocation for the given prosy invocation.
      *
@@ -42,6 +43,7 @@ public class ObservedInvocation extends ProxyInvocation {
         this.behaviorDefiningInvocation = behaviorDefiningInvocation;
         this.mockBehavior = mockBehavior;
     }
+
 
     /**
      * Sets the result of the invocation.
@@ -68,12 +70,7 @@ public class ObservedInvocation extends ProxyInvocation {
         return behaviorDefiningInvocation;
     }
 
-
     public MockBehavior getMockBehavior() {
         return mockBehavior;
-    }
-
-    public boolean hasMockBehavior() {
-        return mockBehavior != null;
     }
 }

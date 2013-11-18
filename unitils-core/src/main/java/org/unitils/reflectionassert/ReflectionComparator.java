@@ -47,7 +47,6 @@ public class ReflectionComparator {
      * The comparator chain.
      */
     protected List<Comparator> comparators;
-
     /**
      * A cache of results, so that comparisons are only performed once and infinite loops because of cycles are avoided
      * A different cache is used dependent on whether only the first difference is required or whether we need all
@@ -79,7 +78,6 @@ public class ReflectionComparator {
         return difference == null;
     }
 
-
     /**
      * Checks whether there is a difference between the left and right objects.
      *
@@ -90,7 +88,6 @@ public class ReflectionComparator {
     public Difference getDifference(Object left, Object right) {
         return getDifference(left, right, false);
     }
-
 
     /**
      * Checks whether there are differences between the left and right objects. This will return the root difference
@@ -135,6 +132,7 @@ public class ReflectionComparator {
         cachedResult.put(right, result);
         return result;
     }
+
 
     protected void saveResultInCache(Object left, Map<Object, Difference> cachedResult, boolean onlyFirstDifference) {
         if (onlyFirstDifference) {

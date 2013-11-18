@@ -76,5 +76,4 @@ public abstract class FieldAnnotationListener<A extends Annotation> {
      */
     public void afterTestTearDown(TestInstance testInstance, TestField testField, Annotations<A> annotations, Throwable testThrowable) {
     }
-
 }

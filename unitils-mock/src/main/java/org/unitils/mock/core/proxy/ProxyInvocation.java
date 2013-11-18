@@ -16,6 +16,7 @@
 package org.unitils.mock.core.proxy;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.reflect.Modifier.isAbstract;
@@ -36,9 +37,7 @@ public class ProxyInvocation {
     /* The method that was called */
     protected Method method;
     /* The arguments that were used */
-    protected List<?> arguments;
-    /* The arguments at the time that they were used */
-    protected List<?> argumentsAtInvocationTime;
+    protected List<Argument<?>> arguments;
     /* The trace of the invocation */
     protected StackTraceElement[] invokedAtTrace;
 
@@ -46,19 +45,17 @@ public class ProxyInvocation {
     /**
      * Creates an invocation.
      *
-     * @param proxyName                 The display name of the proxy, not null
-     * @param proxy                     The proxy on which the method was called, not null
-     * @param method                    The method that was called, not null
-     * @param arguments                 The arguments that were used (pass by reference), not null
-     * @param argumentsAtInvocationTime A copy of the values at the time of invocation (pass by value), not null
-     * @param invokedAtTrace            The trace of the invocation, not null
+     * @param proxyName      The display name of the proxy, not null
+     * @param proxy          The proxy on which the method was called, not null
+     * @param method         The method that was called, not null
+     * @param arguments      The arguments that were used (pass by reference), not null
+     * @param invokedAtTrace The trace of the invocation, not null
      */
-    public ProxyInvocation(String proxyName, Object proxy, Method method, List<?> arguments, List<?> argumentsAtInvocationTime, StackTraceElement[] invokedAtTrace) {
+    public ProxyInvocation(String proxyName, Object proxy, Method method, List<Argument<?>> arguments, StackTraceElement[] invokedAtTrace) {
         this.proxyName = proxyName;
         this.proxy = proxy;
         this.method = method;
         this.arguments = arguments;
-        this.argumentsAtInvocationTime = argumentsAtInvocationTime;
         this.invokedAtTrace = invokedAtTrace;
     }
 
@@ -77,7 +74,6 @@ public class ProxyInvocation {
         this.proxy = proxyInvocation.proxy;
         this.method = proxyInvocation.method;
         this.arguments = proxyInvocation.arguments;
-        this.argumentsAtInvocationTime = proxyInvocation.argumentsAtInvocationTime;
         this.invokedAtTrace = proxyInvocation.invokedAtTrace;
     }
 
@@ -92,21 +88,48 @@ public class ProxyInvocation {
     }
 
     /**
-     * @return The nr of arguments at invocation time that were not null
+     * @return The nr of arguments that are not null
      */
     public int getNrOfNotNullArguments() {
-        if (argumentsAtInvocationTime == null) {
+        if (arguments == null) {
             return 0;
         }
         int count = 0;
-        for (Object argument : argumentsAtInvocationTime) {
-            if (argument != null) {
+        for (Argument<?> argument : arguments) {
+            if (argument.getValue() != null) {
                 count++;
             }
         }
         return count;
     }
 
+    /**
+     * @return True if the invoked method is an abstract method or a method of an interface
+     */
+    public boolean isAbstractMethod() {
+        return isAbstract(method.getModifiers());
+    }
+
+    /**
+     * @return True if the method does not have a return value
+     */
+    public boolean isVoidMethod() {
+        return method.getReturnType() == Void.TYPE;
+    }
+
+    /**
+     * @return The location of the invocation, not null
+     */
+    public StackTraceElement getInvokedAt() {
+        return invokedAtTrace[0];
+    }
+
+    /**
+     * @return The line nr of the invocation
+     */
+    public int getLineNumber() {
+        return getInvokedAt().getLineNumber();
+    }
 
     /**
      * @return The proxy on which the method was called, not null
@@ -132,36 +155,17 @@ public class ProxyInvocation {
     /**
      * @return The arguments that were used, not null
      */
-    public List<?> getArguments() {
+    public List<Argument<?>> getArguments() {
         return arguments;
     }
 
-    /**
-     * @return True if the invoked method is an abstract method or a method of an interface
-     */
-    public boolean isAbstractMethod() {
-        return isAbstract(method.getModifiers());
-    }
-
-    /**
-     * @return True if the method does not have a return value
-     */
-    public boolean isVoidMethod() {
-        return method.getReturnType() == Void.TYPE;
-    }
-
-    /**
-     * The arguments at the time that they were used.
-     * <p/>
-     * The argumentsAtInvocationTime can be set as copies (deep clones) of the arguments at the time of
-     * the invocation. This way the original values can still be used later-on even when changes
-     * occur to the original values (pass-by-value vs pass-by-reference). If not explicitly set, this will return the
-     * same values as the arguments.
-     *
-     * @return The arguments, not null
-     */
-    public List<?> getArgumentsAtInvocationTime() {
-        return argumentsAtInvocationTime;
+    public List<?> getArgumentValues() {
+        List<Object> argumentValues = new ArrayList<Object>(arguments.size());
+        for (Argument<?> argument : arguments) {
+            Object argumentValue = argument.getValue();
+            argumentValues.add(argumentValue);
+        }
+        return argumentValues;
     }
 
     /**
@@ -169,19 +173,5 @@ public class ProxyInvocation {
      */
     public StackTraceElement[] getInvokedAtTrace() {
         return invokedAtTrace;
-    }
-
-    /**
-     * @return The location of the invocation, not null
-     */
-    public StackTraceElement getInvokedAt() {
-        return invokedAtTrace[0];
-    }
-
-    /**
-     * @return The line nr of the invocation
-     */
-    public int getLineNumber() {
-        return getInvokedAt().getLineNumber();
     }
 }

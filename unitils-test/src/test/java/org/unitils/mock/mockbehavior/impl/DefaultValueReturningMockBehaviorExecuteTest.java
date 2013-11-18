@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -40,7 +39,8 @@ public class DefaultValueReturningMockBehaviorExecuteTest {
 
     @Test
     public void list() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("listMethod"));
+        Method method = TestClass.class.getMethod("listMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof List);
@@ -48,7 +48,8 @@ public class DefaultValueReturningMockBehaviorExecuteTest {
 
     @Test
     public void set() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("setMethod"));
+        Method method = TestClass.class.getMethod("setMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Set);
@@ -56,7 +57,8 @@ public class DefaultValueReturningMockBehaviorExecuteTest {
 
     @Test
     public void map() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("mapMethod"));
+        Method method = TestClass.class.getMethod("mapMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Map);
@@ -64,7 +66,8 @@ public class DefaultValueReturningMockBehaviorExecuteTest {
 
     @Test
     public void collection() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("collectionMethod"));
+        Method method = TestClass.class.getMethod("collectionMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Collection);
@@ -72,7 +75,8 @@ public class DefaultValueReturningMockBehaviorExecuteTest {
 
     @Test
     public void array() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("arrayMethod"));
+        Method method = TestClass.class.getMethod("arrayMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof String[]);
@@ -80,7 +84,8 @@ public class DefaultValueReturningMockBehaviorExecuteTest {
 
     @Test
     public void booleanPrimitiveValue() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("booleanPrimitiveMethod"));
+        Method method = TestClass.class.getMethod("booleanPrimitiveMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Boolean);
@@ -88,7 +93,8 @@ public class DefaultValueReturningMockBehaviorExecuteTest {
 
     @Test
     public void booleanValue() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("booleanMethod"));
+        Method method = TestClass.class.getMethod("booleanMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Boolean);
@@ -96,7 +102,8 @@ public class DefaultValueReturningMockBehaviorExecuteTest {
 
     @Test
     public void nullForObject() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("dataSourceMethod"));
+        Method method = TestClass.class.getMethod("dataSourceMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertNull(result);
@@ -104,15 +111,11 @@ public class DefaultValueReturningMockBehaviorExecuteTest {
 
     @Test
     public void nullForVoid() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("voidMethod"));
+        Method method = TestClass.class.getMethod("voidMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
 
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertNull(result);
-    }
-
-
-    private ProxyInvocation createProxyInvocation(Method method) {
-        return new ProxyInvocation(null, null, method, emptyList(), emptyList(), null);
     }
 
 

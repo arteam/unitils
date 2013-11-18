@@ -67,7 +67,7 @@ public class MockFactoryCreateDummyTest extends UnitilsJUnit4 {
     }
 
 
-    public static interface MyInterface {
+    private static interface MyInterface {
 
         int test();
     }

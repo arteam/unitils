@@ -23,7 +23,6 @@ import org.unitils.mock.core.proxy.ProxyInvocation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
-import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -108,7 +107,7 @@ public class ValueReturningMockBehaviorAssertCanExecuteTest {
 
 
     private ProxyInvocation createProxyInvocation(Method method) {
-        return new ProxyInvocation(null, null, method, emptyList(), emptyList(), null);
+        return new ProxyInvocation(null, null, method, null, null);
     }
 
 

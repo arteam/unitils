@@ -82,7 +82,7 @@ public class MatchingProxyInvocationHandler implements ProxyInvocationHandler {
                 e.setStackTrace(proxyInvocation.getInvokedAtTrace());
                 throw e;
             }
-            List<ArgumentMatcher> argumentMatchers = argumentMatcherRepository.finishMatchingInvocation(proxyInvocation);
+            List<ArgumentMatcher<?>> argumentMatchers = argumentMatcherRepository.finishMatchingInvocation(proxyInvocation);
             MatchingInvocation matchingInvocation = new MatchingInvocation(proxyInvocation, argumentMatchers);
             return matchingInvocationHandler.handleInvocation(matchingInvocation);
 

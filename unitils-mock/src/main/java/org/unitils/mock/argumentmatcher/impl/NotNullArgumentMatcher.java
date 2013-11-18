@@ -16,6 +16,7 @@
 package org.unitils.mock.argumentmatcher.impl;
 
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+import org.unitils.mock.core.proxy.Argument;
 
 import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.MATCH;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.NO_MATCH;
@@ -27,7 +28,7 @@ import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.NO_MA
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class NotNullArgumentMatcher implements ArgumentMatcher {
+public class NotNullArgumentMatcher<T> extends ArgumentMatcher<T> {
 
     /**
      * Returns true if the given object is not null, false otherwise.
@@ -36,12 +37,13 @@ public class NotNullArgumentMatcher implements ArgumentMatcher {
      * the invocation. This way the original values can still be used later-on even when changes
      * occur to the original values (pass-by-value vs pass-by-reference).
      *
-     * @param argument                 The argument that were used by reference
-     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed
+     * @param argument The argument to match, not null
      * @return The match result, not null
      */
-    public MatchResult matches(Object argument, Object argumentAtInvocationTime) {
-        if (argument != null) {
+    @Override
+    public MatchResult matches(Argument<T> argument) {
+        T argumentValue = argument.getValue();
+        if (argumentValue != null) {
             return MATCH;
         }
         return NO_MATCH;

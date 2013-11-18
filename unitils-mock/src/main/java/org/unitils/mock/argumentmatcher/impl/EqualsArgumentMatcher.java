@@ -16,6 +16,7 @@
 package org.unitils.mock.argumentmatcher.impl;
 
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+import org.unitils.mock.core.proxy.Argument;
 
 import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.*;
 
@@ -26,10 +27,10 @@ import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.*;
  * @author Kenny Claes
  * @author Filip Neven
  */
-public class EqualsArgumentMatcher implements ArgumentMatcher {
+public class EqualsArgumentMatcher<T> extends ArgumentMatcher<T> {
 
     /* The excepted value */
-    protected Object value;
+    protected T value;
 
 
     /**
@@ -37,7 +38,7 @@ public class EqualsArgumentMatcher implements ArgumentMatcher {
      *
      * @param value The expected value
      */
-    public EqualsArgumentMatcher(Object value) {
+    public EqualsArgumentMatcher(T value) {
         this.value = value;
     }
 
@@ -49,15 +50,16 @@ public class EqualsArgumentMatcher implements ArgumentMatcher {
      * the invocation. This way the original values can still be used later-on even when changes
      * occur to the original values (pass-by-value vs pass-by-reference).
      *
-     * @param argument                 The argument that were used by reference
-     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed
+     * @param argument The argument to match, not null
      * @return The match result, not null
      */
-    public MatchResult matches(Object argument, Object argumentAtInvocationTime) {
-        if (value == argument) {
+    @Override
+    public MatchResult matches(Argument<T> argument) {
+        T argumentValue = argument.getValue();
+        if (value == argumentValue) {
             return SAME;
         }
-        if (value != null && argument != null && value.equals(argument)) {
+        if (value != null && argumentValue != null && value.equals(argumentValue)) {
             return MATCH;
         }
         return NO_MATCH;

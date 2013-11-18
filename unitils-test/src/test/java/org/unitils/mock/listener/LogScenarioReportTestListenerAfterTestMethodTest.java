@@ -21,6 +21,7 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.core.TestInstance;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
+import org.unitils.mock.core.MockAssertionError;
 import org.unitils.mock.report.ScenarioReport;
 
 import java.util.Properties;
@@ -55,6 +56,12 @@ public class LogScenarioReportTestListenerAfterTestMethodTest extends UnitilsJUn
     @Test
     public void ignoreWhenNoException() {
         logScenarioReportTestListener.afterTestMethod(testInstanceMock.getMock(), null);
+        scenarioReportMock.assertNotInvoked().createReport();
+    }
+
+    @Test
+    public void ignoreWhenMockAssertionError() {
+        logScenarioReportTestListener.afterTestMethod(testInstanceMock.getMock(), new MockAssertionError("expected"));
         scenarioReportMock.assertNotInvoked().createReport();
     }
 }

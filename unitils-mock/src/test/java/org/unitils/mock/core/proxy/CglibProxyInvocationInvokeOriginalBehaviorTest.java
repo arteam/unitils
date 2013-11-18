@@ -21,9 +21,10 @@ import org.junit.Test;
 import org.unitils.core.UnitilsException;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.objectweb.asm.Type.getMethodDescriptor;
@@ -53,7 +54,9 @@ public class CglibProxyInvocationInvokeOriginalBehaviorTest {
     public void invokeOriginalBehavior() throws Throwable {
         Method method = MyClass.class.getDeclaredMethod("method", String.class);
         methodProxy = MethodProxy.create(MyClass.class, MyClass.class, getMethodDescriptor(method), "method", "method");
-        cglibProxyInvocation = new CglibProxyInvocation("mockName", method, asList("value"), asList("cloned value"), stackTrace, new MyClass(), methodProxy);
+        List<Argument<?>> arguments = new ArrayList<Argument<?>>();
+        arguments.add(new Argument<String>("value", "cloned value", String.class));
+        cglibProxyInvocation = new CglibProxyInvocation("mockName", method, arguments, stackTrace, new MyClass(), methodProxy);
 
         Object result = cglibProxyInvocation.invokeOriginalBehavior();
         assertEquals("original result value", result);
@@ -63,7 +66,7 @@ public class CglibProxyInvocationInvokeOriginalBehaviorTest {
     public void exceptionWhenAbstractMethod() throws Throwable {
         Method method = AbstractClass.class.getDeclaredMethod("abstractMethod");
         methodProxy = MethodProxy.create(AbstractClass.class, Void.class, getMethodDescriptor(method), "abstractMethod", "abstractMethod");
-        cglibProxyInvocation = new CglibProxyInvocation("mockName", method, emptyList(), emptyList(), stackTrace, "object", methodProxy);
+        cglibProxyInvocation = new CglibProxyInvocation("mockName", method, Collections.<Argument<?>>emptyList(), stackTrace, "object", methodProxy);
         try {
             cglibProxyInvocation.invokeOriginalBehavior();
             fail("UnitilsException expected");

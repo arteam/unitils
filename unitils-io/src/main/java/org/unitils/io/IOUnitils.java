@@ -30,7 +30,7 @@ import static org.unitils.util.ReflectionUtils.getTestClass;
  * @author Thomas De Rycke
  * @since 3.3
  */
-public abstract class IOUnitils {
+public class IOUnitils {
 
     protected static FileContentReader fileContentReader = getInstanceOfType(FileContentReader.class);
     protected static TempService tempService = getInstanceOfType(TempService.class);
