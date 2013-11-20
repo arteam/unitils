@@ -66,7 +66,7 @@ public class MockFactoryCreateChainedMockTest extends UnitilsJUnit4 {
         mockFactory = new MockFactory(scenario, argumentMatcherRepository, null, proxyServiceMock.getMock(), stackTraceService, cloneService, null);
 
         BehaviorDefiningInvocations behaviorDefiningInvocations = new BehaviorDefiningInvocations();
-        matchingProxyInvocationHandler = new MatchingProxyInvocationHandler(argumentMatcherRepository, proxyServiceMock.getMock(), stackTraceService);
+        matchingProxyInvocationHandler = new MatchingProxyInvocationHandler(argumentMatcherRepository, stackTraceService);
         mockProxyInvocationHandler = new MockProxyInvocationHandler<Properties>(behaviorDefiningInvocations, scenario, cloneService, matchingProxyInvocationHandler);
     }
 

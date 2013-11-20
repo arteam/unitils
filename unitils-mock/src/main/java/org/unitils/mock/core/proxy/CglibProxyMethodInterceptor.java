@@ -91,7 +91,8 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
         }
 
         Class<?>[] argumentTypes = method.getParameterTypes();
-        StackTraceElement[] proxiedMethodStackTrace = proxyService.getProxiedMethodStackTrace();
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        StackTraceElement[] proxiedMethodStackTrace = proxyService.getProxiedMethodStackTrace(stackTrace);
         List<Argument<?>> argumentsList = getArguments(arguments, argumentTypes);
 
         ProxyInvocation invocation = new CglibProxyInvocation(proxyName, method, argumentsList, proxiedMethodStackTrace, proxy, methodProxy);

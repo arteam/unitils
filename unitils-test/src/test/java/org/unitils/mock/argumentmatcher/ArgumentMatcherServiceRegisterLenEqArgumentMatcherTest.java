@@ -44,6 +44,6 @@ public class ArgumentMatcherServiceRegisterLenEqArgumentMatcherTest extends Unit
         cloneServiceMock.returns("cloned value").createDeepClone("value");
 
         argumentMatcherService.registerLenEqArgumentMatcher("value");
-        argumentMatcherRepositoryMock.assertInvoked().registerArgumentMatcher(new LenEqArgumentMatcher("cloned value"));
+        argumentMatcherRepositoryMock.assertInvoked().registerArgumentMatcher(new LenEqArgumentMatcher<String>("cloned value"));
     }
 }

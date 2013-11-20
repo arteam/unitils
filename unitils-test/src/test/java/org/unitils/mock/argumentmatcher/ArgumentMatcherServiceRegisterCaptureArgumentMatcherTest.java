@@ -19,12 +19,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
-import org.unitils.mock.argumentmatcher.impl.SameArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.CaptureArgumentMatcher;
+
+import java.util.Map;
 
 /**
  * @author Tim Ducheyne
  */
-public class ArgumentMatcherServiceRegisterSameArgumentMatcherTest extends UnitilsJUnit4 {
+public class ArgumentMatcherServiceRegisterCaptureArgumentMatcherTest extends UnitilsJUnit4 {
 
     private ArgumentMatcherService argumentMatcherService;
 
@@ -38,8 +40,9 @@ public class ArgumentMatcherServiceRegisterSameArgumentMatcherTest extends Uniti
 
 
     @Test
-    public void registerSameArgumentMatcher() {
-        argumentMatcherService.registerSameArgumentMatcher("value");
-        argumentMatcherRepositoryMock.assertInvoked().registerArgumentMatcher(new SameArgumentMatcher<String>("value"));
+    public void registerCaptureArgumentMatcher() {
+        Capture<Map> capture = new Capture<Map>(Map.class);
+        argumentMatcherService.registerCaptureArgumentMatcher(capture);
+        argumentMatcherRepositoryMock.assertInvoked().registerArgumentMatcher(new CaptureArgumentMatcher<Map>(capture));
     }
 }

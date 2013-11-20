@@ -13,30 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.argumentmatcher.impl;
+package org.unitils.mock.core.proxy;
 
-import org.unitils.mock.argumentmatcher.Capture;
-import org.unitils.mock.core.proxy.Argument;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Tim Ducheyne
  */
-public class CaptureArgumentMatcher<T> extends AnyArgumentMatcher<T> {
+public class ArgumentGetValueAtInvocationTimeTest {
 
-    private Capture<T> capture;
-
-
-    /**
-     * @param capture The object that will hold the captured argument value, not null
-     */
-    public CaptureArgumentMatcher(Capture<T> capture) {
-        super(capture.getType());
-        this.capture = capture;
-    }
+    private Argument<String> argument;
 
 
-    @Override
-    public void matched(Argument<T> argument) {
-        capture.setArgument(argument);
+    @Test
+    public void getValueAtInvocationTime() {
+        argument = new Argument<String>(null, "value", String.class);
+
+        String value = argument.getValueAtInvocationTime();
+        assertEquals("value", value);
     }
 }

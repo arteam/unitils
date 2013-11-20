@@ -29,6 +29,7 @@ import org.unitils.mock.core.util.CloneService;
 
 import java.util.*;
 
+import static java.lang.reflect.Modifier.isAbstract;
 import static java.util.Arrays.asList;
 import static org.springframework.util.ClassUtils.isCglibProxyClassName;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
@@ -87,11 +88,14 @@ public class ProxyService {
      * have to offer an empty constructor in order for this method to succeed.
      *
      * @param <T>   The type of the instance
-     * @param clazz The class for which an instance is requested
-     * @return An instance of the given class
+     * @param clazz The class for which an instance is requested, not null
+     * @return An instance of the given class, not null
      */
     @SuppressWarnings("unchecked")
     public <T> T createInitializedOrUninitializedInstanceOfType(Class<T> clazz) {
+        if (clazz.isInterface()) {
+            throw new UnitilsException("Cannot create instance of an interface type: " + clazz);
+        }
         try {
             return createInstanceOfType(clazz, true);
         } catch (UnitilsException e) {
@@ -110,12 +114,11 @@ public class ProxyService {
      * @return An instance of the given class
      */
     public <T> T createUninitializedInstanceOfType(Class<T> clazz) {
-        try {
-            Objenesis objenesis = new ObjenesisStd();
-            return objenesis.newInstance(clazz);
-        } catch (Exception e) {
-            throw new UnitilsException("Unable to create instance of type " + clazz, e);
+        if (clazz.isInterface() || isAbstract(clazz.getModifiers())) {
+            throw new UnitilsException("Cannot create instance of an interface or abstract type: " + clazz);
         }
+        Objenesis objenesis = new ObjenesisStd();
+        return objenesis.newInstance(clazz);
     }
 
     /**
@@ -128,10 +131,7 @@ public class ProxyService {
         }
         if (object instanceof Factory) {
             Callback[] callbacks = ((Factory) object).getCallbacks();
-            if (callbacks == null || callbacks.length == 0) {
-                return null;
-            }
-            if (callbacks[0] instanceof CglibProxyMethodInterceptor) {
+            if (callbacks != null && callbacks.length == 1 && callbacks[0] instanceof CglibProxyMethodInterceptor) {
                 return ((CglibProxyMethodInterceptor) callbacks[0]).getProxiedType();
             }
         }
@@ -144,24 +144,23 @@ public class ProxyService {
      *
      * @return The proxied method trace, not null
      */
-    public StackTraceElement[] getProxiedMethodStackTrace() {
-        List<StackTraceElement> stackTrace = new ArrayList<StackTraceElement>();
+    public StackTraceElement[] getProxiedMethodStackTrace(StackTraceElement[] stackTrace) {
+        List<StackTraceElement> result = new ArrayList<StackTraceElement>();
 
         boolean foundProxyMethod = false;
-        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-        for (StackTraceElement stackTraceElement : stackTraceElements) {
+        for (StackTraceElement stackTraceElement : stackTrace) {
             if (foundProxyMethod) {
-                stackTrace.add(stackTraceElement);
+                result.add(stackTraceElement);
 
             } else if (isCglibProxyClassName(stackTraceElement.getClassName())) {
                 // found the proxy method element, the next element is the proxied method element
                 foundProxyMethod = true;
             }
         }
-        if (stackTrace.isEmpty()) {
-            throw new UnitilsException("No invocation of a cglib proxy method found in stack trace: " + Arrays.toString(stackTraceElements));
+        if (result.isEmpty()) {
+            throw new UnitilsException("No invocation of a cglib proxy method found in stack trace: " + Arrays.toString(stackTrace));
         }
-        return stackTrace.toArray(new StackTraceElement[stackTrace.size()]);
+        return result.toArray(new StackTraceElement[result.size()]);
     }
 
 

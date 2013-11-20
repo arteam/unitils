@@ -42,6 +42,6 @@ public class ArgumentMatcherServiceRegisterAnyArgumentMatcherTest extends Unitil
     @Test
     public void registerAnyArgumentMatcher() {
         argumentMatcherService.registerAnyArgumentMatcher(Map.class);
-        argumentMatcherRepositoryMock.assertInvoked().registerArgumentMatcher(new AnyArgumentMatcher(Map.class));
+        argumentMatcherRepositoryMock.assertInvoked().registerArgumentMatcher(new AnyArgumentMatcher<Map>(Map.class));
     }
 }

@@ -44,6 +44,6 @@ public class ArgumentMatcherServiceRegisterRefEqArgumentMatcherTest extends Unit
         cloneServiceMock.returns("cloned value").createDeepClone("value");
 
         argumentMatcherService.registerRefEqArgumentMatcher("value");
-        argumentMatcherRepositoryMock.assertInvoked().registerArgumentMatcher(new RefEqArgumentMatcher("cloned value"));
+        argumentMatcherRepositoryMock.assertInvoked().registerArgumentMatcher(new RefEqArgumentMatcher<String>("cloned value"));
     }
 }
