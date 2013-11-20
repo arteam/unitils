@@ -25,9 +25,11 @@ import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.core.util.CloneService;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
-import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
+import static org.unitils.mock.ArgumentMatchers.any;
 import static org.unitils.mock.core.proxy.CglibProxyMethodInterceptor.CglibProxyInvocation;
 
 /**
@@ -54,7 +56,7 @@ public class CglibProxyMethodInterceptorInterceptTest extends UnitilsJUnit4 {
         cglibProxyMethodInterceptor = new CglibProxyMethodInterceptor<MyClass>("myProxy", MyClass.class, proxyInvocationHandlerMock.getMock(), proxyServiceMock.getMock(), cloneServiceMock.getMock());
 
         stackTrace = new StackTraceElement[]{new StackTraceElement("class", "method", "file", 10)};
-        proxyServiceMock.returns(stackTrace).getProxiedMethodStackTrace();
+        proxyServiceMock.returns(stackTrace).getProxiedMethodStackTrace(any(StackTraceElement[].class));
         cloneServiceMock.returns(new Object[0]).createDeepClone(new Object[0]);
 
         methodProxy = MethodProxy.create(MyClass.class, MyClass.class, "", "", "");
@@ -119,9 +121,11 @@ public class CglibProxyMethodInterceptorInterceptTest extends UnitilsJUnit4 {
 
     @Test
     public void methodInvocation() throws Throwable {
-        Method method = MyClass.class.getDeclaredMethod("method");
-        cloneServiceMock.returns(new Object[]{"cloned arg"}).createDeepClone(new Object[]{"arg"});
-        proxyInvocationHandlerMock.returns("result").handleInvocation(new CglibProxyInvocation("myProxy", method, asList("arg"), asList("cloned arg"), stackTrace, proxy, methodProxy));
+        Method method = MyClass.class.getDeclaredMethod("method", String.class);
+        cloneServiceMock.returns("cloned arg").createDeepClone("arg");
+        List<Argument<?>> arguments = new ArrayList<Argument<?>>();
+        arguments.add(new Argument<String>("arg", "cloned arg", String.class));
+        proxyInvocationHandlerMock.returns("result").handleInvocation(new CglibProxyInvocation("myProxy", method, arguments, stackTrace, proxy, methodProxy));
 
         Object result = cglibProxyMethodInterceptor.intercept(proxy, method, new Object[]{"arg"}, methodProxy);
         assertEquals("result", result);
@@ -154,7 +158,7 @@ public class CglibProxyMethodInterceptorInterceptTest extends UnitilsJUnit4 {
             return null;
         }
 
-        public String method() {
+        public String method(String arg) {
             return null;
         }
 

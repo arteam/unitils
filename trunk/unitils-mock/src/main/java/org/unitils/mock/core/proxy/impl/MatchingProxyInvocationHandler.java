@@ -23,7 +23,6 @@ import org.unitils.mock.core.MatchingInvocation;
 import org.unitils.mock.core.matching.MatchingInvocationHandler;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.core.proxy.ProxyInvocationHandler;
-import org.unitils.mock.core.proxy.ProxyService;
 import org.unitils.mock.core.util.StackTraceService;
 
 import java.util.List;
@@ -31,18 +30,15 @@ import java.util.List;
 
 public class MatchingProxyInvocationHandler implements ProxyInvocationHandler {
 
-
     protected ArgumentMatcherRepository argumentMatcherRepository;
-    protected ProxyService proxyService;
     protected StackTraceService stackTraceService;
 
     protected MatchingInvocationHandler matchingInvocationHandler;
     protected UnitilsException previousMatchingInvocationNotCompletedException;
 
 
-    public MatchingProxyInvocationHandler(ArgumentMatcherRepository argumentMatcherRepository, ProxyService proxyService, StackTraceService stackTraceService) {
+    public MatchingProxyInvocationHandler(ArgumentMatcherRepository argumentMatcherRepository, StackTraceService stackTraceService) {
         this.argumentMatcherRepository = argumentMatcherRepository;
-        this.proxyService = proxyService;
         this.stackTraceService = stackTraceService;
     }
 

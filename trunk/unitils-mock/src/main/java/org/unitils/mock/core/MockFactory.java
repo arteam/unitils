@@ -210,7 +210,7 @@ public class MockFactory {
     }
 
     protected <T> MatchingProxyInvocationHandler createMatchingProxyInvocationHandler() {
-        return new MatchingProxyInvocationHandler(argumentMatcherRepository, proxyService, stackTraceService);
+        return new MatchingProxyInvocationHandler(argumentMatcherRepository, stackTraceService);
     }
 
     protected MatchingInvocationHandlerFactory createMatchingInvocationHandlerFactory() {

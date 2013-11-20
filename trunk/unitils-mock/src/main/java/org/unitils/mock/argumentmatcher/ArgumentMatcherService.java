@@ -80,7 +80,6 @@ public class ArgumentMatcherService {
         argumentMatcherRepository.registerArgumentMatcher(argumentMatcher);
     }
 
-    // todo td test
     public <T> void registerCaptureArgumentMatcher(Capture<T> capture) {
         ArgumentMatcher<T> argumentMatcher = new CaptureArgumentMatcher<T>(capture);
         argumentMatcherRepository.registerArgumentMatcher(argumentMatcher);

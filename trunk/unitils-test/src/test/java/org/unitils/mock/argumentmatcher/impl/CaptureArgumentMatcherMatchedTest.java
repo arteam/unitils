@@ -15,28 +15,29 @@
  */
 package org.unitils.mock.argumentmatcher.impl;
 
+import org.junit.Test;
 import org.unitils.mock.argumentmatcher.Capture;
 import org.unitils.mock.core.proxy.Argument;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Tim Ducheyne
  */
-public class CaptureArgumentMatcher<T> extends AnyArgumentMatcher<T> {
+public class CaptureArgumentMatcherMatchedTest {
 
-    private Capture<T> capture;
-
-
-    /**
-     * @param capture The object that will hold the captured argument value, not null
-     */
-    public CaptureArgumentMatcher(Capture<T> capture) {
-        super(capture.getType());
-        this.capture = capture;
-    }
+    private CaptureArgumentMatcher<String> captureArgumentMatcher;
 
 
-    @Override
-    public void matched(Argument<T> argument) {
-        capture.setArgument(argument);
+    @Test
+    public void matched() {
+        Argument<String> argument = new Argument<String>("value", "cloned value", String.class);
+        Capture<String> capture = new Capture<String>(String.class);
+        captureArgumentMatcher = new CaptureArgumentMatcher<String>(capture);
+
+        captureArgumentMatcher.matched(argument);
+        assertEquals("value", capture.getValue());
+        assertEquals("cloned value", capture.getValueAtInvocationTime());
+        assertEquals(String.class, capture.getType());
     }
 }

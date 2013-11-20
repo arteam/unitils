@@ -17,29 +17,30 @@ package org.unitils.mock.argumentmatcher;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
-import org.unitils.mock.Mock;
-import org.unitils.mock.argumentmatcher.impl.SameArgumentMatcher;
+import org.unitils.mock.core.proxy.Argument;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Tim Ducheyne
  */
-public class ArgumentMatcherServiceRegisterSameArgumentMatcherTest extends UnitilsJUnit4 {
+public class CaptureSetArgumentTest {
 
-    private ArgumentMatcherService argumentMatcherService;
-
-    private Mock<ArgumentMatcherRepository> argumentMatcherRepositoryMock;
+    private Capture<String> capture;
 
 
     @Before
     public void initialize() {
-        argumentMatcherService = new ArgumentMatcherService(argumentMatcherRepositoryMock.getMock(), null);
+        capture = new Capture<String>(String.class);
     }
 
 
     @Test
-    public void registerSameArgumentMatcher() {
-        argumentMatcherService.registerSameArgumentMatcher("value");
-        argumentMatcherRepositoryMock.assertInvoked().registerArgumentMatcher(new SameArgumentMatcher<String>("value"));
+    public void setArgument() {
+        Argument<String> argument = new Argument<String>("value", "cloned value", String.class);
+
+        capture.setArgument(argument);
+        assertEquals("value", capture.getValue());
+        assertEquals("cloned value", capture.getValueAtInvocationTime());
     }
 }

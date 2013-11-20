@@ -35,6 +35,5 @@ public interface MockBehavior {
      * @param proxyInvocation The proxy method invocation, not null
      * @return The return value, null if there is no return value
      */
-    // todo td remove Throwable
     Object execute(ProxyInvocation proxyInvocation) throws Throwable;
 }

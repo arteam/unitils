@@ -73,7 +73,7 @@ public class MockFactoryCreateMockTest extends UnitilsJUnit4 {
         scenarioMock.returns(testObject).getTestObject();
 
         behaviorDefiningInvocations = new BehaviorDefiningInvocations();
-        matchingProxyInvocationHandler = new MatchingProxyInvocationHandler(argumentMatcherRepositoryMock.getMock(), proxyServiceMock.getMock(), stackTraceService);
+        matchingProxyInvocationHandler = new MatchingProxyInvocationHandler(argumentMatcherRepositoryMock.getMock(), stackTraceService);
         mockProxyInvocationHandler = new MockProxyInvocationHandler<Properties>(behaviorDefiningInvocations, scenarioMock.getMock(), cloneService, matchingProxyInvocationHandler);
         matchingInvocationHandlerFactory = new MatchingInvocationHandlerFactory(scenarioMock.getMock(), mockFactory, scenarioReport);
     }

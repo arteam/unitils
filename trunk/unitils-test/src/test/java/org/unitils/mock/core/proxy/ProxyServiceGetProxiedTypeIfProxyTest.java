@@ -21,7 +21,6 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -55,7 +54,7 @@ public class ProxyServiceGetProxiedTypeIfProxyTest {
 
     @Test
     public void regularObject() {
-        Class<?> result = proxyService.getProxiedTypeIfProxy("notproxy");
+        Class<?> result = proxyService.getProxiedTypeIfProxy("notProxy");
         assertNull(result);
     }
 

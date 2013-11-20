@@ -40,6 +40,6 @@ public class ArgumentMatcherServiceRegisterEqualsArgumentMatcherTest extends Uni
     @Test
     public void registerEqualsArgumentMatcher() {
         argumentMatcherService.registerEqualsArgumentMatcher("value");
-        argumentMatcherRepositoryMock.assertInvoked().registerArgumentMatcher(new EqualsArgumentMatcher("value"));
+        argumentMatcherRepositoryMock.assertInvoked().registerArgumentMatcher(new EqualsArgumentMatcher<String>("value"));
     }
 }
