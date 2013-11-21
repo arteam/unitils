@@ -3,8 +3,6 @@
  */
 package org.unitils;
 
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +10,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.internal.runners.TestClass;
 import org.junit.runner.RunWith;
-import org.unitils.UnitilsParameterized;
 import org.unitils.UnitilsParameterized.TestClassRunnerForParameters;
 import org.unitils.UnitilsParameterized.UnitilsMethodValidator;
 import org.unitils.parameterized.JustATestClass;
