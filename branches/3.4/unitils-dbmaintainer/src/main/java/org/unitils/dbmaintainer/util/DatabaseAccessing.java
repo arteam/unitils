@@ -32,7 +32,6 @@ public interface DatabaseAccessing {
      *
      * @param configuration The configuration, not null
      * @param sqlHandler    The sql handler, not null
-     * @param dialect 
      */
     public void init(Properties configuration, SQLHandler sqlHandler, String dialect);
 

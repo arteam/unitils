@@ -35,6 +35,7 @@ import org.unitils.core.dbsupport.SQLHandler;
 import static org.unitils.database.SQLUnitils.*;
 
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 
@@ -67,7 +68,7 @@ public class DefaultDBCleanerMultiSchemaTest extends UnitilsJUnit4 {
     /* True if current test is not for the current dialect */
     private boolean disabled;
     
-    private static String dialect = "h2";
+    private static String dialect;
 
 
     /**
@@ -76,6 +77,7 @@ public class DefaultDBCleanerMultiSchemaTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
+        dialect = PropertyUtils.getString(DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT, configuration);
         this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
         if (disabled) {
             return;

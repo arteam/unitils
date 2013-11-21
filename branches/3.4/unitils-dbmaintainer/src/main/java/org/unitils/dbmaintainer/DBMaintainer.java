@@ -29,9 +29,7 @@ import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
 import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
-
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
-
 import org.unitils.dbmaintainer.version.ExecutedScriptInfoSource;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.util.PropertyUtils;
@@ -168,6 +166,14 @@ public class DBMaintainer {
      * tried only when changes were made to the script files
      */
     protected boolean keepRetryingAfterError;
+
+
+    /**
+     * Default constructor for testing.
+     */
+    protected DBMaintainer() {
+    }
+
 
     /**
      * Create a new instance of <code>DBMaintainer</code>, The concrete implementations of all

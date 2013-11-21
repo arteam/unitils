@@ -100,6 +100,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
         configuration.setProperty(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS, "sql");
         configuration.setProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPT_DIRNAME, "postprocessing");
         configuration.setProperty(DefaultScriptSource.PROPKEY_USESCRIPTFILELASTMODIFICATIONDATES, "false");
+        configuration.setProperty("dbMaintainer.generateDataSetStructure.enabled", "true");
         scriptSource = new DefaultScriptSource();
         scriptSource.init(configuration);
     }
