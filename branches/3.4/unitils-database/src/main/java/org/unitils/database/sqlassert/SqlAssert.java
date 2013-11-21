@@ -56,7 +56,7 @@ public abstract class SqlAssert {
      * @param row
      */
     public static void assertSingleRowSqlResult(String sql, String[] row) {
-        assertSingleRowSqlResult(sql, getDefaultDataSourceFromUnitils(), row);
+        assertSingleRowSqlResult(sql, "", row);
     }
     
     /**
@@ -67,25 +67,11 @@ public abstract class SqlAssert {
      *
      * @param sql
      * @param row
-     * @param databaseName
      */
-    public static void assertSingleRowSqlResult(String sql, String[] row, String databaseName) {
+    public static void assertSingleRowSqlResult(String sql, String databaseName, String[] row) {
         assertSingleRowSqlResult(sql, getDataSourceFromUnitils(databaseName), row);
     }
 
-    /**
-     * To be succesfull the result of the SQL should return as many rows as the two dimensional arrey has, each row should be identical to
-     * the given parameter. The sequence of the values is not important nor is the order of the rows.
-     *
-     * The datasource will be fetched from the database module of unitils ({@link DatabaseModule}).
-     *
-     * @param sql
-     * @param rows
-     */
-    public static void assertMultipleRowSqlResult(String sql, String[]... rows) {
-        assertMultipleRowSqlResult(sql, getDefaultDataSourceFromUnitils(), rows);
-    }
-    
     /**
      * To be succesfull the result of the SQL should return as many rows as the two dimensional arrey has, each row should be identical to
      * the given parameter. The sequence of the values is not important nor is the order of the rows.
@@ -99,6 +85,19 @@ public abstract class SqlAssert {
     public static void assertMultipleRowSqlResult(String sql, String databaseName, String[]... rows) {
         assertMultipleRowSqlResult(sql, getDataSourceFromUnitils(databaseName), rows);
     }
+    
+    /**
+     * To be succesfull the result of the SQL should return as many rows as the two dimensional arrey has, each row should be identical to
+     * the given parameter. The sequence of the values is not important nor is the order of the rows.
+     *
+     * The datasource will be fetched from the database module of unitils ({@link DatabaseModule}).
+     *
+     * @param sql
+     * @param rows
+     */
+    public static void assertMultipleRowSqlResult(String sql, String[]... rows) {
+        assertMultipleRowSqlResult(sql, "", rows);
+    }
 
     /**
      * The SQL given should only return one row with one column, this column should be a number (preferred a count(*)). The result is
@@ -110,7 +109,7 @@ public abstract class SqlAssert {
      * @param countResult
      */
     public static void assertCountSqlResult(String sql, Long countResult) {
-        assertCountSqlResult(sql, getDefaultDataSourceFromUnitils(), countResult);
+        assertCountSqlResult(sql, countResult, "");
     }
     
     /**
@@ -121,7 +120,6 @@ public abstract class SqlAssert {
      *
      * @param sql
      * @param countResult
-     * @param databaseName
      */
     public static void assertCountSqlResult(String sql, Long countResult, String databaseName) {
         assertCountSqlResult(sql, getDataSourceFromUnitils(databaseName), countResult);
@@ -211,16 +209,9 @@ public abstract class SqlAssert {
      *
      * @return DataSource
      */
-    private static DataSource getDefaultDataSourceFromUnitils() {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class).getDefaultDataSourceWrapper().getDataSource();
+    private static DataSource getDataSourceFromUnitils(String databaseName) {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class).getWrapper(databaseName).getDataSource();
     }
 
-    /**
-     * Returns the {@link DataSource} fetched from the unitils {@link DatabaseModule}
-     *
-     * @return DataSource
-     */
-    private static DataSource getDataSourceFromUnitils(String databaseName) {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class).getDataSourceWrapper(databaseName).getDataSource();
-    }
+
 }

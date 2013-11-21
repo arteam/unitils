@@ -1,5 +1,7 @@
 package org.unitils.database;
 
+import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
 import java.lang.reflect.Field;
@@ -18,6 +20,7 @@ import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.core.util.ConfigUtils;
+import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.config.DataSourceFactory;
 import org.unitils.database.config.DatabaseConfiguration;
 import org.unitils.database.transaction.TransactionHandler;
@@ -57,8 +60,12 @@ public class DataSourceWrapper {
 	private boolean wrapDataSourceInTransactionalProxy;
 
 	public DataSourceWrapper(DatabaseConfiguration databaseConfiguration) {
+	    this(databaseConfiguration, Unitils.getInstance().getConfiguration());
+	}
+	
+	public DataSourceWrapper(DatabaseConfiguration databaseConfiguration, Properties unitilsConfig) {
 		// Get the factory for the data source and create it
-		configuration = Unitils.getInstance().getConfiguration();
+		configuration = unitilsConfig;
 		dataSourceFactory = ConfigUtils.getConfiguredInstanceOf(DataSourceFactory.class, configuration);
 		dataSourceFactory.init(databaseConfiguration);
 		updateDatabaseSchemaEnabled = PropertyUtils.getBoolean(DatabaseModule.PROPERTY_UPDATEDATABASESCHEMA_ENABLED, configuration);
@@ -258,9 +265,9 @@ public class DataSourceWrapper {
 	 * Generates a definition file that defines the structure of dataset's, i.e. a XSD of DTD that
 	 * describes the structure of the database.
 	 */
-	/*public void generateDatasetDefinition() {
+	public void generateDatasetDefinition() {
         getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class).generateDataSetStructure();
-    }*/
+    }
 
 	public boolean isDataSourceLoaded() {
 		return wrappedDataSource != null;
