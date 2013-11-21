@@ -39,6 +39,7 @@ import static org.unitils.database.SQLUnitils.executeUpdate;
 
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.DBClearer;
+import org.unitils.util.PropertyUtils;
 
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.*;
 
@@ -68,7 +69,7 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
     /* The DbSupport object */
     private DbSupport dbSupport;
     
-    private static String dialect = "h2";
+    private String dialect;
 
 
     /**
@@ -78,6 +79,7 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
+        dialect = PropertyUtils.getString("database.dialect", configuration);
         dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect);
 
         // first create database, otherwise items to preserve do not yet exist

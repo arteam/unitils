@@ -32,6 +32,8 @@ import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.DBClearer;
+import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import org.unitils.util.PropertyUtils;
 
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.*;
 
@@ -63,7 +65,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest extends UnitilsJUnit4 {
     /* The sql statement handler */
     private SQLHandler sqlHandler;
 
-    private static String dialect = "h2";
+    private static String dialect;
     /**
      * Configures the tested object.
      * <p/>
@@ -72,6 +74,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         configuration = new ConfigurationLoader().loadConfiguration();
+        dialect = PropertyUtils.getString(DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT, configuration);
         sqlHandler = new DefaultSQLHandler(dataSource);
         defaultDbClearer = new DefaultDBClearer();
     }

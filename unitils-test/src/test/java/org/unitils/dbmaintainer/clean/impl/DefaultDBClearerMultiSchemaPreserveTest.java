@@ -63,14 +63,15 @@ public class DefaultDBClearerMultiSchemaPreserveTest extends UnitilsJUnit4 {
 	/* True if current test is not for the current dialect */
 	private boolean disabled;
 
-	private static String dialect = "h2";
+	private static String dialect;
 	/**
 	 * Configures the tested object. Creates a test table, index, view and sequence
 	 */
 	@Before
 	public void setUp() throws Exception {
 		Properties configuration = new ConfigurationLoader().loadConfiguration();
-		this.disabled = !"hsqldb".equals(PropertyUtils.getString(DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT, configuration));
+		dialect = PropertyUtils.getString(DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT, configuration);
+        this.disabled = !"hsqldb".equals(dialect);
 		if (disabled) {
 			return;
 		}
