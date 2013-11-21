@@ -58,5 +58,7 @@ public @interface JpaEntityManagerFactory {
 	 * If omitted, the default META-INF/persistence.xml file is loaded.
 	 */
 	String configFile() default "";
+	
+	String databaseName() default "";
     
 }

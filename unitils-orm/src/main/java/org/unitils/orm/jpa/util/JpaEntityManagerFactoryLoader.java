@@ -29,6 +29,7 @@ import org.unitils.util.ReflectionUtils;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -38,6 +39,15 @@ import java.lang.reflect.InvocationTargetException;
  * @author Tim Ducheyne
  */
 public class JpaEntityManagerFactoryLoader implements OrmPersistenceUnitLoader<EntityManagerFactory, Object, JpaConfig> {
+
+    protected String databaseName;
+
+    /**
+     * @param databaseName
+     */
+    public JpaEntityManagerFactoryLoader(String databaseName) {
+        this.databaseName = databaseName;
+    }
 
 
     public ConfiguredOrmPersistenceUnit<EntityManagerFactory, Object> getConfiguredOrmPersistenceUnit(Object testObject, JpaConfig entityManagerConfig) {
@@ -80,7 +90,7 @@ public class JpaEntityManagerFactoryLoader implements OrmPersistenceUnitLoader<E
 
 
     protected DataSource getDataSource() {
-        return getDatabaseModule().getDefaultDataSourceWrapper().getDataSource();
+        return getDatabaseModule().getWrapper(databaseName).getDataSource();
     }
 
 

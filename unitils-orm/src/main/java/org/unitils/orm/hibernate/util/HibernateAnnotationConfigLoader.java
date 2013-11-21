@@ -3,9 +3,9 @@ package org.unitils.orm.hibernate.util;
 import java.lang.reflect.Method;
 
 import org.hibernate.cfg.Configuration;
-import org.unitils.orm.common.util.AnnotationConfigLoader;
 import org.unitils.orm.common.util.OrmConfig;
 import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
+import org.unitils.util.AnnotationConfigLoader;
 import org.unitils.util.CollectionUtils;
 
 public class HibernateAnnotationConfigLoader extends AnnotationConfigLoader<HibernateSessionFactory, OrmConfig> {

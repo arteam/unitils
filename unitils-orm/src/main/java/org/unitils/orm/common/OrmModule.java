@@ -26,6 +26,9 @@ import org.unitils.orm.common.spring.OrmSpringSupport;
 import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
 import org.unitils.orm.common.util.OrmConfig;
 import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
+import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
+import org.unitils.util.AnnotationUtils;
+
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
@@ -77,7 +80,9 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
      */
     protected OrmSpringSupport<ORM_PERSISTENCE_UNIT, PROVIDER_CONFIGURATION_OBJECT> ormSpringSupport;
 
-
+    protected String databaseName;
+    
+    
     public void init(Properties configuration) {
         persistenceUnitConfigLoader = createOrmConfigLoader();
         ormPersistenceUnitLoader = createOrmPersistenceUnitLoader();
@@ -180,7 +185,7 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
         if (configuredPersistenceUnit == null) {
             configuredPersistenceUnit = ormPersistenceUnitLoader.getConfiguredOrmPersistenceUnit(testObject, persistenceUnitConfig);
             configuredOrmPersistenceUnitCache.put(persistenceUnitConfig, configuredPersistenceUnit);
-            getDatabaseModule().getDefaultDataSourceWrapper().activateTransactionIfNeeded();
+            getDatabaseModule().activateTransactionIfNeeded();
         }
         return configuredPersistenceUnit;
     }
@@ -356,6 +361,18 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
         return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
     }
 
+    public String getDatabaseName(Object testObject, Method testMethod) {
+        Set<JpaEntityManagerFactory> fields = AnnotationUtils.getFieldLevelAnnotations(testObject.getClass(), JpaEntityManagerFactory.class);
+        Set<JpaEntityManagerFactory> methods = AnnotationUtils.getMethodLevelAnnotations(testObject.getClass(), JpaEntityManagerFactory.class);
+        if (fields.isEmpty() && methods.isEmpty()) {
+            // Jump out to make sure that we don't try to instantiate the EntityManagerFactory
+            return "";
+        }
+        if (!fields.isEmpty()) {
+             return fields.iterator().next().databaseName();
+        }
+        return methods.iterator().next().databaseName();
+    }
 
     /**
      * The {@link TestListener} for this module

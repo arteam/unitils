@@ -49,6 +49,7 @@ import org.unitils.orm.jpa.util.JpaAnnotationConfigLoader;
 import org.unitils.orm.jpa.util.JpaConfig;
 import org.unitils.orm.jpa.util.JpaEntityManagerFactoryLoader;
 import org.unitils.orm.jpa.util.JpaProviderSupport;
+import org.unitils.util.AnnotationUtils;
 
 /**
  * Module providing support for unit tests for code that uses JPA. It offers an easy way of loading a 
@@ -110,32 +111,36 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
     public void afterInit() {
     	super.afterInit();
     	
-    	// Make sure that a spring JpaTransactionManager is used for transaction management in the database module, if the
-    	// current test object defines a JPA EntityManagerFactory
-    	getDatabaseModule().getTransactionHandler().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
-    		
-    		public boolean isApplicableFor(Object testObject) {
-    			return isPersistenceUnitConfiguredFor(testObject);
-			}
-    		
+    	
+	}
+    
+    public void  registerTransactionManagementConfiguration() {
+     // Make sure that a spring JpaTransactionManager is used for transaction management in the database module, if the
+        // current test object defines a JPA EntityManagerFactory
+        getDatabaseModule().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
+            
+            public boolean isApplicableFor(Object testObject) {
+                return isPersistenceUnitConfiguredFor(testObject);
+            }
+            
             public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
-				EntityManagerFactory entityManagerFactory = getPersistenceUnit(testObject);
-				JpaTransactionManager jpaTransactionManager = new JpaTransactionManager(entityManagerFactory);
-				jpaTransactionManager.setDataSource(getDataSource());
-				jpaTransactionManager.setJpaDialect(jpaProviderSupport.getSpringJpaVendorAdaptor().getJpaDialect());
-				return jpaTransactionManager;
-			}
+                EntityManagerFactory entityManagerFactory = getPersistenceUnit(testObject);
+                JpaTransactionManager jpaTransactionManager = new JpaTransactionManager(entityManagerFactory);
+                jpaTransactionManager.setDataSource(getDataSource());
+                jpaTransactionManager.setJpaDialect(jpaProviderSupport.getSpringJpaVendorAdaptor().getJpaDialect());
+                return jpaTransactionManager;
+            }
             
             public boolean isTransactionalResourceAvailable(Object testObject) {
-                return getDatabaseModule().getDefaultDataSourceWrapper().isDataSourceLoaded();
+                return getDatabaseModule().getWrapper(databaseName).isDataSourceLoaded();
             }
 
             public Integer getPreference() {
                 return 10;
             }
-    		
-    	});
-	}
+            
+        });
+    }
     
     
     @Override
@@ -158,7 +163,7 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
 
 	@Override
 	protected OrmPersistenceUnitLoader<EntityManagerFactory, Object, JpaConfig> createOrmPersistenceUnitLoader() {
-		return new JpaEntityManagerFactoryLoader();
+		return new JpaEntityManagerFactoryLoader(databaseName);
 	}
 
 
@@ -268,7 +273,7 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
     
     
     protected DataSource getDataSource() {
-    	return getDatabaseModule().getDefaultDataSourceWrapper().getDataSourceAndActivateTransactionIfNeeded();
+    	return getDatabaseModule().getWrapper(databaseName).getDataSourceAndActivateTransactionIfNeeded();
     }
     
     
@@ -292,6 +297,8 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
 
         @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
+            getDatabaseName(testObject, testMethod);
+            registerTransactionManagementConfiguration();
             injectJpaResourcesIntoTestObject(testObject);
         }
         
