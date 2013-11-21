@@ -3,8 +3,6 @@
  */
 package org.unitils.database;
 
-import static org.junit.Assert.*;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,14 +13,14 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.Unitils;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.config.DatabaseConfiguration;
-import org.unitils.inject.annotation.TestedObject;
+/*import org.unitils.database.config.DatabaseConfiguration;
+import org.unitils.database.transaction.TransactionHandler;*/
 import org.unitils.reflectionassert.ReflectionAssert;
 
 
@@ -36,7 +34,7 @@ import org.unitils.reflectionassert.ReflectionAssert;
  */
 public class DatabaseModuleMultipleDatabasesTest {
 
-
+    private Properties unitilsConfig;
     //@TestedObject
     private DatabaseModule module;
 
@@ -44,22 +42,23 @@ public class DatabaseModuleMultipleDatabasesTest {
     public void setUp() throws FileNotFoundException, IOException {
     	module = new DatabaseModule();
         File file = new File("src\\test\\resources\\org\\unitils\\database\\config\\testconfigMultipleDatabases.properties");
-        Properties prop = Unitils.getInstance().getConfiguration();
-        prop.load(new FileInputStream(file));
-        module.init(prop);
+        unitilsConfig = (Properties) Unitils.getInstance().getConfiguration().clone();
+        unitilsConfig.load(new FileInputStream(file));
+        module.init(unitilsConfig);
         
         
     }
     @Test
     public void testGetdefaultDatabaseWrapper() {
-        DataSourceWrapper actual = module.getDefaultDataSourceWrapper();
+        DataSourceWrapper actual = module.getWrapper("");
         ReflectionAssert.assertLenientEquals(getWrapper1(), actual);
     }
 
     @Test
-    public void testGetDatabase1() throws SQLException {
+    public void testGetDatabase1() throws SQLException, SecurityException, NoSuchMethodException {
         TestClassDatabase1 obj = new TestClassDatabase1();
-
+        String databaseName = module.getDatabaseName(obj, obj.getClass().getMethod("testMethod"));
+        module.wrapper = module.getWrapper(databaseName);
         module.injectDataSource(obj);
         
         Assert.assertNotNull(obj.dataSource);
@@ -68,9 +67,12 @@ public class DatabaseModuleMultipleDatabasesTest {
     }
 
     @Test
-    public void testGetDatabase2() throws SQLException {
+    public void testGetDatabase2() throws SQLException, SecurityException, NoSuchMethodException {
         TestClassDatabase2 obj = new TestClassDatabase2();
 
+        String databaseName = module.getDatabaseName(obj, obj.getClass().getMethod("testMethod"));
+        module.wrapper = module.getWrapper(databaseName);
+        
         module.injectDataSource(obj);
         Assert.assertNotNull(obj.dataSource);
         Assert.assertEquals("jdbc:h2:~/test", obj.dataSource.getConnection().getMetaData().getURL());
@@ -79,30 +81,45 @@ public class DatabaseModuleMultipleDatabasesTest {
 
     private DataSourceWrapper getWrapper1() {
         DatabaseConfiguration conf = new DatabaseConfiguration("database1", "hsqldb", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:unitils1", "sa", null, "public", Arrays.asList("public"), false, true);
-        return new DataSourceWrapper(conf);
+        return new DataSourceWrapper(conf, unitilsConfig);
     }
 
     private DataSourceWrapper getWrapper2() {
         DatabaseConfiguration conf = new DatabaseConfiguration("database2", "h2", "org.h2.Driver", "jdbc:h2:~/test", "sa", null, "public", Arrays.asList("public"), false, false);
-        return new DataSourceWrapper(conf);
+        return new DataSourceWrapper(conf, unitilsConfig);
     }
 
     private class TestClassDefaultDatabase {
 
         @TestDataSource
         private DataSource datasource;
+        
+        @Test
+        public void testMethod() {
+            //do nothing
+        }
     }
 
     private class TestClassDatabase1 {
 
         @TestDataSource("database1")
         private DataSource dataSource;
+        
+        @Test
+        public void testMethod() {
+            //do nothing
+        }
     }
 
     private class TestClassDatabase2 {
 
         @TestDataSource("database2")
         private DataSource dataSource;
+        
+        @Test
+        public void testMethod() {
+            //do nothing
+        }
     }
 
 }

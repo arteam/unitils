@@ -15,9 +15,10 @@
  */
 package org.unitils.database;
 
-import javax.sql.DataSource;
-
 import org.unitils.core.Unitils;
+import org.unitils.dbmaintainer.DBMaintainer;
+
+import javax.sql.DataSource;
 
 /**
  * Class providing access to the functionality of the database module using static methods. Meant
@@ -28,19 +29,24 @@ import org.unitils.core.Unitils;
  */
 public class DatabaseUnitils {
 
+
+    /**
+     * Returns the DataSource that connects to the test database
+     *
+     * @return The DataSource that connects to the test database
+     */
+    public static DataSource getDataSource(String databaseName) {
+    	return getDatabaseModule().getWrapper(databaseName).getTransactionalDataSourceAndActivateTransactionIfNeeded(getTestObject());
+    }
+    
     /**
      * Returns the DataSource that connects to the test database
      *
      * @return The DataSource that connects to the test database
      */
     public static DataSource getDataSource() {
-    	return getDatabaseModule().getDefaultDataSourceWrapper().getTransactionalDataSourceAndActivateTransactionIfNeeded(getTestObject());
+        return getDataSource("");
     }
-    public static DataSource getDatasource(String databaseName) {
-        return getDatabaseModule().getDataSourceWrapper(databaseName).getTransactionalDataSourceAndActivateTransactionIfNeeded(getTestObject());
-    }
-    
-    
     
     
     /**
@@ -60,7 +66,7 @@ public class DatabaseUnitils {
      * Starts a new transaction on the transaction manager configured in unitils
      */
     public static void startTransaction() {
-        getDatabaseModule().getTransactionHandler().startTransaction(getTestObject());
+        getDatabaseModule().startTransaction(getTestObject());
     }
     
     
@@ -68,7 +74,7 @@ public class DatabaseUnitils {
      * Commits the current unitils transaction
      */
     public static void commitTransaction() {
-        getDatabaseModule().getTransactionHandler().commitTransaction(getTestObject());
+        getDatabaseModule().commitTransaction(getTestObject());
     }
     
     
@@ -77,7 +83,7 @@ public class DatabaseUnitils {
      *
      */
     public static void rollbackTransaction() {
-        getDatabaseModule().getTransactionHandler().rollbackTransaction(getTestObject());
+        getDatabaseModule().rollbackTransaction(getTestObject());
     }
 
 
@@ -86,7 +92,7 @@ public class DatabaseUnitils {
      * latest changes. See {@link DBMaintainer} for more information.
      */
     public static void updateDatabase() {
-        getDatabaseModule().getDefaultDataSourceWrapper().updateDatabase();
+        updateDatabase("");
     }
     
     /**
@@ -94,8 +100,9 @@ public class DatabaseUnitils {
      * latest changes. See {@link DBMaintainer} for more information.
      */
     public static void updateDatabase(String databaseName) {
-        getDatabaseModule().getDataSourceWrapper(databaseName).updateDatabase();
+        getDatabaseModule().getWrapper(databaseName).updateDatabase();
     }
+
 
     /**
      * Updates the database version to the current version, without issuing any other updates to the database.
@@ -104,7 +111,7 @@ public class DatabaseUnitils {
      * reinitializing the database after having reorganized the scripts folder.
      */
     public static void resetDatabaseState() {
-        getDatabaseModule().getDefaultDataSourceWrapper().resetDatabaseState();
+        resetDatabaseState("");
     }
     
     /**
@@ -114,7 +121,7 @@ public class DatabaseUnitils {
      * reinitializing the database after having reorganized the scripts folder.
      */
     public static void resetDatabaseState(String databaseName) {
-        getDatabaseModule().getDataSourceWrapper(databaseName).resetDatabaseState();
+        getDatabaseModule().getWrapper(databaseName).resetDatabaseState();
     }
 
 
@@ -122,13 +129,14 @@ public class DatabaseUnitils {
      * Clears all configured schema's. I.e. drops all tables, views and other database objects.
      */
     public static void clearSchemas() {
-        getDatabaseModule().getDefaultDataSourceWrapper().clearSchemas();
+        clearSchemas("");
     }
+    
     /**
      * Clears all configured schema's. I.e. drops all tables, views and other database objects.
      */
     public static void clearSchemas(String databaseName) {
-        getDatabaseModule().getDataSourceWrapper(databaseName).clearSchemas();
+        getDatabaseModule().getWrapper(databaseName).clearSchemas();
     }
 
 
@@ -136,14 +144,14 @@ public class DatabaseUnitils {
      * Cleans all configured schema's. I.e. removes all data from its database tables.
      */
     public static void cleanSchemas() {
-        getDatabaseModule().getDefaultDataSourceWrapper().cleanSchemas();
+        cleanSchemas("");
     }
-
+    
     /**
      * Cleans all configured schema's. I.e. removes all data from its database tables.
      */
     public static void cleanSchemas(String databaseName) {
-        getDatabaseModule().getDataSourceWrapper(databaseName).cleanSchemas();
+        getDatabaseModule().getWrapper(databaseName).cleanSchemas();
     }
 
 
@@ -151,14 +159,14 @@ public class DatabaseUnitils {
      * Disables all foreign key and not-null constraints on the configured schema's.
      */
     public static void disableConstraints() {
-        getDatabaseModule().getDefaultDataSourceWrapper().disableConstraints();
+        disableConstraints("");
     }
     
     /**
      * Disables all foreign key and not-null constraints on the configured schema's.
      */
     public static void disableConstraints(String databaseName) {
-        getDatabaseModule().getDataSourceWrapper(databaseName).disableConstraints();
+        getDatabaseModule().getWrapper(databaseName).disableConstraints();
     }
 
 
@@ -167,7 +175,7 @@ public class DatabaseUnitils {
      * to this treshold
      */
     public static void updateSequences() {
-        getDatabaseModule().getDefaultDataSourceWrapper().updateSequences();
+        updateSequences("");
     }
     
     /**
@@ -175,7 +183,7 @@ public class DatabaseUnitils {
      * to this treshold
      */
     public static void updateSequences(String databaseName) {
-        getDatabaseModule().getDataSourceWrapper(databaseName).updateSequences();
+        getDatabaseModule().getWrapper(databaseName).updateSequences();
     }
 
 
@@ -183,17 +191,17 @@ public class DatabaseUnitils {
      * Generates a definition file that defines the structure of dataset's, i.e. a XSD of DTD that
      * describes the structure of the database.
      */
-    /*public static void generateDatasetDefinition() {
-        getDatabaseModule().getDefaultDataSourceWrapper().generateDatasetDefinition();
-    }*/
+    public static void generateDatasetDefinition() {
+        generateDatasetDefinition("");
+    }
     
     /**
      * Generates a definition file that defines the structure of dataset's, i.e. a XSD of DTD that
      * describes the structure of the database.
      */
-    /*public static void generateDatasetDefinition(String databaseName) {
-        getDatabaseModule().getDataSourceWrapper(databaseName).generateDatasetDefinition();
-    }*/
+    public static void generateDatasetDefinition(String databaseName) {
+        getDatabaseModule().getWrapper(databaseName).generateDatasetDefinition();
+    }
 
 
     /**

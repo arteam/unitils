@@ -31,19 +31,9 @@ import javax.sql.DataSource;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class UnitilsDataSourceFactoryBean implements FactoryBean<Object> {
+public class UnitilsDataSourceFactoryBean implements FactoryBean {
 
 
-    /**
-     * Gets the data source instance.
-     *
-     * @return The data source, not null
-     */
-    public Object getObject() throws Exception {
-        DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-        return databaseModule.getDefaultDataSourceWrapper().getTransactionalDataSourceAndActivateTransactionIfNeeded(databaseModule.getTestObject());
-    }
-    
     /**
      * Gets the data source instance.
      *
@@ -51,7 +41,16 @@ public class UnitilsDataSourceFactoryBean implements FactoryBean<Object> {
      */
     public Object getObject(String databaseName) throws Exception {
         DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-        return databaseModule.getDataSourceWrapper(databaseName).getTransactionalDataSourceAndActivateTransactionIfNeeded(databaseModule.getTestObject());
+        return databaseModule.getWrapper(databaseName).getTransactionalDataSourceAndActivateTransactionIfNeeded(databaseModule.getTestObject());
+    }
+    
+    /**
+     * Gets the data source instance.
+     *
+     * @return The data source, not null
+     */
+    public Object getObject() throws Exception {
+        return getObject("");
     }
 
 

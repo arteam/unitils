@@ -15,12 +15,19 @@
  */
 package org.unitils.database;
 
+import static org.unitils.core.util.ConfigUtils.getInstanceOf;
+import static org.unitils.database.util.TransactionMode.COMMIT;
+import static org.unitils.database.util.TransactionMode.DEFAULT;
+import static org.unitils.database.util.TransactionMode.DISABLED;
+import static org.unitils.database.util.TransactionMode.ROLLBACK;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
+import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -34,13 +41,19 @@ import javax.sql.DataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
+import org.unitils.core.UnitilsException;
 import org.unitils.core.config.Configuration;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
+import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.core.util.ConfigUtils;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
+import org.unitils.database.config.DataSourceFactory;
 import org.unitils.database.config.DatabaseConfiguration;
 import org.unitils.database.config.DatabaseConfigurations;
 import org.unitils.database.config.DatabaseConfigurationsFactory;
@@ -48,6 +61,16 @@ import org.unitils.database.transaction.TransactionHandler;
 import org.unitils.database.transaction.UnitilsTransactionManager;
 import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 import org.unitils.database.util.Flushable;
+import org.unitils.database.util.TransactionMode;
+import org.unitils.dbmaintainer.DBMaintainer;
+import org.unitils.dbmaintainer.clean.DBCleaner;
+import org.unitils.dbmaintainer.clean.DBClearer;
+import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
+import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
+import org.unitils.dbmaintainer.structure.SequenceUpdater;
+import org.unitils.dbmaintainer.util.DatabaseAccessing;
+import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import org.unitils.util.AnnotationUtils;
 import org.unitils.util.PropertyUtils;
 
 /**
@@ -89,7 +112,7 @@ public class DatabaseModule implements Module {
     public static final String PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY = "dataSource.wrapInTransactionalProxy";
 
     /* The logger instance for this class */
-    private static final Log LOGGER = LogFactory.getLog(DatabaseModule.class);
+    private static Log logger = LogFactory.getLog(DatabaseModule.class);
 
     /**
      * Map holding the default configuration of the database module annotations
@@ -127,90 +150,87 @@ public class DatabaseModule implements Module {
      */
     protected Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations = new HashSet<UnitilsTransactionManagementConfiguration>();
 
+    protected String dialect;
+
     private TransactionHandler transactionHandler;
 
     private DatabaseConfigurations databaseConfigurations;
 
+    protected DataSourceWrapper wrapper;
     /**
      * Initializes this module using the given <code>Configuration</code>
      *
      * @param configuration The config, not null
      */
-    public void init(Properties configuration) {
-        setConfig(configuration, new TransactionHandler());
-    }
-
     @SuppressWarnings("unchecked")
-    public void setConfig(Properties configuration, TransactionHandler transactionHandler2) {
+    public void init(Properties configuration) {
         this.configuration = configuration;
-        DatabaseConfigurationsFactory databaseConfigurationsFactory = new DatabaseConfigurationsFactory(new Configuration(configuration));
-        databaseConfigurations = databaseConfigurationsFactory.create();
+        DatabaseConfigurationsFactory configFactory = new DatabaseConfigurationsFactory(new Configuration(configuration));
+        databaseConfigurations = configFactory.create();
+
+        wrapper = new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(), configuration);
 
         defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(DatabaseModule.class, configuration, Transactional.class);
         updateDatabaseSchemaEnabled = PropertyUtils.getBoolean(PROPERTY_UPDATEDATABASESCHEMA_ENABLED, configuration);
         wrapDataSourceInTransactionalProxy = PropertyUtils.getBoolean(PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY, configuration);
 
+        dialect = PropertyUtils.getString("database.dialect", configuration);
         PlatformTransactionManager.class.getName();
-        this.transactionHandler = transactionHandler2;
+        transactionHandler = new TransactionHandler();
     }
-
 
 
     /**
      * Initializes the spring support object
      */
     public void afterInit() {
-        LOGGER.info("DatabaseModule is loaded");
-        for (DatabaseConfiguration conf : databaseConfigurations.getDatabaseConfigurations()) {
-            getTransactionHandler().registerTransactionManagementConfiguration(new DataSourceWrapper(conf).getDataSource());
+        //do nothing
+    }
+
+    public void registerTransactionManagementConfiguration() {
+
+        // Make sure that a spring DataSourceTransactionManager is used for transaction management, if
+        // no other transaction management configuration takes preference
+        registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
+
+            public boolean isApplicableFor(Object testObject) {
+                return true;
+            }
+
+            public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
+                return new DataSourceTransactionManager(wrapper.getDataSourceAndActivateTransactionIfNeeded());
+            }
+
+            public boolean isTransactionalResourceAvailable(Object testObject) {
+                return wrapper.isDataSourceLoaded();
+            }
+
+            public Integer getPreference() {
+                return 1;
+            }
+
+        });
+    }
+
+    public void activateTransactionIfNeeded() {
+        if (transactionManager != null) {
+            transactionManager.activateTransactionIfNeeded(getTestObject());
         }
     }
 
     /**
-     * Assigns the <code>TestDataSource</code> to every field annotated with {@link TestDataSource} and calls all methods
-     * annotated with {@link TestDataSource}
+     * Returns the transaction manager or creates one if it does not exist yet.
      *
-     * @param testObject The test instance, not null
+     * @return The transaction manager, not null
      */
-    public void injectDataSource(Object testObject) {
-        Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), TestDataSource.class);
-        Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), TestDataSource.class);
-        if (fields.isEmpty() && methods.isEmpty()) {
-            LOGGER.info("Nothing to do. Jump out to make sure that we don't try to instantiate the DataSource");
-            return;
+    public UnitilsTransactionManager getTransactionManager() {
+        if (transactionManager == null) {
+            transactionManager = getInstanceOf(UnitilsTransactionManager.class, configuration);
+            transactionManager.init(transactionManagementConfigurations);
         }
-        LOGGER.info("Try to instantiate the DataSource.");
-        while (!fields.isEmpty() || !methods.isEmpty()) {
-            String firstDatabase = null;
-            if (!fields.isEmpty()) {
-                firstDatabase = fields.iterator().next().getAnnotation(TestDataSource.class).value();
-            } else {
-                firstDatabase = methods.iterator().next().getAnnotation(TestDataSource.class).value();
-            }
-            Set<Field> tempFields = new HashSet<Field>();
-            Set<Method> tempMethods = new HashSet<Method>();
-
-            DataSourceWrapper wrapper = getDataSourceWrapper(firstDatabase);
-           
-
-            getAccessibleObjectsAnnotatedWithChosenDatabase(firstDatabase, fields, tempFields);
-            getAccessibleObjectsAnnotatedWithChosenDatabase(firstDatabase, methods, tempMethods);
-
-            wrapper.injectDataSource(tempFields, tempMethods, testObject);
-
-        }
+        return transactionManager;
     }
 
-    protected void getAccessibleObjectsAnnotatedWithChosenDatabase(String databaseName, Set<? extends AccessibleObject> firstSet, Set returnSet) {
-        //check fields
-        for (AccessibleObject field : firstSet) {
-            if (field.getAnnotation(TestDataSource.class).value().equals(databaseName)) {
-                returnSet.add(field);
-
-                firstSet.remove(field);
-            }
-        }
-    }
 
     /**
      * Flushes all pending updates to the database. This method is useful when the effect of updates needs to
@@ -228,6 +248,146 @@ public class DatabaseModule implements Module {
         }
     }
 
+
+    /**
+     * Determines whether the test database is outdated and, if that is the case, updates the database with the
+     * latest changes.
+     *
+     * @param sqlHandler SQLHandler that needs to be used for the database updates
+     * @see {@link DBMaintainer}
+     */
+    public void updateDatabase(SQLHandler sqlHandler) {
+        logger.info("Checking if database has to be updated.");
+        DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler, dialect);
+        dbMaintainer.updateDatabase();
+    }
+
+
+    /**
+     * Updates the database version to the current version, without issuing any other updates to the database.
+     * This method can be used for example after you've manually brought the database to the latest version, but
+     * the database version is not yet set to the current one. This method can also be useful for example for
+     * reinitializing the database after having reorganized the scripts folder.
+     *
+     * @param sqlHandler The {@link DefaultSQLHandler} to which all commands are issued
+     */
+    public void resetDatabaseState(SQLHandler sqlHandler) {
+        DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler, dialect);
+        dbMaintainer.resetDatabaseState();
+    }
+
+
+    /**
+     * Assigns the <code>TestDataSource</code> to every field annotated with {@link TestDataSource} and calls all methods
+     * annotated with {@link TestDataSource}
+     *
+     * @param testObject The test instance, not null
+     */
+    public void injectDataSource(Object testObject) {
+        Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), TestDataSource.class);
+        Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), TestDataSource.class);
+
+        if (fields.isEmpty() && methods.isEmpty()) {
+            // Nothing to do. Jump out to make sure that we don't try to instantiate the DataSource
+            return;
+        }
+        setFieldAndSetterValue(testObject, fields, methods, wrapper.getTransactionalDataSourceAndActivateTransactionIfNeeded(testObject));
+    }
+
+
+    /**
+     * @param testObject The test object, not null
+     * @param testMethod The test method, not null
+     * @return The {@link TransactionMode} for the given object
+     */
+    protected TransactionMode getTransactionMode(Object testObject, Method testMethod) {
+        TransactionMode transactionMode = getMethodOrClassLevelAnnotationProperty(Transactional.class, "value", DEFAULT, testMethod, testObject.getClass());
+        transactionMode = getEnumValueReplaceDefault(Transactional.class, "value", transactionMode, defaultAnnotationPropertyValues);
+        return transactionMode;
+    }
+
+
+    /**
+     * Starts a transaction. If the Unitils DataSource was not loaded yet, we simply remember that a
+     * transaction was started but don't actually start it. If the DataSource is loaded within this
+     * test, the transaction will be started immediately after loading the DataSource.
+     *
+     * @param testObject The test object, not null
+     * @param testMethod The test method, not null
+     */
+    protected void startTransactionForTestMethod(Object testObject, Method testMethod) {
+        if (isTransactionsEnabled(testObject, testMethod)) {
+            startTransaction(testObject);
+        }
+    }
+
+
+    /**
+     * Commits or rollbacks the current transaction, if transactions are enabled and a transactionManager is
+     * active for the given testObject
+     *
+     * @param testObject The test object, not null
+     * @param testMethod The test method, not null
+     */
+    protected void endTransactionForTestMethod(Object testObject, Method testMethod) {
+        if (isTransactionsEnabled(testObject, testMethod)) {
+            if (getTransactionMode(testObject, testMethod) == COMMIT) {
+                commitTransaction(testObject);
+            } else if (getTransactionMode(testObject, testMethod) == ROLLBACK) {
+                rollbackTransaction(testObject);
+            }
+        }
+    }
+
+
+    /**
+     * Starts a new transaction on the transaction manager configured in unitils
+     *
+     * @param testObject The test object, not null
+     */
+    public void startTransaction(Object testObject) {
+        getTransactionManager().startTransaction(testObject);
+    }
+
+
+    /**
+     * Commits the current transaction.
+     *
+     * @param testObject The test object, not null
+     */
+    public void commitTransaction(Object testObject) {
+        flushDatabaseUpdates(testObject);
+        getTransactionManager().commit(testObject);
+    }
+
+
+    /**
+     * Performs a rollback of the current transaction
+     *
+     * @param testObject The test object, not null
+     */
+    public void rollbackTransaction(Object testObject) {
+        flushDatabaseUpdates(testObject);
+        getTransactionManager().rollback(testObject);
+    }
+
+
+    /**
+     * @param testObject The test object, not null
+     * @param testMethod The test method, not null
+     * @return Whether transactions are enabled for the given test method and test object
+     */
+    public boolean isTransactionsEnabled(Object testObject, Method testMethod) {
+        TransactionMode transactionMode = getTransactionMode(testObject, testMethod);
+        return transactionMode != DISABLED;
+    }
+
+    // todo javadoc
+    public void registerTransactionManagementConfiguration(UnitilsTransactionManagementConfiguration transactionManagementConfiguration) {
+        transactionManagementConfigurations.add(transactionManagementConfiguration);
+    }
+
+
     protected Object getTestObject() {
         return Unitils.getInstance().getTestContext().getTestObject();
     }
@@ -240,7 +400,34 @@ public class DatabaseModule implements Module {
         return new DatabaseTestListener();
     }
 
-
+    /**
+     * Checks if the {@link DataSet} or the {@link ExpectedDataSet} contains the name of a database.
+     * If this isn't the case, than the default databaseName of the unitils.properties is used.
+     * 
+     * If a {@link DataSet} contains a different
+     * 
+     * @param testObject
+     * @param testMethod
+     * @return {@link String}
+     */
+    public String getDatabaseName(Object testObject, Method testMethod) {
+        TestDataSource dataSource = AnnotationUtils.getMethodOrClassLevelAnnotation(TestDataSource.class, testMethod, testObject.getClass());
+        if (dataSource == null) {
+            Set<TestDataSource> dataSources = AnnotationUtils.getFieldLevelAnnotations(testObject.getClass(), TestDataSource.class);
+            if (!dataSources.isEmpty()) {
+                dataSource = dataSources.iterator().next();
+            } else {
+                //The TestDataSource annotation doesn't exist;
+                return null;
+            }
+        }
+        if (dataSource.value().isEmpty()) {
+            return "";
+        }
+        
+        return dataSource.value();
+    }
+    
     /**
      * The {@link TestListener} for this module
      */
@@ -248,33 +435,39 @@ public class DatabaseModule implements Module {
 
         @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
+            String databaseName = getDatabaseName(testObject, testMethod);
+            if (databaseName != null) {
+                wrapper = getWrapper(databaseName);
+            }
+            registerTransactionManagementConfiguration();
             injectDataSource(testObject);
-            transactionHandler.startTransactionForTestMethod(testObject, testMethod);
+            startTransactionForTestMethod(testObject, testMethod);
         }
 
         @Override
         public void afterTestTearDown(Object testObject, Method testMethod) {
-            transactionHandler.endTransactionForTestMethod(testObject, testMethod);
+            endTransactionForTestMethod(testObject, testMethod);
         }
     }
-    public DataSourceWrapper getDataSourceWrapper(String databaseName) {
-        DatabaseConfiguration databaseConfig = null;
+
+
+    /**
+     * @return the dialect
+     */
+    public String getDialect() {
+        return dialect;
+    }
+
+
+    /**
+     * @return the wrapper
+     */
+    public DataSourceWrapper getWrapper(String databaseName) {
         if (StringUtils.isEmpty(databaseName)) {
-            databaseConfig = databaseConfigurations.getDatabaseConfiguration();
-        } else {
-            databaseConfig = databaseConfigurations.getDatabaseConfiguration(databaseName);
+            return new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(), configuration);
         }
-
-        DataSourceWrapper wrapper = new DataSourceWrapper(databaseConfig);
-        transactionHandler.registerTransactionManagementConfiguration(wrapper.getDataSource());
-        wrapper.updateDatabase();
-        return wrapper;
+        return new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(databaseName), configuration);
     }
-
-    public DataSourceWrapper getDefaultDataSourceWrapper() {
-        return getDataSourceWrapper("");
-    }
-
 
 
     /**
@@ -282,20 +475,5 @@ public class DatabaseModule implements Module {
      */
     public DatabaseConfigurations getDatabaseConfigurations() {
         return databaseConfigurations;
-    }
-
-    /**
-     * @param databaseConfigurations the databaseConfigurations to set
-     */
-    public void setDatabaseConfigurations(DatabaseConfigurations databaseConfigurations) {
-        this.databaseConfigurations = databaseConfigurations;
-    }
-
-
-    /**
-     * @return the transactionHandler
-     */
-    public TransactionHandler getTransactionHandler() {
-        return transactionHandler;
     }
 }
