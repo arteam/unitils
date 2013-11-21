@@ -18,6 +18,7 @@ package org.unitils.orm.hibernate;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.unitils.util.PropertyUtils.getString;
 
+import java.lang.reflect.Method;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -90,30 +91,34 @@ public class HibernateModule extends OrmModule<SessionFactory, Session, Configur
     public void afterInit() {
     	super.afterInit();
     	
-    	// Make sure that a spring HibernateTransactionManager is used for transaction management in the database module, if the
-    	// current test object defines a hibernate SessionFactory
-    	getDatabaseModule().getTransactionHandler().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
-    		
-    		public boolean isApplicableFor(Object testObject) {
-    			return isPersistenceUnitConfiguredFor(testObject);
-			}
-    		
+    	
+    }
+    
+    public void registerTransactionManagementConfiguration() {
+     // Make sure that a spring HibernateTransactionManager is used for transaction management in the database module, if the
+        // current test object defines a hibernate SessionFactory
+        getDatabaseModule().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
+            
+            public boolean isApplicableFor(Object testObject) {
+                return isPersistenceUnitConfiguredFor(testObject);
+            }
+            
             public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
-				SessionFactory sessionFactory = getPersistenceUnit(testObject);
-				HibernateTransactionManager hibernateTransactionManager = new HibernateTransactionManager(sessionFactory);
-				hibernateTransactionManager.setDataSource(getDataSource());
-				return hibernateTransactionManager;
-			}
+                SessionFactory sessionFactory = getPersistenceUnit(testObject);
+                HibernateTransactionManager hibernateTransactionManager = new HibernateTransactionManager(sessionFactory);
+                hibernateTransactionManager.setDataSource(getDataSource());
+                return hibernateTransactionManager;
+            }
 
             public boolean isTransactionalResourceAvailable(Object testObject) {
-                return getDatabaseModule().getDefaultDataSourceWrapper().isDataSourceLoaded();
+                return getDatabaseModule().getWrapper(databaseName).isDataSourceLoaded();
             }
 
             public Integer getPreference() {
                 return 10;
             }
-    		
-    	});
+            
+        });
     }
     
     
@@ -137,7 +142,7 @@ public class HibernateModule extends OrmModule<SessionFactory, Session, Configur
     
     @Override
 	protected OrmPersistenceUnitLoader<SessionFactory, Configuration, OrmConfig> createOrmPersistenceUnitLoader() {
-		return new HibernateSessionFactoryLoader();
+		return new HibernateSessionFactoryLoader(databaseName);
 	}
 
     
@@ -213,7 +218,7 @@ public class HibernateModule extends OrmModule<SessionFactory, Session, Configur
 
 
     protected DataSource getDataSource() {
-    	return getDatabaseModule().getDefaultDataSourceWrapper().getDataSourceAndActivateTransactionIfNeeded();
+    	return getDatabaseModule().getWrapper(databaseName).getDataSourceAndActivateTransactionIfNeeded();
     }
     
     
@@ -229,6 +234,17 @@ public class HibernateModule extends OrmModule<SessionFactory, Session, Configur
      * The {@link TestListener} for this module
      */
     protected class HibernateTestListener extends OrmTestListener {
+        
+        /**
+         * @see org.unitils.core.TestListener#beforeTestMethod(java.lang.Object, java.lang.reflect.Method)
+         */
+        @Override
+        public void beforeTestMethod(Object testObject, Method testMethod) {
+            databaseName = getDatabaseName(testObject, testMethod);
+            registerTransactionManagementConfiguration();
+            super.beforeTestMethod(testObject, testMethod);
+        }
+        
     }
 
    

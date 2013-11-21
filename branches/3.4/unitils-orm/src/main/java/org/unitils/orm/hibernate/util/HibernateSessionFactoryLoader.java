@@ -34,6 +34,15 @@ import javax.sql.DataSource;
 //todo javadoc
 public class HibernateSessionFactoryLoader implements OrmPersistenceUnitLoader<SessionFactory, Configuration, OrmConfig> {
 
+    protected String databaseName;
+    /**
+     * @param databaseName
+     */
+    public HibernateSessionFactoryLoader(String databaseName) {
+        this.databaseName = databaseName;
+    }
+
+
     public ConfiguredOrmPersistenceUnit<SessionFactory, Configuration> getConfiguredOrmPersistenceUnit(Object testObject, OrmConfig entityManagerConfig) {
         LocalSessionFactoryBean factoryBean = createSessionFactoryBean(testObject, entityManagerConfig);
         SessionFactory entityManagerFactory = (SessionFactory) factoryBean.getObject();
@@ -75,7 +84,7 @@ public class HibernateSessionFactoryLoader implements OrmPersistenceUnitLoader<S
 
 
     protected DataSource getDataSource() {
-        return getDatabaseModule().getDefaultDataSourceWrapper().getDataSourceAndActivateTransactionIfNeeded();
+        return getDatabaseModule().getWrapper(databaseName).getDataSourceAndActivateTransactionIfNeeded();
     }
 
 
