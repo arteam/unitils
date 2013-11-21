@@ -1,12 +1,18 @@
 package org.unitils.spring.profile;
 
+import static org.unitils.database.SQLUnitils.executeUpdate;
+
 import javax.sql.DataSource;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.unitils.UnitilsJUnit4TestClassRunner;
 import org.unitils.spring.annotation.ConfigureProfile;
 import org.unitils.spring.annotation.SpringApplicationContext;

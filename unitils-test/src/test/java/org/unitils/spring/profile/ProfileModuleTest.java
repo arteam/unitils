@@ -2,6 +2,8 @@ package org.unitils.spring.profile;
 
 import static org.unitils.database.SQLUnitils.executeUpdate;
 
+import java.util.Properties;
+
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,7 +18,10 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.unitils.UnitilsJUnit4TestClassRunner;
+import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
+import org.unitils.database.DatabaseModule;
 import org.unitils.easymock.EasyMockUnitils;
 import org.unitils.easymock.annotation.Mock;
 import org.unitils.inject.annotation.TestedObject;
@@ -59,6 +64,10 @@ public class ProfileModuleTest {
     @Before
     public void setUp() throws Exception {
         profileModule = new ProfileModule();
+        Properties config = new ConfigurationLoader().loadConfiguration();
+        profileModule.init(config);
+        profileModule.afterInit();
+        
     }
 
     @Test(expected = UnitilsException.class)
@@ -222,7 +231,6 @@ public class ProfileModuleTest {
     private void dropTableDummyTable() {
         EmbeddedDatabase dataSource = new EmbeddedDatabaseBuilder()
         .setType(EmbeddedDatabaseType.HSQL)
-        .addScript("classpath:org/unitils/database/DatabaseUnitilsTest.sql")
         .build();
         
         executeUpdate("drop table DUMMYTABLE", dataSource);
