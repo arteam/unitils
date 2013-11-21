@@ -29,8 +29,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.unitils.mock.ArgumentMatchers.notNull;
@@ -140,7 +140,6 @@ public class MockObjectTest {
     @Test
     public void proxyArgumentsAndResult() {
         Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[]{Collection.class}, new InvocationHandler() {
-            @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 return null;
             }
