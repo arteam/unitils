@@ -98,7 +98,7 @@ public class SpringModule implements Module {
         // Make sure that, if a custom transaction manager is configured in the spring ApplicationContext associated with
         // the current test, it is used for managing transactions. 
         if (isDatabaseModuleEnabled()) {
-            getDatabaseModule().getTransactionHandler().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
+            getDatabaseModule().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
                 
                 public boolean isApplicableFor(Object testObject) {
                     if (!isApplicationContextConfiguredFor(testObject)) {

@@ -3,6 +3,7 @@ package org.unitils.spring.profile;
 
 import javax.sql.DataSource;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +34,12 @@ public class ProfilesModuleConfigurationIntegrationTest {
     public void test() {
         
         Assert.assertTrue(dataSource instanceof EmbeddedDatabase);
+    }
+    
+    
+    @After
+    public void dropDossierTable() {
+        
     }
 
 }
