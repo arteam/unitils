@@ -24,7 +24,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
-import org.unitils.dbunit.datasetfactory.impl.ResourceMultiSchemaXmlDataSetFactory;
 
 /**
  * Annotation indicating that after having executed a test method, the contents of the unit test database should be
@@ -88,8 +87,13 @@ public @interface ExpectedDataSet {
      */
     String[] value() default {};
 
-    Class<? extends DataSetFactory> factory() default ResourceMultiSchemaXmlDataSetFactory.class;
-    
-    String databaseName() default "";
+    Class<? extends DataSetFactory> factory() default DataSetFactory.class;
 
+    /**
+     * The name of the database. 
+     * If you want to use the default database defined in the unitils.properties, than you should leave this empty.
+     * 
+     * @return {@link String}
+     */
+    String databaseName() default "";
 }

@@ -35,36 +35,17 @@ public class DbUnitUnitils {
      * Inserts the default dataset for the given test class into the database
      */
     public static void insertDefaultDataSet() {
-        insertDefaultDataSet("");
-    }
-    
-    /**
-     * Inserts the default dataset for the given test class into the database
-     * 
-     * @param databaseName
-     */
-    public static void insertDefaultDataSet(String databaseName) {
-        getDbUnitModule().insertDefaultDataSet(Unitils.getInstance().getTestContext().getTestClass(), databaseName);
+        getDbUnitModule().insertDefaultDataSet(Unitils.getInstance().getTestContext().getTestClass());
     }
 
 
-    /**
-     * Inserts the dataset consisting of the given list of files into the database
-     *
-     * @param databaseName
-     * @param dataSetFileNames The names of the files that define the test data
-     */
-    public static void insertDataSet(String databaseName, String... dataSetFileNames) {
-        getDbUnitModule().insertDataSet(Unitils.getInstance().getTestContext().getTestClass(), databaseName, dataSetFileNames);
-    }
-    
     /**
      * Inserts the dataset consisting of the given list of files into the database
      *
      * @param dataSetFileNames The names of the files that define the test data
      */
     public static void insertDataSet(String... dataSetFileNames) {
-        insertDataSet("", dataSetFileNames);
+        getDbUnitModule().insertDataSet(Unitils.getInstance().getTestContext().getTestClass(), dataSetFileNames);
     }
 
 
@@ -75,20 +56,10 @@ public class DbUnitUnitils {
      * @param dataSetFile The test data set, not null
      */
     public static void insertDataSet(File dataSetFile) {
-        insertDataSet(dataSetFile, "");
+        getDbUnitModule().insertDataSet(dataSetFile);
     }
 
-    /**
-     * Inserts the test data coming from the given DbUnit dataset file,
-     * using the default {@link DataSetLoadStrategy} and {@link DataSetFactory} class.
-     *
-     * @param dataSetFile The test data set, not null
-     * @param databaseName
-     */
-    public static void insertDataSet(File dataSetFile, String databaseName) {
-        getDbUnitModule().insertDataSet(dataSetFile, databaseName);
-    }
-    
+
     /**
      * Inserts the test data coming from the given DbUnit dataset file.
      *
@@ -97,19 +68,7 @@ public class DbUnitUnitils {
      * @param dataSetLoadStrategyClass The class of the load strategy that must be used to load this dataset
      */
     public static void insertDataSet(File dataSetFile, Class<? extends DataSetFactory> dataSetFactoryClass, Class<? extends DataSetLoadStrategy> dataSetLoadStrategyClass) {
-        insertDataSet(dataSetFile, dataSetFactoryClass, dataSetLoadStrategyClass, "");
-    }
-    
-    /**
-     * Inserts the test data coming from the given DbUnit dataset file.
-     *
-     * @param dataSetFile              The test data set, not null
-     * @param dataSetFactoryClass      The class of the factory that must be used to read this dataset
-     * @param dataSetLoadStrategyClass The class of the load strategy that must be used to load this dataset
-     * @param databaseName
-     */
-    public static void insertDataSet(File dataSetFile, Class<? extends DataSetFactory> dataSetFactoryClass, Class<? extends DataSetLoadStrategy> dataSetLoadStrategyClass, String databaseName) {
-        getDbUnitModule().insertDataSet(dataSetFile, dataSetFactoryClass, dataSetLoadStrategyClass, databaseName);
+        getDbUnitModule().insertDataSet(dataSetFile, dataSetFactoryClass, dataSetLoadStrategyClass);
     }
 
 
