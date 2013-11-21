@@ -24,7 +24,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
-import org.unitils.dbunit.datasetfactory.impl.ResourceMultiSchemaXmlDataSetFactory;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 
 /**
@@ -106,7 +105,13 @@ public @interface DataSet {
      * @return An implementation class of {@link DataSetFactory}. Use the default value {@link DataSetFactory}
      *         to make use of the default DataSetLoadStrategy configured in the unitils configuration.
      */
-    Class<? extends DataSetFactory> factory() default ResourceMultiSchemaXmlDataSetFactory.class;
+    Class<? extends DataSetFactory> factory() default DataSetFactory.class;
     
+    /**
+     * The name of the database. 
+     * If you want to use the default database defined in the unitils.properties, than you should leave this empty.
+     * 
+     * @return {@link String}
+     */
     String databaseName() default "";
 }
