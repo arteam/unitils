@@ -1,6 +1,3 @@
-/*
- * Copyright (c) Smals
- */
 package org.unitils.dbunit.datasetfactory.impl;
 
 import java.io.File;
@@ -19,9 +16,11 @@ import org.unitils.dbunit.util.MultiSchemaDataSet;
 /**
  * ResourceMultiSchemaXmlDataSetFactory - A factory to create datasets for {@link org.unitils.dbunit.annotation.DataSet} and {@link org.unitils.dbunit.annotation.ExpectedDataSet} .
  * 
- * @author wiw
+ * @author Jeroen Horemans
+ * @author Thomas De Rycke
+ * @author Willemijn Wouters
  * 
- * @since 1.2.8
+ * @since 3.4
  */
 public class ResourceMultiSchemaXmlDataSetFactory extends MultiSchemaXmlDataSetFactory {
 

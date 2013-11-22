@@ -1,6 +1,3 @@
-/*
- * Copyright (c) Smals
- */
 package org.unitils.database;
 
 import java.io.File;
@@ -19,13 +16,11 @@ import org.junit.Test;
 import org.unitils.core.Unitils;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.config.DatabaseConfiguration;
-/*import org.unitils.database.config.DatabaseConfiguration;
-import org.unitils.database.transaction.TransactionHandler;*/
 import org.unitils.reflectionassert.ReflectionAssert;
 
 
 /**
- * TODO: Description of the class.
+ * Test multiple databases.
  * 
  * @author wiw
  * 

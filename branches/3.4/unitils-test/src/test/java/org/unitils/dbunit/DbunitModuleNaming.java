@@ -1,6 +1,3 @@
-/*
- * Copyright (c) Smals
- */
 package org.unitils.dbunit;
 
 import java.util.Properties;
@@ -15,7 +12,9 @@ import org.unitils.dbunit.dataset.ColumnComparisonTest;
 /**
  * DbunitModuleNaming.
  * 
- * @author wiw
+ * @author Jeroen Horemans
+ * @author Thomas De Rycke
+ * @author Willemijn Wouters
  * 
  * @since 3.4
  * 

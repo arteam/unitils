@@ -1,6 +1,3 @@
-/*
- * Copyright (c) Smals
- */
 package org.unitils;
 
 import java.util.ArrayList;
