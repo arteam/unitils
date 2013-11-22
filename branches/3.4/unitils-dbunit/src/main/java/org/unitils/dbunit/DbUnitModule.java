@@ -47,7 +47,6 @@ import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import org.unitils.dbunit.util.DataSetAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
-import org.unitils.util.AnnotationUtils;
 import org.unitils.util.PropertyUtils;
 
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
@@ -182,7 +181,7 @@ public class DbUnitModule implements Module {
      */
     public void insertDefaultDataSet(Class<?> testClass) {
         DataSetFactory dataSetFactory = getDefaultDataSetFactory();
-        String[] dataSetFileNames = new String[]{getDefaultDataSetFileName(testClass, dataSetFactory.getDataSetFileExtension())};
+        String[] dataSetFileNames = new String[]{getDefaultDataSetFileNameClassLevel(testClass, dataSetFactory.getDataSetFileExtension())};
         insertDataSet(testClass, dataSetFileNames);
     }
 
@@ -331,7 +330,7 @@ public class DbUnitModule implements Module {
         String[] dataSetFileNames = dataSetAnnotation.value();
         if (dataSetFileNames.length == 0) {
             // empty means, use default file name, which is the name of the class + extension
-            dataSetFileNames = new String[]{getDefaultDataSetFileName(testClass, dataSetFactory.getDataSetFileExtension())};
+            dataSetFileNames = new String[]{getCorrectFileName(testClass, testMethod, dataSetFactory.getDataSetFileExtension())};
         }
         return getDataSet(testClass, dataSetFileNames, dataSetFactory);
     }
@@ -451,6 +450,20 @@ public class DbUnitModule implements Module {
             throw new UnitilsException("Error while closing connection.", e);
         }
     }
+    
+    protected String getCorrectFileName(Class<?> testClass, Method method, String extension) {
+        String name = getDefaultDataSetFileNameMethodLevel(testClass, method, extension);
+        DataSetResolver dataSetResolver = getDataSetResolver();
+        try {
+            dataSetResolver.resolve(testClass, name);
+            return name;
+        } catch (Exception e) {
+            //the DefaultDataSetFileNameMethodLevel does not exist.
+            //so the dataset should exist on classlevel.
+        }
+        
+        return getDefaultDataSetFileNameClassLevel(testClass, extension);
+    }
 
 
     /**
@@ -461,9 +474,32 @@ public class DbUnitModule implements Module {
      * @param extension The configured extension of dataset files
      * @return The default filename, not null
      */
-    protected String getDefaultDataSetFileName(Class<?> testClass, String extension) {
+    protected String getDefaultDataSetFileNameClassLevel(Class<?> testClass, String extension) {
         String className = testClass.getName();
-        return className.substring(className.lastIndexOf(".") + 1) + '.' + extension;
+        StringBuilder builder = new StringBuilder();
+        builder.append(className.substring(className.lastIndexOf(".") + 1));
+        builder.append(".");
+        builder.append(extension);
+        return builder.toString() ;
+    }
+    
+   /**
+    * Gets the name of the default testdata file at class level The default name is constructed as
+    * follows: 'classname without packagename'-"testmethod".xml
+    * @param testClass
+    * @param method
+    * @param extension
+    * @return {@link String}
+    */
+    protected String getDefaultDataSetFileNameMethodLevel(Class<?> testClass, Method method, String extension) {
+        String className = testClass.getName();
+        StringBuilder builder = new StringBuilder();
+        builder.append(className.substring(className.lastIndexOf(".") + 1));
+        builder.append("-");
+        builder.append(method.getName());
+        builder.append(".");
+        builder.append(extension);
+        return builder.toString();
     }
 
 
@@ -553,6 +589,7 @@ public class DbUnitModule implements Module {
     protected DatabaseModule getDatabaseModule() {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
     }
+    
 
 
     /**
