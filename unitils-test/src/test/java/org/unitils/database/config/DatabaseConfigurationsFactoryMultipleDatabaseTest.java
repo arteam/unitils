@@ -1,6 +1,3 @@
-/*
- * Copyright (c) Smals
- */
 package org.unitils.database.config;
 
 import java.io.File;
@@ -21,7 +18,9 @@ import org.unitils.reflectionassert.ReflectionAssert;
 /**
  * DatabaseConfigurationsFactoryMultipleDatabaseTest.
  * 
- * @author wiw
+ * @author Jeroen Horemans
+ * @author Thomas De Rycke
+ * @author Willemijn Wouters
  * 
  * @since 3.4
  * 

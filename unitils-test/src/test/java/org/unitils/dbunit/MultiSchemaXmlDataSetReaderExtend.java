@@ -1,10 +1,3 @@
-/*
- * CVS file status:
- * 
- * $Id: MultiSchemaXmlDataSetReaderExtend.java,v 1.1 2010-11-22 12:10:09 jeho Exp $
- * 
- * Copyright (c) Smals
- */
 package org.unitils.dbunit;
 
 import java.io.InputStream;

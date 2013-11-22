@@ -1,13 +1,12 @@
-/*
- * Copyright (c) Smals
- */
 package org.unitils.dbunit;
 
 
 /**
  * Test class.
  * 
- * @author wiw
+ * @author Jeroen Horemans
+ * @author Thomas De Rycke
+ * @author Willemijn Wouters
  * 
  * @since 3.4
  * 
