@@ -56,7 +56,7 @@ public class ValueReturningMockBehaviorExecuteTest {
 
     @Test
     public void unwrapWrappedTypes() throws Exception {
-        Method method = MyInterface.class.getMethod("wrapperMethod");
+        Method method = MyInterface.class.getMethod("method");
         ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
         valueReturningMockBehavior = new ValueReturningMockBehavior(new MyWrapper());
 
@@ -68,8 +68,6 @@ public class ValueReturningMockBehaviorExecuteTest {
     private static interface MyInterface {
 
         String method();
-
-        MyWrapper wrapperMethod();
     }
 
     private static class MyWrapper implements ObjectToInjectHolder<String> {

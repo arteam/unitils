@@ -36,15 +36,9 @@ public class MockUnitils {
     /* The logger instance for this class */
     protected static Log logger = LogFactory.getLog(MockUnitils.class);
 
-    // todo move to getter functions to avoid unnecessary inits
-    protected static Scenario scenario = Unitils.getInstanceOfType(Scenario.class);
-    protected static MockService mockService = Unitils.getInstanceOfType(MockService.class);
-    protected static MockFactory mockFactory = Unitils.getInstanceOfType(MockFactory.class);
-    protected static ScenarioReport scenarioReport = Unitils.getInstanceOfType(ScenarioReport.class);
-
 
     public static void assertNoMoreInvocations() {
-        mockService.assertNoMoreInvocations();
+        getMockService().assertNoMoreInvocations();
     }
 
     // todo log error when mock chaining does not work  e.g.
@@ -55,15 +49,16 @@ public class MockUnitils {
     }
 
     public static <T> Mock<T> createMock(String name, Class<T> type, Object testObject) {
-        return mockFactory.createMock(name, type, testObject);
+        return getMockFactory().createMock(name, type, testObject);
     }
+
 
     public static <T> PartialMock<T> createPartialMock(Class<T> type, Object testObject) {
         return createPartialMock(null, type, testObject);
     }
 
     public static <T> PartialMock<T> createPartialMock(String name, Class<T> type, Object testObject) {
-        return mockFactory.createPartialMock(name, type, testObject);
+        return getMockFactory().createPartialMock(name, type, testObject);
     }
 
     public static <T> PartialMock<T> createPartialMock(T mockPrototype, Object testObject) {
@@ -71,7 +66,7 @@ public class MockUnitils {
     }
 
     public static <T> PartialMock<T> createPartialMock(String name, T mockPrototype, Object testObject) {
-        return mockFactory.createPartialMock(name, mockPrototype, testObject);
+        return getMockFactory().createPartialMock(name, mockPrototype, testObject);
     }
 
 
@@ -80,16 +75,33 @@ public class MockUnitils {
     }
 
     public static <T> T createDummy(String name, Class<T> type) {
-        return mockFactory.createDummy(name, type);
+        return getMockFactory().createDummy(name, type);
     }
 
 
     public static void logScenarioReport() {
-        String report = scenarioReport.createReport();
+        String report = getScenarioReport().createReport();
         logger.info(report);
     }
 
     public static List<ObservedInvocation> getObservedInvocations() {
-        return scenario.getObservedInvocations();
+        return getScenario().getObservedInvocations();
+    }
+
+
+    protected static Scenario getScenario() {
+        return Unitils.getInstanceOfType(Scenario.class);
+    }
+
+    protected static MockService getMockService() {
+        return Unitils.getInstanceOfType(MockService.class);
+    }
+
+    protected static MockFactory getMockFactory() {
+        return Unitils.getInstanceOfType(MockFactory.class);
+    }
+
+    protected static ScenarioReport getScenarioReport() {
+        return Unitils.getInstanceOfType(ScenarioReport.class);
     }
 }

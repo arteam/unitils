@@ -347,23 +347,36 @@ public class ReflectionUtils {
      * @return The declared generic type parameter, null if not generic a generic type
      */
     public static Class<?> getGenericParameterClass(Type type) {
-        if (type instanceof ParameterizedType) {
-            Type[] argumentTypes = ((ParameterizedType) type).getActualTypeArguments();
-            if (argumentTypes.length == 0) {
-                return null;
-            }
-            if (argumentTypes.length > 1) {
-                throw new UnitilsException("Unable to determine unique generic type for type: " + type + ". The type declares more than one generic type: " + type);
-            }
-            Type argumentType = argumentTypes[0];
-            if (argumentType instanceof ParameterizedType) {
-                argumentType = ((ParameterizedType) argumentTypes[0]).getRawType();
-            }
-            if (argumentType instanceof Class) {
-                return (Class<?>) argumentType;
-            }
+        Type parameterType = getGenericParameterType(type);
+        if (parameterType instanceof Class) {
+            return (Class<?>) parameterType;
         }
         return null;
+    }
+
+    /**
+     * Gets the T from a Class<T> type declaration. An exception is raised if
+     * the type has more than 1 generic type
+     *
+     * @param type The type to get the generic type parameter from, not null
+     * @return The declared generic type parameter, null if not generic a generic type
+     */
+    public static Type getGenericParameterType(Type type) {
+        if (!(type instanceof ParameterizedType)) {
+            return null;
+        }
+        Type[] argumentTypes = ((ParameterizedType) type).getActualTypeArguments();
+        if (argumentTypes.length == 0) {
+            return null;
+        }
+        if (argumentTypes.length > 1) {
+            throw new UnitilsException("Unable to determine unique generic type for type: " + type + ". The type declares more than one generic type: " + type);
+        }
+        Type argumentType = argumentTypes[0];
+        if (argumentType instanceof ParameterizedType) {
+            argumentType = ((ParameterizedType) argumentTypes[0]).getRawType();
+        }
+        return argumentType;
     }
 
     public static void copyFields(Object fromObject, Object toObject) {

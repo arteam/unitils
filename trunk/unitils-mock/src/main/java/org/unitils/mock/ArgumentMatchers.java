@@ -27,9 +27,6 @@ import org.unitils.mock.argumentmatcher.Capture;
  */
 public class ArgumentMatchers {
 
-    protected static ArgumentMatcherService argumentMatcherService = Unitils.getInstanceOfType(ArgumentMatcherService.class);
-
-
     /**
      * Matches when the argument is not null.
      * <p/>
@@ -41,7 +38,7 @@ public class ArgumentMatchers {
      */
     @ArgumentMatcher
     public static <T> T notNull(Class<T> argumentClass) {
-        argumentMatcherService.registerNotNullArgumentMatcher(argumentClass);
+        getArgumentMatcherService().registerNotNullArgumentMatcher(argumentClass);
         return null;
     }
 
@@ -56,7 +53,7 @@ public class ArgumentMatchers {
      */
     @ArgumentMatcher
     public static <T> T isNull(Class<T> argumentClass) {
-        argumentMatcherService.registerNullArgumentMatcher(argumentClass);
+        getArgumentMatcherService().registerNullArgumentMatcher(argumentClass);
         return null;
     }
 
@@ -70,25 +67,25 @@ public class ArgumentMatchers {
      */
     @ArgumentMatcher
     public static <T> T same(T sameAs) {
-        argumentMatcherService.registerSameArgumentMatcher(sameAs);
+        getArgumentMatcherService().registerSameArgumentMatcher(sameAs);
         return sameAs;
     }
 
     @ArgumentMatcher
     public static <T> T eq(T equalTo) {
-        argumentMatcherService.registerEqualsArgumentMatcher(equalTo);
+        getArgumentMatcherService().registerEqualsArgumentMatcher(equalTo);
         return equalTo;
     }
 
     @ArgumentMatcher
     public static <T> T refEq(T equalTo) {
-        argumentMatcherService.registerRefEqArgumentMatcher(equalTo);
+        getArgumentMatcherService().registerRefEqArgumentMatcher(equalTo);
         return equalTo;
     }
 
     @ArgumentMatcher
     public static <T> T lenEq(T equalTo) {
-        argumentMatcherService.registerLenEqArgumentMatcher(equalTo);
+        getArgumentMatcherService().registerLenEqArgumentMatcher(equalTo);
         return equalTo;
     }
 
@@ -105,61 +102,66 @@ public class ArgumentMatchers {
      */
     @ArgumentMatcher
     public static <T> T any(Class<T> argumentClass) {
-        argumentMatcherService.registerAnyArgumentMatcher(argumentClass);
+        getArgumentMatcherService().registerAnyArgumentMatcher(argumentClass);
         return null;
     }
 
     @ArgumentMatcher
     public static <T> T get(Capture<T> capture) {
-        argumentMatcherService.registerCaptureArgumentMatcher(capture);
+        getArgumentMatcherService().registerCaptureArgumentMatcher(capture);
         return null;
     }
 
     @ArgumentMatcher
     public static boolean anyBoolean() {
-        argumentMatcherService.registerAnyArgumentMatcher(Boolean.class);
+        getArgumentMatcherService().registerAnyArgumentMatcher(Boolean.class);
         return false;
     }
 
     @ArgumentMatcher
     public static byte anyByte() {
-        argumentMatcherService.registerAnyArgumentMatcher(Byte.class);
+        getArgumentMatcherService().registerAnyArgumentMatcher(Byte.class);
         return 0;
     }
 
     @ArgumentMatcher
     public static short anyShort() {
-        argumentMatcherService.registerAnyArgumentMatcher(Short.class);
+        getArgumentMatcherService().registerAnyArgumentMatcher(Short.class);
         return 0;
     }
 
     @ArgumentMatcher
     public static char anyChar() {
-        argumentMatcherService.registerAnyArgumentMatcher(Character.class);
+        getArgumentMatcherService().registerAnyArgumentMatcher(Character.class);
         return 0;
     }
 
     @ArgumentMatcher
     public static int anyInt() {
-        argumentMatcherService.registerAnyArgumentMatcher(Integer.class);
+        getArgumentMatcherService().registerAnyArgumentMatcher(Integer.class);
         return 0;
     }
 
     @ArgumentMatcher
     public static long anyLong() {
-        argumentMatcherService.registerAnyArgumentMatcher(Long.class);
+        getArgumentMatcherService().registerAnyArgumentMatcher(Long.class);
         return 0;
     }
 
     @ArgumentMatcher
     public static float anyFloat() {
-        argumentMatcherService.registerAnyArgumentMatcher(Float.class);
+        getArgumentMatcherService().registerAnyArgumentMatcher(Float.class);
         return 0;
     }
 
     @ArgumentMatcher
     public static double anyDouble() {
-        argumentMatcherService.registerAnyArgumentMatcher(Double.class);
+        getArgumentMatcherService().registerAnyArgumentMatcher(Double.class);
         return 0;
+    }
+
+
+    protected static ArgumentMatcherService getArgumentMatcherService() {
+        return Unitils.getInstanceOfType(ArgumentMatcherService.class);
     }
 }

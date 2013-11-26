@@ -18,10 +18,7 @@ package org.unitils.mock.mockbehavior;
 import org.unitils.mock.core.MockFactory;
 import org.unitils.mock.core.proxy.ProxyService;
 import org.unitils.mock.core.util.StackTraceService;
-import org.unitils.mock.mockbehavior.impl.DummyValueReturningMockBehavior;
-import org.unitils.mock.mockbehavior.impl.ExceptionThrowingMockBehavior;
-import org.unitils.mock.mockbehavior.impl.StubMockBehavior;
-import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
+import org.unitils.mock.mockbehavior.impl.*;
 
 /**
  * @author Tim Ducheyne
@@ -40,6 +37,10 @@ public class MockBehaviorFactory {
 
     public MockBehavior createValueReturningMockBehavior(Object returnValue) {
         return new ValueReturningMockBehavior(returnValue);
+    }
+
+    public MockBehavior createCollectionReturningMockBehavior(Object... returnValues) {
+        return new CollectionReturningMockBehavior(returnValues);
     }
 
     public MockBehavior createExceptionThrowingMockBehavior(Throwable exception) {

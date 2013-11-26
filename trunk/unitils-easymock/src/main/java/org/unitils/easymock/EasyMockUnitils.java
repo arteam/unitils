@@ -33,8 +33,6 @@ import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDE
  */
 public class EasyMockUnitils {
 
-    protected static MockService mockService = Unitils.getInstanceOfType(MockService.class);
-
     /**
      * Expects the given object argument but uses a reflection argument matcher to compare
      * the given value with the actual value during the test. The comparator modes are set to
@@ -95,7 +93,7 @@ public class EasyMockUnitils {
      * @return a mock for the given class or interface, not null
      */
     public static <T> T createRegularMock(Class<T> mockType, InvocationOrder invocationOrder, Calls calls) {
-        return mockService.createRegularMock(mockType, invocationOrder, calls);
+        return getMockService().createRegularMock(mockType, invocationOrder, calls);
     }
 
     /**
@@ -134,7 +132,7 @@ public class EasyMockUnitils {
      * @return a mock for the given class or interface, not null
      */
     public static <T> T createMock(Class<T> mockType, InvocationOrder invocationOrder, Calls calls, Order order, Dates dates, Defaults defaults) {
-        return mockService.createMock(mockType, invocationOrder, calls, order, dates, defaults);
+        return getMockService().createMock(mockType, invocationOrder, calls, order, dates, defaults);
     }
 
     /**
@@ -148,7 +146,7 @@ public class EasyMockUnitils {
      * After each test, the expected behavior is verified automatically, or explicitly by calling {@link #verify()}.
      */
     public static void replay() {
-        mockService.replay();
+        getMockService().replay();
     }
 
     /**
@@ -165,14 +163,19 @@ public class EasyMockUnitils {
      * by calling this method.
      */
     public static void verify() {
-        mockService.verify();
+        getMockService().verify();
     }
 
     public static void reset() {
-        mockService.reset();
+        getMockService().reset();
     }
 
     public static void clearMocks() {
-        mockService.clearMocks();
+        getMockService().clearMocks();
+    }
+
+
+    protected static MockService getMockService() {
+        return Unitils.getInstanceOfType(MockService.class);
     }
 }
