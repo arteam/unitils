@@ -13,28 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.database;
+package org.unitils.mock.mockbehavior;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.unitils.UnitilsJUnit4TestClassRunner;
+import org.unitils.mock.mockbehavior.impl.StubMockBehavior;
 
-import javax.sql.DataSource;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Tim Ducheyne
  */
-@RunWith(UnitilsJUnit4TestClassRunner.class)
-@ContextConfiguration
-public class UnitilsDataSourceBeanIntegrationTest {
+public class MockBehaviorFactoryCreateStubMockBehaviorTest {
 
-    // todo debug remove
+    private MockBehaviorFactory mockBehaviorFactory;
+
+
+    @Before
+    public void initialize() {
+        mockBehaviorFactory = new MockBehaviorFactory(null, null);
+    }
+
 
     @Test
-    public void test1() {
-        System.out.println("UnitilsDataSourceBeanIntegrationTest.test1");
-        DataSource dataSource = DatabaseUnitils.getDataSource("test");
-        System.out.println("dataSource = " + dataSource);
+    public void createValueReturningMockBehavior() {
+        MockBehavior result = mockBehaviorFactory.createStubMockBehavior();
+        assertTrue(result instanceof StubMockBehavior);
     }
 }

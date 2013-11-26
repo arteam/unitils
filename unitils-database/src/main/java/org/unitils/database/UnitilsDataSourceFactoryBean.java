@@ -34,8 +34,6 @@ import javax.sql.DataSource;
  */
 public class UnitilsDataSourceFactoryBean implements FactoryBean {
 
-    protected static DataSourceService dataSourceService = Unitils.getInstanceOfType(DataSourceService.class);
-
     protected String databaseName;
 
 
@@ -45,9 +43,8 @@ public class UnitilsDataSourceFactoryBean implements FactoryBean {
      * @return The data source, not null
      */
     public Object getObject() throws Exception {
-        return dataSourceService.getDataSource(databaseName);
+        return getDataSourceService().getDataSource(databaseName);
     }
-
 
     /**
      * @return The database name, null for the default database
@@ -63,7 +60,6 @@ public class UnitilsDataSourceFactoryBean implements FactoryBean {
         this.databaseName = databaseName;
     }
 
-
     /**
      * Gets the type of the object provided by this <code>FactoryBean</code>, i.e. <code>DataSource</code>
      *
@@ -73,11 +69,15 @@ public class UnitilsDataSourceFactoryBean implements FactoryBean {
         return DataSource.class;
     }
 
-
     /**
      * @return true, this is a singleton
      */
     public boolean isSingleton() {
         return true;
+    }
+
+
+    protected DataSourceService getDataSourceService() {
+        return Unitils.getInstanceOfType(DataSourceService.class);
     }
 }

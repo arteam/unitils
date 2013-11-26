@@ -15,6 +15,7 @@
  */
 package org.unitils.mock.core;
 
+import org.unitils.mock.CreateMockListener;
 import org.unitils.mock.Mock;
 import org.unitils.mock.PartialMock;
 import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
@@ -71,7 +72,12 @@ public class MockFactory {
     public <T> Mock<T> createMock(String name, Class<T> mockedType, Object testObject) {
         String mockName = getName(name, mockedType);
         resetIfNewTestObject(testObject);
-        return createMockObject(mockName, mockedType, false);
+
+        MockObject<T> mockObject = createMockObject(mockName, mockedType, false);
+        if (testObject instanceof CreateMockListener) {
+            ((CreateMockListener) testObject).mockCreated(mockObject, name, mockedType);
+        }
+        return mockObject;
     }
 
     /**
@@ -88,7 +94,12 @@ public class MockFactory {
     public <T> PartialMock<T> createPartialMock(String name, Class<T> mockedType, Object testObject) {
         String mockName = getName(name, mockedType);
         resetIfNewTestObject(testObject);
-        return createPartialMockObject(mockName, mockedType, false);
+
+        PartialMockObject<T> partialMockObject = createPartialMockObject(mockName, mockedType, false);
+        if (testObject instanceof CreateMockListener) {
+            ((CreateMockListener) testObject).mockCreated(partialMockObject, name, mockedType);
+        }
+        return partialMockObject;
     }
 
     /**
@@ -107,9 +118,15 @@ public class MockFactory {
     @SuppressWarnings("unchecked")
     public <T> PartialMock<T> createPartialMock(String name, T mockPrototype, Object testObject) {
         Class<T> mockedType = (Class<T>) mockPrototype.getClass();
-        PartialMock<T> partialMock = createPartialMock(name, mockedType, testObject);
-        copyFields(mockPrototype, partialMock.getMock());
-        return partialMock;
+        String mockName = getName(name, mockedType);
+        resetIfNewTestObject(testObject);
+
+        PartialMockObject<T> partialMockObject = createPartialMockObject(mockName, mockedType, false);
+        copyFields(mockPrototype, partialMockObject.getMock());
+        if (testObject instanceof CreateMockListener) {
+            ((CreateMockListener) testObject).mockCreated(partialMockObject, name, mockedType);
+        }
+        return partialMockObject;
     }
 
     public Mock<?> createChainedMock(MatchingInvocation matchingInvocation) {

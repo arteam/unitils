@@ -28,17 +28,13 @@ import org.unitils.inject.core.ObjectToInject;
  */
 public class InjectUnitils {
 
-    protected static InjectionService injectionService = Unitils.getInstanceOfType(InjectionService.class);
-    protected static InjectionByTypeService injectionByTypeService = Unitils.getInstanceOfType(InjectionByTypeService.class);
-
-
     public static OriginalFieldValue injectInto(Object target, String property, Object value) {
         return injectInto(target, property, value, true);
     }
 
     public static OriginalFieldValue injectInto(Object target, String property, Object value, boolean autoCreateInnerFields) {
         ObjectToInject objectToInject = new ObjectToInject(value);
-        return injectionService.injectInto(target, property, objectToInject, autoCreateInnerFields);
+        return getInjectionService().injectInto(target, property, objectToInject, autoCreateInnerFields);
     }
 
 
@@ -48,7 +44,7 @@ public class InjectUnitils {
 
     public static OriginalFieldValue injectIntoStatic(Class<?> targetClass, String property, Object value, boolean autoCreateInnerFields) {
         ObjectToInject objectToInject = new ObjectToInject(value);
-        return injectionService.injectIntoStatic(targetClass, property, objectToInject, autoCreateInnerFields);
+        return getInjectionService().injectIntoStatic(targetClass, property, objectToInject, autoCreateInnerFields);
     }
 
 
@@ -66,7 +62,7 @@ public class InjectUnitils {
 
     public static OriginalFieldValue injectIntoByType(Object target, Object value, Class<?> type, boolean failWhenNoMatch) {
         ObjectToInject objectToInject = new ObjectToInject(value, type);
-        return injectionByTypeService.injectIntoByType(target, objectToInject, failWhenNoMatch);
+        return getInjectionByTypeService().injectIntoByType(target, objectToInject, failWhenNoMatch);
     }
 
 
@@ -84,6 +80,15 @@ public class InjectUnitils {
 
     public static OriginalFieldValue injectIntoStaticByType(Class<?> targetClass, Object value, Class<?> type, boolean failWhenNoMatch) {
         ObjectToInject objectToInject = new ObjectToInject(value, type);
-        return injectionByTypeService.injectIntoStaticByType(targetClass, objectToInject, failWhenNoMatch);
+        return getInjectionByTypeService().injectIntoStaticByType(targetClass, objectToInject, failWhenNoMatch);
+    }
+
+
+    protected static InjectionService getInjectionService() {
+        return Unitils.getInstanceOfType(InjectionService.class);
+    }
+
+    protected static InjectionByTypeService getInjectionByTypeService() {
+        return Unitils.getInstanceOfType(InjectionByTypeService.class);
     }
 }

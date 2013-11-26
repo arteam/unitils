@@ -18,6 +18,7 @@ package org.unitils.mock.core;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.mock.CreateMockListener;
 import org.unitils.mock.Mock;
 import org.unitils.mock.PartialMock;
 import org.unitils.mock.annotation.Dummy;
@@ -59,6 +60,7 @@ public class MockFactoryCreatePartialMockTest extends UnitilsJUnit4 {
     private Properties matchingProxy;
     @Dummy
     private Object testObject;
+    private Mock<CreateMockListener> createMockListenerMock;
     @Dummy
     private Object otherTestObject;
     private BehaviorDefiningInvocations behaviorDefiningInvocations;
@@ -131,5 +133,21 @@ public class MockFactoryCreatePartialMockTest extends UnitilsJUnit4 {
         scenarioMock.assertNotInvoked().reset();
         scenarioMock.assertNotInvoked().setTestObject(testObject);
         argumentMatcherRepositoryMock.assertNotInvoked().reset();
+    }
+
+    @Test
+    public void mockCreatedCalledWhenTestObjectIsCreateMockListener() {
+        Mock<Properties> mock = mockFactory.createPartialMock("name", Properties.class, createMockListenerMock.getMock());
+        createMockListenerMock.assertInvoked().mockCreated(mock, "name", Properties.class);
+    }
+
+    @Test
+    public void mockCreatedCalledForPrototypeWhenTestObjectIsCreateMockListener() {
+        Properties prototype = new Properties();
+        Properties prototypeProxy = new Properties();
+        proxyServiceMock.returns(prototypeProxy).createProxy("name", true, mockProxyInvocationHandler, Properties.class);
+
+        Mock<Properties> mock = mockFactory.createPartialMock("name", prototype, createMockListenerMock.getMock());
+        createMockListenerMock.assertInvoked().mockCreated(mock, "name", Properties.class);
     }
 }

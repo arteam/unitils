@@ -18,6 +18,7 @@ package org.unitils.mock.core;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.mock.CreateMockListener;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
@@ -60,6 +61,7 @@ public class MockFactoryCreateMockTest extends UnitilsJUnit4 {
     private Object testObject;
     @Dummy
     private Object otherTestObject;
+    private Mock<CreateMockListener> createMockListenerMock;
     private BehaviorDefiningInvocations behaviorDefiningInvocations;
     private MatchingProxyInvocationHandler matchingProxyInvocationHandler;
     private MockProxyInvocationHandler mockProxyInvocationHandler;
@@ -117,5 +119,11 @@ public class MockFactoryCreateMockTest extends UnitilsJUnit4 {
         scenarioMock.assertNotInvoked().reset();
         scenarioMock.assertNotInvoked().setTestObject(testObject);
         argumentMatcherRepositoryMock.assertNotInvoked().reset();
+    }
+
+    @Test
+    public void mockCreatedCalledWhenTestObjectIsCreateMockListener() {
+        Mock<Properties> mock = mockFactory.createMock("name", Properties.class, createMockListenerMock.getMock());
+        createMockListenerMock.assertInvoked().mockCreated(mock, "name", Properties.class);
     }
 }

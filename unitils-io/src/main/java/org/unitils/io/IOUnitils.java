@@ -32,10 +32,6 @@ import static org.unitils.util.ReflectionUtils.getTestClass;
  */
 public class IOUnitils {
 
-    protected static FileContentReader fileContentReader = getInstanceOfType(FileContentReader.class);
-    protected static TempService tempService = getInstanceOfType(TempService.class);
-
-
     /**
      * Loads the content of 'test-class'.'target-type-default-extension' and converts it to the given target type using the default
      * encoding. e.g.
@@ -117,7 +113,7 @@ public class IOUnitils {
      */
     public static <T> T readFileContent(String fileName, Class<T> targetType, String encoding, Object testInstanceOrClass) {
         Class<?> testClass = getTestClass(testInstanceOrClass);
-        return fileContentReader.readFileContent(fileName, targetType, encoding, testClass);
+        return getFileContentReader().readFileContent(fileName, targetType, encoding, testClass);
     }
 
     /**
@@ -134,7 +130,7 @@ public class IOUnitils {
      * @return The temp file, not null
      */
     public static File createTempFile(String fileName) {
-        return tempService.createTempFile(fileName);
+        return getTempService().createTempFile(fileName);
     }
 
     /**
@@ -152,7 +148,7 @@ public class IOUnitils {
      * @return The temp dir, not null
      */
     public static File createTempDir(String dirName) {
-        return tempService.createTempDir(dirName);
+        return getTempService().createTempDir(dirName);
     }
 
     /**
@@ -165,6 +161,15 @@ public class IOUnitils {
      * @param fileOrDir The file or directory to delete, can be null
      */
     public static void deleteTempFileOrDir(File fileOrDir) {
-        tempService.deleteTempFileOrDir(fileOrDir);
+        getTempService().deleteTempFileOrDir(fileOrDir);
+    }
+
+
+    protected static FileContentReader getFileContentReader() {
+        return getInstanceOfType(FileContentReader.class);
+    }
+
+    protected static TempService getTempService() {
+        return getInstanceOfType(TempService.class);
     }
 }

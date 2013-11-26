@@ -63,6 +63,26 @@ public interface Mock<T> {
     @MatchStatement
     T returns(Object returnValue);
 
+    /*
+    * Defines behavior for this mock so that it will return the given values as a list/array/set when the invocation following
+    * this call matches the observed behavior. E.g.
+    * Suppose method1 haa a List return type. Then setting
+     * <p/>
+     * mock.returnsAll("value1", "value2).method1();
+     * <p/>
+     * will return a list list containing ("aValue", "value2") when method1 is called. Array types and Sets are also supported.
+     * <p/>
+     * If no values were specified, an empty list/array/set will be returned.
+     * <p/>
+     * Note that this behavior is executed each time a match is found. So the same list/set/array will be returned
+     * each time method1() is called. If you only want to return the value once, use the {@link #onceReturnsAll} method.
+     *
+     * @param returnValues The value to return, optional
+     * @return The proxy instance that will record the method call, not null
+     */
+    @MatchStatement
+    T returnsAll(Object... returnValues);
+
     /**
      * Defines behavior for this mock so that it raises the given exception when the invocation following
      * this call matches the observed behavior. E.g.
@@ -131,6 +151,27 @@ public interface Mock<T> {
      */
     @MatchStatement
     T onceReturns(Object returnValue);
+
+    /**
+     * Defines behavior for this mock so that it will return the given values as a list/array/set when the invocation following
+     * this call matches the observed behavior. E.g.
+     * Suppose method1 haa a List return type. Then setting
+     * <p/>
+     * mock.onceReturnsAll("value1", "value2).method1();
+     * <p/>
+     * will return a list list containing ("aValue", "value2") when method1 is called. Array types and Sets are also supported.
+     * <p/>
+     * If no values were specified, an empty list/array/set will be returned.
+     * <p/>
+     * Note that this behavior is executed only once. If method1() is invoked a second time, a different
+     * behavior definition will be used (if defined) or a default value will be returned. If you want this
+     * definition to be able to be matched multiple times, use the method {@link #returnsAll} instead.
+     *
+     * @param returnValues The value to return, none for empty
+     * @return The proxy instance that will record the method call, not null
+     */
+    @MatchStatement
+    T onceReturnsAll(Object... returnValues);
 
     /**
      * Defines behavior for this mock so that it raises an instance of the given exception class when the invocation following

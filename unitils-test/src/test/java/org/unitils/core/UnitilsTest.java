@@ -28,7 +28,6 @@ import static org.junit.Assert.assertSame;
  */
 public class UnitilsTest extends UnitilsJUnit4 {
 
-
     @Test
     public void getUnitilsTestListener() {
         UnitilsTestListener result = Unitils.getUnitilsTestListener();

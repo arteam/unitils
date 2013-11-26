@@ -34,9 +34,6 @@ import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDE
  */
 public class SqlAssert {
 
-    protected static DataSourceService dataSourceService = Unitils.getInstanceOfType(DataSourceService.class);
-
-
     /**
      * To be successful the result of the SQL should return as many rows as the two dimensional array has, each row should be identical to
      * the given parameter. The sequence of the values is not important nor the order of the rows.
@@ -46,7 +43,7 @@ public class SqlAssert {
     }
 
     public static void assertRows(String sql, String databaseName, String[]... expectedRows) {
-        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = getDataSourceService().getDataSourceWrapper(databaseName);
         List<List<String>> actualRows = dataSourceWrapper.getRowsAsString(sql);
         assertReflectionEquals(expectedRows, actualRows, LENIENT_ORDER);
     }
@@ -61,7 +58,7 @@ public class SqlAssert {
     }
 
     public static void assertTableCount(long expectedCount, String tableName, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = getDataSourceService().getDataSourceWrapper(databaseName);
         long actualCount = dataSourceWrapper.getTableCount(tableName);
         assertEquals("Different table count for table '" + tableName + "':", expectedCount, actualCount);
     }
@@ -153,7 +150,7 @@ public class SqlAssert {
     }
 
     public static <T> void assertObject(T expectedValue, Class<T> type, String sql, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = getDataSourceService().getDataSourceWrapper(databaseName);
         T actualValue = dataSourceWrapper.getObject(sql, type);
         assertEquals("Different result found for query '" + sql + "':", expectedValue, actualValue);
     }
@@ -163,9 +160,13 @@ public class SqlAssert {
     }
 
     public static <T> void assertObjectList(List<T> expectedValues, Class<T> type, String sql, String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = getDataSourceService().getDataSourceWrapper(databaseName);
         List<T> actualValues = dataSourceWrapper.getObjectList(sql, type);
         assertReflectionEquals("Different result found for query '" + sql + "':", expectedValues, actualValues, LENIENT_ORDER);
     }
 
+
+    protected static DataSourceService getDataSourceService() {
+        return Unitils.getInstanceOfType(DataSourceService.class);
+    }
 }

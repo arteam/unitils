@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.dummy;
+package org.unitils.mock;
 
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
-import org.unitils.mock.MockUnitils;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.core.util.CloneService;
 import org.unitils.mock.core.util.ObjectFactory;
@@ -78,8 +77,8 @@ public class DummyIntegrationTest extends UnitilsJUnit4 {
             MockUnitils.createDummy(FinalTestClass.class);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to create proxy with name finalTestClass for type class org.unitils.mock.dummy.DummyIntegrationTest$FinalTestClass\n" +
-                    "Reason: IllegalArgumentException: Cannot subclass final class class org.unitils.mock.dummy.DummyIntegrationTest$FinalTestClass", e.getMessage());
+            assertEquals("Unable to create proxy with name finalTestClass for type class org.unitils.mock.DummyIntegrationTest$FinalTestClass\n" +
+                    "Reason: IllegalArgumentException: Cannot subclass final class class org.unitils.mock.DummyIntegrationTest$FinalTestClass", e.getMessage());
         }
     }
 

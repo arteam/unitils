@@ -32,11 +32,6 @@ import javax.sql.DataSource;
  */
 public class DatabaseUnitils {
 
-    protected static DataSourceService dataSourceService = Unitils.getInstanceOfType(DataSourceService.class);
-    protected static TransactionManager transactionManager = Unitils.getInstanceOfType(TransactionManager.class);
-    protected static DbMaintainWrapper dbMaintainWrapper = Unitils.getInstanceOfType(DbMaintainWrapper.class);
-
-
     /**
      * @return The data source for the default database, not null
      */
@@ -49,7 +44,7 @@ public class DatabaseUnitils {
      * @return The data source, not null
      */
     public static DataSource getDataSource(String databaseName) {
-        DataSourceWrapper dataSourceWrapper = dataSourceService.getDataSourceWrapper(databaseName);
+        DataSourceWrapper dataSourceWrapper = getDataSourceService().getDataSourceWrapper(databaseName);
         return dataSourceWrapper.getWrappedDataSource();
     }
 
@@ -59,7 +54,7 @@ public class DatabaseUnitils {
     }
 
     public static DataSourceWrapper getDataSourceWrapper(String databaseName) {
-        return dataSourceService.getDataSourceWrapper(databaseName);
+        return getDataSourceService().getDataSourceWrapper(databaseName);
     }
 
 
@@ -68,11 +63,11 @@ public class DatabaseUnitils {
     }
 
     public static Database getDatabase(String databaseName) {
-        return dbMaintainWrapper.getDatabase(databaseName);
+        return getDbMaintainWrapper().getDatabase(databaseName);
     }
 
     public static Databases getDatabases() {
-        return dbMaintainWrapper.getDatabases();
+        return getDbMaintainWrapper().getDatabases();
     }
 
 
@@ -85,20 +80,33 @@ public class DatabaseUnitils {
 
     // todo unit test
     public static void startTransaction(String transactionManagerName) {
-        transactionManager.startTransaction(transactionManagerName);
+        getTransactionManager().startTransaction(transactionManagerName);
     }
 
     /**
      * Commits the current transaction.
      */
     public static void commitTransaction() {
-        transactionManager.commit(true);
+        getTransactionManager().commit(true);
     }
 
     /**
      * Performs a rollback of the current transaction.
      */
     public static void rollbackTransaction() {
-        transactionManager.rollback(true);
+        getTransactionManager().rollback(true);
+    }
+
+
+    protected static DataSourceService getDataSourceService() {
+        return Unitils.getInstanceOfType(DataSourceService.class);
+    }
+
+    protected static TransactionManager getTransactionManager() {
+        return Unitils.getInstanceOfType(TransactionManager.class);
+    }
+
+    protected static DbMaintainWrapper getDbMaintainWrapper() {
+        return Unitils.getInstanceOfType(DbMaintainWrapper.class);
     }
 }

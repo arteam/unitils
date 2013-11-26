@@ -18,8 +18,7 @@ package org.unitils.inject.listener;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.unitils.UnitilsJUnit4TestClassRunner;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.TestField;
 import org.unitils.core.TestInstance;
 import org.unitils.core.reflect.Annotations;
@@ -36,8 +35,7 @@ import static java.util.Arrays.asList;
 /**
  * @author Tim Ducheyne
  */
-@RunWith(UnitilsJUnit4TestClassRunner.class)
-public class InjectIntoByTypeFieldAnnotationListenerBeforeTestMethodTest {
+public class InjectIntoByTypeFieldAnnotationListenerBeforeTestMethodTest extends UnitilsJUnit4 {
 
     /* Tested object */
     private InjectIntoByTypeFieldAnnotationListener injectIntoByTypeFieldAnnotationListener;

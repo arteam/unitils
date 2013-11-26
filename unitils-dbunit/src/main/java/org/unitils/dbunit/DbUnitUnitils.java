@@ -35,10 +35,6 @@ import static org.unitils.util.ReflectionUtils.getTestClass;
  */
 public class DbUnitUnitils {
 
-    protected static DataSetService dataSetService = getInstanceOfType(DataSetService.class);
-    protected static DbUnitConnectionManager dbUnitConnectionManager = getInstanceOfType(DbUnitConnectionManager.class);
-
-
     /**
      * Inserts the data set consisting of the given list of files into the database
      *
@@ -47,7 +43,7 @@ public class DbUnitUnitils {
     public static void insertDataSet(Object testInstanceOrClass, String... fileNames) {
         Class<?> testClass = getTestClass(testInstanceOrClass);
         List<String> dataSetFileNames = fileNames == null ? null : asList(fileNames);
-        dataSetService.loadDataSets(dataSetFileNames, testClass, null, null);
+        getDataSetService().loadDataSets(dataSetFileNames, testClass, null, null);
     }
 
     /**
@@ -59,24 +55,33 @@ public class DbUnitUnitils {
     public static void insertDataSet(Object testInstanceOrClass, Class<? extends DataSetLoadStrategy> dataSetLoadStrategyClass, Class<? extends DataSetFactory> dataSetFactoryClass, String... fileNames) {
         Class<?> testClass = getTestClass(testInstanceOrClass);
         List<String> dataSetFileNames = fileNames == null ? null : asList(fileNames);
-        dataSetService.loadDataSets(dataSetFileNames, testClass, dataSetLoadStrategyClass, dataSetFactoryClass);
+        getDataSetService().loadDataSets(dataSetFileNames, testClass, dataSetLoadStrategyClass, dataSetFactoryClass);
     }
 
 
     public static void assertExpectedDataSet(Object testInstanceOrClass, String... fileNames) {
         Class<?> testClass = getTestClass(testInstanceOrClass);
         List<String> dataSetFileNames = fileNames == null ? null : asList(fileNames);
-        dataSetService.assertExpectedDataSets(dataSetFileNames, null, testClass, null);
+        getDataSetService().assertExpectedDataSets(dataSetFileNames, null, testClass, null);
     }
 
     public static void assertExpectedDataSet(Object testInstanceOrClass, Class<? extends DataSetFactory> dataSetFactoryClass, String... fileNames) {
         Class<?> testClass = getTestClass(testInstanceOrClass);
         List<String> dataSetFileNames = fileNames == null ? null : asList(fileNames);
-        dataSetService.assertExpectedDataSets(dataSetFileNames, null, testClass, dataSetFactoryClass);
+        getDataSetService().assertExpectedDataSets(dataSetFileNames, null, testClass, dataSetFactoryClass);
     }
 
 
     public static void resetDbUnitConnections() {
-        dbUnitConnectionManager.resetDbUnitConnections();
+        getDbUnitConnectionManager().resetDbUnitConnections();
+    }
+
+
+    protected static DataSetService getDataSetService() {
+        return getInstanceOfType(DataSetService.class);
+    }
+
+    protected static DbUnitConnectionManager getDbUnitConnectionManager() {
+        return getInstanceOfType(DbUnitConnectionManager.class);
     }
 }
