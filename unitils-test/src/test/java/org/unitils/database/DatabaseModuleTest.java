@@ -50,6 +50,7 @@ public class DatabaseModuleTest extends UnitilsJUnit4 {
 
 		databaseModule = new TestDatabaseModule();
 		databaseModule.init(configuration);
+		databaseModule.wrapper.setTransactionManager(databaseModule.getTransactionManager());
 	}
 
 
