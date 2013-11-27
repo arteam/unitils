@@ -46,30 +46,17 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
-import org.unitils.core.UnitilsException;
 import org.unitils.core.config.Configuration;
-import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
-import org.unitils.core.util.ConfigUtils;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
-import org.unitils.database.config.DataSourceFactory;
-import org.unitils.database.config.DatabaseConfiguration;
 import org.unitils.database.config.DatabaseConfigurations;
 import org.unitils.database.config.DatabaseConfigurationsFactory;
-import org.unitils.database.transaction.TransactionHandler;
 import org.unitils.database.transaction.UnitilsTransactionManager;
 import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 import org.unitils.database.util.Flushable;
 import org.unitils.database.util.TransactionMode;
 import org.unitils.dbmaintainer.DBMaintainer;
-import org.unitils.dbmaintainer.clean.DBCleaner;
-import org.unitils.dbmaintainer.clean.DBClearer;
-import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
-import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
-import org.unitils.dbmaintainer.structure.SequenceUpdater;
-import org.unitils.dbmaintainer.util.DatabaseAccessing;
-import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.PropertyUtils;
 
@@ -152,8 +139,6 @@ public class DatabaseModule implements Module {
 
     protected String dialect;
 
-    private TransactionHandler transactionHandler;
-
     private DatabaseConfigurations databaseConfigurations;
 
     protected DataSourceWrapper wrapper;
@@ -176,7 +161,6 @@ public class DatabaseModule implements Module {
 
         dialect = PropertyUtils.getString("database.dialect", configuration);
         PlatformTransactionManager.class.getName();
-        transactionHandler = new TransactionHandler();
     }
 
 
@@ -247,21 +231,6 @@ public class DatabaseModule implements Module {
             flushable.flushDatabaseUpdates(testObject);
         }
     }
-
-
-    /**
-     * Determines whether the test database is outdated and, if that is the case, updates the database with the
-     * latest changes.
-     *
-     * @param sqlHandler SQLHandler that needs to be used for the database updates
-     * @see {@link DBMaintainer}
-     */
-    public void updateDatabase(SQLHandler sqlHandler) {
-        logger.info("Checking if database has to be updated.");
-        DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler, dialect);
-        dbMaintainer.updateDatabase();
-    }
-
 
     /**
      * Updates the database version to the current version, without issuing any other updates to the database.
@@ -440,6 +409,7 @@ public class DatabaseModule implements Module {
                 wrapper = getWrapper(databaseName);
             }
             registerTransactionManagementConfiguration();
+            wrapper.setTransactionManager(getTransactionManager());
             injectDataSource(testObject);
             startTransactionForTestMethod(testObject, testMethod);
         }

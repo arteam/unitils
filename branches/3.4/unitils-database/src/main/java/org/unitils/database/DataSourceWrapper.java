@@ -1,7 +1,5 @@
 package org.unitils.database;
 
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
 import java.lang.reflect.Field;
@@ -20,10 +18,8 @@ import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.core.util.ConfigUtils;
-import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.config.DataSourceFactory;
 import org.unitils.database.config.DatabaseConfiguration;
-import org.unitils.database.transaction.TransactionHandler;
 import org.unitils.database.transaction.UnitilsTransactionManager;
 import org.unitils.dbmaintainer.DBMaintainer;
 import org.unitils.dbmaintainer.clean.DBCleaner;
@@ -51,11 +47,12 @@ public class DataSourceWrapper {
 
 	private DataSource wrappedDataSource;
 	protected DatabaseConfiguration databaseConfiguration;
-	private TransactionHandler transactionHandler;
 	private DataSourceFactory dataSourceFactory;
 	private boolean updateDatabaseSchemaEnabled;
 	private Properties configuration;
 	private String databaseName;
+	
+	private UnitilsTransactionManager transactionManager;
 
 	private boolean wrapDataSourceInTransactionalProxy;
 
@@ -70,7 +67,6 @@ public class DataSourceWrapper {
 		dataSourceFactory.init(databaseConfiguration);
 		updateDatabaseSchemaEnabled = PropertyUtils.getBoolean(DatabaseModule.PROPERTY_UPDATEDATABASESCHEMA_ENABLED, configuration);
 		wrapDataSourceInTransactionalProxy = PropertyUtils.getBoolean(DatabaseModule.PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY, configuration);
-		transactionHandler = new TransactionHandler();
 		databaseName = databaseConfiguration.getDatabaseName();
 		this.databaseConfiguration = databaseConfiguration;
 	}
@@ -99,7 +95,8 @@ public class DataSourceWrapper {
 	 */
 	public DataSource getTransactionalDataSourceAndActivateTransactionIfNeeded(Object testObject) {
 		if (wrapDataSourceInTransactionalProxy) {
-			return transactionHandler.getTransactionManager().getTransactionalDataSource(getDataSourceAndActivateTransactionIfNeeded());
+			//return transactionHandler.getTransactionManager().getTransactionalDataSource(getDataSourceAndActivateTransactionIfNeeded());
+		    return transactionManager.getTransactionalDataSource(getDataSourceAndActivateTransactionIfNeeded());
 		}
 		return getDataSourceAndActivateTransactionIfNeeded();
 	} 
@@ -180,7 +177,7 @@ public class DataSourceWrapper {
 	}
 
 	public void activateTransactionIfNeeded() {
-		UnitilsTransactionManager transactionManager = transactionHandler.getTransactionManager();
+		//UnitilsTransactionManager transactionManager = transactionHandler.getTransactionManager();
 		if (transactionManager != null) {
 			transactionManager.activateTransactionIfNeeded(getTestObject());
 		}
@@ -282,5 +279,13 @@ public class DataSourceWrapper {
 	public String getDatabaseName() {
 		return databaseName;
 	}
+	
+	
+    /**
+     * @param transactionManager the transactionManager to set
+     */
+    public void setTransactionManager(UnitilsTransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
+    }
 
 }
