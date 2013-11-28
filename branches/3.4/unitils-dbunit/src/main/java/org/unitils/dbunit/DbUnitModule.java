@@ -44,6 +44,9 @@ import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
 import org.unitils.dbunit.datasetfactory.DataSetResolver;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
+import org.unitils.dbunit.locator.ClassPathDataLocator;
+import org.unitils.dbunit.locator.FileHandler;
+import org.unitils.dbunit.resourcepickingstrategie.ResourcePickingStrategie;
 import org.unitils.dbunit.util.DataSetAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
@@ -58,6 +61,7 @@ import static org.unitils.util.ReflectionUtils.getClassWithName;
 import javax.sql.DataSource;
 
 import java.io.File;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
@@ -108,7 +112,10 @@ public class DbUnitModule implements Module {
     protected String dialect;
     
     protected String databaseName;
+    
+    protected String scriptExtension = "xml";
 
+    private FileHandler fileHandler = new FileHandler();
 
     /**
      * Initializes the DbUnitModule using the given Configuration
@@ -380,14 +387,31 @@ public class DbUnitModule implements Module {
     protected MultiSchemaDataSet getDataSet(Class<?> testClass, String[] dataSetFileNames, DataSetFactory dataSetFactory) {
         List<File> dataSetFiles = new ArrayList<File>();
 
+        ResourcePickingStrategie resourcePickingStrategie = getResourcePickingStrategie();
+
+        
         DataSetResolver dataSetResolver = getDataSetResolver();
         for (String dataSetFileName : dataSetFileNames) {
-            File dataSetFile = dataSetResolver.resolve(testClass, dataSetFileName);
+            File dataSetFile = handleDataSetResource(new ClassPathDataLocator(), dataSetFileName, resourcePickingStrategie);
             dataSetFiles.add(dataSetFile);
         }
 
         logger.info("Loading DbUnit data set. File names: " + dataSetFiles);
-        return dataSetFactory.createDataSet(dataSetFiles.toArray(new File[dataSetFiles.size()]));
+        MultiSchemaDataSet dataSet = dataSetFactory.createDataSet(dataSetFiles.toArray(new File[dataSetFiles.size()]));
+        fileHandler.deleteFiles(dataSetFiles);
+        return dataSet;
+    }
+    
+    protected File handleDataSetResource(ClassPathDataLocator locator, String nameResource, ResourcePickingStrategie strategy) {
+        InputStream in = locator.getDataResource(nameResource, strategy);
+
+        if (in == null) {
+            throw new UnitilsException((new StringBuilder()).append("DataSetResource file with name '").append(nameResource).append("' cannot be found").toString());
+        }
+
+        File tempFile = fileHandler.createTempFile(nameResource);
+        fileHandler.writeToFile(tempFile, in);
+        return tempFile;
     }
 
 
@@ -588,6 +612,15 @@ public class DbUnitModule implements Module {
      */
     protected DatabaseModule getDatabaseModule() {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+    }
+    
+    /**
+     * use unitil property instead of hardcoding
+     * 
+     * @return {@link ResourcePickingStrategie}
+     */
+    protected ResourcePickingStrategie getResourcePickingStrategie() {
+        return getInstanceOf(ResourcePickingStrategie.class, configuration, "");
     }
     
 

@@ -1,10 +1,3 @@
-/*
- * CVS file status:
- * 
- * $Id: ResourcePickingStrategie.java,v 1.1 2010-11-22 12:10:10 jeho Exp $
- * 
- * Copyright (c) Smals
- */
 package org.unitils.dbunit.resourcepickingstrategie;
 
 import java.net.URL;
@@ -15,9 +8,11 @@ import java.util.List;
  * Defines a Strategie for picking out resources.
  * 
  *
- * @author tdr
- *
- * @since 1.0.2
+ * @author Jeroen Horemans
+ * @author Thomas De Rycke
+ * @author Willemijn Wouters
+ * 
+ * @since 3.4
  *
  */
 public interface ResourcePickingStrategie {
