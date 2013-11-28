@@ -50,7 +50,7 @@ public class DbunitModuleNaming {
         ExpectedDataSetWithPrimaryKeysTest obj = new ExpectedDataSetWithPrimaryKeysTest();
         
         String actual = sut.getCorrectFileName(obj.getClass(), obj.getClass().getMethod("setUp"), "xml");
-        String expected = "ExpectedDataSetWithPrimaryKeysTest.xml";
+        String expected = "org/unitils/dbunit/ExpectedDataSetWithPrimaryKeysTest.xml";
         
         Assert.assertEquals(expected, actual);
     }
@@ -62,7 +62,7 @@ public class DbunitModuleNaming {
     public void testGetDefaultDataSetFileNameClassLevel_Innerclass() {
         TestClass1 obj = new TestClass1();
         String actual = sut.getDefaultDataSetFileNameClassLevel(obj.getClass(), "xml");
-        String expected = "DbunitModuleNaming$TestClass1.xml";
+        String expected = "org/unitils/dbunit/DbunitModuleNaming$TestClass1.xml";
         Assert.assertEquals(expected, actual);
     }
     
@@ -70,7 +70,7 @@ public class DbunitModuleNaming {
     public void testGetDefaultDataSetFileNameClassLevel() {
         ColumnComparisonTest obj = new ColumnComparisonTest();
         String actual = sut.getDefaultDataSetFileNameClassLevel(obj.getClass(), "xml");
-        String expected = "ColumnComparisonTest.xml";
+        String expected = "org/unitils/dbunit/dataset/ColumnComparisonTest.xml";
         Assert.assertEquals(expected, actual);
     }
 

@@ -7,10 +7,16 @@
  */
 package org.unitils.dbunit.locator;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.unitils.UnitilsJUnit4TestClassRunner;
+import org.unitils.core.Unitils;
+import org.unitils.database.DatabaseModule;
+import org.unitils.database.SQLUnitils;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 
@@ -29,15 +35,27 @@ import org.unitils.dbunit.annotation.ExpectedDataSet;
 @RunWith(UnitilsJUnit4TestClassRunner.class)
 @DataSet(value = "org/unitils/testdata/exampleResourceData.xml")
 public class ResourceLoadingClassTest {
+    
+    @BeforeClass
+    public static void setUp() {
+        DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+        SQLUnitils.executeUpdate("CREATE TABLE dossier (id varchar(50), name varchar(50), Start_date date)", databaseModule.getWrapper("").getDataSource());
+    }
 
     /*** */
     @Test
-    @ExpectedDataSet("org/unitils/testdata/testdata/exampleResourceData.xml")
+    @ExpectedDataSet("org/unitils/testdata/exampleResourceData.xml")
     public void testLoadingResource() {
         //SqlAssert.assertCountSqlResult("select count(*) from dossier", 3L);
         //SqlAssert.assertMultipleRowSqlResult("select * from dossier", new String[]{"DS-1", "TestAppResourcesBlack"}, new String[]{"DS-2", "n"}, new String[]{"DS-3", "decker"});
         Assert.assertTrue(true);
-    }   
+    }
+    
+    @AfterClass
+    public static void afterClass() {
+        DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+        SQLUnitils.executeUpdate("drop table dossier",databaseModule.getWrapper("").getDataSource());
+    }
 
 
 }

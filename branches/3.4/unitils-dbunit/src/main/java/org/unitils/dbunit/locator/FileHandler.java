@@ -35,7 +35,7 @@ public class FileHandler {
             tempDataSetResourceName = tempDataSetResourceName.substring(0, tempDataSetResourceName.length() - 1);
         }
         int lastIndexOfSlash = tempDataSetResourceName.lastIndexOf("/");
-        String nameFile = tempDataSetResourceName.substring(((lastIndexOfSlash < 0) ? 0 : lastIndexOfSlash), tempDataSetResourceName.lastIndexOf("."));
+        String nameFile = tempDataSetResourceName.substring(((lastIndexOfSlash < 0) ? 0 : lastIndexOfSlash + 1), tempDataSetResourceName.lastIndexOf("."));
         try {
             return File.createTempFile(nameFile + "-", ".xml");
         } catch (IOException e) {
