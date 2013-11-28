@@ -95,7 +95,8 @@ public class DbUnitModule implements Module {
     protected Map<Class<? extends Annotation>, Map<String, String>> defaultAnnotationPropertyValues;
 
     /**
-     * Objects that DbUnit uses to connect to the database and to cache some database metadata. Since DBUnit's data caching is
+     * Objects that D513
+     * bUnit uses to connect to the database and to cache some database metadata. Since DBUnit's data caching is
      * time-consuming, this object is created only once and used throughout the entire test run. The underlying JDBC Connection however is
      * 'closed' (returned to the pool) after every database operation.
      * <p/>
@@ -406,9 +407,6 @@ public class DbUnitModule implements Module {
     }
 
     protected File handleDataSetResource(ClassPathDataLocator locator, String nameResource, ResourcePickingStrategie strategy) {
-        if (nameResource.endsWith("/")) {
-            nameResource = nameResource.substring(0, nameResource.length()-2);
-        }
         InputStream in = locator.getDataResource(nameResource, strategy);
 
         if (in == null) {
@@ -510,12 +508,9 @@ public class DbUnitModule implements Module {
     protected String getDefaultDataSetFileNameClassLevel(Class<?> testClass, String extension) {
         String className = testClass.getName();
         StringBuilder builder = new StringBuilder();
-        String name = testClass.getPackage().getName();
-        if (name.contains(".")) {
-            name = name.replace(".", "/");
+        if (className.contains(".")) {
+            className = className.replace(".", "/");
         }
-        builder.append(name);
-        builder.append("/");
         builder.append(className.substring(className.lastIndexOf(".") + 1));
         builder.append(".");
         builder.append(extension);
