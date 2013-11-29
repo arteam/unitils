@@ -48,6 +48,7 @@ public class ResourceLoadingMethodTest {
     }
 
     /** */
+    @Ignore
     @DataSet("../testdata/exampleResourceData.xml")
     @Test
     public void testLoadingDataset() {

@@ -392,9 +392,7 @@ public class DbUnitModule implements Module {
         List<File> dataSetFiles = new ArrayList<File>();
 
         ResourcePickingStrategie resourcePickingStrategie = getResourcePickingStrategie();
-
-
-        DataSetResolver dataSetResolver = getDataSetResolver();
+        
         for (String dataSetFileName : dataSetFileNames) {
             File dataSetFile = handleDataSetResource(new ClassPathDataLocator(), dataSetFileName, resourcePickingStrategie);
             dataSetFiles.add(dataSetFile);

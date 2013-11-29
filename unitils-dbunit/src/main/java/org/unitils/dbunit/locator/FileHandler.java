@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import org.apache.commons.logging.LogFactory;
@@ -38,7 +39,7 @@ public class FileHandler {
         String nameFile = tempDataSetResourceName.substring(((lastIndexOfSlash < 0) ? 0 : lastIndexOfSlash + 1), tempDataSetResourceName.lastIndexOf("."));
         try {
             return File.createTempFile(nameFile + "-", ".xml");
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
         return null;
@@ -51,7 +52,8 @@ public class FileHandler {
     public void writeToFile(File file, InputStream in) {
         try {
             FileOutputStream fos = new FileOutputStream(file);
-            LOGGER.debug("Writing preprocessed dataset to temp file: " + file.getAbsolutePath());
+            String path = file.getAbsolutePath();
+            LOGGER.debug("Writing preprocessed dataset to temp file: " + path);
 
             if (in.markSupported()) {
                 in.mark(Integer.MAX_VALUE);
@@ -62,7 +64,7 @@ public class FileHandler {
             }
             LOGGER.trace("inputstream visualised: \n" + IOUtils.toString(in));
             fos.close();
-            LOGGER.debug("End writing preprocessed dataset to file: " + file.getAbsolutePath());
+            LOGGER.debug("End writing preprocessed dataset to file: " + path);
         } catch(IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
