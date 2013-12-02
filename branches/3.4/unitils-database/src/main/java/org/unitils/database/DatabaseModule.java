@@ -153,8 +153,7 @@ public class DatabaseModule implements Module {
         DatabaseConfigurationsFactory configFactory = new DatabaseConfigurationsFactory(new Configuration(configuration));
         databaseConfigurations = configFactory.create();
 
-        wrapper = new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(), configuration);
-
+        wrapper = new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(), configuration, getTransactionManager());
         defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(DatabaseModule.class, configuration, Transactional.class);
         updateDatabaseSchemaEnabled = PropertyUtils.getBoolean(PROPERTY_UPDATEDATABASESCHEMA_ENABLED, configuration);
         wrapDataSourceInTransactionalProxy = PropertyUtils.getBoolean(PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY, configuration);
@@ -210,8 +209,9 @@ public class DatabaseModule implements Module {
     public UnitilsTransactionManager getTransactionManager() {
         if (transactionManager == null) {
             transactionManager = getInstanceOf(UnitilsTransactionManager.class, configuration);
-            transactionManager.init(transactionManagementConfigurations);
+            
         }
+        transactionManager.init(transactionManagementConfigurations);
         return transactionManager;
     }
 
@@ -409,7 +409,7 @@ public class DatabaseModule implements Module {
                 wrapper = getWrapper(databaseName);
             }
             registerTransactionManagementConfiguration();
-            wrapper.setTransactionManager(getTransactionManager());
+            //wrapper.setTransactionManager(getTransactionManager());
             injectDataSource(testObject);
             startTransactionForTestMethod(testObject, testMethod);
         }
@@ -434,9 +434,17 @@ public class DatabaseModule implements Module {
      */
     public DataSourceWrapper getWrapper(String databaseName) {
         if (StringUtils.isEmpty(databaseName)) {
-            return new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(), configuration);
+            return new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(), configuration, getTransactionManager());
         }
-        return new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(databaseName), configuration);
+        return new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(databaseName), configuration, getTransactionManager());
+    }
+    
+    
+    /**
+     * @param wrapper the wrapper to set
+     */
+    public void setWrapper(DataSourceWrapper wrapper) {
+        this.wrapper = wrapper;
     }
 
 

@@ -19,20 +19,29 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hsqldb.Trigger;
 import org.junit.After;
+
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.Unitils;
+
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import static org.unitils.core.util.SQLTestUtils.*;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.getItemAsLong;
-import org.unitils.database.annotations.TestDataSource;
+
+import org.unitils.database.DatabaseModule;
+import org.unitils.util.PropertyUtils;
+
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 import javax.sql.DataSource;
+
 import static java.util.Arrays.asList;
+
 import java.util.Properties;
 import java.util.Set;
 
@@ -50,11 +59,13 @@ public class DbSupportTest extends UnitilsJUnit4 {
     private static Log logger = LogFactory.getLog(DbSupportTest.class);
 
     /* DataSource for the test database, is injected */
-    @TestDataSource
+    //@TestDataSource
     protected DataSource dataSource = null;
 
     /* Instance under test */
     protected DbSupport dbSupport;
+    
+    private String dialect;
 
 
     /**
@@ -62,9 +73,12 @@ public class DbSupportTest extends UnitilsJUnit4 {
      */
     @Before
     public void setUp() throws Exception {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        Properties configuration = (Properties) new ConfigurationLoader().loadConfiguration().clone();
+        
+        initDatabaseModule(configuration);
+        
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dbSupport = getDefaultDbSupport(configuration, sqlHandler, "hsqldb");
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect);
 
         cleanupTestDatabase();
         createTestDatabase();
@@ -826,5 +840,18 @@ public class DbSupportTest extends UnitilsJUnit4 {
         dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
         dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
         dropTestTypes(dbSupport, "test_type", "\"Test_CASE_Type\"");
+    }
+    
+    private void initDatabaseModule(Properties configuration) {
+        configuration.setProperty("dbMaintainer.autoCreateExecutedScriptsTable", "false");
+        configuration.setProperty("dbMaintainer.autoCreateDbMaintainScriptsTable", "false");
+        configuration.setProperty("updateDataBaseSchema.enabled", "false");
+        
+        dialect = PropertyUtils.getString("database.dialect", configuration);
+        
+        DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+        databaseModule.init(configuration);
+        databaseModule.afterInit();
+        dataSource = databaseModule.getWrapper("").getTransactionalDataSourceAndActivateTransactionIfNeeded(this);
     }
 }

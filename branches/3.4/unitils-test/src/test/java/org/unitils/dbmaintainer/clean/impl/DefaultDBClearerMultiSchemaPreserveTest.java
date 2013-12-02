@@ -20,12 +20,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.Unitils;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
-import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.clean.DBClearer;
+import org.unitils.database.DatabaseModule;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import org.unitils.util.PropertyUtils;
 
@@ -42,7 +42,6 @@ public class DefaultDBClearerMultiSchemaPreserveTest extends UnitilsJUnit4 {
 	private static Log logger = LogFactory.getLog(DefaultDBClearerMultiSchemaPreserveTest.class);
 
 	/* DataSource for the test database, is injected */
-	@TestDataSource
 	private DataSource dataSource = null;
 
 	/* Tested object */
@@ -76,6 +75,8 @@ public class DefaultDBClearerMultiSchemaPreserveTest extends UnitilsJUnit4 {
 			return;
 		}
 
+		initDatabaseModule(configuration);
+		
 		// first create database, otherwise items to preserve do not yet exist
 		cleanupTestDatabase();
 		createTestDatabase();
@@ -221,4 +222,16 @@ public class DefaultDBClearerMultiSchemaPreserveTest extends UnitilsJUnit4 {
 		executeUpdateQuietly("drop schema SCHEMA_C", dataSource);
 	}
 
+	private void initDatabaseModule(Properties configuration) {
+	    configuration.setProperty("dbMaintainer.autoCreateExecutedScriptsTable", "false");
+        configuration.setProperty("dbMaintainer.autoCreateDbMaintainScriptsTable", "false");
+        configuration.setProperty("updateDataBaseSchema.enabled", "false");
+        configuration.setProperty("dbMaintainer.autoCreateExecutedScriptsTable", "false");
+        configuration.setProperty("dataSetStructureGenerator.xsd.dirName", "");
+        
+        DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+        databaseModule.init(configuration);
+        databaseModule.afterInit();
+        dataSource = databaseModule.getWrapper("").getTransactionalDataSourceAndActivateTransactionIfNeeded(this);
+	}
 }

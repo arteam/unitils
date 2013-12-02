@@ -16,7 +16,6 @@
 package org.unitils.core.dbsupport;
 
 import static org.unitils.core.util.ConfigUtils.getInstanceOf;
-import static org.unitils.util.PropertyUtils.getString;
 import static org.unitils.util.PropertyUtils.getStringList;
 
 import java.util.ArrayList;

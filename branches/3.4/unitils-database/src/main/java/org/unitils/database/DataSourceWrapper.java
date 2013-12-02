@@ -56,11 +56,11 @@ public class DataSourceWrapper {
 
 	private boolean wrapDataSourceInTransactionalProxy;
 
-	public DataSourceWrapper(DatabaseConfiguration databaseConfiguration) {
-	    this(databaseConfiguration, Unitils.getInstance().getConfiguration());
+	public DataSourceWrapper(DatabaseConfiguration databaseConfiguration, UnitilsTransactionManager transactionManager) {
+	    this(databaseConfiguration, Unitils.getInstance().getConfiguration(), transactionManager);
 	}
 	
-	public DataSourceWrapper(DatabaseConfiguration databaseConfiguration, Properties unitilsConfig) {
+	public DataSourceWrapper(DatabaseConfiguration databaseConfiguration, Properties unitilsConfig, UnitilsTransactionManager transactionmanager) {
 		// Get the factory for the data source and create it
 		configuration = unitilsConfig;
 		dataSourceFactory = ConfigUtils.getConfiguredInstanceOf(DataSourceFactory.class, configuration);
@@ -69,6 +69,7 @@ public class DataSourceWrapper {
 		wrapDataSourceInTransactionalProxy = PropertyUtils.getBoolean(DatabaseModule.PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY, configuration);
 		databaseName = databaseConfiguration.getDatabaseName();
 		this.databaseConfiguration = databaseConfiguration;
+		this.transactionManager = transactionmanager;
 	}
 
 	/**

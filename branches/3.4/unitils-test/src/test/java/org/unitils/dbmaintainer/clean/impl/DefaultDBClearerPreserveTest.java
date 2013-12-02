@@ -15,37 +15,42 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import static org.unitils.core.util.SQLTestUtils.dropTestMaterializedViews;
+import static org.unitils.core.util.SQLTestUtils.dropTestSequences;
+import static org.unitils.core.util.SQLTestUtils.dropTestSynonyms;
+import static org.unitils.core.util.SQLTestUtils.dropTestTables;
+import static org.unitils.core.util.SQLTestUtils.dropTestTriggers;
+import static org.unitils.core.util.SQLTestUtils.dropTestTypes;
+import static org.unitils.core.util.SQLTestUtils.dropTestViews;
+import static org.unitils.database.SQLUnitils.executeUpdate;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_MATERIALIZED_VIEWS;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_SEQUENCES;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_SYNONYMS;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_TABLES;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_VIEWS;
+
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hsqldb.Trigger;
 import org.junit.After;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.Unitils;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.SQLHandler;
-
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
-
 import org.unitils.core.dbsupport.DefaultSQLHandler;
-
-import static org.unitils.core.util.SQLTestUtils.*;
-import static org.unitils.database.SQLUnitils.executeUpdate;
-
-import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.clean.DBClearer;
+import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.database.DataSourceWrapper;
+import org.unitils.database.DatabaseModule;
 import org.unitils.util.PropertyUtils;
-
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.*;
-
-import javax.sql.DataSource;
-
-import java.util.Properties;
 
 /**
  * Test class for the {@link DBClearer} with configuratin to preserve all items.
@@ -60,7 +65,6 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
     private static Log logger = LogFactory.getLog(DefaultDBClearerPreserveTest.class);
 
     /* DataSource for the test database, is injected */
-    @TestDataSource
     private DataSource dataSource = null;
 
     /* Tested object */
@@ -77,11 +81,14 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
      */
     @Before
     public void setUp() throws Exception {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        Properties configuration = (Properties) new ConfigurationLoader().loadConfiguration().clone();
+        
+        initDatabaseModule(configuration);
+        
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dialect = PropertyUtils.getString("database.dialect", configuration);
+        
         dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect);
-
+        
         // first create database, otherwise items to preserve do not yet exist
         cleanupTestDatabase();
         createTestDatabase();
@@ -98,6 +105,8 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
         if (dbSupport.supportsSynonyms()) {
             configuration.setProperty(PROPKEY_PRESERVE_SYNONYMS, "Test_Synonym, " + dbSupport.quoted("Test_CASE_Synonym"));
         }
+        
+        
         // create clearer instance
         defaultDbClearer = new DefaultDBClearer();
         defaultDbClearer.init(configuration, sqlHandler, dialect);
@@ -499,5 +508,21 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
         dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
         dropTestTables(dbSupport, "\"Test_CASE_Table\"", "test_table");
         dropTestTypes(dbSupport, "test_type", "\"Test_CASE_Type\"");
+    }
+    
+    private void initDatabaseModule(Properties configuration) {
+        dialect = PropertyUtils.getString("database.dialect", configuration);
+        configuration.setProperty("dbMaintainer.autoCreateExecutedScriptsTable", "false");
+        configuration.setProperty("dbMaintainer.autoCreateDbMaintainScriptsTable", "false");
+        configuration.setProperty("updateDataBaseSchema.enabled", "false");
+       
+        DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+        databaseModule.init(configuration);
+        databaseModule.afterInit();
+        
+        
+        DataSourceWrapper wrapper = databaseModule.getWrapper("");
+        databaseModule.setWrapper(wrapper);
+        dataSource = wrapper.getTransactionalDataSourceAndActivateTransactionIfNeeded(this);
     }
 }
