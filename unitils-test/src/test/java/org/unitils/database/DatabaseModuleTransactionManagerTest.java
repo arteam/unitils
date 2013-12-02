@@ -15,29 +15,26 @@
  */
 package org.unitils.database;
 
-import static org.easymock.EasyMock.*;
-import static org.easymock.classextension.EasyMock.createMock;
-
-import org.easymock.classextension.EasyMock;
-import org.junit.After;
-
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
+import static org.unitils.database.util.TransactionMode.COMMIT;
+import static org.unitils.database.util.TransactionMode.DISABLED;
+import static org.unitils.database.util.TransactionMode.ROLLBACK;
 
+import java.lang.reflect.Method;
+import java.sql.Connection;
+
+import javax.sql.DataSource;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.jdbc.datasource.ConnectionProxy;
 import org.unitils.core.Unitils;
 import org.unitils.database.annotations.Transactional;
-//import org.unitils.database.transaction.TransactionHandler;
-
-import static org.unitils.database.util.TransactionMode.*;
-
-import javax.sql.DataSource;
-
-import java.lang.reflect.Method;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 
 /**
  * Tests verifying whether the SimpleTransactionManager functions correctly.
@@ -55,7 +52,7 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
 
     private CommitTest commitTest;
     
-    private DatabaseMetaData metaData = createMock(DatabaseMetaData.class);;
+    private DataSourceWrapper wrapper;
 
 
     /**
@@ -63,10 +60,7 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
      */
     @Before
     public void setUp() throws Exception {
-        configuration.setProperty("unitils.module.spring.enabled", "false");
-        Unitils.getInstance().init(configuration);
-        databaseModule = getDatabaseModule();
-        SQLUnitils.executeUpdate("create table DBMAINTAIN_SCRIPTS ( FILE_NAME VARCHAR2(150), FILE_LAST_MODIFIED_AT INTEGER, CHECKSUM VARCHAR2(50), EXECUTED_AT VARCHAR2(20), SUCCEEDED INTEGER ) ", getDatabaseModule().getWrapper("").getDataSource());
+        initializeDatabaseModule();
 
         transactionsDisabledTest = new TransactionsDisabledTest();
         rollbackTest = new RollbackTest();
@@ -80,7 +74,6 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
     @After
     public void tearDown() throws Exception {
         Unitils.getInstance().init();
-        SQLUnitils.executeUpdate("drop table DBMAINTAIN_SCRIPTS", getDatabaseModule().getWrapper("").getDataSource());
     }
 
 
@@ -90,19 +83,11 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
     @Test
     public void testWithTransactionsDisabled() throws Exception {
         mockConnection1.close();
-        EasyMock.expect(mockConnection1.getMetaData()).andReturn(metaData);
-        EasyMock.expect(metaData.storesUpperCaseIdentifiers()).andReturn(false).times(2);
-        EasyMock.expect(metaData.storesLowerCaseIdentifiers()).andReturn(true).times(2);
-        EasyMock.expect(metaData.getIdentifierQuoteString()).andReturn("test").times(2);
-        
         mockConnection2.close();
-        EasyMock.expect(mockConnection2.getMetaData()).andReturn(metaData);
         replay(mockConnection1, mockConnection2);
 
         Method testMethod = TransactionsDisabledTest.class.getMethod("test", new Class[]{});
         databaseModule.startTransactionForTestMethod(transactionsDisabledTest, testMethod);
-        DataSourceWrapper wrapper = databaseModule.getWrapper("");
-        
         Connection conn1 = wrapper.getDataSourceAndActivateTransactionIfNeeded().getConnection();
         conn1.close();
         Connection conn2 = wrapper.getDataSourceAndActivateTransactionIfNeeded().getConnection();
@@ -126,7 +111,6 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
         replay(mockConnection1, mockConnection2);
 
         Method testMethod = RollbackTest.class.getMethod("test", new Class[]{});
-        DataSourceWrapper wrapper = databaseModule.getWrapper("");
         DataSource dataSource = wrapper.getTransactionalDataSourceAndActivateTransactionIfNeeded(rollbackTest);
         databaseModule.startTransactionForTestMethod(rollbackTest, testMethod);
         Connection connection1 = dataSource.getConnection();
@@ -154,7 +138,6 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
         replay(mockConnection1, mockConnection2);
 
         Method testMethod = CommitTest.class.getMethod("test", new Class[]{});
-        DataSourceWrapper wrapper = databaseModule.getWrapper("");
         DataSource dataSource = wrapper.getTransactionalDataSourceAndActivateTransactionIfNeeded(commitTest);
         databaseModule.startTransactionForTestMethod(commitTest, testMethod);
         Connection connection1 = dataSource.getConnection();
@@ -202,6 +185,18 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
 
         public void test() {
         }
+    }
+    
+    private void initializeDatabaseModule() {
+        configuration.setProperty("unitils.module.spring.enabled", "false");
+        configuration.setProperty("updateDataBaseSchema.enabled", "false");
+        databaseModule = getDatabaseModule();
+        databaseModule.init(configuration);
+        databaseModule.afterInit();
+        wrapper = databaseModule.getWrapper("");
+        databaseModule.wrapper = wrapper;
+        databaseModule.getTransactionManager();
+        databaseModule.registerTransactionManagementConfiguration();
     }
 
 }
