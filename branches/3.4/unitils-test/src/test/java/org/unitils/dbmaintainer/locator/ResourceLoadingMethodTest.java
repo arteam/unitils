@@ -5,7 +5,7 @@
  * 
  * Copyright (c) Smals
  */
-package org.unitils.dbunit.locator;
+package org.unitils.dbmaintainer.locator;
 
 import org.apache.log4j.Logger;
 import org.junit.AfterClass;
@@ -21,6 +21,7 @@ import org.unitils.database.SQLUnitils;
 import org.unitils.dbunit.DbUnitModule;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
+import org.unitils.dbunit.util.FileHandler;
 
 /**
  * Unit test for simple App.

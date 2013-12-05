@@ -1,4 +1,4 @@
-package org.unitils.dbunit.locator;
+package org.unitils.dbunit.util;
 
 import java.io.File;
 import java.io.FileOutputStream;
