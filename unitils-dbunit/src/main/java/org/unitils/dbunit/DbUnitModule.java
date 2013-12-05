@@ -15,12 +15,35 @@
  */
 package org.unitils.dbunit;
 
+import static org.dbunit.database.DatabaseConfig.FEATURE_BATCHED_STATEMENTS;
+import static org.dbunit.database.DatabaseConfig.PROPERTY_DATATYPE_FACTORY;
+import static org.dbunit.database.DatabaseConfig.PROPERTY_ESCAPE_PATTERN;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
+import static org.unitils.core.util.ConfigUtils.getInstanceOf;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefault;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getClassValueReplaceDefault;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+import static org.unitils.util.ReflectionUtils.getClassWithName;
+
+import java.io.File;
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbunit.database.DatabaseConfig;
-
-import static org.dbunit.database.DatabaseConfig.*;
-
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
 import org.unitils.core.Module;
@@ -29,43 +52,22 @@ import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
-
-import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
-
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.core.util.ConfigUtils;
-
-import static org.unitils.core.util.ConfigUtils.getInstanceOf;
-
 import org.unitils.database.DatabaseModule;
+import org.unitils.dbmaintainer.locator.ClassPathDataLocator;
+import org.unitils.dbmaintainer.locator.resourcepickingstrategie.ResourcePickingStrategie;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
 import org.unitils.dbunit.datasetfactory.DataSetResolver;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
-import org.unitils.dbunit.locator.ClassPathDataLocator;
-import org.unitils.dbunit.locator.FileHandler;
-import org.unitils.dbunit.resourcepickingstrategie.ResourcePickingStrategie;
 import org.unitils.dbunit.util.DataSetAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
+import org.unitils.dbunit.util.FileHandler;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
 import org.unitils.util.PropertyUtils;
-
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
-import static org.unitils.util.ModuleUtils.*;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-import static org.unitils.util.ReflectionUtils.getClassWithName;
-
-import javax.sql.DataSource;
-
-import java.io.File;
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * Module that provides support for managing database test data using DBUnit.

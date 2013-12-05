@@ -1,4 +1,4 @@
-package org.unitils.dbunit.resourcepickingstrategie;
+package org.unitils.dbmaintainer.resourcepickingstrategie;
 
 
 import java.io.File;
@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.unitils.UnitilsJUnit4TestClassRunner;
-import org.unitils.dbunit.resourcepickingstrategie.impl.UniqueMostRecentPickingStrategie;
+import org.unitils.dbmaintainer.locator.resourcepickingstrategie.impl.UniqueMostRecentPickingStrategie;
 import org.unitils.reflectionassert.ReflectionAssert;
 
 

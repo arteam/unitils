@@ -5,7 +5,7 @@
  * 
  * Copyright (c) Smals
  */
-package org.unitils.dbunit.locator;
+package org.unitils.dbmaintainer.locator;
 
 import java.io.IOException;
 import java.net.URL;
@@ -14,8 +14,8 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.unitils.dbmaintainer.locator.resourcepickingstrategie.ResourcePickingStrategie;
 import org.unitils.dbmaintainer.script.Script;
-import org.unitils.dbunit.resourcepickingstrategie.ResourcePickingStrategie;
 
 
 /**

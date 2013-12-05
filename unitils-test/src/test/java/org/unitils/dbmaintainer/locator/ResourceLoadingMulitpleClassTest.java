@@ -1,4 +1,4 @@
-package org.unitils.dbunit.locator;
+package org.unitils.dbmaintainer.locator;
 
 
 import org.junit.AfterClass;
@@ -12,30 +12,32 @@ import org.unitils.database.DatabaseModule;
 import org.unitils.database.SQLUnitils;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
-import org.unitils.dbunit.datasetfactory.impl.ResourceMultiSchemaXmlDataSetFactory;
 
 /**
  * Unit test for simple App.
  * 
  * @author tdr
+ * 
  */
 @RunWith(UnitilsJUnit4TestClassRunner.class)
-@DataSet(factory = ResourceMultiSchemaXmlDataSetFactory.class)
-public class ResourceLoadingDefaultClassTest {
-    
+@DataSet({
+    "org/unitils/testdata/exampleResourceData.xml", "org/unitils/testdata/exampleResourceData.xml"
+})
+public class ResourceLoadingMulitpleClassTest {
+
     @BeforeClass
     public static void setUp() {
         DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
         SQLUnitils.executeUpdate("CREATE TABLE dossier (id varchar(50), name varchar(50), Start_date date)", databaseModule.getWrapper("").getDataSource());
     }
-
+    
     /** */
     @Test
-    @ExpectedDataSet(value = "org/unitils/testdata/exampleResourceLoadingData.xml",factory = ResourceMultiSchemaXmlDataSetFactory.class)
+    @ExpectedDataSet("org/unitils/testdata/exampleResourceData.xml")
     public void testLoadingResource() {
         Assert.assertTrue(true);
     }
-
+    
     @AfterClass
     public static void afterClass() {
         DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);

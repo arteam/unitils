@@ -1,4 +1,4 @@
-package org.unitils.dbunit.resourcepickingstrategie;
+package org.unitils.dbmaintainer.locator.resourcepickingstrategie;
 
 import java.net.URL;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.unitils.dbunit.locator;
+package org.unitils.dbunit.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.unitils.dbunit.util.FileHandler;
 
 
 /**

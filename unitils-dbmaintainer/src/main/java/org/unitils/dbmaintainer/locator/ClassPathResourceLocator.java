@@ -5,7 +5,7 @@
  * 
  * Copyright (c) Smals
  */
-package org.unitils.dbunit.locator;
+package org.unitils.dbmaintainer.locator;
 
 import java.io.IOException;
 import java.net.URL;

@@ -5,7 +5,7 @@
  * 
  * Copyright (c) Smals
  */
-package org.unitils.dbunit.resourcepickingstrategie.impl;
+package org.unitils.dbmaintainer.locator.resourcepickingstrategie.impl;
 
 import java.io.IOException;
 import java.net.URL;
@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitils.dbunit.resourcepickingstrategie.ResourcePickingStrategie;
+import org.unitils.dbmaintainer.locator.resourcepickingstrategie.ResourcePickingStrategie;
 
 
 /**

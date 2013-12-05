@@ -1,4 +1,4 @@
-package org.unitils.dbunit.locator;
+package org.unitils.dbunit.util;
 
 import java.io.File;
 
@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.unitils.UnitilsJUnit4TestClassRunner;
+import org.unitils.dbunit.util.FileHandler;
 
 
 /**
