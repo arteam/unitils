@@ -1,12 +1,7 @@
 package org.unitils.database;
 
-import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -121,19 +116,6 @@ public class DataSourceWrapper {
 	}
 
 	/**
-	 * Assigns the <code>TestDataSource</code> to every field annotated with {@link TestDataSource} and calls all methods
-	 * annotated with {@link TestDataSource}
-	 *
-	 * @param testObject The test instance, not null
-	 */
-	public void injectDataSource(Set<Field> fields, Set<Method> methods, Object obj) {
-		if (fields.isEmpty() && methods.isEmpty()) {
-			// Nothing to do. Jump out to make sure that we don't try to instantiate the DataSource
-			return;
-		}
-		setFieldAndSetterValue(obj, fields, methods, getTransactionalDataSourceAndActivateTransactionIfNeeded(getTestObject()));
-	}
-	/**
 	 * Determines whether the test database is outdated and, if this is the case, updates the database with the
 	 * latest changes. See {@link DBMaintainer} for more information.
 	 */
@@ -193,29 +175,6 @@ public class DataSourceWrapper {
 			wrappedDataSource = createDataSource();
 		}
 		return wrappedDataSource;
-	}
-
-	/**
-	 * Updates the database version to the current version, without issuing any other update to the database.
-	 * This method can be used for example after you've manually brought the database to the latest version, but
-	 * the database version is not yet set to the current one. This method can also be useful for example for
-	 * Reinitialising the database after having reorganised the scripts folder.
-	 */
-	public void resetDatabaseState() {
-		resetDatabaseState(getDefaultSqlHandler());
-	}
-
-	/**
-	 * Updates the database version to the current version, without issuing any other updates to the database.
-	 * This method can be used for example after you've manually brought the database to the latest version, but
-	 * the database version is not yet set to the current one. This method can also be useful for example for
-	 * Reinitialising the database after having reorganised the scripts folder.
-	 *
-	 * @param sqlHandler The {@link DefaultSQLHandler} to which all commands are issued
-	 */
-	public void resetDatabaseState(SQLHandler sqlHandler) {
-		DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler, databaseName);
-		dbMaintainer.resetDatabaseState();
 	}
 
 	/**

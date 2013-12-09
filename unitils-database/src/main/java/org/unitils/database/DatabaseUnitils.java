@@ -16,8 +16,7 @@
 package org.unitils.database;
 
 import org.unitils.core.Unitils;
-import org.unitils.dbmaintainer.DBMaintainer;
-
+import org.unitils.core.dbsupport.SQLHandler;
 import javax.sql.DataSource;
 
 /**
@@ -121,7 +120,9 @@ public class DatabaseUnitils {
      * reinitializing the database after having reorganized the scripts folder.
      */
     public static void resetDatabaseState(String databaseName) {
-        getDatabaseModule().getWrapper(databaseName).resetDatabaseState();
+        DatabaseModule databaseModule = getDatabaseModule();
+        SQLHandler sqlHandler = databaseModule.getWrapper(databaseName).getDefaultSqlHandler();
+        databaseModule.resetDatabaseState(sqlHandler);
     }
 
 
