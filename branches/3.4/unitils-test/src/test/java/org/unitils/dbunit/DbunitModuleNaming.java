@@ -1,5 +1,7 @@
 package org.unitils.dbunit;
 
+import static org.junit.Assert.*;
+
 import java.util.Properties;
 
 import org.junit.Assert;
@@ -37,7 +39,7 @@ public class DbunitModuleNaming {
         JustAClass obj = new JustAClass();
         
         String actual = sut.getCorrectFileName(obj.getClass(), obj.getClass().getMethod("method1"), "xml");
-        String expected = "JustAClass-method1.xml";
+        String expected = "org.unitils.dbunit.JustAClass-method1.xml";
         
         Assert.assertEquals(expected, actual);
     }

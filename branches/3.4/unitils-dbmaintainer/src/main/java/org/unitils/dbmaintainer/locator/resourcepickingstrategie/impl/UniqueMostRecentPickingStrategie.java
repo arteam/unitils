@@ -1,10 +1,3 @@
-/*
- * CVS file status:
- * 
- * $Id: UniqueMostRecentPickingStrategie.java,v 1.1 2010-11-22 12:10:10 jeho Exp $
- * 
- * Copyright (c) Smals
- */
 package org.unitils.dbmaintainer.locator.resourcepickingstrategie.impl;
 
 import java.io.IOException;
