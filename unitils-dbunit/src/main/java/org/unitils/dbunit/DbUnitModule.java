@@ -29,6 +29,8 @@ import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 import static org.unitils.util.ReflectionUtils.getClassWithName;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -342,7 +344,7 @@ public class DbUnitModule implements Module {
             dataSetFileNames = new String[]{
                 getCorrectFileName(testClass, testMethod, dataSetFactory.getDataSetFileExtension())
             };
-        }
+        } 
         return getDataSet(testClass, dataSetFileNames, dataSetFactory);
     }
 
@@ -375,8 +377,8 @@ public class DbUnitModule implements Module {
             dataSetFileNames = new String[]{
                 getDefaultExpectedDataSetFileName(testMethod, testClass, dataSetFactory.getDataSetFileExtension())
             };
-        }
-
+        } 
+        
         return getDataSet(testMethod.getDeclaringClass(), dataSetFileNames, dataSetFactory);
     }
 
@@ -396,7 +398,7 @@ public class DbUnitModule implements Module {
         ResourcePickingStrategie resourcePickingStrategie = getResourcePickingStrategie();
         
         for (String dataSetFileName : dataSetFileNames) {
-            File dataSetFile = handleDataSetResource(new ClassPathDataLocator(), dataSetFileName, resourcePickingStrategie);
+            File dataSetFile = handleDataSetResource(new ClassPathDataLocator(), dataSetFileName, resourcePickingStrategie, testClass);
             dataSetFiles.add(dataSetFile);
         }
 
@@ -406,11 +408,19 @@ public class DbUnitModule implements Module {
         return dataSet;
     }
 
-    protected File handleDataSetResource(ClassPathDataLocator locator, String nameResource, ResourcePickingStrategie strategy) {
+    protected File handleDataSetResource(ClassPathDataLocator locator, String nameResource, ResourcePickingStrategie strategy, Class<?> testClass) {
         InputStream in = locator.getDataResource(nameResource, strategy);
 
         if (in == null) {
-            throw new UnitilsException((new StringBuilder()).append("DataSetResource file with name '").append(nameResource).append("' cannot be found").toString());
+            File resolvedFile = getDataSetResolver().resolve(testClass, nameResource);
+            if (resolvedFile == null) {
+                throw new UnitilsException((new StringBuilder()).append("DataSetResource file with name '").append(nameResource).append("' cannot be found").toString());
+            }
+            try {
+                in = new FileInputStream(resolvedFile);
+            } catch (FileNotFoundException e) {
+                throw new UnitilsException((new StringBuilder()).append("DataSetResource file with name '").append(nameResource).append("' cannot be found").toString());
+            }
         }
 
         File tempFile = fileHandler.createTempFile(nameResource);
@@ -487,7 +497,7 @@ public class DbUnitModule implements Module {
         try {
 
             dataSetResolver.resolve(testClass, name);
-            return name;
+            return testClass.getPackage().getName() + "." + name;
         } catch (Exception e) {
             // the DefaultDataSetFileNameMethodLevel does not exist.
             // so the dataset should exist on classlevel.
@@ -508,10 +518,13 @@ public class DbUnitModule implements Module {
     protected String getDefaultDataSetFileNameClassLevel(Class<?> testClass, String extension) {
         String className = testClass.getName();
         StringBuilder builder = new StringBuilder();
+        
         if (className.contains(".")) {
             className = className.replace(".", "/");
+            
+            //builder.append(className.substring(className.lastIndexOf(".") + 1));
         }
-        builder.append(className.substring(className.lastIndexOf(".") + 1));
+        builder.append(className);
         builder.append(".");
         builder.append(extension);
         return builder.toString();
@@ -529,7 +542,11 @@ public class DbUnitModule implements Module {
     protected String getDefaultDataSetFileNameMethodLevel(Class<?> testClass, Method method, String extension) {
         String className = testClass.getName();
         StringBuilder builder = new StringBuilder();
-        builder.append(className.substring(className.lastIndexOf(".") + 1));
+        if (className.contains(".")) {
+            //className = className.replace(".", "/");
+            className = className.substring(className.lastIndexOf(".") + 1);
+        }
+        builder.append(className);
         builder.append("-");
         builder.append(method.getName());
         builder.append(".");
@@ -549,7 +566,7 @@ public class DbUnitModule implements Module {
      */
     protected String getDefaultExpectedDataSetFileName(Method method, Class<?> testClass, String extension) {
         String className = testClass.getName();
-        return className.substring(className.lastIndexOf(".") + 1) + "." + method.getName() + "-result." + extension;
+        return className.replace(".", "/") + "." + method.getName() + "-result." + extension;
     }
 
 

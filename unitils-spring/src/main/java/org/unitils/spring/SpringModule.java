@@ -427,10 +427,8 @@ public class SpringModule implements Module {
 	}*/
     
     protected void closeApplicationContextIfNeeded(Object testObject) {
-        SpringModule module = Unitils.getInstance().getModulesRepository().getModuleOfType(SpringModule.class);
-
-        if (module != null && module.isApplicationContextConfiguredFor(testObject)) {
-            module.invalidateApplicationContext(testObject.getClass());
+        if (this.isApplicationContextConfiguredFor(testObject)) {
+            this.invalidateApplicationContext(testObject.getClass());
         }
     }
     
