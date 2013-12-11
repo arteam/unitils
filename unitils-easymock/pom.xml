@@ -24,15 +24,14 @@
             <version>2.3</version>
         </dependency>
         <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>2.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymockclassextension</artifactId>
             <version>2.3</version>
-            <exclusions>  <!-- not needed dependencies -->
-                <exclusion>
-                    <groupId>cglib</groupId>
-                    <artifactId>cglib-nodep</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 
