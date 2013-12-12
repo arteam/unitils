@@ -16,6 +16,7 @@
 package org.unitils.core;
 
 import java.lang.reflect.Method;
+import org.unitils.TestRunnerAccessor;
 
 /**
  * Object that holds information about the current test execution. During a test run
@@ -34,6 +35,9 @@ public class TestContext {
 
     /* The test method which is currently executed */
     private Method testMethod;
+    
+    /* The runner executing the current test */
+    private TestRunnerAccessor runner;
 
 
     public Class<?> getTestClass() {
@@ -59,5 +63,14 @@ public class TestContext {
     public void setTestMethod(Method testMethod) {
         this.testMethod = testMethod;
     }
+
+    public TestRunnerAccessor getRunner() {
+        return runner;
+    }
+
+    public void setRunner(TestRunnerAccessor runner) {
+        this.runner = runner;
+    }
+        
 
 }

@@ -80,7 +80,7 @@ abstract public class UnitilsInvocationTestBase {
     public void init() throws Exception {
         // Create a test listener that traces the test execution, and make sure it is used by the tests to
         // record their calls
-        tracingTestListener = new TracingTestListener();
+        tracingTestListener = new TracingTestListener(originalTestListener);
 
         UnitilsJUnit3TestBase.setTracingTestListener(tracingTestListener);
         SpringUnitilsJUnit38TestBase.setTracingTestListener(tracingTestListener);

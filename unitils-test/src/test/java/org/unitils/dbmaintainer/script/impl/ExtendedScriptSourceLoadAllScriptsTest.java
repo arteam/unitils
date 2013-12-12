@@ -34,7 +34,7 @@ public class ExtendedScriptSourceLoadAllScriptsTest {
         config.setProperty(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS, "sql");
         config.setProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPT_DIRNAME, "postprocessing");
         config.setProperty(DefaultScriptSource.PROPKEY_USESCRIPTFILELASTMODIFICATIONDATES, "false");
-        
+        config.setProperty("database.dialect", "hsqldb");
     }
     @Test
     public void testIgnoreListDoesNotStartWithSlash() {

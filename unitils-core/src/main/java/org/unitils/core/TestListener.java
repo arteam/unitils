@@ -16,6 +16,7 @@
 package org.unitils.core;
 
 import java.lang.reflect.Method;
+import org.unitils.TestRunnerAccessor;
 
 /**
  * Listener for test events. The events must follow following ordering:
@@ -124,5 +125,17 @@ public abstract class TestListener {
         // empty
     }
     
+    
+    /**
+     * Method to test whether this method should be executed or not. This goes further than @Ignore, we
+     * query the various listeners so they can veto the execution at this time.
+     * 
+     * @param testObject The test instance, not null
+     * @param testMethod The test method, not null
+     * @return boolean indicating whether the method should be executed or not.
+     */
+    public boolean shouldInvokeTestMethod(Object testObject, Method testMethod) {
+        return true; // per default, execute all
+    }        
 
 }

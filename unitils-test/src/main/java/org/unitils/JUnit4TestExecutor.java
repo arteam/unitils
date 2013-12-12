@@ -19,11 +19,11 @@ import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Result;
 import org.junit.runner.notification.RunNotifier;
 
-class JUnit4TestExecutor implements TestExecutor {
+public class JUnit4TestExecutor implements TestExecutor {
 
 	private Result result;
 	
-	JUnit4TestExecutor() {
+	public JUnit4TestExecutor() {
 		super();
 	}
 

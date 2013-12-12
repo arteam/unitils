@@ -316,6 +316,19 @@ public class Unitils {
             }
         }
 
+        @Override
+        public boolean shouldInvokeTestMethod(Object testObject, Method testMethod) {
+            List<Module> modules = modulesRepository.getModules();
+            for (Module module : modules) {
+                if(!modulesRepository.getTestListener(module).shouldInvokeTestMethod(testObject, testMethod)) {
+                    return false; // there is a module that wants us to prevent execution of the method.
+                }
+            }
+            return true;
+        }
+        
+        
+
     }
 
 }
