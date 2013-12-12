@@ -76,7 +76,11 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void setUp() throws Exception {
     	executionDate = new Date();
     	// Create test directories
-        scriptsDirName = System.getProperty("java.io.tmpdir") + "DefaultScriptSourceTest";
+        String tmpDir = System.getProperty("java.io.tmpdir");
+        if(!tmpDir.endsWith("/")) {
+            tmpDir += "/";
+        }
+        scriptsDirName = tmpDir + "DefaultScriptSourceTest";
         forceDeleteOnExit(new File(scriptsDirName));
 
         // Copy test files

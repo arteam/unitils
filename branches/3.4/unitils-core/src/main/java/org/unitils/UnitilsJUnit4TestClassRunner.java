@@ -24,6 +24,8 @@ import org.unitils.core.Unitils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import org.junit.runner.notification.RunListener;
+import org.unitils.core.UnitilsException;
 
 /**
  * Custom test runner that will Unitils-enable your test. This will make sure that the
@@ -37,7 +39,7 @@ import java.lang.reflect.Method;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
+public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner implements TestRunnerAccessor{
 
 
     /**
@@ -59,6 +61,7 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
             }
         });
 
+        Unitils.getInstance().getTestContext().setRunner(this);
         try {
             getTestListener().beforeTestClass(getTestClass().getJavaClass());
             classRoadie.runProtected();
@@ -88,7 +91,9 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
         if (!testMethod.isIgnored()) {
             getTestListener().afterCreateTestObject(testObject);
         }
-        createMethodRoadie(testObject, method, testMethod, notifier, description).run();
+        if(getTestListener().shouldInvokeTestMethod(testObject, method)) {
+            createMethodRoadie(testObject, method, testMethod, notifier, description).run();
+        }
     }
 
     private void testAborted(RunNotifier notifier, Description description,
@@ -111,6 +116,28 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
      */
     protected MethodRoadie createMethodRoadie(Object testObject, Method testMethod, TestMethod jUnitTestMethod, RunNotifier notifier, Description description) {
         return new TestListenerInvokingMethodRoadie(testObject, testMethod, jUnitTestMethod, notifier, description);
+    }
+
+    /**
+     * This method allows access to the test invocation, from within the modules (who get a reference to the runner
+     * via the context). We do not check for listeners veto's (typically, these modules will veto the execution of
+     * the test in normal execution mode, and call this method later on to do their logic).
+     * 
+     * @param testObject
+     * @param method 
+     */
+    public void executeTestMethod(Object testObject, Method method) {
+        TestMethod testMethod = wrapMethod(method);        
+        RunNotifier notifier = new RunNotifier();
+        InterceptingListener listener = new InterceptingListener();
+        notifier.addListener(listener);
+        Description description = methodDescription(method);
+        createMethodRoadie(testObject, method, testMethod, notifier, description).run();
+        if(listener.isFailed()) {
+            StringBuilder msg = new StringBuilder("Exeception while executing ");
+            msg.append(method.getName()).append(": ").append(listener.getFailure().getDescription());
+            throw new UnitilsException(msg.toString(),listener.getFailure().getException());
+        }
     }
 
 
@@ -218,3 +245,22 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
     }
 }
 
+class InterceptingListener extends RunListener {
+    
+    private Failure failure = null;    
+
+    @Override
+    public void testFailure(Failure failure) throws Exception {
+        this.failure = failure;
+    }        
+    
+    public boolean isFailed() {
+        return this.failure != null;
+    }
+    
+    public Failure getFailure() {
+        return this.failure;
+    }
+    
+    
+}

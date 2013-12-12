@@ -80,6 +80,11 @@ public class TracingTestListener extends TestListener {
 
     private boolean throwAssertionFailedError;
     
+    /**
+     * Delegate target for functions that need the original testlistener (with module support).
+     */
+    private TestListener delegate;
+    
     /*
      * Test method that is currently executing
      */
@@ -91,6 +96,11 @@ public class TracingTestListener extends TestListener {
      */
     private Throwable currentThrowable;
 
+    public TracingTestListener(TestListener delegate) {
+        this();
+        this.delegate = delegate;
+    }   
+    
 
     public TracingTestListener() {
         this.callList = new ArrayList<Call>();
@@ -138,6 +148,7 @@ public class TracingTestListener extends TestListener {
 	@Override
     public void afterCreateTestObject(Object testObject) {
         registerListenerInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testObject.getClass(), testObject, null, null);
+        this.delegate.afterCreateTestObject(testObject);
         throwExceptionIfRequested(LISTENER_AFTER_CREATE_TEST_OBJECT);
     }
 
@@ -173,6 +184,14 @@ public class TracingTestListener extends TestListener {
         throwExceptionIfRequested(LISTENER_AFTER_TEST_TEARDOWN);
     }
 
+    @Override
+    public boolean shouldInvokeTestMethod(Object testObject, Method testMethod) {
+        // delegate to the main testlistener, so that the multipart module can do its job (and maybe others in future)
+        return delegate.shouldInvokeTestMethod(testObject, testMethod);
+    }
+    
+    
+
     private void throwExceptionIfRequested(Invocation exceptionMethod) {
         if (this.exceptionMethod == null || !this.exceptionMethod.equals(exceptionMethod)) {
             return;
@@ -186,101 +205,116 @@ public class TracingTestListener extends TestListener {
         currentThrowable = exception;
 		throw exception;
     }
-    
+            
     public Throwable getCurrentThrowable() {
 		return currentThrowable;
 	}
     
 
-	public static class Call {
-    	
-    	private InvocationSource invocationSource;
-    	
-    	private Invocation invocation;
-    	
-    	private Class<?> testClass;
-    	
-    	private String testMethod;
-    	
-    	private Throwable throwable;
+   public static class Call {
 
-    	
-    	public Call(Invocation invocation, Class<?> testClass) {
-    		this(invocation, testClass, null);
-    	}
-    	
-    	
-		public Call(Invocation invocation, Class<?> testClass, String testMethod) {
-			this(invocation, testClass, testMethod, null);
-		}
+        private InvocationSource invocationSource;
+        private Invocation invocation;
+        private Class<?> testClass;
+        private String testMethod;
+        private Throwable throwable;
 
-		
-		public Call(Invocation invocation, Class<?> testClass, String testMethod, Throwable throwable) {
-			if (invocation instanceof TestInvocation) {
-				this.invocationSource = TEST;
-			} else {
-				this.invocationSource = UNITILS;
-			}
-			this.invocation = invocation;
-			this.testClass = testClass;
-			this.testMethod = testMethod;
-			this.throwable = throwable;
-		}
+        public Call(Invocation invocation, Class<?> testClass) {
+            this(invocation, testClass, null);
+        }
 
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result
-					+ ((invocation == null) ? 0 : invocation.hashCode());
-			result = prime
-					* result
-					+ ((invocationSource == null) ? 0 : invocationSource
-							.hashCode());
-			result = prime * result
-					+ ((testClass == null) ? 0 : testClass.hashCode());
-			result = prime * result
-					+ ((testMethod == null) ? 0 : testMethod.hashCode());
-			result = prime * result
-					+ ((throwable == null) ? 0 : throwable.hashCode());
-			return result;
-		}
+        public Call(Invocation invocation, Class<?> testClass, String testMethod) {
+            this(invocation, testClass, testMethod, null);
+        }
 
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			final Call other = (Call) obj;
-			if (invocation == null) {
-				if (other.invocation != null)
-					return false;
-			} else if (!invocation.equals(other.invocation))
-				return false;
-			if (invocationSource == null) {
-				if (other.invocationSource != null)
-					return false;
-			} else if (!invocationSource.equals(other.invocationSource))
-				return false;
-			if (testClass == null) {
-				if (other.testClass != null)
-					return false;
-			} else if (!testClass.equals(other.testClass))
-				return false;
-			return true;
-		}
+        public Call(Invocation invocation, Class<?> testClass, String testMethod, Throwable throwable) {
+            if (invocation instanceof TestInvocation) {
+                this.invocationSource = TEST;
+            } else {
+                this.invocationSource = UNITILS;
+            }
+            this.invocation = invocation;
+            this.testClass = testClass;
+            this.testMethod = testMethod;
+            this.throwable = throwable;
+        }
 
-		@Override
-		public String toString() {
-			return invocationSource + " " + invocation + " " + 
-				(testClass == null ? "" : testClass.getSimpleName()) + 
-				(testMethod == null ? "" : " " + testMethod) + 
-				(throwable == null ? "" : " " + throwable);
-		}
-    	
+        public Invocation getInvocation() {
+            return invocation;
+        }
+
+        public Class<?> getTestClass() {
+            return testClass;
+        }
+
+        public String getTestMethod() {
+            return testMethod;
+        }
+        
+        
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result
+                    + ((invocation == null) ? 0 : invocation.hashCode());
+            result = prime
+                    * result
+                    + ((invocationSource == null) ? 0 : invocationSource
+                    .hashCode());
+            result = prime * result
+                    + ((testClass == null) ? 0 : testClass.hashCode());
+            result = prime * result
+                    + ((testMethod == null) ? 0 : testMethod.hashCode());
+            result = prime * result
+                    + ((throwable == null) ? 0 : throwable.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final Call other = (Call) obj;
+            if (invocation == null) {
+                if (other.invocation != null) {
+                    return false;
+                }
+            } else if (!invocation.equals(other.invocation)) {
+                return false;
+            }
+            if (invocationSource == null) {
+                if (other.invocationSource != null) {
+                    return false;
+                }
+            } else if (!invocationSource.equals(other.invocationSource)) {
+                return false;
+            }
+            if (testClass == null) {
+                if (other.testClass != null) {
+                    return false;
+                }
+            } else if (!testClass.equals(other.testClass)) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public String toString() {
+            return invocationSource + " " + invocation + " "
+                    + (testClass == null ? "" : testClass.getSimpleName())
+                    + (testMethod == null ? "" : " " + testMethod)
+                    + (throwable == null ? "" : " " + throwable);
+        }
     }
 	
 }
