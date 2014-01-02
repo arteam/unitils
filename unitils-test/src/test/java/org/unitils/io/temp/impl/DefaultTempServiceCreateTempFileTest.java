@@ -26,7 +26,7 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.writeStringToFile;
+import static org.unitils.core.util.FileUtils.writeStringToFile;
 
 
 /**

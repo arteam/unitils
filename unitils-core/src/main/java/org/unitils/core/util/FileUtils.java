@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.thirdparty.org.apache.commons.io;
-
-import org.unitils.core.util.IOUtils;
+package org.unitils.core.util;
 
 import java.io.*;
 import java.net.URL;

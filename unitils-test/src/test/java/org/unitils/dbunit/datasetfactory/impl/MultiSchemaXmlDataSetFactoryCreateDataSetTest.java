@@ -36,8 +36,8 @@ import java.io.File;
 import static java.util.Arrays.asList;
 import static org.dbunit.dataset.ITable.NO_VALUE;
 import static org.junit.Assert.*;
+import static org.unitils.core.util.FileUtils.toFile;
 import static org.unitils.reflectionassert.ReflectionAssert.*;
-import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.toFile;
 
 /**
  * @author Tim Ducheyne

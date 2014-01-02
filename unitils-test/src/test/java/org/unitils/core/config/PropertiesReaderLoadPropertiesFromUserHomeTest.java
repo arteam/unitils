@@ -25,7 +25,7 @@ import java.net.URL;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
-import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.copyFileToDirectory;
+import static org.unitils.core.util.FileUtils.copyFileToDirectory;
 
 /**
  * @author Fabian Krueger
