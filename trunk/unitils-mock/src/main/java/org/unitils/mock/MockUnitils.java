@@ -18,10 +18,7 @@ package org.unitils.mock;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Unitils;
-import org.unitils.mock.core.MockFactory;
-import org.unitils.mock.core.MockService;
-import org.unitils.mock.core.ObservedInvocation;
-import org.unitils.mock.core.Scenario;
+import org.unitils.mock.core.*;
 import org.unitils.mock.report.ScenarioReport;
 
 import java.util.List;
@@ -40,9 +37,6 @@ public class MockUnitils {
     public static void assertNoMoreInvocations() {
         getMockService().assertNoMoreInvocations();
     }
-
-    // todo log error when mock chaining does not work  e.g.
-    // proxyInvocationMock.returns(String.class).getMethod().getReturnType();
 
     public static <T> Mock<T> createMock(Class<T> type, Object testObject) {
         return createMock(null, type, testObject);
@@ -75,7 +69,7 @@ public class MockUnitils {
     }
 
     public static <T> T createDummy(String name, Class<T> type) {
-        return getMockFactory().createDummy(name, type);
+        return getDummyFactory().createDummy(name, type);
     }
 
 
@@ -99,6 +93,10 @@ public class MockUnitils {
 
     protected static MockFactory getMockFactory() {
         return Unitils.getInstanceOfType(MockFactory.class);
+    }
+
+    protected static DummyFactory getDummyFactory() {
+        return Unitils.getInstanceOfType(DummyFactory.class);
     }
 
     protected static ScenarioReport getScenarioReport() {

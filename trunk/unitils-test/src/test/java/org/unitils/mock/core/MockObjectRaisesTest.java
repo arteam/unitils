@@ -51,7 +51,7 @@ public class MockObjectRaisesTest extends UnitilsJUnit4 {
     @Before
     public void initialize() {
         mockObject = new MockObject<Object>("name", Object.class, null, matchingProxy, false, behaviorDefiningInvocations,
-                matchingProxyInvocationHandlerMock.getMock(), mockBehaviorFactoryMock.getMock(), matchingInvocationHandlerFactoryMock.getMock());
+                matchingProxyInvocationHandlerMock.getMock(), mockBehaviorFactoryMock.getMock(), matchingInvocationHandlerFactoryMock.getMock(), null, null);
     }
 
 
@@ -78,7 +78,7 @@ public class MockObjectRaisesTest extends UnitilsJUnit4 {
     @Test
     public void chainedRaises() {
         mockObject = new MockObject<Object>("name", Object.class, null, matchingProxy, true, behaviorDefiningInvocations,
-                matchingProxyInvocationHandlerMock.getMock(), mockBehaviorFactoryMock.getMock(), matchingInvocationHandlerFactoryMock.getMock());
+                matchingProxyInvocationHandlerMock.getMock(), mockBehaviorFactoryMock.getMock(), matchingInvocationHandlerFactoryMock.getMock(), null, null);
         mockBehaviorFactoryMock.returns(mockBehavior).createExceptionThrowingMockBehavior(NullPointerException.class);
         matchingInvocationHandlerFactoryMock.returns(matchingInvocationHandler).createBehaviorDefiningMatchingInvocationHandler(mockBehavior, false, behaviorDefiningInvocations);
 
@@ -89,7 +89,7 @@ public class MockObjectRaisesTest extends UnitilsJUnit4 {
     @Test
     public void chainedRaisesInstance() {
         mockObject = new MockObject<Object>("name", Object.class, null, matchingProxy, true, behaviorDefiningInvocations,
-                matchingProxyInvocationHandlerMock.getMock(), mockBehaviorFactoryMock.getMock(), matchingInvocationHandlerFactoryMock.getMock());
+                matchingProxyInvocationHandlerMock.getMock(), mockBehaviorFactoryMock.getMock(), matchingInvocationHandlerFactoryMock.getMock(), null, null);
         mockBehaviorFactoryMock.returns(mockBehavior).createExceptionThrowingMockBehavior(new NullPointerException("expected"));
         matchingInvocationHandlerFactoryMock.returns(matchingInvocationHandler).createBehaviorDefiningMatchingInvocationHandler(mockBehavior, false, behaviorDefiningInvocations);
 

@@ -34,7 +34,7 @@ public class MockObjectGetObjectToInjectTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        mockObject = new MockObject<Object>("name", Object.class, proxy, null, false, null, null, null, null);
+        mockObject = new MockObject<Object>("name", Object.class, proxy, null, false, null, null, null, null, null, null);
     }
 
 

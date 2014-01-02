@@ -85,13 +85,13 @@ public class ContextGetInstanceOfTypeWithPropertyArgumentsTest extends UnitilsJU
     public void listPropertyTypes() {
         StringBuffer stringBuffer1 = new StringBuffer();
         StringBuffer stringBuffer2 = new StringBuffer();
-        configurationMock.returns(asList("value1", "value2")).getValueListOfType(String.class, "strings");
-        configurationMock.returns(asList(true, false)).getValueListOfType(Boolean.class, "booleans");
-        configurationMock.returns(asList(5, 6)).getValueListOfType(Integer.class, "integers");
-        configurationMock.returns(asList(7L, 8L)).getValueListOfType(Long.class, "longs");
-        configurationMock.returns(asList(stringBuffer1, stringBuffer2)).getValueListOfType(StringBuffer.class, "objects");
-        configurationMock.returns(asList(FIELD, METHOD)).getValueListOfType(ElementType.class, "enums");
-        configurationMock.returns(asList(Map.class, Set.class)).getValueListOfType(Class.class, "classes");
+        configurationMock.returnsAll("value1", "value2").getValueListOfType(String.class, "strings");
+        configurationMock.returnsAll(true, false).getValueListOfType(Boolean.class, "booleans");
+        configurationMock.returnsAll(5, 6).getValueListOfType(Integer.class, "integers");
+        configurationMock.returnsAll(7L, 8L).getValueListOfType(Long.class, "longs");
+        configurationMock.returnsAll(stringBuffer1, stringBuffer2).getValueListOfType(StringBuffer.class, "objects");
+        configurationMock.returnsAll(FIELD, METHOD).getValueListOfType(ElementType.class, "enums");
+        configurationMock.returnsAll(Map.class, Set.class).getValueListOfType(Class.class, "classes");
 
         ListTypesClass result = context.getInstanceOfType(ListTypesClass.class);
         assertReflectionEquals(asList("value1", "value2"), result.stringValues);
@@ -149,7 +149,7 @@ public class ContextGetInstanceOfTypeWithPropertyArgumentsTest extends UnitilsJU
 
     @Test
     public void rawListTypeReturnsStringElements() {
-        configurationMock.returns(asList("value1", "value2")).getValueListOfType(String.class, "rawValues");
+        configurationMock.returnsAll("value1", "value2").getValueListOfType(String.class, "rawValues");
 
         RawListClass result = context.getInstanceOfType(RawListClass.class);
         assertReflectionEquals(asList("value1", "value2"), result.rawValues);

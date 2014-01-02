@@ -28,8 +28,6 @@ import org.unitils.mock.core.MockFactory;
 
 import java.util.Properties;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -55,9 +53,7 @@ public class PartialMockTestListenerBeforeTestSetUpTest extends UnitilsJUnit4 {
         partialMockTestListener = new PartialMockTestListener(mockFactoryMock.getMock());
 
         testInstanceMock.returns(testObject).getTestObject();
-        // todo td  make it possible to re-write this as
-        // testInstanceMock.returnsList(testFieldMock1, testFieldMock2).getTestFieldsOfType(Mock.class);
-        testInstanceMock.returns(asList(testFieldMock1.getMock(), testFieldMock2.getMock())).getTestFieldsOfType(PartialMock.class);
+        testInstanceMock.returnsAll(testFieldMock1, testFieldMock2).getTestFieldsOfType(PartialMock.class);
         testFieldMock1.returns("field1").getName();
         testFieldMock1.returns(TestInterface1.class).getSingleGenericClass();
         testFieldMock2.returns("field2").getName();
@@ -87,7 +83,7 @@ public class PartialMockTestListenerBeforeTestSetUpTest extends UnitilsJUnit4 {
 
     @Test
     public void ignoredWhenNoTestFields() {
-        testInstanceMock.returns(emptyList()).getTestFieldsOfType(PartialMock.class);
+        testInstanceMock.onceReturnsAll().getTestFieldsOfType(PartialMock.class);
 
         partialMockTestListener.beforeTestSetUp(testInstanceMock.getMock());
         testFieldMock1.assertNotInvoked().setValue(null);

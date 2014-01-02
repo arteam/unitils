@@ -23,6 +23,7 @@ import org.unitils.core.UnitilsException;
 import org.unitils.core.config.Configuration;
 import org.unitils.mock.Mock;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 /**
@@ -48,7 +49,13 @@ public class ContextGetInstanceOfTypeCyclicDependencyTest extends UnitilsJUnit4 
             context.getInstanceOfType(TestClassA.class);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            System.out.println("e = " + e);
+            assertEquals("Unable to create instance for type org.unitils.core.context.ContextGetInstanceOfTypeCyclicDependencyTest$TestClassA.\n" +
+                    "Reason: Unable to create instance for type org.unitils.core.context.ContextGetInstanceOfTypeCyclicDependencyTest$TestClassB.\n" +
+                    "Reason: Unable to create instance for type org.unitils.core.context.ContextGetInstanceOfTypeCyclicDependencyTest$TestClassC.\n" +
+                    "Reason: Unable to create instance for type org.unitils.core.context.ContextGetInstanceOfTypeCyclicDependencyTest$TestClassA: cyclic dependency detected between following types:\n" +
+                    "org.unitils.core.context.ContextGetInstanceOfTypeCyclicDependencyTest$TestClassA\n" +
+                    "org.unitils.core.context.ContextGetInstanceOfTypeCyclicDependencyTest$TestClassB\n" +
+                    "org.unitils.core.context.ContextGetInstanceOfTypeCyclicDependencyTest$TestClassC\n", e.getMessage());
         }
     }
 

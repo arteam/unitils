@@ -106,31 +106,35 @@ public class FileResolver {
 
         // if name starts with / treat it as absolute path
         if (fullFileName.startsWith("/")) {
-            File file = new File(fullFileName);
-            if (!file.exists()) {
-                throw new UnitilsException("File with name " + file.getAbsolutePath() + " cannot be found.");
-            }
-            return file.toURI();
+            return resolveOnFileSystem(fullFileName);
         }
-
         // find file in classpath
+        return resolveOnClasspath(testClass, fullFileName);
+    }
+
+
+    protected URI resolveOnFileSystem(String fullFileName) {
+        File file = new File(fullFileName);
+        if (!file.exists()) {
+            throw new UnitilsException("File with name " + file.getAbsolutePath() + " cannot be found.");
+        }
+        return file.toURI();
+    }
+
+    protected URI resolveOnClasspath(Class<?> testClass, String fullFileName) {
         URL fileUrl = testClass.getResource('/' + fullFileName);
         if (fileUrl == null) {
             throw new UnitilsException("File with name " + fullFileName + " cannot be found.");
         }
         try {
-            return fileUrl.toURI();
+            return toUri(fullFileName, fileUrl);
         } catch (URISyntaxException e) {
             throw new UnitilsException("File with name " + fullFileName + " cannot be found.", e);
         }
     }
 
-    public boolean isPrefixWithPackageName() {
-        return prefixWithPackageName;
-    }
-
-    public String getPathPrefix() {
-        return pathPrefix;
+    protected URI toUri(String fullFileName, URL fileUrl) throws URISyntaxException {
+        return fileUrl.toURI();
     }
 
     /**

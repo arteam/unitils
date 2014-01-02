@@ -29,7 +29,7 @@ import static java.lang.Boolean.TRUE;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
 /**
- * todo javadoc
+ * Helper class for dealing with configuration properties.
  * <p/>
  * If classifiers are used, it will first look for a property using all classifiers, then look for
  * a property without the last classifier etc. If still no property was found, it will look for the property
@@ -45,6 +45,7 @@ public class Configuration {
     protected Properties properties;
 
     protected Properties overridingProperties;
+
 
     /**
      * Creates a configuration for the given properties.
@@ -585,7 +586,6 @@ public class Configuration {
         return result;
     }
 
-    // todo javadoc
     public <T> T getValueOfType(Class<T> type, String propertyName, String... classifiers) {
         String value = getString(propertyName, classifiers);
         return toValueOfType(type, value, propertyName, classifiers);
@@ -700,7 +700,7 @@ public class Configuration {
             return null;
         }
         try {
-            T instance = (T) createInstanceOfType(value, true);
+            T instance = createInstanceOfType(value, true);
             if (instance instanceof Factory) {
                 return (T) ((Factory) instance).create();
             }
@@ -723,7 +723,7 @@ public class Configuration {
 
     @SuppressWarnings({"unchecked"})
     protected <T> T toInstance(Class<T> type, String value, String propertyName, String... classifiers) {
-        T instance = (T) toInstance(value, propertyName, classifiers);
+        T instance = toInstance(value, propertyName, classifiers);
         if (instance != null && !type.isAssignableFrom(instance.getClass())) {
             throw new UnitilsException("Value " + value + " of " + nameToString(propertyName, classifiers) + " is not of the expected type " + type.getName());
         }

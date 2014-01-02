@@ -146,6 +146,35 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     }
 
     @Test
+    public void boundGenericType() throws Exception {
+        GenericClass<String> genericClass = new GenericClass<String>();
+        collectionReturningMockBehavior = new CollectionReturningMockBehavior("1", "2");
+        Method method = genericClass.getClass().getMethod("listMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+
+        collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
+    }
+
+    @Test
+    public void noFailureWhenBoundGenericTypeIsNotAssignable() throws Exception {
+        GenericClass<Properties> propertiesGenericClass = new GenericClass<Properties>();
+        collectionReturningMockBehavior = new CollectionReturningMockBehavior("1", "2");
+        Method method = propertiesGenericClass.getClass().getMethod("listMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+
+        collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
+    }
+
+    @Test
+    public void notBoundType() throws Exception {
+        collectionReturningMockBehavior = new CollectionReturningMockBehavior("1", "2");
+        Method method = MyInterface.class.getMethod("notBoundType");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+
+        collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
+    }
+
+    @Test
     public void rawSetType() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior("1", "2");
         Method method = MyInterface.class.getMethod("rawSetMethod");
@@ -163,7 +192,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
             collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to return a list, set or array value. The method does not have a list, set or array return type. The given value does not have a valid type for the list, set or array. Expected type: ? extends org.unitils.mock.mockbehavior.impl.CollectionReturningMockBehaviorAssertCanExecuteTest$MyClass, actual type: class java.util.Properties", e.getMessage());
+            assertEquals("Unable to return a list, set or array value. The given value does not have a valid type for the list, set or array. Expected type: ? extends org.unitils.mock.mockbehavior.impl.CollectionReturningMockBehaviorAssertCanExecuteTest$MyClass, actual type: class java.util.Properties", e.getMessage());
         }
     }
 
@@ -176,7 +205,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
             collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to return a list, set or array value. The method does not have a list, set or array return type. The given value does not have a valid type for the list, set or array. Expected type: class java.lang.String, actual type: class java.util.Properties", e.getMessage());
+            assertEquals("Unable to return a list, set or array value. The given value does not have a valid type for the list, set or array. Expected type: class java.lang.String, actual type: class java.util.Properties", e.getMessage());
         }
     }
 
@@ -189,7 +218,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
             collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to return a list, set or array value. The method does not have a list, set or array return type. The given value does not have a valid type for the list, set or array. Expected type: class java.lang.String, actual type: class java.util.Properties", e.getMessage());
+            assertEquals("Unable to return a list, set or array value. The given value does not have a valid type for the list, set or array. Expected type: class java.lang.String, actual type: class java.util.Properties", e.getMessage());
         }
     }
 
@@ -202,7 +231,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
             collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to return a list, set or array value. The method does not have a list, set or array return type. The given value does not have a valid type for the list, set or array. Expected type: class java.lang.String, actual type: class java.util.Properties", e.getMessage());
+            assertEquals("Unable to return a list, set or array value. The given value does not have a valid type for the list, set or array. Expected type: class java.lang.String, actual type: class java.util.Properties", e.getMessage());
         }
     }
 
@@ -237,7 +266,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
             collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to return a list, set or array value. The method does not have a list, set or array return type. The given value does not have a valid type for the list, set or array. Expected type: class org.unitils.mock.mockbehavior.impl.CollectionReturningMockBehaviorAssertCanExecuteTest$MyClass, actual type: class java.lang.String", e.getMessage());
+            assertEquals("Unable to return a list, set or array value. The given value does not have a valid type for the list, set or array. Expected type: class org.unitils.mock.mockbehavior.impl.CollectionReturningMockBehaviorAssertCanExecuteTest$MyClass, actual type: class java.lang.String", e.getMessage());
         }
     }
 
@@ -274,11 +303,20 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
 
         List<? extends MyClass> extendsWildcardMethod();
 
+        <T> List<T> notBoundType();
+
         String method();
 
         List rawListMethod();
 
         List rawSetMethod();
+    }
+
+    private static class GenericClass<T> {
+
+        public List<T> listMethod() {
+            return null;
+        }
     }
 
     private static class MyWrapper implements ObjectToInjectHolder<String> {

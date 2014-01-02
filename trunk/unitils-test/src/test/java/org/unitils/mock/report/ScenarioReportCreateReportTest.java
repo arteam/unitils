@@ -56,7 +56,7 @@ public class ScenarioReportCreateReportTest extends UnitilsJUnit4 {
 
     @Test
     public void invocationsObserved() {
-        scenarioMock.returns(asList(observedInvocation)).getObservedInvocations();
+        scenarioMock.returnsAll(observedInvocation).getObservedInvocations();
         observedInvocationsReportMock.returns("observed report").createReport(asList(observedInvocation), testObject);
         detailedObservedInvocationsReportMock.returns("detailed observed report").createReport(asList(observedInvocation), testObject);
 

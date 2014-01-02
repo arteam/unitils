@@ -236,6 +236,26 @@ public class CloneServiceCreateDeepCloneTest extends UnitilsJUnit4 {
         }
     }
 
+    @Test
+    public void cloneStringBuilder() {
+        StringBuilder stringBuilder = new StringBuilder("test");
+
+        StringBuilder result = cloneService.createDeepClone(stringBuilder);
+        stringBuilder.append(" 123");
+        assertEquals("test", result.toString());
+        assertEquals("test 123", stringBuilder.toString());
+    }
+
+    @Test
+    public void cloneStringBuffer() {
+        StringBuffer stringBuilder = new StringBuffer("test");
+
+        StringBuffer result = cloneService.createDeepClone(stringBuilder);
+        stringBuilder.append(" 123");
+        assertEquals("test", result.toString());
+        assertEquals("test 123", stringBuilder.toString());
+    }
+
 
     protected static class SimpleValues {
 

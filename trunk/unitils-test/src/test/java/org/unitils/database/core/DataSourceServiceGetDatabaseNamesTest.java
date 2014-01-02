@@ -40,14 +40,14 @@ public class DataSourceServiceGetDatabaseNamesTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        dataSourceService = new DataSourceService(dataSourceProviderManagerMock.getMock(), null, null);
+        dataSourceService = new DataSourceService(dataSourceProviderManagerMock.getMock(), null);
         dataSourceProviderManagerMock.returns(dataSourceProviderMock).getDataSourceProvider();
     }
 
 
     @Test
     public void getDatabaseNames() throws Exception {
-        dataSourceProviderMock.returns(asList("name1", "name2")).getDatabaseNames();
+        dataSourceProviderMock.returnsAll("name1", "name2").getDatabaseNames();
 
         List<String> result = dataSourceService.getDatabaseNames();
 

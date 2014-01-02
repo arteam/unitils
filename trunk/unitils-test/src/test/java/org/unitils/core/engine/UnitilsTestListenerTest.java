@@ -41,8 +41,8 @@ public class UnitilsTestListenerTest extends UnitilsJUnit4 {
     /* Tested object */
     private UnitilsTestListener unitilsTestListener;
 
-    private Mock<WrapperForFieldAnnotationListenerFactory> wrapperForFieldAnnotationListenerFactoryMock;
-    private Mock<WrapperForTestAnnotationListenerFactory> wrapperForTestAnnotationListenerFactoryMock;
+    private Mock<FieldAnnotationTestListenerFactory> wrapperForFieldAnnotationListenerFactoryMock;
+    private Mock<TestAnnotationTestListenerFactory> wrapperForTestAnnotationListenerFactoryMock;
     private PartialMock<TestListener> testListener1Mock;
     private PartialMock<TestListener> testListener2Mock;
     @Dummy
@@ -80,7 +80,10 @@ public class UnitilsTestListenerTest extends UnitilsJUnit4 {
         unitilsTestListener.beforeTestMethod();
         unitilsTestListener.afterTestMethod(testThrowable);
         unitilsTestListener.afterTestTearDown();
+        unitilsTestListener.afterTestClass();
 
+        testListener1Mock.assertInvokedInSequence().beforeTestClass(classWrapper);
+        testListener2Mock.assertInvokedInSequence().beforeTestClass(classWrapper);
         testListener1Mock.assertInvokedInSequence().beforeTestSetUp(testInstance);
         testListener2Mock.assertInvokedInSequence().beforeTestSetUp(testInstance);
         testListener1Mock.assertInvokedInSequence().beforeTestMethod(testInstance);
@@ -89,19 +92,24 @@ public class UnitilsTestListenerTest extends UnitilsJUnit4 {
         testListener2Mock.assertInvokedInSequence().afterTestMethod(testInstance, testThrowable);
         testListener1Mock.assertInvokedInSequence().afterTestTearDown(testInstance, testThrowable);
         testListener2Mock.assertInvokedInSequence().afterTestTearDown(testInstance, testThrowable);
+        testListener1Mock.assertInvokedInSequence().afterTestClass(classWrapper);
+        testListener2Mock.assertInvokedInSequence().afterTestClass(classWrapper);
     }
 
 
     @Test
     public void fieldAnnotationTestListeners() throws Exception {
-        wrapperForFieldAnnotationListenerFactoryMock.returns(asList(testListener1Mock.getMock(), testListener2Mock.getMock())).create(testInstance);
+        wrapperForFieldAnnotationListenerFactoryMock.returnsAll(testListener1Mock, testListener2Mock).create(testInstance);
 
         unitilsTestListener.beforeTestClass(MyClass.class);
         unitilsTestListener.beforeTestSetUp(testObject, testMethod);
         unitilsTestListener.beforeTestMethod();
         unitilsTestListener.afterTestMethod(testThrowable);
         unitilsTestListener.afterTestTearDown();
+        unitilsTestListener.afterTestClass();
 
+        testListener1Mock.assertNotInvoked().beforeTestClass(classWrapper);
+        testListener2Mock.assertNotInvoked().beforeTestClass(classWrapper);
         testListener1Mock.assertInvokedInSequence().beforeTestSetUp(testInstance);
         testListener2Mock.assertInvokedInSequence().beforeTestSetUp(testInstance);
         testListener1Mock.assertInvokedInSequence().beforeTestMethod(testInstance);
@@ -110,18 +118,23 @@ public class UnitilsTestListenerTest extends UnitilsJUnit4 {
         testListener2Mock.assertInvokedInSequence().afterTestMethod(testInstance, testThrowable);
         testListener1Mock.assertInvokedInSequence().afterTestTearDown(testInstance, testThrowable);
         testListener2Mock.assertInvokedInSequence().afterTestTearDown(testInstance, testThrowable);
+        testListener1Mock.assertNotInvoked().afterTestClass(classWrapper);
+        testListener2Mock.assertNotInvoked().afterTestClass(classWrapper);
     }
 
     @Test
     public void testAnnotationTestListeners() throws Exception {
-        wrapperForTestAnnotationListenerFactoryMock.returns(asList(testListener1Mock.getMock(), testListener2Mock.getMock())).create(testInstance);
+        wrapperForTestAnnotationListenerFactoryMock.returnsAll(testListener1Mock, testListener2Mock).create(testInstance);
 
         unitilsTestListener.beforeTestClass(MyClass.class);
         unitilsTestListener.beforeTestSetUp(testObject, testMethod);
         unitilsTestListener.beforeTestMethod();
         unitilsTestListener.afterTestMethod(testThrowable);
         unitilsTestListener.afterTestTearDown();
+        unitilsTestListener.afterTestClass();
 
+        testListener1Mock.assertNotInvoked().beforeTestClass(classWrapper);
+        testListener2Mock.assertNotInvoked().beforeTestClass(classWrapper);
         testListener1Mock.assertInvokedInSequence().beforeTestSetUp(testInstance);
         testListener2Mock.assertInvokedInSequence().beforeTestSetUp(testInstance);
         testListener1Mock.assertInvokedInSequence().beforeTestMethod(testInstance);
@@ -130,6 +143,8 @@ public class UnitilsTestListenerTest extends UnitilsJUnit4 {
         testListener2Mock.assertInvokedInSequence().afterTestMethod(testInstance, testThrowable);
         testListener1Mock.assertInvokedInSequence().afterTestTearDown(testInstance, testThrowable);
         testListener2Mock.assertInvokedInSequence().afterTestTearDown(testInstance, testThrowable);
+        testListener1Mock.assertNotInvoked().afterTestClass(classWrapper);
+        testListener2Mock.assertNotInvoked().afterTestClass(classWrapper);
     }
 
     @Test
@@ -139,11 +154,10 @@ public class UnitilsTestListenerTest extends UnitilsJUnit4 {
         unitilsTestListener.beforeTestMethod();
         unitilsTestListener.afterTestMethod(testThrowable);
         unitilsTestListener.afterTestTearDown();
+        unitilsTestListener.afterTestClass();
 
-        testListener1Mock.assertNotInvoked().beforeTestSetUp(null);
-        testListener1Mock.assertNotInvoked().beforeTestMethod(null);
-        testListener1Mock.assertNotInvoked().afterTestMethod(null, null);
-        testListener1Mock.assertNotInvoked().afterTestTearDown(null, null);
+        testListener1Mock.assertNoMoreInvocations();
+        testListener2Mock.assertNoMoreInvocations();
     }
 
 

@@ -28,9 +28,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Note: after test class is never called
- * todo td should we implement this?
- *
  * @author Tim Ducheyne
  */
 public class SpringTestListener extends TestListener {
@@ -87,6 +84,15 @@ public class SpringTestListener extends TestListener {
         invokeAfterTestMethod(testObject, testMethod, testThrowable);
     }
 
+    @Override
+    public void afterTestClass(ClassWrapper classWrapper) {
+        if (!currentTestIsSpringTest) {
+            // ignore, this is not a spring test
+            return;
+        }
+        invokeAfterTestClassMethod();
+        springTestManager.reset();
+    }
 
     protected boolean isSpringTest(ClassWrapper classWrapper) {
         return classWrapper.hasAnnotation(TestExecutionListeners.class) || classWrapper.hasAnnotation(ContextConfiguration.class);
@@ -98,14 +104,15 @@ public class SpringTestListener extends TestListener {
             Method beforeTestClassMethod = TestContextManager.class.getMethod("beforeTestClass");
             beforeTestClassMethod.invoke(testContextManager);
 
-        } catch (NoSuchMethodException e) {
-            // ignore, in spring 2.5 there is no beforeTestClass method
         } catch (Exception e) {
-            Throwable cause = e;
-            if (e instanceof InvocationTargetException) {
-                cause = e.getCause();
+            // in spring 2.5 there is no beforeTestClass method, ignore exception
+            if (!(e instanceof NoSuchMethodException)) {
+                Throwable cause = e;
+                if (e instanceof InvocationTargetException) {
+                    cause = e.getCause();
+                }
+                throw new UnitilsException("Exception occurred during before test class.", cause);
             }
-            throw new UnitilsException("Exception occurred during before test class.", cause);
         }
     }
 
@@ -137,6 +144,15 @@ public class SpringTestListener extends TestListener {
 
         } catch (Exception e) {
             throw new UnitilsException("Exception occurred during after test method.", e);
+        }
+    }
+
+    protected void invokeAfterTestClassMethod() {
+        try {
+            testContextManager.afterTestClass();
+
+        } catch (Exception e) {
+            throw new UnitilsException("Exception occurred during after test class method.", e);
         }
     }
 

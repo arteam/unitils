@@ -22,8 +22,6 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.core.config.Configuration;
 import org.unitils.mock.Mock;
 
-import java.util.Collections;
-
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
@@ -47,20 +45,20 @@ public class DatabaseConfigurationsFactoryCreateTest extends UnitilsJUnit4 {
 
     @Test
     public void databaseNamesSpecified() {
-        configurationMock.returns(asList("a", "b")).getOptionalStringList("database.names");
+        configurationMock.returnsAll("a", "b").getOptionalStringList("database.names");
         configurationMock.returns("driverA").getOptionalString("database.driverClassName", "a");
         configurationMock.returns("urlA").getOptionalString("database.url", "a");
         configurationMock.returns("userA").getOptionalString("database.userName", "a");
         configurationMock.returns("passA").getOptionalString("database.password", "a");
         configurationMock.returns("dialectA").getOptionalString("database.dialect", "a");
-        configurationMock.returns(asList("schema1", "schema2")).getOptionalStringList("database.schemaNames", "a");
+        configurationMock.returnsAll("schema1", "schema2").getOptionalStringList("database.schemaNames", "a");
         configurationMock.returns(false).getOptionalString("database.updateDisabled", "a");
         configurationMock.returns("driverB").getOptionalString("database.driverClassName", "b");
         configurationMock.returns("urlB").getOptionalString("database.url", "b");
         configurationMock.returns("userB").getOptionalString("database.userName", "b");
         configurationMock.returns("passB").getOptionalString("database.password", "b");
         configurationMock.returns("dialectB").getOptionalString("database.dialect", "b");
-        configurationMock.returns(Collections.<String>emptyList()).getOptionalStringList("database.schemaNames", "b");
+        configurationMock.returnsAll().getOptionalStringList("database.schemaNames", "b");
         configurationMock.returns(true).getOptionalBoolean("database.updateDisabled", "b");
 
         DatabaseConfigurations result = databaseConfigurationsFactory.create();
@@ -91,7 +89,7 @@ public class DatabaseConfigurationsFactoryCreateTest extends UnitilsJUnit4 {
 
     @Test
     public void firstNamedDatabaseIsDefaultDatabase() {
-        configurationMock.returns(asList("a", "b")).getOptionalStringList("database.names");
+        configurationMock.returnsAll("a", "b").getOptionalStringList("database.names");
 
         DatabaseConfigurations result = databaseConfigurationsFactory.create();
 
@@ -110,7 +108,7 @@ public class DatabaseConfigurationsFactoryCreateTest extends UnitilsJUnit4 {
         configurationMock.returns("userA").getOptionalString("database.userName");
         configurationMock.returns("passA").getOptionalString("database.password");
         configurationMock.returns("dialectA").getOptionalString("database.dialect");
-        configurationMock.returns(asList("schema1", "schema2")).getOptionalStringList("database.schemaNames");
+        configurationMock.returnsAll("schema1", "schema2").getOptionalStringList("database.schemaNames");
         configurationMock.returns(false).getOptionalString("database.updateDisabled");
 
         DatabaseConfigurations result = databaseConfigurationsFactory.create();

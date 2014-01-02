@@ -73,8 +73,7 @@ public class ReflectionUtils {
      *
      * @param <T>                 The type of the instance
      * @param type                The type of the instance
-     * @param bypassAccessibility If true, no exception is thrown if the parameterless
-     *                            constructor is not public
+     * @param bypassAccessibility If true, no exception is thrown if the default constructor is not public
      * @return An instance of this type
      * @throws UnitilsException If an instance could not be created
      */
@@ -87,8 +86,7 @@ public class ReflectionUtils {
      *
      * @param <T>                 The type of the instance
      * @param type                The type of the instance
-     * @param bypassAccessibility If true, no exception is thrown if the parameterless
-     *                            constructor is not public
+     * @param bypassAccessibility If true, no exception is thrown if the default constructor is not public
      * @param argumentTypes       The constructor arg types, not null
      * @param arguments           The constructor args, not null
      * @return An instance of this type
@@ -147,7 +145,7 @@ public class ReflectionUtils {
      * @param arguments The method arguments
      * @return The result of the invocation, null if void
      * @throws UnitilsException          if the method could not be invoked
-     * @throws InvocationTargetException If the called method throwed an exception
+     * @throws InvocationTargetException If the called method threw an exception
      */
     @SuppressWarnings({"unchecked"})
     public static <T> T invokeMethod(Object target, Method method, Object... arguments)
@@ -175,7 +173,7 @@ public class ReflectionUtils {
      * @param fieldName The name, not null
      * @param isStatic  True if a static field is to be returned, false for non-static
      * @return The field that matches the given parameters, or null if no such
-     *         field exists
+     * field exists
      */
     public static Field getFieldWithName(Class<?> clazz, String fieldName, boolean isStatic) {
         if (clazz == null || clazz.equals(Object.class)) {
@@ -288,12 +286,7 @@ public class ReflectionUtils {
      * @return The string representation, not null
      */
     public static String getSimpleMethodName(Method method) {
-        StringBuilder result = new StringBuilder();
-        result.append(method.getDeclaringClass().getSimpleName());
-        result.append('.');
-        result.append(method.getName());
-        result.append("()");
-        return result.toString();
+        return method.getDeclaringClass().getSimpleName() + '.' + method.getName() + "()";
     }
 
     /**
@@ -374,7 +367,7 @@ public class ReflectionUtils {
         }
         Type argumentType = argumentTypes[0];
         if (argumentType instanceof ParameterizedType) {
-            argumentType = ((ParameterizedType) argumentTypes[0]).getRawType();
+            argumentType = ((ParameterizedType) argumentType).getRawType();
         }
         return argumentType;
     }

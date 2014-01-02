@@ -22,6 +22,7 @@ import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +38,7 @@ public class CollectionReturningMockBehavior implements ValidatableMockBehavior 
 
     /* The value to return */
     protected List<?> valuesToReturn;
+    protected List<Type> valuesToReturnTypes;
 
 
     /**
@@ -46,6 +48,7 @@ public class CollectionReturningMockBehavior implements ValidatableMockBehavior 
      */
     public CollectionReturningMockBehavior(Object... valuesToReturn) {
         this.valuesToReturn = unwrapValuesToReturnIfNeeded(valuesToReturn);
+        this.valuesToReturnTypes = getValuesToReturnTypes(valuesToReturn);
     }
 
 
@@ -67,8 +70,9 @@ public class CollectionReturningMockBehavior implements ValidatableMockBehavior 
         if (isAssignable(returnType, List.class) || isAssignable(returnType, Set.class)) {
             Type genericType = proxyInvocation.getMethod().getGenericReturnType();
             elementType = getGenericParameterType(genericType);
-            if (elementType == null) {
-                // raw type
+            if (elementType == null || elementType instanceof TypeVariable) {
+                // raw type or not bound type: unable to verify whether the elements are of correct type
+                // ignore, let java handle it at runtime
                 return;
             }
         } else if (returnType.isArray()) {
@@ -78,20 +82,19 @@ public class CollectionReturningMockBehavior implements ValidatableMockBehavior 
             throw new UnitilsException("Unable to return a list, set or array value. The method does not have a list, set or array return type.");
         }
 
-        Class<?> unAssignableType = isAssignableElementType(valuesToReturn, elementType);
+        Type unAssignableType = isAssignableElementTypes(elementType);
         if (unAssignableType != null) {
-            throw new UnitilsException("Unable to return a list, set or array value. The method does not have a list, set or array return type. The given value does not have a valid type for the list, set or array. Expected type: " + elementType + ", actual type: " + unAssignableType);
+            throw new UnitilsException("Unable to return a list, set or array value. The given value does not have a valid type for the list, set or array. Expected type: " + elementType + ", actual type: " + unAssignableType);
         }
     }
 
-    protected Class<?> isAssignableElementType(List<?> values, Type type) {
-        for (Object value : values) {
-            if (value == null) {
-                continue;
-            }
-            Class<?> valueType = value.getClass();
-            if (!isAssignable(valueType, type)) {
-                return valueType;
+    protected Type isAssignableElementTypes(Type type) {
+        if (valuesToReturnTypes == null) {
+            return null;
+        }
+        for (Type valuesToReturnType : valuesToReturnTypes) {
+            if (!isAssignable(valuesToReturnType, type)) {
+                return valuesToReturnType;
             }
         }
         return null;
@@ -137,6 +140,27 @@ public class CollectionReturningMockBehavior implements ValidatableMockBehavior 
                 valueToReturn = objectToInjectHolder.getObjectToInject();
             }
             result.add(valueToReturn);
+        }
+        return result;
+    }
+
+    protected List<Type> getValuesToReturnTypes(Object... valuesToReturn) {
+        if (valuesToReturn == null) {
+            return null;
+        }
+        List<Type> result = new ArrayList<Type>();
+        for (Object valueToReturn : valuesToReturn) {
+            if (valueToReturn == null) {
+                continue;
+            }
+            Type type;
+            if (valueToReturn instanceof ObjectToInjectHolder) {
+                ObjectToInjectHolder objectToInjectHolder = (ObjectToInjectHolder) valueToReturn;
+                type = objectToInjectHolder.getObjectToInjectType(null);
+            } else {
+                type = valueToReturn.getClass();
+            }
+            result.add(type);
         }
         return result;
     }

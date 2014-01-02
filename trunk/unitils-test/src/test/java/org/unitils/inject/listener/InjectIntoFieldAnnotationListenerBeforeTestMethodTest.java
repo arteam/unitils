@@ -68,7 +68,7 @@ public class InjectIntoFieldAnnotationListenerBeforeTestMethodTest extends Uniti
     @Test
     public void singleTarget() {
         annotationsMock.returns(annotation1).getAnnotationWithDefaults();
-        targetServiceMock.returns(asList("target")).getTargetsForInjection(asList("targetName"), testInstanceMock.getMock());
+        targetServiceMock.returnsAll("target").getTargetsForInjection(asList("targetName"), testInstanceMock.getMock());
 
         injectIntoFieldAnnotationListener.beforeTestMethod(testInstanceMock.getMock(), testFieldMock.getMock(), annotationsMock.getMock());
 
@@ -79,7 +79,7 @@ public class InjectIntoFieldAnnotationListenerBeforeTestMethodTest extends Uniti
     @Test
     public void multipleTargets() {
         annotationsMock.returns(annotation2).getAnnotationWithDefaults();
-        targetServiceMock.returns(asList("target1", "target2")).getTargetsForInjection(asList("targetName1", "targetName2"), testInstanceMock.getMock());
+        targetServiceMock.returnsAll("target1", "target2").getTargetsForInjection(asList("targetName1", "targetName2"), testInstanceMock.getMock());
 
         injectIntoFieldAnnotationListener.beforeTestMethod(testInstanceMock.getMock(), testFieldMock.getMock(), annotationsMock.getMock());
 
@@ -90,7 +90,7 @@ public class InjectIntoFieldAnnotationListenerBeforeTestMethodTest extends Uniti
     @Test
     public void noTargets() {
         annotationsMock.returns(annotation3).getAnnotationWithDefaults();
-        targetServiceMock.returns(Collections.<String>emptyList()).getTargetsForInjection(Collections.<String>emptyList(), testInstanceMock.getMock());
+        targetServiceMock.returnsAll().getTargetsForInjection(Collections.<String>emptyList(), testInstanceMock.getMock());
 
         injectIntoFieldAnnotationListener.beforeTestMethod(testInstanceMock.getMock(), testFieldMock.getMock(), annotationsMock.getMock());
 

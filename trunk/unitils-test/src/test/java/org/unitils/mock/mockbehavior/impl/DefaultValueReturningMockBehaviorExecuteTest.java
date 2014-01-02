@@ -25,8 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Tim Ducheyne
@@ -36,6 +35,15 @@ public class DefaultValueReturningMockBehaviorExecuteTest {
 
     private DefaultValueReturningMockBehavior defaultValueReturningMockBehavior = new DefaultValueReturningMockBehavior();
 
+
+    @Test
+    public void proxyNameForToStringMethod() throws Exception {
+        Method method = Object.class.getMethod("toString");
+        ProxyInvocation proxyInvocation = new ProxyInvocation("proxy name", null, method, null, null);
+
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        assertEquals("proxy name", result);
+    }
 
     @Test
     public void list() throws Exception {

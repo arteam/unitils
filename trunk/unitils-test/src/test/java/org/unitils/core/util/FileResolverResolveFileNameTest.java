@@ -20,31 +20,29 @@ import org.unitils.core.UnitilsException;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
- * Tests the file resolver.
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class FileResolverTest {
+public class FileResolverResolveFileNameTest {
 
-    /* Tested object */
     private FileResolver fileResolver = new FileResolver();
 
 
     @Test
     public void withPackagePrefix() throws Exception {
-        URI result = fileResolver.resolveFileName("FileResolverTest.txt", FileResolverTest.class);
+        URI result = fileResolver.resolveFileName("FileResolverTest.txt", FileResolverResolveFileNameTest.class);
         assertEquals("FileResolverTest.txt", new File(result).getName());
     }
 
     @Test
     public void noPackagePrefixWhenFileNameStartsWithSlash() throws Exception {
-        URI result = fileResolver.resolveFileName("/org/unitils/FileResolverTest-otherPackage.txt", FileResolverTest.class);
+        URI result = fileResolver.resolveFileName("/org/unitils/FileResolverTest-otherPackage.txt", FileResolverResolveFileNameTest.class);
         assertEquals("FileResolverTest-otherPackage.txt", new File(result).getName());
     }
 
@@ -59,7 +57,7 @@ public class FileResolverTest {
         fileResolver = new FileResolver(false, null);
 
         // no slash --> a prefix would have been used
-        URI result = fileResolver.resolveFileName("org/unitils/FileResolverTest-otherPackage.txt", FileResolverTest.class);
+        URI result = fileResolver.resolveFileName("org/unitils/FileResolverTest-otherPackage.txt", FileResolverResolveFileNameTest.class);
         assertEquals("FileResolverTest-otherPackage.txt", new File(result).getName());
     }
 
@@ -67,7 +65,7 @@ public class FileResolverTest {
     public void pathPrefixWithoutSlashIsRelativeToClassPath() throws Exception {
         fileResolver = new FileResolver(false, "org/unitils");
 
-        URI result = fileResolver.resolveFileName("FileResolverTest-otherPackage.txt", FileResolverTest.class);
+        URI result = fileResolver.resolveFileName("FileResolverTest-otherPackage.txt", FileResolverResolveFileNameTest.class);
         assertEquals("FileResolverTest-otherPackage.txt", new File(result).getName());
     }
 
@@ -76,35 +74,47 @@ public class FileResolverTest {
         String directory = new File(getClass().getClassLoader().getResource("org/unitils/FileResolverTest-otherPackage.txt").toURI()).getParent();
         fileResolver = new FileResolver(false, "/" + directory);
 
-        URI result = fileResolver.resolveFileName("/FileResolverTest-otherPackage.txt", FileResolverTest.class);
+        URI result = fileResolver.resolveFileName("/FileResolverTest-otherPackage.txt", FileResolverResolveFileNameTest.class);
         assertEquals("FileResolverTest-otherPackage.txt", new File(result).getName());
     }
 
     @Test
-    public void fileNotFoundInClassPath() throws Exception {
+    public void exceptionWhenFileNotFoundInClassPath() throws Exception {
         try {
-            fileResolver.resolveFileName("xxx.txt", FileResolverTest.class);
+            fileResolver.resolveFileName("xxx.txt", FileResolverResolveFileNameTest.class);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            // expected
+            assertEquals("File with name org/unitils/core/util/xxx.txt cannot be found.", e.getMessage());
         }
     }
 
     @Test
-    public void absoluteFileNotFound() throws Exception {
+    public void exceptionWhenAbsoluteFileNotFound() throws Exception {
         fileResolver = new FileResolver(false, "/xxxx");
         try {
-            fileResolver.resolveFileName("xxx.txt", FileResolverTest.class);
+            fileResolver.resolveFileName("xxx.txt", FileResolverResolveFileNameTest.class);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            // expected
+            String message = e.getMessage();
+            assertTrue(message.startsWith("File with name"));
+            assertTrue(message.endsWith("xxx.txt cannot be found."));
         }
     }
 
     @Test
-    public void defaultFileName() throws Exception {
-        URI result = fileResolver.resolveDefaultFileName("txt", FileResolverTest.class);
-        assertEquals("FileResolverTest.txt", new File(result).getName());
+    public void exceptionWhenToUriFails() throws Exception {
+        fileResolver = new FileResolver(true, null) {
+            @Override
+            protected URI toUri(String fullFileName, URL fileUrl) throws URISyntaxException {
+                throw new URISyntaxException("input", "reason");
+            }
+        };
+        try {
+            fileResolver.resolveFileName("FileResolverTest.txt", FileResolverResolveFileNameTest.class);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("File with name org/unitils/core/util/FileResolverTest.txt cannot be found.\n" +
+                    "Reason: URISyntaxException: reason: input", e.getMessage());
+        }
     }
-
 }

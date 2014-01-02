@@ -18,6 +18,7 @@ package org.unitils;
 import org.testng.IHookCallBack;
 import org.testng.IHookable;
 import org.testng.ITestResult;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -49,7 +50,6 @@ public abstract class UnitilsTestNG implements IHookable {
         getUnitilsTestListener().beforeTestClass(this.getClass());
     }
 
-
     /**
      * Called before all test setup. This is where beforeTestSetUp is called.
      *
@@ -60,7 +60,6 @@ public abstract class UnitilsTestNG implements IHookable {
         beforeTestSetUpCalled = true;
         getUnitilsTestListener().beforeTestSetUp(this, testMethod);
     }
-
 
     /**
      * Called after all test tear down. This is where afterTestTearDown is called.
@@ -77,6 +76,11 @@ public abstract class UnitilsTestNG implements IHookable {
             beforeTestSetUpCalled = false;
             getUnitilsTestListener().afterTestTearDown();
         }
+    }
+
+    @AfterClass(alwaysRun = true)
+    protected void unitilsAfterClass() {
+        getUnitilsTestListener().afterTestClass();
     }
 
 
@@ -127,7 +131,6 @@ public abstract class UnitilsTestNG implements IHookable {
         }
     }
 
-
     /**
      * Throws an unchecked excepton for the given throwable.
      *
@@ -142,7 +145,6 @@ public abstract class UnitilsTestNG implements IHookable {
             throw new RuntimeException(throwable);
         }
     }
-
 
     /**
      * @return The unitils test listener

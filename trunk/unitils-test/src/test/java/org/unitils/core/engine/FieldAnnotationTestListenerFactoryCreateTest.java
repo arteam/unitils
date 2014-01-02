@@ -22,6 +22,7 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.core.FieldAnnotationListener;
 import org.unitils.core.TestField;
 import org.unitils.core.TestInstance;
+import org.unitils.core.TestListener;
 import org.unitils.core.annotation.FieldAnnotation;
 import org.unitils.core.config.Configuration;
 import org.unitils.core.context.Context;
@@ -47,10 +48,10 @@ import static org.unitils.core.TestPhase.EXECUTION;
 /**
  * @author Tim Ducheyne
  */
-public class WrapperForFieldAnnotationListenerFactoryCreateTest extends UnitilsJUnit4 {
+public class FieldAnnotationTestListenerFactoryCreateTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private WrapperForFieldAnnotationListenerFactory wrapperForFieldAnnotationListenerFactory;
+    private FieldAnnotationTestListenerFactory fieldAnnotationTestListenerFactory;
 
     private Mock<Context> contextMock;
     private Mock<MyFieldAnnotationListener1> fieldAnnotationListener1Mock;
@@ -61,7 +62,7 @@ public class WrapperForFieldAnnotationListenerFactoryCreateTest extends UnitilsJ
 
     @Before
     public void initialize() throws Exception {
-        wrapperForFieldAnnotationListenerFactory = new WrapperForFieldAnnotationListenerFactory(contextMock.getMock());
+        fieldAnnotationTestListenerFactory = new FieldAnnotationTestListenerFactory(contextMock.getMock());
 
         fieldAnnotationListener1Mock.returns(EXECUTION).getTestPhase();
         fieldAnnotationListener2Mock.returns(EXECUTION).getTestPhase();
@@ -86,16 +87,16 @@ public class WrapperForFieldAnnotationListenerFactoryCreateTest extends UnitilsJ
         TestField testField2 = new TestField(new FieldWrapper(field2), testObject);
         MyFieldAnnotation2 fieldAnnotation2 = testField2.getAnnotation(MyFieldAnnotation2.class);
 
-        List<WrapperForFieldAnnotationListener> result = wrapperForFieldAnnotationListenerFactory.create(testInstance);
+        List<TestListener> result = fieldAnnotationTestListenerFactory.create(testInstance);
         assertEquals(2, result.size());
 
-        WrapperForFieldAnnotationListener listener1 = result.get(0);
+        WrapperForFieldAnnotationListener listener1 = (WrapperForFieldAnnotationListener) result.get(0);
         assertTrue(listener1.fieldAnnotationListener instanceof MyFieldAnnotationListener2);
         assertEquals(testField2, listener1.testField);
         assertEquals(fieldAnnotation2, listener1.annotations.getAnnotation());
         assertTrue(listener1.annotations.getClassAnnotations().isEmpty());
 
-        WrapperForFieldAnnotationListener listener2 = result.get(1);
+        WrapperForFieldAnnotationListener listener2 = (WrapperForFieldAnnotationListener) result.get(1);
         assertTrue(listener2.fieldAnnotationListener instanceof MyFieldAnnotationListener1);
         assertEquals(testField1, listener2.testField);
         assertEquals(fieldAnnotation1, listener2.annotations.getAnnotation());
@@ -116,10 +117,10 @@ public class WrapperForFieldAnnotationListenerFactoryCreateTest extends UnitilsJ
         MyFieldAnnotation1 classAnnotation = AnnotationOnClassAndField.class.getAnnotation(MyFieldAnnotation1.class);
         MyFieldAnnotation1 superClassAnnotation = AnnotationOnSuperClass.class.getAnnotation(MyFieldAnnotation1.class);
 
-        List<WrapperForFieldAnnotationListener> result = wrapperForFieldAnnotationListenerFactory.create(testInstance);
+        List<TestListener> result = fieldAnnotationTestListenerFactory.create(testInstance);
         assertEquals(1, result.size());
 
-        WrapperForFieldAnnotationListener listener1 = result.get(0);
+        WrapperForFieldAnnotationListener listener1 = (WrapperForFieldAnnotationListener) result.get(0);
         assertTrue(listener1.fieldAnnotationListener instanceof MyFieldAnnotationListener1);
         assertEquals(testField, listener1.testField);
         assertEquals(fieldAnnotation, listener1.annotations.getAnnotation());
@@ -135,7 +136,7 @@ public class WrapperForFieldAnnotationListenerFactoryCreateTest extends UnitilsJ
         ClassWrapper classWrapper = new ClassWrapper(AnnotationOnClass.class);
         TestInstance testInstance = new TestInstance(classWrapper, testObject, testMethod);
 
-        List<WrapperForFieldAnnotationListener> result = wrapperForFieldAnnotationListenerFactory.create(testInstance);
+        List<TestListener> result = fieldAnnotationTestListenerFactory.create(testInstance);
         assertTrue(result.isEmpty());
     }
 
@@ -147,7 +148,7 @@ public class WrapperForFieldAnnotationListenerFactoryCreateTest extends UnitilsJ
         ClassWrapper classWrapper = new ClassWrapper(NoAnnotation.class);
         TestInstance testInstance = new TestInstance(classWrapper, testObject, testMethod);
 
-        List<WrapperForFieldAnnotationListener> result = wrapperForFieldAnnotationListenerFactory.create(testInstance);
+        List<TestListener> result = fieldAnnotationTestListenerFactory.create(testInstance);
         assertTrue(result.isEmpty());
     }
 
@@ -159,7 +160,7 @@ public class WrapperForFieldAnnotationListenerFactoryCreateTest extends UnitilsJ
         ClassWrapper classWrapper = new ClassWrapper(NoFields.class);
         TestInstance testInstance = new TestInstance(classWrapper, testObject, testMethod);
 
-        List<WrapperForFieldAnnotationListener> result = wrapperForFieldAnnotationListenerFactory.create(testInstance);
+        List<TestListener> result = fieldAnnotationTestListenerFactory.create(testInstance);
         assertTrue(result.isEmpty());
     }
 
@@ -171,7 +172,7 @@ public class WrapperForFieldAnnotationListenerFactoryCreateTest extends UnitilsJ
         ClassWrapper classWrapper = new ClassWrapper(OtherAnnotation.class);
         TestInstance testInstance = new TestInstance(classWrapper, testObject, testMethod);
 
-        List<WrapperForFieldAnnotationListener> result = wrapperForFieldAnnotationListenerFactory.create(testInstance);
+        List<TestListener> result = fieldAnnotationTestListenerFactory.create(testInstance);
         assertTrue(result.isEmpty());
     }
 

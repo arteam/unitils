@@ -49,7 +49,7 @@ public class DataSourceWrapperGetLongListTest extends UnitilsJUnit4 {
 
     @Test
     public void getLongList() throws Exception {
-        simpleJdbcTemplateMock.returns(asList(4L, 5L)).query("query", null, "arg");
+        simpleJdbcTemplateMock.returnsAll(4L, 5L).query("query", null, "arg");
 
         List<Long> result = dataSourceWrapper.getMock().getLongList("query", "arg");
         assertEquals(asList(4L, 5L), result);

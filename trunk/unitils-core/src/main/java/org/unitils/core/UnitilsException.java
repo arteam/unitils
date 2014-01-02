@@ -22,8 +22,6 @@ import static org.apache.commons.lang.StringUtils.isBlank;
  */
 public class UnitilsException extends RuntimeException {
 
-    // todo unit test
-
     public UnitilsException() {
     }
 
@@ -35,25 +33,33 @@ public class UnitilsException extends RuntimeException {
         super(message, cause);
     }
 
-    public UnitilsException(Throwable cause) {
-        super(cause);
-    }
-
 
     @Override
     public String getMessage() {
-        String reason = "";
-
+        String message = super.getMessage();
         Throwable cause = getCause();
+        if (message == null && cause == null) {
+            return null;
+        }
+        String causeMessage = null;
         if (cause != null) {
-            if (!isBlank(cause.getMessage())) {
-                reason = "\nReason: ";
-                if (!(cause instanceof UnitilsException)) {
-                    reason += cause.getClass().getSimpleName() + ": ";
-                }
-                reason = reason + cause.getMessage();
+            causeMessage = cause.getMessage();
+        }
+
+        StringBuilder result = new StringBuilder();
+        if (!isBlank(message)) {
+            result.append(message);
+            if (!isBlank(causeMessage)) {
+                result.append("\nReason: ");
             }
         }
-        return super.getMessage() + reason;
+        if (!isBlank(causeMessage)) {
+            if (!(cause instanceof UnitilsException)) {
+                result.append(cause.getClass().getSimpleName());
+                result.append(": ");
+            }
+            result.append(causeMessage);
+        }
+        return result.toString();
     }
 }

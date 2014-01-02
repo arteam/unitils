@@ -63,7 +63,7 @@ public class SpringTestListenerAfterTestTearDownTest extends UnitilsJUnit4 {
 
     @Test
     public void ignoredWhenNotASpringTest() throws Exception {
-        springTestListener.beforeTestSetUp(testInstance);
+        springTestListener.afterTestTearDown(testInstance, testThrowable);
 
         assertNull(MyTestExecutionListener.testContext);
     }

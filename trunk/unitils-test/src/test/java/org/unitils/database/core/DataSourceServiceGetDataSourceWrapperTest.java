@@ -40,7 +40,6 @@ public class DataSourceServiceGetDataSourceWrapperTest extends UnitilsJUnit4 {
     private Mock<DataSourceProviderManager> dataSourceProviderManagerMock;
     private Mock<DataSourceProvider> dataSourceProviderMock;
     private Mock<DbMaintainWrapper> dbMaintainWrapperMock;
-    private Mock<TransactionManager> transactionManagerMock;
 
     @Dummy
     private DatabaseConfiguration databaseConfiguration;
@@ -51,7 +50,7 @@ public class DataSourceServiceGetDataSourceWrapperTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        dataSourceService = new DataSourceService(dataSourceProviderManagerMock.getMock(), dbMaintainWrapperMock.getMock(), transactionManagerMock.getMock());
+        dataSourceService = new DataSourceService(dataSourceProviderManagerMock.getMock(), dbMaintainWrapperMock.getMock());
         dataSourceProviderManagerMock.returns(dataSourceProviderMock).getDataSourceProvider();
     }
 
@@ -64,7 +63,6 @@ public class DataSourceServiceGetDataSourceWrapperTest extends UnitilsJUnit4 {
         DataSourceWrapper result = dataSourceService.getDataSourceWrapper("databaseName");
 
         assertSame(dataSourceWrapperMock.getMock(), result);
-        transactionManagerMock.assertInvoked().registerDataSource(dataSource);
         dbMaintainWrapperMock.assertInvoked().updateDatabaseIfNeeded();
     }
 
@@ -76,7 +74,6 @@ public class DataSourceServiceGetDataSourceWrapperTest extends UnitilsJUnit4 {
         DataSourceWrapper result = dataSourceService.getDataSourceWrapper(null);
 
         assertSame(dataSourceWrapperMock.getMock(), result);
-        transactionManagerMock.assertInvoked().registerDataSource(dataSource);
         dbMaintainWrapperMock.assertInvoked().updateDatabaseIfNeeded();
     }
 }

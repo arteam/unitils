@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.Mock;
-import org.unitils.mock.core.MockFactory;
+import org.unitils.mock.core.DummyFactory;
 import org.unitils.mock.core.proxy.Argument;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 
@@ -37,12 +37,12 @@ public class DummyValueReturningMockBehaviorExecuteTest extends UnitilsJUnit4 {
 
     private DummyValueReturningMockBehavior dummyValueReturningMockBehavior;
 
-    private Mock<MockFactory> mockFactoryMock;
+    private Mock<DummyFactory> dummyFactoryMock;
 
 
     @Before
     public void initialize() {
-        dummyValueReturningMockBehavior = new DummyValueReturningMockBehavior(mockFactoryMock.getMock());
+        dummyValueReturningMockBehavior = new DummyValueReturningMockBehavior(dummyFactoryMock.getMock());
     }
 
 
@@ -88,7 +88,7 @@ public class DummyValueReturningMockBehaviorExecuteTest extends UnitilsJUnit4 {
         Method method = TestInterface.class.getMethod("dummyMethod");
         ProxyInvocation proxyInvocation = createProxyInvocation(method);
         TestClass dummy = new TestClass();
-        mockFactoryMock.returns(dummy).createDummy(isNull(String.class), TestClass.class);
+        dummyFactoryMock.returns(dummy).createDummy(isNull(String.class), TestClass.class);
 
         Object result = dummyValueReturningMockBehavior.execute(proxyInvocation);
         assertSame(dummy, result);

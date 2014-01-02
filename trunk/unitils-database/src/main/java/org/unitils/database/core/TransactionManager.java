@@ -46,58 +46,51 @@ public class TransactionManager {
     protected static Log logger = LogFactory.getLog(TransactionManager.class);
 
     protected TransactionProviderManager transactionProviderManager;
+    protected DataSourceService dataSourceService;
 
+    protected DataSource dataSource;
+    protected String databaseName;
     protected PlatformTransactionManager platformTransactionManager;
     protected String transactionManagerName;
-    protected boolean transactionStarted;
-    protected DataSource dataSource;
     protected TransactionStatus transactionStatus;
 
 
-    public TransactionManager(TransactionProviderManager transactionProviderManager) {
+    public TransactionManager(TransactionProviderManager transactionProviderManager, DataSourceService dataSourceService) {
         this.transactionProviderManager = transactionProviderManager;
+        this.dataSourceService = dataSourceService;
     }
 
 
-    public void startTransaction(String transactionManagerName) {
+    public void startTransaction(String databaseName, String transactionManagerName) {
+        DataSource dataSource = dataSourceService.getDataSource(databaseName);
         if (transactionManagerName == null) {
             transactionManagerName = "";
         }
-        if (transactionStarted) {
+        if (isTransactionActive()) {
+            if (this.dataSource != dataSource) {
+                String newDatabaseName = isBlank(databaseName) ? "the default database" : ("database with name '" + databaseName + "'");
+                String currentDatabaseName = isBlank(this.databaseName) ? "the default database" : ("database with name '" + this.databaseName + "'");
+                throw new UnitilsException("Unable to start transaction for " + newDatabaseName + ". A transaction for " + currentDatabaseName + " is already active.\n" +
+                        "A transaction can only be started for 1 data source at the same time. If you want a transaction spanning multiple data sources, you will need to set up an XA-transaction manager in a spring context.");
+            }
             if (!this.transactionManagerName.equals(transactionManagerName)) {
                 String newTransactionManagerName = isBlank(transactionManagerName) ? "the default transaction manager" : ("transaction manager with name '" + transactionManagerName + "'");
                 String currentTransactionManagerName = isBlank(this.transactionManagerName) ? "the default transaction manager" : ("transaction manager with name '" + this.transactionManagerName + "'");
-                throw new UnitilsException("Unable to start transaction for " + newTransactionManagerName + ". A transaction for " + currentTransactionManagerName + " is already active for this test.\n" +
+                throw new UnitilsException("Unable to start transaction for " + newTransactionManagerName + ". A transaction for " + currentTransactionManagerName + " is already active.\n" +
                         "A transaction can only be started for 1 transaction manager at the same time. If you want a transaction spanning multiple data sources, you will need to set up an XA-transaction manager in a spring context.");
             }
             // transaction already active, ignore
             return;
         }
+
+        logger.debug("Starting transaction.");
+        TransactionProvider transactionProvider = transactionProviderManager.getTransactionProvider();
+        TransactionDefinition transactionDefinition = createTransactionDefinition();
+        this.databaseName = databaseName;
         this.transactionManagerName = transactionManagerName;
-        this.transactionStarted = true;
-
-        if (!isTransactionActive() && dataSource != null) {
-            doStartTransaction();
-        }
-    }
-
-    public void registerDataSource(DataSource dataSource) {
-        if (isTransactionActive()) {
-            if (this.dataSource != dataSource) {
-                throw new UnitilsException("Unable to register data source. A transaction for another data source is already active for this test.\n" +
-                        "A transaction can only be started for 1 data source at the same time. If you want a transaction spanning multiple data sources, you will need to set up an XA-transaction manager in a spring context.");
-            }
-            // transaction already active, ignore
-            return;
-        }
         this.dataSource = dataSource;
-        if (isTransactionStarted()) {
-            doStartTransaction();
-        }
-    }
-
-    public boolean isTransactionStarted() {
-        return transactionStarted;
+        this.platformTransactionManager = transactionProvider.getPlatformTransactionManager(transactionManagerName, dataSource);
+        this.transactionStatus = platformTransactionManager.getTransaction(transactionDefinition);
     }
 
     public boolean isTransactionActive() {
@@ -108,51 +101,41 @@ public class TransactionManager {
     /**
      * Commits the current transaction.
      */
-    public void commit(boolean endTransaction) {
+    public void commit() {
         if (!isTransactionActive()) {
             throw new UnitilsException("Unable to commit. No transaction is currently active. Make sure to call startTransaction to start a transaction.");
         }
         logger.debug("Committing transaction.");
-        platformTransactionManager.commit(transactionStatus);
-        transactionStatus = null;
-
-        if (endTransaction) {
-            doEndTransaction();
+        try {
+            platformTransactionManager.commit(transactionStatus);
+        } finally {
+            reset();
         }
     }
 
     /**
      * Rolls back the current transaction.
      */
-    public void rollback(boolean endTransaction) {
+    public void rollback() {
         if (!isTransactionActive()) {
             throw new UnitilsException("Unable to rollback. No transaction is currently active. Make sure to call startTransaction to start a transaction.");
         }
         logger.debug("Rolling back transaction.");
-        platformTransactionManager.rollback(transactionStatus);
-        transactionStatus = null;
-
-        if (endTransaction) {
-            doEndTransaction();
+        try {
+            platformTransactionManager.rollback(transactionStatus);
+        } finally {
+            reset();
         }
     }
 
 
-    protected void doStartTransaction() {
-        logger.debug("Starting transaction.");
-        TransactionProvider transactionProvider = transactionProviderManager.getTransactionProvider();
-        TransactionDefinition transactionDefinition = createTransactionDefinition();
-
-        platformTransactionManager = transactionProvider.getPlatformTransactionManager(transactionManagerName, dataSource);
-        transactionStatus = platformTransactionManager.getTransaction(transactionDefinition);
-    }
-
-    protected void doEndTransaction() {
-        transactionStarted = false;
+    protected void reset() {
+        dataSource = null;
+        databaseName = null;
         platformTransactionManager = null;
         transactionManagerName = null;
+        transactionStatus = null;
     }
-
 
     /**
      * Returns a @{link TransactionDefinition} to use when starting a transaction.

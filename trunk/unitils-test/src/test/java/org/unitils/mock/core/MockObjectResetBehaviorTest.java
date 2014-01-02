@@ -32,7 +32,7 @@ public class MockObjectResetBehaviorTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        mockObject = new MockObject<Object>("name", Object.class, null, null, false, behaviorDefiningInvocationsMock.getMock(), null, null, null);
+        mockObject = new MockObject<Object>("name", Object.class, null, null, false, behaviorDefiningInvocationsMock.getMock(), null, null, null, null, null);
     }
 
 

@@ -46,16 +46,16 @@ public class ScenarioGetUnverifiedInvocationsTest extends UnitilsJUnit4 {
     @Before
     public void initialize() {
         scenario = new Scenario();
+        scenario.addObservedInvocation(observedInvocation1);
+        scenario.addObservedInvocation(observedInvocation2);
+        scenario.addObservedInvocation(observedInvocation3);
+
         matchingInvocationMock.returns(-1).matches(null);
     }
 
 
     @Test
     public void getUnverifiedInvocations() {
-        scenario.addObservedInvocation(observedInvocation1);
-        scenario.addObservedInvocation(observedInvocation2);
-        scenario.addObservedInvocation(observedInvocation3);
-
         matchingInvocationMock.returns(1).matches(observedInvocation2);
         scenario.verifyInvocation(matchingInvocationMock.getMock());
 
@@ -65,16 +65,13 @@ public class ScenarioGetUnverifiedInvocationsTest extends UnitilsJUnit4 {
 
     @Test
     public void emptyWhenNoObservedInvocations() {
+        scenario.reset();
         List<ObservedInvocation> result = scenario.getUnverifiedInvocations();
         assertTrue(result.isEmpty());
     }
 
     @Test
     public void emptyWhenNoAllInvocationsVerified() {
-        scenario.addObservedInvocation(observedInvocation1);
-        scenario.addObservedInvocation(observedInvocation2);
-        scenario.addObservedInvocation(observedInvocation3);
-
         matchingInvocationMock.returns(1).matches(observedInvocation1);
         matchingInvocationMock.returns(1).matches(observedInvocation2);
         matchingInvocationMock.returns(1).matches(observedInvocation3);

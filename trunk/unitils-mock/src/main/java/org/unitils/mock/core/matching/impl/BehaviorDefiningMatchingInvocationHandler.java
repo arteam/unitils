@@ -60,6 +60,9 @@ public class BehaviorDefiningMatchingInvocationHandler implements MatchingInvoca
         if (mock == null) {
             return null;
         }
+        if (oneTimeMatch) {
+            return mock.oncePerforms(new ChainedMockBehavior(mock, behaviorDefiningInvocation));
+        }
         return mock.performs(new ChainedMockBehavior(mock, behaviorDefiningInvocation));
     }
 }

@@ -63,6 +63,10 @@ public class MockFactoryCreatePartialMockTest extends UnitilsJUnit4 {
     private Mock<CreateMockListener> createMockListenerMock;
     @Dummy
     private Object otherTestObject;
+    @Dummy
+    private MockService mockService;
+    @Dummy
+    private DummyFactory dummyFactory;
     private BehaviorDefiningInvocations behaviorDefiningInvocations;
     private MatchingProxyInvocationHandler matchingProxyInvocationHandler;
     private MockProxyInvocationHandler mockProxyInvocationHandler;
@@ -71,7 +75,7 @@ public class MockFactoryCreatePartialMockTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        mockFactory = new MockFactory(scenarioMock.getMock(), argumentMatcherRepositoryMock.getMock(), mockBehaviorFactoryMock.getMock(), proxyServiceMock.getMock(), stackTraceService, cloneService, scenarioReport);
+        mockFactory = new MockFactory(scenarioMock.getMock(), argumentMatcherRepositoryMock.getMock(), mockBehaviorFactoryMock.getMock(), proxyServiceMock.getMock(), stackTraceService, cloneService, scenarioReport, mockService, dummyFactory);
 
         scenarioMock.returns(testObject).getTestObject();
 
@@ -97,6 +101,8 @@ public class MockFactoryCreatePartialMockTest extends UnitilsJUnit4 {
         assertSame(mockBehaviorFactoryMock.getMock(), mockObject.mockBehaviorFactory);
         assertReflectionEquals(matchingProxyInvocationHandler, mockObject.matchingProxyInvocationHandler);
         assertReflectionEquals(matchingInvocationHandlerFactory, mockObject.matchingInvocationHandlerFactory);
+        assertReflectionEquals(mockService, mockObject.mockService);
+        assertReflectionEquals(dummyFactory, mockObject.dummyFactory);
     }
 
     @Test

@@ -22,12 +22,13 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.unitils.TracingUnitilsBlockJUnit4ClassRunner.Invocation.*;
+import static org.unitils.AssertInvocationsBlockJUnit4ClassRunner.Invocation.*;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 /**
  * @author Tim Ducheyne
  */
-public class TracingUnitilsBlockJUnit4ClassRunner extends UnitilsBlockJUnit4ClassRunner {
+public class AssertInvocationsBlockJUnit4ClassRunner extends UnitilsBlockJUnit4ClassRunner {
 
     public static enum Invocation {
         LISTENER_BEFORE_CLASS,
@@ -39,20 +40,17 @@ public class TracingUnitilsBlockJUnit4ClassRunner extends UnitilsBlockJUnit4Clas
         LISTENER_AFTER_TEST_METHOD,
         TEST_AFTER,
         LISTENER_AFTER_TEST_TEAR_DOWN,
-        TEST_AFTER_CLASS
+        TEST_AFTER_CLASS,
+        LISTENER_AFTER_TEST_CLASS
     }
 
 
-    public TracingUnitilsBlockJUnit4ClassRunner(Class<?> testClass) throws InitializationError {
+    public AssertInvocationsBlockJUnit4ClassRunner(Class<?> testClass) throws InitializationError {
         super(testClass);
     }
 
     private static List<Invocation> listenerInvocations = new ArrayList<Invocation>();
 
-
-    public static List<Invocation> getInvocations() {
-        return listenerInvocations;
-    }
 
     public static void addInvocations(Invocation invocation) {
         listenerInvocations.add(invocation);
@@ -62,13 +60,13 @@ public class TracingUnitilsBlockJUnit4ClassRunner extends UnitilsBlockJUnit4Clas
     @Override
     protected UnitilsTestListener getUnitilsTestListener() {
         listenerInvocations.clear();
-        return new TracingUnitilsTestListener();
+        return new AssertInvocationsUnitilsTestListener();
     }
 
 
-    public static class TracingUnitilsTestListener extends UnitilsTestListener {
+    public static class AssertInvocationsUnitilsTestListener extends UnitilsTestListener {
 
-        public TracingUnitilsTestListener() {
+        public AssertInvocationsUnitilsTestListener() {
             super(null, null, null);
         }
 
@@ -95,6 +93,12 @@ public class TracingUnitilsBlockJUnit4ClassRunner extends UnitilsBlockJUnit4Clas
         @Override
         public void afterTestTearDown() {
             listenerInvocations.add(LISTENER_AFTER_TEST_TEAR_DOWN);
+        }
+
+        @Override
+        public void afterTestClass() {
+            listenerInvocations.add(LISTENER_AFTER_TEST_CLASS);
+            assertReflectionEquals(Invocation.values(), listenerInvocations);
         }
     }
 }

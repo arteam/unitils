@@ -40,6 +40,7 @@ public class TransactionManagerRollbackTest extends UnitilsJUnit4 {
     private TransactionManager transactionManager;
 
     private Mock<TransactionProviderManager> transactionProviderManagerMock;
+    private Mock<DataSourceService> dataSourceServiceMock;
     private Mock<TransactionProvider> transactionProviderMock;
     private Mock<PlatformTransactionManager> platformTransactionManagerMock;
     @Dummy
@@ -50,51 +51,28 @@ public class TransactionManagerRollbackTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        transactionManager = new TransactionManager(transactionProviderManagerMock.getMock());
+        transactionManager = new TransactionManager(transactionProviderManagerMock.getMock(), dataSourceServiceMock.getMock());
 
+        dataSourceServiceMock.returns(dataSource).getDataSource("myDatabase");
         transactionProviderManagerMock.returns(transactionProviderMock).getTransactionProvider();
-        transactionProviderMock.returns(platformTransactionManagerMock).getPlatformTransactionManager(null, null);
+        transactionProviderMock.returns(platformTransactionManagerMock).getPlatformTransactionManager("myTransactionManager", dataSource);
         platformTransactionManagerMock.returns(transactionStatus).getTransaction(null);
     }
 
 
     @Test
-    public void endTransaction() throws Exception {
-        transactionManager.startTransaction("myTransactionManager");
-        transactionManager.registerDataSource(dataSource);
+    public void rollback() throws Exception {
+        transactionManager.startTransaction("myDatabase", "myTransactionManager");
 
-        transactionManager.rollback(true);
+        transactionManager.rollback();
         platformTransactionManagerMock.assertInvoked().rollback(transactionStatus);
         assertFalse(transactionManager.isTransactionActive());
-        assertFalse(transactionManager.isTransactionStarted());
-    }
-
-    @Test
-    public void keepTransactionRunning() throws Exception {
-        transactionManager.startTransaction("myTransactionManager");
-        transactionManager.registerDataSource(dataSource);
-
-        transactionManager.rollback(false);
-        platformTransactionManagerMock.assertInvoked().rollback(transactionStatus);
-        assertFalse(transactionManager.isTransactionActive());
-        assertTrue(transactionManager.isTransactionStarted());
     }
 
     @Test
     public void exceptionWhenNoTransactionRunning() throws Exception {
         try {
-            transactionManager.rollback(true);
-            fail("UnitilsException expected");
-        } catch (UnitilsException e) {
-            assertEquals("Unable to rollback. No transaction is currently active. Make sure to call startTransaction to start a transaction.", e.getMessage());
-        }
-    }
-
-    @Test
-    public void exceptionWhenTransactionIsOnlyMarkedAsStartedButNoDataSourceWasRegistered() throws Exception {
-        transactionManager.startTransaction("myTransactionManager");
-        try {
-            transactionManager.rollback(true);
+            transactionManager.rollback();
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Unable to rollback. No transaction is currently active. Make sure to call startTransaction to start a transaction.", e.getMessage());

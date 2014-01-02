@@ -29,7 +29,9 @@ import java.util.List;
 @Entity
 public class Parent implements Serializable {
 
+    @Id
     private Long id;
+    @OneToMany(mappedBy = "parent")
     private List<Child> children;
 
 
@@ -42,7 +44,6 @@ public class Parent implements Serializable {
     }
 
 
-    @Id
     public Long getId() {
         return id;
     }
@@ -51,7 +52,6 @@ public class Parent implements Serializable {
         this.id = id;
     }
 
-    @OneToMany(mappedBy = "parent")
     public List<Child> getChildren() {
         return children;
     }

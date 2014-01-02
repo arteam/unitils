@@ -196,9 +196,9 @@ public class DummyIntegrationTest extends UnitilsJUnit4 {
     }
 
     @Test
-    public void toStringMethod() {
+    public void toStringMethodReturnsDummyName() {
         String result = dummyTestClass1.toString();
-        assertEquals(TestClass.class.getName() + "@" + Integer.toHexString(dummyTestClass1.hashCode()), result);
+        assertEquals("dummyTestClass1", result);
     }
 
     @Test

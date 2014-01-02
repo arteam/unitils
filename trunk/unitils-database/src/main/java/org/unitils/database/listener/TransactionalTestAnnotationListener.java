@@ -51,10 +51,11 @@ public class TransactionalTestAnnotationListener extends TestAnnotationListener<
     public void beforeTestSetUp(TestInstance testInstance, Annotations<Transactional> annotations) {
         Transactional annotation = annotations.getAnnotationWithDefaults();
         TransactionMode transactionMode = annotation.value();
+        String databaseName = annotation.databaseName();
         String transactionManagerName = annotation.transactionManagerName();
 
         if (transactionMode == COMMIT || transactionMode == ROLLBACK) {
-            transactionManager.startTransaction(transactionManagerName);
+            transactionManager.startTransaction(databaseName, transactionManagerName);
         }
     }
 
@@ -64,10 +65,10 @@ public class TransactionalTestAnnotationListener extends TestAnnotationListener<
         TransactionMode transactionMode = annotation.value();
 
         if (transactionMode == COMMIT) {
-            transactionManager.commit(true);
+            transactionManager.commit();
 
         } else if (transactionMode == ROLLBACK) {
-            transactionManager.rollback(true);
+            transactionManager.rollback();
         }
     }
 }

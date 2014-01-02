@@ -33,7 +33,6 @@ import java.io.File;
 import java.util.Collections;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptySet;
 import static org.unitils.util.CollectionUtils.asSet;
 
 /**
@@ -142,7 +141,7 @@ public class DataSetServiceLoadDataSetsTest extends UnitilsJUnit4 {
 
     @Test
     public void emptyMultiSchemaDataSet() {
-        multiSchemaDataSetMock.onceReturns(emptySet()).getSchemaNames();
+        multiSchemaDataSetMock.onceReturnsAll().getSchemaNames();
         dataSetResolverMock.returns(testFile1).resolve(MyClass.class, "dataSet1.xml");
         defaultDataSetFactoryMock.returns(multiSchemaDataSetMock).createDataSet(asList(testFile1));
 

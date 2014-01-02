@@ -99,4 +99,11 @@ public abstract class TestListener {
     public void afterTestTearDown(TestInstance testInstance, Throwable testThrowable) {
     }
 
+    /**
+     * Invoked after the generic class tear down (e.g. @AfterClass) is performed.
+     *
+     * @param classWrapper The test class, not null
+     */
+    public void afterTestClass(ClassWrapper classWrapper) {
+    }
 }

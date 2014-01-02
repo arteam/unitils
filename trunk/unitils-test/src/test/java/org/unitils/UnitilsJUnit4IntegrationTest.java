@@ -18,17 +18,15 @@ package org.unitils;
 import org.junit.*;
 import org.junit.runner.RunWith;
 
-import java.util.List;
-
-import static org.unitils.TracingUnitilsBlockJUnit4ClassRunner.Invocation;
-import static org.unitils.TracingUnitilsBlockJUnit4ClassRunner.Invocation.*;
-import static org.unitils.TracingUnitilsBlockJUnit4ClassRunner.addInvocations;
-import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
+import static org.unitils.AssertInvocationsBlockJUnit4ClassRunner.Invocation.*;
+import static org.unitils.AssertInvocationsBlockJUnit4ClassRunner.addInvocations;
 
 /**
+ * Note: the assertion is done in the {@code AssertInvocationsUnitilsTestListener#afterClass}
+ *
  * @author Tim Ducheyne
  */
-@RunWith(TracingUnitilsBlockJUnit4ClassRunner.class)
+@RunWith(AssertInvocationsBlockJUnit4ClassRunner.class)
 public class UnitilsJUnit4IntegrationTest {
 
     @BeforeClass
@@ -54,8 +52,5 @@ public class UnitilsJUnit4IntegrationTest {
     @AfterClass
     public static void afterClass() {
         addInvocations(TEST_AFTER_CLASS);
-
-        List<Invocation> result = TracingUnitilsBlockJUnit4ClassRunner.getInvocations();
-        assertReflectionEquals(Invocation.values(), result);
     }
 }

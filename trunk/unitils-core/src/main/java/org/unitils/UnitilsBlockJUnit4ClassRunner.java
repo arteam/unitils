@@ -29,7 +29,6 @@ import java.lang.reflect.Method;
 /**
  * @author Tim Ducheyne
  */
-
 public class UnitilsBlockJUnit4ClassRunner extends BlockJUnit4ClassRunner {
 
     protected Object test;
@@ -47,8 +46,9 @@ public class UnitilsBlockJUnit4ClassRunner extends BlockJUnit4ClassRunner {
         Class<?> testClass = getTestClass().getJavaClass();
 
         Statement statement = super.classBlock(notifier);
-        return new BeforeTestClassStatement(testClass, unitilsTestListener, statement);
-
+        statement = new BeforeTestClassStatement(testClass, unitilsTestListener, statement);
+        statement = new AfterTestClassStatement(unitilsTestListener, statement);
+        return statement;
     }
 
     @Override

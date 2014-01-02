@@ -47,7 +47,7 @@ public class DefaultDataSourceProviderGetDatabaseNamesTest extends UnitilsJUnit4
 
     @Test
     public void getDatabaseNames() throws Exception {
-        databaseConfigurationsMock.returns(asList("name 1", "name 2")).getDatabaseNames();
+        databaseConfigurationsMock.returnsAll("name 1", "name 2").getDatabaseNames();
 
         List<String> result = defaultDatabaseProvider.getDatabaseNames();
 

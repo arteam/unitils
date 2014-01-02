@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.core.context.UnitilsContextFactory.LISTENERS_PROPERTY;
@@ -54,7 +53,7 @@ public class UnitilsContextFactoryCreateTest extends UnitilsJUnit4 {
     public void initialize() {
         unitilsContextFactory = new UnitilsContextFactory(userProperties, propertiesReader.getMock());
 
-        propertiesReader.returns(asList(moduleProperties1, moduleProperties2)).loadAllPropertiesFromClasspath(MODULE_PROPERTIES_NAME);
+        propertiesReader.returnsAll(moduleProperties1, moduleProperties2).loadAllPropertiesFromClasspath(MODULE_PROPERTIES_NAME);
 
         moduleProperties1.put("module1", "value1");
         moduleProperties2.put("module2", "value2");
@@ -82,7 +81,7 @@ public class UnitilsContextFactoryCreateTest extends UnitilsJUnit4 {
 
     @Test
     public void noModulesFound() {
-        propertiesReader.onceReturns(emptyList()).loadAllPropertiesFromClasspath(MODULE_PROPERTIES_NAME);
+        propertiesReader.onceReturnsAll().loadAllPropertiesFromClasspath(MODULE_PROPERTIES_NAME);
 
         UnitilsContext result = unitilsContextFactory.create();
 

@@ -20,9 +20,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.util.ObjectToFormat;
+import org.unitils.mock.ArgumentMatchers;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
+import org.unitils.mock.argumentmatcher.Capture;
 import org.unitils.mock.core.util.CloneService;
+import org.unitils.reflectionassert.ReflectionAssert;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -104,11 +107,26 @@ public class CglibProxyMethodInterceptorInterceptTest extends UnitilsJUnit4 {
     }
 
     @Test
-    public void toStringReturnsNameAndHashCode() throws Throwable {
+    public void toStringReturnsNameAndHashCodeIfNoBehaviorDefined() throws Throwable {
         Method method = MyClass.class.getDeclaredMethod("toString");
 
         Object result = cglibProxyMethodInterceptor.intercept(proxy, method, new Object[0], methodProxy);
         assertEquals(MyClass.class.getName() + "@" + Integer.toHexString(cglibProxyMethodInterceptor.hashCode()), result);
+    }
+
+    @Test
+    public void toStringCanBeOverridden() throws Throwable {
+        Method method = MyClass.class.getDeclaredMethod("toString");
+        List<Argument<?>> arguments = new ArrayList<Argument<?>>(0);
+        CglibProxyInvocation cglibProxyInvocation = new CglibProxyInvocation("myProxy", method, arguments, stackTrace, proxy, methodProxy);
+        proxyInvocationHandlerMock.returns("result").handleInvocation(cglibProxyInvocation);
+
+        Object result = cglibProxyMethodInterceptor.intercept(proxy, method, new Object[0], methodProxy);
+
+        Capture<CglibProxyInvocation> capture = new Capture<CglibProxyInvocation>(CglibProxyInvocation.class);
+        proxyInvocationHandlerMock.assertInvoked().handleInvocation(ArgumentMatchers.get(capture));
+        ReflectionAssert.assertReflectionEquals(cglibProxyInvocation, capture.getValue());
+//        assertEquals("result", result);
     }
 
     @Test
