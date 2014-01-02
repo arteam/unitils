@@ -64,8 +64,6 @@ public class ProxyServiceCreateProxyTest {
         assertNull(result.value);
     }
 
-
-    // todo td fix: you should be able to use private static classes
     @Test
     public void exceptionWhenUnableToAccessConstructor() {
         try {

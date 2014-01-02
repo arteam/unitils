@@ -89,7 +89,7 @@ public class MockReturnsAllIntegrationTest extends UnitilsJUnit4 {
             mockObject.getMock().wildCardExtendsMethod();
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to return a list, set or array value. The method does not have a list, set or array return type. The given value does not have a valid type for the list, set or array. Expected type: ? extends org.unitils.mock.MockReturnsAllIntegrationTest$MyClass, actual type: class java.util.Properties", e.getMessage());
+            assertEquals("Unable to return a list, set or array value. The given value does not have a valid type for the list, set or array. Expected type: ? extends org.unitils.mock.MockReturnsAllIntegrationTest$MyClass, actual type: class java.util.Properties", e.getMessage());
         }
     }
 
@@ -108,7 +108,7 @@ public class MockReturnsAllIntegrationTest extends UnitilsJUnit4 {
             mockObject.getMock().listMethod();
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to return a list, set or array value. The method does not have a list, set or array return type. The given value does not have a valid type for the list, set or array. Expected type: class java.lang.String, actual type: class java.lang.Integer", e.getMessage());
+            assertEquals("Unable to return a list, set or array value. The given value does not have a valid type for the list, set or array. Expected type: class java.lang.String, actual type: class java.lang.Integer", e.getMessage());
         }
     }
 
@@ -146,7 +146,7 @@ public class MockReturnsAllIntegrationTest extends UnitilsJUnit4 {
             mockObject.getMock().setMethod();
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to return a list, set or array value. The method does not have a list, set or array return type. The given value does not have a valid type for the list, set or array. Expected type: class java.lang.String, actual type: class java.lang.Integer", e.getMessage());
+            assertEquals("Unable to return a list, set or array value. The given value does not have a valid type for the list, set or array. Expected type: class java.lang.String, actual type: class java.lang.Integer", e.getMessage());
         }
     }
 
@@ -184,7 +184,7 @@ public class MockReturnsAllIntegrationTest extends UnitilsJUnit4 {
             mockObject.getMock().arrayMethod();
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
-            assertEquals("Unable to return a list, set or array value. The method does not have a list, set or array return type. The given value does not have a valid type for the list, set or array. Expected type: class java.lang.String, actual type: class java.lang.Integer", e.getMessage());
+            assertEquals("Unable to return a list, set or array value. The given value does not have a valid type for the list, set or array. Expected type: class java.lang.String, actual type: class java.lang.Integer", e.getMessage());
         }
     }
 

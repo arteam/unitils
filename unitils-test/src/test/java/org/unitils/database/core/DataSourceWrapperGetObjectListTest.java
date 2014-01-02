@@ -50,7 +50,7 @@ public class DataSourceWrapperGetObjectListTest extends UnitilsJUnit4 {
 
     @Test
     public void getObjectList() throws Exception {
-        simpleJdbcTemplateMock.returns(asList(new BigDecimal(1), new BigDecimal(2))).query("query", null, "arg");
+        simpleJdbcTemplateMock.returnsAll(new BigDecimal(1), new BigDecimal(2)).query("query", null, "arg");
 
         List<BigDecimal> result = dataSourceWrapper.getMock().getObjectList("query", BigDecimal.class, "arg");
         assertEquals(asList(new BigDecimal(1), new BigDecimal(2)), result);

@@ -36,7 +36,7 @@ public class MockObjectGetMockTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        mockObject = new MockObject<Properties>("name", null, proxy, null, false, null, null, null, null);
+        mockObject = new MockObject<Properties>("name", null, proxy, null, false, null, null, null, null, null, null);
     }
 
 

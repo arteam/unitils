@@ -31,7 +31,6 @@ import javax.sql.DataSource;
 import java.util.Collections;
 import java.util.List;
 
-import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.unitils.mock.ArgumentMatchers.isNull;
 
@@ -70,7 +69,7 @@ public class DbMaintainDatabaseConnectionManagerGetDatabaseConnectionsTest exten
 
     @Test
     public void namedDatabase() {
-        dataSourceProviderMock.returns(asList("database1", "database2")).getDatabaseNames();
+        dataSourceProviderMock.returnsAll("database1", "database2").getDatabaseNames();
         dataSourceProviderMock.returns(dataSourceWrapperMock1).getDataSourceWrapper("database1");
         dataSourceProviderMock.returns(dataSourceWrapperMock2).getDataSourceWrapper("database2");
 
@@ -82,7 +81,7 @@ public class DbMaintainDatabaseConnectionManagerGetDatabaseConnectionsTest exten
 
     @Test
     public void defaultDatabaseWhenThereAreNoNamedDatabases() {
-        dataSourceProviderMock.returns(Collections.<String>emptyList()).getDatabaseNames();
+        dataSourceProviderMock.returnsAll().getDatabaseNames();
         dataSourceProviderMock.returns(dataSourceWrapperMock1).getDataSourceWrapper(isNull(String.class));
 
         List<DatabaseConnection> result = dbMaintainDatabaseConnectionManager.getDatabaseConnections();

@@ -18,13 +18,14 @@ package org.unitils.mock.core;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.core.matching.MatchingInvocationHandler;
 import org.unitils.mock.core.matching.MatchingInvocationHandlerFactory;
 import org.unitils.mock.core.proxy.impl.MatchingProxyInvocationHandler;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 /**
  * @author Tim Ducheyne
@@ -44,7 +45,7 @@ public class MockObjectAssertInvokedTest extends UnitilsJUnit4 {
     @Before
     public void initialize() {
         mockObject = new MockObject<Object>("name", Object.class, null, matchingProxy, false, null,
-                matchingProxyInvocationHandlerMock.getMock(), null, matchingInvocationHandlerFactoryMock.getMock());
+                matchingProxyInvocationHandlerMock.getMock(), null, matchingInvocationHandlerFactoryMock.getMock(), null, null);
     }
 
 
@@ -58,9 +59,38 @@ public class MockObjectAssertInvokedTest extends UnitilsJUnit4 {
     }
 
     @Test
+    public void assertInvokedTimes() {
+        matchingInvocationHandlerFactoryMock.returns(matchingInvocationHandler).createAssertInvokedVerifyingTimesMatchingInvocationHandler(5);
+
+        Object result = mockObject.assertInvoked(5);
+        assertSame(matchingProxy, result);
+        matchingProxyInvocationHandlerMock.assertInvoked().startMatchingInvocation("name", true, matchingInvocationHandler);
+    }
+
+    @Test
+    public void exceptionWhenTimesIsNegative() {
+        try {
+            mockObject.assertInvoked(-5);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to assert that a method was invoked a number of times. Times must be a positive integer, but value is -5", e.getMessage());
+        }
+    }
+
+    @Test
+    public void exceptionWhenTimesIsZero() {
+        try {
+            mockObject.assertInvoked(0);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to assert that a method was invoked a number of times. Times must be a positive integer, but value is 0", e.getMessage());
+        }
+    }
+
+    @Test
     public void chainedAssertInvoked() {
         mockObject = new MockObject<Object>("name", Object.class, null, matchingProxy, true, null,
-                matchingProxyInvocationHandlerMock.getMock(), null, matchingInvocationHandlerFactoryMock.getMock());
+                matchingProxyInvocationHandlerMock.getMock(), null, matchingInvocationHandlerFactoryMock.getMock(), null, null);
         matchingInvocationHandlerFactoryMock.returns(matchingInvocationHandler).createAssertInvokedVerifyingMatchingInvocationHandler();
 
         Object result = mockObject.assertInvoked();

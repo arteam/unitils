@@ -29,7 +29,6 @@ import org.unitils.dbunit.dataset.comparison.SchemaDifference;
 import org.unitils.dbunit.dataset.comparison.TableDifference;
 import org.unitils.mock.Mock;
 
-import static java.util.Arrays.asList;
 import static org.dbunit.dataset.datatype.DataType.VARCHAR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -79,7 +78,7 @@ public class DataSetAssertAssertEqualSchemasTest extends UnitilsJUnit4 {
         schemaDifference = new SchemaDifference(expectedSchemaMock.getMock(), actualSchema);
 
         expectedSchemaMock.returns("schema").getName();
-        expectedSchemaMock.returns(asList(expectedTable)).getTables();
+        expectedSchemaMock.returnsAll(expectedTable).getTables();
         expectedSchemaMock.returns(schemaDifference).compare(actualSchema);
     }
 

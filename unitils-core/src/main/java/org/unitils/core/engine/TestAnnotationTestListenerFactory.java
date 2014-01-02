@@ -18,6 +18,7 @@ package org.unitils.core.engine;
 
 import org.unitils.core.TestAnnotationListener;
 import org.unitils.core.TestInstance;
+import org.unitils.core.TestListener;
 import org.unitils.core.annotation.TestAnnotation;
 import org.unitils.core.context.Context;
 import org.unitils.core.reflect.Annotations;
@@ -31,22 +32,22 @@ import java.util.Set;
 /**
  * @author Tim Ducheyne
  */
-public class WrapperForTestAnnotationListenerFactory {
+public class TestAnnotationTestListenerFactory {
 
     protected Context context;
 
 
-    public WrapperForTestAnnotationListenerFactory(Context context) {
+    public TestAnnotationTestListenerFactory(Context context) {
         this.context = context;
     }
 
 
-    public List<WrapperForTestAnnotationListener> create(TestInstance testInstance) {
+    public List<TestListener> create(TestInstance testInstance) {
         List<Annotation> classAnnotations = testInstance.getClassAnnotations();
         List<Annotation> methodAnnotations = testInstance.getMethodAnnotations();
         Set<Class<? extends Annotation>> testAnnotationTypes = getTestAnnotationTypes(classAnnotations, methodAnnotations);
 
-        List<WrapperForTestAnnotationListener> testListeners = new ArrayList<WrapperForTestAnnotationListener>();
+        List<TestListener> testListeners = new ArrayList<TestListener>();
         for (Class<? extends Annotation> testAnnotationType : testAnnotationTypes) {
             WrapperForTestAnnotationListener testListener = createWrapperForTestAnnotationListener(testAnnotationType, testInstance);
             testListeners.add(testListener);

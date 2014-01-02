@@ -49,7 +49,7 @@ public class DataSourceWrapperGetStringListTest extends UnitilsJUnit4 {
 
     @Test
     public void getStringList() throws Exception {
-        simpleJdbcTemplateMock.returns(asList("value1", "value2")).query("query", null, "arg");
+        simpleJdbcTemplateMock.returnsAll("value1", "value2").query("query", null, "arg");
 
         List<String> result = dataSourceWrapper.getMock().getStringList("query", "arg");
         assertEquals(asList("value1", "value2"), result);

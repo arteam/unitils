@@ -44,7 +44,7 @@ public class MockObjectAssertNotInvokedTest extends UnitilsJUnit4 {
     @Before
     public void initialize() {
         mockObject = new MockObject<Object>("name", Object.class, null, matchingProxy, false, null,
-                matchingProxyInvocationHandlerMock.getMock(), null, matchingInvocationHandlerFactoryMock.getMock());
+                matchingProxyInvocationHandlerMock.getMock(), null, matchingInvocationHandlerFactoryMock.getMock(), null, null);
     }
 
 
@@ -60,7 +60,7 @@ public class MockObjectAssertNotInvokedTest extends UnitilsJUnit4 {
     @Test
     public void chainedAssertNotInvoked() {
         mockObject = new MockObject<Object>("name", Object.class, null, matchingProxy, true, null,
-                matchingProxyInvocationHandlerMock.getMock(), null, matchingInvocationHandlerFactoryMock.getMock());
+                matchingProxyInvocationHandlerMock.getMock(), null, matchingInvocationHandlerFactoryMock.getMock(), null, null);
         matchingInvocationHandlerFactoryMock.returns(matchingInvocationHandler).createAssertNotInvokedVerifyingMatchingInvocationHandler();
 
         Object result = mockObject.assertNotInvoked();

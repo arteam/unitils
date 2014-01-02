@@ -39,7 +39,7 @@ public class MockUnitilsCreatePartialMockIntegrationTest {
     @Test
     public void settingBehavior() {
         Mock<TestClass> result = MockUnitils.createPartialMock("mockName", TestClass.class, this);
-        result.returns(asList("new value")).method();
+        result.returnsAll("new value").method();
 
         assertEquals("mockName", result.toString());
         assertEquals(asList("new value"), result.getMock().method());

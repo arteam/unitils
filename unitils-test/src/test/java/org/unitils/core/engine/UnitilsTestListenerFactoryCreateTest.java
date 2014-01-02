@@ -25,7 +25,6 @@ import org.unitils.core.spring.SpringTestListener;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 
-import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
@@ -39,16 +38,16 @@ public class UnitilsTestListenerFactoryCreateTest extends UnitilsJUnit4 {
 
     private Mock<UnitilsContext> unitilsContextMock;
     @Dummy
-    private WrapperForFieldAnnotationListenerFactory wrapperForFieldAnnotationListenerFactory;
+    private FieldAnnotationTestListenerFactory fieldAnnotationTestListenerFactory;
     @Dummy
-    private WrapperForTestAnnotationListenerFactory wrapperForTestAnnotationListenerFactory;
+    private TestAnnotationTestListenerFactory testAnnotationTestListenerFactory;
     @Dummy
     private SpringTestListener springTestListener;
 
 
     @Before
     public void initialize() {
-        unitilsTestListenerFactory = new UnitilsTestListenerFactory(unitilsContextMock.getMock(), wrapperForFieldAnnotationListenerFactory, wrapperForTestAnnotationListenerFactory, springTestListener);
+        unitilsTestListenerFactory = new UnitilsTestListenerFactory(unitilsContextMock.getMock(), fieldAnnotationTestListenerFactory, testAnnotationTestListenerFactory, springTestListener);
     }
 
 
@@ -57,18 +56,18 @@ public class UnitilsTestListenerFactoryCreateTest extends UnitilsJUnit4 {
     public void testListenersAreCreated() throws Exception {
         MyTestListener1 myTestListener1 = new MyTestListener1();
         MyTestListener2 myTestListener2 = new MyTestListener2();
-        unitilsContextMock.returns(asList(MyTestListener1.class, MyTestListener2.class)).getTestListenerTypes();
+        unitilsContextMock.returnsAll(MyTestListener1.class, MyTestListener2.class).getTestListenerTypes();
         unitilsContextMock.returns(myTestListener1).getInstanceOfType(MyTestListener1.class);
         unitilsContextMock.returns(myTestListener2).getInstanceOfType(MyTestListener2.class);
 
         UnitilsTestListener result = unitilsTestListenerFactory.create();
 
         assertEquals(3, result.testListeners.size());
-        assertSame(myTestListener1, result.testListeners.get(0));
-        assertSame(myTestListener2, result.testListeners.get(1));
-        assertSame(springTestListener, result.testListeners.get(2));
-        assertSame(wrapperForFieldAnnotationListenerFactory, result.wrapperForFieldAnnotationListenerFactory);
-        assertSame(wrapperForTestAnnotationListenerFactory, result.wrapperForTestAnnotationListenerFactory);
+        assertSame(springTestListener, result.testListeners.get(0));
+        assertSame(myTestListener1, result.testListeners.get(1));
+        assertSame(myTestListener2, result.testListeners.get(2));
+        assertSame(fieldAnnotationTestListenerFactory, result.fieldAnnotationTestListenerFactory);
+        assertSame(testAnnotationTestListenerFactory, result.testAnnotationTestListenerFactory);
     }
 
     @Test

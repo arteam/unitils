@@ -44,7 +44,6 @@ public abstract class UnitilsJUnit3 extends TestCase {
         this(null);
     }
 
-
     /**
      * Creates a test with the given name. The name should be the name of the test method.
      *
@@ -62,7 +61,18 @@ public abstract class UnitilsJUnit3 extends TestCase {
      */
     @Override
     public void runBare() throws Throwable {
+        // simulate class level methods
+        // if this is the first test of a test class (previous test was of a different test class),
+        // first finalize the previous test class by calling afterTestClass, then call beforeTestClass
+        // to start the new one
         if (!getClass().equals(currentTestClass)) {
+            if (currentTestClass != null) {
+                try {
+                    getUnitilsTestListener().afterTestClass();
+                } catch (Throwable e) {
+                    throw new UnitilsException("After test class failed for the previous test class: " + currentTestClass, e);
+                }
+            }
             currentTestClass = getClass();
             getUnitilsTestListener().beforeTestClass(getClass());
         }
@@ -76,7 +86,6 @@ public abstract class UnitilsJUnit3 extends TestCase {
             // hold exception until later, first call afterTestTearDown
             firstThrowable = t;
         }
-
         try {
             getUnitilsTestListener().afterTestTearDown();
 
@@ -86,13 +95,11 @@ public abstract class UnitilsJUnit3 extends TestCase {
                 firstThrowable = t;
             }
         }
-
         // if there were exceptions, throw the first one
         if (firstThrowable != null) {
             throw firstThrowable;
         }
     }
-
 
     /**
      * Overridden JUnit3 method to be able to call beforeTestMethod and afterTestMethod.
@@ -110,7 +117,6 @@ public abstract class UnitilsJUnit3 extends TestCase {
             // hold exception until later, first call afterTestMethod
             firstThrowable = t;
         }
-
         try {
             getUnitilsTestListener().afterTestMethod(firstThrowable);
 
@@ -120,13 +126,11 @@ public abstract class UnitilsJUnit3 extends TestCase {
                 firstThrowable = t;
             }
         }
-
         // if an exception occurred during beforeTestMethod, the test or afterTestMethod, throw it
         if (firstThrowable != null) {
             throw firstThrowable;
         }
     }
-
 
     /**
      * Gets the method that has the same name as the current test.
@@ -147,7 +151,6 @@ public abstract class UnitilsJUnit3 extends TestCase {
             throw new UnitilsException("Unable to find current test method. Test name: " + getName() + " , test class: " + getClass(), e);
         }
     }
-
 
     /**
      * @return The unitils test listener

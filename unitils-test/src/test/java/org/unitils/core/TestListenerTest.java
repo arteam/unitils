@@ -78,6 +78,11 @@ public class TestListenerTest extends UnitilsJUnit4 {
         testListener.afterTestTearDown(testInstance, e);
     }
 
+    @Test
+    public void defaultAfterTestClassDoesNothing() {
+        testListener.afterTestClass(classWrapper);
+    }
+
 
     private static class MyTestListener extends TestListener {
     }

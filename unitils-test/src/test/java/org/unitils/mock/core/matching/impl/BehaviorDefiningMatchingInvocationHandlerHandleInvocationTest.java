@@ -57,13 +57,13 @@ public class BehaviorDefiningMatchingInvocationHandlerHandleInvocationTest exten
 
     @Before
     public void initialize() throws Exception {
-        behaviorDefiningMatchingInvocationHandler = new BehaviorDefiningMatchingInvocationHandler(mockBehaviorMock.getMock(), true, behaviorDefiningInvocationsMock.getMock(), mockServiceMock.getMock());
+        behaviorDefiningMatchingInvocationHandler = new BehaviorDefiningMatchingInvocationHandler(mockBehaviorMock.getMock(), false, behaviorDefiningInvocationsMock.getMock(), mockServiceMock.getMock());
 
         Method method = MyInterface.class.getMethod("method");
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
         ProxyInvocation proxyInvocation = new ProxyInvocation("mock", null, method, arguments, null);
         matchingInvocation = new MatchingInvocation(proxyInvocation, null);
-        behaviorDefiningInvocation = new BehaviorDefiningInvocation(matchingInvocation, mockBehaviorMock.getMock(), true);
+        behaviorDefiningInvocation = new BehaviorDefiningInvocation(matchingInvocation, mockBehaviorMock.getMock(), false);
     }
 
 
@@ -71,6 +71,18 @@ public class BehaviorDefiningMatchingInvocationHandlerHandleInvocationTest exten
     public void mockChainingStartedWhenAssertionOk() {
         mockServiceMock.returns(chainedMock).createChainedMock(behaviorDefiningInvocation);
         chainedMock.returns(chainedProxy).performs(new ChainedMockBehavior(chainedMock.getMock(), behaviorDefiningInvocation));
+
+        Object result = behaviorDefiningMatchingInvocationHandler.handleInvocation(matchingInvocation);
+        assertSame(chainedProxy, result);
+        behaviorDefiningInvocationsMock.assertInvoked().addBehaviorDefiningInvocation(behaviorDefiningInvocation);
+    }
+
+    @Test
+    public void oncePerformsWhenOneTimeMatching() {
+        behaviorDefiningMatchingInvocationHandler = new BehaviorDefiningMatchingInvocationHandler(mockBehaviorMock.getMock(), true, behaviorDefiningInvocationsMock.getMock(), mockServiceMock.getMock());
+        behaviorDefiningInvocation = new BehaviorDefiningInvocation(matchingInvocation, mockBehaviorMock.getMock(), false);
+        mockServiceMock.returns(chainedMock).createChainedMock(behaviorDefiningInvocation);
+        chainedMock.returns(chainedProxy).oncePerforms(new ChainedMockBehavior(chainedMock.getMock(), behaviorDefiningInvocation));
 
         Object result = behaviorDefiningMatchingInvocationHandler.handleInvocation(matchingInvocation);
         assertSame(chainedProxy, result);
@@ -88,7 +100,7 @@ public class BehaviorDefiningMatchingInvocationHandlerHandleInvocationTest exten
 
     @Test
     public void installChainWhenInvocationOnChainedMockBehavior() {
-        behaviorDefiningMatchingInvocationHandler = new BehaviorDefiningMatchingInvocationHandler(chainedMockBehavior.getMock(), true, behaviorDefiningInvocationsMock.getMock(), mockServiceMock.getMock());
+        behaviorDefiningMatchingInvocationHandler = new BehaviorDefiningMatchingInvocationHandler(chainedMockBehavior.getMock(), false, behaviorDefiningInvocationsMock.getMock(), mockServiceMock.getMock());
 
         behaviorDefiningMatchingInvocationHandler.handleInvocation(matchingInvocation);
         chainedMockBehavior.assertInvoked().installChain();

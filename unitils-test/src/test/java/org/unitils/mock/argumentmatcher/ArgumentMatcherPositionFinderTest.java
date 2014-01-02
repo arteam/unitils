@@ -18,7 +18,7 @@ package org.unitils.mock.argumentmatcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
-import org.unitils.mock.core.MockObject;
+import org.unitils.mock.Mock;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -55,7 +55,7 @@ public class ArgumentMatcherPositionFinderTest {
 
     public static class TestClass {
 
-        private MockObject<MockedClass> mockObject;
+        private Mock<MockedClass> mockObject;
 
         public void test() {
             // regular invocation
@@ -63,9 +63,11 @@ public class ArgumentMatcherPositionFinderTest {
             // invocation without argument matchers
             mockObject.performs(null).someMethod("aValue", "aValue", "aValue");
             // 2 same invocations on same line  DO NOT FORMAT
-            mockObject.performs(null).someMethod(notNull(String.class), "aValue", "aValue"); mockObject.performs(null).someMethod("aValue", "aValue", notNull(String.class));
+            mockObject.performs(null).someMethod(notNull(String.class), "aValue", "aValue");
+            mockObject.performs(null).someMethod("aValue", "aValue", notNull(String.class));
             // 2 different invocations on same line  DO NOT FORMAT
-            mockObject.performs(null).someMethod(notNull(String.class), "aValue", "aValue"); mockObject.performs(null).valueReturningMethod("aValue", "aValue", notNull(String.class));
+            mockObject.performs(null).someMethod(notNull(String.class), "aValue", "aValue");
+            mockObject.performs(null).valueReturningMethod("aValue", "aValue", notNull(String.class));
             // Invocation spread over multiple lines
             mockObject.performs(null).someMethod(notNull(String.class),
                     "aValue",

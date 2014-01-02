@@ -37,7 +37,6 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptySet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.unitils.util.CollectionUtils.asSet;
@@ -173,7 +172,7 @@ public class DataSetServiceAssertExpectedDataSetsTest extends UnitilsJUnit4 {
 
     @Test
     public void emptyMultiSchemaDataSet() {
-        multiSchemaDataSetMock.onceReturns(emptySet()).getSchemaNames();
+        multiSchemaDataSetMock.onceReturnsAll().getSchemaNames();
         dataSetResolverMock.returns(testFile1).resolve(MyClass.class, "dataSet1.xml");
         defaultDataSetFactoryMock.returns(multiSchemaDataSetMock).createDataSet(asList(testFile1));
 

@@ -61,14 +61,14 @@ public class DetailedObservedInvocationsReport extends ObservedInvocationsReport
 
 
     @Override
-    protected String formatObservedInvocations(List<ObservedInvocation> observedInvocations, Map<Object, FormattedObject> allLargeObjects, Map<Class<?>, Integer> largeObjectNameIndexes, Map<Object, String> fieldValuesAndNames) {
+    protected String formatObservedInvocations(List<ObservedInvocation> observedInvocations, Map<Object, String> largeObjectNames, Map<Class<?>, Integer> largeObjectNameIndexes, Map<Object, String> fieldValuesAndNames) {
         StringBuilder result = new StringBuilder();
         int invocationIndex = 0;
         for (ObservedInvocation observedInvocation : observedInvocations) {
             List<FormattedObject> currentLargeObjects = new ArrayList<FormattedObject>();
             result.append(++invocationIndex);
             result.append(". ");
-            result.append(formatObservedInvocation(observedInvocation, currentLargeObjects, allLargeObjects, largeObjectNameIndexes, fieldValuesAndNames));
+            result.append(formatObservedInvocation(observedInvocation, currentLargeObjects, largeObjectNames, largeObjectNameIndexes, fieldValuesAndNames));
             result.append("\n");
             result.append(formatLargeObjects(currentLargeObjects));
             result.append(formatObservedAt(observedInvocation));

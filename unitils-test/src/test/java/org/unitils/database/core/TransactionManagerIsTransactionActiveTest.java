@@ -40,6 +40,7 @@ public class TransactionManagerIsTransactionActiveTest extends UnitilsJUnit4 {
     private TransactionManager transactionManager;
 
     private Mock<TransactionProviderManager> transactionProviderManagerMock;
+    private Mock<DataSourceService> dataSourceServiceMock;
     private Mock<TransactionProvider> transactionProviderMock;
     private Mock<PlatformTransactionManager> platformTransactionManagerMock;
     @Dummy
@@ -50,18 +51,18 @@ public class TransactionManagerIsTransactionActiveTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        transactionManager = new TransactionManager(transactionProviderManagerMock.getMock());
+        transactionManager = new TransactionManager(transactionProviderManagerMock.getMock(), dataSourceServiceMock.getMock());
 
+        dataSourceServiceMock.returns(dataSource).getDataSource("myDatabase");
         transactionProviderManagerMock.returns(transactionProviderMock).getTransactionProvider();
-        transactionProviderMock.returns(platformTransactionManagerMock).getPlatformTransactionManager(null, null);
+        transactionProviderMock.returns(platformTransactionManagerMock).getPlatformTransactionManager("myTransactionManager", dataSource);
         platformTransactionManagerMock.returns(transactionStatus).getTransaction(null);
     }
 
 
     @Test
     public void active() throws Exception {
-        transactionManager.startTransaction("myTransactionManager");
-        transactionManager.registerDataSource(dataSource);
+        transactionManager.startTransaction("myDatabase", "myTransactionManager");
 
         boolean result = transactionManager.isTransactionActive();
         assertTrue(result);
@@ -75,17 +76,8 @@ public class TransactionManagerIsTransactionActiveTest extends UnitilsJUnit4 {
 
     @Test
     public void noLongerActive() throws Exception {
-        transactionManager.startTransaction("myTransactionManager");
-        transactionManager.registerDataSource(dataSource);
-        transactionManager.rollback(true);
-
-        boolean result = transactionManager.isTransactionActive();
-        assertFalse(result);
-    }
-
-    @Test
-    public void notActiveIfOnlyMarkedAsStarted() throws Exception {
-        transactionManager.startTransaction("myTransactionManager");
+        transactionManager.startTransaction("myDatabase", "myTransactionManager");
+        transactionManager.rollback();
 
         boolean result = transactionManager.isTransactionActive();
         assertFalse(result);

@@ -30,9 +30,9 @@ import static org.junit.Assert.assertSame;
 /**
  * @author Tim Ducheyne
  */
-public class MockFactoryCreateDummyTest extends UnitilsJUnit4 {
+public class DummyFactoryCreateDummyTest extends UnitilsJUnit4 {
 
-    private MockFactory mockFactory;
+    private DummyFactory dummyFactory;
 
     private Mock<ProxyService> proxyServiceMock;
     private Mock<MockBehaviorFactory> mockBehaviorFactoryMock;
@@ -44,25 +44,25 @@ public class MockFactoryCreateDummyTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        mockFactory = new MockFactory(null, null, mockBehaviorFactoryMock.getMock(), proxyServiceMock.getMock(), null, null, null);
+        dummyFactory = new DummyFactory(mockBehaviorFactoryMock.getMock(), proxyServiceMock.getMock());
     }
 
 
     @Test
     public void createDummy() {
-        mockBehaviorFactoryMock.returns(mockBehavior).createDummyValueReturningMockBehavior(mockFactory);
+        mockBehaviorFactoryMock.returns(mockBehavior).createDummyValueReturningMockBehavior(dummyFactory);
         proxyServiceMock.returns(myInterfaceProxy).createProxy("myDummy", false, new DummyProxyInvocationHandler(mockBehavior), MyInterface.class);
 
-        MyInterface result = mockFactory.createDummy("myDummy", MyInterface.class);
+        MyInterface result = dummyFactory.createDummy("myDummy", MyInterface.class);
         assertSame(myInterfaceProxy, result);
     }
 
     @Test
     public void defaultName() {
-        mockBehaviorFactoryMock.returns(mockBehavior).createDummyValueReturningMockBehavior(mockFactory);
+        mockBehaviorFactoryMock.returns(mockBehavior).createDummyValueReturningMockBehavior(dummyFactory);
         proxyServiceMock.returns(myInterfaceProxy).createProxy("myInterface", false, new DummyProxyInvocationHandler(mockBehavior), MyInterface.class);
 
-        MyInterface result = mockFactory.createDummy(null, MyInterface.class);
+        MyInterface result = dummyFactory.createDummy(null, MyInterface.class);
         assertSame(myInterfaceProxy, result);
     }
 

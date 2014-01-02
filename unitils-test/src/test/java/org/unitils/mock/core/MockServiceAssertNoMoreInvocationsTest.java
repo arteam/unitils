@@ -24,7 +24,6 @@ import org.unitils.mock.report.ScenarioReport;
 import org.unitils.mock.report.impl.ObservedInvocationsReport;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -49,7 +48,7 @@ public class MockServiceAssertNoMoreInvocationsTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() {
-        mockService = new MockService(scenarioMock.getMock(), observedInvocationsReportMock.getMock(), scenarioReportMock.getMock());
+        mockService = new MockService(scenarioMock.getMock(), observedInvocationsReportMock.getMock(), scenarioReportMock.getMock(), null);
 
         scenarioMock.returns(testObject).getTestObject();
         scenarioReportMock.returns("scenario report").createReport();
@@ -58,14 +57,14 @@ public class MockServiceAssertNoMoreInvocationsTest extends UnitilsJUnit4 {
 
     @Test
     public void okWhenNoUnverifiedInvocations() {
-        scenarioMock.returns(emptyList()).getUnverifiedInvocations();
+        scenarioMock.onceReturnsAll().getUnverifiedInvocations();
 
         mockService.assertNoMoreInvocations();
     }
 
     @Test
     public void exceptionWhenUnverifiedInvocations() {
-        scenarioMock.returns(asList(observedInvocation1, observedInvocation2)).getUnverifiedInvocations();
+        scenarioMock.returnsAll(observedInvocation1, observedInvocation2).getUnverifiedInvocations();
         observedInvocationsReportMock.returns("observed report").createReport(asList(observedInvocation1, observedInvocation2), testObject);
         try {
             mockService.assertNoMoreInvocations();

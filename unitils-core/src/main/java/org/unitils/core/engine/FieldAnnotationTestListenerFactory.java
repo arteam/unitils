@@ -19,6 +19,7 @@ package org.unitils.core.engine;
 import org.unitils.core.FieldAnnotationListener;
 import org.unitils.core.TestField;
 import org.unitils.core.TestInstance;
+import org.unitils.core.TestListener;
 import org.unitils.core.annotation.FieldAnnotation;
 import org.unitils.core.context.Context;
 import org.unitils.core.reflect.Annotations;
@@ -30,18 +31,18 @@ import java.util.List;
 /**
  * @author Tim Ducheyne
  */
-public class WrapperForFieldAnnotationListenerFactory {
+public class FieldAnnotationTestListenerFactory {
 
     protected Context context;
 
 
-    public WrapperForFieldAnnotationListenerFactory(Context context) {
+    public FieldAnnotationTestListenerFactory(Context context) {
         this.context = context;
     }
 
 
-    public List<WrapperForFieldAnnotationListener> create(TestInstance testInstance) {
-        List<WrapperForFieldAnnotationListener> testListeners = new ArrayList<WrapperForFieldAnnotationListener>(3);
+    public List<TestListener> create(TestInstance testInstance) {
+        List<TestListener> testListeners = new ArrayList<TestListener>(3);
 
         List<TestField> testFields = testInstance.getTestFields();
         for (TestField testField : testFields) {

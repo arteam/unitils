@@ -15,7 +15,7 @@
  */
 package org.unitils.mock.mockbehavior;
 
-import org.unitils.mock.core.MockFactory;
+import org.unitils.mock.core.DummyFactory;
 import org.unitils.mock.core.proxy.ProxyService;
 import org.unitils.mock.core.util.StackTraceService;
 import org.unitils.mock.mockbehavior.impl.*;
@@ -57,7 +57,7 @@ public class MockBehaviorFactory {
         return new StubMockBehavior();
     }
 
-    public MockBehavior createDummyValueReturningMockBehavior(MockFactory mockFactory) {
-        return new DummyValueReturningMockBehavior(mockFactory);
+    public MockBehavior createDummyValueReturningMockBehavior(DummyFactory dummyFactory) {
+        return new DummyValueReturningMockBehavior(dummyFactory);
     }
 }

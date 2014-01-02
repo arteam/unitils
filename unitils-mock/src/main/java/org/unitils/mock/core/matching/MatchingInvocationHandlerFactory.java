@@ -18,10 +18,7 @@ package org.unitils.mock.core.matching;
 import org.unitils.mock.core.BehaviorDefiningInvocations;
 import org.unitils.mock.core.MockFactory;
 import org.unitils.mock.core.Scenario;
-import org.unitils.mock.core.matching.impl.AssertInvokedInSequenceVerifyingMatchingInvocationHandler;
-import org.unitils.mock.core.matching.impl.AssertInvokedVerifyingMatchingInvocationHandler;
-import org.unitils.mock.core.matching.impl.AssertNotInvokedVerifyingMatchingInvocationHandler;
-import org.unitils.mock.core.matching.impl.BehaviorDefiningMatchingInvocationHandler;
+import org.unitils.mock.core.matching.impl.*;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.report.ScenarioReport;
 
@@ -45,6 +42,10 @@ public class MatchingInvocationHandlerFactory {
 
     public MatchingInvocationHandler createAssertInvokedVerifyingMatchingInvocationHandler() {
         return new AssertInvokedVerifyingMatchingInvocationHandler(scenario, mockFactory, scenarioReport);
+    }
+
+    public MatchingInvocationHandler createAssertInvokedVerifyingTimesMatchingInvocationHandler(int times) {
+        return new AssertInvokedVerifyingTimesMatchingInvocationHandler(times, scenario, mockFactory, scenarioReport);
     }
 
     public MatchingInvocationHandler createAssertInvokedInSequenceVerifyingMatchingInvocationHandler() {

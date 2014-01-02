@@ -49,7 +49,7 @@ public class DataSourceWrapperGetIntegerListTest extends UnitilsJUnit4 {
 
     @Test
     public void getIntegerList() throws Exception {
-        simpleJdbcTemplateMock.returns(asList(4, 5)).query("query", null, "arg");
+        simpleJdbcTemplateMock.returnsAll(4, 5).query("query", null, "arg");
 
         List<Integer> result = dataSourceWrapper.getMock().getIntegerList("query", "arg");
         assertEquals(asList(4, 5), result);

@@ -49,7 +49,7 @@ public class DataSourceWrapperGetBooleanListTest extends UnitilsJUnit4 {
 
     @Test
     public void getBooleanList() throws Exception {
-        simpleJdbcTemplateMock.returns(asList(true, false)).query("query", null, "arg");
+        simpleJdbcTemplateMock.returnsAll(true, false).query("query", null, "arg");
 
         List<Boolean> result = dataSourceWrapper.getMock().getBooleanList("query", "arg");
         assertEquals(asList(true, false), result);

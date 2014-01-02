@@ -30,33 +30,32 @@ import java.util.List;
 public class UnitilsTestListenerFactory implements Factory<UnitilsTestListener> {
 
     protected UnitilsContext unitilsContext;
-    protected WrapperForFieldAnnotationListenerFactory wrapperForFieldAnnotationListenerFactory;
-    protected WrapperForTestAnnotationListenerFactory wrapperForTestAnnotationListenerFactory;
+    protected FieldAnnotationTestListenerFactory fieldAnnotationTestListenerFactory;
+    protected TestAnnotationTestListenerFactory testAnnotationTestListenerFactory;
     protected SpringTestListener springTestListener;
 
 
-    public UnitilsTestListenerFactory(UnitilsContext unitilsContext, WrapperForFieldAnnotationListenerFactory wrapperForFieldAnnotationListenerFactory, WrapperForTestAnnotationListenerFactory wrapperForTestAnnotationListenerFactory, SpringTestListener springTestListener) {
+    public UnitilsTestListenerFactory(UnitilsContext unitilsContext, FieldAnnotationTestListenerFactory fieldAnnotationTestListenerFactory, TestAnnotationTestListenerFactory testAnnotationTestListenerFactory, SpringTestListener springTestListener) {
         this.unitilsContext = unitilsContext;
-        this.wrapperForFieldAnnotationListenerFactory = wrapperForFieldAnnotationListenerFactory;
-        this.wrapperForTestAnnotationListenerFactory = wrapperForTestAnnotationListenerFactory;
+        this.fieldAnnotationTestListenerFactory = fieldAnnotationTestListenerFactory;
+        this.testAnnotationTestListenerFactory = testAnnotationTestListenerFactory;
         this.springTestListener = springTestListener;
     }
 
 
     public UnitilsTestListener create() {
         List<TestListener> testListeners = createTestListeners();
-        return new UnitilsTestListener(testListeners, wrapperForFieldAnnotationListenerFactory, wrapperForTestAnnotationListenerFactory);
+        return new UnitilsTestListener(testListeners, fieldAnnotationTestListenerFactory, testAnnotationTestListenerFactory);
     }
 
 
     protected List<TestListener> createTestListeners() {
         List<TestListener> testListeners = new ArrayList<TestListener>();
-
+        testListeners.add(springTestListener);
         for (Class<?> testListenerType : unitilsContext.getTestListenerTypes()) {
             TestListener testListener = (TestListener) unitilsContext.getInstanceOfType(testListenerType);
             testListeners.add(testListener);
         }
-        testListeners.add(springTestListener);
         return testListeners;
     }
 }

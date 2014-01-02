@@ -89,8 +89,6 @@ public class ArgumentMatchers {
         return equalTo;
     }
 
-    // todo add lenEqs(T... equalTo)  en refEqs  e.G. lenEq("1", "2")
-
     /**
      * Matches when the object argument is of the given type (or subtype).
      * <p/>

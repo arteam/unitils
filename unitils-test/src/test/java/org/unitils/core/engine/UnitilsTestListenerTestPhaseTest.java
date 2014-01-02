@@ -35,8 +35,8 @@ public class UnitilsTestListenerTestPhaseTest extends UnitilsJUnit4 {
     /* Tested object */
     private UnitilsTestListener unitilsTestListener;
 
-    private Mock<WrapperForFieldAnnotationListenerFactory> wrapperForFieldAnnotationListenerFactoryMock;
-    private Mock<WrapperForTestAnnotationListenerFactory> wrapperForTestAnnotationListenerFactoryMock;
+    private Mock<FieldAnnotationTestListenerFactory> wrapperForFieldAnnotationListenerFactoryMock;
+    private Mock<TestAnnotationTestListenerFactory> wrapperForTestAnnotationListenerFactoryMock;
     private Mock<TestListener> initializationTestListenerMock;
     private Mock<TestListener> constructionTestListenerMock;
     private Mock<TestListener> injectionTestListenerMock;
@@ -72,8 +72,8 @@ public class UnitilsTestListenerTestPhaseTest extends UnitilsJUnit4 {
     @Test
     public void beforeTestSetupSortedOnTestPhase() {
         unitilsTestListener = new UnitilsTestListener(asList(executionTestListenerMock.getMock(), setupTestListenerMock.getMock()), wrapperForFieldAnnotationListenerFactoryMock.getMock(), wrapperForTestAnnotationListenerFactoryMock.getMock());
-        wrapperForFieldAnnotationListenerFactoryMock.returns(asList(injectionTestListenerMock.getMock())).create(null);
-        wrapperForTestAnnotationListenerFactoryMock.returns(asList(constructionTestListenerMock.getMock())).create(null);
+        wrapperForFieldAnnotationListenerFactoryMock.returnsAll(injectionTestListenerMock).create(null);
+        wrapperForTestAnnotationListenerFactoryMock.returnsAll(constructionTestListenerMock).create(null);
 
         unitilsTestListener.beforeTestClass(null);
         unitilsTestListener.beforeTestSetUp(null, null);
@@ -87,8 +87,8 @@ public class UnitilsTestListenerTestPhaseTest extends UnitilsJUnit4 {
     @Test
     public void beforeTestMethodSortedOnTestPhase() {
         unitilsTestListener = new UnitilsTestListener(asList(executionTestListenerMock.getMock(), setupTestListenerMock.getMock()), wrapperForFieldAnnotationListenerFactoryMock.getMock(), wrapperForTestAnnotationListenerFactoryMock.getMock());
-        wrapperForFieldAnnotationListenerFactoryMock.returns(asList(injectionTestListenerMock.getMock())).create(null);
-        wrapperForTestAnnotationListenerFactoryMock.returns(asList(constructionTestListenerMock.getMock())).create(null);
+        wrapperForFieldAnnotationListenerFactoryMock.returnsAll(injectionTestListenerMock).create(null);
+        wrapperForTestAnnotationListenerFactoryMock.returnsAll(constructionTestListenerMock).create(null);
 
         unitilsTestListener.beforeTestClass(null);
         unitilsTestListener.beforeTestSetUp(null, null);
@@ -103,8 +103,8 @@ public class UnitilsTestListenerTestPhaseTest extends UnitilsJUnit4 {
     @Test
     public void afterTestMethodSortedOnTestPhase() {
         unitilsTestListener = new UnitilsTestListener(asList(executionTestListenerMock.getMock(), setupTestListenerMock.getMock()), wrapperForFieldAnnotationListenerFactoryMock.getMock(), wrapperForTestAnnotationListenerFactoryMock.getMock());
-        wrapperForFieldAnnotationListenerFactoryMock.returns(asList(injectionTestListenerMock.getMock())).create(null);
-        wrapperForTestAnnotationListenerFactoryMock.returns(asList(constructionTestListenerMock.getMock())).create(null);
+        wrapperForFieldAnnotationListenerFactoryMock.returnsAll(injectionTestListenerMock).create(null);
+        wrapperForTestAnnotationListenerFactoryMock.returnsAll(constructionTestListenerMock).create(null);
 
         unitilsTestListener.beforeTestClass(null);
         unitilsTestListener.beforeTestSetUp(null, null);
@@ -119,8 +119,8 @@ public class UnitilsTestListenerTestPhaseTest extends UnitilsJUnit4 {
     @Test
     public void afterTestTearDownSortedOnTestPhase() {
         unitilsTestListener = new UnitilsTestListener(asList(executionTestListenerMock.getMock(), setupTestListenerMock.getMock()), wrapperForFieldAnnotationListenerFactoryMock.getMock(), wrapperForTestAnnotationListenerFactoryMock.getMock());
-        wrapperForFieldAnnotationListenerFactoryMock.returns(asList(injectionTestListenerMock.getMock())).create(null);
-        wrapperForTestAnnotationListenerFactoryMock.returns(asList(constructionTestListenerMock.getMock())).create(null);
+        wrapperForFieldAnnotationListenerFactoryMock.returnsAll(injectionTestListenerMock).create(null);
+        wrapperForTestAnnotationListenerFactoryMock.returnsAll(constructionTestListenerMock).create(null);
 
         unitilsTestListener.beforeTestClass(null);
         unitilsTestListener.beforeTestSetUp(null, null);

@@ -15,6 +15,8 @@
  */
 package org.unitils.core.util;
 
+import org.unitils.core.UnitilsException;
+
 import java.io.File;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -131,12 +133,12 @@ public class ObjectFormatter {
             arrayAndCollectionFormatter.formatMap((Map<?, ?>) object, currentDepth, result);
             return;
         }
+        if (formatFile(object, result)) {
+            return;
+        }
         if (currentDepth >= maxDepth) {
             result.append(getShortClassName(type));
             result.append("<...>");
-            return;
-        }
-        if (formatFile(object, result)) {
             return;
         }
         formatObject(object, currentDepth, result);
@@ -221,33 +223,42 @@ public class ObjectFormatter {
         Field[] fields = clazz.getDeclaredFields();
         AccessibleObject.setAccessible(fields, true);
 
-        for (int i = 0; i < fields.length; i++) {
+        boolean firstField = true;
+        for (Field field : fields) {
             // skip transient and static fields
-            Field field = fields[i];
             if (isTransient(field.getModifiers()) || isStatic(field.getModifiers()) || field.isSynthetic()) {
                 continue;
             }
+            Object fieldValue;
             try {
-                if (i > 0) {
-                    result.append(", ");
-                }
-                result.append(field.getName());
-                result.append("=");
-                formatImpl(field.get(object), currentDepth + 1, result);
-
+                fieldValue = getFieldValue(object, field);
             } catch (IllegalAccessException e) {
                 // this can't happen. Would get a Security exception instead
                 // throw a runtime exception in case the impossible happens.
-                throw new InternalError("Unexpected IllegalAccessException");
+                throw new UnitilsException("Unable to format field " + field, e);
             }
+            if (!firstField) {
+                result.append(", ");
+            }
+            firstField = false;
+            result.append(field.getName());
+            result.append("=");
+
+            formatImpl(fieldValue, currentDepth + 1, result);
         }
 
         // format fields declared in superclass
         Class<?> superclazz = clazz.getSuperclass();
-        while (superclazz != null && !superclazz.getName().startsWith("java.lang")) {
+        if (superclazz != null && !superclazz.getName().startsWith("java.lang")) {
+            if (!firstField) {
+                result.append(", ");
+            }
             formatFields(object, superclazz, currentDepth, result);
-            superclazz = superclazz.getSuperclass();
         }
+    }
+
+    protected Object getFieldValue(Object object, Field field) throws IllegalAccessException {
+        return field.get(object);
     }
 
     protected boolean formatProxy(Object object, Class<?> type, StringBuilder result) {

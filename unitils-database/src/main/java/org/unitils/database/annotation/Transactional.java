@@ -59,7 +59,8 @@ public @interface Transactional {
      */
     TransactionMode value() default DEFAULT;
 
-    // todo remove or refactor  (was used in spring module)
-    // todo it should be possible to specify the transaction manager when more than one is defined in a spring context (e.g. hibernate and datasource)
+    // todo exception when both database and tx-manager
+    String databaseName() default "";
+
     String transactionManagerName() default "";
 }

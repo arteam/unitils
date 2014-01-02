@@ -20,11 +20,14 @@ import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static org.unitils.util.MethodUtils.isToStringMethod;
 
 /**
  * Mock behavior that returns a default value.
@@ -63,7 +66,11 @@ public class DefaultValueReturningMockBehavior implements ValidatableMockBehavio
      */
     @SuppressWarnings("unchecked")
     public Object execute(ProxyInvocation proxyInvocation) {
-        Class<?> returnType = proxyInvocation.getMethod().getReturnType();
+        Method method = proxyInvocation.getMethod();
+        if (isToStringMethod(method)) {
+            return proxyInvocation.getProxyName();
+        }
+        Class<?> returnType = method.getReturnType();
         if (returnType == Void.TYPE) {
             return null;
         }

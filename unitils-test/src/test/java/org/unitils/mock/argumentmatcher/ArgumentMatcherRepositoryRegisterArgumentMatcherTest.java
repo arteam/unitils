@@ -63,7 +63,7 @@ public class ArgumentMatcherRepositoryRegisterArgumentMatcherTest extends Unitil
     @Test
     public void registerArgumentMatcher() {
         ProxyInvocation proxyInvocation = createProxyInvocation(method, 333, "arg1");
-        argumentMatcherPositionFinderMock.returns(asList(0)).getArgumentMatcherIndexes(proxyInvocation, 111, 333, 1);
+        argumentMatcherPositionFinderMock.returnsAll(0).getArgumentMatcherIndexes(proxyInvocation, 111, 333, 1);
         argumentMatcherRepository.startMatchingInvocation(111);
 
         argumentMatcherRepository.registerArgumentMatcher(argumentMatcher);
@@ -74,7 +74,7 @@ public class ArgumentMatcherRepositoryRegisterArgumentMatcherTest extends Unitil
     @Test
     public void argumentsWithoutArgumentMatcherAreWrappedInDefaultArgumentMatcher() {
         ProxyInvocation proxyInvocation = createProxyInvocation(method, 333, "arg1", "arg2", "arg3");
-        argumentMatcherPositionFinderMock.returns(asList(1)).getArgumentMatcherIndexes(proxyInvocation, 111, 333, 1);
+        argumentMatcherPositionFinderMock.returnsAll(1).getArgumentMatcherIndexes(proxyInvocation, 111, 333, 1);
         argumentMatcherRepository.startMatchingInvocation(111);
 
         argumentMatcherRepository.registerArgumentMatcher(argumentMatcher);

@@ -18,7 +18,7 @@ package org.unitils.util;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
@@ -39,7 +39,7 @@ public class CollectionUtils {
      * @return The elements as a set, empty if elements was null
      */
     public static <T> Set<T> asSet(T... elements) {
-        Set<T> result = new HashSet<T>();
+        Set<T> result = new LinkedHashSet<T>();
         if (elements == null) {
             return result;
         }

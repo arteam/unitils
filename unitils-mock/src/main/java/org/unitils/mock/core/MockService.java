@@ -15,6 +15,8 @@
  */
 package org.unitils.mock.core;
 
+import org.unitils.mock.Mock;
+import org.unitils.mock.core.util.StackTraceService;
 import org.unitils.mock.report.ScenarioReport;
 import org.unitils.mock.report.impl.ObservedInvocationsReport;
 
@@ -30,12 +32,14 @@ public class MockService {
     protected Scenario scenario;
     protected ObservedInvocationsReport observedInvocationsReport;
     protected ScenarioReport scenarioReport;
+    protected StackTraceService stackTraceService;
 
 
-    public MockService(Scenario scenario, ObservedInvocationsReport observedInvocationsReport, ScenarioReport scenarioReport) {
+    public MockService(Scenario scenario, ObservedInvocationsReport observedInvocationsReport, ScenarioReport scenarioReport, StackTraceService stackTraceService) {
         this.scenario = scenario;
         this.observedInvocationsReport = observedInvocationsReport;
         this.scenarioReport = scenarioReport;
+        this.stackTraceService = stackTraceService;
     }
 
 
@@ -44,13 +48,26 @@ public class MockService {
         if (unverifiedInvocations.isEmpty()) {
             return;
         }
-        Object testObject = scenario.getTestObject();
-        String assertionErrorMessage = getNoMoreInvocationsErrorMessage(testObject, unverifiedInvocations);
+        String assertionErrorMessage = getNoMoreInvocationsErrorMessage(unverifiedInvocations);
         throw new MockAssertionError(assertionErrorMessage);
     }
 
+    public void assertNoMoreMockInvocations(Mock<?> mock) {
+        Object proxy = mock.getMock();
+        List<ObservedInvocation> unverifiedInvocations = scenario.getUnverifiedProxyInvocations(proxy);
+        if (unverifiedInvocations.isEmpty()) {
+            return;
+        }
+        String assertionErrorMessage = getNoMoreMockInvocationsErrorMessage(mock, unverifiedInvocations);
+        StackTraceElement[] invokedAt = stackTraceService.getInvocationStackTrace(Mock.class, false);
+        MockAssertionError assertionError = new MockAssertionError(assertionErrorMessage);
+        assertionError.setStackTrace(invokedAt);
+        throw assertionError;
+    }
 
-    protected String getNoMoreInvocationsErrorMessage(Object testObject, List<ObservedInvocation> unexpectedInvocations) {
+
+    protected String getNoMoreInvocationsErrorMessage(List<ObservedInvocation> unexpectedInvocations) {
+        Object testObject = scenario.getTestObject();
         String report = scenarioReport.createReport();
 
         StringBuilder message = new StringBuilder();
@@ -61,4 +78,17 @@ public class MockService {
         return message.toString();
     }
 
+    protected String getNoMoreMockInvocationsErrorMessage(Mock<?> mock, List<ObservedInvocation> unexpectedInvocations) {
+        Object testObject = scenario.getTestObject();
+        String report = scenarioReport.createReport();
+
+        StringBuilder message = new StringBuilder();
+        message.append("No more invocations expected for mock ");
+        message.append(mock);
+        message.append(", yet observed following calls:\n");
+        message.append(observedInvocationsReport.createReport(unexpectedInvocations, testObject));
+        message.append("\n");
+        message.append(report);
+        return message.toString();
+    }
 }

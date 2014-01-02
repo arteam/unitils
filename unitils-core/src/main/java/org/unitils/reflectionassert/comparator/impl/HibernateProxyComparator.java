@@ -61,8 +61,8 @@ public class HibernateProxyComparator implements Comparator {
      */
     public Difference compare(Object left, Object right, boolean onlyFirstDifference, ReflectionComparator reflectionComparator) {
         if (isUninitialized(left) && isUninitialized(right)) {
-            String leftType = getEntitiyName(left);
-            String rightType = getEntitiyName(right);
+            String leftType = getEntityName(left);
+            String rightType = getEntityName(right);
             if (leftType == null || !leftType.equals(rightType)) {
                 return new ObjectDifference("Different hibernate proxy types. Left: " + leftType + ", right: " + rightType, left, right);
             }

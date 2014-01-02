@@ -54,7 +54,6 @@ public class HibernateUtil {
         return hibernateProxyClass != null && hibernateProxyClass.isInstance(object);
     }
 
-
     /**
      * Checks whether the given proxy object has been loaded.
      *
@@ -75,13 +74,12 @@ public class HibernateUtil {
      * @param object The object or proxy
      * @return The class name of the object, null if the object is null
      */
-    public static String getEntitiyName(Object object) {
+    public static String getEntityName(Object object) {
         if (!isHibernateProxy(object)) {
             return object == null ? null : object.getClass().getName();
         }
         return (String) invokeLazyInitializerMethod("getEntityName", object);
     }
-
 
     /**
      * Gets the unique identifier of the given proxy object.
@@ -96,7 +94,6 @@ public class HibernateUtil {
         return invokeLazyInitializerMethod("getIdentifier", object);
     }
 
-
     /**
      * Gets (and loads) the wrapped object out of a given hibernate proxy.
      * <p/>
@@ -105,7 +102,7 @@ public class HibernateUtil {
      * is returned.
      *
      * @param object The object or proxy
-     * @return The uproxied object or the object itself if it was no proxy
+     * @return The unproxied object or the object itself if it was no proxy
      */
     public static Object getUnproxiedValue(Object object) {
         // check whether object is a proxy
@@ -113,6 +110,11 @@ public class HibernateUtil {
             return object;
         }
         // found a proxy, load and un-wrap
+        Object session = invokeLazyInitializerMethod("getSession", object);
+        if (session == null) {
+            // detached, do not try to initialize
+            return object;
+        }
         return invokeLazyInitializerMethod("getImplementation", object);
     }
 

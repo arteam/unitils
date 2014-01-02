@@ -51,7 +51,7 @@ public class PartialMockObjectStubTest extends UnitilsJUnit4 {
     @Before
     public void initialize() {
         partialMockObject = new PartialMockObject<Object>("name", Object.class, null, matchingProxy, false, behaviorDefiningInvocations,
-                matchingProxyInvocationHandlerMock.getMock(), mockBehaviorFactoryMock.getMock(), matchingInvocationHandlerFactoryMock.getMock());
+                matchingProxyInvocationHandlerMock.getMock(), mockBehaviorFactoryMock.getMock(), matchingInvocationHandlerFactoryMock.getMock(), null, null);
 
         mockBehaviorFactoryMock.returns(mockBehavior).createStubMockBehavior();
         matchingInvocationHandlerFactoryMock.returns(matchingInvocationHandler).createBehaviorDefiningMatchingInvocationHandler(mockBehavior, false, behaviorDefiningInvocations);
@@ -68,7 +68,7 @@ public class PartialMockObjectStubTest extends UnitilsJUnit4 {
     @Test
     public void chainedStub() {
         partialMockObject = new PartialMockObject<Object>("name", Object.class, null, matchingProxy, true, behaviorDefiningInvocations,
-                matchingProxyInvocationHandlerMock.getMock(), mockBehaviorFactoryMock.getMock(), matchingInvocationHandlerFactoryMock.getMock());
+                matchingProxyInvocationHandlerMock.getMock(), mockBehaviorFactoryMock.getMock(), matchingInvocationHandlerFactoryMock.getMock(), null, null);
 
         partialMockObject.stub();
         matchingProxyInvocationHandlerMock.assertInvoked().startMatchingInvocation("name", false, matchingInvocationHandler);

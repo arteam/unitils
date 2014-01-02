@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.TestAnnotationListener;
 import org.unitils.core.TestInstance;
+import org.unitils.core.TestListener;
 import org.unitils.core.annotation.TestAnnotation;
 import org.unitils.core.config.Configuration;
 import org.unitils.core.context.Context;
@@ -43,14 +44,12 @@ import static org.junit.Assert.*;
 import static org.unitils.core.TestPhase.EXECUTION;
 
 /**
- * todo add test for annotation that is not annotated
- *
  * @author Tim Ducheyne
  */
-public class WrapperForTestAnnotationListenerFactoryCreateTest extends UnitilsJUnit4 {
+public class TestAnnotationTestListenerFactoryCreateTest extends UnitilsJUnit4 {
 
     /* Tested object */
-    private WrapperForTestAnnotationListenerFactory wrapperForTestAnnotationListenerFactory;
+    private TestAnnotationTestListenerFactory testAnnotationTestListenerFactory;
 
     private Mock<Context> contextMock;
     private Mock<MyTestAnnotationListener1> testAnnotationListener1Mock;
@@ -61,7 +60,7 @@ public class WrapperForTestAnnotationListenerFactoryCreateTest extends UnitilsJU
 
     @Before
     public void initialize() throws Exception {
-        wrapperForTestAnnotationListenerFactory = new WrapperForTestAnnotationListenerFactory(contextMock.getMock());
+        testAnnotationTestListenerFactory = new TestAnnotationTestListenerFactory(contextMock.getMock());
 
         testAnnotationListener1Mock.returns(EXECUTION).getTestPhase();
         testAnnotationListener2Mock.returns(EXECUTION).getTestPhase();
@@ -85,11 +84,11 @@ public class WrapperForTestAnnotationListenerFactoryCreateTest extends UnitilsJU
         MyTestAnnotation2 methodAnnotation2 = testMethod.getAnnotation(MyTestAnnotation2.class);
         Annotations<MyTestAnnotation2> annotations2 = new Annotations<MyTestAnnotation2>(methodAnnotation2, new ArrayList<MyTestAnnotation2>(), configuration);
 
-        List<WrapperForTestAnnotationListener> result = wrapperForTestAnnotationListenerFactory.create(testInstance);
+        List<TestListener> result = testAnnotationTestListenerFactory.create(testInstance);
         assertEquals(2, result.size());
 
-        WrapperForTestAnnotationListener listener1 = result.get(0);
-        WrapperForTestAnnotationListener listener2 = result.get(1);
+        WrapperForTestAnnotationListener listener1 = (WrapperForTestAnnotationListener) result.get(0);
+        WrapperForTestAnnotationListener listener2 = (WrapperForTestAnnotationListener) result.get(1);
         assertTrue((listener1.testAnnotationListener instanceof MyTestAnnotationListener1 && listener2.testAnnotationListener instanceof MyTestAnnotationListener2) ||
                 (listener2.testAnnotationListener instanceof MyTestAnnotationListener1 && listener1.testAnnotationListener instanceof MyTestAnnotationListener2));
         assertTrue((methodAnnotation1.equals(listener1.annotations.getAnnotation()) && methodAnnotation2.equals(listener2.annotations.getAnnotation())) ||
@@ -108,10 +107,10 @@ public class WrapperForTestAnnotationListenerFactoryCreateTest extends UnitilsJU
         MyTestAnnotation1 classAnnotation = AnnotationOnClass.class.getAnnotation(MyTestAnnotation1.class);
         MyTestAnnotation1 superClassAnnotation = AnnotationOnSuperClass.class.getAnnotation(MyTestAnnotation1.class);
 
-        List<WrapperForTestAnnotationListener> result = wrapperForTestAnnotationListenerFactory.create(testInstance);
+        List<TestListener> result = testAnnotationTestListenerFactory.create(testInstance);
         assertEquals(1, result.size());
 
-        WrapperForTestAnnotationListener listener1 = result.get(0);
+        WrapperForTestAnnotationListener listener1 = (WrapperForTestAnnotationListener) result.get(0);
         assertTrue(listener1.testAnnotationListener instanceof MyTestAnnotationListener1);
         assertNull(listener1.annotations.getAnnotation());
         assertEquals(asList(classAnnotation, superClassAnnotation), listener1.annotations.getClassAnnotations());
@@ -128,10 +127,10 @@ public class WrapperForTestAnnotationListenerFactoryCreateTest extends UnitilsJU
         MyTestAnnotation1 classAnnotation = AnnotationOnClassAndMethod.class.getAnnotation(MyTestAnnotation1.class);
         MyTestAnnotation1 superClassAnnotation = AnnotationOnSuperClass.class.getAnnotation(MyTestAnnotation1.class);
 
-        List<WrapperForTestAnnotationListener> result = wrapperForTestAnnotationListenerFactory.create(testInstance);
+        List<TestListener> result = testAnnotationTestListenerFactory.create(testInstance);
         assertEquals(1, result.size());
 
-        WrapperForTestAnnotationListener listener1 = result.get(0);
+        WrapperForTestAnnotationListener listener1 = (WrapperForTestAnnotationListener) result.get(0);
         assertTrue(listener1.testAnnotationListener instanceof MyTestAnnotationListener1);
         assertEquals(methodAnnotation, listener1.annotations.getAnnotation());
         assertEquals(asList(classAnnotation, superClassAnnotation), listener1.annotations.getClassAnnotations());
@@ -145,7 +144,7 @@ public class WrapperForTestAnnotationListenerFactoryCreateTest extends UnitilsJU
         ClassWrapper classWrapper = new ClassWrapper(OtherAnnotation.class);
         TestInstance testInstance = new TestInstance(classWrapper, testObject, testMethod);
 
-        List<WrapperForTestAnnotationListener> result = wrapperForTestAnnotationListenerFactory.create(testInstance);
+        List<TestListener> result = testAnnotationTestListenerFactory.create(testInstance);
         assertTrue(result.isEmpty());
     }
 
@@ -157,7 +156,7 @@ public class WrapperForTestAnnotationListenerFactoryCreateTest extends UnitilsJU
         ClassWrapper classWrapper = new ClassWrapper(NoAnnotation.class);
         TestInstance testInstance = new TestInstance(classWrapper, testObject, testMethod);
 
-        List<WrapperForTestAnnotationListener> result = wrapperForTestAnnotationListenerFactory.create(testInstance);
+        List<TestListener> result = testAnnotationTestListenerFactory.create(testInstance);
         assertTrue(result.isEmpty());
     }
 

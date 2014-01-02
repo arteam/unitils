@@ -32,20 +32,21 @@ import static java.util.Collections.sort;
 public class UnitilsTestListener {
 
     protected List<TestListener> testListeners;
-    protected WrapperForFieldAnnotationListenerFactory wrapperForFieldAnnotationListenerFactory;
-    protected WrapperForTestAnnotationListenerFactory wrapperForTestAnnotationListenerFactory;
+    protected FieldAnnotationTestListenerFactory fieldAnnotationTestListenerFactory;
+    protected TestAnnotationTestListenerFactory testAnnotationTestListenerFactory;
     protected TestListenerTestPhaseComparator testListenerTestPhaseComparator = new TestListenerTestPhaseComparator();
 
     protected ClassWrapper currentClassWrapper;
     protected TestInstance currentTestInstance;
     protected Throwable currentTestThrowable;
-    protected List<TestListener> currentTestListeners;
+    protected List<TestListener> onlyTestListeners;
+    protected List<TestListener> testAndAnnotationTestListeners;
 
 
-    public UnitilsTestListener(List<TestListener> testListeners, WrapperForFieldAnnotationListenerFactory wrapperForFieldAnnotationListenerFactory, WrapperForTestAnnotationListenerFactory wrapperForTestAnnotationListenerFactory) {
+    public UnitilsTestListener(List<TestListener> testListeners, FieldAnnotationTestListenerFactory fieldAnnotationTestListenerFactory, TestAnnotationTestListenerFactory testAnnotationTestListenerFactory) {
         this.testListeners = testListeners;
-        this.wrapperForFieldAnnotationListenerFactory = wrapperForFieldAnnotationListenerFactory;
-        this.wrapperForTestAnnotationListenerFactory = wrapperForTestAnnotationListenerFactory;
+        this.fieldAnnotationTestListenerFactory = fieldAnnotationTestListenerFactory;
+        this.testAnnotationTestListenerFactory = testAnnotationTestListenerFactory;
     }
 
 
@@ -54,10 +55,10 @@ public class UnitilsTestListener {
         currentTestInstance = null;
         currentTestThrowable = null;
 
-        currentTestListeners = new ArrayList<TestListener>(testListeners);
-        sort(currentTestListeners, testListenerTestPhaseComparator);
+        onlyTestListeners = new ArrayList<TestListener>(testListeners);
+        sort(onlyTestListeners, testListenerTestPhaseComparator);
 
-        for (TestListener testListener : currentTestListeners) {
+        for (TestListener testListener : onlyTestListeners) {
             testListener.beforeTestClass(currentClassWrapper);
         }
     }
@@ -66,18 +67,17 @@ public class UnitilsTestListener {
         currentTestInstance = new TestInstance(currentClassWrapper, testObject, testMethod);
         currentTestThrowable = null;
 
-        currentTestListeners = new ArrayList<TestListener>(testListeners);
-        addFieldAndTestAnnotationListeners(currentTestInstance, currentTestListeners);
-        sort(currentTestListeners, testListenerTestPhaseComparator);
+        testAndAnnotationTestListeners = new ArrayList<TestListener>(onlyTestListeners);
+        addFieldAndTestAnnotationListeners(currentTestInstance, testAndAnnotationTestListeners);
+        sort(testAndAnnotationTestListeners, testListenerTestPhaseComparator);
 
-        for (TestListener testListener : currentTestListeners) {
+        for (TestListener testListener : testAndAnnotationTestListeners) {
             testListener.beforeTestSetUp(currentTestInstance);
         }
     }
 
-
     public void beforeTestMethod() {
-        for (TestListener testListener : currentTestListeners) {
+        for (TestListener testListener : testAndAnnotationTestListeners) {
             testListener.beforeTestMethod(currentTestInstance);
         }
     }
@@ -85,21 +85,27 @@ public class UnitilsTestListener {
     public void afterTestMethod(Throwable testThrowable) {
         currentTestThrowable = testThrowable;
 
-        for (TestListener testListener : currentTestListeners) {
+        for (TestListener testListener : testAndAnnotationTestListeners) {
             testListener.afterTestMethod(currentTestInstance, currentTestThrowable);
         }
     }
 
     public void afterTestTearDown() {
-        for (TestListener testListener : currentTestListeners) {
+        for (TestListener testListener : testAndAnnotationTestListeners) {
             testListener.afterTestTearDown(currentTestInstance, currentTestThrowable);
+        }
+    }
+
+    public void afterTestClass() {
+        for (TestListener testListener : onlyTestListeners) {
+            testListener.afterTestClass(currentClassWrapper);
         }
     }
 
 
     protected void addFieldAndTestAnnotationListeners(TestInstance currentTestInstance, List<TestListener> currentTestListeners) {
-        List<WrapperForFieldAnnotationListener> fieldAnnotationTestListeners = wrapperForFieldAnnotationListenerFactory.create(currentTestInstance);
-        List<WrapperForTestAnnotationListener> testAnnotationTestListeners = wrapperForTestAnnotationListenerFactory.create(currentTestInstance);
+        List<TestListener> fieldAnnotationTestListeners = fieldAnnotationTestListenerFactory.create(currentTestInstance);
+        List<TestListener> testAnnotationTestListeners = testAnnotationTestListenerFactory.create(currentTestInstance);
 
         currentTestListeners.addAll(fieldAnnotationTestListeners);
         currentTestListeners.addAll(testAnnotationTestListeners);

@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.annotation.Dummy;
-import org.unitils.mock.core.MockFactory;
+import org.unitils.mock.core.DummyFactory;
 import org.unitils.mock.mockbehavior.impl.DummyValueReturningMockBehavior;
 
 import static org.junit.Assert.assertTrue;
@@ -33,7 +33,7 @@ public class MockBehaviorFactoryCreateDummyValueReturningMockBehaviorTest extend
     private MockBehaviorFactory mockBehaviorFactory;
 
     @Dummy
-    private MockFactory mockFactory;
+    private DummyFactory dummyFactory;
 
 
     @Before
@@ -44,8 +44,8 @@ public class MockBehaviorFactoryCreateDummyValueReturningMockBehaviorTest extend
 
     @Test
     public void createDummyValueReturningMockBehavior() {
-        MockBehavior result = mockBehaviorFactory.createDummyValueReturningMockBehavior(mockFactory);
+        MockBehavior result = mockBehaviorFactory.createDummyValueReturningMockBehavior(dummyFactory);
         assertTrue(result instanceof DummyValueReturningMockBehavior);
-        assertPropertyReflectionEquals("mockFactory", mockFactory, result);
+        assertPropertyReflectionEquals("dummyFactory", dummyFactory, result);
     }
 }

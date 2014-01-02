@@ -75,26 +75,29 @@ public class DatabaseUnitils {
      * Starts a new transaction.
      */
     public static void startTransaction() {
-        startTransaction(null);
+        startTransactionForDatabase(null);
     }
 
-    // todo unit test
-    public static void startTransaction(String transactionManagerName) {
-        getTransactionManager().startTransaction(transactionManagerName);
+    public static void startTransactionForDatabase(String databaseName) {
+        getTransactionManager().startTransaction(databaseName, null);
+    }
+
+    public static void startTransactionForTransactionManager(String transactionManagerName) {
+        getTransactionManager().startTransaction(null, transactionManagerName);
     }
 
     /**
      * Commits the current transaction.
      */
     public static void commitTransaction() {
-        getTransactionManager().commit(true);
+        getTransactionManager().commit();
     }
 
     /**
      * Performs a rollback of the current transaction.
      */
     public static void rollbackTransaction() {
-        getTransactionManager().rollback(true);
+        getTransactionManager().rollback();
     }
 
 

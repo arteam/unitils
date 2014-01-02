@@ -64,21 +64,21 @@ public class ObservedInvocationsReport {
      * @return The string representation, not null
      */
     public String createReport(List<ObservedInvocation> observedInvocations, Object testObject) {
-        Map<Object, FormattedObject> allLargeObjects = new IdentityHashMap<Object, FormattedObject>();
+        Map<Object, String> largeObjectNames = new IdentityHashMap<Object, String>();
         Map<Class<?>, Integer> largeObjectNameIndexes = new HashMap<Class<?>, Integer>();
         Map<Object, String> fieldValuesAndNames = getFieldValuesAndNames(testObject);
 
-        return formatObservedInvocations(observedInvocations, allLargeObjects, largeObjectNameIndexes, fieldValuesAndNames);
+        return formatObservedInvocations(observedInvocations, largeObjectNames, largeObjectNameIndexes, fieldValuesAndNames);
     }
 
 
-    protected String formatObservedInvocations(List<ObservedInvocation> observedInvocations, Map<Object, FormattedObject> allLargeObjects, Map<Class<?>, Integer> largeObjectNameIndexes, Map<Object, String> fieldValuesAndNames) {
+    protected String formatObservedInvocations(List<ObservedInvocation> observedInvocations, Map<Object, String> largeObjectNames, Map<Class<?>, Integer> largeObjectNameIndexes, Map<Object, String> fieldValuesAndNames) {
         StringBuilder result = new StringBuilder();
         int invocationIndex = 0;
         for (ObservedInvocation observedInvocation : observedInvocations) {
             List<FormattedObject> currentLargeObjects = new ArrayList<FormattedObject>();
             result.append(formatInvocationIndex(++invocationIndex, observedInvocations.size()));
-            result.append(formatObservedInvocation(observedInvocation, currentLargeObjects, allLargeObjects, largeObjectNameIndexes, fieldValuesAndNames));
+            result.append(formatObservedInvocation(observedInvocation, currentLargeObjects, largeObjectNames, largeObjectNameIndexes, fieldValuesAndNames));
             result.append(formatInvokedAt(observedInvocation));
         }
         return result.toString();
@@ -91,12 +91,12 @@ public class ObservedInvocationsReport {
      *
      * @param observedInvocation     The invocation to format, not null
      * @param currentLargeObjects    The current the large values, not null
-     * @param allLargeObjects        All large values per value, not null
+     * @param largeObjectNames       All large values names per value, not null
      * @param largeObjectNameIndexes The current indexes to use for the large value names (per value type), not null
      * @param fieldValuesAndNames    The values and name of the instance fields in the test object
      * @return The string representation, not null
      */
-    protected String formatObservedInvocation(ObservedInvocation observedInvocation, List<FormattedObject> currentLargeObjects, Map<Object, FormattedObject> allLargeObjects, Map<Class<?>, Integer> largeObjectNameIndexes, Map<Object, String> fieldValuesAndNames) {
+    protected String formatObservedInvocation(ObservedInvocation observedInvocation, List<FormattedObject> currentLargeObjects, Map<Object, String> largeObjectNames, Map<Class<?>, Integer> largeObjectNameIndexes, Map<Object, String> fieldValuesAndNames) {
         StringBuilder result = new StringBuilder();
         Method method = observedInvocation.getMethod();
 
@@ -114,7 +114,7 @@ public class ObservedInvocationsReport {
                 Object argumentValue = argument.getValue();
                 Object argumentValueAtInvocationTime = argument.getValueAtInvocationTime();
 
-                result.append(formatValue(argumentValueAtInvocationTime, argumentValue, argumentType, currentLargeObjects, allLargeObjects, largeObjectNameIndexes, fieldValuesAndNames));
+                result.append(formatValue(argumentValueAtInvocationTime, argumentValue, argumentType, currentLargeObjects, largeObjectNames, largeObjectNameIndexes, fieldValuesAndNames));
                 result.append(", ");
             }
             // remove the last comma
@@ -128,7 +128,7 @@ public class ObservedInvocationsReport {
             result.append(" -> ");
             Object resultValue = observedInvocation.getResult();
             Object resultAtInvocationTime = observedInvocation.getResultAtInvocationTime();
-            result.append(formatValue(resultAtInvocationTime, resultValue, resultType, currentLargeObjects, allLargeObjects, largeObjectNameIndexes, fieldValuesAndNames));
+            result.append(formatValue(resultAtInvocationTime, resultValue, resultType, currentLargeObjects, largeObjectNames, largeObjectNameIndexes, fieldValuesAndNames));
         }
         return result.toString();
     }
@@ -143,23 +143,20 @@ public class ObservedInvocationsReport {
      * @param value                  The value to format by reference, not null
      * @param type                   The type of the large value, not null
      * @param currentLargeObjects    The current the large values, not null
-     * @param allLargeObjects        All large values per value, not null
+     * @param largeObjectNames       All large values names per value, not null
      * @param largeObjectNameIndexes The current indexes to use for the large value names (per value type), not null
      * @param fieldValuesAndNames    The values and name of the instance fields in the test object
      * @return The value or the replaced name, not null
      */
-    protected String formatValue(Object valueAtInvocationTime, Object value, Class<?> type, List<FormattedObject> currentLargeObjects, Map<Object, FormattedObject> allLargeObjects, Map<Class<?>, Integer> largeObjectNameIndexes, Map<Object, String> fieldValuesAndNames) {
-        FormattedObject formattedObject = allLargeObjects.get(valueAtInvocationTime);
-        if (formattedObject == null) {
-            formattedObject = allLargeObjects.get(value);
+    protected String formatValue(Object valueAtInvocationTime, Object value, Class<?> type, List<FormattedObject> currentLargeObjects, Map<Object, String> largeObjectNames, Map<Class<?>, Integer> largeObjectNameIndexes, Map<Object, String> fieldValuesAndNames) {
+        String valueName = largeObjectNames.get(valueAtInvocationTime);
+        if (valueName == null) {
+            valueName = largeObjectNames.get(value);
         }
-        if (formattedObject != null) {
-            currentLargeObjects.add(formattedObject);
-            return formattedObject.getName();
+        if (valueName == null) {
+            valueName = fieldValuesAndNames.get(value);
         }
-
         String objectRepresentation = formatObject(valueAtInvocationTime);
-        String valueName = fieldValuesAndNames.get(value);
         if (valueName == null) {
             if (objectRepresentation.length() <= maxInlineParameterLength) {
                 // The object representation is small enough to be shown inline
@@ -167,9 +164,9 @@ public class ObservedInvocationsReport {
             }
             valueName = createLargeValueName(type, largeObjectNameIndexes);
         }
-        formattedObject = new FormattedObject(valueName, objectRepresentation);
-        allLargeObjects.put(valueAtInvocationTime, formattedObject);
-        allLargeObjects.put(value, formattedObject);
+        FormattedObject formattedObject = new FormattedObject(valueName, objectRepresentation);
+        largeObjectNames.put(valueAtInvocationTime, valueName);
+        largeObjectNames.put(value, valueName);
         currentLargeObjects.add(formattedObject);
         return valueName;
     }

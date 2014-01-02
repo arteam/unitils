@@ -15,8 +15,6 @@
  */
 package org.unitils.reflectionassert.hibernate;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
@@ -24,13 +22,10 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.database.annotation.TestDataSource;
 import org.unitils.database.annotation.Transactional;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.difference.Difference;
-
-import javax.sql.DataSource;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertNotNull;
@@ -48,18 +43,11 @@ import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRef
 @ContextConfiguration
 public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
 
-    private static Log logger = LogFactory.getLog(ReflectionComparatorHibernateProxyTest.class);
-
     private ReflectionComparator reflectionComparator;
 
-    /* A test hibernate entity, with a link to a lazily loaded parent class */
-    private Child testChild;
-    @TestDataSource
-    protected DataSource dataSource;
     @Autowired
     protected SessionFactory sessionFactory;
-    /* True if current test is not for the current dialect */
-    private boolean disabled;
+    private Child testChild;
 
 
     @Before
@@ -72,22 +60,14 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
         createTestTables();
     }
 
-
     @After
     public void cleanUp() throws Exception {
-        if (disabled) {
-            return;
-        }
         dropTestTables();
     }
 
 
     @Test
     public void nullWhenEqualsAndRightSideIsHibernateProxy() {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
         Child childWithParentProxy = (Child) sessionFactory.getCurrentSession().get(Child.class, 1L);
         Difference result = reflectionComparator.getDifference(testChild, childWithParentProxy);
         assertNull(result);
@@ -95,10 +75,6 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
 
     @Test
     public void nullWhenEqualsAndLeftSideIsHibernateProxy() {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
         Child childWithParentProxy = (Child) sessionFactory.getCurrentSession().get(Child.class, 1L);
         Difference result = reflectionComparator.getDifference(childWithParentProxy, testChild);
 
@@ -108,10 +84,6 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
 
     @Test
     public void nullWhenBothSidesAreHibernateProxiesAndIdentifiersAreEqual() {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
         // open 2 session two avoid the values being taken from the cache
         Child childWithParentProxy1 = (Child) sessionFactory.openSession().get(Child.class, 1L);
         Child childWithParentProxy2 = (Child) sessionFactory.openSession().get(Child.class, 1L);
@@ -121,10 +93,6 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
 
     @Test
     public void differenceWhenBothSidesAreHibernateProxiesAndDifferentIdentifiers() {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
         // open 2 session two avoid the values being taken from the cache
         Child childWithParentProxy1 = (Child) sessionFactory.openSession().get(Child.class, 1L);
         Child childWithParentProxy2 = (Child) sessionFactory.openSession().get(Child.class, 2L);

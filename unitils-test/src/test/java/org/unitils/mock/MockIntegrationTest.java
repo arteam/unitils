@@ -79,17 +79,34 @@ public class MockIntegrationTest extends UnitilsJUnit4 {
     }
 
     @Test
-    public void testHashcode_equalObjects() {
+    public void hashCode_equalObjects() {
         assertTrue(mockObject.getMock().hashCode() == mockObject.getMock().hashCode());
     }
 
     @Test
-    public void testHashcode_differentObjects() {
+    public void hashCode_differentObjects() {
         assertFalse(mockObject.getMock().hashCode() == equalMockObject.getMock().hashCode());
     }
 
     @Test
-    public void testDeepCloneEqualToOriginal() {
+    public void defaultToStringForProxy() {
+        Mock<TestInterface> mock = createMock(TestInterface.class, this);
+
+        String result = mock.getMock().toString();
+        assertEquals("testInterface", result);
+    }
+
+    @Test
+    public void overridingToStringBevior() {
+        Mock<TestInterface> mock = createMock(TestInterface.class, this);
+        mock.returns("value").toString();
+
+        String result = mock.getMock().toString();
+        assertEquals("value", result);
+    }
+
+    @Test
+    public void deepCloneEqualToOriginal() {
         CloneService cloneService = new CloneService(new ObjectFactory());
 
         assertTrue(mockObject.getMock() instanceof Cloneable);

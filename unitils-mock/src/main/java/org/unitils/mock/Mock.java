@@ -32,11 +32,6 @@ import org.unitils.mock.mockbehavior.MockBehavior;
  */
 public interface Mock<T> {
 
-    // todo add returnsdummy(Class<?>)
-    // todo td onceReturns does not work when chaining calls
-    // todo td assertInvoked + int times
-    // todo td assertNoMoreInvocations
-
     /**
      * Gets the mock proxy instance. This is the instance that can be used to perform the test.
      * You could for example inject it in the tested object. It will then perform the defined behavior and record
@@ -82,6 +77,22 @@ public interface Mock<T> {
      */
     @MatchStatement
     T returnsAll(Object... returnValues);
+
+    /**
+     * Defines behavior for this mock so that it will return a dummy value when the invocation following
+     * this call matches the observed behavior. E.g.
+     * <p/>
+     * mock.returnsDummy().method1();
+     * <p/>
+     * will return a dummy return value when method1 is called.
+     * <p/>
+     * Note that this behavior is executed each time a match is found. So the dummy instance will be returned
+     * each time method1() is called. If you only want to return the value once, use the {@link #onceReturnsDummy} method.
+     *
+     * @return The proxy instance that will record the method call, not null
+     */
+    @MatchStatement
+    T returnsDummy();
 
     /**
      * Defines behavior for this mock so that it raises the given exception when the invocation following
@@ -174,6 +185,23 @@ public interface Mock<T> {
     T onceReturnsAll(Object... returnValues);
 
     /**
+     * Defines behavior for this mock so that it will return a dummy of the return type when the invocation following
+     * this call matches the observed behavior. E.g.
+     * <p/>
+     * mock.onceReturnsDummy().method1();
+     * <p/>
+     * will return a dummy return value when method1 is called.
+     * <p/>
+     * Note that this behavior is executed only once. If method1() is invoked a second time, a different
+     * behavior definition will be used (if defined) or a default value will be returned. If you want this
+     * definition to be able to be matched multiple times, use the method {@link #returnsDummy} instead.
+     *
+     * @return The proxy instance that will record the method call, not null
+     */
+    @MatchStatement
+    T onceReturnsDummy();
+
+    /**
      * Defines behavior for this mock so that it raises an instance of the given exception class when the invocation following
      * this call matches the observed behavior. E.g.
      * <p/>
@@ -237,6 +265,17 @@ public interface Mock<T> {
     T assertInvoked();
 
     /**
+     * Asserts that an invocation that matches the invocation following this call has been observed the given amount of
+     * times on this mock object during this test.
+     * An exception will be raised when times is zero or negative
+     *
+     * @param times The nr of times, should be > 0
+     * @return The proxy instance that will record the method call, not null
+     */
+    @MatchStatement
+    T assertInvoked(int times);
+
+    /**
      * Asserts that an invocation that matches the invocation following this call has been observed
      * on this mock object during this test.
      * <p/>
@@ -256,6 +295,12 @@ public interface Mock<T> {
      */
     @MatchStatement
     T assertNotInvoked();
+
+    /**
+     * Asserts that no more invocations have been observed on this mock object during this test.
+     */
+    @MatchStatement
+    void assertNoMoreInvocations();
 
     /**
      * Removes all behavior defined for this mock.

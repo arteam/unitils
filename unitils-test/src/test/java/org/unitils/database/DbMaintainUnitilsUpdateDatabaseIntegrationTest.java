@@ -46,7 +46,6 @@ public class DbMaintainUnitilsUpdateDatabaseIntegrationTest extends UnitilsJUnit
 
     @Before
     public void initialize() {
-        System.out.println("scriptsDir = " + scriptsDir);
         script1 = new File(scriptsDir, "01_insert.sql");
         script2 = new File(scriptsDir, "02_insert.sql");
         script3 = new File(scriptsDir, "03_insert.sql");

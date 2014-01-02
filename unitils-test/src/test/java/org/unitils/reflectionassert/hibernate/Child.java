@@ -16,10 +16,11 @@
 package org.unitils.reflectionassert.hibernate;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import java.io.Serializable;
+
+import static javax.persistence.FetchType.LAZY;
 
 /**
  * @author Tim Peeters
@@ -29,7 +30,9 @@ import java.io.Serializable;
 @Entity
 public class Child implements Serializable {
 
+    @Id
     private Long id;
+    @ManyToOne(fetch = LAZY, optional = false)
     private Parent parent;
 
 
@@ -43,7 +46,6 @@ public class Child implements Serializable {
     }
 
 
-    @Id
     public Long getId() {
         return id;
     }
@@ -52,7 +54,6 @@ public class Child implements Serializable {
         this.id = id;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     public Parent getParent() {
         return parent;
     }

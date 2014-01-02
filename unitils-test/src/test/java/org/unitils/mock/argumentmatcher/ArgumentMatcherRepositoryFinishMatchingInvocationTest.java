@@ -66,7 +66,7 @@ public class ArgumentMatcherRepositoryFinishMatchingInvocationTest extends Uniti
     @Test
     public void finishMatchingInvocation() {
         ProxyInvocation proxyInvocation = createProxyInvocation(method1, 333, "arg1", "arg2");
-        argumentMatcherPositionFinderMock.returns(asList(0, 1)).getArgumentMatcherIndexes(proxyInvocation, 111, 333, 1);
+        argumentMatcherPositionFinderMock.returnsAll(0, 1).getArgumentMatcherIndexes(proxyInvocation, 111, 333, 1);
 
         argumentMatcherRepository.startMatchingInvocation(111);
         argumentMatcherRepository.registerArgumentMatcher(argumentMatcher1);
@@ -79,7 +79,7 @@ public class ArgumentMatcherRepositoryFinishMatchingInvocationTest extends Uniti
     @Test
     public void argumentsWithoutArgumentMatcherAreWrappedInDefaultArgumentMatcher() {
         ProxyInvocation proxyInvocation = createProxyInvocation(method1, 333, "arg1", "arg2", "arg3");
-        argumentMatcherPositionFinderMock.returns(asList(1)).getArgumentMatcherIndexes(proxyInvocation, 111, 333, 1);
+        argumentMatcherPositionFinderMock.returnsAll(1).getArgumentMatcherIndexes(proxyInvocation, 111, 333, 1);
 
         argumentMatcherRepository.startMatchingInvocation(111);
         argumentMatcherRepository.registerArgumentMatcher(argumentMatcher1);

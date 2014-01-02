@@ -15,19 +15,19 @@
  */
 package org.unitils.mock.core;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.mock.CreateMockListener;
 import org.unitils.mock.Mock;
 import org.unitils.mock.PartialMock;
 import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
 import org.unitils.mock.core.matching.MatchingInvocationHandlerFactory;
 import org.unitils.mock.core.proxy.ProxyService;
-import org.unitils.mock.core.proxy.impl.DummyProxyInvocationHandler;
 import org.unitils.mock.core.proxy.impl.MatchingProxyInvocationHandler;
 import org.unitils.mock.core.proxy.impl.MockProxyInvocationHandler;
 import org.unitils.mock.core.proxy.impl.PartialMockProxyInvocationHandler;
 import org.unitils.mock.core.util.CloneService;
 import org.unitils.mock.core.util.StackTraceService;
-import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.MockBehaviorFactory;
 import org.unitils.mock.report.ScenarioReport;
 
@@ -46,6 +46,9 @@ import static org.unitils.util.ReflectionUtils.copyFields;
  */
 public class MockFactory {
 
+    /* The logger instance for this class */
+    protected static Log logger = LogFactory.getLog(MockFactory.class);
+
     protected Scenario scenario;
     protected ArgumentMatcherRepository argumentMatcherRepository;
     protected ProxyService proxyService;
@@ -53,12 +56,14 @@ public class MockFactory {
     protected CloneService cloneService;
     protected MockBehaviorFactory mockBehaviorFactory;
     protected ScenarioReport scenarioReport;
+    protected MockService mockService;
+    protected DummyFactory dummyFactory;
 
     /* Created chained mocks per proxy and per method */
     protected Map<Object, Map<Method, Mock<?>>> chainedMocks = new IdentityHashMap<Object, Map<Method, Mock<?>>>();
 
 
-    public MockFactory(Scenario scenario, ArgumentMatcherRepository argumentMatcherRepository, MockBehaviorFactory mockBehaviorFactory, ProxyService proxyService, StackTraceService stackTraceService, CloneService cloneService, ScenarioReport scenarioReport) {
+    public MockFactory(Scenario scenario, ArgumentMatcherRepository argumentMatcherRepository, MockBehaviorFactory mockBehaviorFactory, ProxyService proxyService, StackTraceService stackTraceService, CloneService cloneService, ScenarioReport scenarioReport, MockService mockService, DummyFactory dummyFactory) {
         this.scenario = scenario;
         this.argumentMatcherRepository = argumentMatcherRepository;
         this.proxyService = proxyService;
@@ -66,6 +71,8 @@ public class MockFactory {
         this.cloneService = cloneService;
         this.mockBehaviorFactory = mockBehaviorFactory;
         this.scenarioReport = scenarioReport;
+        this.mockService = mockService;
+        this.dummyFactory = dummyFactory;
     }
 
 
@@ -141,34 +148,27 @@ public class MockFactory {
         if (chainedMock != null) {
             return chainedMock;
         }
+        String name = matchingInvocation.getInnerMockName();
         Class<?> mockedType = matchingInvocation.getReturnType();
-        if (Void.class.equals(mockedType) || mockedType.isPrimitive() || mockedType.isArray() || Modifier.isFinal(mockedType.getModifiers())) {
+        if (Void.class.equals(mockedType)) {
+            return null;
+        }
+        if (mockedType.isPrimitive() || mockedType.isArray() || Modifier.isFinal(mockedType.getModifiers())) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Unable to create chained mock " + name + " for return type +" + mockedType + ". Chaining not supported for primitive, arrays or final types, returning null.");
+            }
             return null;
         }
         try {
-            String name = matchingInvocation.getInnerMockName();
             chainedMock = createMockObject(name, mockedType, true);
         } catch (Exception e) {
-            // chaining not supported, return type cannot be mocked
+            if (logger.isDebugEnabled()) {
+                logger.debug("Unable to create chained mock " + name + " for return type +" + mockedType + ". Chaining not supported, returning null.");
+            }
             return null;
         }
         chainedMocksForProxy.put(method, chainedMock);
         return chainedMock;
-    }
-
-    /**
-     * Creates a dummy of the given type. A dummy object is a proxy that will return default values for every method. This can be
-     * used to quickly create test objects without having to worry about correctly filling in every field.
-     *
-     * @param name      The name for the dummy, use null for the default typeDummy name
-     * @param dummyType The type for the proxy, not null
-     * @return The proxy, not null
-     */
-    public <T> T createDummy(String name, Class<T> dummyType) {
-        String dummyName = getName(name, dummyType);
-        MockBehavior mockBehaviour = mockBehaviorFactory.createDummyValueReturningMockBehavior(this);
-        DummyProxyInvocationHandler dummyProxyInvocationHandler = createDummyProxyInvocationHandler(mockBehaviour);
-        return proxyService.createProxy(dummyName, false, dummyProxyInvocationHandler, dummyType);
     }
 
 
@@ -179,7 +179,7 @@ public class MockFactory {
         T proxy = proxyService.createProxy(name, false, mockProxyInvocationHandler, mockedType);
         T matchingProxy = proxyService.createProxy(name, false, matchingProxyInvocationHandler, mockedType);
         MatchingInvocationHandlerFactory matchingInvocationHandlerFactory = createMatchingInvocationHandlerFactory();
-        return new MockObject<T>(name, mockedType, proxy, matchingProxy, chained, behaviorDefiningInvocations, matchingProxyInvocationHandler, mockBehaviorFactory, matchingInvocationHandlerFactory);
+        return new MockObject<T>(name, mockedType, proxy, matchingProxy, chained, behaviorDefiningInvocations, matchingProxyInvocationHandler, mockBehaviorFactory, matchingInvocationHandlerFactory, mockService, dummyFactory);
     }
 
     protected <T> PartialMockObject<T> createPartialMockObject(String name, Class<T> mockedType, boolean chained) {
@@ -189,7 +189,7 @@ public class MockFactory {
         T proxy = proxyService.createProxy(name, true, mockProxyInvocationHandler, mockedType);
         T matchingProxy = proxyService.createProxy(name, false, matchingProxyInvocationHandler, mockedType);
         MatchingInvocationHandlerFactory matchingInvocationHandlerFactory = createMatchingInvocationHandlerFactory();
-        return new PartialMockObject<T>(name, mockedType, proxy, matchingProxy, chained, behaviorDefiningInvocations, matchingProxyInvocationHandler, mockBehaviorFactory, matchingInvocationHandlerFactory);
+        return new PartialMockObject<T>(name, mockedType, proxy, matchingProxy, chained, behaviorDefiningInvocations, matchingProxyInvocationHandler, mockBehaviorFactory, matchingInvocationHandlerFactory, mockService, dummyFactory);
     }
 
     protected void resetIfNewTestObject(Object testObject) {
@@ -220,10 +220,6 @@ public class MockFactory {
 
     protected <T> PartialMockProxyInvocationHandler<T> createPartialMockProxyInvocationHandler(BehaviorDefiningInvocations behaviorDefiningInvocations, MatchingProxyInvocationHandler matchingProxyInvocationHandler) {
         return new PartialMockProxyInvocationHandler<T>(behaviorDefiningInvocations, scenario, cloneService, matchingProxyInvocationHandler);
-    }
-
-    protected <T> DummyProxyInvocationHandler createDummyProxyInvocationHandler(MockBehavior mockBehaviour) {
-        return new DummyProxyInvocationHandler(mockBehaviour);
     }
 
     protected <T> MatchingProxyInvocationHandler createMatchingProxyInvocationHandler() {

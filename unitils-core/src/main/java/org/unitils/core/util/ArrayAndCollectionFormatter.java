@@ -125,7 +125,7 @@ public class ArrayAndCollectionFormatter {
             if (count++ > 0) {
                 result.append(", ");
             }
-            objectFormatter.formatImpl(element.getKey(), currentDepth, result);
+            objectFormatter.formatImpl(element.getKey(), currentDepth + 1, result);
             result.append("=");
             objectFormatter.formatImpl(element.getValue(), currentDepth + 1, result);
 

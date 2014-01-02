@@ -151,7 +151,7 @@ public class DetailedObservedInvocationsReportCreateReportTest extends UnitilsJU
 
     @Test
     public void largeValuesAreReplacedByNames() {
-        observedInvocationMock1.returns(asList("a", "b", new Properties())).getArguments();
+        observedInvocationMock1.returnsAll("a", "b", new Properties()).getArguments();
         Properties largeProperties = new Properties();
         largeProperties.put("value", "large property");
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
@@ -176,7 +176,7 @@ public class DetailedObservedInvocationsReportCreateReportTest extends UnitilsJU
 
     @Test
     public void sameNameUsedForEqualLargeValue() {
-        observedInvocationMock1.returns(asList("a", "b", new Properties())).getArguments();
+        observedInvocationMock1.returnsAll("a", "b", new Properties()).getArguments();
         String largeValue = "1234567890x";
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
         arguments.add(new Argument<String>(largeValue, largeValue, String.class));
@@ -198,7 +198,7 @@ public class DetailedObservedInvocationsReportCreateReportTest extends UnitilsJU
 
     @Test
     public void useFieldNamesWhenIdenticalValueIsFoundInTestObjectField() {
-        testObject.field1 = "aaa";
+        testObject.field1 = "zzz";
         testObject.field2 = new Properties();
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
         arguments.add(new Argument<String>(testObject.field1, "xxx", String.class));
@@ -214,7 +214,7 @@ public class DetailedObservedInvocationsReportCreateReportTest extends UnitilsJU
                 "- Observed at class1.method1(file1:111)\n" +
                 "\n" +
                 "2. proxy2.testMethod2() -> field1\n" +
-                "- field1 -> \"xxx\"\n" +
+                "- field1 -> \"zzz\"\n" +
                 "- Observed at class2.method2(file2:222)\n" +
                 "\n", result);
     }

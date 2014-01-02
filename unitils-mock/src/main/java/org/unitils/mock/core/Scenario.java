@@ -74,6 +74,17 @@ public class Scenario {
         return unverifiedInvocations;
     }
 
+    public List<ObservedInvocation> getUnverifiedProxyInvocations(Object proxy) {
+        List<ObservedInvocation> unverifiedInvocations = getUnverifiedInvocations();
+        List<ObservedInvocation> unverifiedProxyInvocations = new ArrayList<ObservedInvocation>(unverifiedInvocations.size());
+        for (ObservedInvocation unverifiedInvocation : unverifiedInvocations) {
+            if (proxy == unverifiedInvocation.getProxy()) {
+                unverifiedProxyInvocations.add(unverifiedInvocation);
+            }
+        }
+        return unverifiedProxyInvocations;
+    }
+
     public ObservedInvocation verifyInvocation(MatchingInvocation matchingInvocation) {
         for (int i = 0; i < observedInvocations.size(); i++) {
             ObservedInvocation observedInvocation = observedInvocations.get(i);

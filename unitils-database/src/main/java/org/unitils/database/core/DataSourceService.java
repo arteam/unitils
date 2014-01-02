@@ -32,13 +32,11 @@ public class DataSourceService {
 
     protected DataSourceProviderManager dataSourceProviderManager;
     protected DbMaintainWrapper dbMaintainWrapper;
-    protected TransactionManager transactionManager;
 
 
-    public DataSourceService(DataSourceProviderManager dataSourceProviderManager, DbMaintainWrapper dbMaintainWrapper, TransactionManager transactionManager) {
+    public DataSourceService(DataSourceProviderManager dataSourceProviderManager, DbMaintainWrapper dbMaintainWrapper) {
         this.dataSourceProviderManager = dataSourceProviderManager;
         this.dbMaintainWrapper = dbMaintainWrapper;
-        this.transactionManager = transactionManager;
     }
 
 
@@ -63,7 +61,6 @@ public class DataSourceService {
         DataSourceWrapper dataSourceWrapper = dataSourceProvider.getDataSourceWrapper(databaseName);
 
         DataSource dataSource = dataSourceWrapper.getWrappedDataSource();
-        transactionManager.registerDataSource(dataSource);
         dbMaintainWrapper.updateDatabaseIfNeeded();
         return dataSourceWrapper;
     }

@@ -102,6 +102,14 @@ public class CloneService {
                 return clone;
             }
         }
+        // check for string builders
+        if (instanceToClone instanceof StringBuilder) {
+            return new StringBuilder(instanceToClone.toString());
+        }
+        // check for string buffers
+        if (instanceToClone instanceof StringBuffer) {
+            return new StringBuffer(instanceToClone.toString());
+        }
         // don't clone java classes (unless they are cloneable)
         if (isJdkClass(instanceToClone)) {
             return instanceToClone;

@@ -84,8 +84,6 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
             return super.hashCode();
         } else if (isCloneMethod(method)) {
             return proxy;
-        } else if (isToStringMethod(method)) {
-            return getProxiedType().getName() + "@" + Integer.toHexString(super.hashCode());
         } else if (isFormatObjectMethod(method)) {
             return "Proxy<" + proxyName + ">";
         }
@@ -96,7 +94,11 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
         List<Argument<?>> argumentsList = getArguments(arguments, argumentTypes);
 
         ProxyInvocation invocation = new CglibProxyInvocation(proxyName, method, argumentsList, proxiedMethodStackTrace, proxy, methodProxy);
-        return proxyInvocationHandler.handleInvocation(invocation);
+        Object result = proxyInvocationHandler.handleInvocation(invocation);
+        if (result == null && isToStringMethod(method)) {
+            return getProxiedType().getName() + "@" + Integer.toHexString(super.hashCode());
+        }
+        return result;
     }
 
 

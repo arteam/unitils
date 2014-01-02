@@ -28,10 +28,7 @@ import org.unitils.util.ReflectionUtils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Tim Ducheyne
@@ -42,7 +39,7 @@ public class Context {
     protected static Log logger = LogFactory.getLog(Context.class);
 
     protected Configuration configuration;
-    protected Map<Key, Object> instances = new HashMap<Key, Object>();
+    protected Map<Key, Object> instances = new LinkedHashMap<Key, Object>();
     protected Map<Key, Class<?>> defaultImplementationTypes = new HashMap<Key, Class<?>>();
 
 
