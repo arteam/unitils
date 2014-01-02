@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.util;
+package org.unitils.core.util;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,10 +23,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import static org.junit.Assert.*;
-import static org.unitils.util.ReflectionUtils.*;
+import static org.unitils.core.util.ReflectionUtils.*;
 
 /**
- * Test for {@link ReflectionUtils}.
+ * Test for {@link org.unitils.core.util.ReflectionUtils}.
  *
  * @author Filip Neven
  * @author Tim Ducheyne

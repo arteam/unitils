@@ -39,7 +39,7 @@ import java.util.Collections;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.unitils.util.CollectionUtils.asSet;
+import static org.unitils.core.util.CollectionUtils.asSet;
 
 /**
  * @author Tim Ducheyne

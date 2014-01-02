@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.util;
+package org.unitils.core.util;
 
 import java.io.File;
 import java.io.FileOutputStream;

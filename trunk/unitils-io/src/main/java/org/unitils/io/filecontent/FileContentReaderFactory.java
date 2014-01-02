@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+import static org.unitils.core.util.ReflectionUtils.createInstanceOfType;
 
 /**
  * @author Tim Ducheyne

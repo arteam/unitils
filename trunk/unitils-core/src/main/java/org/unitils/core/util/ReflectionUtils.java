@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.util;
+package org.unitils.core.util;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.core.util.TypeUtils;
 
 import java.lang.reflect.*;
 import java.util.HashSet;

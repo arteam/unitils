@@ -25,10 +25,10 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
+import static org.unitils.core.util.ReflectionUtils.getMethod;
 import static org.unitils.mock.ArgumentMatchers.anyInt;
 import static org.unitils.mock.ArgumentMatchers.notNull;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
-import static org.unitils.util.ReflectionUtils.getMethod;
 
 /**
  * Tests the finding of the argument matchers in a proxy method invocation.

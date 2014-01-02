@@ -21,11 +21,11 @@ import org.unitils.UnitilsJUnit4;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertTrue;
+import static org.unitils.core.util.CollectionUtils.asSet;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
-import static org.unitils.util.CollectionUtils.asSet;
 
 
 /**

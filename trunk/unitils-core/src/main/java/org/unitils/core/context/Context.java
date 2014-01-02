@@ -23,7 +23,7 @@ import org.unitils.core.UnitilsException;
 import org.unitils.core.annotation.Classifier;
 import org.unitils.core.annotation.Property;
 import org.unitils.core.config.Configuration;
-import org.unitils.util.ReflectionUtils;
+import org.unitils.core.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;

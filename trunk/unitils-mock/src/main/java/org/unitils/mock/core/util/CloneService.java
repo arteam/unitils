@@ -25,7 +25,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 import static java.lang.reflect.Modifier.isStatic;
-import static org.unitils.util.ReflectionUtils.isProxy;
+import static org.unitils.core.util.ReflectionUtils.isProxy;
 
 /**
  * Utility class for deep cloning objects.

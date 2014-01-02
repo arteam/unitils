@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-import static org.unitils.util.CollectionUtils.convertToCollection;
+import static org.unitils.core.util.CollectionUtils.convertToCollection;
 
 
 /**

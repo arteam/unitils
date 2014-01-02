@@ -25,7 +25,7 @@ import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.unitils.util.CollectionUtils.asSet;
+import static org.unitils.core.util.CollectionUtils.asSet;
 
 /**
  * @author Tim Ducheyne

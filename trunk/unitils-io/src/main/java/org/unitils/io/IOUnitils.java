@@ -22,7 +22,7 @@ import org.unitils.io.temp.TempService;
 import java.io.File;
 
 import static org.unitils.core.Unitils.getInstanceOfType;
-import static org.unitils.util.ReflectionUtils.getTestClass;
+import static org.unitils.core.util.ReflectionUtils.getTestClass;
 
 /**
  * @author Jeroen Horemans

@@ -32,7 +32,7 @@ import java.util.*;
 import static java.lang.reflect.Modifier.isAbstract;
 import static java.util.Arrays.asList;
 import static org.springframework.util.ClassUtils.isCglibProxyClassName;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+import static org.unitils.core.util.ReflectionUtils.createInstanceOfType;
 
 /**
  * Utility class to create and work with proxy objects.

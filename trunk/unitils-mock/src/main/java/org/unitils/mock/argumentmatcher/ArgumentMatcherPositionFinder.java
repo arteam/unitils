@@ -32,8 +32,8 @@ import java.util.List;
 import java.util.Set;
 
 import static org.objectweb.asm.Type.getMethodDescriptor;
+import static org.unitils.core.util.ReflectionUtils.getClassWithName;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-import static org.unitils.util.ReflectionUtils.getClassWithName;
 
 
 /**
