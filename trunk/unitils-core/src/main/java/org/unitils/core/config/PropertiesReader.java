@@ -29,7 +29,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import static org.unitils.core.util.IOUtils.closeQuietly;
 
 /**
  * @author Tim Ducheyne

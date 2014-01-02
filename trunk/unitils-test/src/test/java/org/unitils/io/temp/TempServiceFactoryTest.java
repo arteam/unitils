@@ -19,13 +19,13 @@ package org.unitils.io.temp;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
-import org.unitils.core.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
+import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.writeStringToFile;
 
 /**
  * @author Jeroen Horemans
@@ -90,7 +90,7 @@ public class TempServiceFactoryTest {
     @Test(expected = UnitilsException.class)
     public void createWithFileAsRootDir() throws IOException {
 
-        FileUtils.writeStringToFile(new File(DIR_TWO), "empty");
+        writeStringToFile(new File(DIR_TWO), "empty", "UTF-8");
         TempServiceFactory factory = new TempServiceFactory(DIR_TWO, DIR_ONE);
         TempService result = factory.create();
 
