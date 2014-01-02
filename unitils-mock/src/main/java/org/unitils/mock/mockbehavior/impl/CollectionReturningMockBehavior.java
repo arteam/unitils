@@ -28,8 +28,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.unitils.util.ReflectionUtils.getGenericParameterType;
-import static org.unitils.util.ReflectionUtils.isAssignable;
+import static org.unitils.core.util.ReflectionUtils.getGenericParameterType;
+import static org.unitils.core.util.ReflectionUtils.isAssignable;
 
 /**
  * @author Tim Ducheyne

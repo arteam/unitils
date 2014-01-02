@@ -20,7 +20,7 @@ import org.unitils.core.util.ObjectToInjectHolder;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
 
-import static org.unitils.util.ReflectionUtils.isAssignable;
+import static org.unitils.core.util.ReflectionUtils.isAssignable;
 
 /**
  * Mock behavior that returns a given value.

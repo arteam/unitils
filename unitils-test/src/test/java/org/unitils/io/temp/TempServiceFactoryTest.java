@@ -19,7 +19,7 @@ package org.unitils.io.temp;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
-import org.unitils.util.FileUtils;
+import org.unitils.core.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;

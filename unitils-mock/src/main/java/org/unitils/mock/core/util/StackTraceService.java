@@ -19,7 +19,7 @@ import org.unitils.core.UnitilsException;
 
 import static java.lang.System.arraycopy;
 import static org.springframework.util.ClassUtils.isCglibProxyClassName;
-import static org.unitils.util.ReflectionUtils.getClassWithName;
+import static org.unitils.core.util.ReflectionUtils.getClassWithName;
 
 /**
  * Class offering utilities involving the call stack

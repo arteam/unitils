@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ReflectionUtils.invokeMethod;
+import static org.unitils.core.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.core.util.ReflectionUtils.invokeMethod;
 
 /**
  * @author Tim Ducheyne

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.util;
+package org.unitils.core.util;
 
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
@@ -22,7 +22,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
 /**
- * Test for {@link ReflectionUtils} that use enumeration values.
+ * Test for {@link org.unitils.core.util.ReflectionUtils} that use enumeration values.
  *
  * @author Tim Ducheyne
  * @author Filip Neven

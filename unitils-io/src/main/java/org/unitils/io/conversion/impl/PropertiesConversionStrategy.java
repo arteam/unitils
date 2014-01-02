@@ -15,8 +15,8 @@
  */
 package org.unitils.io.conversion.impl;
 
+import org.unitils.core.util.ReaderInputStream;
 import org.unitils.io.conversion.ConversionStrategy;
-import org.unitils.util.ReaderInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;

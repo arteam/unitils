@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.util;
+package org.unitils.core.util;
 
 import org.junit.Test;
 
@@ -29,7 +29,7 @@ import static org.junit.Assert.assertTrue;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenientEquals;
 
 /**
- * Test for {@link AnnotationUtils}.
+ * Test for {@link org.unitils.core.util.AnnotationUtils}.
  *
  * @author Filip Neven
  * @author Tim Ducheyne

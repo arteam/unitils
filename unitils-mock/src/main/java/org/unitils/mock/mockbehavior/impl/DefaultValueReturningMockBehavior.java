@@ -27,7 +27,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.unitils.util.MethodUtils.isToStringMethod;
+import static org.unitils.core.util.MethodUtils.isToStringMethod;
 
 /**
  * Mock behavior that returns a default value.

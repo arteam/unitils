@@ -22,7 +22,7 @@ import org.unitils.mock.core.ObservedInvocation;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.report.ScenarioReport;
 
-import static org.unitils.util.ReflectionUtils.getSimpleMethodName;
+import static org.unitils.core.util.ReflectionUtils.getSimpleMethodName;
 
 
 /**

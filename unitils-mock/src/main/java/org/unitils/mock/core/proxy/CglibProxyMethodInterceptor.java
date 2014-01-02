@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.reflect.Modifier.isAbstract;
-import static org.unitils.util.MethodUtils.*;
+import static org.unitils.core.util.MethodUtils.*;
 
 /**
  * A cglib method interceptor that will delegate the invocations to the given invocation handler.

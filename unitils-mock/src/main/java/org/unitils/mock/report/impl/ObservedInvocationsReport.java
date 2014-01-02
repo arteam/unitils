@@ -26,8 +26,8 @@ import java.util.*;
 
 import static org.apache.commons.lang.StringUtils.rightPad;
 import static org.apache.commons.lang.StringUtils.uncapitalize;
-import static org.unitils.util.ReflectionUtils.getAllFields;
-import static org.unitils.util.ReflectionUtils.getFieldValue;
+import static org.unitils.core.util.ReflectionUtils.getAllFields;
+import static org.unitils.core.util.ReflectionUtils.getFieldValue;
 
 /**
  * A view that displays the observed invocations and the location where they were invoked.

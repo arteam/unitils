@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static org.unitils.core.util.CollectionUtils.asSet;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.*;
-import static org.unitils.util.CollectionUtils.asSet;
 
 /**
  * A factory for creating a reflection comparator.

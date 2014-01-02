@@ -33,7 +33,7 @@ import java.io.File;
 import java.util.Collections;
 
 import static java.util.Arrays.asList;
-import static org.unitils.util.CollectionUtils.asSet;
+import static org.unitils.core.util.CollectionUtils.asSet;
 
 /**
  * @author Tim Ducheyne

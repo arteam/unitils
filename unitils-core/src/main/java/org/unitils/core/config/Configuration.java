@@ -26,7 +26,7 @@ import java.util.Properties;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+import static org.unitils.core.util.ReflectionUtils.createInstanceOfType;
 
 /**
  * Helper class for dealing with configuration properties.

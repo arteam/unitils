@@ -39,7 +39,7 @@ import java.util.Map;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.uncapitalize;
-import static org.unitils.util.ReflectionUtils.copyFields;
+import static org.unitils.core.util.ReflectionUtils.copyFields;
 
 /**
  * @author Tim Ducheyne
