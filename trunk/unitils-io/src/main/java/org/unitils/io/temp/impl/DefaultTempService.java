@@ -21,7 +21,7 @@ import org.unitils.io.temp.TempService;
 import java.io.File;
 import java.io.IOException;
 
-import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.forceDelete;
+import static org.unitils.core.util.FileUtils.forceDelete;
 
 /**
  * @author Jeroen Horemans

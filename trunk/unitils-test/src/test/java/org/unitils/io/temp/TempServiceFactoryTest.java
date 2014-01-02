@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
-import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.writeStringToFile;
+import static org.unitils.core.util.FileUtils.writeStringToFile;
 
 /**
  * @author Jeroen Horemans
