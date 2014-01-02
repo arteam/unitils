@@ -22,8 +22,8 @@ import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.core.util.FileUtils.writeStringToFile;
 import static org.unitils.io.IOUnitils.createTempFile;
+import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.writeStringToFile;
 
 /**
  * @author Tim Ducheyne
@@ -52,7 +52,7 @@ public class IOUnitilsCreateTempFileTest {
     @Test
     public void fileAlreadyExists() throws Exception {
         File file = createTempFile(fileName);
-        writeStringToFile(file, "test");
+        writeStringToFile(file, "test", "UTF-8");
 
         File result = createTempFile(fileName);
 

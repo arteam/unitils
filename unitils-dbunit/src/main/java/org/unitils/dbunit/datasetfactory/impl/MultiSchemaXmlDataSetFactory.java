@@ -35,7 +35,7 @@ import java.util.Map;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.dbunit.dataset.ITable.NO_VALUE;
 import static org.dbunit.dataset.datatype.DataType.UNKNOWN;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import static org.unitils.core.util.IOUtils.closeQuietly;
 
 /**
  * A factory for DbUnit xml data sets.

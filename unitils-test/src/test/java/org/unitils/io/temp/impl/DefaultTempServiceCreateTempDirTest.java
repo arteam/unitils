@@ -26,7 +26,7 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.core.util.FileUtils.writeStringToFile;
+import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.writeStringToFile;
 
 /**
  * @author Jeroen Horemans
@@ -74,7 +74,7 @@ public class DefaultTempServiceCreateTempDirTest {
     public void directoryIsDeletedIfItAlreadyExists() throws Exception {
         File existingDir = defaultTempService.createTempDir("tempDir");
         File existingFile = new File(existingDir, "file.tmp");
-        writeStringToFile(existingFile, "test");
+        writeStringToFile(existingFile, "test", "UTF-8");
 
         File result = defaultTempService.createTempDir("tempDir");
         assertTrue(result.exists());

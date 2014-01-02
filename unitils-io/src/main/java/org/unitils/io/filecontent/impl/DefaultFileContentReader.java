@@ -24,7 +24,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import static org.unitils.core.util.IOUtils.closeQuietly;
 
 /**
  * @author Jeroen Horemans

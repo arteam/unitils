@@ -15,8 +15,8 @@
  */
 package org.unitils.io.conversion.impl;
 
+import org.unitils.core.util.IOUtils;
 import org.unitils.io.conversion.ConversionStrategy;
-import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
