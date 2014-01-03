@@ -25,7 +25,6 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.unitils.core.util.ReflectionUtils.getMethod;
 import static org.unitils.mock.ArgumentMatchers.anyInt;
 import static org.unitils.mock.ArgumentMatchers.notNull;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
@@ -42,7 +41,7 @@ public class ArgumentMatcherPositionFinderTest {
     private ArgumentMatcherPositionFinder argumentMatcherPositionFinder = new ArgumentMatcherPositionFinder();
 
     /* The line nrs of the proxy method invocations in the TestClass.test method */
-    private static final int LINE_NR = 62;
+    private static final int LINE_NR = 61;
     private static final int NO_MATCHER_LINE_NR = LINE_NR + 2;
     private static final int TWO_SAME_ON_SAME_LINE_LINE_NR = LINE_NR + 4;
     private static final int TWO_DIFFERENT_ON_SAME_LINE_LINE_NR = LINE_NR + 6;
@@ -89,12 +88,12 @@ public class ArgumentMatcherPositionFinderTest {
 
 
     @Before
-    public void initialize() {
-        method = getMethod(MockedClass.class, "someMethod", false, String.class, String.class, String.class);
-        staticMethod = getMethod(MockedClass.class, "someStaticMethod", true, Integer.TYPE, Integer.TYPE);
-        noArgumentsMethod = getMethod(MockedClass.class, "someMethod", false);
-        valueReturningMethod = getMethod(MockedClass.class, "valueReturningMethod", false, String.class, String.class, String.class);
-        intMethod = getMethod(MockedClass.class, "intMethod", false, Integer.TYPE);
+    public void initialize() throws Exception {
+        method = MockedClass.class.getDeclaredMethod("someMethod", String.class, String.class, String.class);
+        staticMethod = MockedClass.class.getDeclaredMethod("someStaticMethod", Integer.TYPE, Integer.TYPE);
+        noArgumentsMethod = MockedClass.class.getDeclaredMethod("someMethod");
+        valueReturningMethod = MockedClass.class.getDeclaredMethod("valueReturningMethod", String.class, String.class, String.class);
+        intMethod = MockedClass.class.getDeclaredMethod("intMethod", Integer.TYPE);
     }
 
 
