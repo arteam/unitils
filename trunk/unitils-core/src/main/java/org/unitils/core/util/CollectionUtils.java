@@ -31,7 +31,6 @@ import static java.util.Arrays.asList;
  */
 public class CollectionUtils {
 
-
     /**
      * Converts the given array of elements to a set.
      *
@@ -54,13 +53,14 @@ public class CollectionUtils {
      * @return The object collection
      */
     public static Collection<?> convertToCollection(Object object) {
+        if (object == null) {
+            return null;
+        }
         if (object instanceof Collection<?>) {
             return (Collection<?>) object;
         }
-
         // If needed convert primitive array to object array
         Object[] objectArray = convertToObjectArray(object);
-
         // Convert array to collection
         return asList(objectArray);
     }
@@ -72,32 +72,34 @@ public class CollectionUtils {
      * @return The object array
      */
     public static Object[] convertToObjectArray(Object object) {
+        if (object == null) {
+            return null;
+        }
         if (object instanceof byte[]) {
             return ArrayUtils.toObject((byte[]) object);
-
-        } else if (object instanceof short[]) {
-            return ArrayUtils.toObject((short[]) object);
-
-        } else if (object instanceof int[]) {
-            return ArrayUtils.toObject((int[]) object);
-
-        } else if (object instanceof long[]) {
-            return ArrayUtils.toObject((long[]) object);
-
-        } else if (object instanceof char[]) {
-            return ArrayUtils.toObject((char[]) object);
-
-        } else if (object instanceof float[]) {
-            return ArrayUtils.toObject((float[]) object);
-
-        } else if (object instanceof double[]) {
-            return ArrayUtils.toObject((double[]) object);
-
-        } else if (object instanceof boolean[]) {
-            return ArrayUtils.toObject((boolean[]) object);
-
-        } else {
-            return (Object[]) object;
         }
+        if (object instanceof short[]) {
+            return ArrayUtils.toObject((short[]) object);
+        }
+        if (object instanceof int[]) {
+            return ArrayUtils.toObject((int[]) object);
+        }
+        if (object instanceof long[]) {
+            return ArrayUtils.toObject((long[]) object);
+        }
+        if (object instanceof char[]) {
+            return ArrayUtils.toObject((char[]) object);
+        }
+        if (object instanceof float[]) {
+            return ArrayUtils.toObject((float[]) object);
+        }
+        if (object instanceof double[]) {
+            return ArrayUtils.toObject((double[]) object);
+        }
+        if (object instanceof boolean[]) {
+            return ArrayUtils.toObject((boolean[]) object);
+        }
+        return (Object[]) object;
+
     }
 }

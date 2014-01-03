@@ -19,12 +19,10 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.unitils.core.util.ReflectionUtils.createInstanceOfType;
 
 /**
- * Test for creating instances using reflectation.
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
@@ -43,9 +41,15 @@ public class ReflectionUtilsCreateInstanceOfTypeTest extends UnitilsJUnit4 {
         assertNotNull(result);
     }
 
-    @Test(expected = UnitilsException.class)
+    @Test
     public void privateConstructor_noByPassed() {
-        createInstanceOfType(TestPrivateConstructor.class.getName(), false);
+        try {
+            createInstanceOfType(TestPrivateConstructor.class.getName(), false);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Error while trying to create object of class org.unitils.core.util.ReflectionUtilsCreateInstanceOfTypeTest$TestPrivateConstructor\n" +
+                    "Reason: IllegalAccessException: Class org.unitils.core.util.ReflectionUtils can not access a member of class org.unitils.core.util.ReflectionUtilsCreateInstanceOfTypeTest$TestPrivateConstructor with modifiers \"private\"", e.getMessage());
+        }
     }
 
     @Test
@@ -54,26 +58,62 @@ public class ReflectionUtilsCreateInstanceOfTypeTest extends UnitilsJUnit4 {
         assertNotNull(result);
     }
 
-    @Test(expected = UnitilsException.class)
-    public void noConstructorNonStaticInnerClass() {
-        createInstanceOfType(TestNoConstructorInnerClass.class.getName(), false);
+    @Test
+    public void argumentConstructor() {
+        TestConstructor result = createInstanceOfType(TestConstructor.class, false, new Class[]{String.class}, new Object[]{"value"});
+        assertEquals("value", result.value);
     }
 
-    @Test(expected = UnitilsException.class)
+    @Test
+    public void noConstructorNonStaticInnerClass() {
+        try {
+            createInstanceOfType(TestNoConstructorInnerClass.class.getName(), false);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Creation of an instance of a non-static innerclass is not possible using reflection. The type TestNoConstructorInnerClass is only known in the context of an instance of the enclosing class ReflectionUtilsCreateInstanceOfTypeTest. Declare the innerclass as static to make construction possible.", e.getMessage());
+        }
+    }
+
+    @Test
     public void classNotFound() {
-        createInstanceOfType("xxx", false);
+        try {
+            createInstanceOfType("xxx", false);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to create instance of type xxx\n" +
+                    "Reason: ClassNotFoundException: xxx", e.getMessage());
+        }
+    }
+
+    @Test
+    public void exceptionInConstructor() {
+        try {
+            createInstanceOfType(ExceptionConstructor.class, false);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Error while trying to create object of class org.unitils.core.util.ReflectionUtilsCreateInstanceOfTypeTest$ExceptionConstructor\n" +
+                    "Reason: NullPointerException: expected", e.getMessage());
+        }
+    }
+
+    @Test
+    public void constructionForCoverage() {
+        new ReflectionUtils();
     }
 
 
     public static class TestConstructor {
 
+        public String value;
+
         public TestConstructor() {
         }
 
-        public TestConstructor(String test) {
+        public TestConstructor(String value) {
+            this.value = value;
         }
 
-        private TestConstructor(int test) {
+        private TestConstructor(int intValue) {
         }
     }
 
@@ -87,5 +127,12 @@ public class ReflectionUtilsCreateInstanceOfTypeTest extends UnitilsJUnit4 {
     }
 
     public class TestNoConstructorInnerClass {
+    }
+
+    public static class ExceptionConstructor {
+
+        public ExceptionConstructor() {
+            throw new NullPointerException("expected");
+        }
     }
 }

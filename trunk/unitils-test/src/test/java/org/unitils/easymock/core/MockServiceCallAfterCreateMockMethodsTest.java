@@ -82,6 +82,8 @@ public class MockServiceCallAfterCreateMockMethodsTest extends UnitilsJUnit4 {
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Unable to invoke after create mock method: public void org.unitils.easymock.core.MockServiceCallAfterCreateMockMethodsTest$ExceptionDuringCallTestClass.method(java.lang.Object,java.lang.String,java.lang.Class)\n" +
+                    "Ensure that this method has following signature: void myMethod(Object mock, String name, Class type)\n" +
+                    "Reason: Error while invoking method public void org.unitils.easymock.core.MockServiceCallAfterCreateMockMethodsTest$ExceptionDuringCallTestClass.method(java.lang.Object,java.lang.String,java.lang.Class)\n" +
                     "Reason: NullPointerException: expected", e.getMessage());
         }
     }
