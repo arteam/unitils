@@ -17,7 +17,6 @@ package org.unitils.core.util;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 
 import java.lang.reflect.Method;
@@ -27,9 +26,8 @@ import static org.junit.Assert.*;
 
 /**
  * @author Tim Ducheyne
- * @author Filip Neven
  */
-public class ReflectionUtilsInvokeMethodTest extends UnitilsJUnit4 {
+public class ReflectionUtilsInvokeMethodTest {
 
     private TestClass testClass;
     private Method method1;

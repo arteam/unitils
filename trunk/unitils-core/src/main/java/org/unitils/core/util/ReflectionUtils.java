@@ -152,7 +152,6 @@ public class ReflectionUtils {
      * @param className The name of the class, not null
      * @return The class, not null
      */
-    //todo unit test
     @SuppressWarnings("unchecked")
     public static <T> Class<T> getClassWithName(String className) {
         try {
@@ -169,7 +168,6 @@ public class ReflectionUtils {
      * @param clazz The class
      * @return The fields, not null
      */
-    //todo unit test
     public static Set<Field> getAllFields(Class<?> clazz) {
         Set<Field> result = new HashSet<Field>();
         if (clazz == null || clazz.equals(Object.class)) {
@@ -192,7 +190,6 @@ public class ReflectionUtils {
      * @param method The method, not null
      * @return The string representation, not null
      */
-    //todo unit test
     public static String getSimpleMethodName(Method method) {
         return method.getDeclaringClass().getSimpleName() + '.' + method.getName() + "()";
     }
@@ -205,35 +202,31 @@ public class ReflectionUtils {
      * @param toType   The to type, not null
      * @return True if assignable
      */
-    //todo unit test
     public static boolean isAssignable(Type fromType, Type toType) {
         if (fromType instanceof Class<?> && toType instanceof Class<?>) {
             Class<?> fromClass = (Class<?>) fromType;
             Class<?> toClass = (Class<?>) toType;
 
             // handle auto boxing types
-            if (boolean.class.equals(fromClass) && Boolean.class.isAssignableFrom(toClass)
-                    || boolean.class.equals(toClass) && Boolean.class.isAssignableFrom(fromClass)) {
+            if (byte.class.equals(fromClass) && Byte.class.equals(toClass) || byte.class.equals(toClass) && Byte.class.equals(fromClass)) {
                 return true;
             }
-            if (char.class.equals(fromClass) && Character.class.isAssignableFrom(toClass) || char.class.equals(toClass)
-                    && Character.class.isAssignableFrom(fromClass)) {
+            if (boolean.class.equals(fromClass) && Boolean.class.equals(toClass) || boolean.class.equals(toClass) && Boolean.class.equals(fromClass)) {
                 return true;
             }
-            if (int.class.equals(fromClass) && Integer.class.isAssignableFrom(toClass) || int.class.equals(toClass)
-                    && Integer.class.isAssignableFrom(fromClass)) {
+            if (char.class.equals(fromClass) && Character.class.equals(toClass) || char.class.equals(toClass) && Character.class.equals(fromClass)) {
                 return true;
             }
-            if (long.class.equals(fromClass) && Long.class.isAssignableFrom(toClass) || long.class.equals(toClass)
-                    && Long.class.isAssignableFrom(fromClass)) {
+            if (int.class.equals(fromClass) && Integer.class.equals(toClass) || int.class.equals(toClass) && Integer.class.equals(fromClass)) {
                 return true;
             }
-            if (float.class.equals(fromClass) && Float.class.isAssignableFrom(toClass) || float.class.equals(toClass)
-                    && Float.class.isAssignableFrom(fromClass)) {
+            if (long.class.equals(fromClass) && Long.class.equals(toClass) || long.class.equals(toClass) && Long.class.equals(fromClass)) {
                 return true;
             }
-            if (double.class.equals(fromClass) && Double.class.isAssignableFrom(toClass)
-                    || double.class.equals(toClass) && Double.class.isAssignableFrom(fromClass)) {
+            if (float.class.equals(fromClass) && Float.class.equals(toClass) || float.class.equals(toClass) && Float.class.equals(fromClass)) {
+                return true;
+            }
+            if (double.class.equals(fromClass) && Double.class.equals(toClass) || double.class.equals(toClass) && Double.class.equals(fromClass)) {
                 return true;
             }
             return toClass.isAssignableFrom(fromClass);
@@ -248,7 +241,6 @@ public class ReflectionUtils {
      * @param type The type to get the generic type parameter from, not null
      * @return The declared generic type parameter, null if not generic a generic type
      */
-    //todo unit test
     public static Class<?> getGenericParameterClass(Type type) {
         Type parameterType = getGenericParameterType(type);
         if (parameterType instanceof Class) {
@@ -264,15 +256,11 @@ public class ReflectionUtils {
      * @param type The type to get the generic type parameter from, not null
      * @return The declared generic type parameter, null if not generic a generic type
      */
-    //todo unit test
     public static Type getGenericParameterType(Type type) {
-        if (!(type instanceof ParameterizedType)) {
+        if (!(type instanceof ParameterizedType) || ((ParameterizedType) type).getActualTypeArguments().length == 0) {
             return null;
         }
         Type[] argumentTypes = ((ParameterizedType) type).getActualTypeArguments();
-        if (argumentTypes.length == 0) {
-            return null;
-        }
         if (argumentTypes.length > 1) {
             throw new UnitilsException("Unable to determine unique generic type for type: " + type + ". The type declares more than one generic type: " + type);
         }
@@ -283,16 +271,10 @@ public class ReflectionUtils {
         return argumentType;
     }
 
-    //todo unit test
-    public static void copyFields(Object fromObject, Object toObject) {
-        try {
-            copyFields(fromObject.getClass(), fromObject, toObject);
-        } catch (Exception e) {
-            throw new UnitilsException("Unable to copy fields.", e);
-        }
+    public static void copyFields(Object fromObject, Object toObject) throws IllegalAccessException {
+        copyFields(fromObject.getClass(), fromObject, toObject);
     }
 
-    //todo unit test
     public static Class<?> getTestClass(Object testInstanceOrClass) {
         if (testInstanceOrClass == null) {
             return null;
@@ -307,7 +289,6 @@ public class ReflectionUtils {
      * @param instance The instance to check, not null
      * @return True if the given instance is a jdk or cglib proxy
      */
-    //todo unit test
     public static boolean isProxy(Object instance) {
         if (instance == null) {
             return false;
