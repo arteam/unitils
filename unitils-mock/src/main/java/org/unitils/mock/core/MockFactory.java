@@ -17,6 +17,7 @@ package org.unitils.mock.core;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.unitils.core.UnitilsException;
 import org.unitils.mock.CreateMockListener;
 import org.unitils.mock.Mock;
 import org.unitils.mock.PartialMock;
@@ -129,7 +130,11 @@ public class MockFactory {
         resetIfNewTestObject(testObject);
 
         PartialMockObject<T> partialMockObject = createPartialMockObject(mockName, mockedType, false);
-        copyFields(mockPrototype, partialMockObject.getMock());
+        try {
+            copyFields(mockPrototype, partialMockObject.getMock());
+        } catch (IllegalAccessException e) {
+            throw new UnitilsException("Unable to create partial mock from prototype.", e);
+        }
         if (testObject instanceof CreateMockListener) {
             ((CreateMockListener) testObject).mockCreated(partialMockObject, name, mockedType);
         }
