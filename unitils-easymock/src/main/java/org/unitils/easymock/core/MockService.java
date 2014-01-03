@@ -20,7 +20,6 @@ import org.unitils.core.UnitilsException;
 import org.unitils.easymock.annotation.AfterCreateMock;
 import org.unitils.easymock.util.*;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -143,8 +142,6 @@ public class MockService {
             try {
                 invokeMethod(testObject, method, mock, fieldName, mockType);
 
-            } catch (InvocationTargetException e) {
-                throw new UnitilsException("Unable to invoke after create mock method: " + method, e.getTargetException());
             } catch (Exception e) {
                 throw new UnitilsException("Unable to invoke after create mock method: " + method + "\n" +
                         "Ensure that this method has following signature: void myMethod(Object mock, String name, Class type)", e);

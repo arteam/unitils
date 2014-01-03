@@ -46,25 +46,14 @@ public class ReflectionUtils {
      */
     @SuppressWarnings({"unchecked"})
     public static <T> T createInstanceOfType(String className, boolean bypassAccessibility) {
+        Class<T> type;
         try {
-            Class<?> type = Class.forName(className);
-            return (T) createInstanceOfType(type, bypassAccessibility);
-
-        } catch (ClassCastException e) {
-            throw new UnitilsException("Class " + className + " is not of expected type.", e);
-
-        } catch (NoClassDefFoundError e) {
-            throw new UnitilsException("Unable to load class " + className, e);
-
-        } catch (ClassNotFoundException e) {
-            throw new UnitilsException("Class " + className + " not found", e);
-
-        } catch (UnitilsException e) {
-            throw e;
+            type = (Class<T>) Class.forName(className);
 
         } catch (Exception e) {
-            throw new UnitilsException("Error while instantiating class " + className, e);
+            throw new UnitilsException("Unable to create instance of type " + className, e);
         }
+        return createInstanceOfType(type, bypassAccessibility);
     }
 
     /**
@@ -127,10 +116,7 @@ public class ReflectionUtils {
             field.setAccessible(true);
             return (T) field.get(object);
 
-        } catch (IllegalArgumentException e) {
-            throw new UnitilsException("Error while trying to access field " + field, e);
-
-        } catch (IllegalAccessException e) {
+        } catch (Exception e) {
             throw new UnitilsException("Error while trying to access field " + field, e);
         }
     }
@@ -143,73 +129,20 @@ public class ReflectionUtils {
      * @param method    The method, not null
      * @param arguments The method arguments
      * @return The result of the invocation, null if void
-     * @throws UnitilsException          if the method could not be invoked
-     * @throws InvocationTargetException If the called method threw an exception
+     * @throws UnitilsException if the method could not be invoked
      */
     @SuppressWarnings({"unchecked"})
-    public static <T> T invokeMethod(Object target, Method method, Object... arguments)
-            throws InvocationTargetException {
+    public static <T> T invokeMethod(Object target, Method method, Object... arguments) {
         try {
             method.setAccessible(true);
             return (T) method.invoke(target, arguments);
 
-        } catch (ClassCastException e) {
-            throw new UnitilsException("Unable to invoke method. Unexpected return type " + method, e);
+        } catch (InvocationTargetException e) {
+            throw new UnitilsException("Error while invoking method " + method, e.getCause());
 
-        } catch (IllegalArgumentException e) {
-            throw new UnitilsException("Error while invoking method " + method, e);
-
-        } catch (IllegalAccessException e) {
+        } catch (Exception e) {
             throw new UnitilsException("Error while invoking method " + method, e);
         }
-    }
-
-    /**
-     * From the given class, returns the field with the given name. isStatic
-     * indicates if it should be a static field or not.
-     *
-     * @param clazz     The class to get the field from, not null
-     * @param fieldName The name, not null
-     * @param isStatic  True if a static field is to be returned, false for non-static
-     * @return The field that matches the given parameters, or null if no such
-     * field exists
-     */
-    public static Field getFieldWithName(Class<?> clazz, String fieldName, boolean isStatic) {
-        if (clazz == null || clazz.equals(Object.class)) {
-            return null;
-        }
-
-        Field field;
-        try {
-            field = clazz.getDeclaredField(fieldName);
-        } catch (NoSuchFieldException e) {
-            field = null;
-        }
-
-        if (field != null && isStatic(field.getModifiers()) == isStatic) {
-            return field;
-        }
-        return getFieldWithName(clazz.getSuperclass(), fieldName, isStatic);
-    }
-
-    /**
-     * Gets the enum value that has the given name.
-     *
-     * @param enumClass     The enum class, not null
-     * @param enumValueName The name of the enum value, not null
-     * @return The actual enum value, not null
-     * @throws UnitilsException if no value could be found with the given name
-     */
-    public static <T extends Enum<?>> T getEnumValue(Class<T> enumClass, String enumValueName) {
-        T[] enumValues = enumClass.getEnumConstants();
-        for (T enumValue : enumValues) {
-            if (enumValueName.equalsIgnoreCase(enumValue.name())) {
-
-                return enumValue;
-            }
-        }
-        throw new UnitilsException("Unable to find a enum value in enum: " + enumClass + ", with value name: "
-                + enumValueName);
     }
 
     /**
@@ -219,6 +152,7 @@ public class ReflectionUtils {
      * @param className The name of the class, not null
      * @return The class, not null
      */
+    //todo unit test
     @SuppressWarnings("unchecked")
     public static <T> Class<T> getClassWithName(String className) {
         try {
@@ -230,38 +164,12 @@ public class ReflectionUtils {
     }
 
     /**
-     * Gets the method with the given name from the given class or one of its
-     * super-classes.
-     *
-     * @param clazz          The class containing the method
-     * @param methodName     The name of the method, not null
-     * @param isStatic       True for a static method, false for non-static
-     * @param parameterTypes The parameter types
-     * @return The method, null if no matching method was found
-     */
-    public static Method getMethod(Class<?> clazz, String methodName, boolean isStatic, Class<?>... parameterTypes) {
-        if (clazz == null || clazz.equals(Object.class)) {
-            return null;
-        }
-
-        Method result;
-        try {
-            result = clazz.getDeclaredMethod(methodName, parameterTypes);
-        } catch (NoSuchMethodException e) {
-            result = null;
-        }
-        if (result != null && isStatic(result.getModifiers()) == isStatic) {
-            return result;
-        }
-        return getMethod(clazz.getSuperclass(), methodName, isStatic, parameterTypes);
-    }
-
-    /**
      * Gets all fields of the given class and all its super-classes.
      *
      * @param clazz The class
      * @return The fields, not null
      */
+    //todo unit test
     public static Set<Field> getAllFields(Class<?> clazz) {
         Set<Field> result = new HashSet<Field>();
         if (clazz == null || clazz.equals(Object.class)) {
@@ -284,6 +192,7 @@ public class ReflectionUtils {
      * @param method The method, not null
      * @return The string representation, not null
      */
+    //todo unit test
     public static String getSimpleMethodName(Method method) {
         return method.getDeclaringClass().getSimpleName() + '.' + method.getName() + "()";
     }
@@ -296,6 +205,7 @@ public class ReflectionUtils {
      * @param toType   The to type, not null
      * @return True if assignable
      */
+    //todo unit test
     public static boolean isAssignable(Type fromType, Type toType) {
         if (fromType instanceof Class<?> && toType instanceof Class<?>) {
             Class<?> fromClass = (Class<?>) fromType;
@@ -338,6 +248,7 @@ public class ReflectionUtils {
      * @param type The type to get the generic type parameter from, not null
      * @return The declared generic type parameter, null if not generic a generic type
      */
+    //todo unit test
     public static Class<?> getGenericParameterClass(Type type) {
         Type parameterType = getGenericParameterType(type);
         if (parameterType instanceof Class) {
@@ -353,6 +264,7 @@ public class ReflectionUtils {
      * @param type The type to get the generic type parameter from, not null
      * @return The declared generic type parameter, null if not generic a generic type
      */
+    //todo unit test
     public static Type getGenericParameterType(Type type) {
         if (!(type instanceof ParameterizedType)) {
             return null;
@@ -371,6 +283,7 @@ public class ReflectionUtils {
         return argumentType;
     }
 
+    //todo unit test
     public static void copyFields(Object fromObject, Object toObject) {
         try {
             copyFields(fromObject.getClass(), fromObject, toObject);
@@ -379,6 +292,7 @@ public class ReflectionUtils {
         }
     }
 
+    //todo unit test
     public static Class<?> getTestClass(Object testInstanceOrClass) {
         if (testInstanceOrClass == null) {
             return null;
@@ -393,6 +307,7 @@ public class ReflectionUtils {
      * @param instance The instance to check, not null
      * @return True if the given instance is a jdk or cglib proxy
      */
+    //todo unit test
     public static boolean isProxy(Object instance) {
         if (instance == null) {
             return false;
@@ -417,5 +332,4 @@ public class ReflectionUtils {
         }
         copyFields(clazz.getSuperclass(), fromObject, toObject);
     }
-
 }
