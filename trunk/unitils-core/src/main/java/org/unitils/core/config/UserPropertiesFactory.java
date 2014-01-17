@@ -78,7 +78,7 @@ public class UserPropertiesFactory implements Factory<Properties> {
         String customConfigurationFileName = getPropertiesFileName(UNITILS_PROPERTIES_NAME_PROPERTY, DEFAULT_UNITILS_PROPERTIES_NAME, null);
         Properties customProperties = propertiesReader.loadPropertiesFromClasspath(customConfigurationFileName);
         if (customProperties == null) {
-            logger.info("No properties found in classpath with name " + customConfigurationFileName);
+            logger.debug("No properties found in classpath with name " + customConfigurationFileName);
         } else {
             properties.putAll(customProperties);
         }
@@ -96,7 +96,7 @@ public class UserPropertiesFactory implements Factory<Properties> {
             localProperties = propertiesReader.loadPropertiesFromClasspath(localConfigurationFileName);
         }
         if (localProperties == null) {
-            logger.info("No properties found in user home or classpath with name " + localConfigurationFileName);
+            logger.debug("No properties found in user home or classpath with name " + localConfigurationFileName);
         } else {
             properties.putAll(localProperties);
         }

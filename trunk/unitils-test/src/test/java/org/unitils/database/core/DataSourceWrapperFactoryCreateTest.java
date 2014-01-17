@@ -22,9 +22,10 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.database.config.DatabaseConfiguration;
 
+import javax.sql.DataSource;
+
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Tim Ducheyne
@@ -48,6 +49,12 @@ public class DataSourceWrapperFactoryCreateTest extends UnitilsJUnit4 {
         DataSourceWrapper result = dataSourceWrapperFactory.create(databaseConfiguration);
 
         assertSame(databaseConfiguration, result.getDatabaseConfiguration());
-        assertTrue(result.getDataSource(false) instanceof BasicDataSource);
+        DataSource dataSource = result.getDataSource(false);
+        BasicDataSource basicDataSource = (BasicDataSource) dataSource;
+        assertTrue(basicDataSource.isAccessToUnderlyingConnectionAllowed());
+        assertEquals("driver", basicDataSource.getDriverClassName());
+        assertEquals("user", basicDataSource.getUsername());
+        assertEquals("pass", basicDataSource.getPassword());
+        assertEquals("url", basicDataSource.getUrl());
     }
 }

@@ -42,6 +42,7 @@ public class DataSourceWrapperFactory {
 
     protected DataSource createDataSource(DatabaseConfiguration databaseConfiguration) {
         BasicDataSource dataSource = new BasicDataSource();
+        dataSource.setAccessToUnderlyingConnectionAllowed(true);
         dataSource.setDriverClassName(databaseConfiguration.getDriverClassName());
         dataSource.setUsername(databaseConfiguration.getUserName());
         dataSource.setPassword(databaseConfiguration.getPassword());
