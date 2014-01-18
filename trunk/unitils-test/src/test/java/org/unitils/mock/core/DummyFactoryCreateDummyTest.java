@@ -26,6 +26,7 @@ import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.MockBehaviorFactory;
 
 import static org.junit.Assert.assertSame;
+import static org.unitils.mock.ArgumentMatchers.notNull;
 
 /**
  * @author Tim Ducheyne
@@ -51,7 +52,7 @@ public class DummyFactoryCreateDummyTest extends UnitilsJUnit4 {
     @Test
     public void createDummy() {
         mockBehaviorFactoryMock.returns(mockBehavior).createDummyValueReturningMockBehavior(dummyFactory);
-        proxyServiceMock.returns(myInterfaceProxy).createProxy("myDummy", false, new DummyProxyInvocationHandler(mockBehavior), MyInterface.class);
+        proxyServiceMock.returns(myInterfaceProxy).createProxy(notNull(String.class), "myDummy", false, new DummyProxyInvocationHandler(mockBehavior), MyInterface.class);
 
         MyInterface result = dummyFactory.createDummy("myDummy", MyInterface.class);
         assertSame(myInterfaceProxy, result);
@@ -60,7 +61,7 @@ public class DummyFactoryCreateDummyTest extends UnitilsJUnit4 {
     @Test
     public void defaultName() {
         mockBehaviorFactoryMock.returns(mockBehavior).createDummyValueReturningMockBehavior(dummyFactory);
-        proxyServiceMock.returns(myInterfaceProxy).createProxy("myInterface", false, new DummyProxyInvocationHandler(mockBehavior), MyInterface.class);
+        proxyServiceMock.returns(myInterfaceProxy).createProxy(notNull(String.class), "myInterface", false, new DummyProxyInvocationHandler(mockBehavior), MyInterface.class);
 
         MyInterface result = dummyFactory.createDummy(null, MyInterface.class);
         assertSame(myInterfaceProxy, result);

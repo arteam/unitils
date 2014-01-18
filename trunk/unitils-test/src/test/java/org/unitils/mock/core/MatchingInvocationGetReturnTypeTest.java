@@ -52,13 +52,13 @@ public class MatchingInvocationGetReturnTypeTest {
         matchingInvocation = new MatchingInvocation(proxyInvocation, null);
 
         Class<?> result = matchingInvocation.getReturnType();
-        assertEquals(Void.class, result);
+        assertEquals(Void.TYPE, result);
     }
 
 
     private ProxyInvocation createProxyInvocation(Method method) {
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
-        return new ProxyInvocation(null, null, method, arguments, null);
+        return new ProxyInvocation(null, null, null, method, arguments, null);
     }
 
 
@@ -66,6 +66,6 @@ public class MatchingInvocationGetReturnTypeTest {
 
         Properties method();
 
-        Void voidMethod();
+        void voidMethod();
     }
 }

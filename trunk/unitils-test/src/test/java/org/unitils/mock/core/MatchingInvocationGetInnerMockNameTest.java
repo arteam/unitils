@@ -37,7 +37,7 @@ public class MatchingInvocationGetInnerMockNameTest {
     public void getInnerMockName() throws Exception {
         Method method = MyInterface.class.getMethod("method");
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
-        ProxyInvocation proxyInvocation = new ProxyInvocation("proxyName", null, method, arguments, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation("1", "proxyName", null, method, arguments, null);
         matchingInvocation = new MatchingInvocation(proxyInvocation, null);
 
         String result = matchingInvocation.getInnerMockName();

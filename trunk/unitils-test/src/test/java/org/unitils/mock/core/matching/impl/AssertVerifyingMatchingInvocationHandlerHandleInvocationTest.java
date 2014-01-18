@@ -64,7 +64,7 @@ public class AssertVerifyingMatchingInvocationHandlerHandleInvocationTest extend
 
         Method method = MyInterface.class.getMethod("method");
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
-        ProxyInvocation proxyInvocation = new ProxyInvocation("mock", null, method, arguments, stackTrace);
+        ProxyInvocation proxyInvocation = new ProxyInvocation("i", "mock", null, method, arguments, stackTrace);
         matchingInvocation = new MatchingInvocation(proxyInvocation, null);
 
         scenarioReportMock.returns("scenario report").createReport();

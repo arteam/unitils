@@ -35,14 +35,14 @@ public class DefaultValueReturningMockBehaviorAssertCanExecuteTest {
     @Test
     public void canExecute() throws Exception {
         Method method = MyInterface.class.getMethod("method");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         defaultValueReturningMockBehavior.assertCanExecute(proxyInvocation);
     }
 
     @Test
     public void exceptionWhenVoidReturnType() throws Exception {
         Method method = MyInterface.class.getMethod("voidMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         try {
             defaultValueReturningMockBehavior.assertCanExecute(proxyInvocation);
             fail("UnitilsException expected");

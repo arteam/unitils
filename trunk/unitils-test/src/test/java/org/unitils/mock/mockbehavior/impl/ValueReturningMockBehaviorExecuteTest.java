@@ -36,7 +36,7 @@ public class ValueReturningMockBehaviorExecuteTest {
     @Test
     public void canExecute() throws Exception {
         Method method = MyInterface.class.getMethod("method");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         valueReturningMockBehavior = new ValueReturningMockBehavior("test");
 
         Object result = valueReturningMockBehavior.execute(proxyInvocation);
@@ -46,7 +46,7 @@ public class ValueReturningMockBehaviorExecuteTest {
     @Test
     public void nullReturnValue() throws Exception {
         Method method = MyInterface.class.getMethod("method");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         valueReturningMockBehavior = new ValueReturningMockBehavior(null);
 
         Object result = valueReturningMockBehavior.execute(proxyInvocation);
@@ -57,7 +57,7 @@ public class ValueReturningMockBehaviorExecuteTest {
     @Test
     public void unwrapWrappedTypes() throws Exception {
         Method method = MyInterface.class.getMethod("method");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         valueReturningMockBehavior = new ValueReturningMockBehavior(new MyWrapper());
 
         Object result = valueReturningMockBehavior.execute(proxyInvocation);

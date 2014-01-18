@@ -132,8 +132,8 @@ public class MockFactory {
         PartialMockObject<T> partialMockObject = createPartialMockObject(mockName, mockedType, false);
         try {
             copyFields(mockPrototype, partialMockObject.getMock());
-        } catch (IllegalAccessException e) {
-            throw new UnitilsException("Unable to create partial mock from prototype.", e);
+        } catch (Exception e) {
+            throw new UnitilsException("Unable to create partial mock from prototype. Unable to copy fields values from prototype to mock instance for " + mockedType + ".", e);
         }
         if (testObject instanceof CreateMockListener) {
             ((CreateMockListener) testObject).mockCreated(partialMockObject, name, mockedType);
@@ -155,7 +155,7 @@ public class MockFactory {
         }
         String name = matchingInvocation.getInnerMockName();
         Class<?> mockedType = matchingInvocation.getReturnType();
-        if (Void.class.equals(mockedType)) {
+        if (mockedType == Void.TYPE) {
             return null;
         }
         if (mockedType.isPrimitive() || mockedType.isArray() || Modifier.isFinal(mockedType.getModifiers())) {
@@ -178,21 +178,23 @@ public class MockFactory {
 
 
     protected <T> MockObject<T> createMockObject(String name, Class<T> mockedType, boolean chained) {
+        String proxyId = getProxyId(name);
         BehaviorDefiningInvocations behaviorDefiningInvocations = createBehaviorDefiningInvocations();
         MatchingProxyInvocationHandler matchingProxyInvocationHandler = createMatchingProxyInvocationHandler();
         MockProxyInvocationHandler<T> mockProxyInvocationHandler = createMockProxyInvocationHandler(behaviorDefiningInvocations, matchingProxyInvocationHandler);
-        T proxy = proxyService.createProxy(name, false, mockProxyInvocationHandler, mockedType);
-        T matchingProxy = proxyService.createProxy(name, false, matchingProxyInvocationHandler, mockedType);
+        T proxy = proxyService.createProxy(proxyId, name, false, mockProxyInvocationHandler, mockedType);
+        T matchingProxy = proxyService.createProxy(proxyId, name, false, matchingProxyInvocationHandler, mockedType);
         MatchingInvocationHandlerFactory matchingInvocationHandlerFactory = createMatchingInvocationHandlerFactory();
         return new MockObject<T>(name, mockedType, proxy, matchingProxy, chained, behaviorDefiningInvocations, matchingProxyInvocationHandler, mockBehaviorFactory, matchingInvocationHandlerFactory, mockService, dummyFactory);
     }
 
     protected <T> PartialMockObject<T> createPartialMockObject(String name, Class<T> mockedType, boolean chained) {
+        String proxyId = getProxyId(name);
         BehaviorDefiningInvocations behaviorDefiningInvocations = createBehaviorDefiningInvocations();
         MatchingProxyInvocationHandler matchingProxyInvocationHandler = createMatchingProxyInvocationHandler();
         MockProxyInvocationHandler<T> mockProxyInvocationHandler = createPartialMockProxyInvocationHandler(behaviorDefiningInvocations, matchingProxyInvocationHandler);
-        T proxy = proxyService.createProxy(name, true, mockProxyInvocationHandler, mockedType);
-        T matchingProxy = proxyService.createProxy(name, false, matchingProxyInvocationHandler, mockedType);
+        T proxy = proxyService.createProxy(proxyId, name, true, mockProxyInvocationHandler, mockedType);
+        T matchingProxy = proxyService.createProxy(proxyId, name, false, matchingProxyInvocationHandler, mockedType);
         MatchingInvocationHandlerFactory matchingInvocationHandlerFactory = createMatchingInvocationHandlerFactory();
         return new PartialMockObject<T>(name, mockedType, proxy, matchingProxy, chained, behaviorDefiningInvocations, matchingProxyInvocationHandler, mockBehaviorFactory, matchingInvocationHandlerFactory, mockService, dummyFactory);
     }
@@ -214,6 +216,9 @@ public class MockFactory {
         return name;
     }
 
+    protected synchronized String getProxyId(String mockName) {
+        return mockName + "@" + System.currentTimeMillis();
+    }
 
     protected BehaviorDefiningInvocations createBehaviorDefiningInvocations() {
         return new BehaviorDefiningInvocations();

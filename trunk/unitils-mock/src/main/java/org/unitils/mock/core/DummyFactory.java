@@ -48,9 +48,10 @@ public class DummyFactory {
      */
     public <T> T createDummy(String name, Class<T> dummyType) {
         String dummyName = getName(name, dummyType);
+        String proxyId = getProxyId(dummyName);
         MockBehavior mockBehaviour = mockBehaviorFactory.createDummyValueReturningMockBehavior(this);
         DummyProxyInvocationHandler dummyProxyInvocationHandler = createDummyProxyInvocationHandler(mockBehaviour);
-        return proxyService.createProxy(dummyName, false, dummyProxyInvocationHandler, dummyType);
+        return proxyService.createProxy(proxyId, dummyName, false, dummyProxyInvocationHandler, dummyType);
     }
 
 
@@ -59,6 +60,10 @@ public class DummyFactory {
             return uncapitalize(type.getSimpleName());
         }
         return name;
+    }
+
+    protected synchronized String getProxyId(String mockName) {
+        return mockName + "@" + System.currentTimeMillis();
     }
 
     protected <T> DummyProxyInvocationHandler createDummyProxyInvocationHandler(MockBehavior mockBehaviour) {

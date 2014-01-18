@@ -60,7 +60,7 @@ public class MatchingInvocation extends ProxyInvocation {
      */
     public int matches(ProxyInvocation proxyInvocation) {
         List<Argument<?>> arguments = proxyInvocation.getArguments();
-        if (!getMethod().equals(proxyInvocation.getMethod())) {
+        if (!proxyId.equals(proxyInvocation.getProxyId()) || !method.equals(proxyInvocation.getMethod())) {
             return -1;
         }
 

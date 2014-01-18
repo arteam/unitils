@@ -152,7 +152,7 @@ public class MockProxyInvocationHandlerHandleInvocationTest extends UnitilsJUnit
 
     private ProxyInvocation createProxyInvocation(Method method) throws NoSuchMethodException {
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
-        return new ProxyInvocation(null, null, method, arguments, null);
+        return new ProxyInvocation(null, null, null, method, arguments, null);
     }
 
     private static interface MyInterface {

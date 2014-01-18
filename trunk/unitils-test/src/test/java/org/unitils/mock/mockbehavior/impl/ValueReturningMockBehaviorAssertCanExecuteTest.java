@@ -107,7 +107,7 @@ public class ValueReturningMockBehaviorAssertCanExecuteTest {
 
 
     private ProxyInvocation createProxyInvocation(Method method) {
-        return new ProxyInvocation(null, null, method, null, null);
+        return new ProxyInvocation(null, null, null, method, null, null);
     }
 
 

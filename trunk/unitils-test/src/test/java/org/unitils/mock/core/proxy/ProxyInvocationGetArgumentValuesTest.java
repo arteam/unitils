@@ -38,7 +38,7 @@ public class ProxyInvocationGetArgumentValuesTest {
     @Before
     public void initialize() throws Exception {
         arguments = new ArrayList<Argument<?>>();
-        proxyInvocation = new ProxyInvocation(null, null, null, arguments, null);
+        proxyInvocation = new ProxyInvocation(null, null, null, null, arguments, null);
     }
 
 

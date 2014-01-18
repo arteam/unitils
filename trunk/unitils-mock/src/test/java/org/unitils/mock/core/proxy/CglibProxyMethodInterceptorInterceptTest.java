@@ -56,7 +56,7 @@ public class CglibProxyMethodInterceptorInterceptTest extends UnitilsJUnit4 {
 
     @Before
     public void initialize() throws Exception {
-        cglibProxyMethodInterceptor = new CglibProxyMethodInterceptor<MyClass>("myProxy", MyClass.class, proxyInvocationHandlerMock.getMock(), proxyServiceMock.getMock(), cloneServiceMock.getMock());
+        cglibProxyMethodInterceptor = new CglibProxyMethodInterceptor<MyClass>("i", "myProxy", MyClass.class, proxyInvocationHandlerMock.getMock(), proxyServiceMock.getMock(), cloneServiceMock.getMock());
 
         stackTrace = new StackTraceElement[]{new StackTraceElement("class", "method", "file", 10)};
         proxyServiceMock.returns(stackTrace).getProxiedMethodStackTrace(any(StackTraceElement[].class));
@@ -118,7 +118,7 @@ public class CglibProxyMethodInterceptorInterceptTest extends UnitilsJUnit4 {
     public void toStringCanBeOverridden() throws Throwable {
         Method method = MyClass.class.getDeclaredMethod("toString");
         List<Argument<?>> arguments = new ArrayList<Argument<?>>(0);
-        CglibProxyInvocation cglibProxyInvocation = new CglibProxyInvocation("myProxy", method, arguments, stackTrace, proxy, methodProxy);
+        CglibProxyInvocation cglibProxyInvocation = new CglibProxyInvocation("i", "myProxy", method, arguments, stackTrace, proxy, methodProxy);
         proxyInvocationHandlerMock.returns("result").handleInvocation(cglibProxyInvocation);
 
         Object result = cglibProxyMethodInterceptor.intercept(proxy, method, new Object[0], methodProxy);
@@ -143,7 +143,7 @@ public class CglibProxyMethodInterceptorInterceptTest extends UnitilsJUnit4 {
         cloneServiceMock.returns("cloned arg").createDeepClone("arg");
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
         arguments.add(new Argument<String>("arg", "cloned arg", String.class));
-        proxyInvocationHandlerMock.returns("result").handleInvocation(new CglibProxyInvocation("myProxy", method, arguments, stackTrace, proxy, methodProxy));
+        proxyInvocationHandlerMock.returns("result").handleInvocation(new CglibProxyInvocation("i", "myProxy", method, arguments, stackTrace, proxy, methodProxy));
 
         Object result = cglibProxyMethodInterceptor.intercept(proxy, method, new Object[]{"arg"}, methodProxy);
         assertEquals("result", result);

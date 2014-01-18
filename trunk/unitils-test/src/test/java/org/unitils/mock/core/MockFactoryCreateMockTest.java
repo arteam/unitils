@@ -34,6 +34,7 @@ import org.unitils.mock.report.ScenarioReport;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
+import static org.unitils.mock.ArgumentMatchers.notNull;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 /**
@@ -87,8 +88,8 @@ public class MockFactoryCreateMockTest extends UnitilsJUnit4 {
 
     @Test
     public void createMock() {
-        proxyServiceMock.returns(proxy).createProxy("name", false, mockProxyInvocationHandler, Properties.class);
-        proxyServiceMock.returns(matchingProxy).createProxy("name", false, matchingProxyInvocationHandler, Properties.class);
+        proxyServiceMock.returns(proxy).createProxy(notNull(String.class), "name", false, mockProxyInvocationHandler, Properties.class);
+        proxyServiceMock.returns(matchingProxy).createProxy(notNull(String.class), "name", false, matchingProxyInvocationHandler, Properties.class);
 
         Mock<Properties> result = mockFactory.createMock("name", Properties.class, testObject);
         MockObject<Properties> mockObject = (MockObject<Properties>) result;

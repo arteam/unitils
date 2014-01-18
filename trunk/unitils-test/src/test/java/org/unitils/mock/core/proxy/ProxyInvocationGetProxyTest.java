@@ -35,7 +35,7 @@ public class ProxyInvocationGetProxyTest {
     @Before
     public void initialize() {
         proxy = new Properties();
-        proxyInvocation = new ProxyInvocation(null, proxy, null, null, null);
+        proxyInvocation = new ProxyInvocation(null, null, proxy, null, null, null);
     }
 
 

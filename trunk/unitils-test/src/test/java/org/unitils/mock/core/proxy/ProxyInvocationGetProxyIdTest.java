@@ -18,31 +18,25 @@ package org.unitils.mock.core.proxy;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Tim Ducheyne
  */
-public class ProxyInvocationGetArgumentsTest {
+public class ProxyInvocationGetProxyIdTest {
 
     private ProxyInvocation proxyInvocation;
 
-    private List<Argument<?>> arguments;
-
 
     @Before
-    public void initialize() throws Exception {
-        arguments = new ArrayList<Argument<?>>();
-        proxyInvocation = new ProxyInvocation(null, null, null, null, arguments, null);
+    public void initialize() {
+        proxyInvocation = new ProxyInvocation("id", null, null, null, null, null);
     }
 
 
     @Test
-    public void getArguments() throws Throwable {
-        List<?> result = proxyInvocation.getArguments();
-        assertSame(arguments, result);
+    public void getProxyName() throws Throwable {
+        String result = proxyInvocation.getProxyId();
+        assertEquals("id", result);
     }
 }

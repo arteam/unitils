@@ -34,6 +34,7 @@ import static org.unitils.core.util.MethodUtils.*;
  */
 public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
 
+    protected String proxyId;
     protected String proxyName;
     protected Class<T> proxiedType;
     protected ProxyInvocationHandler proxyInvocationHandler;
@@ -45,11 +46,13 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
     /**
      * Creates an interceptor.
      *
+     * @param proxyId                The identifier of the proxy, not null
      * @param proxyName              The display name of the proxy, not null
      * @param proxiedType            The proxied type, not null
      * @param proxyInvocationHandler The handler to delegate the invocations to, not null
      */
-    public CglibProxyMethodInterceptor(String proxyName, Class<T> proxiedType, ProxyInvocationHandler proxyInvocationHandler, ProxyService proxyService, CloneService cloneService) {
+    public CglibProxyMethodInterceptor(String proxyId, String proxyName, Class<T> proxiedType, ProxyInvocationHandler proxyInvocationHandler, ProxyService proxyService, CloneService cloneService) {
+        this.proxyId = proxyId;
         this.proxyName = proxyName;
         this.proxiedType = proxiedType;
         this.proxyInvocationHandler = proxyInvocationHandler;
@@ -93,7 +96,7 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
         StackTraceElement[] proxiedMethodStackTrace = proxyService.getProxiedMethodStackTrace(stackTrace);
         List<Argument<?>> argumentsList = getArguments(arguments, argumentTypes);
 
-        ProxyInvocation invocation = new CglibProxyInvocation(proxyName, method, argumentsList, proxiedMethodStackTrace, proxy, methodProxy);
+        ProxyInvocation invocation = new CglibProxyInvocation(proxyId, proxyName, method, argumentsList, proxiedMethodStackTrace, proxy, methodProxy);
         Object result = proxyInvocationHandler.handleInvocation(invocation);
         if (result == null && isToStringMethod(method)) {
             return getProxiedType().getName() + "@" + Integer.toHexString(super.hashCode());
@@ -128,6 +131,7 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
         /**
          * Creates an invocation.
          *
+         * @param proxyId     The identifier of the proxy, not null
          * @param proxyName   The display name of the proxy, not null
          * @param method      The method that was called, not null
          * @param arguments   The arguments that were used, not null
@@ -135,8 +139,8 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
          * @param proxy       The proxy, not null
          * @param methodProxy The cglib method proxy, not null
          */
-        public CglibProxyInvocation(String proxyName, Method method, List<Argument<?>> arguments, StackTraceElement[] invokedAt, Object proxy, MethodProxy methodProxy) {
-            super(proxyName, proxy, method, arguments, invokedAt);
+        public CglibProxyInvocation(String proxyId, String proxyName, Method method, List<Argument<?>> arguments, StackTraceElement[] invokedAt, Object proxy, MethodProxy methodProxy) {
+            super(proxyId, proxyName, proxy, method, arguments, invokedAt);
             this.methodProxy = methodProxy;
         }
 

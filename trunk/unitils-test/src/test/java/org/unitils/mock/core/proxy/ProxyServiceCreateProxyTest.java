@@ -38,36 +38,36 @@ public class ProxyServiceCreateProxyTest {
 
     @Test
     public void createProxyForInterface() {
-        TestInterface result = proxyService.createProxy("name", true, new MyProxyInvocationHandler(), TestInterface.class);
+        TestInterface result = proxyService.createProxy("1", "name", true, new MyProxyInvocationHandler(), TestInterface.class);
         assertTrue(result instanceof ObjectToFormat);
         assertTrue(result instanceof Cloneable);
         assertEquals("Proxy<name>", ((ObjectToFormat) result).$formatObject());
-        assertEquals("Handled by MyProxyInvocationHandler", result.method());
+        assertEquals("Handled by MyProxyInvocationHandler: proxyId: 1, proxyName: name", result.method());
     }
 
     @Test
     public void customInterfaces() {
-        Object result = proxyService.createProxy("name", true, new MyProxyInvocationHandler(), TestClass.class, CustomInterface1.class, CustomInterface2.class);
+        Object result = proxyService.createProxy("1", "name", true, new MyProxyInvocationHandler(), TestClass.class, CustomInterface1.class, CustomInterface2.class);
         assertTrue(result instanceof CustomInterface1);
         assertTrue(result instanceof CustomInterface2);
     }
 
     @Test
     public void createInitializedProxy() {
-        TestClass result = proxyService.createProxy("name", true, new MyProxyInvocationHandler(), TestClass.class);
+        TestClass result = proxyService.createProxy("1", "name", true, new MyProxyInvocationHandler(), TestClass.class);
         assertEquals("test", result.value);
     }
 
     @Test
     public void createUninitializedProxy() {
-        TestClass result = proxyService.createProxy("name", false, new MyProxyInvocationHandler(), TestClass.class);
+        TestClass result = proxyService.createProxy("1", "name", false, new MyProxyInvocationHandler(), TestClass.class);
         assertNull(result.value);
     }
 
     @Test
     public void exceptionWhenUnableToAccessConstructor() {
         try {
-            proxyService.createProxy("name", true, new MyProxyInvocationHandler(), PrivateTestClass.class);
+            proxyService.createProxy("1", "name", true, new MyProxyInvocationHandler(), PrivateTestClass.class);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             assertEquals("Unable to create proxy with name name for type class org.unitils.mock.core.proxy.ProxyServiceCreateProxyTest$PrivateTestClass\n" +
@@ -98,7 +98,7 @@ public class ProxyServiceCreateProxyTest {
     private static class MyProxyInvocationHandler implements ProxyInvocationHandler {
 
         public Object handleInvocation(ProxyInvocation invocation) throws Throwable {
-            return "Handled by MyProxyInvocationHandler";
+            return "Handled by MyProxyInvocationHandler: proxyId: " + invocation.getProxyId() + ", proxyName: " + invocation.getProxyName();
         }
     }
 }

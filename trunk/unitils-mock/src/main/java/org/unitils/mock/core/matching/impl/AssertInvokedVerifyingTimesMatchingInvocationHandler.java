@@ -67,9 +67,9 @@ public class AssertInvokedVerifyingTimesMatchingInvocationHandler extends Assert
         message.append(simpleMethodName);
         message.append(", but found ");
         if (actualTimes == 0) {
-            message.append("none.");
+            message.append("none");
         } else {
-            message.append(" only ");
+            message.append("only ");
             message.append(actualTimes);
         }
         return message.toString();

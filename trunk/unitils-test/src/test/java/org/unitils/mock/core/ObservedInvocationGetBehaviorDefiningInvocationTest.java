@@ -40,7 +40,7 @@ public class ObservedInvocationGetBehaviorDefiningInvocationTest extends Unitils
     @Before
     public void initialize() {
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, arguments, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, null, arguments, null);
         observedInvocation = new ObservedInvocation(proxyInvocation, behaviorDefiningInvocation, null);
     }
 

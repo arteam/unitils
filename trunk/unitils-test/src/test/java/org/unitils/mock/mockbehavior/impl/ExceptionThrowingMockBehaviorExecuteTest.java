@@ -46,7 +46,7 @@ public class ExceptionThrowingMockBehaviorExecuteTest extends UnitilsJUnit4 {
         exceptionThrowingMockBehavior = new ExceptionThrowingMockBehavior(exception, stackTraceServiceMock.getMock());
 
         Method method = MyInterface.class.getMethod("method");
-        proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         stackTrace = new StackTraceElement[]{new StackTraceElement("class", "method", "file", 333)};
     }
 

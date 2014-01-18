@@ -60,7 +60,7 @@ public class MatchingProxyInvocationHandleInvocationTest extends UnitilsJUnit4 {
         StackTraceElement stackTraceElement1 = new StackTraceElement("class1", "method1", "file1", 111);
         StackTraceElement stackTraceElement2 = new StackTraceElement("class2", "method2", "file2", 222);
         stackTrace = new StackTraceElement[]{stackTraceElement1, stackTraceElement2};
-        proxyInvocation = new ProxyInvocation(null, null, null, null, stackTrace);
+        proxyInvocation = new ProxyInvocation(null, null, null, null, null, stackTrace);
         stackTraceServiceMock.returns(stackTrace).getInvocationStackTrace(Mock.class);
     }
 

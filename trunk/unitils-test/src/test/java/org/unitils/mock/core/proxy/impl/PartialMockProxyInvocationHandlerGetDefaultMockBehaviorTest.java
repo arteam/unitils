@@ -44,7 +44,7 @@ public class PartialMockProxyInvocationHandlerGetDefaultMockBehaviorTest {
     @Test
     public void originalBehaviorWhenRegularMethod() throws Exception {
         Method method = TestClass.class.getMethod("regularMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         MockBehavior result = partialMockProxyInvocationHandler.getDefaultMockBehavior(proxyInvocation);
         assertTrue(result instanceof OriginalBehaviorInvokingMockBehavior);
@@ -53,7 +53,7 @@ public class PartialMockProxyInvocationHandlerGetDefaultMockBehaviorTest {
     @Test
     public void defaultValueReturningMockBehaviorWhenAbstractMethodWithReturnValueMethod() throws Exception {
         Method method = TestClass.class.getMethod("returnAbstractMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         MockBehavior result = partialMockProxyInvocationHandler.getDefaultMockBehavior(proxyInvocation);
         assertTrue(result instanceof DefaultValueReturningMockBehavior);
@@ -62,7 +62,7 @@ public class PartialMockProxyInvocationHandlerGetDefaultMockBehaviorTest {
     @Test
     public void nullWhenVoidAbstractMethod() throws Exception {
         Method method = TestClass.class.getMethod("voidAbstractMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         MockBehavior result = partialMockProxyInvocationHandler.getDefaultMockBehavior(proxyInvocation);
         assertNull(result);

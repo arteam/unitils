@@ -38,7 +38,7 @@ public class ExceptionThrowingMockBehaviorAssertCanExecuteTest {
     @Test
     public void canExecuteWhenError() throws Exception {
         Method method = MyInterface.class.getMethod("method");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         exceptionThrowingMockBehavior = new ExceptionThrowingMockBehavior(new AbstractMethodError(), null);
 
         exceptionThrowingMockBehavior.assertCanExecute(proxyInvocation);
@@ -47,7 +47,7 @@ public class ExceptionThrowingMockBehaviorAssertCanExecuteTest {
     @Test
     public void canExecuteWhenRuntimeException() throws Exception {
         Method method = MyInterface.class.getMethod("method");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         exceptionThrowingMockBehavior = new ExceptionThrowingMockBehavior(new RuntimeException(), null);
 
         exceptionThrowingMockBehavior.assertCanExecute(proxyInvocation);
@@ -56,7 +56,7 @@ public class ExceptionThrowingMockBehaviorAssertCanExecuteTest {
     @Test
     public void canExecuteWhenExceptionIsDeclaredInThrowsClause() throws Exception {
         Method method = MyInterface.class.getMethod("exceptionMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         exceptionThrowingMockBehavior = new ExceptionThrowingMockBehavior(new IOException(), null);
 
         exceptionThrowingMockBehavior.assertCanExecute(proxyInvocation);
@@ -65,7 +65,7 @@ public class ExceptionThrowingMockBehaviorAssertCanExecuteTest {
     @Test
     public void exceptionWhenCheckedExceptionAndNoThrowsClause() throws Exception {
         Method method = MyInterface.class.getMethod("method");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         exceptionThrowingMockBehavior = new ExceptionThrowingMockBehavior(new SAXException(), null);
         try {
             exceptionThrowingMockBehavior.assertCanExecute(proxyInvocation);
@@ -78,7 +78,7 @@ public class ExceptionThrowingMockBehaviorAssertCanExecuteTest {
     @Test
     public void exceptionWhenCheckedExceptionNotNotDeclaredInThrowsClause() throws Exception {
         Method method = MyInterface.class.getMethod("exceptionMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         exceptionThrowingMockBehavior = new ExceptionThrowingMockBehavior(new SAXException(), null);
         try {
             exceptionThrowingMockBehavior.assertCanExecute(proxyInvocation);
