@@ -73,8 +73,8 @@ public class MockFactoryCreateChainedMockTest extends UnitilsJUnit4 {
     @Test
     public void createChainedMock() throws Exception {
         MatchingInvocation matchingInvocation = createMatchingInvocation("name", matchingProxy, "testMethod1");
-        proxyServiceMock.returns(proxy).createProxy("name.testMethod1", false, mockProxyInvocationHandler, Properties.class);
-        proxyServiceMock.returns(matchingProxy).createProxy("name.testMethod1", false, matchingProxyInvocationHandler, Properties.class);
+        proxyServiceMock.returns(proxy).createProxy(null, "name.testMethod1", false, mockProxyInvocationHandler, Properties.class);
+        proxyServiceMock.returns(matchingProxy).createProxy(null, "name.testMethod1", false, matchingProxyInvocationHandler, Properties.class);
 
         Mock<?> result = mockFactory.createChainedMock(matchingInvocation);
         MockObject<?> mockObject = (MockObject<?>) result;
@@ -120,7 +120,7 @@ public class MockFactoryCreateChainedMockTest extends UnitilsJUnit4 {
     @Test
     public void nullWhenUnableToCreateMock() throws Exception {
         MatchingInvocation matchingInvocation = createMatchingInvocation("name", matchingProxy, "testMethod1");
-        proxyServiceMock.raises(NullPointerException.class).createProxy("name.testMethod1", false, mockProxyInvocationHandler, Properties.class);
+        proxyServiceMock.raises(NullPointerException.class).createProxy(null, "name.testMethod1", false, mockProxyInvocationHandler, Properties.class);
 
         Mock<?> result = mockFactory.createChainedMock(matchingInvocation);
         assertNull(result);
@@ -160,7 +160,7 @@ public class MockFactoryCreateChainedMockTest extends UnitilsJUnit4 {
     private MatchingInvocation createMatchingInvocation(String proxyName, Object proxy, String methodName) throws Exception {
         Method method = MyClass.class.getMethod(methodName);
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
-        ProxyInvocation proxyInvocation = new ProxyInvocation(proxyName, proxy, method, arguments, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation("1", proxyName, proxy, method, arguments, null);
         return new MatchingInvocation(proxyInvocation, null);
     }
 

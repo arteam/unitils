@@ -167,7 +167,7 @@ public class ArgumentMatcherRepositoryFinishMatchingInvocationTest extends Uniti
         for (String argument : arguments) {
             argumentList.add(new Argument<Object>(argument, argument, String.class));
         }
-        return new ProxyInvocation("mockName", null, method, argumentList, stackTrace);
+        return new ProxyInvocation("1", "mockName", null, method, argumentList, stackTrace);
     }
 
 

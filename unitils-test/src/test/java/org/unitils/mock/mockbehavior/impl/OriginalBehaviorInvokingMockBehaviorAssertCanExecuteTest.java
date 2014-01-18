@@ -65,7 +65,7 @@ public class OriginalBehaviorInvokingMockBehaviorAssertCanExecuteTest {
     private ProxyInvocation createProxyInvocation(Method method) {
         StackTraceElement[] stackTrace = new StackTraceElement[]{new StackTraceElement("class", "method", "file", 0)};
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
-        return new ProxyInvocation(null, null, method, arguments, stackTrace);
+        return new ProxyInvocation(null, null, null, method, arguments, stackTrace);
     }
 
 

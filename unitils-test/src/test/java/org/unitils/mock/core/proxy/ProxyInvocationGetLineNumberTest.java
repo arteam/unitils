@@ -37,7 +37,7 @@ public class ProxyInvocationGetLineNumberTest {
         StackTraceElement stackTraceElement2 = new StackTraceElement("class2", "method2", "file2", 2);
         StackTraceElement[] stackTrace = new StackTraceElement[]{stackTraceElement1, stackTraceElement2};
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
-        proxyInvocation = new ProxyInvocation(null, null, null, arguments, stackTrace);
+        proxyInvocation = new ProxyInvocation(null, null, null, null, arguments, stackTrace);
     }
 
 

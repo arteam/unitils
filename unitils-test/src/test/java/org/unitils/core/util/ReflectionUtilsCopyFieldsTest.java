@@ -50,7 +50,7 @@ public class ReflectionUtilsCopyFieldsTest {
     private class TestClass extends SuperClass {
 
         private int field2;
-        private String field3;
+        private final String field3;
 
         private TestClass(String field1, int field2, String field3) {
             super(field1);

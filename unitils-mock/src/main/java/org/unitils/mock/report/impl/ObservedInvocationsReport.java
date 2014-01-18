@@ -124,7 +124,7 @@ public class ObservedInvocationsReport {
 
         // append the result value, if the method is non-void
         Class<?> resultType = method.getReturnType();
-        if (!Void.TYPE.equals(resultType)) {
+        if (Void.TYPE != resultType) {
             result.append(" -> ");
             Object resultValue = observedInvocation.getResult();
             Object resultAtInvocationTime = observedInvocation.getResultAtInvocationTime();

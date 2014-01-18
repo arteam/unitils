@@ -22,18 +22,11 @@
         </layout>
     </appender>
 
-    <logger name="org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver">
-        <level value="INFO"/>
+    <logger name="org.unitils">
+        <level value="DEBUG"/>
     </logger>
-    <logger name="org.springframework">
-        <level value="WARN"/>
-    </logger>
-    <logger name="org.hibernate">
-        <level value="WARN"/>
-    </logger>
-
     <root>
-        <priority value="INFO"/>
+        <priority value="WARN"/>
         <appender-ref ref="STDOUT"/>
     </root>
 </log4j:configuration>

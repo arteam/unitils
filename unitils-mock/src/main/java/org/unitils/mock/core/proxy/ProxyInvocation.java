@@ -30,6 +30,8 @@ import static java.lang.reflect.Modifier.isAbstract;
  */
 public class ProxyInvocation {
 
+    /* The identifier of the proxy */
+    protected String proxyId;
     /* The display name of the proxy */
     protected String proxyName;
     /* The proxy on which the method was called */
@@ -45,13 +47,15 @@ public class ProxyInvocation {
     /**
      * Creates an invocation.
      *
+     * @param proxyId        The identifier of the proxy, not null
      * @param proxyName      The display name of the proxy, not null
      * @param proxy          The proxy on which the method was called, not null
      * @param method         The method that was called, not null
      * @param arguments      The arguments that were used (pass by reference), not null
      * @param invokedAtTrace The trace of the invocation, not null
      */
-    public ProxyInvocation(String proxyName, Object proxy, Method method, List<Argument<?>> arguments, StackTraceElement[] invokedAtTrace) {
+    public ProxyInvocation(String proxyId, String proxyName, Object proxy, Method method, List<Argument<?>> arguments, StackTraceElement[] invokedAtTrace) {
+        this.proxyId = proxyId;
         this.proxyName = proxyName;
         this.proxy = proxy;
         this.method = method;
@@ -70,6 +74,7 @@ public class ProxyInvocation {
      * @param proxyInvocation The proxy invocation to copy, not null
      */
     public ProxyInvocation(ProxyInvocation proxyInvocation) {
+        this.proxyId = proxyInvocation.proxyId;
         this.proxyName = proxyInvocation.proxyName;
         this.proxy = proxyInvocation.proxy;
         this.method = proxyInvocation.method;
@@ -132,7 +137,14 @@ public class ProxyInvocation {
     }
 
     /**
-     * @return The proxy on which the method was called, not null
+     * @return The id of the proxy on which the method was called, not null
+     */
+    public String getProxyId() {
+        return proxyId;
+    }
+
+    /**
+     * @return The name of the proxy on which the method was called, not null
      */
     public String getProxyName() {
         return proxyName;

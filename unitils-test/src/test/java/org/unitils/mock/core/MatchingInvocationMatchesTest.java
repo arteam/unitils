@@ -57,7 +57,7 @@ public class MatchingInvocationMatchesTest extends UnitilsJUnit4 {
         otherTestMethod = MyInterface.class.getMethod("otherTestMethod");
 
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, testMethod, arguments, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation("1", null, null, testMethod, arguments, null);
         List<ArgumentMatcher<?>> argumentMatchers = new ArrayList<ArgumentMatcher<?>>();
         argumentMatchers.add(argumentMatcherMock1.getMock());
         argumentMatchers.add(argumentMatcherMock2.getMock());
@@ -72,15 +72,23 @@ public class MatchingInvocationMatchesTest extends UnitilsJUnit4 {
         arguments.add(argument2);
         argumentMatcherMock1.returns(SAME).matches(argument1);
         argumentMatcherMock2.returns(MATCH).matches(argument2);
-        ProxyInvocation proxyInvocation = createProxyInvocation(testMethod, arguments);
+        ProxyInvocation proxyInvocation = createProxyInvocation("1", testMethod, arguments);
 
         int result = matchingInvocation.matches(proxyInvocation);
         assertEquals(3, result);
     }
 
     @Test
+    public void minusOneWhenDifferentProxy() {
+        ProxyInvocation proxyInvocation = createProxyInvocation("xxx", testMethod);
+
+        int result = matchingInvocation.matches(proxyInvocation);
+        assertEquals(-1, result);
+    }
+
+    @Test
     public void minusOneWhenDifferentMethod() {
-        ProxyInvocation proxyInvocation = createProxyInvocation(otherTestMethod);
+        ProxyInvocation proxyInvocation = createProxyInvocation("1", otherTestMethod);
 
         int result = matchingInvocation.matches(proxyInvocation);
         assertEquals(-1, result);
@@ -93,20 +101,20 @@ public class MatchingInvocationMatchesTest extends UnitilsJUnit4 {
         arguments.add(argument2);
         argumentMatcherMock1.returns(SAME).matches(argument1);
         argumentMatcherMock2.returns(NO_MATCH).matches(argument2);
-        ProxyInvocation proxyInvocation = createProxyInvocation(testMethod, arguments);
+        ProxyInvocation proxyInvocation = createProxyInvocation("1", testMethod, arguments);
 
         int result = matchingInvocation.matches(proxyInvocation);
         assertEquals(-1, result);
     }
 
 
-    private ProxyInvocation createProxyInvocation(Method method) {
+    private ProxyInvocation createProxyInvocation(String id, Method method) {
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
-        return createProxyInvocation(method, arguments);
+        return createProxyInvocation(id, method, arguments);
     }
 
-    private ProxyInvocation createProxyInvocation(Method method, List<Argument<?>> arguments) {
-        return new ProxyInvocation(null, null, method, arguments, null);
+    private ProxyInvocation createProxyInvocation(String id, Method method, List<Argument<?>> arguments) {
+        return new ProxyInvocation(id, null, null, method, arguments, null);
     }
 
 

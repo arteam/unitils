@@ -40,7 +40,7 @@ public class StubMockBehaviorExecuteTest {
     @Test
     public void nullWhenVoidMethod() throws Exception {
         Method method = MyInterface.class.getMethod("voidMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         Object result = stubMockBehavior.execute(proxyInvocation);
         assertNull(result);

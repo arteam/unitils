@@ -38,7 +38,7 @@ public class ProxyInvocationGetMethodTest {
     public void initialize() throws Exception {
         method = MyInterface.class.getMethod("method");
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
-        proxyInvocation = new ProxyInvocation(null, null, method, arguments, null);
+        proxyInvocation = new ProxyInvocation(null, null, null, method, arguments, null);
     }
 
 

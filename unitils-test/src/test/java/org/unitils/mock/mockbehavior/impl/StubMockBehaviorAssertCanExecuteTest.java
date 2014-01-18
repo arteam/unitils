@@ -38,7 +38,7 @@ public class StubMockBehaviorAssertCanExecuteTest {
     @Test
     public void alwaysAllowed() throws Exception {
         Method method = MyInterface.class.getMethod("voidMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         stubMockBehavior.assertCanExecute(proxyInvocation);
     }

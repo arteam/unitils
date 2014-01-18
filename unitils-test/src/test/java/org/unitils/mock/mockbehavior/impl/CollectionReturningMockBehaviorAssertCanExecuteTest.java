@@ -41,7 +41,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void listReturnType() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior("1", "2");
         Method method = MyInterface.class.getMethod("listMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
     }
@@ -50,7 +50,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void setReturnType() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior("1", "2");
         Method method = MyInterface.class.getMethod("setMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
     }
@@ -59,16 +59,16 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void arrayReturnType() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior("1", "2");
         Method method = MyInterface.class.getMethod("arrayMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
     }
 
     @Test
     public void nullReturnValue() throws Exception {
-        collectionReturningMockBehavior = new CollectionReturningMockBehavior(null);
+        collectionReturningMockBehavior = new CollectionReturningMockBehavior((Object[]) null);
         Method method = MyInterface.class.getMethod("listMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
     }
@@ -77,7 +77,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void nullElementValues() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior(null, null);
         Method method = MyInterface.class.getMethod("listMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
     }
@@ -86,7 +86,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void emptyReturnValue() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior();
         Method method = MyInterface.class.getMethod("listMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
     }
@@ -95,7 +95,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void assignableListValues() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior(new SubClass(), new MyClass());
         Method method = MyInterface.class.getMethod("myClassListMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
     }
@@ -104,7 +104,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void assignableSetValues() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior(new SubClass(), new MyClass());
         Method method = MyInterface.class.getMethod("myClassSetMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
     }
@@ -113,7 +113,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void assignableArrayValues() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior(new SubClass(), new MyClass());
         Method method = MyInterface.class.getMethod("myClassArrayMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
     }
@@ -122,7 +122,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void wildcard() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior(new SubClass(), new MyClass());
         Method method = MyInterface.class.getMethod("wildcardMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
     }
@@ -131,7 +131,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void assignableWildcardExtend() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior(new SubClass(), new MyClass());
         Method method = MyInterface.class.getMethod("extendsWildcardMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
     }
@@ -140,7 +140,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void rawListType() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior("1", "2");
         Method method = MyInterface.class.getMethod("rawListMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
     }
@@ -150,7 +150,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
         GenericClass<String> genericClass = new GenericClass<String>();
         collectionReturningMockBehavior = new CollectionReturningMockBehavior("1", "2");
         Method method = genericClass.getClass().getMethod("listMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
     }
@@ -160,7 +160,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
         GenericClass<Properties> propertiesGenericClass = new GenericClass<Properties>();
         collectionReturningMockBehavior = new CollectionReturningMockBehavior("1", "2");
         Method method = propertiesGenericClass.getClass().getMethod("listMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
     }
@@ -169,7 +169,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void notBoundType() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior("1", "2");
         Method method = MyInterface.class.getMethod("notBoundType");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
     }
@@ -178,7 +178,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void rawSetType() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior("1", "2");
         Method method = MyInterface.class.getMethod("rawSetMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
     }
@@ -187,7 +187,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void exceptionWhenNotAssignableWildcardExtend() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior(new Properties());
         Method method = MyInterface.class.getMethod("extendsWildcardMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         try {
             collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
             fail("UnitilsException expected");
@@ -200,7 +200,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void exceptionWhenNotAssignableListValue() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior(new Properties());
         Method method = MyInterface.class.getMethod("listMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         try {
             collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
             fail("UnitilsException expected");
@@ -213,7 +213,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void exceptionWhenNotAssignableSetValue() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior(new Properties());
         Method method = MyInterface.class.getMethod("listMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         try {
             collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
             fail("UnitilsException expected");
@@ -226,7 +226,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void exceptionWhenNotAssignableArrayValue() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior(new Properties());
         Method method = MyInterface.class.getMethod("arrayMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         try {
             collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
             fail("UnitilsException expected");
@@ -239,7 +239,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void wrappedReturnValue() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior(new MyWrapper("test"));
         Method method = MyInterface.class.getMethod("listMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
     }
@@ -248,7 +248,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void exceptionWhenVoidReturnType() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior("test");
         Method method = MyInterface.class.getMethod("voidMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         try {
             collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
             fail("UnitilsException expected");
@@ -261,7 +261,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void exceptionWhenWrappedTypeIsNotAssignableToReturnType() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior(new MyWrapper("value"));
         Method method = MyInterface.class.getMethod("myClassListMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         try {
             collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
             fail("UnitilsException expected");
@@ -274,7 +274,7 @@ public class CollectionReturningMockBehaviorAssertCanExecuteTest {
     public void exceptionWhenNotListSetOrArray() throws Exception {
         collectionReturningMockBehavior = new CollectionReturningMockBehavior(new Properties());
         Method method = MyInterface.class.getMethod("method");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         try {
             collectionReturningMockBehavior.assertCanExecute(proxyInvocation);
             fail("UnitilsException expected");

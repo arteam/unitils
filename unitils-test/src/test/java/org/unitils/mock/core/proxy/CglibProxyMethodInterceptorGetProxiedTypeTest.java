@@ -32,7 +32,7 @@ public class CglibProxyMethodInterceptorGetProxiedTypeTest {
 
     @Before
     public void initialize() throws Exception {
-        cglibProxyMethodInterceptor = new CglibProxyMethodInterceptor<Map>("mockName", Map.class, null, null, null);
+        cglibProxyMethodInterceptor = new CglibProxyMethodInterceptor<Map>("1", "mockName", Map.class, null, null, null);
     }
 
 

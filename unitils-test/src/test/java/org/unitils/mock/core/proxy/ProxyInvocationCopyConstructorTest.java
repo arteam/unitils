@@ -40,7 +40,7 @@ public class ProxyInvocationCopyConstructorTest {
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
         arguments.add(new Argument<String>("1", "2", String.class));
         StackTraceElement[] stackTrace = new StackTraceElement[]{new StackTraceElement("class", "method", "file", 1)};
-        proxyInvocation = new ProxyInvocation("name", proxy, method, arguments, stackTrace);
+        proxyInvocation = new ProxyInvocation("1", "name", proxy, method, arguments, stackTrace);
     }
 
 

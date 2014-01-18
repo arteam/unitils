@@ -126,7 +126,7 @@ public class ObjectFormatterFormatTest {
 
     @Test
     public void cglibProxy() {
-        Object proxy = proxyService.createProxy("name", false, new ProxyInvocationHandler() {
+        Object proxy = proxyService.createProxy("1", "name", false, new ProxyInvocationHandler() {
             public Object handleInvocation(ProxyInvocation proxyInvocation) throws Throwable {
                 return null;
             }

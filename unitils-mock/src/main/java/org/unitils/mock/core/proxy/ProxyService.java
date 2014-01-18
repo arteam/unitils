@@ -64,7 +64,7 @@ public class ProxyService {
      * @return The proxy object, not null
      */
     @SuppressWarnings("unchecked")
-    public <T> T createProxy(String name, boolean initialize, ProxyInvocationHandler invocationHandler, Class<T> proxiedClass, Class<?>... implementedInterfaces) {
+    public <T> T createProxy(String proxyId, String name, boolean initialize, ProxyInvocationHandler invocationHandler, Class<T> proxiedClass, Class<?>... implementedInterfaces) {
         Class<T> enhancedClass;
         try {
             enhancedClass = createEnhancedClass(proxiedClass, implementedInterfaces);
@@ -78,7 +78,7 @@ public class ProxyService {
         } else {
             proxy = (Factory) createUninitializedInstanceOfType(enhancedClass);
         }
-        proxy.setCallbacks(new Callback[]{new CglibProxyMethodInterceptor<T>(name, proxiedClass, invocationHandler, this, cloneService)});
+        proxy.setCallbacks(new Callback[]{new CglibProxyMethodInterceptor<T>(proxyId, name, proxiedClass, invocationHandler, this, cloneService)});
         return (T) proxy;
     }
 

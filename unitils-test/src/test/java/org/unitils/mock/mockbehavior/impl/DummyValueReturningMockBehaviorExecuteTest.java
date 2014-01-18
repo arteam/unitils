@@ -107,7 +107,7 @@ public class DummyValueReturningMockBehaviorExecuteTest extends UnitilsJUnit4 {
 
     private ProxyInvocation createProxyInvocation(Method method) {
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
-        return new ProxyInvocation(null, null, method, arguments, null);
+        return new ProxyInvocation(null, null, null, method, arguments, null);
     }
 
 

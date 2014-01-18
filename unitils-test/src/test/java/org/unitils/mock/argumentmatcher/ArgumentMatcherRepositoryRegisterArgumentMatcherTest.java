@@ -105,7 +105,7 @@ public class ArgumentMatcherRepositoryRegisterArgumentMatcherTest extends Unitil
         for (String argumentValue : argumentValues) {
             arguments.add(new Argument<String>(argumentValue, argumentValue, String.class));
         }
-        return new ProxyInvocation("mockName", null, method, arguments, stackTrace);
+        return new ProxyInvocation("1", "mockName", null, method, arguments, stackTrace);
     }
 
     private static interface MyInterface {

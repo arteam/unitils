@@ -33,7 +33,7 @@ public class ProxyInvocationIsVoidMethodTest {
     @Test
     public void trueWhenVoidMethod() throws Exception {
         Method method = TestInterface.class.getMethod("voidMethod");
-        proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         boolean result = proxyInvocation.isVoidMethod();
         assertTrue(result);
@@ -42,7 +42,7 @@ public class ProxyInvocationIsVoidMethodTest {
     @Test
     public void falseWhenNotVoidMethod() throws Exception {
         Method method = TestInterface.class.getMethod("returnMethod");
-        proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
         boolean result = proxyInvocation.isVoidMethod();
         assertFalse(result);

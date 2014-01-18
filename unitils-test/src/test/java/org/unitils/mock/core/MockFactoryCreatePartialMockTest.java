@@ -18,6 +18,7 @@ package org.unitils.mock.core;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.core.UnitilsException;
 import org.unitils.mock.CreateMockListener;
 import org.unitils.mock.Mock;
 import org.unitils.mock.PartialMock;
@@ -88,8 +89,8 @@ public class MockFactoryCreatePartialMockTest extends UnitilsJUnit4 {
 
     @Test
     public void createPartialMock() {
-        proxyServiceMock.returns(proxy).createProxy("name", true, mockProxyInvocationHandler, Properties.class);
-        proxyServiceMock.returns(matchingProxy).createProxy("name", false, matchingProxyInvocationHandler, Properties.class);
+        proxyServiceMock.returns(proxy).createProxy(null, "name", true, mockProxyInvocationHandler, Properties.class);
+        proxyServiceMock.returns(matchingProxy).createProxy(null, "name", false, matchingProxyInvocationHandler, Properties.class);
 
         PartialMock<Properties> result = mockFactory.createPartialMock("name", Properties.class, testObject);
         PartialMockObject<Properties> mockObject = (PartialMockObject<Properties>) result;
@@ -110,8 +111,8 @@ public class MockFactoryCreatePartialMockTest extends UnitilsJUnit4 {
         Properties prototype = new Properties();
         Properties prototypeProxy = new Properties();
         prototype.put("test", "123");
-        proxyServiceMock.returns(prototypeProxy).createProxy("name", true, mockProxyInvocationHandler, Properties.class);
-        proxyServiceMock.returns(matchingProxy).createProxy("name", false, matchingProxyInvocationHandler, Properties.class);
+        proxyServiceMock.returns(prototypeProxy).createProxy(null, "name", true, mockProxyInvocationHandler, Properties.class);
+        proxyServiceMock.returns(matchingProxy).createProxy(null, "name", false, matchingProxyInvocationHandler, Properties.class);
 
         PartialMock<Properties> result = mockFactory.createPartialMock("name", prototype, testObject);
         PartialMockObject<Properties> mockObject = (PartialMockObject<Properties>) result;
@@ -151,9 +152,22 @@ public class MockFactoryCreatePartialMockTest extends UnitilsJUnit4 {
     public void mockCreatedCalledForPrototypeWhenTestObjectIsCreateMockListener() {
         Properties prototype = new Properties();
         Properties prototypeProxy = new Properties();
-        proxyServiceMock.returns(prototypeProxy).createProxy("name", true, mockProxyInvocationHandler, Properties.class);
+        proxyServiceMock.returns(prototypeProxy).createProxy(null, "name", true, mockProxyInvocationHandler, Properties.class);
 
         Mock<Properties> mock = mockFactory.createPartialMock("name", prototype, createMockListenerMock.getMock());
         createMockListenerMock.assertInvoked().mockCreated(mock, "name", Properties.class);
+    }
+
+    @Test
+    public void exceptionWhenCopyFieldsFails() {
+        proxyServiceMock.returns(proxy).createProxy(null, "name", true, mockProxyInvocationHandler, Properties.class);
+        proxyServiceMock.returns(matchingProxy).createProxy(null, "name", false, matchingProxyInvocationHandler, Properties.class);
+        try {
+            // forces a copy from the wrong type  (StringBuilder to Properties)
+            mockFactory.createPartialMock("name", new StringBuilder(), testObject);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to create partial mock from prototype. Unable to copy fields values from prototype to mock instance for class java.lang.StringBuilder.", e.getMessage());
+        }
     }
 }

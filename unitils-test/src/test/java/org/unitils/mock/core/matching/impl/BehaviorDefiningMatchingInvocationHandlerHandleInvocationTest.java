@@ -61,7 +61,7 @@ public class BehaviorDefiningMatchingInvocationHandlerHandleInvocationTest exten
 
         Method method = MyInterface.class.getMethod("method");
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
-        ProxyInvocation proxyInvocation = new ProxyInvocation("mock", null, method, arguments, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation("i", "mock", null, method, arguments, null);
         matchingInvocation = new MatchingInvocation(proxyInvocation, null);
         behaviorDefiningInvocation = new BehaviorDefiningInvocation(matchingInvocation, mockBehaviorMock.getMock(), false);
     }

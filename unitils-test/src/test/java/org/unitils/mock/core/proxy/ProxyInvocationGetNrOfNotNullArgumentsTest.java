@@ -36,7 +36,7 @@ public class ProxyInvocationGetNrOfNotNullArgumentsTest {
     @Before
     public void initialize() {
         arguments = new ArrayList<Argument<?>>();
-        proxyInvocation = new ProxyInvocation(null, null, null, arguments, null);
+        proxyInvocation = new ProxyInvocation(null, null, null, null, arguments, null);
     }
 
 
@@ -67,7 +67,7 @@ public class ProxyInvocationGetNrOfNotNullArgumentsTest {
 
     @Test
     public void zeroWhenNullArgumentsAtInvocationTime() throws Throwable {
-        proxyInvocation = new ProxyInvocation(null, null, null, null, null);
+        proxyInvocation = new ProxyInvocation(null, null, null, null, null, null);
 
         int result = proxyInvocation.getNrOfNotNullArguments();
         assertEquals(0, result);

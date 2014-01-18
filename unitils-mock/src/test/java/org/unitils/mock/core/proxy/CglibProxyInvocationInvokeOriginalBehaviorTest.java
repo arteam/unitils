@@ -56,7 +56,7 @@ public class CglibProxyInvocationInvokeOriginalBehaviorTest {
         methodProxy = MethodProxy.create(MyClass.class, MyClass.class, getMethodDescriptor(method), "method", "method");
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
         arguments.add(new Argument<String>("value", "cloned value", String.class));
-        cglibProxyInvocation = new CglibProxyInvocation("mockName", method, arguments, stackTrace, new MyClass(), methodProxy);
+        cglibProxyInvocation = new CglibProxyInvocation("i", "mockName", method, arguments, stackTrace, new MyClass(), methodProxy);
 
         Object result = cglibProxyInvocation.invokeOriginalBehavior();
         assertEquals("original result value", result);
@@ -65,8 +65,8 @@ public class CglibProxyInvocationInvokeOriginalBehaviorTest {
     @Test
     public void exceptionWhenAbstractMethod() throws Throwable {
         Method method = AbstractClass.class.getDeclaredMethod("abstractMethod");
-        methodProxy = MethodProxy.create(AbstractClass.class, Void.class, getMethodDescriptor(method), "abstractMethod", "abstractMethod");
-        cglibProxyInvocation = new CglibProxyInvocation("mockName", method, Collections.<Argument<?>>emptyList(), stackTrace, "object", methodProxy);
+        methodProxy = MethodProxy.create(AbstractClass.class, Void.TYPE, getMethodDescriptor(method), "abstractMethod", "abstractMethod");
+        cglibProxyInvocation = new CglibProxyInvocation("i", "mockName", method, Collections.<Argument<?>>emptyList(), stackTrace, "object", methodProxy);
         try {
             cglibProxyInvocation.invokeOriginalBehavior();
             fail("UnitilsException expected");

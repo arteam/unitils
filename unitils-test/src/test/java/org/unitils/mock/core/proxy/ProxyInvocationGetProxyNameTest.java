@@ -30,7 +30,7 @@ public class ProxyInvocationGetProxyNameTest {
 
     @Before
     public void initialize() {
-        proxyInvocation = new ProxyInvocation("proxy name", null, null, null, null);
+        proxyInvocation = new ProxyInvocation(null, "proxy name", null, null, null, null);
     }
 
 

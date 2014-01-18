@@ -48,7 +48,7 @@ public class ArgumentMatcherRepositoryStartMatchingInvocationTest extends Unitil
         Method method = MyInterface.class.getMethod("method");
         StackTraceElement element = new StackTraceElement(MyInterface.class.getName(), "method1", "file", 222);
         List<Argument<?>> arguments = new ArrayList<Argument<?>>();
-        proxyInvocation = new ProxyInvocation("mockName", null, method, arguments, new StackTraceElement[]{element});
+        proxyInvocation = new ProxyInvocation("1", "mockName", null, method, arguments, new StackTraceElement[]{element});
     }
 
 

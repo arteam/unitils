@@ -39,7 +39,7 @@ public class CollectionReturningMockBehaviorExecuteTest {
     @Test
     public void listMethod() throws Exception {
         Method method = MyInterface.class.getMethod("listMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         collectionReturningMockBehavior = new CollectionReturningMockBehavior("1", "2");
 
         Object result = collectionReturningMockBehavior.execute(proxyInvocation);
@@ -50,7 +50,7 @@ public class CollectionReturningMockBehaviorExecuteTest {
     @Test
     public void setMethod() throws Exception {
         Method method = MyInterface.class.getMethod("setMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         collectionReturningMockBehavior = new CollectionReturningMockBehavior("1", "2", "1", "2");
 
         Object result = collectionReturningMockBehavior.execute(proxyInvocation);
@@ -61,7 +61,7 @@ public class CollectionReturningMockBehaviorExecuteTest {
     @Test
     public void arrayMethod() throws Exception {
         Method method = MyInterface.class.getMethod("arrayMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         collectionReturningMockBehavior = new CollectionReturningMockBehavior("1", "2");
 
         Object result = collectionReturningMockBehavior.execute(proxyInvocation);
@@ -72,8 +72,8 @@ public class CollectionReturningMockBehaviorExecuteTest {
     @Test
     public void nullWhenNullValue() throws Exception {
         Method method = MyInterface.class.getMethod("listMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
-        collectionReturningMockBehavior = new CollectionReturningMockBehavior(null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
+        collectionReturningMockBehavior = new CollectionReturningMockBehavior((Object[]) null);
 
         Object result = collectionReturningMockBehavior.execute(proxyInvocation);
         assertNull(result);
@@ -82,7 +82,7 @@ public class CollectionReturningMockBehaviorExecuteTest {
     @Test
     public void unwrapWrappedTypes() throws Exception {
         Method method = MyInterface.class.getMethod("listMethod");
-        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, method, null, null);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
         collectionReturningMockBehavior = new CollectionReturningMockBehavior(new MyWrapper("1"), new MyWrapper("2"));
 
         Object result = collectionReturningMockBehavior.execute(proxyInvocation);

@@ -31,7 +31,7 @@ public class ProxyInvocationInvokeOriginalBehaviorTest {
 
     @Before
     public void initialize() {
-        proxyInvocation = new ProxyInvocation(null, null, null, null, null);
+        proxyInvocation = new ProxyInvocation(null, null, null, null, null, null);
     }
 
 
