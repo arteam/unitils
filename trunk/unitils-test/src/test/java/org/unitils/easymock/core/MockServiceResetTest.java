@@ -50,8 +50,6 @@ public class MockServiceResetTest extends UnitilsJUnit4 {
         mockService.createMock(MyInterface.class, InvocationOrder.DEFAULT, Calls.DEFAULT, Order.DEFAULT, Dates.DEFAULT, Defaults.IGNORE_DEFAULTS);
         mockService.createRegularMock(MyInterface.class, InvocationOrder.DEFAULT, Calls.DEFAULT);
 
-        // todo this does not seem to work in unitils-mock (reset is special name?)
-
         mockService.reset();
         mocksControlMock1.assertInvoked().reset();
         mocksControlMock2.assertInvoked().reset();

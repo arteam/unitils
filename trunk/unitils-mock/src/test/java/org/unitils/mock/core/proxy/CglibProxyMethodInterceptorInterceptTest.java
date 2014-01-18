@@ -20,12 +20,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.util.ObjectToFormat;
-import org.unitils.mock.ArgumentMatchers;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
-import org.unitils.mock.argumentmatcher.Capture;
 import org.unitils.mock.core.util.CloneService;
-import org.unitils.reflectionassert.ReflectionAssert;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -83,7 +80,15 @@ public class CglibProxyMethodInterceptorInterceptTest extends UnitilsJUnit4 {
     }
 
     @Test
-    public void equalsReturnsFalseWhenNotSame() throws Throwable {
+    public void cloneReturnsProxyItself() throws Throwable {
+        Method method = MyClass.class.getDeclaredMethod("clone");
+
+        Object result = cglibProxyMethodInterceptor.intercept(proxy, method, new Object[0], methodProxy);
+        assertSame(proxy, result);
+    }
+
+    @Test
+    public void equalsReturnsFalseWhenNotSameIfNoBehaviorDefined() throws Throwable {
         Method method = MyClass.class.getDeclaredMethod("equals", Object.class);
 
         Object result = cglibProxyMethodInterceptor.intercept(proxy, method, new Object[]{new MyClass()}, methodProxy);
@@ -91,7 +96,18 @@ public class CglibProxyMethodInterceptorInterceptTest extends UnitilsJUnit4 {
     }
 
     @Test
-    public void hashCodeReturnsHashCodeOfInterceptor() throws Throwable {
+    public void equalsCanBeOverridden() throws Throwable {
+        Method method = MyClass.class.getDeclaredMethod("equals", Object.class);
+        List<Argument<?>> arguments = new ArrayList<Argument<?>>(0);
+        CglibProxyInvocation cglibProxyInvocation = new CglibProxyInvocation("i", "myProxy", method, arguments, stackTrace, proxy, methodProxy);
+        proxyInvocationHandlerMock.returns(true).handleInvocation(cglibProxyInvocation);
+
+        Object result = cglibProxyMethodInterceptor.intercept(proxy, method, new Object[0], methodProxy);
+        assertEquals(true, result);
+    }
+
+    @Test
+    public void hashCodeReturnsHashCodeOfInterceptorIfNoBehaviorDefined() throws Throwable {
         Method method = MyClass.class.getDeclaredMethod("hashCode");
 
         Object result = cglibProxyMethodInterceptor.intercept(proxy, method, new Object[0], methodProxy);
@@ -99,11 +115,14 @@ public class CglibProxyMethodInterceptorInterceptTest extends UnitilsJUnit4 {
     }
 
     @Test
-    public void cloneReturnsProxyItself() throws Throwable {
-        Method method = MyClass.class.getDeclaredMethod("clone");
+    public void hashCodeCanBeOverridden() throws Throwable {
+        Method method = MyClass.class.getDeclaredMethod("hashCode");
+        List<Argument<?>> arguments = new ArrayList<Argument<?>>(0);
+        CglibProxyInvocation cglibProxyInvocation = new CglibProxyInvocation("i", "myProxy", method, arguments, stackTrace, proxy, methodProxy);
+        proxyInvocationHandlerMock.returns(55).handleInvocation(cglibProxyInvocation);
 
         Object result = cglibProxyMethodInterceptor.intercept(proxy, method, new Object[0], methodProxy);
-        assertSame(proxy, result);
+        assertEquals(55, result);
     }
 
     @Test
@@ -122,11 +141,7 @@ public class CglibProxyMethodInterceptorInterceptTest extends UnitilsJUnit4 {
         proxyInvocationHandlerMock.returns("result").handleInvocation(cglibProxyInvocation);
 
         Object result = cglibProxyMethodInterceptor.intercept(proxy, method, new Object[0], methodProxy);
-
-        Capture<CglibProxyInvocation> capture = new Capture<CglibProxyInvocation>(CglibProxyInvocation.class);
-        proxyInvocationHandlerMock.assertInvoked().handleInvocation(ArgumentMatchers.get(capture));
-        ReflectionAssert.assertReflectionEquals(cglibProxyInvocation, capture.getValue());
-//        assertEquals("result", result);
+        assertEquals("result", result);
     }
 
     @Test

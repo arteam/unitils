@@ -27,8 +27,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.unitils.core.util.MethodUtils.isToStringMethod;
-
 /**
  * Mock behavior that returns a default value.
  * <p/>
@@ -52,8 +50,7 @@ public class DefaultValueReturningMockBehavior implements ValidatableMockBehavio
      * @param proxyInvocation The proxy method invocation, not null
      */
     public void assertCanExecute(ProxyInvocation proxyInvocation) throws UnitilsException {
-        Class<?> returnType = proxyInvocation.getMethod().getReturnType();
-        if (returnType == Void.TYPE) {
+        if (proxyInvocation.isVoidMethod()) {
             throw new UnitilsException("Trying to define mock behavior that returns a value for a void method.");
         }
     }
@@ -67,11 +64,11 @@ public class DefaultValueReturningMockBehavior implements ValidatableMockBehavio
     @SuppressWarnings("unchecked")
     public Object execute(ProxyInvocation proxyInvocation) {
         Method method = proxyInvocation.getMethod();
-        if (isToStringMethod(method)) {
+        if (proxyInvocation.isToStringMethod()) {
             return proxyInvocation.getProxyName();
         }
         Class<?> returnType = method.getReturnType();
-        if (returnType == Void.TYPE) {
+        if (proxyInvocation.isVoidMethod()) {
             return null;
         }
         if (Boolean.class.equals(returnType) || Boolean.TYPE.equals(returnType)) {
