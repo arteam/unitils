@@ -32,6 +32,9 @@ public class PartialMockProxyInvocationHandler<T> extends MockProxyInvocationHan
 
     @Override
     protected MockBehavior getDefaultMockBehavior(ProxyInvocation proxyInvocation) {
+        if (proxyInvocation.isEqualsMethod() || proxyInvocation.isHashCodeMethod()) {
+            return null;
+        }
         if (proxyInvocation.isAbstractMethod()) {
             return super.getDefaultMockBehavior(proxyInvocation);
         }

@@ -123,6 +123,27 @@ public class ProxyInvocation {
     }
 
     /**
+     * @return True if the method is the toString() method
+     */
+    public boolean isToStringMethod() {
+        return "toString".equals(method.getName()) && 0 == method.getParameterTypes().length;
+    }
+
+    /**
+     * @return True if the method is the equals() method
+     */
+    public boolean isEqualsMethod() {
+        return "equals".equals(method.getName()) && 1 == method.getParameterTypes().length && Object.class.equals(method.getParameterTypes()[0]);
+    }
+
+    /**
+     * @return True if the method is the hashCode() method
+     */
+    public boolean isHashCodeMethod() {
+        return "hashCode".equals(method.getName()) && 0 == method.getParameterTypes().length;
+    }
+
+    /**
      * @return The location of the invocation, not null
      */
     public StackTraceElement getInvokedAt() {

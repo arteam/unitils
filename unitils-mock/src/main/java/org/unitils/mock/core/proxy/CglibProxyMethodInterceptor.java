@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.reflect.Modifier.isAbstract;
-import static org.unitils.core.util.MethodUtils.*;
 
 /**
  * A cglib method interceptor that will delegate the invocations to the given invocation handler.
@@ -79,15 +78,11 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
      * @return The value to return for the method call, ignored for void methods
      */
     public Object intercept(Object proxy, Method method, Object[] arguments, MethodProxy methodProxy) throws Throwable {
-        if (isFinalizeMethod(method)) {
+        if ("finalize".equals(method.getName()) && 0 == method.getParameterTypes().length) {
             return null;
-        } else if (isEqualsMethod(method)) {
-            return proxy == arguments[0];
-        } else if (isHashCodeMethod(method)) {
-            return super.hashCode();
-        } else if (isCloneMethod(method)) {
+        } else if ("clone".equals(method.getName()) && 0 == method.getParameterTypes().length) {
             return proxy;
-        } else if (isFormatObjectMethod(method)) {
+        } else if ("$formatObject".equals(method.getName()) && 0 == method.getParameterTypes().length) {
             return "Proxy<" + proxyName + ">";
         }
 
@@ -96,10 +91,16 @@ public class CglibProxyMethodInterceptor<T> implements MethodInterceptor {
         StackTraceElement[] proxiedMethodStackTrace = proxyService.getProxiedMethodStackTrace(stackTrace);
         List<Argument<?>> argumentsList = getArguments(arguments, argumentTypes);
 
-        ProxyInvocation invocation = new CglibProxyInvocation(proxyId, proxyName, method, argumentsList, proxiedMethodStackTrace, proxy, methodProxy);
-        Object result = proxyInvocationHandler.handleInvocation(invocation);
-        if (result == null && isToStringMethod(method)) {
-            return getProxiedType().getName() + "@" + Integer.toHexString(super.hashCode());
+        ProxyInvocation proxyInvocation = new CglibProxyInvocation(proxyId, proxyName, method, argumentsList, proxiedMethodStackTrace, proxy, methodProxy);
+        Object result = proxyInvocationHandler.handleInvocation(proxyInvocation);
+        if (result == null) {
+            if (proxyInvocation.isToStringMethod()) {
+                return getProxiedType().getName() + "@" + Integer.toHexString(super.hashCode());
+            } else if (proxyInvocation.isEqualsMethod()) {
+                return proxy == arguments[0];
+            } else if (proxyInvocation.isHashCodeMethod()) {
+                return super.hashCode();
+            }
         }
         return result;
     }

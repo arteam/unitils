@@ -101,8 +101,38 @@ public class MockProxyInvocationHandlerHandleInvocationTest extends UnitilsJUnit
     }
 
     @Test
-    public void nullResultWhenNoMockBehaviorAndVoidMethod() throws Throwable {
+    public void nullWhenNoMockBehaviorAndVoidMethod() throws Throwable {
         Method method = MyInterface.class.getMethod("voidMethod");
+        proxyInvocation = createProxyInvocation(method);
+        behaviorDefiningInvocationsMock.returns(null).getMatchingBehaviorDefiningInvocation(proxyInvocation);
+
+        Object result = mockProxyInvocationHandler.handleInvocation(proxyInvocation);
+        assertNull(result);
+        Capture<ObservedInvocation> capture = new Capture<ObservedInvocation>(ObservedInvocation.class);
+        scenarioMock.assertInvoked().addObservedInvocation(get(capture));
+        ObservedInvocation observedInvocation = capture.getValue();
+        assertNull(observedInvocation.getResult());
+        assertNull(observedInvocation.getResultAtInvocationTime());
+    }
+
+    @Test
+    public void nullWhenNoMockBehaviorAndEqualsMethod() throws Throwable {
+        Method method = MyClass.class.getMethod("equals", Object.class);
+        proxyInvocation = createProxyInvocation(method);
+        behaviorDefiningInvocationsMock.returns(null).getMatchingBehaviorDefiningInvocation(proxyInvocation);
+
+        Object result = mockProxyInvocationHandler.handleInvocation(proxyInvocation);
+        assertNull(result);
+        Capture<ObservedInvocation> capture = new Capture<ObservedInvocation>(ObservedInvocation.class);
+        scenarioMock.assertInvoked().addObservedInvocation(get(capture));
+        ObservedInvocation observedInvocation = capture.getValue();
+        assertNull(observedInvocation.getResult());
+        assertNull(observedInvocation.getResultAtInvocationTime());
+    }
+
+    @Test
+    public void nullWhenNoMockBehaviorAndHashCodeMethod() throws Throwable {
+        Method method = MyClass.class.getMethod("hashCode");
         proxyInvocation = createProxyInvocation(method);
         behaviorDefiningInvocationsMock.returns(null).getMatchingBehaviorDefiningInvocation(proxyInvocation);
 
@@ -160,5 +190,8 @@ public class MockProxyInvocationHandlerHandleInvocationTest extends UnitilsJUnit
         String testMethod();
 
         void voidMethod();
+    }
+
+    private static class MyClass {
     }
 }

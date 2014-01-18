@@ -94,7 +94,7 @@ public class MockProxyInvocationHandler<T> implements ProxyInvocationHandler {
     }
 
     protected MockBehavior getDefaultMockBehavior(ProxyInvocation proxyInvocation) {
-        if (proxyInvocation.isVoidMethod()) {
+        if (proxyInvocation.isVoidMethod() || proxyInvocation.isEqualsMethod() || proxyInvocation.isHashCodeMethod()) {
             return null;
         }
         return new DefaultValueReturningMockBehavior();

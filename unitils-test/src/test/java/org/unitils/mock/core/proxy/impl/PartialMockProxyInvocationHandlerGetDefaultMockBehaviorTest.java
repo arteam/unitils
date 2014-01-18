@@ -68,6 +68,24 @@ public class PartialMockProxyInvocationHandlerGetDefaultMockBehaviorTest {
         assertNull(result);
     }
 
+    @Test
+    public void nullWhenEqualsMethod() throws Exception {
+        Method method = TestClass.class.getMethod("equals", Object.class);
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
+
+        MockBehavior result = partialMockProxyInvocationHandler.getDefaultMockBehavior(proxyInvocation);
+        assertNull(result);
+    }
+
+    @Test
+    public void nullWhenHashCodeMethod() throws Exception {
+        Method method = TestClass.class.getMethod("hashCode");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
+
+        MockBehavior result = partialMockProxyInvocationHandler.getDefaultMockBehavior(proxyInvocation);
+        assertNull(result);
+    }
+
 
     private static abstract class TestClass {
 
