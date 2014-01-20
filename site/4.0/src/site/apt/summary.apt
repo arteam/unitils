@@ -1,1 +1,0 @@
-%{include|source=site/html/summary.html|id=body|verbatim=false}
