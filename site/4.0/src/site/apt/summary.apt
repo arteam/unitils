@@ -1,0 +1,129 @@
+Summary
+~~~~~~~
+    Unitils is an open source library aimed at making unit and integration testing easy and maintainable.
+
+    It is divided into several modules, each of them providing extra support for a certain aspect of your unit and
+    integration tests. If you for example need mocking for your tests, just include unitils-mock as a dependency. If you
+    would also want to load DbUnit data sets, just include unitils-dbunit.
+
+    Below you can find a list of the modules and their features. Click on the title to go to the corresponding
+    tutorial and examples.
+
+
+* {Features}
+~~~~~~~~~~~~
+
+    {{{tutorial-reflectionassert.html} Reflection assert}}
+
+        * Equality assertion through reflection
+
+        * Possibility to ignore order of collections and Java default/null values
+
+        []
+
+    {{{tutorial-mock.html} Mock module}} - <Makes mocking easy and maintainable>
+
+        * Simple syntax for defining and asserting invoked behavior
+
+        * Gives you the best possible feedback so you can easily find out why a test is failing
+
+        * Argument matchers, partial mocking, stubbing behavior, dummy objects...
+
+        []
+
+    {{{tutorial-inject.html} Inject module}} - <Easily inject test artifacts into classes and instances>
+
+        * Inject values by type and name
+
+        * Inject into static fields, e.g. singletons, and automatically reset the old value after the test
+
+        []
+
+    {{{tutorial-io.html} IO module}} - <Support for performing IO in tests>
+
+        * Creating temporary files and directories
+
+        * Loading the contents of files into objects
+
+        []
+
+    {{{tutorial-database.html} Database testing}} - <Support for testing with databases and loading of DbUnit data sets>
+
+        * Simplify test database connection setup
+
+        * Support for setting up a separate schema/database per developer
+
+        * Transactional testing
+
+        * Easy loading of data sets
+
+        * Multi-schema data sets
+
+        * Expected data set assertions
+
+        []
+
+    {{{tutorial-dbmaintain.html} Automatic test database maintenance}} - <Use DbMaintain to automatically bring your unit test databases up to date before running your tests>
+
+        * Automatic maintenance of databases with support for incremental, repeatable and post processing scripts
+
+        * Automatically disable constraints and set sequences to a minimum value
+
+        * Generating an XSD of the database structure for dataset xml files
+
+        []
+
+
+    {{{tutorial-hibernate.html} Hibernate module}} - <Support for Hibernate database testing>
+
+        * Hibernate SessionFactory creation and session management
+
+        * Automatically test the mapping of JPA entities / hibernate mapped objects with the database
+
+        []
+
+
+    {{{tutorial-spring.html} Spring module}} - <Support for testing when your project uses Spring>
+
+        * ApplicationContext configuration and easy injection of spring managed beans into a unit test
+
+        * Support for using a Spring-configured Hibernate SessionFactory in unit tests.
+
+        []
+
+
+    {{{tutorial-easymock.html} EasyMock module}} - <Helps you set up tests that use EasyMock as a mocking framework>
+
+        * Simplify EasyMock mock object creation
+
+        * EasyMock argument matching using reflection equality
+
+        []
+
+
+
+
+* News
+~~~~~~
+  <<2011-12-22 - Release of Unitils 3.3>>
+
+    In this release a brand new module was added: io-unitils. This module adds support for creating temporary files
+    or directories and for the loading of a file contents into a field. Take a look at the {{{tutorial-io.html} tutorial}} for more info.
+
+    We've also rolled out a first version of our new site layout.
+
+    Check the {{{https://unitils.atlassian.net/secure/ReleaseNote.jspa?projectId=10000&version=10031}release notes}} for more details.
+
+
+
+  <<2011-09-29 - Release of Unitils 3.2>>
+
+    It's been a while since our last release, but now we're back. There's a new team, we're completely redoing the website and
+    there are a lot of new features in the pipeline.
+
+    This first release contains an update of the mocking and inject module and some minor fixes to the reflection assert.
+
+    A 3.3 release is planned for the end of October, a new major release is planned for the beginning of next year.
+
+    Check the {{{http://jira.unitils.org/secure/ReleaseNote.jspa?projectId=10000&version=10081}release notes}} for more details.
+

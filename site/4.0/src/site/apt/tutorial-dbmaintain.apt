@@ -1,0 +1,313 @@
+Automatic test database maintenance
+
+    When writing database tests, keep in mind following guidelines:
+
+        * Use small sets of test data, containing as few data as possible. In your data files, only specify columns that are used in join columns or
+          the where clause of the tested query.
+
+        * Make data sets test class specific. Don't reuse data sets between different test classes, for example do not use 1 big domain data set for all
+          your test classes. Doing so will make it very difficult to make changes to your test data for a test without braking anything for another test. You
+          are writing a unit test and such a test should be independent of other tests.
+
+        * Don't use too many data sets. The more data sets you use, the more maintenance is needed. Try to reuse the testclass data set for all tests in
+          that testclass. Only use method data sets if it makes your tests more understandable and clear.
+
+        * Limit the use of expected result data sets. If you do use them, only include the tables and columns that are important for the test and
+          leave out the rest.
+
+        * Use a database schema per developer. This allows developers to insert test data and run tests without interfering with each other.
+
+        * Disable all foreign key and not null constraints on the test databases. This way, the data files need to contain no more data than absolutely necessary.
+
+        []
+
+        Following section describes how Unitils provides support for these 2 last guidelines: automatic test database schema maintenance and constraints disabling.
+
+
+* {Installation}
+~~~~~~~~~~~~~~~~
+    If you are using maven, you can add following dependency to your project.
+
+%{include|source=pom.xml|id=database|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    If you are not using maven you can download the unitils-with-dependencies.zip. The required jar, unitils-database.jar, can be
+    found in the unitils-database folder, the required dependencies, in the unitils-database/lib folder.
+
+
+* {Maintaining the database structure}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    The <DBMaintainer> can automatically maintain each developer's individual database schema. It will check whether database structure updates are available
+    and apply them if necessary.
+
+    The database maintainer is disabled by default. If you want to use it you have to enable it by setting following property:
+
++-----+
+updateDataBaseSchema.enabled=true
++-----+
+
+	If enabled, the database maintainer is invoked automatically when executing a test for which a DataSource must be created. This happens at most once during
+	each test run. If no persistence layer tests (or any other tests that require a DataSource) are run, the database maintainer is not invoked.
+
+    The database maintainer works as follows: a project has a directory that contains all database scripts of the application.
+    The database maintainer monitors this directory and makes sure that every new script and every change to an existing script is applied on the database.
+
+    The directory in which the scripts are located can be configured with following property:
+
++-----+
+dbMaintainer.script.locations=myproject/dbscripts
++-----+
+
+    Multiple directories can be specified, separated by commas. Subdirectories are also scanned for script files. All scripts are required to follow a
+    particular naming pattern: they start with a version number, followed by an underscore and end with '.sql' (the supported extensions are configurable). The example below
+    shows some typical scripts names. The leading zeroes in the example are not required, they are only added for convenience, to make sure they are shown in proper sequence
+    in a file explorer window.
+
++-----+
+dbscripts/ 001_initial.sql
+           002_tracking_updates.sql
+           003_auditing_updates.sql
++-----+
+
+  Suppose you add a new script, this time with version number 4: <004_create_user_admin_tables.sql>. The next time you execute a database test, the database
+  maintainer will notice that the database structure is no longer up to date. It will update the database schema incrementally by executing all of the new scripts,
+  in this case only <004_create_user_admin_tables.sql>.
+
+  The database maintainer will also notice if one of the existing database scripts was modified. For example suppose that <002_tracking_updates.sql> was changed.
+  In that case, the database maintainer will first clear the database, thereby removing all tables and then recreate it from scratch, executing all scripts in sequence.
+
+	The database script folders may also contain scripts without a version number. Such scripts are executed last, after execution of all versioned scripts. If an
+	existing version-less script is updated, this script will be applied to the database again, the database is not recreated from scratch. We call such scripts
+	'repeatable' scripts, since their execution can be repeated without having to update from scratch. You typically use this for stored procedure definitions,
+	views or definition of reference data.
+
+  For performance reasons, it's a good practice to work incrementally, each time adding new update files for small database updates. This makes sure updates can be
+  executed very quickly. If you database is small, you could of course just as well simply maintain one script and update it each time a database update is needed.
+
+	Database scripts are often organized in multiple directories, usually grouped per application version. To define the order in which the scripts in these folders
+	must be executed, the folder names can be prefixed by a version number, just like individual scripts. For example:
+
++-----+
+dbscripts/ 01_production/ 001_initial.sql
+                          002_auditing_updates.sql
+           02_latest_dev/ 001_add_user_table.sql
+                          002_rename_product_id.sql
++-----+
+
+	In this example, the scripts in folder 01_production are executed first, the scripts in 02_latest_dev are executed afterwards.
+
+	Scripts located in a folders without a version number are executed after the scripts located in a folder with a version number. Folders may contain
+	subfolders that in turn have a version number. The same ordering system is recursively applied to those subfolders.
+
+    The database maintainer stores the current version of a database schema in a table called <DBMAINTAIN_SCRIPTS>. This way, it can determine whether the database is
+    up to date or not.
+
+    This table is by default not created automatically. This is to make sure unitils does not clear the wrong database by accident. Suppose for example
+    you have configured unitils to connect to your system test database. If you would enable the database maintainer it would see that the database is not in synch with
+    the scripts (because there is no <DBMAINTAIN_SCRIPTS> table) and as a result drop the whole database and recreate it from scratch. This is probably not the desired result.
+    Therefore a database can only be updated automatically if it is 'unitils-enabled', i.e. when it contains a <DBMAINTAIN_SCRIPTS> table.
+
+    The database maintainer will throw an exception when it does not find a version table. The correct DDL statements for creating the version table will be
+    displayed in the exception message. If desired, you can make unitils create the <DBMAINTAIN_SCRIPTS> table automatically by setting following property to true.
+
++-----+
+dbMaintainer.autoCreateExecutedScriptsTable=true
++-----+
+
+    Tip: We strongly advise to manage your project's database scripts in a version control system (e.g. cvs, subversion). This way, database scripts are brought into
+	version control just like regular code. Developers can make updates to their local copy of the scripts and have them applied to their own test database.
+	Database updates and associated java code changes are checked in together, and the rest of the team always receives these updates all at once, so that they aren't
+	bothered with failing tests.
+
+
+* Oracle PL/SQL support
+~~~~~~~~~~~~~~~~~~~~~~~
+
+	Unitils also supports Oracle functions and stored procedures, written using the PL/SQL syntax. If the database dialect is set to Oracle (property database.dialect=oracle),
+	Unitils makes sure that function, stored procedure, trigger, type, package and library declarations are correctly parsed and sent to the JDBC driver as a whole. Blocks of PL/SQL
+	code must always end with a line containing a single forward slash (/)!
+
+	Tip: Declarations of functions, stored procedures etc. can usually be executed multiple times (using the <CREATE OR REPLACE> syntax). If a stored procedure changes, the script that
+	declares the procedure can simply be re-executed: the old definition is overwritten by the new one. It's therefore a good idea to put these declarations in script files
+	containing no version number: When such a script is modified, the modified script is simply re-executed, without re-creating the database from scratch. In case of a from-scratch
+	creation of the database, the versionless scripts are executed after the versioned scripts, which is normally also the desired behavior.
+
+* Post processing scripts
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	It's often useful to have one or more database post-processing scripts: e.g. a script that compiles all PL/SQL procedures, that adds any missing grants, or that re-calculates the Oracle statistics. Scripts are automatically recognized as post-processing scripts if they are located in the subdirectory postprocessing of the scripts root dir. To change the directory in which post processing scripts are located, you can use dbMaintainer.postProcessingScript.directoryName
+
+
+* {Preserving items}
+~~~~~~~~~~~~~~~~~~~~
+
+    It's possible to exclude certain database objects from being dropped when a fromScratch update occurs, or when the clearDatabase operation is invoked: the data in these tables is also not removed when performing an update using the cleanDatabase option. If you want a table to be dropped in case of a fromScratch update, but you want it's data to preserved when performing the cleanDatabase operation, you can use one of the preserveDataOnly properties.
+
++-----+
+# Comma separated list of database items that may not be dropped or cleared by DbMaintain when
+# updating the database from scratch.
+# Schemas can also be preserved entirely. If identifiers are quoted (eg "" for oracle) they are considered
+# case sensitive. Items may be prefixed with the schema name. Items that do not have a schema prefix are
+# considered to be in the default schema.
+dbMaintainer.preserve.schemas=
+dbMaintainer.preserve.tables=
+dbMaintainer.preserve.views=
+dbMaintainer.preserve.materializedViews=
+dbMaintainer.preserve.synonyms=
+dbMaintainer.preserve.sequences=
+
+# Comma separated list of table names. The tables listed here will not be emptied during a cleanDatabase operation.
+# Data of the dbmaintain_scripts table is preserved automatically.
+# Tables listed here will still be dropped before a fromScratch update. If this is not desirable
+# you should use the property dbMaintainer.preserve.tables instead.
+# Schemas can also be preserved entirely. If identifiers are quoted (eg "" for oracle) they are considered
+# case sensitive. Items may be prefixed with the schema name. Items that do not have a schema prefix are considered
+# to be in the default schema
+dbMaintainer.preserveDataOnly.schemas=
+dbMaintainer.preserveDataOnly.tables=
++-----+
+
+    Note that the items in the preserve properties must exist! If one of them doesn't exist, the operation is aborted and an error message is given.
+
+	Note that in the ant tasks, no attributes are provided for configuring items to preserve.
+
+
+* {Disabling constraints and updating sequences}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    The database maintainer does more than just update the schema structure. After each update, it performs following actions:
+
+    * <Disable foreign key and not-null constraints>
+
+    * <Update sequences to a high value>
+
+    * <Generate an XSD or DTD of the schema structure>
+
+    []
+
+    To be able to work with the smallest possible test data sets, all foreign key and not null constraints on the test database are disabled. This way
+    you only need to add data that is of real value for your test. Because less data is specified in the data set, they are easier to write, indicate
+    more clearly what is actually being tested and, more importantly, they become much easier to maintain.
+
+    All sequences and identity columns are updated to a sufficiently high initial value (1000 by default). This way, you can use fixed primary key values
+    when inserting test data, avoiding conflicts with for example primary key sequences.
+
+    The database maintainer is highly configurable. You can switch on or off things like constraints disabling, disable from scratch updates... Consult the
+    {{{unitils-default.properties} unitils-default.properties}} for a list of possible configuration settings and their values.
+
+    Some functionality of the database maintainer, e.g. constraint disabling, uses DBMS specific functionality. This functionality will only run properly when
+    the correct dialect (oracle, mysql...) is configured. If you are for example using an Oracle database, you should set the dialect propety to <oracle>:
+
++-----+
+# Supported values are 'oracle', 'db2', 'mysql', 'hsqldb', 'postgresql', 'derby' and 'mssql'
+database.dialect=oracle
++-----+
+
+    Currently there is support for following databases:
+
+    * <<Oracle>> - Tested with version 9i, 10g, 10XE
+
+    * <<Hsqldb>> - Tested with version 1.8.0
+
+    * <<MySQL>> - Tested with version 5.0
+
+    * <<PostgreSQL>> - Tested with version 8.2
+
+    * <<DB2>> - Tested with version 9
+
+    * <<Derby>> - Tested with version 10.2.2.0
+
+    * <<MS-SQL Server>> - Tested with version 2005
+
+    []
+
+
+* {Generate an XSD or DTD of the database structure}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    After updating the database structure, the database maintainer will also generate a number of xml schema definitions (XSD) that describe the structure of the database. These XSDs
+    can help you to write datasets more quickly. Modern IDEs offer you code-completion and give errors when e.g. a column name is incorrectly spelled in one of your dataset files.
+
+    The database maintainer generates an XSD for each configured database schema. These XSDs have the same name as the corresponding database schema, e.g. <SCHEMA_A.xsd>.
+    Next to these schema XSDs, a general <dataset.xsd> is generated. This XSD bundles all schema XSDs. This is the one you have to include in your XML declaration.
+
++-----+
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="target/xsd/dataset.xsd">
+
+    <user id="1" userName="jack" />
+    <user id="1" userName="jack" />
+    <role id="1" roleName="admin" />
+
+</dataset>
++-----+
+
+    The target location for the XSDs is configured by setting following property:
+
++-----+
+dataSetStructureGenerator.xsd.dirName=target/xsd
++-----+
+
+    Unitils creates a file dataset.xsd and stores it in this directory. If the directory didn't exist yet, it's created automatically.
+
+    The generated XSD also supports multiple database shemas. Suppose you are using 2 schemas:
+
++-----+
+database.schemaNames=SCHEMA_A, SCHEMA_B
++-----+
+
+    Since <SCHEMA_A> is listed first, it is considered to be the default database schema. The database maintainer generates 3 XSD files for this database:
+
++-----+
+target/xsd/ dataset.xsd
+target/xsd/ SCHEMA_A.xsd
+target/xsd/ SCHEMA_B.xsd
++-----+
+
+    You can use these XSDs like demonstrated in following example:
+
++-----+
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="target/xsd/dataset.xsd"
+         xmlns:a="SCHEMA_A" xmlns:b="SCHEMA_B">
+
+    <user id="1" userName="jack" />
+    <a:user id="1" userName="jack" />
+    <b:role id="1" roleName="admin" />
+
+</dataset>
++-----+
+
+    The first 2 attributes of the dataset element configure the XSD of the dataset to point to <dataset.xsd>. This enables the validation of  3 namespaces: the default namespace,
+	the <SCHEMA_A> and the <SCHEMA_B> namespace. The last 2 attributes configure the usage of the <SCHEMA_A> and <SCHEMA_B> namespaces.
+
+    As a result, the user table element (without namespace prefix) is validated against the default database schema structure, i.e. <SCHEMA_A>. The same is true for the user
+    element that is explicitly prefixed with the <SCHEMA_A> namespace (prefix a). The role table element is prefixed with the <SCHEMA_B> namespace and will thus be validated
+    against the <SCHEMA_B> database structure.
+
+    If you only use 1 database schema, there is no need to use namespaces, you can simply use the default namespace.
+
+    For backward compatibility reasons, a DTD can also be generated instead of an XSD. This DTD however does not support multiple database schemas. Only the structure
+    of the default database schema, i.e. the first one in the <database.schemaNames> list will be described.
+
+    You can switch to the DTD generator by setting following properties:
+
++-----+
+org.unitils.dbmaintainer.structure.DataSetStructureGenerator.implClassName=org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator
+dataSetStructureGenerator.dtd.filename=target/dtd/MyDatabase.dtd
++-----+
+
+    This will generate a DTD at the specified location. You can then use this DTD in your data set by adding a doctype declaration
+    pointing to the DTD file. As with XDS, the IDE will then offer you auto-completion and validation while you are editing the file.
+
++-----+
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE dataset SYSTEM "target/dtd/database.dtd">
+
+<dataset>
+    <user userName="jack" active="true" />
+    <user userName="jim"  active="false" />
+</dataset>
++-----+
+
+

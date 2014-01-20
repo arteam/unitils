@@ -1,0 +1,13 @@
+#c4t_topbar { height: 30px; background: #2d2d2d; width:100%; }
+#c4t_access { display: block; float: left; }
+#c4t_access .menu-header,div.menu { font: 13px/27px Arial,sans-serif; margin-left: 4px; width: 960px; }
+#c4t_access .menu-header ul,div.menu ul { list-style: none; margin: 0; }
+#c4t_access .menu-header li,div.menu li { float: left; position: relative; }
+#c4t_access a { color: #ccc; display: block; height: 29px; line-height: 30px; text-decoration: none; padding: 0 10px; }
+#c4t_access ul ul { box-shadow: 0 3px 3px rgba(0,0,0,0.2); -moz-box-shadow: 0 3px 3px rgba(0,0,0,0.2); -webkit-box-shadow: 0 3px 3px rgba(0,0,0,0.2); display: none; position: absolute; top: 38px; left: 0; float: left; width: 180px; z-index: 99999; }
+#c4t_access ul ul li { min-width: 180px; }
+#c4t_access ul ul ul { left: 100%; top: 0; }
+#c4t_access ul ul a { background: #f1f2f4; line-height: 1em; width: 160px; height: auto; padding: 10px; }
+#c4t_access li:hover > a,#c4t_access ul ul :hover > a { background: #444; background: #4c4c4c; color: #fff; -webkit-transition: all 0.5s ease-in-out; -moz-transition: all 0.5s ease-in-out; -o-transition: all 0.5s ease-in-out; -webkit-transition: all 0.5s ease-in-out; transition: all 0.5s ease-in-out; }
+#c4t_access ul li:hover > ul { display: block; }
+#c4t_access ul li.current_page_item > a,#c4t_access ul li.current-menu-ancestor > a,#c4t_access ul li.current-menu-item > a,#c4t_access ul li.current-menu-parent > a,* html #c4t_access ul li.current_page_item a,* html #c4t_access ul li.current-menu-ancestor a,* html #c4t_access ul li.current-menu-item a,* html #c4t_access ul li.current-menu-parent a,* html #c4t_access ul li a:hover { height: 28px; line-height: 27px; border-top: 2px solid #DD4B39; color: #FFFFFF; font-weight: bold; }

@@ -1,0 +1,504 @@
+Mocking
+~~~~~~~
+
+* {Installation}
+~~~~~~~~~~~~~~~~
+    If you are using maven, you can add following dependency to your project.
+
+%{include|source=pom.xml|id=mock|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    If you are not using maven you can download the unitils-with-dependencies.zip. The required jar, unitils-mock.jar, can be
+    found in the unitils-mock folder, the required dependencies, in the unitils-mock/lib folder.
+
+
+* {Creating mocks}
+~~~~~~~~~~~~~~~~~~
+    Creating a mock is easy. If your test is unitils-enabled you just have to create a field of type <Mock>
+    and unitils will automatically create a mock and inject it into the field. The type to mock is specified as a generic type.
+
+%{include|source=org/unitils/mock/example1/MyServiceTest.java|id=creation|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    If you don't want to unitils-enable your test, you can also create the mocks directly in your test by creating an instance of <MockObject>.
+
+%{include|source=org/unitils/mock/example1/MyServiceTest.java|id=programmatic|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    You can mock both interfaces and classes. In case a class is mocked, you also have the option to use a <PartialMock>.
+    This is a special kind of mock that will invoke the original behavior of the class if you do not set a mock behavior.
+    Some examples of how this works will be given later in the tutorial.
+
+
+* {Defining and asserting mock behavior}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    There are 2 types of operations on a mock: behavior defining operations and asserting operations.
+    These are 2 different functions of the mock. Before a test you typically setup some required behavior for a mock.
+    After the test, you then assert that some of the methods of the mock have been called.
+
+    The mocks are lenient. If you do not define any behavior, unitils will perform a default behavior (see below). It's
+    only when you do an assertion that unitils will verify that something has been called.
+    You only have to assert things in your test that are of importance for your test. This will make your tests more
+    maintainable and readable.
+
+
+
+** Defining behavior
+
+*** Returning values
+
+%{include|source=org/unitils/mock/example1/MyServiceTest.java|id=returns|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    This will return <a value> when <someMethod> is called on the <myServiceMock> instance.
+
+
+*** Throwing exceptions
+
+%{include|source=org/unitils/mock/example1/MyServiceTest.java|id=raises|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    This will raise a RuntimeException when <someMethod> is called on the <myServiceMock> instance. You can pass the instance
+    that needs to be thrown or just pass the exception class. An instance will then automatically be
+    created (a default constructor is not needed).
+
+
+*** Overriding behavior
+
+%{include|source=org/unitils/mock/example1/MyServiceTest.java|id=performs|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    This will make the given mock behavior the behavior of <someMethod>. The return value of the <execute> method
+    will then be returned by the mock. If you are overriding a void method, you can just return a <null> value.
+
+
+*** Default behavior
+
+    You're not required to specify behavior. If no behavior was defined, Unitils will return a sensible default value.
+
+    * <<0>> - for any primitive or primitive wrapper return value
+
+    * <<empty ArrayList>> - for any <List> or <Collection> return value
+
+    * <<empty HashSet>> - for any <Set> return value
+
+    * <<empty HashMap>> - for any <Map> return value
+
+    * <<empty array>> - for any array return value
+
+    * <<null>> - for any object return value
+
+    []
+
+
+
+** Asserting behavior
+
+*** Asserting that a method was invoked
+
+%{include|source=org/unitils/mock/example1/MyServiceTest.java|id=assertInvoked1|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    This will verify that <someMethod> was invoked. This only matches one invocation. Multiple <assertInvoked> methods
+    can be used to verify that multiple invocations were performed.
+
+
+*** Asserting that a method was not invoked
+
+%{include|source=org/unitils/mock/example1/MyServiceTest.java|id=assertNotInvoked|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    This will verify that <someMethod> was not invoked. If you want to verify that an invocation only occurred once, you
+    can first do an <assertInvoked> followed by an <assertNotInvoked>
+
+%{include|source=org/unitils/mock/example1/MyServiceTest.java|id=assertInvokedOnce|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+
+*** Asserting that methods were invoked in a particular order
+
+%{include|source=org/unitils/mock/example1/MyServiceTest.java|id=assertInvokedInSequence|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    This will verify that <someMethod> was called followed by <anotherMethod>. Only the <assertInvokedInSequence> invocations will be
+    checked on relative order. The order of <assertInvoked> methods is ignored.
+
+
+*** Asserting that there were no other invocations
+
+    The <MockUnitils.assertNoMoreInvocations> method can be used if you want to make sure that the asserted invocations were the only invocations.
+
+%{include|source=org/unitils/mock/example1/MyServiceTest.java|id=assertNoMoreInvocations|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    This will verify that <someMethod> was invoked and that it was the only invocation on any of the mocks.
+
+
+** When to define mock behavior
+
+    Mock behavior can be defined anywhere in your test. It only has to be there when the mock is actually used. You can
+    for example define default behavior in your setup method. Using argument matching you can then even override
+    the behavior with more specific behavior in your test method.
+
+%{include|source=org/unitils/mock/example1/UserDaoTest.java|id=defaultBehavior|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    Further in the tutorial we will discuss the argument matching in more detail. In short, unitils will always try to
+    find the best matching invocation. A null argument value will be ignored, i.e it will match any object.
+
+
+** Mock chaining
+
+    It is possible to chain methods when defining or asserting mock behavior.
+
+%{include|source=org/unitils/mock/example3/ChainingTest.java|id=behavior|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    This will return the given connection when <getConnection()> is called on the <DataSource> that is returned by
+    the <createDateSource()> method. Behind the scenes unitils will automatically create a mock of type <DataSource> and
+    define the <getConnection()> behavior on it.
+
+    You can do the same thing when asserting invocations:
+
+%{include|source=org/unitils/mock/example3/ChainingTest.java|id=assert|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    This will assert that the <getConnection()> method was called on the <DataSource> that was returned by the
+    <createDataSource()> method. This does not create a mock, it only asserts that a method was called. The mock behavior
+    has to be defined like in the previous example.
+
+
+* {Using mocks}
+~~~~~~~~~~~~~~~
+    In order to use the created mocks, we have to install them in the tested object (or wherever they will be used).
+    You can do this manually by calling the appropriate setter methods or use unitils-inject to inject the mock directly.
+
+** Installing a mock using setter methods
+
+%{include|source=org/unitils/mock/example2/MyServiceTest.java|id=serviceTest|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    This test extends UnitilsJUnit4 and is therefore unitils-enabled. Unitils will automatically create and inject a
+    mock instance in the <myDaoMock> field. In the before method, the test then creates the tested object and uses the
+    <setMyDao> setter method to install the mock into that tested object. The <testMethod> then first defines some
+    returns-behavior on the mock, executes the test and finally asserts that <storeSomething>
+    with argument <"something"> was called during the test.
+
+    Notice that we used <myDaoMock.getMock()> as argument for the setter method.
+
+%{include|source=org/unitils/mock/example2/MyServiceTest.java|id=getMock|verbatim=true|set-first-line=11|pad-line-numbers=2}
+
+    The <myDaoMock> instance is the object on which you define and assert behavior. The actual instance that is going to
+    execute the behavior is the mock proxy and can be obtained by calling the <getMock()> method.
+    The mock proxy is a dynamically generated implementation or sub-class of the required type, in this case MyDao.
+    This proxy will intercept all invocations called on it, record them and if necessary execute the requested behavior.
+
+
+** Installing a mock using injection
+
+    If you use unitils-inject, the above test can be written as follows:
+
+%{include|source=org/unitils/mock/example2/MyServiceInjectTest.java|id=inject|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    Unitils will see that the mock field has an <InjectIntoByType> annotation and inject the proxy of that mock
+    into the object marked as <TestedObject>. The tested object will automatically be created.
+
+    This is not the only way you can inject mocks. You can, for example, also use injection without a <TestedObject> or
+    inject mocks into static fields (like singletons). See the {{{tutorial-inject.html}unitils-inject tutorial}} for more information.
+
+
+** Intercepting mock creation
+
+    The above way of injecting mocks is very powerful and easy, but sometimes applications are not coded in such a way that this is possible. It could be for example, that
+    an application uses a service locator instead of dependency injection.
+
+    To help with this, an <@AfterCreateMock> annotation is provided that allows intercepting a mock immediately after its creation. The mock instance can then be used to
+    register the mock in the service locator or perform some other task of configuration. For example:
+
+%{include|source=org/unitils/mock/example7/AfterMockCreateTest.java|id=afterMockCreate|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+
+
+** Scenario report
+
+    When an assertion fails you will get an AssertionError containing a report that consists out of 3 parts:
+
+    * The reason why the assertion failed and where the assertion was made
+
+    * A list of all observed invocations with the arguments at invocation time and the location where the invocation occurred
+
+    * The same list of invocations but now with more details, like for example where the behavior was defined (if any)
+
+    []
+
++-----------------------------------------------------------------------------------------------------------+
+java.lang.AssertionError: Expected invocation of MailService.sendMail(), but it didn't occur.
+asserted at org.unitils.mock.UserNotificationServiceTest.notifyExpiredUsers(UserNotificationServiceTest.java:44)
+
+Observed scenario:
+
+1. userDaoMock.getUsersWithExpiredLicense() -> list1  .....  at org.unitils.mock.UserNotificationService.notifyExpiredUsersByMail(UserNotificationService.java:14)
+2. mailServiceMock.sendMail("john@company.com", "subject", "body")  .....  at org.unitils.mock.UserNotificationService.notifyExpiredUsersByMail(UserNotificationService.java:16)
+3. mailServiceMock.sendMail(string1, "subject", "body")  .....  at org.unitils.mock.UserNotificationService.notifyExpiredUsersByMail(UserNotificationService.java:16)
+
+
+Detailed scenario:
+
+1. userDaoMock.getUsersWithExpiredLicense() -> list1
+- list1 -> [User<id=1, first="first", last="last", address=null, email="john@company.com">, User<id=2, first="first", last="last", address=null, email="jane@organization.org">]
+- Observed at org.unitils.mock.UserNotificationService.notifyExpiredUsersByMail(UserNotificationService.java:14)
+- Behavior defined at org.unitils.mock.UserNotificationServiceTest.notifyExpiredUsers(UserNotificationServiceTest.java:40)
+
+2. mailServiceMock.sendMail("john@company.com", "subject", "body")
+- Observed at org.unitils.mock.UserNotificationService.notifyExpiredUsersByMail(UserNotificationService.java:16)
+
+3. mailServiceMock.sendMail(string1, "subject", "body")
+- string1 -> "jane@organization.org"
+- Observed at org.unitils.mock.UserNotificationService.notifyExpiredUsersByMail(UserNotificationService.java:16)
++-----------------------------------------------------------------------------------------------------------+
+
+    To keep the observed scenario report readable, large argument and result values will be replaced by a name.
+    The full value can then be found in the detailed scenario. E.g. the list of users returned by
+    the userDaoMock was too big to fit in the observed scenario and was therefore replaced by <list1>. The detailed
+    scenario then displays the full content of <list1>.
+
+    All locations are formatted as stack trace element so you can click on them in your IDE.
+
+    You can display the observed and detailed scenario at any time by invoking the <MockUnitils.logFullScenarioReport()>
+    method. This can help you write and debug tests. It's also possible to get only the observed or detailed scenario by calling
+    <MockUnitils.logObservedScenario()> or <MockUnitils.logDetailedObservedScenario()> respectively.
+
+%{include|source=org/unitils/mock/example1/UserNotificationServiceTest.java|id=reports|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    The last log report statement,  <MockUnitils.logSuggestedAsserts()>, is a small utility method that displays possible
+    assertions for all void methods that were invoked during the test. If they are of value for your test, you could then
+    add them to the test method (after verifying that they were correct!).
+
++-----------------------------------------------------------------------------------------------------------+
+Suggested assert statements:
+
+mailServiceMock.assertInvoked().sendMail("john@company.com", "subject", "body");
+mailServiceMock.assertInvoked().sendMail("jane@organization.org", "subject", "body");
++-----------------------------------------------------------------------------------------------------------+
+
+
+** Argument matching
+
+    Unitils will try to find the mock behavior that has the best matching arguments. You only have to specify the behavior once.
+    If it has matching arguments, the behavior will be invoked.
+
+    In the previous examples <someMethod> did not have any arguments. This means that unitils will always perform that
+    behavior when <someMethod> is called. If you want to return/raise/perform something else for a following call, you can use the
+    <onceReturns>, <onceRaises> and <oncePerforms> methods. The behavior then will be only invoked once and then
+    removed from the mock. Matches for <onceReturns>, <onceRaises> and <oncePerforms> will always take precedence over
+    any maching <returns>, <raises> or <performs> behavior.
+
+%{include|source=org/unitils/mock/example1/MyServiceTest.java|id=once|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    In this example, <someMethod> will first throw a runtime exception, then return <a value> and then continues returning
+    <another value> for all following calls.
+
+    Most of the time you will not need the <once behaviors>. If there are arguments you can use these arguments to
+    indicate when to execute the behavior.
+
+%{include|source=org/unitils/mock/example1/UserServiceTest.java|id=arguments|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+     In this case <user1> will be returned when the id argument is 1 and <user2> when the argument value is 2.
+
+
+*** Ignoring arguments
+
+    If you are not interested in an argument value, you can just use null as argument value. Unitils will then ignore
+    the actual argument value (it will always match).
+
+%{include|source=org/unitils/mock/example1/UserServiceTest.java|id=ignoreArguments|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    This will return <user1> and <user2> for any argument value of <getUsersInGroup>. Note: this is only true for
+    object values, primitive 0 values will be matched.
+
+    The rational behind this, is to make your tests as simple as possible. If an argument is not really of importance
+    for a particular test, you can just leave it out.
+
+    If you explicitly want to check for a <null> argument value, you can use the <isNull()> argument matcher (see below).
+
+
+*** Argument matchers
+
+    By default, arguments are matched as follows: if it's the same instance, there is of course a match. If it is not
+    the same instance, we use reflection to match the to instances. If the argument is a collection, the order and
+    actual type of the collection is ignored. You can for example use <Arrays.asList()> instead of an <ArrayList>.
+
+%{include|source=org/unitils/mock/example1/UserServiceTest.java|id=defaultArgumentMatcher|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    If this behavior is not sufficient, you can also use following argument matchers defined in the <ArgumentMatchers> class.
+
+    * <<notNull>> - the argument is not null
+
+    * <<isNull>> - the argument is null
+
+    * <<same>> - the argument is the same instance
+
+    * <<eq>> - the argument is equal using the equals method
+
+    * <<refEq>> - the argument is equal using reflection
+
+    * <<lenEq>> - the argument is equal using lenient reflection (see reflection assert)
+
+    * <<any>> - the argument is any object of the given type
+
+    * <<anyBoolean>> - the argument is a boolean
+
+    * <<anyByte>> - the argument is a byte
+
+    * <<anyShort>> - the argument is a short
+
+    * <<anyChar>> - the argument is a char
+
+    * <<anyInt>> - the argument is an int
+
+    * <<anyLong>> - the argument is a long
+
+    * <<anyFloat>> - the argument is a float
+
+    * <<anyDouble>> - the argument is a double
+
+    []
+
+%{include|source=org/unitils/mock/example1/UserServiceTest.java|id=argumentMatchers|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    You do not have to specify argument matchers for all arguments (as in other frameworks). You only have to
+    use argument matchers when you really need them. For example:
+
+%{include|source=org/unitils/mock/example1/UserServiceTest.java|id=someArgumentMatchers|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+*** Creating your own argument matchers
+
+    It's not difficult to create a custom argument matcher. Just create a class that implements <ArgumentMatcher> and provide a static
+    method somewhere that is annotated with <@ArgumentMatcher>.
+
+    The annotation will enable unitils to identify the method as argument matching method. It has to have a return value of the correct type
+    so you can use it instead of an actual method argument. When the argument matcher method is called it should then register the argument matcher
+    implementation in the <ArgumentMatcherRepository>.
+
+    Following is an example of a custom <lessThan> implementation that will match when a parameter is less than a given value. E.g
+    <method(lessThan(5))> will match for <method(4)> and not for <method(6)>
+
+%{include|source=org/unitils/mock/example5/CustomArgumentMatchers.java|id=argumentMatcher|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+%{include|source=org/unitils/mock/example5/LessThanArgumentMatcher.java|id=argumentMatcher|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+
+** Dummy objects
+~~~~~~~~~~~~~~~~
+    To be able to do a test you sometimes just need an instance of a class where the actual data or implementation is not of importance for your test.
+    For example, you need a <User> instance that will be passed during invocations, but the actual values of the <User> instance are not used
+    in your test. You just need a dummy implementation.
+
+    You can create a dummy object by annotating a field with the <@Dummy> annotation or by calling <MockUnitils.createDummy>. This will create a
+    stub of the correct type that will ignore all method calls on it and will return default values for methods with return values.
+    There doesn't have to be a default constructor. If your class does not have a no-argument constructor, you can still create an
+    instance without having to provide all kinds of unnecessary values.
+
+%{include|source=org/unitils/mock/example6/DummyTest.java|id=dummy|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+
+
+* {Partial mocks}
+~~~~~~~~~~~~~~~~~
+    A partial mock is a special kind of mock that will call the original behavior of the mocked class when no behavior
+    was explicitly defined using returns, raises, performs or stub.
+
+    As an example, take following service implementation:
+
+%{include|source=org/unitils/mock/example1/SomeService.java|id=partial|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    Suppose we created a partial mock for this class and define mock behavior for <method2> but not for <method3>.
+
+%{include|source=org/unitils/mock/example1/PartialMockTest.java|id=partial|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    When <method1> is now called on the someService mock proxy it will now return the mocked value <5> for <method2> and
+    the original value <2000> for <method3>.
+
+
+** Creating a partial mock
+
+    Creating a partial mock is similar to creating a regular mock. The only difference is that you now use <PartialMock>
+    instead of <Mock> and <PartialMockObject> instead of <MockObject>.
+
+    If your test is unitils-enabled, just declare a field of type <PartialMock> with the type to mock as generic type.
+
+%{include|source=org/unitils/mock/example1/PartialMockTest.java|id=create|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    Unitils will automatically create the mock and inject it into the field.
+
+    If you don't want to unitils-enable your test, you can also create the mock directly by creating a new instance of
+    <PartialMockObject>.
+
+%{include|source=org/unitils/mock/example1/PartialMockTest.java|id=programmatic|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    When creating the mock, the default constructor will be called. If such a constructor does not exist, no constructor
+    will be called and no fields will be initialized (all fields will be null or 0). If you still want to initialize
+    your object, you can use a prototype to populate your mock.
+
+%{include|source=org/unitils/mock/example4/SomeService.java|id=prototype|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    A mock instance with correct values can then be created as follows:
+
+%{include|source=org/unitils/mock/example4/PrototypeTest.java|id=prototype|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    All fields of the given prototype instance will then automatically be copied into the new mock instance. This way you
+    can still have a correctly initialized partial mock instance.
+
+
+** Behavior for a partial mock
+
+    All behavior and assertions you can do on a regular mock, you can also do on partial mock (<PartialMock> actually extends <Mock>).
+    There is one extra behavior you can define on a partial mock: stub behavior.
+
+*** Stubbing a method
+
+%{include|source=org/unitils/mock/example1/PartialMockTest.java|id=stub|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    If a method is stubbed, it will no longer do it's original behavior. If a non-void method is stubbed, it will return a default value.
+    Asserting that the method was invoked, is still possible.
+
+
+
+** Mocking the tested object
+
+    This way of mocking can especially be useful for mocking methods of the tested object itself.
+
+*** Factory and service locator methods
+
+    As a first example, suppose that your service has a factory method that returns something you would like to mock or
+    uses the service-locator pattern to fetch a service.
+
+%{include|source=org/unitils/mock/example3/MyService.java|id=service|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    We can then create a test for it that overrides these methods so that they return the mock instances.
+
+%{include|source=org/unitils/mock/example3/MyServiceTest.java|id=serviceTest|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    In this example, we setup the default mock behavior in the before method: the mock will override the <createDataSource> and
+    <getMyDao> method behavior and let them return the mocked <DataSource> and <MyDao> instances. The test method then performs the test on the tested object.
+
+    Notice the special <myService.getMock()> call. We've made our tested object a mock, so we need to get the mock proxy
+    to call the actual test method.
+
+    This example test also shows that we can mock protected methods. A mock proxy is nothing more that an automatically
+    created subclass, so we can access anything we would normally be allowed to access. In this case, the test class is
+    in the same package (but other sources folder) as the tested object so the protected methods can be called.
+
+
+*** Stubbing complex methods
+
+    Some methods are hard to test from a unit test. For example, methods that require network access or methods that
+    require some kind of external service to be running. In these cases you would probably like to stub out the
+    actual behavior of the method and just assert that the method was called with the expected arguments.
+
+%{include|source=org/unitils/mock/example4/MailService.java|id=mailService|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    We can then write a test that stubs out the <doSendMail> method and just asserts that it has been called.
+
+%{include|source=org/unitils/mock/example4/MailServiceTest.java|id=mailServiceTest|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    Another example usage could be that there is some kind of complex behavior that is already covered in another set of tests.
+    You can then stub the behavior and just assert that it was invoked with the correct argument values.
+
+
+*** Testing abstract classes
+
+    Using a partial mock, it's easy to test the behavior of an abstract super class.
+
+%{include|source=org/unitils/mock/example4/AbstractService.java|id=abstract|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    Just write a test that defines some behavior for the abstract methods and, if needed, assert that the methods were
+    invoked during the test.
+
+%{include|source=org/unitils/mock/example4/AbstractServiceTest.java|id=abstract|verbatim=true|set-first-line=1|pad-line-numbers=2}
+

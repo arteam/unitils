@@ -1,0 +1,141 @@
+body {
+	margin: 0; padding: 0;
+	font: 12px normal Arial, Helvetica, sans-serif;
+}
+.container {
+	width: 950px;
+	margin: 0 auto;
+	position: relative;
+}
+#header {
+	padding-top: 65px;
+}
+#header .sitename{
+	position:absolute;
+	top:0;
+	padding:30px 0 7px;
+	font-size:500%;
+	color:#111111
+	
+	}
+	#header .logo {
+background: url(http://www.cleanjava.org/blog/wp-content/themes/Prestij/images/stve-colors-600x250-flipped.png) no-repeat right top ;
+	height:150px;
+	display: block;
+	position: absolute;
+	top: 0; right: 0;
+	width: 200px;
+background-position:-400px 0px;	
+z-index:-1;
+
+}
+#header .blue {
+background-position:-200px 0px;
+}
+#header .red{
+background-position: 0px 0px;
+}
+#header .green{
+background-position: -400px 0px;
+}
+#header .disclaimer a {	color: #ccc;}
+ul.topnav {
+	list-style: none;
+	padding: 0 20px;	
+	margin: 0;
+	float: left;
+	width: 920px;
+	background: #222;
+	font-size: 1.2em;
+	background: url(http://www.cleanjava.org/blog/wp-content/themes/Prestij/images/topnav_bg.gif) repeat-x;
+}
+#header .disclaimer {
+	color: #999;
+	padding: 100px 0 7px 0;
+	text-align: right;
+	display: block;
+	position: absolute;
+	top: 0; right: 0;
+}
+#header .disclaimer a {	color: #ccc;}
+ul.topnav {
+	list-style: none;
+	padding: 0 15px;	
+	margin: 0;
+	float: left;
+	width: 920px;
+	background: #222;
+	font-size: 1.2em;
+	background: url(http://www.cleanjava.org/blog/wp-content/themes/Prestij/images/topnav_bg.gif) repeat-x;
+}
+ul.topnav li {
+	float: left;
+	margin: 0;	
+	padding: 0 15px 0 0;
+	position: relative; /*--Declare X and Y axis base--*/
+}
+ul.topnav li a{
+	padding: 10px 5px;
+	color: #fff;
+	display: block;
+	text-decoration: none;
+	float: left;
+}
+ul.topnav li a:hover{
+	background: url(http://www.cleanjava.org/blog/wp-content/themes/Prestij/images/topnav_hover.gif) no-repeat center top;
+}
+ul.topnav li span { /*--Drop down trigger styles--*/
+	width: 17px;
+	height: 35px;
+	float: left;
+	background: url(http://www.cleanjava.org/blog/wp-content/themes/Prestij/images/subnav_btn.gif) no-repeat center top;
+}
+ul.topnav li span.subhover {background-position: center bottom; cursor: pointer;} /*--Hover effect for trigger--*/
+ul.topnav li ul.children {
+	list-style: none;
+	position: absolute; /*--Important - Keeps children from affecting main navigation flow--*/
+	left: 0; top: 34px;
+	background: #333;
+	margin: 0; padding: 0;
+	display: none;
+	float: left;
+	width: 170px;
+	-moz-border-radius-bottomleft: 5px;
+	-moz-border-radius-bottomright: 5px;
+	-webkit-border-bottom-left-radius: 5px;
+	-webkit-border-bottom-right-radius: 5px;
+	border: 1px solid #111;
+	z-index:50;
+}
+ul.topnav li ul.children li{
+	margin: 0; padding: 0;
+	border-top: 1px solid #252525; /*--Create bevel effect--*/
+	border-bottom: 1px solid #444; /*--Create bevel effect--*/
+	clear: both;
+	width: 170px;
+}
+html ul.topnav li ul.children li a {
+	float: left;
+	width: 145px;
+	background: #333 url(http://www.cleanjava.org/blog/wp-content/themes/Prestij/images/dropdown_linkbg.gif) no-repeat 10px center;
+	padding-left: 20px;
+}
+html ul.topnav li ul.children li a:hover { /*--Hover effect for children links--*/
+	background: #222 url(http://www.cleanjava.org/blog/wp-content/themes/Prestij/images/dropdown_linkbg.gif) no-repeat 10px center; 
+}
+#header img {
+	margin: 20px 0 10px;
+}
+
+#topsearch  {
+	background-color: #CCCCCC;
+}
+#version {
+	color: #999999;
+    display: block;
+    padding: 100px 0 7px;
+    position: absolute;
+    left: 0;
+    text-align: right;
+    top: 0;
+}

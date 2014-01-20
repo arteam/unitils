@@ -1,0 +1,159 @@
+Testing with Hibernate
+
+    An O/R mapping framework like Hibernate greatly simplifies the data access layer of an application. Even when using such a O/R mapping tool, unit
+    tests remain valuable. They can ensure the mapping of the Hibernate mapped classes is always in sync with the database and can be used for
+    easy and quick testing of HQL queries.
+
+    Testing a HQL method is done in the same way as described above in {{{#Managing test data with DbUnit} Managing test data with DbUnit}}. The <@DataSet> annotation
+    can be used for loading test data from a data set and the <ReflectionAssert> class or <@ExpectedDataSet> annotation can be used for checking the result.
+
+    Unitils hibernate support is based on spring's ORM abstraction layer. Spring is used under the hoods to configure a SessionFactory that connects to the unitils-configured
+    database, and associate a hibernate Session with the current transaction. This doesn't mean you that need to use spring in your application code.
+    The fact that spring is used, is completely transparent.
+
+* {Installation}
+~~~~~~~~~~~~~~~~
+    If you are using maven, you can add following dependency to your project.
+
+%{include|source=pom.xml|id=orm|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    If you are not using maven you can download the unitils-with-dependencies.zip. The required jar, unitils-orm.jar, can be
+    found in the unitils-orm folder, the required dependencies, in the unitils-orm/lib folder.
+
+
+* {Loading Hibernate configurations}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Unitils provides out-of-the box configuration support for Hibernate. You can obtain a <SessionFactory> that connects to the unit test database simply by annotating
+    a class, field or method with the <@HibernateSessionFactory> annotation. The Hibernate configuration files that you want to have loaded can be passed as a parameter. If
+    you annotate a field or method with this annotation, the session factory is also injected into this field or method.
+
+    Note that in order to function correctly, Hibernate tests must be run in a transaction. Unitils is configured by default to run in a transaction. Read the chapter on {{{#Transactions} Transactions}}
+    for more information on transaction support.
+
+    Under the hoods, hibernate uses an instance of <org.hibernate.cfg.Configuration> or <org.hibernate.cfg.AnnotationConfiguration> for loading configuration files and
+    registering mapped classes, depending on whether you're using hibernate the classic way or whether you use hibernate with annotation. By default, Unitils uses
+    <org.hibernate.cfg.AnnotationConfiguration>. If you're using mapping files only and you don't have the hibernate annotations extension in your classpath, you can change
+    this by setting following property:
+
++----+
+HibernateModule.configuration.implClassName=org.hibernate.cfg.Configuration
++----+
+
++-----+
+public class UserDaoTest extends UnitilsJUnit4 {
+
+    @HibernateSessionFactory({"hibernate.cfg.xml", "mapped-classes.cfg.xml"})
+    private SessionFactory sessionFactory;
+
+}
++-----+
+
+    This will create a Hibernate <Configuration> and load the configuration files <hibernate.cfg.xml> and <mapped-class.cfg.xml>. The
+    <Configuration> instance is used to create a <SessionFactory> which is injected into the annotated field method of the test.
+    Setter injection is also supported by annotating the setter method instead of the field.
+
+    Unitils also scans superclasses for <@HibernateSessionFactory> annotations. We advise to specify all configuration on a common superclass
+	for all hibernate tests. E.g.:
+
++-----+
+@HibernateSessionFactory("hibernate.cfg.xml")
+public class BaseDaoTest extends UnitilsJUnit4 {
+}
+
+public class UserDaoTest extends BaseDaoTest {
+
+    @HibernateSessionFactory
+    private SessionFactory sessionFactory;
+}
++-----+
+
+    If desired, a test subclass can override the configuration of the superclass.
+
++-----+
+@HibernateSessionFactory("hibernate.cfg.xml")
+public class BaseDaoTest extends UnitilsJUnit4 {
+}
+
+@HibernateSessionFactory({"hibernate.cfg.xml", "user-mapped-classes.cfg.xml"})
+public class UserDaoTest extends BaseDaoTest {
+
+    @HibernateSessionFactory
+    private SessionFactory sessionFactory;
+}
++-----+
+
+    This will create a new configuration for UserDAOTest class, first loading the <hibernate.cfg.xml> followed by the <user-mapped-classes.cfg.xml>.
+    The configuration is then used to create a <SessionFactory> instance. Note that there is a performance implication. By adding this new
+    configuration file in the subclass, a new session factory has to be created. In the previous example, no extra configuration is added and
+    the session factory can be reused. <SessionFactory> creation is a heavy operation, so try to reuse them as much as possible.
+
+
+** Programmatic configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Performing programmatic configuration is also supported. You can use it by annotating a custom initialization method with
+    <@HibernateSessionFactory>. A custom configuration method has 1 parameter of a <Configuration> (sub-)type and a void return
+    type. It can be used to further configure the <Configuration> instance that was created by Unitils. A typical usage is to programmatically
+    register mapped classes:
+
++-----+
+@HibernateSessionFactory
+protected void initializeConfiguration(AnnotationConfiguration configuration) {
+    configuration.addAnnotatedClass(User.class);
+}
++-----+
+
+
+* {Hibernate Session management}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    The previous section showed you how to get a reference to a <SessionFactory> instance. To make your persistence layer code use this session factory, you still need
+    to provide some project specific code. Typically this is implemented in a common superclass for all your persistence layer tests. An implementation of such a class could be:
+
++-----+
+public abstract class BaseDAOTest extends UnitilsJUnit4 {
+
+    @HibernateSessionFactory
+    private SessionFactory sessionFactory;
+
+    @Before
+    public void initializeDao() {
+        BaseDAO dao = getDaoUnderTest();
+        dao.setSessionFactory(sessionFactory);
+    }
+
+    protected abstract BaseDAO getDaoUnderTest();
+}
++-----+
+
+    Unitils manages all sessions created by these session factories. It will flush the session before checking the state of a database and
+    close the session after a unit test was finished.
+
+    Unitils also provides what we call a 'test-bound session context'. This means that, for the duration of a test, every call to <SessionFactory.getCurrentSession()>
+    will return the same hibernate session.
+
+
+* Hibernate mapping test
+~~~~~~~~~~~~~~~~~~~~~~~~
+    Unitils is shipped with a unit test that verifies if the mapping of all your mapped classes is consistent with the database
+    structure. <HibernateUnitils.assertMappingWithDatabaseConsistent()> checks if any updates are required to the database to make it
+    consistent with the Hibernate mapping. If yes, the test fails showing all DDL statements that should be issued to the database.
+    This test is not automatically executed, you have to write a unit test yourself like follows:
+
++-----+
+@HibernateSessionFactory("hibernate.cfg.xml")
+public class HibernateMappingTest extends UnitilsJUnit4 {
+
+    @Test
+    public void testMappingToDatabase() {
+        HibernateUnitils.assertMappingWithDatabaseConsistent();
+    }
+}
++-----+
+
+    An example error message could be:
+
++-----+
+Found mismatches between Java objects and database tables. Applying following DDL statements to the database should resolve the problem:
+alter table PERSON add column lastName varchar(255);
+alter table PRODUCT add column barCode varchar(255);
++-----+
+

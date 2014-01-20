@@ -1,0 +1,169 @@
+EasyMock support
+
+    Unit tests should test code in isolation. Mock objects enable you to test a piece of code without having to care about other objects or services that it depends on. Since version 2.0, unitils provides
+    a complete mock object solution to dynamically create mock objects. See the {{{tutorial-mock.html}mocking tutorial}} for more info.
+
+    Unitils offers support for tests that use {{{http://www.easymock.org}EasyMock}}.
+    It provides convenience functionality that reduces the plumbing, such as simplification of mock creation, argument matching and injection of mocks.
+
+* {Installation}
+~~~~~~~~~~~~~~~~
+    If you are using maven, you can add following dependency to your project.
+
+%{include|source=pom.xml|id=easy|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    If you are not using maven you can download the unitils-with-dependencies.zip. The required jar, unitils-easymock.jar, can be
+    found in the unitils-easymock folder, the required dependencies, in the unitils-easymock/lib folder.
+
+
+* Mock creation
+~~~~~~~~~~~~~~~
+    Mocks can automatically be created by annotating a field with the <@Mock> annotation, Unitils will create a mock of the same type as the field and inject the instance 
+    into that field. This mock creation and assignment is performed before the setup of your test. During the setup you can then do extra configuration and, for example, 
+    install the mock so that it is used by your code during the test. The injection tutorial describes how Unitils can help you perform this mock injection more easily.
+    
+    Following example shows a unit test for a method on a <UserService> that disables all user accounts that haven't been active for a certain time:
+    
++-----+
+public class UserServiceTest extends UnitilsJUnit4 { 
+
+    @Mock
+    private UserDao mockUserDao;
+
+    private UserService userService;
+    
+    @Before
+    public void setUp() {
+        userService = new UserService();
+        userService.setUserDao(mockUserDao);        
+    }
+
+    @Test 
+    testDisableInActiveAccounts() {    
+        expect(mockUserDao.getAccountsNotAccessedAfter(null)).andReturn(accounts);
+        mockUserDao.disableAccount(accounts.get(0));
+        mockUserDao.disableAccount(accounts.get(1));
+        EasyMockUnitils.replay();
+
+        userService.disableInactiveAccounts(); 
+    }
+} 
++-----+
+
+    In this example the <UserDao> of the user service is replaced by a mock object. This mock is automatically created by Unitils and then installed in the user service
+    during the setup of the test. During the test we then first record the expected behavior and call <EasyMockUnitils.replay()> which will call replay on all mock 
+    objects, in this case only mockUserDao. Then the actual test is performed. After the test, Unitils will automatically invoke <EasyMockUnitils.verify()> which will 
+    call verify on all mock objects to check the expected behavior.
+    
+    The created mock objects by default use EasyMock's strict call expectations (i.e. the test fails when unexpected method calls occur) and ignore the invocation order. 
+    You can change these settings by specifying attributes on the @Mock annotation, e.g.:
+   
++-----+
+@Mock(returns=Calls.LENIENT, invocationOrder=InvocationOrder.STRICT)
+private UserDao mockUserDao;
++-----+
+
+    You can also change the default values for all <@Mock> annotations by changing the values in the configuration settings:
+
++-----+
+EasyMockModule.Mock.Calls.default=lenient
+EasyMockModule.Mock.InvocationOrder.default=strict
++-----+
+
+
+* Reflection lenient argument matching
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    The mocks that are supplied by Unitils are slightly different from mocks objects that you get when directly using EasyMock: a <LenientMocksControl> is used for these mocks. 
+    This control will make sure that arguments specified in method calls are matched using reflection. The arguments of the expected and actual method calls are compared in 
+    the same way we saw in the {{{#Assertion utilities}Assertion utilities}} section. By default, ignore defaults and lenient order leniency levels are used. E.g., following 
+    expectation and actual method calls will match:
+    
++-----+
+expected: dao.findById(0);
+actual:   dao.findById(99999);
+
+List<Integer> userIds = new ArrayList<Integer>();
+userIds.add(3);
+userIds.add(2);
+userIds.add(1);
+expected: dao.deleteById(Arrays.asList(1,2,3));
+actual:   dao.deleteById(userIds);
+
+expected: dao.update(0,    new User(null,   "Doe"));
+actual:   dao.update(9999, new User("John", "Doe"));
++-----+
+
+    As you can see, the leniency levels not only apply to objects and their fields but also apply to the arguments themselves. For example, take a 
+    look at following expectation:
+    
++-----+
+expect(mockUserDao.getAccountsNotAccessedAfter(null)).andReturn(accounts);
++-----+
+
+    The <null> parameter in this method call actually means that we don't care what argument is passed to this method. This provides a very convenient way of setting flexible 
+    expectations! There is no need to specify <anyInt>, <notNull> ... argument matchers for each of the arguments anymore.
+
+    By default, lenient order and ignore defaults are used as leniency levels. If you want to change this, you can specify which levels to use by setting attributes 
+    on the <@Mock> annotation:
+
++-----+
+@Mock(order=Order.STRICT, defaults=Defaults.STRICT, dates=Dates.LENIENT)
+private UserDao mockUserDao;
++-----+
+
+    The levels can also be set project-wide, for all mocks at once, by changing the defaults in the configuration settings. E.g. to do the same as above for the 
+    entire project you could set following properties:
+
++-----+
+EasyMockModule.Mock.Order.default=strict
+EasyMockModule.Mock.Dates.default=lenient
+EasyMockModule.Mock.Defaults.default=strict
++-----+
+
+    If you don't want to use reflection for lenient argument matching, you can also make Unitils inject regular EasyMock mocks into your test, using the <@RegularMock> annotation.
+
++-----+
+@RegularMock
+private UserDao mockUserDao;
++-----+
+
+
+* Mock injection
+~~~~~~~~~~~~~~~~
+    unitils-inject can be used for injecting mocks into the tested classes.
+
+    Following example shows how a <UserDao> mock is created using the <@Mock> annotation. Since the mock field is
+    annotated with <@InjectIntoByType> it will then automatically be injected into the <userService> field that is annotated as <@TestedObject>
+
+    See the {{{tutorial-inject.html}unitils-inject tutorial}} for more examples and other ways to use injection.
+
++-----+
+@Mock
+@InjectIntoByType
+private UserDao mockUserDao;
+
+@TestedObject
+private UserService userService;
++-----+
+
+
+
+* Mock injection when using a Service Locator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    The above way of injecting mocks is very powerful and easy, but sometimes applications are not coded in such a way that this is possible. It could be for example, that
+    an application uses a service locator instead of dependency injection.
+
+    To help with this, an <@AfterCreateMock> annotation is provided that allows intercepting a mock immediately after its creation. The annotated method takes as parameters an
+    <Object> (the mock), a <String> (the name of the field to which the mock is assigned) and a <Class> (the type of the mock object). The mock instance can then be used to
+    register the mock in the service locator or perform some other task of configuration. Such a method could for example be implemented as follows:
+
++-----+
+@AfterCreateMock
+void injectMock(Object mock, String name, Class type) {
+    ServiceLocator.injectService(type, mock);
+}
++----+
+
+    The <injectService> method installs the instance, so that the mock instance is returned when the <ServiceLocator> is asked for an instance of that type. This allows for a very
+    simple way of using mock objects in combination with such a service locator.
+

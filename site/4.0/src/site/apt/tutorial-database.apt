@@ -1,0 +1,348 @@
+Database testing
+
+    Unit tests for the database layer can be extremely valuable when building enterprise applications, but are often abandoned because of their complexity. Unitils greatly reduces
+    this complexity, making database testing easy and maintainable. The following sections describe the support that the <DatabaseModule> and <DbUnitModule> have to offer 
+    for your database tests.
+
+* {Installation}
+~~~~~~~~~~~~~~~~
+    If you are using maven, you can add following dependency to your project.
+
+%{include|source=pom.xml|id=dbunit|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    If you are not using maven you can download the unitils-with-dependencies.zip. The required jar, unitils-dbunit.jar, can be
+    found in the unitils-dbunit folder, the required dependencies, in the unitils-dbunit/lib folder.
+
+    If you just want to connect to a test database and don't want to use DbUnit, you can use unitils-database instead of unitils-dbunit.
+
+%{include|source=pom.xml|id=database|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+    If you are not using maven you can download the unitils-with-dependencies.zip. The required jar, unitils-database.jar, can be
+    found in the unitils-database folder, the required dependencies, in the unitils-database/lib folder.
+
+
+* {Managing test data with DbUnit}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Database tests should be run on a unit test database, giving you complete and fine grained control over the test data that is used. The <DbUnitModule> builds further 
+    on {{{http://www.dbunit.org/}DbUnit}} to provide support for working with test data sets. 
+
+
+** {Loading test data sets}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Let's start with an example of a UserDAO with a simple findByName method for retrieving a user based on its first and last name. A typical unit test looks as follows:
+
++-----+
+@DataSet
+public class UserDAOTest extends UnitilsJUnit4 {
+
+    @Test
+    public void testFindByName() {
+        User result = userDao.findByName("doe", "john");
+        assertPropertyLenientEquals("userName", "jdoe", result);
+    }
+
+    @Test
+    public void testFindByMinimalAge() {
+        List<User> result = userDao.findByMinimalAge(18);        
+        assertPropertyLenientEquals("firstName", Arrays.asList("jack"), result);
+    }
+}
++-----+
+
+    The <@DataSet> annotation in the test instructs Unitils to look for DbUnit data files that need to be loaded for the test. If no file name is specified,
+    Unitils automatically looks for a data set file that is in the same directory as the test class and has following name pattern: <className>.xml
+    
+    The data set file should be in DbUnit's {{{http://www.dbunit.org/apidocs/org/dbunit/dataset/xml/FlatXmlDataSet.html} FlatXMLDataSet}} file 
+    format and should contain all data needed for the test. All existing content of tables in the data set will first be deleted, then all data of the data 
+    set will be inserted. Tables that are not in the data set will not be cleared. You can explicitly clear a table by adding an empty table 
+    element, e.g. \<MY_TABLE /\> to the data set file. If you explicitly want to specify a null value, you can do so by using the value <[null]>.
+        
+    For the <UserDAOTest> we could for example create a class level data set file named <UserDAOTest.xml> and put it in the same directory as 
+    the <UserDAOTest> class:
+    
++-----+
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+
+    <usergroup name="admin" />  
+    <user userName="jdoe"  name="doe"   firstname="john"   userGroup="admin" />
+    
+    <usergroup name="sales" />    
+    <user userName="smith" name="smith" userGroup="sales" />
+    
+</dataset>
++-----+
+
+    This will clear the user and usergroup tables and insert the user groups and user records. The first name of the user named 'smith' will be 
+    set to a null value.
+    
+    Suppose the <testFindByMinimalAge()> method needs a specific data set instead of the class-level data set. You could create a file named 
+    <UserDAOTest.testFindByMinimalAge.xml> and put that file in the same directory as the test class:
+
++-----+
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <user userName="jack" age="18" />
+    <user userName="jim"  age="17" />
+</dataset>
++-----+
+
+    You can then use this data set by adding an <@DataSet> annotation to the method, overriding the default data set file of the class.
+    
++-----+    
+public class UserDAOTest extends UnitilsJUnit4 {
+
+    @Test
+    @DataSet("UserDAOTest.testFindByMinimalAge.xml")
+    public void testFindByMinimalAge() {
+        List<User> result = userDao.findByMinimalAge(18);        
+        assertPropertyLenientEquals("firstName", Arrays.asList("jack"), result);
+    }
+}
++-----+
+
+    Method-level data sets should not be overused, since having more data files means you have to do more maintenance. You should first try 
+    to reuse the data in the class level data set - in most cases a small set of test records can be reused for multiple tests. If this would 
+    result in a big and incoherent data set, it may be better to use a method specific one, or to try to split the test in 2 separate tests, 
+    each having their own data set.
+    
+    By setting the <@DataSet> annotation on class or superclass level a data set is loaded for every test in the class. If a data set should only be loaded for 
+    some of the tests, you should remove the class level annotation and annotate the test methods instead. Data sets will then only be loaded
+    for the annotated tests. If your data set file does not comply with the naming conventions as described above, you can also specify a file name 
+    explicitly by passing the name as an argument to the <@DataSet> annotation. You can also specify multiple data set file names, in case you 
+    want to use more than 1 data set:
+
++-----+
+@DataSet({"UserDAOTest_general.xml", "ConfigSettings.xml"})
+public class UserDAOTest extends UnitilsJUnit4 {
+
+    @Test
+    public void testFindByName() {
+        User result = userDao.findByName("doe", "john");
+        assertPropertyLenientEquals("userName", "jdoe", result);
+    }
+
+    @Test 
+    @DataSet("UserDAOTest_ages.xml")
+    public void testFindByMinimalAge() {
+        List<User> result = userDao.findByMinimalAge(18);
+        assertPropertyLenientEquals("firstName", Arrays.asList("jack"), result);
+    }
+}
++-----+
+
+
+
+** {Configuring the dataset load strategy}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    By default, data sets are loaded into the database using a <clean insert> strategy. This means that all data in the tables that are present in the
+    dataset is deleted, after which the test data records are inserted. This behavior is configurable, it can be modified by changing the value
+    of the property <DbUnitModule.DataSet.loadStrategy.default>. Suppose we add following in unitils.properties:
+    
++-----+
+DbUnitModule.DataSet.loadStrategy.default=org.unitils.dbunit.datasetloadstrategy.InsertLoadStrategy
++-----+   
+
+    This sets the load strategy to <insert> instead of <clean insert>. The result is that data already available in the tables present in the dataset 
+    is not deleted, and test data records are simply inserted.
+    
+    The loadStrategy that is used can also be configured for specific tests using an attribute of the <@DataSet> annotation. E.g.:
+    
++-----+
+@DataSet(loadStrategy = InsertLoadStrategy.class)
++-----+
+    
+    For those familiar with DbUnit, configuring the load strategy is equivalent to using a different DatabaseOperation. Following are load strategies
+    that are supported by default:
+    
+    * CleanInsertLoadStrategy: Insert the dataset, after removal of all data currently present in the tables specified in the dataset
+    
+    * InsertLoadStrategy: Simply insert the dataset into the database
+    
+    * RefreshLoadStrategy: 'Refresh' the contents of the database with the contents of the dataset. This means that data of existing rows is updated and 
+    non-existing rows are inserted. Any rows that are in the database but not in the dataset stay unaffected
+    
+    * UpdateLoadStrategy: Update the contents of the database with the contents of the dataset. This means that data of existing rows is updated. 	Fails if 
+    the dataset contains records that are not in the database (i.e. a records having the same value for the primary key column).
+
+    []
+
+
+
+** {Configuring the dataset factory}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Dataset files in Unitils have the <multischema xml> format, which is an extended version of DbUnits <FlatXmlDataSet> format. Configuration of the file
+    format and file extension is handled by a <DataSetFactory>. 
+    
+    Although Unitils currently only supports one dataset format, the possibility is offered to implement a custom implementation of <DataSetFactory> to use a
+    different file format. This can be done by specifying the value of the property <DbUnitModule.DataSet.factory.default> in unitils.properties or by using the factory 
+    attribute of the <@DataSet> annotation. Such a custom factory could e.g. be implemented to create an instance of DbUnit's <XlsDataSet>, if you want 
+    to use Excel files instead of XML.
+
+
+
+** {Verifying test results}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Sometimes it can be useful to use data sets for checking the contents of a database after a test was run. For example when you want to check the 
+    result of a bulk update method or a stored procedure. 
+
+    Following example tests a method that disables all user accounts that haven't been used for an entire year:
+
++-----+
+public class UserDAOTest extends UnitilsJUnit4 {
+
+    @Test @ExpectedDataSet
+    public void testInactivateOldAccounts() {
+        userDao.inactivateOldAccounts();
+    }
+}
++-----+
+
+    Note that we have added the <@ExpectedDataSet> to the test method. This will instruct Unitils to look for a data set file named 
+    <UserDAOTest.testInactivateOldAccounts-result.xml> and compare the contents of the database with the contents of the data set:
+
++-----+
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <user userName="jack" active="true" />
+    <user userName="jim"  active="false" />
+</dataset>
++-----+
+
+    For this data set, it will check whether there are 2 different user records with corresponding values in the User table in the 
+    database. Other records and other tables are not taken into account.
+
+    As with the <@DataSet> annotation, a file name can explicitly be specified. If no name is specified, following naming pattern 
+    will be used: <className>.<methodName>-result.xml
+    
+    The use of result data sets should be kept to a minimum. Adding new data sets means more maintenance. As an alternative, you should always 
+    try to perform the same check in the test code (e.g. by using a method <findActiveUsers()>).
+
+
+
+** {Using multi-schema data sets}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Some applications connect to more than one database schema. To facilitate this, Unitils extends the data set xml definition to enable it to 
+    contain data for multiple schemas. Following example loads data for tables in 2 different schemas:
+
++-----+
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset xmlns="SCHEMA_A" xmlns:b="SCHEMA_B">
+    <user id="1" userName="jack" />    
+    <b:role id="1" roleName="admin" />
+</dataset>
++-----+    
+
+    In this case we defined 2 schemas, <SCHEMA_A> and <SCHEMA_B>. The first schema, <SCHEMA_A>, is linked to the default xml namespace, the second schema, <SCHEMA_B>, is 
+    linked to xml namespace b. If a table xml element is prefixed with namespace b, the table is expected to be in schema <SCHEMA_B>, if it doesn't have a namespace
+    prefix it is considered to be in SCHEMA_A. In the example, test data is defined for tables <SCHEMA_A.user> and <SCHEMA_B.role>. 
+    
+    If no default namespace is specified, it is by default set to the first of the list of schema names defined by the property <database.schemaNames>. So suppose you 
+    have defined following schema names:
+    
++-----+
+database.schemaNames=SCHEMA_A, SCHEMA_B
++-----+   
+
+    This will make <SCHEMA_A> the default schema. You can then simplify the above data set example by leaving out the default namespace declaration:
+    
++-----+
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset xmlns:b="SCHEMA_B">
+    <user id="1" userName="jack" />    
+    <b:role id="1" roleName="admin" />
+</dataset>
++-----+    
+
+
+
+* {Connecting to the test database}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    In the above examples we left out 1 important thing: where is the <DataSource> for connecting to the test database coming from and how
+    can we let our DAO classes make use of this <DataSource>? 
+    
+    When the first database test in your test suite is run, Unitils will create a <DataSource> instance that will connect to your unit test database
+    using the settings defined in the properties. Subsequent database tests will then reuse this same data source instance. The connection details
+    are specified by following properties:
+    
++-----+
+database.driverClassName=oracle.jdbc.driver.OracleDriver
+database.url=jdbc:oracle:thin:@yourmachine:1521:YOUR_DB
+database.userName=john
+database.password=secret
+database.schemaNames=test_john
++-----+
+
+    As described in the {{{tutorial-core.html}core tutorial}} you would typically put the driver and url properties in the project's <unitils.properties>, defining them for
+    the project as a whole and put the user, password and schema properties in the <unitils-local.properties>, defining them for that specific user only. This way you 
+    can make each developer connect to its own unit test database schema and run the tests without interference with others.
+
+    Before a test is set up, the <DataSource> instance will be injected into the test instance: if a field or setter method is annotated with <@TestDataSource> is found, 
+    it will be set to or called with this instance value. You still have to provide some project specific code that configures your code to use this data source. Typically
+    all this is implemented once in a project-specific superclass for all your database tests. A simple example of such a base class could be:
+    
++-----+
+public abstract class BaseDAOTest extends UnitilsJUnit4 {
+
+    @TestDataSource
+    private DataSource dataSource;
+    
+    @Before    
+    public void initializeDao() {
+        BaseDAO dao = getDaoUnderTest();
+        dao.setDataSource(dataSource);
+    }
+    
+    protected abstract BaseDAO getDaoUnderTest();
+}
++-----+    
+
+    The above example uses annotations to get a reference to the data source. Another way of making your code use the Unitils <DataSource> is by calling <DatabaseUnitils.getDataSource()>.
+    
+
+** {Transactions}
+~~~~~~~~~~~~~~~~~
+
+    For different reasons, it can be useful to run tests that access a test database in a transaction. The most important reasons are the following:
+
+    * Database actions exist that only work properly when executed in a transaction, such as when using <SELECT FOR UPDATE> or triggers that execute <ON COMMIT>.
+ 
+    * A lot of projects like to run their test on a database that is pre-filled with some general-purpose data. During each test, data may be inserted or
+      modified. To make sure the database is in the same known state before every test, a transaction is started before and rolled back after 
+      each test.
+
+    * When using hibernate or JPA, since these require you to run each test in a transaction to make the system work properly. 
+    
+    []
+    
+    By default every test is executed in a transaction, which is committed at the end of the test. 
+    
+    This default behavior can be changed by by setting a property. Transaction management can for example be disabled (= auto-commit behavior) as follows:
+    
++-----+
+DatabaseModule.Transactional.value.default=disabled
++-----+
+
+    Other supported values for this property are <commit>, <rollback> and <disabled>.
+    
+    The transactional behavior can also be modified at the level of a test class, by annotating the test class with <@Transactional>. For example:
+    
++-----+
+@Transactional(TransactionMode.ROLLBACK)
+public class UserDaoTest extends UnitilsJUnit4 {
++-----+
+
+    This will roll back the transaction after each test in the test class. The <@Transactional> annotation is inheritable, so it can be moved to a 
+    shared superclass instead of specifying it for each test separately.
+
+    Under the hoods, unitils depends on spring to implement transaction management. This doesn't mean you that need to use spring in your
+    application code for transaction management. The fact that spring is used, is completely transparent.
+	
+    If you are using unitils' spring support (see {{{Testing with Spring}Testing with spring}}), and you've configured a bean of type <PlatformTransactionManager>
+    in your spring configuration, unitils will make use of this transaction manager.
+
+
+
