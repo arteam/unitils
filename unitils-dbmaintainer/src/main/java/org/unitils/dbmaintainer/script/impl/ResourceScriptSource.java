@@ -38,12 +38,12 @@ import org.unitils.util.PropertyUtils;
  * @since 1.0.2
  * 
  */
-public class ExtendedScriptSource extends DefaultScriptSource {
+public class ResourceScriptSource extends DefaultScriptSource {
 
-    private static final Log LOGGER = LogFactory.getLog(ExtendedScriptSource.class);
+    private static final Log LOGGER = LogFactory.getLog(ResourceScriptSource.class);
 
     /** */
-    public ExtendedScriptSource() {
+    public ResourceScriptSource() {
     }
 
     /**

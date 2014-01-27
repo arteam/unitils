@@ -34,7 +34,7 @@ public class FileHandlerCreateFileTest {
         File actual = sut.createTempFile(resourceName);
     
         Assert.assertTrue(actual.exists());
-        Assert.assertTrue(actual.getAbsolutePath().toLowerCase().startsWith("c:\\temp\\exampleresourcedata-"));
+        Assert.assertTrue(actual.getName().toLowerCase().startsWith("exampleresourcedata-"));
     
     
         //delete temp file
@@ -47,7 +47,7 @@ public class FileHandlerCreateFileTest {
         File actual = sut.createTempFile(resourceName);
     
         Assert.assertTrue(actual.exists());
-        Assert.assertTrue(actual.getAbsolutePath().toLowerCase().startsWith("c:\\temp\\exampleresourcedata-"));
+        Assert.assertTrue(actual.getName().toLowerCase().startsWith("exampleresourcedata-"));
     
     
         //delete temp file
@@ -60,7 +60,7 @@ public class FileHandlerCreateFileTest {
         File actual = sut.createTempFile(resourceName);
     
         Assert.assertTrue(actual.exists());
-        Assert.assertTrue(actual.getAbsolutePath().toLowerCase().startsWith("c:\\temp\\exampleresourcedata-"));
+        Assert.assertTrue(actual.getName().toLowerCase().startsWith("exampleresourcedata-"));
         
         //delete temp file
         actual.delete();
