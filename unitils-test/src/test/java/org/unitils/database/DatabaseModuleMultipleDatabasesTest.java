@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -52,10 +54,11 @@ public class DatabaseModuleMultipleDatabasesTest {
     }
 
     @Test
-    public void testGetDatabase1() throws SQLException, SecurityException, NoSuchMethodException {
+    public void testGetDatabase1() throws SQLException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         TestClassDatabase1 obj = new TestClassDatabase1();
-        String databaseName = module.getDatabaseName(obj, obj.getClass().getMethod("testMethod"));
-        module.wrapper = module.getWrapper(databaseName);
+        List<String> databaseName = module.getDatabaseName(obj, obj.getClass().getMethod("testMethod"));
+        DataSourceWrapper wrapper = module.getWrapper(databaseName.get(0));
+		module.setWrapper(wrapper);
         module.injectDataSource(obj);
         
         Assert.assertNotNull(obj.dataSource);
@@ -64,11 +67,12 @@ public class DatabaseModuleMultipleDatabasesTest {
     }
 
     @Test
-    public void testGetDatabase2() throws SQLException, SecurityException, NoSuchMethodException {
+    public void testGetDatabase2() throws SQLException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         TestClassDatabase2 obj = new TestClassDatabase2();
 
-        String databaseName = module.getDatabaseName(obj, obj.getClass().getMethod("testMethod"));
-        module.wrapper = module.getWrapper(databaseName);
+        List<String> databaseName = module.getDatabaseName(obj, obj.getClass().getMethod("testMethod"));
+        DataSourceWrapper wrapper = module.getWrapper(databaseName.get(0));
+		module.setWrapper(wrapper);
         
         module.injectDataSource(obj);
         Assert.assertNotNull(obj.dataSource);

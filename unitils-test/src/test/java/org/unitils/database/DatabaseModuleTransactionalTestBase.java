@@ -74,7 +74,7 @@ abstract public class DatabaseModuleTransactionalTestBase {
         expect(mockDataSource.getConnection()).andReturn(mockConnection2);
         replay(mockDataSource);
 
-        configuration = new ConfigurationLoader().loadConfiguration();
+        configuration = (Properties) new ConfigurationLoader().loadConfiguration().clone();
         configuration.setProperty("org.unitils.database.config.DataSourceFactory.implClassName", MockDataSourceFactory.class.getName());
     }
 

@@ -847,6 +847,10 @@ public class DbSupportTest extends UnitilsJUnit4 {
         configuration.setProperty("dbMaintainer.autoCreateDbMaintainScriptsTable", "false");
         configuration.setProperty("updateDataBaseSchema.enabled", "false");
         
+        configuration.setProperty("dbMaintainer.updateSequences.enabled", "true");
+        configuration.setProperty("dbMaintainer.keepRetryingAfterError.enabled","true");
+        configuration.setProperty("org.unitils.dbmaintainer.script.ScriptSource.implClassName", "org.unitils.dbmaintainer.script.impl.DefaultScriptSource");
+        
         dialect = PropertyUtils.getString("database.dialect", configuration);
         
         DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
