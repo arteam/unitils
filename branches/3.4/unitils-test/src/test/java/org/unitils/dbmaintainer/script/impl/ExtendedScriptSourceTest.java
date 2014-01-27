@@ -27,7 +27,7 @@ public class ExtendedScriptSourceTest {
 
 
     /* Tested object */
-    ExtendedScriptSource scriptSource;
+    ResourceScriptSource scriptSource;
 
     String scriptsDirName;
 
@@ -56,7 +56,7 @@ public class ExtendedScriptSourceTest {
         configuration.setProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPT_DIRNAME, "postprocessing");
         configuration.setProperty(DefaultScriptSource.PROPKEY_USESCRIPTFILELASTMODIFICATIONDATES, "false");
         configuration.setProperty("database.dialect", "hsqldb");
-        scriptSource = new ExtendedScriptSource();
+        scriptSource = new ResourceScriptSource();
         scriptSource.init(configuration);
     }
     /**

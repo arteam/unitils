@@ -19,7 +19,7 @@ import org.unitils.dbmaintainer.script.Script;
  */
 public class ExtendedScriptSourceLoadAllScriptsTest {
     
-    private ExtendedScriptSource sut;
+    private ResourceScriptSource sut;
     
     private String scriptLocation = "org/unitils/dbunit/testdbscripts/";
 
@@ -40,7 +40,7 @@ public class ExtendedScriptSourceLoadAllScriptsTest {
     public void testIgnoreListDoesNotStartWithSlash() {
         
         config.setProperty(PROP_IGNORE, scriptLocation + "testsubpackage");
-        sut = new ExtendedScriptSource();
+        sut = new ResourceScriptSource();
         sut.init(config);
         
         

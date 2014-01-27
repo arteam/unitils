@@ -5,6 +5,7 @@ import static org.unitils.database.SQLUnitils.executeUpdate;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,20 +31,28 @@ public class ProfileModuleInjectBeans {
     
     private ProfileModule module;
     
+    @BeforeClass
+    public static void initClass() {
+    	createTestTables();
+    }
+    
     @Before
     public void init() {
-        this.module = new ProfileModule();
+    	module = new ProfileModule();
+       // createTestTables();
     }
     
     @After
     public void tearDown() {
-        dropTestTables();
+        //dropTestTables();
     }
 
     @Test
     public void testClassNoFields() {
         TestClassNoFields obj = new TestClassNoFields();
         Assert.assertTrue(module.injectBeans(obj));
+        
+        dropTestTables();
     }
     
     @Test
@@ -52,6 +61,8 @@ public class ProfileModuleInjectBeans {
         
         TestclassWithAutowired obj = new TestclassWithAutowired();
         Assert.assertFalse(module.injectBeans(obj));
+        
+        dropTestTables();
     }
 
     private class TestClassNoFields {
@@ -76,5 +87,12 @@ public class ProfileModuleInjectBeans {
         .setType(EmbeddedDatabaseType.HSQL)
         .build();
         executeUpdate("drop table DOSSIER", dataSource);
+    }
+    
+    private static void createTestTables() {
+    	EmbeddedDatabase dataSource = new EmbeddedDatabaseBuilder()
+        .setType(EmbeddedDatabaseType.HSQL)
+        .build();
+    	executeUpdate("CREATE TABLE dossier (id varchar(50), name varchar(50), Start_date date)", dataSource);
     }
 }

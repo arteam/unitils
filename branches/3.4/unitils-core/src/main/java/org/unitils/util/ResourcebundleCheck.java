@@ -2,6 +2,7 @@ package org.unitils.util;
 
 import java.util.Enumeration;
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 
@@ -30,9 +31,15 @@ public class ResourcebundleCheck {
         //creates the bundles for each locale
         for (int i = 0; i < locales.length; i++) {
             Locale locale = locales[i];
-
-            bundles[i] = ResourceBundle.getBundle(bundleName, locale);
+            ResourceBundle bundle = ResourceBundle.getBundle(bundleName, locale, ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_PROPERTIES));
+            //check if every locale exists (error found with mac)
+            if (!bundle.getLocale().equals(locale)) {
+                throw new MissingResourceException("The resourcebundle is missing: ", bundleName, locale.getLanguage());
+            }
+            bundles[i] = bundle;
         }
+        
+        
 
         //check which bundle is the biggest.
         ResourceBundle biggestBundle = bundles[0];

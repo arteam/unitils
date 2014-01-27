@@ -28,12 +28,19 @@ import org.unitils.reflectionassert.ReflectionAssert;
  */
 @RunWith(UnitilsJUnit4TestClassRunner.class)
 public class ResourcePickingStrategieTest {
+    
+    private String pathSeperator;
 
 private UniqueMostRecentPickingStrategie strategy;
     
     @Before
     public void init() {
         strategy = new UniqueMostRecentPickingStrategie();
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            pathSeperator = "\\";
+        } else {
+            pathSeperator = "/";
+        }
     }
 
     @Test
@@ -44,7 +51,7 @@ private UniqueMostRecentPickingStrategie strategy;
         URL urlFile1 = new URL("file:///" + file1.getAbsolutePath());
         filteredResources.add(urlFile1);
         
-        String resourceSearchName = file1.getAbsolutePath().substring(file1.getAbsolutePath().lastIndexOf("\\") + 1);
+        String resourceSearchName = file1.getAbsolutePath().substring(file1.getAbsolutePath().lastIndexOf(pathSeperator) + 1);
         
         strategy.addMostRecent(filteredResources, urlFile1, resourceSearchName);
         Assert.assertEquals(1, filteredResources.size());
@@ -61,7 +68,7 @@ private UniqueMostRecentPickingStrategie strategy;
         URL urlFile2 = new URL("file:///" + file2.getAbsolutePath());
         filteredResources.add(urlFile1);
         
-        String resourceSearchName = file1.getAbsolutePath().substring(file1.getAbsolutePath().lastIndexOf("\\") + 1);
+        String resourceSearchName = file1.getAbsolutePath().substring(file1.getAbsolutePath().lastIndexOf(pathSeperator) + 1);
         
         strategy.addMostRecent(filteredResources, urlFile2, resourceSearchName);
     
@@ -91,7 +98,7 @@ private UniqueMostRecentPickingStrategie strategy;
         
         URL urlFile1 = new URL("file:///" + file1.getAbsolutePath());
         filteredResources.add(urlFile1);
-        String resourceSearchName = file1.getAbsolutePath().substring(file1.getAbsolutePath().lastIndexOf("\\") + 1);
+        String resourceSearchName = file1.getAbsolutePath().substring(file1.getAbsolutePath().lastIndexOf(pathSeperator) + 1);
         
         strategy.filter(filteredResources, resourceSearchName);
         Assert.assertEquals(1, filteredResources.size());

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.io.FilenameUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.config.Configuration;
@@ -34,8 +35,8 @@ public class DatabaseConfigurationsFactoryTest {
     public void setUp() throws Exception {
         
         Properties config = new Properties();
-        
-        File file = new File("src\\test\\resources\\org\\unitils\\database\\config\\testconfig.properties");
+        String strFile = FilenameUtils.separatorsToSystem("src\\test\\resources\\org\\unitils\\database\\config\\testconfig.properties");
+        File file = new File(strFile);
         config.load(new FileInputStream(file));
         factory = new DatabaseConfigurationsFactory(new Configuration(config));
         config1 = new DatabaseConfiguration("database1", "hsqldb", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:unitils1", "sa", null, "public", Arrays.asList("public"), false, true);

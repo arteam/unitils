@@ -10,6 +10,7 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.io.FilenameUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +37,8 @@ public class DatabaseModuleMultipleDatabasesTest {
     @Before
     public void setUp() throws FileNotFoundException, IOException {
     	module = new DatabaseModule();
-        File file = new File("src\\test\\resources\\org\\unitils\\database\\config\\testconfigMultipleDatabases.properties");
+    	String strFile = FilenameUtils.separatorsToSystem("src\\test\\resources\\org\\unitils\\database\\config\\testconfigMultipleDatabases.properties");
+        File file = new File(strFile);
         unitilsConfig = (Properties) Unitils.getInstance().getConfiguration().clone();
         unitilsConfig.load(new FileInputStream(file));
         module.init(unitilsConfig);
