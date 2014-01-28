@@ -33,7 +33,7 @@ import static org.unitils.util.PropertyUtils.getString;
  */
 public class DefaultTempServiceFactory implements TempServiceFactory {
 
-    public static final String ROOT_TEMP_DIR = " IOModule.temp.rootTempDir";
+    public static final String ROOT_TEMP_DIR = "IOModule.temp.rootTempDir";
 
 
     public TempService createTempService(Properties configuration) {
