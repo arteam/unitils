@@ -78,7 +78,7 @@
     <scm>
         <connection>scm:svn:https://svn.code.sf.net/p/unitils/code/branches/3.4</connection>
         <developerConnection>scm:svn:https://svn.code.sf.net/p/unitils/code/branches/3.4</developerConnection>
-        <url>https://svn.code.sf.net/p/unitils/code/branches/3.4</url>
+        <url>scm:svn:https://svn.code.sf.net/p/unitils/code/branches/3.4</url>
     </scm>
     <mailingLists>
         <mailingList>
