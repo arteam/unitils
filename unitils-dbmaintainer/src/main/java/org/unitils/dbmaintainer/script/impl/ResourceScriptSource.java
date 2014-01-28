@@ -1,10 +1,3 @@
-/*
- * CVS file status:
- * 
- * $Id: ExtendedScriptSource.java,v 1.2 2011-11-03 12:25:00 jeho Exp $
- * 
- * Copyright (c) Smals
- */
 package org.unitils.dbmaintainer.script.impl;
 
 import java.util.ArrayList;

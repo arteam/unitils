@@ -1,6 +1,3 @@
-/*
- * Copyright (c) Smals
- */
 package org.unitils.dbunit.datasetfactory.impl;
 
 import java.io.File;
