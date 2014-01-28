@@ -1,10 +1,3 @@
-/*
- * CVS file status:
- * 
- * $$Id: ResourceLoadingMethodTest.java,v 1.2 2010-12-20 09:54:18 tdr Exp $$
- * 
- * Copyright (c) Smals
- */
 package org.unitils.dbmaintainer.locator;
 
 import org.apache.log4j.Logger;

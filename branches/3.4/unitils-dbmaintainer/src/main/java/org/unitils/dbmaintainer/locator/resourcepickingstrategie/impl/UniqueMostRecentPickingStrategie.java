@@ -26,7 +26,7 @@ public class UniqueMostRecentPickingStrategie implements ResourcePickingStrategi
     private static Log logger = LogFactory.getLog(UniqueMostRecentPickingStrategie.class);
 
     /**
-     * @see be.smals.stve.unitilsmodules.dbmaintainer.ResourcePickingStrategie#filter(java.util.List)
+     * @see org.unitils.dbmaintainer.locator.resourcepickingstrategie.ResourcePickingStrategie#filter(java.util.List)
      */
     public List<URL> filter(List<URL> resources, String resourceSearchName) {
         List<URL> filteredResources = new ArrayList<URL>();
