@@ -132,7 +132,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <goals>deploy package assembly:assembly javadoc:aggregate</goals>
-                    <tagBase>https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases</tagBase>
+                    <tagBase>https://svn.code.sf.net/p/unitils/code/tags/releases/</tagBase>
                     <mavenExecutorId>forked-path</mavenExecutorId>
                 </configuration>
             </plugin>
