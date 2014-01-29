@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE dataset SYSTEM "target/dtd/database.dtd">
+
+<dataset>
+    <dossier id="DS-1" name="black" />
+    <dossier id="DS-2" name="n" />
+    <dossier id="DS-3" name="decker" />
+</dataset>
+

@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE dataset SYSTEM "target/dtd/database.dtd">
+
+<dataset>
+    <dossier id="DS-1" name="blé#\è§6.ck" />
+</dataset>
