@@ -121,8 +121,10 @@ public class DatabaseUnitils {
      */
     public static void resetDatabaseState(String databaseName) {
         DatabaseModule databaseModule = getDatabaseModule();
-        SQLHandler sqlHandler = databaseModule.getWrapper(databaseName).getDefaultSqlHandler();
-        databaseModule.resetDatabaseState(sqlHandler);
+        DataSourceWrapper wrapper = databaseModule.getWrapper(databaseName);
+        SQLHandler sqlHandler = wrapper.getDefaultSqlHandler();
+        
+        databaseModule.resetDatabaseState(sqlHandler, wrapper);
     }
 
 

@@ -60,6 +60,7 @@ import org.unitils.core.util.ConfigUtils;
 import org.unitils.database.DatabaseModule;
 import org.unitils.dbmaintainer.locator.ClassPathDataLocator;
 import org.unitils.dbmaintainer.locator.resourcepickingstrategie.ResourcePickingStrategie;
+import org.unitils.dbmaintainer.locator.resourcepickingstrategie.impl.UniqueMostRecentPickingStrategie;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
