@@ -43,5 +43,7 @@ public @interface HibernateSessionFactory {
      * Specifies zero, one or more configuration files, that will be used to configure the hibernate <code>SessionFactory</code>
      */
     String[] value() default {};
+    
+    String databaseName() default "";
 
 }

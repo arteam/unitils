@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * A class for holding and retrieving modules.
@@ -115,7 +114,6 @@ public class ModulesRepository {
      * @param fullyQualifiedClassName The class name, not null
      * @return True if the module exists and is enabled
      */
-    @SuppressWarnings("unchecked")
     public boolean isModuleEnabled(String fullyQualifiedClassName) {
         Class<? extends Module> moduleClass;
         try {

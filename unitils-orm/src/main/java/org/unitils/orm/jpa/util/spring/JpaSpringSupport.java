@@ -15,16 +15,16 @@
  */
 package org.unitils.orm.jpa.util.spring;
 
-import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
+import java.util.Collection;
+
+import javax.persistence.EntityManagerFactory;
+
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 import org.unitils.core.Unitils;
 import org.unitils.orm.common.spring.OrmSpringSupport;
 import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
 import org.unitils.orm.jpa.JpaModule;
 import org.unitils.spring.SpringModule;
-
-import javax.persistence.EntityManagerFactory;
-import java.util.Collection;
 
 
 /**

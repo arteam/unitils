@@ -20,6 +20,7 @@ import static org.unitils.util.PropertyUtils.getString;
 
 import java.lang.reflect.Method;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -37,6 +38,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
+import org.unitils.database.DataSourceWrapper;
 import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 import org.unitils.database.util.Flushable;
 import org.unitils.orm.common.OrmModule;
@@ -47,6 +49,8 @@ import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.orm.hibernate.util.HibernateAnnotationConfigLoader;
 import org.unitils.orm.hibernate.util.HibernateAssert;
 import org.unitils.orm.hibernate.util.HibernateSessionFactoryLoader;
+import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
+import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
 
 /**
@@ -97,28 +101,31 @@ public class HibernateModule extends OrmModule<SessionFactory, Session, Configur
     public void registerTransactionManagementConfiguration() {
      // Make sure that a spring HibernateTransactionManager is used for transaction management in the database module, if the
         // current test object defines a hibernate SessionFactory
-        getDatabaseModule().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
-            
-            public boolean isApplicableFor(Object testObject) {
-                return isPersistenceUnitConfiguredFor(testObject);
-            }
-            
-            public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
-                SessionFactory sessionFactory = getPersistenceUnit(testObject);
-                HibernateTransactionManager hibernateTransactionManager = new HibernateTransactionManager(sessionFactory);
-                hibernateTransactionManager.setDataSource(getDataSource());
-                return hibernateTransactionManager;
-            }
+        for (final DataSourceWrapper wrapper : wrappers) {
+            getDatabaseModule().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
+                
+                public boolean isApplicableFor(Object testObject) {
+                    return isPersistenceUnitConfiguredFor(testObject);
+                }
+                
+                public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
+                    SessionFactory sessionFactory = getPersistenceUnit(testObject);
+                    HibernateTransactionManager hibernateTransactionManager = new HibernateTransactionManager(sessionFactory);
+                    hibernateTransactionManager.setDataSource(getDataSource());
+                    return hibernateTransactionManager;
+                }
 
-            public boolean isTransactionalResourceAvailable(Object testObject) {
-                return getDatabaseModule().getWrapper(databaseName).isDataSourceLoaded();
-            }
+                public boolean isTransactionalResourceAvailable(Object testObject) {
+                    return wrapper.isDataSourceLoaded();
+                }
 
-            public Integer getPreference() {
-                return 10;
-            }
-            
-        });
+                public Integer getPreference() {
+                    return 10;
+                }
+                
+            });
+        }
+        
     }
     
     
@@ -240,10 +247,35 @@ public class HibernateModule extends OrmModule<SessionFactory, Session, Configur
          */
         @Override
         public void beforeTestMethod(Object testObject, Method testMethod) {
-            databaseName = getDatabaseName(testObject, testMethod);
+            //databaseName = getDatabaseName(testObject, testMethod);
             registerTransactionManagementConfiguration();
             super.beforeTestMethod(testObject, testMethod);
         }
+        
+    }
+
+
+    /**
+     * @see org.unitils.orm.common.OrmModule#getDatabaseName(java.lang.Object, java.lang.reflect.Method)
+     */
+    @Override
+    protected void getDatabaseName(Object testObject, Method testMethod) {
+        //List<String> dataSources = new ArrayList<String>();
+        HibernateSessionFactory dataSource = AnnotationUtils.getMethodOrClassLevelAnnotation(HibernateSessionFactory.class, testMethod, testObject.getClass());
+        if (dataSource != null) {
+            wrappers.add(getDatabaseModule().getWrapper(dataSource.databaseName()));
+            //dataSources.add(dataSource.databaseName());
+            
+        }
+
+        Set<HibernateSessionFactory> lstDataSources = AnnotationUtils.getFieldLevelAnnotations(testObject.getClass(), HibernateSessionFactory.class);
+        if (!lstDataSources.isEmpty()) {
+            for (HibernateSessionFactory testDataSource : lstDataSources) {
+                //ataSources.add(testDataSource.databaseName());
+                wrappers.add(getDatabaseModule().getWrapper(testDataSource.databaseName()));
+            }
+        } 
+        //return dataSources;
         
     }
 
