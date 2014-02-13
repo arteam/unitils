@@ -1,6 +1,3 @@
-/*
- * Copyright (c) Smals
- */
 package org.unitils.core.junit;
 
 import java.lang.reflect.Method;
