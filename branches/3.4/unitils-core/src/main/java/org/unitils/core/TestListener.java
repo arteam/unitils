@@ -16,7 +16,6 @@
 package org.unitils.core;
 
 import java.lang.reflect.Method;
-import org.unitils.TestRunnerAccessor;
 
 /**
  * Listener for test events. The events must follow following ordering:

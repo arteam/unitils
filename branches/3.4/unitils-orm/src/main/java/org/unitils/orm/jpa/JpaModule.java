@@ -41,6 +41,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.unitils.core.TestListener;
 import org.unitils.core.util.ConfigUtils;
+import org.unitils.database.DataSourceWrapper;
 import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 import org.unitils.orm.common.OrmModule;
 import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
@@ -117,29 +118,33 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
     public void  registerTransactionManagementConfiguration() {
      // Make sure that a spring JpaTransactionManager is used for transaction management in the database module, if the
         // current test object defines a JPA EntityManagerFactory
-        getDatabaseModule().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
-            
-            public boolean isApplicableFor(Object testObject) {
-                return isPersistenceUnitConfiguredFor(testObject);
-            }
-            
-            public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
-                EntityManagerFactory entityManagerFactory = getPersistenceUnit(testObject);
-                JpaTransactionManager jpaTransactionManager = new JpaTransactionManager(entityManagerFactory);
-                jpaTransactionManager.setDataSource(getDataSource());
-                jpaTransactionManager.setJpaDialect(jpaProviderSupport.getSpringJpaVendorAdaptor().getJpaDialect());
-                return jpaTransactionManager;
-            }
-            
-            public boolean isTransactionalResourceAvailable(Object testObject) {
-                return getDatabaseModule().getWrapper(databaseName).isDataSourceLoaded();
-            }
+        for (final DataSourceWrapper wrapper : wrappers) {
+            getDatabaseModule().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
+                
+                public boolean isApplicableFor(Object testObject) {
+                    return isPersistenceUnitConfiguredFor(testObject);
+                }
+                
+                public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
+                    EntityManagerFactory entityManagerFactory = getPersistenceUnit(testObject);
+                    JpaTransactionManager jpaTransactionManager = new JpaTransactionManager(entityManagerFactory);
+                    jpaTransactionManager.setDataSource(getDataSource());
+                    jpaTransactionManager.setJpaDialect(jpaProviderSupport.getSpringJpaVendorAdaptor().getJpaDialect());
+                    return jpaTransactionManager;
+                }
+                
+                public boolean isTransactionalResourceAvailable(Object testObject) {
+                    return wrapper.isDataSourceLoaded();
+                }
 
-            public Integer getPreference() {
-                return 10;
-            }
-            
-        });
+                public Integer getPreference() {
+                    return 10;
+                }
+                
+            });
+        }
+        
+        
     }
     
     
@@ -288,6 +293,8 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
     public TestListener getTestListener() {
         return new JpaTestListener();
     }
+    
+    
 
 
     /**
@@ -302,5 +309,27 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
             injectJpaResourcesIntoTestObject(testObject);
         }
         
+    }
+
+
+
+
+    /**
+     * @see org.unitils.orm.common.OrmModule#getDatabaseName(java.lang.Object, java.lang.reflect.Method)
+     */
+    @Override
+    protected void getDatabaseName(Object testObject, Method testMethod) {
+        JpaEntityManagerFactory dataSource = AnnotationUtils.getMethodOrClassLevelAnnotation(JpaEntityManagerFactory.class, testMethod, testObject.getClass());
+        if (dataSource != null) {
+            wrappers.add(getDatabaseModule().getWrapper(dataSource.databaseName()));
+            
+        }
+
+        Set<JpaEntityManagerFactory> lstDataSources = AnnotationUtils.getFieldLevelAnnotations(testObject.getClass(), JpaEntityManagerFactory.class);
+        if (!lstDataSources.isEmpty()) {
+            for (JpaEntityManagerFactory testDataSource : lstDataSources) {
+                wrappers.add(getDatabaseModule().getWrapper(testDataSource.databaseName()));
+            }
+        } 
     }
 }

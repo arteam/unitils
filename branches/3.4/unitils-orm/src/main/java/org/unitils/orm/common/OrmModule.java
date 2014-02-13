@@ -15,20 +15,6 @@
  */
 package org.unitils.orm.common;
 
-import org.unitils.core.Module;
-import org.unitils.core.TestListener;
-import org.unitils.core.Unitils;
-import org.unitils.core.UnitilsException;
-import org.unitils.core.util.ResourceConfigLoader;
-import org.unitils.database.DatabaseModule;
-import org.unitils.database.util.Flushable;
-import org.unitils.orm.common.spring.OrmSpringSupport;
-import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
-import org.unitils.orm.common.util.OrmConfig;
-import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
-import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
-import org.unitils.util.AnnotationUtils;
-
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
@@ -37,7 +23,25 @@ import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import org.unitils.core.Module;
+import org.unitils.core.TestListener;
+import org.unitils.core.Unitils;
+import org.unitils.core.UnitilsException;
+import org.unitils.core.util.ResourceConfigLoader;
+import org.unitils.database.DataSourceWrapper;
+import org.unitils.database.DatabaseModule;
+import org.unitils.database.util.Flushable;
+import org.unitils.orm.common.spring.OrmSpringSupport;
+import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
+import org.unitils.orm.common.util.OrmConfig;
+import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
 
 /**
  * Base module defining common behavior for a module that provides object relational mapping support for tests.
@@ -81,6 +85,8 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
     protected OrmSpringSupport<ORM_PERSISTENCE_UNIT, PROVIDER_CONFIGURATION_OBJECT> ormSpringSupport;
 
     protected String databaseName;
+    
+    protected Set<DataSourceWrapper> wrappers = new HashSet<DataSourceWrapper>();
     
     
     public void init(Properties configuration) {
@@ -185,7 +191,7 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
         if (configuredPersistenceUnit == null) {
             configuredPersistenceUnit = ormPersistenceUnitLoader.getConfiguredOrmPersistenceUnit(testObject, persistenceUnitConfig);
             configuredOrmPersistenceUnitCache.put(persistenceUnitConfig, configuredPersistenceUnit);
-            getDatabaseModule().activateTransactionIfNeeded();
+            //getDatabaseModule().activateTransactionIfNeeded();
         }
         return configuredPersistenceUnit;
     }
@@ -327,6 +333,8 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
         ORM_PERSISTENCE_UNIT persistenceUnit = getPersistenceUnit(testObject);
         setFieldAndSetterValue(testObject, fields, methods, persistenceUnit);
     }
+    
+    protected abstract void getDatabaseName(Object testObject, Method testMethod);
 
 
     /**
@@ -359,19 +367,6 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
 
     protected DatabaseModule getDatabaseModule() {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-    }
-
-    public String getDatabaseName(Object testObject, Method testMethod) {
-        Set<JpaEntityManagerFactory> fields = AnnotationUtils.getFieldLevelAnnotations(testObject.getClass(), JpaEntityManagerFactory.class);
-        Set<JpaEntityManagerFactory> methods = AnnotationUtils.getMethodLevelAnnotations(testObject.getClass(), JpaEntityManagerFactory.class);
-        if (fields.isEmpty() && methods.isEmpty()) {
-            // Jump out to make sure that we don't try to instantiate the EntityManagerFactory
-            return "";
-        }
-        if (!fields.isEmpty()) {
-             return fields.iterator().next().databaseName();
-        }
-        return methods.iterator().next().databaseName();
     }
 
     /**
