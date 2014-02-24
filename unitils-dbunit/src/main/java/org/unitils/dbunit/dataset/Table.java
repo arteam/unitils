@@ -15,12 +15,13 @@
  */
 package org.unitils.dbunit.dataset;
 
-import org.unitils.dbunit.dataset.comparison.RowDifference;
-import org.unitils.dbunit.dataset.comparison.TableDifference;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.dbunit.dataset.Column;
+import org.unitils.dbunit.dataset.comparison.RowDifference;
+import org.unitils.dbunit.dataset.comparison.TableDifference;
 
 /**
  * A data set table
@@ -35,6 +36,8 @@ public class Table {
 
     /* The data set rows */
     private List<Row> rows = new ArrayList<Row>();
+    
+    private List<Column> columns = new ArrayList<Column>();
 
 
     /**
@@ -137,5 +140,29 @@ public class Table {
                 result.addMissingRow(row);
             }
         }
+    }
+    
+    
+    /**
+     * @return the columns
+     */
+    public List<Column> getColumns() {
+        return columns;
+    }
+    
+    public void addColumns(Column[] columns2) {
+        for (Column column : columns2) {
+            addColumn(column);
+        }
+    }
+    
+    /**
+     * 
+     */
+    public void addColumn(Column column) {
+        if (!columns.contains(column)) {
+            columns.add(column);
+        }
+
     }
 }
