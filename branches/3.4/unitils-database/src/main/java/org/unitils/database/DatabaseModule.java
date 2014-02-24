@@ -157,8 +157,6 @@ public class DatabaseModule implements Module {
         this.configuration = configuration;
         DatabaseConfigurationsFactory configFactory = new DatabaseConfigurationsFactory(new Configuration(configuration));
         databaseConfigurations = configFactory.create();
-        DataSourceWrapper wrapper = new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(), configuration, getTransactionManager());
-        setWrapper(wrapper);
         defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(DatabaseModule.class, configuration, Transactional.class);
         updateDatabaseSchemaEnabled = PropertyUtils.getBoolean(PROPERTY_UPDATEDATABASESCHEMA_ENABLED, configuration);
         wrapDataSourceInTransactionalProxy = PropertyUtils.getBoolean(PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY, configuration);
