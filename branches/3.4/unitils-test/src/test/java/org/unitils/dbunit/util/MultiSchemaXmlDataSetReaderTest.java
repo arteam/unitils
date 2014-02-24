@@ -78,7 +78,7 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit4 {
         // second table TABLE_A row should contain 1 column
         assertTrue(tableIterator.next());
         table = tableIterator.getTable();
-        assertPropertyLenientEquals("columnName", asList("COLUMN_2"), asList(table.getTableMetaData().getColumns()));
+        assertPropertyLenientEquals("columnName", asList("COLUMN_1", "COLUMN_2", "COLUMN_3"), asList(table.getTableMetaData().getColumns()));
         assertEquals(1, table.getRowCount());
         assertEquals("4", table.getValue(0, "COLUMN_2"));
         assertFalse(tableIterator.next());
