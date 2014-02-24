@@ -1,11 +1,14 @@
 package org.unitils.dbunit.util;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.dbunit.dataset.DataSetException;
 import org.unitils.core.UnitilsException;
+import org.unitils.dbunit.dataset.Table;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
@@ -23,6 +26,8 @@ import org.xml.sax.XMLReader;
 public class MultiSchemaXmlDataSetReaderExtend extends MultiSchemaXmlDataSetReader {
 
     private String defaultSchemaName;
+    
+    private Map<String, Table> tables = new HashMap<String, Table>();
 
     
     /**
@@ -59,7 +64,7 @@ public class MultiSchemaXmlDataSetReaderExtend extends MultiSchemaXmlDataSetRead
     public MultiSchemaDataSet readDataSetXml(List<InputStream> inputStreams) throws UnitilsException {
         DataSetContentHandler dataSetContentHandler;
         XMLReader xmlReader;
-        dataSetContentHandler = new DataSetContentHandler(defaultSchemaName);
+        dataSetContentHandler = new DataSetContentHandler(defaultSchemaName, tables);
         xmlReader = createXMLReader();
         xmlReader.setContentHandler(dataSetContentHandler);
         xmlReader.setErrorHandler(dataSetContentHandler);

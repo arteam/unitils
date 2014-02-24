@@ -16,21 +16,33 @@
 package org.unitils.dbunit.util;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.dbunit.dataset.*;
-import org.dbunit.dataset.datatype.DataType;
-import org.unitils.core.UnitilsException;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-import org.xml.sax.*;
-import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.xml.parsers.SAXParserFactory;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dbunit.dataset.CachedDataSet;
+import org.dbunit.dataset.Column;
+import org.dbunit.dataset.DataSetException;
+import org.dbunit.dataset.DefaultTableMetaData;
+import org.dbunit.dataset.ITableMetaData;
+import org.dbunit.dataset.ReplacementDataSet;
+import org.dbunit.dataset.datatype.DataType;
+import org.unitils.core.UnitilsException;
+import org.unitils.dbunit.dataset.Table;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * A reader for DbUnit xml datasets that creates a new ITable instance for each element (row).
@@ -74,6 +86,8 @@ public class MultiSchemaXmlDataSetReader {
 
     /* The schema name to use when none is specified */
     private String defaultSchemaName;
+    
+    protected Map<String, Table> tables = new HashMap<String, Table>();
 
 
     /**
@@ -95,7 +109,7 @@ public class MultiSchemaXmlDataSetReader {
      */
     public MultiSchemaDataSet readDataSetXml(File... dataSetFiles) {
         try {
-            DataSetContentHandler dataSetContentHandler = new DataSetContentHandler(defaultSchemaName);
+            DataSetContentHandler dataSetContentHandler = new DataSetContentHandler(defaultSchemaName, tables);
             XMLReader xmlReader = createXMLReader();
             xmlReader.setContentHandler(dataSetContentHandler);
             xmlReader.setErrorHandler(dataSetContentHandler);
@@ -168,6 +182,8 @@ public class MultiSchemaXmlDataSetReader {
 
         /* All created datasets per schema */
         private Map<String, CachedDataSet> dataSets = new HashMap<String, CachedDataSet>();
+        
+        private Map<String, Table> tables = new HashMap<String, Table>();
 
 
         /**
@@ -175,8 +191,9 @@ public class MultiSchemaXmlDataSetReader {
          *
          * @param defaultSchemaName The schema name to use when none is specified, not null
          */
-        public DataSetContentHandler(String defaultSchemaName) {
+        public DataSetContentHandler(String defaultSchemaName, Map<String, Table> tables) {
             this.defaultSchemaName = defaultSchemaName;
+            this.tables = tables;
         }
 
 
@@ -237,8 +254,12 @@ public class MultiSchemaXmlDataSetReader {
                 }
 
                 ITableMetaData tableMetaData = createTableMetaData(localName, attributes);
-                dataSet.startTable(tableMetaData);
+                
 
+                
+
+                dataSet.startTable(tableMetaData);
+                
                 // add row values if there are any
                 String[] rowValues = getRowValues(tableMetaData.getColumns(), attributes);
                 if (rowValues != null) {
@@ -252,6 +273,10 @@ public class MultiSchemaXmlDataSetReader {
                 throw new SAXException(e);
             }
         }
+        
+        protected void addColumnsToUnitilsTable() {
+            
+        }
 
 
         /**
@@ -262,11 +287,26 @@ public class MultiSchemaXmlDataSetReader {
          * @return the meta data, not null
          */
         protected ITableMetaData createTableMetaData(String tableName, Attributes attributes) {
+            Table table = null;
+            if (tables.containsKey(tableName)) {
+                table = tables.get(tableName);
+            } else {
+                table = new Table(tableName);
+                tables.put(tableName, table);
+            }
+            
             Column[] columns = new Column[attributes.getLength()];
             for (int i = 0; i < attributes.getLength(); i++) {
                 columns[i] = new Column(attributes.getQName(i), DataType.UNKNOWN);
+                table.addColumn(columns[i]);
             }
-            return new DefaultTableMetaData(tableName, columns);
+            
+            columns = new Column[table.getColumns().size()];
+            
+            table.getColumns().toArray(columns);
+            Column[] tempColumns = new Column[table.getColumns().size()];
+            table.getColumns().toArray(tempColumns);
+            return new DefaultTableMetaData(tableName, tempColumns);
         }
 
 
