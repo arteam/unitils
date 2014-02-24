@@ -146,7 +146,7 @@ public class DatabaseModule implements Module {
     private DatabaseConfigurations databaseConfigurations;
 
     //protected DataSourceWrapper wrapper;
-    private List<DataSourceWrapper> wrappers = new ArrayList<DataSourceWrapper>();
+    private Map<String, DataSourceWrapper> wrappers = new HashMap<String, DataSourceWrapper>();
     /**
      * Initializes this module using the given <code>Configuration</code>
      *
@@ -173,11 +173,16 @@ public class DatabaseModule implements Module {
         //do nothing
     }
 
-    public void registerTransactionManagementConfiguration() {
+    public void registerTransactionManagementConfiguration() {  
+        for (DataSourceWrapper wrapper : wrappers.values()) {
+            registerTransactionManagementConfiguration(wrapper);
+        }
+    }
+    
+    public void registerTransactionManagementConfiguration(final DataSourceWrapper wrapper) {
 
         // Make sure that a spring DataSourceTransactionManager is used for transaction management, if
         // no other transaction management configuration takes preference
-        for (final DataSourceWrapper wrapper : wrappers) {
             registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
 
                 public boolean isApplicableFor(Object testObject) {
@@ -197,8 +202,6 @@ public class DatabaseModule implements Module {
                 }
 
             });
-        }
-
     }
 
     public void activateTransactionIfNeeded() {
@@ -453,8 +456,7 @@ public class DatabaseModule implements Module {
                 }
 
             }
-            registerTransactionManagementConfiguration();
-            //wrapper.setTransactionManager(getTransactionManager());
+            
             try {
                 injectDataSource(testObject);
             } catch (Exception e) {
@@ -473,10 +475,18 @@ public class DatabaseModule implements Module {
      * @return the wrapper
      */
     public DataSourceWrapper getWrapper(String databaseName) {
-        if (StringUtils.isEmpty(databaseName)) {
-            return new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(), configuration, getTransactionManager());
+        if (wrappers.containsKey(databaseName)) {
+            return wrappers.get(databaseName);
         }
-        return new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(databaseName), configuration, getTransactionManager());
+        
+        DataSourceWrapper wrapper = null;
+        if (StringUtils.isEmpty(databaseName)) {
+            wrapper = new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(), configuration, getTransactionManager());
+        } else {
+            wrapper = new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(databaseName), configuration, getTransactionManager());
+        }
+        setWrapper(wrapper);
+        return wrapper;
     }
 
 
@@ -484,8 +494,9 @@ public class DatabaseModule implements Module {
      * @param wrapper the wrapper to set
      */
     public void setWrapper(DataSourceWrapper wrapper) {
-        if (!wrappers.contains(wrapper)) {
-            wrappers.add(wrapper);
+        if (!wrappers.keySet().contains(wrapper.getDatabaseName())) {
+            wrappers.put(wrapper.getDatabaseName(), wrapper);
+            registerTransactionManagementConfiguration(wrapper);
         }
 
     }

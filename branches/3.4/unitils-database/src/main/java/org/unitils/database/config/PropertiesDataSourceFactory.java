@@ -38,8 +38,6 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
     //Configuration
     private DatabaseConfiguration config;
     
-    private String databaseName;
-    
 
 
     /**
