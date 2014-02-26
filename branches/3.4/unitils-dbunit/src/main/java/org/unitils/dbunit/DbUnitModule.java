@@ -57,6 +57,7 @@ import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.core.util.ConfigUtils;
+import org.unitils.database.DataSourceWrapper;
 import org.unitils.database.DatabaseModule;
 import org.unitils.dbmaintainer.locator.ClassPathDataLocator;
 import org.unitils.dbmaintainer.locator.resourcepickingstrategie.ResourcePickingStrategie;
@@ -69,7 +70,6 @@ import org.unitils.dbunit.util.DataSetAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.FileHandler;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
-import org.unitils.util.PropertyUtils;
 
 /**
  * Module that provides support for managing database test data using DBUnit.
@@ -114,7 +114,7 @@ public class DbUnitModule implements Module {
      */
     protected Properties configuration;
 
-    protected String dialect;
+    //protected String dialect;
 
     protected String databaseName;
 
@@ -131,7 +131,6 @@ public class DbUnitModule implements Module {
     public void init(Properties configuration) {
         this.configuration = configuration;
         defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(DbUnitModule.class, configuration, DataSet.class, ExpectedDataSet.class);
-        this.dialect = PropertyUtils.getString("database.dialect", configuration);
     }
 
 
@@ -149,10 +148,11 @@ public class DbUnitModule implements Module {
      * @return The DbUnit connection, not null
      */
     public DbUnitDatabaseConnection getDbUnitDatabaseConnection(String schemaName) {
-        DbUnitDatabaseConnection dbUnitDatabaseConnection = dbUnitDatabaseConnections.get(schemaName);
+        String keyInDbUnitConnection = schemaName + databaseName;
+        DbUnitDatabaseConnection dbUnitDatabaseConnection = dbUnitDatabaseConnections.get(keyInDbUnitConnection);
         if (dbUnitDatabaseConnection == null) {
             dbUnitDatabaseConnection = createDbUnitConnection(schemaName);
-            dbUnitDatabaseConnections.put(schemaName, dbUnitDatabaseConnection);
+            dbUnitDatabaseConnections.put(keyInDbUnitConnection, dbUnitDatabaseConnection);
         }
         return dbUnitDatabaseConnection;
     }
@@ -455,9 +455,10 @@ public class DbUnitModule implements Module {
      */
     protected DbUnitDatabaseConnection createDbUnitConnection(String schemaName) {
         // A DbSupport instance is fetched in order to get the schema name in correct case
-        DataSource dataSource = getDatabaseModule().getWrapper(databaseName).getDataSourceAndActivateTransactionIfNeeded();
+        DataSourceWrapper wrapper = getDatabaseModule().getWrapper(databaseName);
+        DataSource dataSource = wrapper.getDataSourceAndActivateTransactionIfNeeded();
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        DbSupport dbSupport = getDbSupport(configuration, sqlHandler, schemaName, dialect);
+        DbSupport dbSupport = getDbSupport(configuration, sqlHandler, schemaName, wrapper.getDatabaseConfiguration().getDialect());
 
         // Create connection
         DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(dataSource, dbSupport.getSchemaName());
@@ -629,9 +630,10 @@ public class DbUnitModule implements Module {
      * @return The default DbSupport (the one that connects to the default database schema)
      */
     protected DbSupport getDefaultDbSupport() {
-        DataSource dataSource = getDatabaseModule().getWrapper(databaseName).getDataSourceAndActivateTransactionIfNeeded();
+        DataSourceWrapper wrapper = getDatabaseModule().getWrapper(databaseName);
+        DataSource dataSource = wrapper.getDataSourceAndActivateTransactionIfNeeded();
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        return DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler, dialect);
+        return DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler, wrapper.getDatabaseConfiguration().getDialect());
     }
 
 
