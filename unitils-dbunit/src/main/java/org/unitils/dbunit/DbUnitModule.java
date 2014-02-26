@@ -36,10 +36,12 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
@@ -62,14 +64,18 @@ import org.unitils.database.DatabaseModule;
 import org.unitils.dbmaintainer.locator.ClassPathDataLocator;
 import org.unitils.dbmaintainer.locator.resourcepickingstrategie.ResourcePickingStrategie;
 import org.unitils.dbunit.annotation.DataSet;
+import org.unitils.dbunit.annotation.DataSets;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
 import org.unitils.dbunit.datasetfactory.DataSetResolver;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
+import org.unitils.dbunit.datasetloadstrategy.impl.CleanInsertLoadStrategy;
+import org.unitils.dbunit.datasetloadstrategy.impl.InsertLoadStrategy;
 import org.unitils.dbunit.util.DataSetAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.FileHandler;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
+import org.unitils.reflectionassert.ReflectionAssert;
 
 /**
  * Module that provides support for managing database test data using DBUnit.
@@ -168,20 +174,77 @@ public class DbUnitModule implements Module {
      * @param testObject The test object, not null
      */
     public void insertDataSet(Method testMethod, Object testObject) {
+        Class<?> testClass = testObject.getClass();
         try {
-            MultiSchemaDataSet multiSchemaDataSet = getDataSet(testMethod, testObject);
-            if (multiSchemaDataSet == null) {
-                // no dataset specified
-                return;
+            DataSets dataSetsAnnotation = getMethodOrClassLevelAnnotation(DataSets.class, testMethod, testClass);
+            if (dataSetsAnnotation != null) {
+                insertDataSets(dataSetsAnnotation, testObject, testMethod);
             }
-            DataSetLoadStrategy dataSetLoadStrategy = getDataSetLoadStrategy(testMethod, testObject.getClass());
-            insertDataSet(multiSchemaDataSet, dataSetLoadStrategy);
-
+            DataSet dataSetAnnotation = getMethodOrClassLevelAnnotation(DataSet.class, testMethod, testClass);
+            if (dataSetAnnotation != null) {
+                insertDataSet(dataSetAnnotation, testObject, testMethod);
+            }
         } catch (Exception e) {
             throw new UnitilsException("Error inserting test data from DbUnit dataset for method " + testMethod, e);
         } finally {
             closeJdbcConnection();
         }
+
+    }
+
+    public void insertDataSets(DataSets dataSets, Object testObject, Method testMethod) {
+        boolean cleanLoadStrategy = false;
+        
+        for (final DataSet dataSet : dataSets.value()) {
+            DataSetLoadStrategy loadStrategy = getDataSetLoadStrategy(testMethod, testObject.getClass(), dataSet);
+            if (loadStrategy instanceof CleanInsertLoadStrategy && !cleanLoadStrategy) {
+                cleanLoadStrategy = true;
+                insertDataSet(dataSet, testObject, testMethod);
+            } else if (loadStrategy instanceof CleanInsertLoadStrategy && cleanLoadStrategy) {
+                 DataSet newDataSet = new DataSet() {
+                    
+                    @Override
+                    public Class<? extends Annotation> annotationType() {
+                        return dataSet.annotationType();
+                    }
+                    
+                    @Override
+                    public String[] value() {
+                        return dataSet.value();
+                    }
+                    
+                    @Override
+                    public Class<? extends DataSetLoadStrategy> loadStrategy() {
+                        return InsertLoadStrategy.class;
+                    }
+                    
+                    @Override
+                    public Class<? extends DataSetFactory> factory() {
+                        return dataSet.factory();
+                    }
+                    
+                    @Override
+                    public String databaseName() {
+                        return dataSet.databaseName();
+                    }
+                };
+                insertDataSet(newDataSet, testObject, testMethod);
+            } else {
+                insertDataSet(dataSet, testObject, testMethod);
+            }
+        }
+    }
+
+    public void insertDataSet(DataSet dataset, Object testObject, Method testMethod) {
+            MultiSchemaDataSet multiSchemaDataSet = getDataSet(dataset, testMethod, testObject.getClass());
+            
+            if (multiSchemaDataSet == null) {
+                // no dataset specified
+                return;
+            }
+            DataSetLoadStrategy dataSetLoadStrategy = getDataSetLoadStrategy(testMethod, testObject.getClass(), dataset);
+            insertDataSet(multiSchemaDataSet, dataSetLoadStrategy);
+
     }
 
 
@@ -325,7 +388,7 @@ public class DbUnitModule implements Module {
      * @param testObject The test object, not null
      * @return The dataset, null if no {@link DataSet} annotation is found.
      */
-    public MultiSchemaDataSet getDataSet(Method testMethod, Object testObject) {
+    /*public MultiSchemaDataSet getDataSet(Method testMethod, Object testObject) {
         Class<?> testClass = testObject.getClass();
         DataSet dataSetAnnotation = getMethodOrClassLevelAnnotation(DataSet.class, testMethod, testClass);
 
@@ -339,6 +402,22 @@ public class DbUnitModule implements Module {
 
         // Get the dataset file name
         String[] dataSetFileNames = dataSetAnnotation.value();
+        if (dataSetFileNames.length == 0) {
+            // empty means, use default file name, which is the name of the class + extension
+            dataSetFileNames = new String[]{
+                getCorrectFileName(testClass, testMethod, dataSetFactory.getDataSetFileExtension())
+            };
+        } 
+        return getDataSet(testClass, dataSetFileNames, dataSetFactory);
+    }*/
+
+    public MultiSchemaDataSet getDataSet(DataSet dataSet, Method testMethod, Class<?> testClass) {
+        databaseName = dataSet.databaseName();
+        // Create configured factory for data sets
+        DataSetFactory dataSetFactory = getDataSetFactory(DataSet.class, testMethod, testClass);
+
+        // Get the dataset file name
+        String[] dataSetFileNames = dataSet.value();
         if (dataSetFileNames.length == 0) {
             // empty means, use default file name, which is the name of the class + extension
             dataSetFileNames = new String[]{
@@ -378,7 +457,7 @@ public class DbUnitModule implements Module {
                 getDefaultExpectedDataSetFileName(testMethod, testClass, dataSetFactory.getDataSetFileExtension())
             };
         } 
-        
+
         return getDataSet(testMethod.getDeclaringClass(), dataSetFileNames, dataSetFactory);
     }
 
@@ -396,7 +475,7 @@ public class DbUnitModule implements Module {
         List<File> dataSetFiles = new ArrayList<File>();
 
         ResourcePickingStrategie resourcePickingStrategie = getResourcePickingStrategie();
-        
+
         for (String dataSetFileName : dataSetFileNames) {
             File dataSetFile = handleDataSetResource(new ClassPathDataLocator(), dataSetFileName, resourcePickingStrategie, testClass);
             dataSetFiles.add(dataSetFile);
@@ -440,8 +519,8 @@ public class DbUnitModule implements Module {
     @SuppressWarnings({
         "unchecked"
     })
-    protected DataSetLoadStrategy getDataSetLoadStrategy(Method testMethod, Class<?> testClass) {
-        Class<? extends DataSetLoadStrategy> dataSetOperationClass = getMethodOrClassLevelAnnotationProperty(DataSet.class, "loadStrategy", DataSetLoadStrategy.class, testMethod, testClass);
+    protected DataSetLoadStrategy getDataSetLoadStrategy(Method testMethod, Class<?> testClass, DataSet dataSet) {
+        Class<? extends DataSetLoadStrategy> dataSetOperationClass = dataSet.loadStrategy();
         dataSetOperationClass = (Class<? extends DataSetLoadStrategy>) getClassValueReplaceDefault(DataSet.class, "loadStrategy", dataSetOperationClass, defaultAnnotationPropertyValues, DataSetLoadStrategy.class);
         return createInstanceOfType(dataSetOperationClass, false);
     }
@@ -519,10 +598,10 @@ public class DbUnitModule implements Module {
     protected String getDefaultDataSetFileNameClassLevel(Class<?> testClass, String extension) {
         String className = testClass.getName();
         StringBuilder builder = new StringBuilder();
-        
+
         if (className.contains(".")) {
             className = className.replace(".", "/");
-            
+
             //builder.append(className.substring(className.lastIndexOf(".") + 1));
         }
         builder.append(className);
@@ -669,8 +748,6 @@ public class DbUnitModule implements Module {
 
         @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
-            // databaseName = getDatabaseName(testObject, testMethod);
-
             insertDataSet(testMethod, testObject);
         }
 

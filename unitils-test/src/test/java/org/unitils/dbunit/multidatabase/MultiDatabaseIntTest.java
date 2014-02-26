@@ -33,6 +33,7 @@ import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.sqlassert.SqlAssert;
 import org.unitils.dbunit.DbUnitModule;
 import org.unitils.dbunit.annotation.DataSet;
+import org.unitils.dbunit.annotation.DataSets;
 
 
 /**
@@ -83,6 +84,15 @@ public class MultiDatabaseIntTest {
         SqlAssert.assertCountSqlResult("select count(*) from person", 1L, "database2");
         SqlAssert.assertCountSqlResult("select count(*) from person where personname='Willemijn'", 0L, "database2");
         SqlAssert.assertCountSqlResult("select count(*) from person where personname='Myrthe'", 1L, "database2");
+    }
+    
+    @Test
+    @DataSets(value= {@DataSet(value = "MultiDatabaseIntTest.testMultipleDataSetsDatabase1_1.xml", databaseName="database1"), @DataSet(value = "MultiDatabaseIntTest.testMultipleDataSetsDatabase1_2.xml", databaseName="database1")})
+    public void testMultipleDataSetsDatabase1() {
+        SqlAssert.assertCountSqlResult("select count(*) from person", 2L, "database1");
+        SqlAssert.assertCountSqlResult("select count(*) from person where personname='Willemijn'", 1L, "database1");
+        SqlAssert.assertCountSqlResult("select count(*) from person where personname='Myrthe'", 0L, "database1");
+        SqlAssert.assertCountSqlResult("select count(*) from person where personname='Maurits'", 1L, "database1");
     }
     
     private static Properties getCorrectProperties() {
