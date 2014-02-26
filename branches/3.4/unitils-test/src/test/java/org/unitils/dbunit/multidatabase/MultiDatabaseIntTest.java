@@ -1,39 +1,28 @@
 package org.unitils.dbunit.multidatabase;
 
-import static org.junit.Assert.*;
-
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.unitils.UnitilsJUnit4TestClassRunner;
 import org.unitils.core.Unitils;
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.DbSupportFactory;
-import org.unitils.core.dbsupport.DefaultSQLHandler;
-import org.unitils.database.DataSourceWrapper;
 import org.unitils.database.DatabaseModule;
-import org.unitils.database.DatabaseUnitils;
 import org.unitils.database.SQLUnitils;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.sqlassert.SqlAssert;
 import org.unitils.dbunit.DbUnitModule;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.DataSets;
+import org.unitils.dbunit.annotation.ExpectedDataSet;
+import org.unitils.dbunit.annotation.ExpectedDataSets;
 
 
 /**
@@ -48,6 +37,12 @@ import org.unitils.dbunit.annotation.DataSets;
 public class MultiDatabaseIntTest {
     
     private static final Log LOGGER = LogFactory.getLog(MultiDatabaseIntTest.class);
+    
+    @TestDataSource("database1")
+    private DataSource dataSourceDatabase1;
+    
+    @TestDataSource("database2")
+    private DataSource dataSourceDatabase2;
     
     @BeforeClass
     public static void beforeClass() throws FileNotFoundException, IOException {
@@ -93,6 +88,29 @@ public class MultiDatabaseIntTest {
         SqlAssert.assertCountSqlResult("select count(*) from person where personname='Willemijn'", 1L, "database1");
         SqlAssert.assertCountSqlResult("select count(*) from person where personname='Myrthe'", 0L, "database1");
         SqlAssert.assertCountSqlResult("select count(*) from person where personname='Maurits'", 1L, "database1");
+    }
+    
+    @Test
+    @DataSets(value= {@DataSet(value = "MultiDatabaseIntTest.testMultipleDataSetsDatabase1_1.xml", databaseName="database1"), @DataSet(value = "MultiDatabaseIntTest.testMultipleDataSetsDatabase1_2.xml", databaseName="database2")})
+    public void testMultipleDataSetsMultipleDatabases() throws Exception {
+        SqlAssert.assertCountSqlResult("select count(*) from person", 1L, "database1");
+        SqlAssert.assertCountSqlResult("select count(*) from person", 1L, "database2");
+        SqlAssert.assertCountSqlResult("select count(*) from person where personname='Willemijn'", 1L, "database1");
+        SqlAssert.assertCountSqlResult("select count(*) from person where personname='Myrthe'", 0L, "database1");
+        SqlAssert.assertCountSqlResult("select count(*) from person where personname='Maurits'", 0L, "database1");
+        SqlAssert.assertCountSqlResult("select count(*) from person where personname='Maurits'", 1L, "database2");
+        SqlAssert.assertCountSqlResult("select count(*) from person where personname='Willemijn'", 0L, "database2");
+    }
+    
+    @Test
+    @ExpectedDataSets({@ExpectedDataSet(databaseName="database1", value = "MultiDatabaseIntTest.testMultipleExpectedDataSetsOnMultipleDatabases_1.xml"), @ExpectedDataSet(databaseName="database2", value= "MultiDatabaseIntTest.testMultipleExpectedDataSetsOnMultipleDatabases_2.xml")})
+    public void testMultipleExpectedDataSetsOnMultipleDatabases() {
+        SQLUnitils.executeUpdate("INSERT INTO person (personid, personname) values ('5', 'Andre');", dataSourceDatabase1);
+        SQLUnitils.executeUpdate("INSERT INTO person (personid, personname) values ('6', 'Charles');", dataSourceDatabase1);
+        SQLUnitils.executeUpdate("INSERT INTO person (personid, personname) values ('8', 'Luc');", dataSourceDatabase2);
+        SQLUnitils.executeUpdate("INSERT INTO person (personid, personname) values ('9', 'Jean-Michel');", dataSourceDatabase2);
+    
+    
     }
     
     private static Properties getCorrectProperties() {
