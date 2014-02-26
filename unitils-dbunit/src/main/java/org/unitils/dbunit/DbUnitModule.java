@@ -36,12 +36,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
@@ -66,6 +64,7 @@ import org.unitils.dbmaintainer.locator.resourcepickingstrategie.ResourcePicking
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.DataSets;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
+import org.unitils.dbunit.annotation.ExpectedDataSets;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
 import org.unitils.dbunit.datasetfactory.DataSetResolver;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
@@ -75,7 +74,6 @@ import org.unitils.dbunit.util.DataSetAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.FileHandler;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
-import org.unitils.reflectionassert.ReflectionAssert;
 
 /**
  * Module that provides support for managing database test data using DBUnit.
@@ -193,46 +191,71 @@ public class DbUnitModule implements Module {
     }
 
     public void insertDataSets(DataSets dataSets, Object testObject, Method testMethod) {
-        boolean cleanLoadStrategy = false;
-        
-        for (final DataSet dataSet : dataSets.value()) {
-            DataSetLoadStrategy loadStrategy = getDataSetLoadStrategy(testMethod, testObject.getClass(), dataSet);
-            if (loadStrategy instanceof CleanInsertLoadStrategy && !cleanLoadStrategy) {
-                cleanLoadStrategy = true;
-                insertDataSet(dataSet, testObject, testMethod);
-            } else if (loadStrategy instanceof CleanInsertLoadStrategy && cleanLoadStrategy) {
-                 DataSet newDataSet = new DataSet() {
-                    
-                    @Override
-                    public Class<? extends Annotation> annotationType() {
-                        return dataSet.annotationType();
-                    }
-                    
-                    @Override
-                    public String[] value() {
-                        return dataSet.value();
-                    }
-                    
-                    @Override
-                    public Class<? extends DataSetLoadStrategy> loadStrategy() {
-                        return InsertLoadStrategy.class;
-                    }
-                    
-                    @Override
-                    public Class<? extends DataSetFactory> factory() {
-                        return dataSet.factory();
-                    }
-                    
-                    @Override
-                    public String databaseName() {
-                        return dataSet.databaseName();
-                    }
-                };
-                insertDataSet(newDataSet, testObject, testMethod);
-            } else {
-                insertDataSet(dataSet, testObject, testMethod);
+        Map<String, List<DataSet>> sortedDataSets = getDataSetsSorted(dataSets);
+        for (List<DataSet> tempDataSets : sortedDataSets.values()) {
+            boolean cleanLoadStrategy = false;
+            for (final DataSet dataSet : tempDataSets) {
+                DataSetLoadStrategy loadStrategy = getDataSetLoadStrategy(testMethod, testObject.getClass(), dataSet);
+                if (loadStrategy instanceof CleanInsertLoadStrategy && !cleanLoadStrategy) {
+                    cleanLoadStrategy = true;
+                    insertDataSet(dataSet, testObject, testMethod);
+                } else if (loadStrategy instanceof CleanInsertLoadStrategy && cleanLoadStrategy) {
+                     DataSet newDataSet = new DataSet() {
+                        
+                        @Override
+                        public Class<? extends Annotation> annotationType() {
+                            return dataSet.annotationType();
+                        }
+                        
+                        @Override
+                        public String[] value() {
+                            return dataSet.value();
+                        }
+                        
+                        @Override
+                        public Class<? extends DataSetLoadStrategy> loadStrategy() {
+                            return InsertLoadStrategy.class;
+                        }
+                        
+                        @Override
+                        public Class<? extends DataSetFactory> factory() {
+                            return dataSet.factory();
+                        }
+                        
+                        @Override
+                        public String databaseName() {
+                            return dataSet.databaseName();
+                        }
+                    };
+                    insertDataSet(newDataSet, testObject, testMethod);
+                } else {
+                    insertDataSet(dataSet, testObject, testMethod);
+                }
             }
         }
+        
+        
+    }
+    
+    protected Map<String, List<DataSet>> getDataSetsSorted(DataSets dataSets) {
+        Map<String, List<DataSet>> map = new HashMap<String, List<DataSet>>();
+        
+        for (DataSet dataSet : dataSets.value()) {
+            if (map.containsKey(dataSet.databaseName())) {
+                //add to the list
+                List<DataSet> tempList = map.get(dataSet.databaseName());
+                tempList.add(dataSet);
+            } else {
+                //new entry
+                List<DataSet> tempList = new ArrayList<DataSet>();
+                tempList.add(dataSet);
+                map.put(dataSet.databaseName(), tempList);
+            }
+        }
+        
+        return map;
+        
+        
     }
 
     public void insertDataSet(DataSet dataset, Object testObject, Method testMethod) {
@@ -333,9 +356,33 @@ public class DbUnitModule implements Module {
      * @param testObject The test object, not null
      */
     public void assertDbContentAsExpected(Method testMethod, Object testObject) {
+
+            Class<?> testClass = testObject.getClass();
+            
+            ExpectedDataSets expectedsDataSetAnnotation = getMethodOrClassLevelAnnotation(ExpectedDataSets.class, testMethod, testClass);
+            
+            if (expectedsDataSetAnnotation != null) {
+                assertMultipleExpectedDataSets(expectedsDataSetAnnotation, testObject, testMethod);
+            }
+            ExpectedDataSet expectedDataSetAnnotation = getMethodOrClassLevelAnnotation(ExpectedDataSet.class, testMethod, testClass);
+            if (expectedDataSetAnnotation != null) {
+                assertExpectedDataSets(expectedDataSetAnnotation, testObject, testMethod);
+            }
+            
+            
+        
+    }
+    
+    public void assertMultipleExpectedDataSets(ExpectedDataSets expectedDataSets, Object testObject, Method testMethod) {
+        for (ExpectedDataSet expectedDataSet : expectedDataSets.value()) {
+            assertExpectedDataSets(expectedDataSet, testObject, testMethod);
+        }
+    }
+    
+    public void assertExpectedDataSets(ExpectedDataSet expectedDataSetAnnotation, Object testObject, Method testMethod) {
         try {
-            // get the expected dataset
-            MultiSchemaDataSet multiSchemaExpectedDataSet = getExpectedDataSet(testMethod, testObject);
+         // get the expected dataset
+            MultiSchemaDataSet multiSchemaExpectedDataSet = getExpectedDataSet(expectedDataSetAnnotation, testMethod, testObject);
             if (multiSchemaExpectedDataSet == null) {
                 // no data set should be compared
                 return;
@@ -354,6 +401,7 @@ public class DbUnitModule implements Module {
             closeJdbcConnection();
         }
     }
+    
 
 
     /**
@@ -436,25 +484,20 @@ public class DbUnitModule implements Module {
      * @param testObject The test object, not null
      * @return The dataset, null if there is no data set
      */
-    public MultiSchemaDataSet getExpectedDataSet(Method testMethod, Object testObject) {
-        Class<?> testClass = testObject.getClass();
-        ExpectedDataSet expectedDataSetAnnotation = getMethodOrClassLevelAnnotation(ExpectedDataSet.class, testMethod, testClass);
-        if (expectedDataSetAnnotation == null) {
-            // No @ExpectedDataSet annotation found
-            return null;
-        }
+    public MultiSchemaDataSet getExpectedDataSet(ExpectedDataSet expectedDataSetAnnotation, Method testMethod, Object testObject) {
+        
 
         databaseName = expectedDataSetAnnotation.databaseName();
 
         // Create configured factory for data sets
-        DataSetFactory dataSetFactory = getDataSetFactory(ExpectedDataSet.class, testMethod, testClass);
+        DataSetFactory dataSetFactory = getDataSetFactory(ExpectedDataSet.class, testMethod, testObject.getClass());
 
         // Get the dataset file name
         String[] dataSetFileNames = expectedDataSetAnnotation.value();
         if (dataSetFileNames.length == 0) {
             // empty means use default file name
             dataSetFileNames = new String[]{
-                getDefaultExpectedDataSetFileName(testMethod, testClass, dataSetFactory.getDataSetFileExtension())
+                getDefaultExpectedDataSetFileName(testMethod, testObject.getClass(), dataSetFactory.getDataSetFileExtension())
             };
         } 
 

@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 
 
 /**
- * Multiple {@link DataSet}.
+ * Multiple {@link ExpectedDataSet}.
  * 
  * @author wiw
  * 
@@ -20,11 +20,11 @@ import java.lang.annotation.Target;
 @Target({TYPE, METHOD})
 @Retention(RUNTIME)
 @Inherited
-public @interface DataSets {
-    
+public @interface ExpectedDataSets {
+
     /**
-     * One or more {@link DataSet}
+     * One or more {@link ExpectedDataSet}
      * @return {@link java.lang.reflect.Array}
      */
-    DataSet[] value();
+    ExpectedDataSet[] value();
 }
