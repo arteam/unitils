@@ -63,26 +63,19 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit4 {
 
         // the dataset should contain 2 tables with the same name
         IDataSet dataSet = result.getDataSetForSchema("SCHEMA_A");
-        assertLenientEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSet.getTableNames());
+        assertLenientEquals(new String[]{"TABLE_A"}, dataSet.getTableNames());
+        assertEquals(2, dataSet.getTable("TABLE_A").getRowCount());
         ITableIterator tableIterator = dataSet.iterator();
 
         // first table TABLE_A row should contain 3 columns
         assertTrue(tableIterator.next());
         ITable table = tableIterator.getTable();
-        assertEquals(1, table.getRowCount());
+        assertEquals(2, table.getRowCount());
         assertPropertyLenientEquals("columnName", asList("COLUMN_1", "COLUMN_2", "COLUMN_3"), asList(table.getTableMetaData().getColumns()));
         assertEquals("1", table.getValue(0, "COLUMN_1"));
         assertEquals("2", table.getValue(0, "COLUMN_2"));
         assertEquals("3", table.getValue(0, "COLUMN_3"));
-
-        // second table TABLE_A row should contain 1 column
-        assertTrue(tableIterator.next());
-        table = tableIterator.getTable();
-        assertPropertyLenientEquals("columnName", asList("COLUMN_1", "COLUMN_2", "COLUMN_3"), asList(table.getTableMetaData().getColumns()));
-        assertEquals(1, table.getRowCount());
-        assertEquals("4", table.getValue(0, "COLUMN_2"));
-        assertFalse(tableIterator.next());
-    }
+  }
 
 
     /**
@@ -98,25 +91,16 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit4 {
 
         // the dataset should contain 2 tables with the same name
         IDataSet dataSet = result.getDataSetForSchema("SCHEMA_A");
-        assertLenientEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSet.getTableNames());
+        assertLenientEquals(new String[]{"TABLE_A"}, dataSet.getTableNames());
+        assertEquals(2, dataSet.getTable("TABLE_A").getRowCount());
         ITableIterator tableIterator = dataSet.iterator();
 
         // first table TABLE_A row should contain 1 column
         assertTrue(tableIterator.next());
         ITable table = tableIterator.getTable();
         assertPropertyLenientEquals("columnName", asList("COLUMN_2"), asList(table.getTableMetaData().getColumns()));
-        assertEquals(1, table.getRowCount());
+        assertEquals(2, table.getRowCount());
         assertEquals("4", table.getValue(0, "COLUMN_2"));
-
-        // second table TABLE_A row should contain 3 columns
-        assertTrue(tableIterator.next());
-        table = tableIterator.getTable();
-        assertEquals(1, table.getRowCount());
-        assertPropertyLenientEquals("columnName", asList("COLUMN_1", "COLUMN_2", "COLUMN_3"), asList(table.getTableMetaData().getColumns()));
-        assertEquals("1", table.getValue(0, "COLUMN_1"));
-        assertEquals("2", table.getValue(0, "COLUMN_2"));
-        assertEquals("3", table.getValue(0, "COLUMN_3"));
-        assertFalse(tableIterator.next());
     }
 
 
@@ -133,15 +117,18 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit4 {
 
         // schema D should contain 3 tables
         IDataSet dataSetA = result.getDataSetForSchema("SCHEMA_D");
-        assertLenientEquals(new String[]{"TABLE_A", "TABLE_A", "TABLE_A"}, dataSetA.getTableNames());
-
+        assertLenientEquals(new String[]{"TABLE_A"}, dataSetA.getTableNames());
+        assertEquals(3, dataSetA.getTable("TABLE_A").getRowCount());
+        
         // schema B should contain 2 tables
         IDataSet dataSetB = result.getDataSetForSchema("SCHEMA_B");
-        assertLenientEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSetB.getTableNames());
+        assertLenientEquals(new String[]{"TABLE_A"}, dataSetB.getTableNames());
+        assertEquals(2, dataSetB.getTable("TABLE_A").getRowCount());
 
         // schema C should contain 2 tables
         IDataSet dataSetC = result.getDataSetForSchema("SCHEMA_C");
-        assertLenientEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSetC.getTableNames());
+        assertLenientEquals(new String[]{"TABLE_A"}, dataSetC.getTableNames());
+        assertEquals(2, dataSetC.getTable("TABLE_A").getRowCount());
     }
 
 
@@ -158,15 +145,18 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit4 {
 
         // default schema A should contain 3 tables
         IDataSet dataSetA = result.getDataSetForSchema("SCHEMA_A");
-        assertLenientEquals(new String[]{"TABLE_A", "TABLE_A", "TABLE_A"}, dataSetA.getTableNames());
+        assertLenientEquals(new String[]{"TABLE_A"}, dataSetA.getTableNames());
+        assertEquals(3, dataSetA.getTable("TABLE_A").getRowCount());
 
         // schema B should contain 2 tables
         IDataSet dataSetB = result.getDataSetForSchema("SCHEMA_B");
-        assertLenientEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSetB.getTableNames());
+        assertLenientEquals(new String[]{"TABLE_A"}, dataSetB.getTableNames());
+        assertEquals(2, dataSetB.getTable("TABLE_A").getRowCount());
 
         // schema C should contain 2 tables
         IDataSet dataSetC = result.getDataSetForSchema("SCHEMA_C");
-        assertLenientEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSetC.getTableNames());
+        assertLenientEquals(new String[]{"TABLE_A"}, dataSetC.getTableNames());
+        assertEquals(2, dataSetC.getTable("TABLE_A").getRowCount());
     }
 
 
@@ -185,6 +175,8 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit4 {
 
         // the dataset should contain 4 tables with the same name
         IDataSet dataSet = result.getDataSetForSchema("SCHEMA_A");
-        assertLenientEquals(new String[]{"TABLE_A", "TABLE_A", "TABLE_A", "TABLE_A"}, dataSet.getTableNames());
+        String[] actual = dataSet.getTableNames();
+        assertLenientEquals(new String[]{"TABLE_A"}, actual);
+        assertEquals(4, dataSet.getTable("TABLE_A").getRowCount());
     }
 }
