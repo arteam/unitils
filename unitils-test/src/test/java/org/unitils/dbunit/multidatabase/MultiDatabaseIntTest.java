@@ -6,8 +6,6 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -28,16 +26,13 @@ import org.unitils.dbunit.annotation.ExpectedDataSets;
 /**
  * Test Multiple Databases with DBUnit.
  * 
- * @author wiw
+ * @author Willemijn Wouters
  * 
  * @since 3.4.1
  * 
  */
 @RunWith(UnitilsJUnit4TestClassRunner.class)
 public class MultiDatabaseIntTest {
-    
-    private static final Log LOGGER = LogFactory.getLog(MultiDatabaseIntTest.class);
-    
     @TestDataSource("database1")
     private DataSource dataSourceDatabase1;
     
@@ -48,16 +43,14 @@ public class MultiDatabaseIntTest {
     public static void beforeClass() throws FileNotFoundException, IOException {
         Properties config = getCorrectProperties();
         
-        //Unitils.getInstance().init(config);
         DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
         databaseModule.init(config);
         databaseModule.afterInit();
         DbUnitModule dbunitModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DbUnitModule.class);
         dbunitModule.init(config);
         dbunitModule.afterInit();
-
     }
-    
+
     /**
      * @throws java.lang.Exception
      */
