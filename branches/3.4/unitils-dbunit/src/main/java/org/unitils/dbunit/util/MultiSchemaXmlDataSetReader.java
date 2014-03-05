@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -92,7 +93,7 @@ public class MultiSchemaXmlDataSetReader {
 
     /* The schema name to use when none is specified */
     private String defaultSchemaName;
-    
+
     protected Map<String, Table> tables = new HashMap<String, Table>();
 
 
@@ -188,7 +189,7 @@ public class MultiSchemaXmlDataSetReader {
 
         /* All created datasets per schema */
         private Map<String, CachedDataSet> dataSets = new HashMap<String, CachedDataSet>();
-        
+
         private Map<String, Table> tables = new HashMap<String, Table>();
 
 
@@ -260,12 +261,12 @@ public class MultiSchemaXmlDataSetReader {
                 }
 
                 ITableMetaData tableMetaData = createTableMetaData(localName, attributes);
-                
 
-                
+
+
 
                 dataSet.startTable(tableMetaData);
-                
+
                 // add row values if there are any
                 String[] rowValues = getRowValues(tableMetaData.getColumns(), attributes);
                 if (rowValues != null) {
@@ -273,7 +274,7 @@ public class MultiSchemaXmlDataSetReader {
                 }
 
                 setCachedDataSetColumnsWithCorrectTables(dataSet, tableMetaData.getTableName(), tableMetaData.getColumns());
-                
+
                 // end table for row
                 dataSet.endTable();
 
@@ -281,20 +282,17 @@ public class MultiSchemaXmlDataSetReader {
                 throw new SAXException(e);
             }
         }
-        
+
         protected void setCachedDataSetColumnsWithCorrectTables(CachedDataSet dataSet, String tableName, Column[] oldColumns) {
             Field tablesField = ReflectionUtils.getFieldWithName(CachedDataSet.class, "_tables", false);
             tablesField.setAccessible(true);
             OrderedTableNameMap tableValue = ReflectionUtils.getFieldValue(dataSet, tablesField);
-            if (tableValue != null) {
-                DefaultTable table = (DefaultTable) tableValue.get(tableName);
-                if (table != null) {
-                    ITableMetaData tableMetaData2 = table.getTableMetaData();
-                    Field columns = ReflectionUtils.getFieldWithName(DefaultTableMetaData.class, "_columns", false);
-                    columns.setAccessible(true);
-                    ReflectionUtils.setFieldValue(tableMetaData2, columns, oldColumns);
-                }
-                
+            DefaultTable table = (DefaultTable) tableValue.get(tableName);
+            if (table != null) {
+                ITableMetaData tableMetaData2 = table.getTableMetaData();
+                Field columns = ReflectionUtils.getFieldWithName(DefaultTableMetaData.class, "_columns", false);
+                columns.setAccessible(true);
+                ReflectionUtils.setFieldValue(tableMetaData2, columns, oldColumns);
             }
         }
 
@@ -314,15 +312,15 @@ public class MultiSchemaXmlDataSetReader {
                 table = new Table(tableName);
                 tables.put(tableName, table);
             }
-            
+
             Column[] columns = new Column[attributes.getLength()];
             for (int i = 0; i < attributes.getLength(); i++) {
                 columns[i] = new Column(attributes.getQName(i), DataType.UNKNOWN);
                 table.addColumn(columns[i]);
             }
-            
+
             columns = new Column[table.getColumns().size()];
-            
+
             table.getColumns().toArray(columns);
             Column[] tempColumns = new Column[table.getColumns().size()];
             table.getColumns().toArray(tempColumns);
