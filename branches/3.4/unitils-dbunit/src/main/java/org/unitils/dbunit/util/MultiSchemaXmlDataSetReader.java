@@ -21,6 +21,7 @@ import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,15 +29,20 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dbunit.dataset.AbstractDataSet;
 import org.dbunit.dataset.CachedDataSet;
 import org.dbunit.dataset.Column;
 import org.dbunit.dataset.DataSetException;
+import org.dbunit.dataset.DefaultTable;
 import org.dbunit.dataset.DefaultTableMetaData;
+import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.ITableMetaData;
+import org.dbunit.dataset.OrderedTableNameMap;
 import org.dbunit.dataset.ReplacementDataSet;
 import org.dbunit.dataset.datatype.DataType;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbunit.dataset.Table;
+import org.unitils.util.ReflectionUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -266,6 +272,8 @@ public class MultiSchemaXmlDataSetReader {
                     dataSet.row(rowValues);
                 }
 
+                setCachedDataSetColumnsWithCorrectTables(dataSet, tableMetaData.getTableName(), tableMetaData.getColumns());
+                
                 // end table for row
                 dataSet.endTable();
 
@@ -274,8 +282,20 @@ public class MultiSchemaXmlDataSetReader {
             }
         }
         
-        protected void addColumnsToUnitilsTable() {
-            
+        protected void setCachedDataSetColumnsWithCorrectTables(CachedDataSet dataSet, String tableName, Column[] oldColumns) {
+            Field tablesField = ReflectionUtils.getFieldWithName(CachedDataSet.class, "_tables", false);
+            tablesField.setAccessible(true);
+            OrderedTableNameMap tableValue = ReflectionUtils.getFieldValue(dataSet, tablesField);
+            if (tableValue != null) {
+                DefaultTable table = (DefaultTable) tableValue.get(tableName);
+                if (table != null) {
+                    ITableMetaData tableMetaData2 = table.getTableMetaData();
+                    Field columns = ReflectionUtils.getFieldWithName(DefaultTableMetaData.class, "_columns", false);
+                    columns.setAccessible(true);
+                    ReflectionUtils.setFieldValue(tableMetaData2, columns, oldColumns);
+                }
+                
+            }
         }
 
 

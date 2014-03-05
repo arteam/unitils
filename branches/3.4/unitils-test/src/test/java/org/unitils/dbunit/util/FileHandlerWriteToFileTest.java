@@ -11,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.unitils.UnitilsJUnit4TestClassRunner;
-import org.unitils.dbunit.util.FileHandler;
 
 
 /**
@@ -39,7 +38,6 @@ public class FileHandlerWriteToFileTest {
     public void testOk() throws IOException {
         File actualFile = File.createTempFile("FileHandlerWriteToFileTest-", ".txt");
         sut.writeToFile(actualFile, new FileInputStream(expectedFile));
-        
         FileAssert.assertBinaryEquals(expectedFile, actualFile);
     }
     
