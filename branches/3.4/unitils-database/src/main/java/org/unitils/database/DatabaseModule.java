@@ -453,6 +453,9 @@ public class DatabaseModule implements Module {
 
                 }
 
+            } else {
+                //register default wrapper
+                getWrapper("");
             }
             
             try {
