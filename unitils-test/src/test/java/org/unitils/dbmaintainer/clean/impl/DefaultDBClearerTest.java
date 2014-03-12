@@ -15,6 +15,7 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
+import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hsqldb.Trigger;
@@ -44,6 +45,7 @@ import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_VERSI
 import javax.sql.DataSource;
 
 import java.util.Properties;
+import org.unitils.util.PropertyUtils;
 
 /**
  * Test class for the {@link DBClearer}.
@@ -71,6 +73,8 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
     private String versionTableName;
 
     private static String dialect = "h2";
+    
+    private List<String> schemas;
 
     /**
      * Configures the tested object. Creates a test table, index, view and sequence
@@ -78,11 +82,12 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
+        schemas = PropertyUtils.getStringList("database.schemaNames", configuration);
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect, schemas.get(0));
         // create clearer instance
         defaultDbClearer = new DefaultDBClearer();
-        defaultDbClearer.init(configuration, sqlHandler, dialect);
+        defaultDbClearer.init(configuration, sqlHandler, dialect, schemas);
         versionTableName = configuration.getProperty(PROPKEY_VERSION_TABLE_NAME);
 
         cleanupTestDatabase();

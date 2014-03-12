@@ -68,6 +68,9 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
 	List<ExecutedScript> alreadyExecutedScripts;
 
 	Date executionDate;
+        
+        private List<String> schemas;
+        private String dialect;
 
     /**
      * Cleans test directory and copies test files to it. Initializes test objects
@@ -75,6 +78,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
     	executionDate = new Date();
+        dialect = "oracle";
     	// Create test directories
         String tmpDir = System.getProperty("java.io.tmpdir");
         if(!tmpDir.endsWith("/")) {
@@ -107,6 +111,8 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
         configuration.setProperty("dbMaintainer.generateDataSetStructure.enabled", "true");
         scriptSource = new DefaultScriptSource();
         scriptSource.init(configuration);
+        schemas = new ArrayList<String>();
+        schemas.add("public");
     }
 
 
@@ -137,7 +143,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
      */
     @Test
     public void testGetAllUpdateScripts() {
-        List<Script> scripts = scriptSource.getAllUpdateScripts();
+        List<Script> scripts = scriptSource.getAllUpdateScripts(schemas.get(0));
 
         assertEquals("1_scripts/001_scriptA.sql", scripts.get(0).getFileName());   // x.1.1
         assertEquals("1_scripts/002_scriptB.sql", scripts.get(1).getFileName());   // x.1.2
@@ -160,7 +166,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
 					+ "/test_scripts/1_scripts/001_duplicateIndexScript.sql");
 			copyFile(scriptA, duplicateIndexScript);
 			try {
-				scriptSource.getAllUpdateScripts();
+				scriptSource.getAllUpdateScripts(schemas.get(0));
 				fail("Expected a UnitilsException because of a duplicate script");
 			} catch (UnitilsException e) {
 				// expected
@@ -183,7 +189,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testGetNewScripts() {
     	alreadyExecutedScripts.set(5, new ExecutedScript(new Script("2_scripts/subfolder/scriptH.sql", 0L, "xxx"), executionDate, true));
     	
-		List<Script> scripts = scriptSource.getNewScripts(new Version("2.x.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts));
+		List<Script> scripts = scriptSource.getNewScripts(new Version("2.x.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts), schemas.get(0));
 		
         assertEquals("1_scripts/scriptD.sql", scripts.get(0).getFileName());       			// x.1.x 		was added
         assertEquals("2_scripts/subfolder/scriptH.sql", scripts.get(1).getFileName());      // x.2.x.x		was changed
@@ -193,7 +199,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
 
     @Test
     public void testIsExistingScriptsModfied_noModifications() {
-        assertFalse(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts)));
+        assertFalse(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect));
     }
     
     
@@ -201,7 +207,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testIsExistingScriptsModfied_modifiedScript() {
     	alreadyExecutedScripts.set(1, new ExecutedScript(new Script("1_scripts/002_scriptB.sql", 0L, "xxx"), executionDate, true));
     	
-        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts)));
+        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts),dialect));
     }
     
     
@@ -209,7 +215,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testIsExistingScriptsModfied_scriptAdded() {
     	alreadyExecutedScripts.remove(1);
     	
-        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts)));
+        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect));
     }
     
     
@@ -217,7 +223,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testIsExistingScriptsModfied_scriptRemoved() {
     	alreadyExecutedScripts.add(new ExecutedScript(new Script("1_scripts/003_scriptB.sql", 0L, "xxx"), executionDate, true));
     	
-        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts)));
+        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect));
     }
     
     
@@ -225,7 +231,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testIsExistingScriptsModfied_newScript() {
     	alreadyExecutedScripts.remove(1);
     	
-        assertFalse(scriptSource.isExistingIndexedScriptModified(new Version("1.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts)));
+        assertFalse(scriptSource.isExistingIndexedScriptModified(new Version("1.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect));
     }
     
     
@@ -233,8 +239,8 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testIsExistingScriptsModfied_higherIndexScriptModified() {
     	alreadyExecutedScripts.set(1, new ExecutedScript(new Script("1_scripts/002_scriptB.sql", 0L, "xxx"), executionDate, true));
     	
-        assertFalse(scriptSource.isExistingIndexedScriptModified(new Version("1.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts)));
-        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("1.2"), new HashSet<ExecutedScript>(alreadyExecutedScripts)));
+        assertFalse(scriptSource.isExistingIndexedScriptModified(new Version("1.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect));
+        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("1.2"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect));
     }
 
 
@@ -243,7 +249,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
      */
     @Test
     public void testIsExistingScriptsModfied_noLowerIndex() {
-        boolean result = scriptSource.isExistingIndexedScriptModified(new Version("0"), new HashSet<ExecutedScript>(alreadyExecutedScripts));
+        boolean result = scriptSource.isExistingIndexedScriptModified(new Version("0"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect);
         assertFalse(result);
     }
 
@@ -253,7 +259,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
      */
     @Test
     public void testGetPostProcessingScripts() {
-        List<Script> scripts = scriptSource.getPostProcessingScripts();
+        List<Script> scripts = scriptSource.getPostProcessingScripts(schemas.get(0));
         assertEquals("postprocessing/post-scriptA.sql", scripts.get(0).getFileName());
         assertEquals("postprocessing/post-scriptB.sql", scripts.get(1).getFileName());
     }

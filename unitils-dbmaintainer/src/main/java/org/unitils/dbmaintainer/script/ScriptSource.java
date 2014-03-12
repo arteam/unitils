@@ -34,7 +34,7 @@ public interface ScriptSource extends Configurable {
      * @return a list of all available update scripts, in the order in which they must be executed on the database. 
      * These scripts can be used to completely recreate the database from scratch. Not null
      */
-    List<Script> getAllUpdateScripts();
+    List<Script> getAllUpdateScripts(String dialect);
 
 
     /**
@@ -49,7 +49,7 @@ public interface ScriptSource extends Configurable {
      * @param alreadyExecutedScripts The scripts which were already executed on the database
      * @return The new scripts.
      */
-    List<Script> getNewScripts(Version highestExecutedScriptVersion, Set<ExecutedScript> alreadyExecutedScripts);
+    List<Script> getNewScripts(Version highestExecutedScriptVersion, Set<ExecutedScript> alreadyExecutedScripts, String dialect);
 
 
     /**
@@ -61,7 +61,7 @@ public interface ScriptSource extends Configurable {
      * @param alreadyExecutedScripts 
      * @return True if an existing script has been modified, false otherwise
      */
-    boolean isExistingIndexedScriptModified(Version currentVersion, Set<ExecutedScript> alreadyExecutedScripts);
+    boolean isExistingIndexedScriptModified(Version currentVersion, Set<ExecutedScript> alreadyExecutedScripts, String dialect);
 
 
     /**
@@ -71,6 +71,6 @@ public interface ScriptSource extends Configurable {
      *
      * @return All the postprocessing code scripts, not null
      */
-    List<Script> getPostProcessingScripts();
+    List<Script> getPostProcessingScripts(String dialect);
 
 }

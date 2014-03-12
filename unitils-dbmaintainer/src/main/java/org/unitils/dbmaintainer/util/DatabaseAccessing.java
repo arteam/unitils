@@ -15,6 +15,7 @@
  */
 package org.unitils.dbmaintainer.util;
 
+import java.util.List;
 import java.util.Properties;
 
 import org.unitils.core.dbsupport.SQLHandler;
@@ -32,7 +33,9 @@ public interface DatabaseAccessing {
      *
      * @param configuration The configuration, not null
      * @param sqlHandler    The sql handler, not null
+     * @param dialect
+     * @param schemaNames
      */
-    public void init(Properties configuration, SQLHandler sqlHandler, String dialect);
+    public void init(Properties configuration, SQLHandler sqlHandler, String dialect, List<String> schemaNames);
 
 }

@@ -15,6 +15,7 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
+import java.util.List;
 import org.junit.After;
 
 import static org.junit.Assert.assertFalse;
@@ -27,7 +28,6 @@ import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 
@@ -43,6 +43,8 @@ import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.*;
 import javax.sql.DataSource;
 
 import java.util.Properties;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import org.unitils.util.PropertyUtils;
 
 /**
  * Test class for the DBCleaner.
@@ -66,6 +68,8 @@ public class DefaultDBCleanerTest extends UnitilsJUnit4 {
     private String versionTableName;
     
     private static String dialect = "h2";
+    
+    private List<String> schemas;
 
 
     /**
@@ -75,15 +79,16 @@ public class DefaultDBCleanerTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
+        schemas = PropertyUtils.getStringList("database.schemaNames", configuration);
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect, schemas.get(0));
 
         // items to preserve
         configuration.setProperty(PROPKEY_PRESERVE_DATA_TABLES, "Test_table_Preserve");
         configuration.setProperty(PROPKEY_PRESERVE_TABLES, dbSupport.quoted("Test_CASE_Table_Preserve"));
         // create cleaner instance
         defaultDbCleaner = new DefaultDBCleaner();
-        defaultDbCleaner.init(configuration, sqlHandler, dialect);
+        defaultDbCleaner.init(configuration, sqlHandler, dialect, schemas);
         versionTableName = configuration.getProperty(PROPKEY_VERSION_TABLE_NAME);
 
         cleanupTestDatabase();

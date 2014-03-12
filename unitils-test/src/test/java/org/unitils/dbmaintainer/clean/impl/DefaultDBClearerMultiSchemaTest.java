@@ -15,6 +15,7 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
+import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
@@ -75,12 +76,14 @@ public class DefaultDBClearerMultiSchemaTest extends UnitilsJUnit4 {
 
 	private String dialect;
 
+        private List<String> schemas;
 	/**
 	 * Configures the tested object. Creates a test table, index, view and sequence
 	 */
 	@Before
 	public void setUp() throws Exception {
 		Properties configuration = new ConfigurationLoader().loadConfiguration();
+                
 		dialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
         this.disabled = !"hsqldb".equals(dialect);
 		if (disabled) {
@@ -95,7 +98,8 @@ public class DefaultDBClearerMultiSchemaTest extends UnitilsJUnit4 {
 		dbSupportSchemaB = getDbSupport(configuration, sqlHandler, "SCHEMA_B", dialect);
 		// create clearer instance
 		defaultDbClearer = new DefaultDBClearer();
-		defaultDbClearer.init(configuration, sqlHandler, dialect);
+                schemas = PropertyUtils.getStringList("database.schemaNames", configuration);
+		defaultDbClearer.init(configuration, sqlHandler, dialect, schemas);
 
 		dropTestDatabase();
 		createTestDatabase();

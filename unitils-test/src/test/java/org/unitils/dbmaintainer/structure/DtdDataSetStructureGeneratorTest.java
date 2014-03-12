@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -48,6 +49,8 @@ public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
     private DataSource dataSource = null;
 
     private static String dialect;
+    
+    private List<String> schemas;
 
     /**
      * Initializes the test by creating following tables in the test database:
@@ -61,12 +64,12 @@ public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
         Properties configuration = (Properties) new ConfigurationLoader().loadConfiguration().clone();
         configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", DtdDataSetStructureGenerator.class.getName());
         configuration.setProperty(PROPKEY_DTD_FILENAME, dtdFile.getPath());
-
+        schemas = PropertyUtils.getStringList("database.schemaNames", configuration);
         initDatabaseModule(configuration);
 
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler, dialect);
-        DBClearer dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler, dialect);
+        dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler, dialect, schemas);
+        DBClearer dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler, dialect, schemas);
 
         dbClearer.clearSchemas();
         createTestTables();

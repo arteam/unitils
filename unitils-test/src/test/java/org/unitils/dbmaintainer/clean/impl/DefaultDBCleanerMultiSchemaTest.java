@@ -15,6 +15,8 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
@@ -70,6 +72,7 @@ public class DefaultDBCleanerMultiSchemaTest extends UnitilsJUnit4 {
     
     private static String dialect;
 
+    private List<String> schemas;
 
     /**
      * Initializes the test fixture.
@@ -87,7 +90,8 @@ public class DefaultDBCleanerMultiSchemaTest extends UnitilsJUnit4 {
         configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, SCHEMA_B");
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
         defaultDbCleaner = new DefaultDBCleaner();
-        defaultDbCleaner.init(configuration, sqlHandler, dialect);
+        schemas = PropertyUtils.getStringList("database.schemaNames", configuration);
+        defaultDbCleaner.init(configuration, sqlHandler, dialect, schemas);
 
         dropTestTables();
         createTestTables();

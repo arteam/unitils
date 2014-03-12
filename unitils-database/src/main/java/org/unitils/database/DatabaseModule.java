@@ -53,6 +53,7 @@ import org.unitils.core.config.Configuration;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
+import org.unitils.database.config.DatabaseConfiguration;
 import org.unitils.database.config.DatabaseConfigurations;
 import org.unitils.database.config.DatabaseConfigurationsFactory;
 import org.unitils.database.transaction.UnitilsTransactionManager;
@@ -251,7 +252,8 @@ public class DatabaseModule implements Module {
         String schema = wrapper.databaseConfiguration.getDefaultSchemaName();
         
         if (!StringUtils.isEmpty(schema)) {
-            DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler, schema);
+            DatabaseConfiguration databaseConfiguration = wrapper.getDatabaseConfiguration();
+            DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler, databaseConfiguration.getDialect(), databaseConfiguration.getSchemaNames());
             dbMaintainer.resetDatabaseState();
         } else {
             logger.debug("No schema found! The database is not reset!");

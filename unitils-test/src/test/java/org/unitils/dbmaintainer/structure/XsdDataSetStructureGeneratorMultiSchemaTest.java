@@ -55,6 +55,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -85,12 +86,15 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
 
     private static String dialect;
     
+    private List<String> schemas;
+    
     /**
      * Initializes the test fixture.
      */
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
+        
         dialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
         this.disabled = !"hsqldb".equals(dialect);
         if (disabled) {
@@ -106,7 +110,8 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
         configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A");
         configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", XsdDataSetStructureGenerator.class.getName());
         configuration.setProperty(PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
-        dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, new DefaultSQLHandler(dataSource), dialect);
+        schemas = PropertyUtils.getStringList("database.schemaNames", configuration);
+        dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, new DefaultSQLHandler(dataSource), dialect, schemas);
 
         dropTestTables();
         createTestTables();

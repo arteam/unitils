@@ -167,6 +167,7 @@ public class DBMaintainer {
      */
     protected boolean keepRetryingAfterError;
 
+    protected String dialect;
 
     /**
      * Default constructor for testing.
@@ -182,39 +183,40 @@ public class DBMaintainer {
      * @param configuration the configuration, not null
      * @param sqlHandler    the data source, not null
      */
-    public DBMaintainer(Properties configuration, SQLHandler sqlHandler, String dialect) {
+    public DBMaintainer(Properties configuration, SQLHandler sqlHandler, String dialect, List<String> schemaNames) {
         try {
-            scriptRunner = getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, sqlHandler, dialect);
-            versionSource = getConfiguredDatabaseTaskInstance(ExecutedScriptInfoSource.class, configuration, sqlHandler, dialect);
+            scriptRunner = getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, sqlHandler, dialect, schemaNames);
+            versionSource = getConfiguredDatabaseTaskInstance(ExecutedScriptInfoSource.class, configuration, sqlHandler, dialect, schemaNames);
             scriptSource = ConfigUtils.getConfiguredInstanceOf(ScriptSource.class, configuration);
 
             boolean cleanDbEnabled = PropertyUtils.getBoolean(PROPKEY_DB_CLEANER_ENABLED, configuration);
             if (cleanDbEnabled) {
-                dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, sqlHandler, dialect);
+                dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, sqlHandler, dialect, schemaNames);
             }
 
             fromScratchEnabled = PropertyUtils.getBoolean(PROPKEY_FROM_SCRATCH_ENABLED, configuration);
             keepRetryingAfterError = PropertyUtils.getBoolean(PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED, configuration);
             if (fromScratchEnabled) {
-                dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler, dialect);
+                dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler, dialect, schemaNames);
             }
 
             disableConstraintsEnabled = PropertyUtils.getBoolean(PROPKEY_DISABLE_CONSTRAINTS_ENABLED, configuration);
-            constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, sqlHandler, dialect);
+            constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, sqlHandler, dialect, schemaNames);
 
             boolean updateSequences = PropertyUtils.getBoolean(PROPKEY_UPDATE_SEQUENCES_ENABLED, configuration);
             if (updateSequences) {
-                sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, sqlHandler, dialect);
+                sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, sqlHandler, dialect, schemaNames);
             }
 
             boolean generateDtd = PropertyUtils.getBoolean(PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED, configuration);
             if (generateDtd) {
-                dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler, dialect);
+                dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler, dialect, schemaNames);
             }
         } catch (UnitilsException e) {
             logger.error("Error while initializing DbMaintainer", e);
             throw e;
         }
+        this.dialect = dialect;
     }
 
 
@@ -242,12 +244,12 @@ public class DBMaintainer {
             // reset the database version
             versionSource.clearAllExecutedScripts();
             // update database with all scripts
-            updateDatabase(scriptSource.getAllUpdateScripts());
+            updateDatabase(scriptSource.getAllUpdateScripts(dialect));
             return;
         }
 
         // perform an incremental update
-        updateDatabase(scriptSource.getNewScripts(highestExecutedScriptVersion, alreadyExecutedScripts));
+        updateDatabase(scriptSource.getNewScripts(highestExecutedScriptVersion, alreadyExecutedScripts, dialect));
     }
 
 
@@ -273,7 +275,7 @@ public class DBMaintainer {
     public void resetDatabaseState() {
         versionSource.clearAllExecutedScripts();
 
-        List<Script> allScripts = scriptSource.getAllUpdateScripts();
+        List<Script> allScripts = scriptSource.getAllUpdateScripts(dialect);
         for (Script script : allScripts) {
             versionSource.registerExecutedScript(new ExecutedScript(script, new Date(), true));
         }
@@ -303,7 +305,7 @@ public class DBMaintainer {
         executeScripts(scripts);
 
         // Execute postprocessing scripts, if any
-        executePostProcessingScripts(scriptSource.getPostProcessingScripts());
+        executePostProcessingScripts(scriptSource.getPostProcessingScripts(dialect));
 
         // Disable FK and not null constraints, if enabled
         if (disableConstraintsEnabled) {
@@ -389,7 +391,7 @@ public class DBMaintainer {
      */
     protected boolean shouldUpdateDatabaseFromScratch(Version currentVersion, Set<ExecutedScript> alreadyExecutedScripts) {
         // check whether an existing script was updated
-        if (scriptSource.isExistingIndexedScriptModified(currentVersion, alreadyExecutedScripts)) {
+        if (scriptSource.isExistingIndexedScriptModified(currentVersion, alreadyExecutedScripts, dialect)) {
             if (!fromScratchEnabled) {
                 throw new UnitilsException("One or more existing incremental database update scripts have been modified, but updating from scratch is disabled. " +
                         "You should either revert to the original version of the modified script and add an new incremental script that performs the desired " +
@@ -432,4 +434,9 @@ public class DBMaintainer {
         return false;
     }
 
+    protected void setDialect(String dialect) {
+        this.dialect = dialect;
+    }
+
+    
 }

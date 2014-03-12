@@ -48,6 +48,8 @@ import org.unitils.util.PropertyUtils;
 import javax.sql.DataSource;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import org.junit.Ignore;
@@ -72,6 +74,7 @@ public class DbMaintainerIntegrationTest extends UnitilsJUnit4 {
     private static String dialect = "h2";
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DbMaintainerIntegrationTest.class);
+    private List<String> schemas;
 
     /* DataSource for the test database, is injected */
     @TestDataSource
@@ -87,6 +90,8 @@ public class DbMaintainerIntegrationTest extends UnitilsJUnit4 {
 
     @Before
     public void setUp() throws Exception {
+        schemas = new ArrayList<String>();
+        schemas.add("PUBLIC");
         configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty("org.unitils.dbmaintainer.script.ScriptSource.implClassName", "org.unitils.dbmaintainer.script.impl.DefaultScriptSource");
         this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
@@ -103,7 +108,7 @@ public class DbMaintainerIntegrationTest extends UnitilsJUnit4 {
         configuration.put(PROPKEY_SCRIPT_LOCATIONS, scriptsLocation1.getAbsolutePath());
         configuration.put(PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED, "false");
 
-        dbSupport = DbSupportFactory.getDefaultDbSupport(configuration, new DefaultSQLHandler(dataSource), dialect);
+        dbSupport = DbSupportFactory.getDefaultDbSupport(configuration, new DefaultSQLHandler(dataSource), dialect, schemas.get(0));
         clearScriptsDirectory();
         clearTestDatabase();
     }
@@ -499,7 +504,7 @@ public class DbMaintainerIntegrationTest extends UnitilsJUnit4 {
     }
 
     private void updateDatabase() {
-        DBMaintainer dbMaintainer = new DBMaintainer(configuration, new DefaultSQLHandler(dataSource), dialect);
+        DBMaintainer dbMaintainer = new DBMaintainer(configuration, new DefaultSQLHandler(dataSource), dialect, schemas);
         dbMaintainer.updateDatabase();
     }
 

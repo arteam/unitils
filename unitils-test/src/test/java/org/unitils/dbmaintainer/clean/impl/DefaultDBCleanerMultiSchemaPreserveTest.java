@@ -15,6 +15,8 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
@@ -41,7 +43,6 @@ import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import org.unitils.util.PropertyUtils;
 
 /**
@@ -71,13 +72,15 @@ public class DefaultDBCleanerMultiSchemaPreserveTest extends UnitilsJUnit4 {
 	
 	private static String dialect;
 
-
+        private List<String> schemas;
 	/**
 	 * Initializes the test fixture.
 	 */
 	@Before
 	public void setUp() throws Exception {
+            
 		Properties configuration = new ConfigurationLoader().loadConfiguration();
+                
 		dialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
 		this.disabled = !"hsqldb".equals(dialect);
 		if (disabled) {
@@ -87,12 +90,14 @@ public class DefaultDBCleanerMultiSchemaPreserveTest extends UnitilsJUnit4 {
 		// configure 3 schemas
 		configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, \"SCHEMA_B\", schema_c");
 		SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-		dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect);
+                schemas = PropertyUtils.getStringList("database.schemaNames", configuration);
+		dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect, schemas.get(0));
 		// items to preserve
 		configuration.setProperty(PROPKEY_PRESERVE_DATA_SCHEMAS, "schema_c");
 		configuration.setProperty(PROPKEY_PRESERVE_DATA_TABLES, "test, " + dbSupport.quoted("SCHEMA_A") + "." + dbSupport.quoted("TEST"));
 		defaultDbCleaner = new DefaultDBCleaner();
-		defaultDbCleaner.init(configuration, sqlHandler, dialect);
+                
+		defaultDbCleaner.init(configuration, sqlHandler, dialect, schemas);
 
 		dropTestTables();
 		createTestTables();

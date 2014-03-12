@@ -15,6 +15,7 @@
  */
 package org.unitils.dbmaintainer.structure;
 
+import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
@@ -46,6 +47,7 @@ import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfigu
 import javax.sql.DataSource;
 
 import java.util.Properties;
+import org.unitils.util.PropertyUtils;
 
 /**
  * Test class for the SequenceUpdater. Contains tests that can be implemented generally for all different database dialects.
@@ -75,6 +77,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
     private DbSupport dbSupport;
 
     private static String dialect = "h2";
+    private List<String> schemas;
 
     /**
      * Test fixture. Configures the implementation of the SequenceUpdater that matches the currenlty configured dialect.
@@ -84,10 +87,10 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, "1000");
-
+        schemas = PropertyUtils.getStringList("database.schemaNames", configuration);
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, sqlHandler, dialect);
-        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect);
+        sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, sqlHandler, dialect, schemas);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect, schemas.get(0));
 
         cleanupTestDatabase();
         createTestDatabase();

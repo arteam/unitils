@@ -44,11 +44,11 @@ public class ResourceScriptSource extends DefaultScriptSource {
      * @see org.unitils.dbmaintainer.script.impl.DefaultScriptSource#loadAllScripts()
      */
     @Override
-    protected List<Script> loadAllScripts() {
+    protected List<Script> loadAllScripts(String dialect) {
         List<String> scriptLocations = PropertyUtils.getStringList("dbMaintainer.script.locations", configuration);
-        String dbDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
-        if(dbDialect != null) {
-            List<String> dbSpecificLocations = PropertyUtils.getStringList("dbMaintainer.script.locations."+dbDialect, configuration);
+        //String dbDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
+        if(dialect != null) {
+            List<String> dbSpecificLocations = PropertyUtils.getStringList("dbMaintainer.script.locations."+dialect, configuration);
             scriptLocations.addAll(dbSpecificLocations);
         }
         List<String> scriptIgnoredLocations = PropertyUtils.getStringList("dbMaintainer.script.locations.ignore", configuration);

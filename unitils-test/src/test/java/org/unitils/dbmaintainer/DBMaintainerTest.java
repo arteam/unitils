@@ -78,7 +78,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
     private List<Script> scripts, postProcessingScripts;
     private List<ExecutedScript> alreadyExecutedScripts;
     private ScriptContentHandle sciptContentHandle1, sciptContentHandle2, postProcessingSciptContentHandle1, postProcessingSciptContentHandle2;
-
+    private String dialect;
 
     /**
      * Create an instance of DBMaintainer
@@ -87,11 +87,13 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
      */
     @Before
     public void setUp() throws Exception {
+        dialect = "hsqldb";
         dbMaintainer = new DBMaintainer();
+        dbMaintainer.setDialect(dialect);
         dbMaintainer.fromScratchEnabled = true;
         dbMaintainer.keepRetryingAfterError = true;
         dbMaintainer.disableConstraintsEnabled = true;
-
+           
         scripts = new ArrayList<Script>();
         sciptContentHandle1 = MockUnitils.createDummy(ScriptContentHandle.class);
         Script script1 = new Script("01_script1.sql", 0L, sciptContentHandle1);
@@ -274,7 +276,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 
 
     private void expectNewScripts(List<Script> scripts) {
-        mockScriptSource.returns(scripts).getNewScripts(null, null);
+        mockScriptSource.returns(scripts).getNewScripts(null, null, dialect);
     }
 
 
@@ -284,17 +286,17 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 
 
     private void expectModifiedScripts(boolean modifiedScripts) {
-        mockScriptSource.returns(modifiedScripts).isExistingIndexedScriptModified(null, null);
+        mockScriptSource.returns(modifiedScripts).isExistingIndexedScriptModified(null, null, dialect);
     }
 
 
     private void expectPostProcessingScripts(List<Script> postProcessingCodeScripts) {
-        mockScriptSource.returns(postProcessingCodeScripts).getPostProcessingScripts();
+        mockScriptSource.returns(postProcessingCodeScripts).getPostProcessingScripts(dialect);
     }
 
 
     private void expectAllScripts(List<Script> scripts) {
-        mockScriptSource.returns(scripts).getAllUpdateScripts();
+        mockScriptSource.returns(scripts).getAllUpdateScripts(dialect);
     }
 
 }
