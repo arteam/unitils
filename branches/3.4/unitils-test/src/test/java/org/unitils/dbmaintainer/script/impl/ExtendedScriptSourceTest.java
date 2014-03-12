@@ -64,7 +64,7 @@ public class ExtendedScriptSourceTest {
      */
     @Test
     public void loadAllScriptsTest() {
-        Assert.assertEquals(4 , scriptSource.loadAllScripts().size());
+        Assert.assertEquals(4 , scriptSource.loadAllScripts("public").size());
         
     }
 }

@@ -51,8 +51,8 @@ public class DbSupportFactory {
      * @param dialect 
      * @return The dbms specific instance of {@link DbSupport}, not null
      */
-    public static DbSupport getDefaultDbSupport(Properties configuration, SQLHandler sqlHandler, String dialect) {
-        String defaultSchemaName = getStringList(PROPKEY_DATABASE_SCHEMA_NAMES, configuration, true).get(0);
+    public static DbSupport getDefaultDbSupport(Properties configuration, SQLHandler sqlHandler, String dialect, String defaultSchemaName) {
+        //String defaultSchemaName = getStringList(PROPKEY_DATABASE_SCHEMA_NAMES, configuration, true).get(0);
         return getDbSupport(configuration, sqlHandler, defaultSchemaName, dialect);
     }
 
@@ -89,9 +89,9 @@ public class DbSupportFactory {
      * @param dialect 
      * @return The dbms specific {@link DbSupport}, not null
      */
-    public static List<DbSupport> getDbSupports(Properties configuration, SQLHandler sqlHandler, String dialect) {
+    public static List<DbSupport> getDbSupports(Properties configuration, SQLHandler sqlHandler, String dialect, List<String> schemaNames) {
         List<DbSupport> result = new ArrayList<DbSupport>();
-        List<String> schemaNames = getStringList(PROPKEY_DATABASE_SCHEMA_NAMES, configuration, true);
+        //List<String> schemaNames = getStringList(PROPKEY_DATABASE_SCHEMA_NAMES, configuration, true);
         for (String schemaName : schemaNames) {
             DbSupport dbSupport = getDbSupport(configuration, sqlHandler, schemaName, dialect);
             result.add(dbSupport);

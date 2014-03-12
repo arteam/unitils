@@ -16,7 +16,6 @@
 package org.unitils.dbmaintainer.script.impl;
 
 import static org.unitils.core.util.ConfigUtils.getInstanceOf;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
 import java.io.Reader;
@@ -25,7 +24,6 @@ import org.unitils.dbmaintainer.script.ScriptContentHandle;
 import org.unitils.dbmaintainer.script.ScriptParser;
 import org.unitils.dbmaintainer.script.ScriptRunner;
 import org.unitils.dbmaintainer.util.BaseDatabaseAccessor;
-import org.unitils.util.PropertyUtils;
 
 /**
  * Default implementation of a script runner.
@@ -51,7 +49,7 @@ public class DefaultScriptRunner extends BaseDatabaseAccessor implements ScriptR
             scriptContentReader = scriptContentHandle.openScriptContentReader();
 
             // create a parser
-            ScriptParser scriptParser = createScriptParser();
+            ScriptParser scriptParser = createScriptParser(dialect);
             scriptParser.init(configuration, scriptContentReader);
 
             // parse and execute the statements
@@ -70,8 +68,7 @@ public class DefaultScriptRunner extends BaseDatabaseAccessor implements ScriptR
      *
      * @return The parser, not null
      */
-    protected ScriptParser createScriptParser() {
-        String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
-        return getInstanceOf(ScriptParser.class, configuration, databaseDialect);
+    protected ScriptParser createScriptParser(String dialect) {
+        return getInstanceOf(ScriptParser.class, configuration, dialect);
     }
 }

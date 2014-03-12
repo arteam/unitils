@@ -26,6 +26,7 @@ import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.util.FileUtils;
 import org.unitils.util.PropertyUtils;
+
 import static org.unitils.util.PropertyUtils.getStringList;
 
 import java.io.File;
@@ -73,9 +74,9 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
      *
      * @return all available database update scripts, not null
      */
-    public List<Script> getAllUpdateScripts() {
+    public List<Script> getAllUpdateScripts(String dialect) {
         if (allUpdateScripts == null) {
-            loadAndOrganizeAllScripts();
+            loadAndOrganizeAllScripts(dialect);
         }
         return allUpdateScripts;
     }
@@ -84,8 +85,8 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
     /**
      * @return All scripts that are incremental, i.e. non-repeatable, i.e. whose file name starts with an index
      */
-    protected List<Script> getIncrementalScripts() {
-        List<Script> scripts = getAllUpdateScripts();
+    protected List<Script> getIncrementalScripts(String dialect) {
+        List<Script> scripts = getAllUpdateScripts(dialect);
         List<Script> indexedScripts = new ArrayList<Script>();
         for (Script script : scripts) {
             if (script.isIncremental()) {
@@ -122,12 +123,12 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
      * @param currentVersion The start version, not null
      * @return The scripts that have a higher index of timestamp than the start version, not null.
      */
-    public List<Script> getNewScripts(Version currentVersion, Set<ExecutedScript> alreadyExecutedScripts) {
+    public List<Script> getNewScripts(Version currentVersion, Set<ExecutedScript> alreadyExecutedScripts, String dialect) {
         Map<String, Script> alreadyExecutedScriptMap = convertToScriptNameScriptMap(alreadyExecutedScripts);
 
         List<Script> result = new ArrayList<Script>();
 
-        List<Script> allScripts = getAllUpdateScripts();
+        List<Script> allScripts = getAllUpdateScripts(dialect);
         for (Script script : allScripts) {
             Script alreadyExecutedScript = alreadyExecutedScriptMap.get(script.getFileName());
 
@@ -161,9 +162,9 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
      * @param currentVersion The current database version, not null
      * @return True if an existing script has been modified, false otherwise
      */
-    public boolean isExistingIndexedScriptModified(Version currentVersion, Set<ExecutedScript> alreadyExecutedScripts) {
+    public boolean isExistingIndexedScriptModified(Version currentVersion, Set<ExecutedScript> alreadyExecutedScripts, String dialect) {
         Map<String, Script> alreadyExecutedScriptMap = convertToScriptNameScriptMap(alreadyExecutedScripts);
-        List<Script> incrementalScripts = getIncrementalScripts();
+        List<Script> incrementalScripts = getIncrementalScripts(dialect);
         // Search for indexed scripts that have been executed but don't appear in the current indexed scripts anymore
         for (ExecutedScript alreadyExecutedScript : alreadyExecutedScripts) {
             if (alreadyExecutedScript.getScript().isIncremental() && Collections.binarySearch(incrementalScripts, alreadyExecutedScript.getScript()) < 0) {
@@ -201,9 +202,9 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
      *
      * @return All the postprocessing code scripts, not null
      */
-    public List<Script> getPostProcessingScripts() {
+    public List<Script> getPostProcessingScripts(String dialect) {
         if (allPostProcessingScripts == null) {
-            loadAndOrganizeAllScripts();
+            loadAndOrganizeAllScripts(dialect);
         }
         return allPostProcessingScripts;
     }
@@ -214,8 +215,8 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
      * them in their execution order, and makes sure there are no 2 update or postprocessing scripts with
      * the same index.
      */
-    protected void loadAndOrganizeAllScripts() {
-        List<Script> allScripts = loadAllScripts();
+    protected void loadAndOrganizeAllScripts(String dialect) {
+        List<Script> allScripts = loadAllScripts(dialect);
         allUpdateScripts = new ArrayList<Script>();
         allPostProcessingScripts = new ArrayList<Script>();
         for (Script script : allScripts) {
@@ -236,7 +237,7 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
     /**
      * @return A List containing all scripts in the given script locations, not null
      */
-    protected List<Script> loadAllScripts() {
+    protected List<Script> loadAllScripts(String dialect) {
         List<String> scriptLocations = PropertyUtils.getStringList(PROPKEY_SCRIPT_LOCATIONS, configuration);
         List<Script> scripts = new ArrayList<Script>();
         for (String scriptLocation : scriptLocations) {

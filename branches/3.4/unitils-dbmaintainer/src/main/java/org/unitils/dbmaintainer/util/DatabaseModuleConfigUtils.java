@@ -17,10 +17,10 @@ package org.unitils.dbmaintainer.util;
 
 import static org.unitils.core.util.ConfigUtils.getInstanceOf;
 
+import java.util.List;
 import java.util.Properties;
 
 import org.unitils.core.dbsupport.SQLHandler;
-import org.unitils.util.PropertyUtils;
 
 /**
  * Class containing configuration utility methods specifically for the {@link org.unitils.database.DatabaseModule} and
@@ -48,10 +48,10 @@ public class DatabaseModuleConfigUtils {
      * @return The configured instance
      */
     @SuppressWarnings({"unchecked"})
-    public static <T extends DatabaseAccessing> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType, Properties configuration, SQLHandler sqlHandler, String dialect) {
-        String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
-        DatabaseAccessing instance = getInstanceOf(databaseTaskType, configuration, databaseDialect);
-        instance.init(configuration, sqlHandler, dialect);
+    public static <T extends DatabaseAccessing> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType, Properties configuration, SQLHandler sqlHandler, String dialect, List<String> schemaNames) {
+        //String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
+        DatabaseAccessing instance = getInstanceOf(databaseTaskType, configuration, dialect);
+        instance.init(configuration, sqlHandler, dialect, schemaNames);
         return (T) instance;
     }
 

@@ -59,6 +59,7 @@ import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.core.util.ConfigUtils;
 import org.unitils.database.DataSourceWrapper;
 import org.unitils.database.DatabaseModule;
+import org.unitils.database.config.DatabaseConfiguration;
 import org.unitils.dbmaintainer.locator.ClassPathDataLocator;
 import org.unitils.dbmaintainer.locator.resourcepickingstrategie.ResourcePickingStrategie;
 import org.unitils.dbunit.annotation.DataSet;
@@ -755,7 +756,8 @@ public class DbUnitModule implements Module {
         DataSourceWrapper wrapper = getDatabaseModule().getWrapper(databaseName);
         DataSource dataSource = wrapper.getDataSourceAndActivateTransactionIfNeeded();
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        return DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler, wrapper.getDatabaseConfiguration().getDialect());
+        DatabaseConfiguration databaseConfiguration = wrapper.getDatabaseConfiguration();
+        return DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler, databaseConfiguration.getDialect(), databaseConfiguration.getSchemaNames().get(0));
     }
 
 

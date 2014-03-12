@@ -53,6 +53,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -82,6 +83,8 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
     private boolean disabled;
 
     private static String dialect = "h2";
+    
+    private List<String> schemas;
     /**
      * Initializes the test by creating following tables in the test database:
      * tableOne(columnA not null, columnB not null, columnC) and
@@ -90,6 +93,7 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
+        schemas = PropertyUtils.getStringList("database.schemaNames", configuration);
         this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
         if (disabled) {
             return;
@@ -105,8 +109,8 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
         configuration.setProperty(XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
 
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dataSetStructureGenerator = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler, dialect);
-        DBClearer dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler, dialect);
+        dataSetStructureGenerator = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler, dialect, schemas);
+        DBClearer dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler, dialect, schemas);
 
         dbClearer.clearSchemas();
         createTestTables();

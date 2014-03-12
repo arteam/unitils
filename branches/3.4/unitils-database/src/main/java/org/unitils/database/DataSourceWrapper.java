@@ -133,7 +133,7 @@ public class DataSourceWrapper {
 	 */
 	public void updateDatabase(SQLHandler sqlHandler) {
 		LOGGER.info("Checking if database has to be updated.");
-		DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler, databaseConfiguration.getDialect());
+		DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler, databaseConfiguration.getDialect(), databaseConfiguration.getSchemaNames());
 		dbMaintainer.updateDatabase();
 	}
 
@@ -215,7 +215,7 @@ public class DataSourceWrapper {
 	 * @param databaseTaskType The type of database task, not null
 	 */
 	protected <T extends DatabaseAccessing> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType) {
-		return DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(databaseTaskType, configuration, getDefaultSqlHandler(), databaseConfiguration.getDialect());
+		return DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(databaseTaskType, configuration, getDefaultSqlHandler(), databaseConfiguration.getDialect(), databaseConfiguration.getSchemaNames());
 	}
 
 	/**

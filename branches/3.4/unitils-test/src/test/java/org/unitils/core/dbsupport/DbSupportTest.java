@@ -15,6 +15,7 @@
  */
 package org.unitils.core.dbsupport;
 
+import java.util.ArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hsqldb.Trigger;
@@ -41,6 +42,7 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 import javax.sql.DataSource;
 
 import static java.util.Arrays.asList;
+import java.util.List;
 
 import java.util.Properties;
 import java.util.Set;
@@ -78,7 +80,7 @@ public class DbSupportTest extends UnitilsJUnit4 {
         initDatabaseModule(configuration);
         
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect, "PUBLIC");
 
         cleanupTestDatabase();
         createTestDatabase();

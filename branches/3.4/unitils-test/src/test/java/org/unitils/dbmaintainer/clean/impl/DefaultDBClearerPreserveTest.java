@@ -15,6 +15,7 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
+import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
@@ -74,6 +75,8 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
     private DbSupport dbSupport;
     
     private String dialect;
+    
+    private List<String> schemas;
 
 
     /**
@@ -82,12 +85,12 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         Properties configuration = (Properties) new ConfigurationLoader().loadConfiguration().clone();
-        
+        schemas = PropertyUtils.getStringList("database.schemaNames", configuration);
         initDatabaseModule(configuration);
         
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
         
-        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect, schemas.get(0));
         
         // first create database, otherwise items to preserve do not yet exist
         cleanupTestDatabase();
@@ -109,7 +112,7 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
         
         // create clearer instance
         defaultDbClearer = new DefaultDBClearer();
-        defaultDbClearer.init(configuration, sqlHandler, dialect);
+        defaultDbClearer.init(configuration, sqlHandler, dialect, schemas);
     }
 
 

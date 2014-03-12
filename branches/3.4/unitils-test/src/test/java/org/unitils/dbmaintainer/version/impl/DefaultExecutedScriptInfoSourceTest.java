@@ -39,6 +39,7 @@ import java.util.Date;
 import java.util.Properties;
 
 import static java.util.Arrays.asList;
+import java.util.List;
 import static junit.framework.Assert.*;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import static org.unitils.database.SQLUnitils.executeUpdate;
@@ -49,6 +50,7 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEqua
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_DATES;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 import static org.unitils.util.CollectionUtils.asSet;
+import org.unitils.util.PropertyUtils;
 
 /**
  * Test class for {@link org.unitils.dbmaintainer.version.impl.DefaultExecutedScriptInfoSource}. The implementation is tested using a
@@ -75,22 +77,25 @@ public class DefaultExecutedScriptInfoSourceTest extends UnitilsJUnit4 {
     ExecutedScript executedScript1, executedScript2;
 
     private static String dialect = "h2";
+    
+    private List<String> schemas;
     /**
      * Initialize test fixture and creates a test version table.
      */
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
+        schemas = PropertyUtils.getStringList("database.schemaNames", configuration);
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        defaultDbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect);
+        defaultDbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect, schemas.get(0));
 
         configuration.setProperty(PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE, "false");
         dbVersionSource = new DefaultExecutedScriptInfoSource();
-        dbVersionSource.init(configuration, sqlHandler, dialect);
+        dbVersionSource.init(configuration, sqlHandler, dialect, schemas);
 
         configuration.setProperty(PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE, "true");
         dbVersionSourceAutoCreate = new DefaultExecutedScriptInfoSource();
-        dbVersionSourceAutoCreate.init(configuration, sqlHandler, dialect);
+        dbVersionSourceAutoCreate.init(configuration, sqlHandler, dialect, schemas);
 
         dropExecutedScriptsTable();
         createExecutedScriptsTable();

@@ -15,6 +15,7 @@
  */
 package org.unitils.dbmaintainer.structure;
 
+import java.util.List;
 import org.junit.After;
 
 import static org.junit.Assert.fail;
@@ -41,6 +42,7 @@ import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfigu
 import javax.sql.DataSource;
 
 import java.util.Properties;
+import org.unitils.util.PropertyUtils;
 
 /**
  * Test class for the ConstraintsDisabler. This test is independent of the dbms that is used. The database dialect that
@@ -62,6 +64,8 @@ public class ConstraintsDisablerTest extends UnitilsJUnit4 {
     protected DataSource dataSource = null;
 
     private static String dialect = "h2";
+    
+    private List<String> schemas;
 
     /**
      * Test fixture. Configures the ConstraintsDisabler with the implementation that matches the configured database
@@ -70,9 +74,10 @@ public class ConstraintsDisablerTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
+        schemas = PropertyUtils.getStringList("database.schemaNames", configuration);
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect);
-        constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, sqlHandler, dialect);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect, schemas.get(0));
+        constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, sqlHandler, dialect, schemas);
 
         cleanupTestDatabase();
         createTestTables();

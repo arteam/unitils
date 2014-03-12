@@ -15,6 +15,7 @@
  */
 package org.unitils.dbmaintainer.script.impl;
 
+import java.util.List;
 import org.junit.After;
 
 import static org.junit.Assert.assertTrue;
@@ -35,6 +36,7 @@ import org.unitils.dbmaintainer.script.ScriptContentHandle.UrlScriptContentHandl
 import javax.sql.DataSource;
 
 import java.util.Properties;
+import org.unitils.util.PropertyUtils;
 
 /**
  * Test class for the DefaultScriptRunner.
@@ -58,6 +60,8 @@ public class DefaultScriptRunnerTest extends UnitilsJUnit4 {
     private Script script2;
     
     private static String dialect = "h2";
+    
+    private List<String> schemas;
 
 
     /**
@@ -67,8 +71,9 @@ public class DefaultScriptRunnerTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
+        schemas = PropertyUtils.getStringList("database.schemaNames", configuration);
         defaultScriptRunner = new DefaultScriptRunner();
-        defaultScriptRunner.init(configuration, new DefaultSQLHandler(dataSource), dialect);
+        defaultScriptRunner.init(configuration, new DefaultSQLHandler(dataSource), dialect, schemas);
 
         script1 = new Script("test-script1.sql", 0L, new UrlScriptContentHandle(getClass().getResource("DefaultScriptRunnerTest/test-script1.sql")));
         script2 = new Script("test-script2.sql", 0L, new UrlScriptContentHandle(getClass().getResource("DefaultScriptRunnerTest/test-script2.sql")));
