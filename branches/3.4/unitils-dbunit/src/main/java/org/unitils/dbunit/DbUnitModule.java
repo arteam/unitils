@@ -46,6 +46,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbunit.database.DatabaseConfig;
+import org.dbunit.database.IMetadataHandler;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
 import org.unitils.core.Module;
@@ -94,6 +95,8 @@ import org.unitils.dbunit.util.MultiSchemaDataSet;
  * @author Tim Ducheyne
  */
 public class DbUnitModule implements Module {
+
+    public static final String PROPERTY_METAHANDLER = "org.dbunit.database.DatabaseConfig.metadatahandler";
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DbUnitModule.class);
@@ -597,10 +600,17 @@ public class DbUnitModule implements Module {
         config.setProperty(FEATURE_BATCHED_STATEMENTS, "true");
         // Make sure that Oracle's recycled tables (BIN$) are ignored (value is used to ensure dbunit-2.2 compliancy)
         config.setProperty("http://www.dbunit.org/features/skipOracleRecycleBinTables", "true");
-
+        
+        //set MetaHandler
+        config.setProperty(DatabaseConfig.PROPERTY_METADATA_HANDLER, getDefaultDatabaseMetaHandler());
+        
         return connection;
     }
 
+    protected IMetadataHandler getDefaultDatabaseMetaHandler() {
+        return ConfigUtils.getInstanceOf(IMetadataHandler.class, configuration);
+        
+    }
 
     /**
      * Closes (i.e. return to the pool) the JDBC Connection that is currently in use by the DbUnitDatabaseConnection
