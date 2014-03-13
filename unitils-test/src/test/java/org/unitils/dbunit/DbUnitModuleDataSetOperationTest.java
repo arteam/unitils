@@ -15,22 +15,26 @@
  */
 package org.unitils.dbunit;
 
-import org.dbunit.dataset.IDataSet;
-import org.junit.After;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.unitils.database.SQLUnitils.executeUpdate;
+import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import static org.unitils.database.SQLUnitils.getItemAsString;
+
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
+import org.dbunit.dataset.IDataSet;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import static org.unitils.database.SQLUnitils.*;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
-
-import javax.sql.DataSource;
-import java.util.Properties;
 
 /**
  * Tests DbUnitModule's feature for using different DataSetOperations
@@ -77,6 +81,7 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit4 {
         dbUnitModule.insertDataSet(DataSetTest.class.getMethod("testMethodCustomDataSetOperation"), new DataSetTest());
         assertTrue(MockDataSetLoadStrategy.operationExecuted);
     }
+    
 
 
     /**
