@@ -475,6 +475,7 @@ public class DatabaseModule implements Module {
     }
 
     /**
+     * @param databaseName
      * @return the wrapper
      */
     public DataSourceWrapper getWrapper(String databaseName) {
@@ -482,12 +483,8 @@ public class DatabaseModule implements Module {
             return wrappers.get(databaseName);
         }
         
-        DataSourceWrapper wrapper = null;
-        if (StringUtils.isEmpty(databaseName)) {
-            wrapper = new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(), configuration, getTransactionManager());
-        } else {
-            wrapper = new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(databaseName), configuration, getTransactionManager());
-        }
+        DataSourceWrapper wrapper = new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(databaseName), configuration, getTransactionManager());
+        
         setWrapper(wrapper);
         return wrapper;
     }
