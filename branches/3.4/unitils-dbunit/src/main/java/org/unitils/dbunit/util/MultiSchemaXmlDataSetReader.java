@@ -17,12 +17,17 @@ package org.unitils.dbunit.util;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import static org.dbunit.dataset.datatype.DataType.UNKNOWN;
+import static org.dbunit.dataset.ITable.NO_VALUE;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.SAXParserFactory;
@@ -39,7 +44,10 @@ import org.dbunit.dataset.OrderedTableNameMap;
 import org.dbunit.dataset.ReplacementDataSet;
 import org.dbunit.dataset.datatype.DataType;
 import org.unitils.core.UnitilsException;
+import org.unitils.dbunit.dataset.Row;
 import org.unitils.dbunit.dataset.Table;
+import org.unitils.dbunit.datasetfactory.impl.DbUnitDataSet;
+import org.unitils.dbunit.datasetfactory.impl.DbUnitTable;
 import org.unitils.util.ReflectionUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -91,8 +99,6 @@ public class MultiSchemaXmlDataSetReader {
     /* The schema name to use when none is specified */
     private String defaultSchemaName;
 
-    protected Map<String, Table> tables = new HashMap<String, Table>();
-
 
     /**
      * Creates a data set reader.
@@ -113,7 +119,7 @@ public class MultiSchemaXmlDataSetReader {
      */
     public MultiSchemaDataSet readDataSetXml(File... dataSetFiles) {
         try {
-            DataSetContentHandler dataSetContentHandler = new DataSetContentHandler(defaultSchemaName, tables);
+            DataSetContentHandler dataSetContentHandler = new DataSetContentHandler(defaultSchemaName);
             XMLReader xmlReader = createXMLReader();
             xmlReader.setContentHandler(dataSetContentHandler);
             xmlReader.setErrorHandler(dataSetContentHandler);
@@ -182,12 +188,10 @@ public class MultiSchemaXmlDataSetReader {
     protected static class DataSetContentHandler extends DefaultHandler {
 
         /* The schema name to use when none is specified */
-        private String defaultSchemaName;
+        protected String defaultSchemaName;
 
-        /* All created datasets per schema */
-        private Map<String, CachedDataSet> dataSets = new HashMap<String, CachedDataSet>();
-
-        private Map<String, Table> tables = new HashMap<String, Table>();
+        /* All created data sets per schema */
+        protected Map<String, DbUnitDataSet> dbUnitDataSetsPerSchemaName = new LinkedHashMap<String, DbUnitDataSet>();
 
 
         /**
@@ -195,35 +199,27 @@ public class MultiSchemaXmlDataSetReader {
          *
          * @param defaultSchemaName The schema name to use when none is specified, not null
          */
-        public DataSetContentHandler(String defaultSchemaName, Map<String, Table> tables) {
+        public DataSetContentHandler(String defaultSchemaName) {
             this.defaultSchemaName = defaultSchemaName;
-            this.tables = tables;
         }
-
 
         /**
          * Gets the result data set.
          *
          * @return the data set, not null
          */
-        public MultiSchemaDataSet getMultiSchemaDataSet() throws DataSetException {
-            // finalize all data sets
-            for (CachedDataSet dataSet : dataSets.values()) {
-                dataSet.endDataSet();
-            }
-
+        public MultiSchemaDataSet getMultiSchemaDataSet() {
             MultiSchemaDataSet multiSchemaDataSet = new MultiSchemaDataSet();
-            for (String schemaName : dataSets.keySet()) {
-                CachedDataSet cachedDataSet = dataSets.get(schemaName);
+            for (String schemaName : dbUnitDataSetsPerSchemaName.keySet()) {
+                DbUnitDataSet dataSet = dbUnitDataSetsPerSchemaName.get(schemaName);
 
-                // wrap datasets in replacement datasets, and replace [null] tokens by the null reference
-                ReplacementDataSet replacementDataSet = new ReplacementDataSet(cachedDataSet);
+                // wrap data sets in replacement data sets, and replace [null] tokens by the null reference
+                ReplacementDataSet replacementDataSet = new ReplacementDataSet(dataSet);
                 replacementDataSet.addReplacementObject("[null]", null);
                 multiSchemaDataSet.setDataSetForSchema(schemaName, replacementDataSet);
             }
             return multiSchemaDataSet;
         }
-
 
         /**
          * Processes an xml element. A new table is started for each element.
@@ -235,119 +231,61 @@ public class MultiSchemaXmlDataSetReader {
          */
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-            try {
-                // begin element of data set, if default namespace set, it will override the default schema
-                if ("dataset".equals(localName)) {
-                    if (!isEmpty(uri)) {
-                        defaultSchemaName = uri;
-                    }
-                    return;
-                }
-
-                // Begin new table for row
-                String schemaName = defaultSchemaName;
+            // begin element of data set, if default namespace set, it will override the default schema
+            if ("dataset".equals(localName)) {
                 if (!isEmpty(uri)) {
-                    schemaName = uri;
+                    defaultSchemaName = uri;
                 }
-
-                CachedDataSet dataSet = dataSets.get(schemaName);
-                if (dataSet == null) {
-                    dataSet = new CachedDataSet();
-                    dataSet.startDataSet();
-                    dataSets.put(schemaName, dataSet);
-                }
-
-                ITableMetaData tableMetaData = createTableMetaData(localName, attributes);
-
-
-
-
-                dataSet.startTable(tableMetaData);
-
-                // add row values if there are any
-                String[] rowValues = getRowValues(tableMetaData.getColumns(), attributes);
-                if (rowValues != null) {
-                    dataSet.row(rowValues);
-                }
-
-                setCachedDataSetColumnsWithCorrectTables(dataSet, tableMetaData.getTableName(), tableMetaData.getColumns());
-
-                // end table for row
-                dataSet.endTable();
-
-            } catch (DataSetException e) {
-                throw new SAXException(e);
+                return;
             }
-        }
 
-        protected void setCachedDataSetColumnsWithCorrectTables(CachedDataSet dataSet, String tableName, Column[] oldColumns) {
-            Field tablesField = ReflectionUtils.getFieldWithName(CachedDataSet.class, "_tables", false);
-            tablesField.setAccessible(true);
-            OrderedTableNameMap tableValue = ReflectionUtils.getFieldValue(dataSet, tablesField);
-            DefaultTable table = (DefaultTable) tableValue.get(tableName);
-            if (table != null) {
-                ITableMetaData tableMetaData2 = table.getTableMetaData();
-                Field columns = ReflectionUtils.getFieldWithName(DefaultTableMetaData.class, "_columns", false);
-                columns.setAccessible(true);
-                ReflectionUtils.setFieldValue(tableMetaData2, columns, oldColumns);
+            // Begin new table for row
+            String schemaName = defaultSchemaName;
+            if (!isEmpty(uri)) {
+                schemaName = uri;
             }
-        }
 
+            DbUnitDataSet dbUnitDataSet = dbUnitDataSetsPerSchemaName.get(schemaName);
+            if (dbUnitDataSet == null) {
+                dbUnitDataSet = new DbUnitDataSet();
+                dbUnitDataSetsPerSchemaName.put(schemaName, dbUnitDataSet);
+            }
+
+            DbUnitTable table = dbUnitDataSet.getDbUnitTable(localName);
+            if (table == null) {
+                table = new DbUnitTable(localName);
+                dbUnitDataSet.addTable(table);
+            }
+            addRow(attributes, table);
+        }
 
         /**
-         * Creates meta data for a table with the given name containing columns for each of the attributes.
+         * Gets column names and row values from the given attribute and adds a new row to the given table.
          *
-         * @param tableName  the table name, not null
+         * @param table      The table to add the row to, not null
          * @param attributes the attributes, not null
-         * @return the meta data, not null
          */
-        protected ITableMetaData createTableMetaData(String tableName, Attributes attributes) {
-            Table table = null;
-            if (tables.containsKey(tableName)) {
-                table = tables.get(tableName);
-            } else {
-                table = new Table(tableName);
-                tables.put(tableName, table);
+        protected void addRow(Attributes attributes, DbUnitTable table) {
+            if (attributes.getLength() == 0) {
+                return;
             }
-
-            Column[] columns = new Column[attributes.getLength()];
             for (int i = 0; i < attributes.getLength(); i++) {
-                columns[i] = new Column(attributes.getQName(i), DataType.UNKNOWN);
-                table.addColumn(columns[i]);
+                Column column = new Column(attributes.getQName(i), UNKNOWN);
+                table.addColumn(column);
             }
-
-            columns = new Column[table.getColumns().size()];
-
-            table.getColumns().toArray(columns);
-            Column[] tempColumns = new Column[table.getColumns().size()];
-            table.getColumns().toArray(tempColumns);
-            return new DefaultTableMetaData(tableName, tempColumns);
+            List<Object> row = new ArrayList<Object>(10);
+            for (String columnName : table.getColumnNames()) {
+                Object value = NO_VALUE;
+                if (attributes.getIndex(columnName) != -1) {
+                    value = attributes.getValue(columnName);
+                }
+                row.add(value);
+            }
+            table.addRow(row);
         }
 
-
         /**
-         * Gets the attribute values corresponding to each of the given columns.
-         *
-         * @param columns    the columns, not null
-         * @param attributes the attributes, not null
-         * @return the values, null if no values
-         */
-        protected String[] getRowValues(Column[] columns, Attributes attributes) {
-            if (columns.length == 0 || attributes.getLength() == 0) {
-                return null;
-            }
-
-            String[] rowValues = new String[columns.length];
-            for (int i = 0; i < columns.length; i++) {
-                Column column = columns[i];
-                rowValues[i] = attributes.getValue(column.getColumnName());
-            }
-            return rowValues;
-        }
-
-
-        /**
-         * Overriden to rethrow exception.
+         * Overridden to rethrow exception.
          *
          * @param e The exception
          */

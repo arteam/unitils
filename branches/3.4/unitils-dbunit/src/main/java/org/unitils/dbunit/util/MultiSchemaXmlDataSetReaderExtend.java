@@ -27,9 +27,6 @@ public class MultiSchemaXmlDataSetReaderExtend extends MultiSchemaXmlDataSetRead
 
     private String defaultSchemaName;
     
-    private Map<String, Table> tables = new HashMap<String, Table>();
-
-    
     /**
      * @return the defaultSchemaName
      */
@@ -64,7 +61,7 @@ public class MultiSchemaXmlDataSetReaderExtend extends MultiSchemaXmlDataSetRead
     public MultiSchemaDataSet readDataSetXml(List<InputStream> inputStreams) throws UnitilsException {
         DataSetContentHandler dataSetContentHandler;
         XMLReader xmlReader;
-        dataSetContentHandler = new DataSetContentHandler(defaultSchemaName, tables);
+        dataSetContentHandler = new DataSetContentHandler(defaultSchemaName);
         xmlReader = createXMLReader();
         xmlReader.setContentHandler(dataSetContentHandler);
         xmlReader.setErrorHandler(dataSetContentHandler);
@@ -84,12 +81,7 @@ public class MultiSchemaXmlDataSetReaderExtend extends MultiSchemaXmlDataSetRead
 
 
         MultiSchemaDataSet multiSchemaDataSet = null;
-        try {
-            multiSchemaDataSet = dataSetContentHandler.getMultiSchemaDataSet();
-        } catch (DataSetException e) {
-            throw new UnitilsException("Unable to load data set xml.", e);
-
-        }
+        multiSchemaDataSet = dataSetContentHandler.getMultiSchemaDataSet();
 
         return multiSchemaDataSet;
     }

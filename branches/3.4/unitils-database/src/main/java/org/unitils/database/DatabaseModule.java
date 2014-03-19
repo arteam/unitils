@@ -147,7 +147,7 @@ public class DatabaseModule implements Module {
     private DatabaseConfigurations databaseConfigurations;
 
     //protected DataSourceWrapper wrapper;
-    private Map<String, DataSourceWrapper> wrappers = new HashMap<String, DataSourceWrapper>();
+    protected Map<String, DataSourceWrapper> wrappers = new HashMap<String, DataSourceWrapper>();
     /**
      * Initializes this module using the given <code>Configuration</code>
      *
@@ -177,30 +177,30 @@ public class DatabaseModule implements Module {
             registerTransactionManagementConfiguration(wrapper);
         }
     }
-    
+
     public void registerTransactionManagementConfiguration(final DataSourceWrapper wrapper) {
 
         // Make sure that a spring DataSourceTransactionManager is used for transaction management, if
         // no other transaction management configuration takes preference
-            registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
+        registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
 
-                public boolean isApplicableFor(Object testObject) {
-                    return true;
-                }
+            public boolean isApplicableFor(Object testObject) {
+                return true;
+            }
 
-                public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
-                    return new DataSourceTransactionManager(wrapper.getDataSourceAndActivateTransactionIfNeeded());
-                }
+            public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
+                return new DataSourceTransactionManager(wrapper.getDataSourceAndActivateTransactionIfNeeded());
+            }
 
-                public boolean isTransactionalResourceAvailable(Object testObject) {
-                    return wrapper.isDataSourceLoaded();
-                }
+            public boolean isTransactionalResourceAvailable(Object testObject) {
+                return wrapper.isDataSourceLoaded();
+            }
 
-                public Integer getPreference() {
-                    return 1;
-                }
+            public Integer getPreference() {
+                return 1;
+            }
 
-            });
+        });
     }
 
     public void activateTransactionIfNeeded() {
@@ -250,7 +250,7 @@ public class DatabaseModule implements Module {
      */
     public void resetDatabaseState(SQLHandler sqlHandler, DataSourceWrapper wrapper) {
         String schema = wrapper.databaseConfiguration.getDefaultSchemaName();
-        
+
         if (!StringUtils.isEmpty(schema)) {
             DatabaseConfiguration databaseConfiguration = wrapper.getDatabaseConfiguration();
             DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler, databaseConfiguration.getDialect(), databaseConfiguration.getSchemaNames());
@@ -258,9 +258,9 @@ public class DatabaseModule implements Module {
         } else {
             logger.debug("No schema found! The database is not reset!");
         }
-        
-        
-        
+
+
+
     }
 
 
@@ -459,7 +459,7 @@ public class DatabaseModule implements Module {
                 //register default wrapper
                 getWrapper("");
             }
-            
+
             try {
                 injectDataSource(testObject);
             } catch (Exception e) {
@@ -479,12 +479,18 @@ public class DatabaseModule implements Module {
      * @return the wrapper
      */
     public DataSourceWrapper getWrapper(String databaseName) {
-        if (wrappers.containsKey(databaseName)) {
-            return wrappers.get(databaseName);
+        String tempDatabaseName = StringUtils.isEmpty(databaseName) ? databaseConfigurations.getDatabaseConfiguration().getDatabaseName() : databaseName;
+
+        if (wrappers.containsKey(tempDatabaseName)) {
+            return wrappers.get(tempDatabaseName);
         }
-        
-        DataSourceWrapper wrapper = new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(databaseName), configuration, getTransactionManager());
-        
+
+        DataSourceWrapper wrapper = null;
+        if (StringUtils.isEmpty(databaseName)) {
+            wrapper = new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(), configuration, getTransactionManager());
+        } else {
+            wrapper = new DataSourceWrapper(databaseConfigurations.getDatabaseConfiguration(databaseName), configuration, getTransactionManager());
+        }
         setWrapper(wrapper);
         return wrapper;
     }

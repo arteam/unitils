@@ -16,6 +16,7 @@
 package org.unitils.core.dbsupport;
 
 import java.util.ArrayList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hsqldb.Trigger;
@@ -34,7 +35,9 @@ import static org.unitils.core.util.SQLTestUtils.*;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.getItemAsLong;
 
+import org.unitils.database.DataSourceWrapper;
 import org.unitils.database.DatabaseModule;
+import org.unitils.database.DatabaseUnitils;
 import org.unitils.util.PropertyUtils;
 
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
@@ -42,8 +45,8 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 import javax.sql.DataSource;
 
 import static java.util.Arrays.asList;
-import java.util.List;
 
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -558,7 +561,7 @@ public class DbSupportTest extends UnitilsJUnit4 {
      * Drops all created test database structures (views, tables...)
      */
     private void cleanupTestDatabaseHsqlDb() throws Exception {
-        dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"");
+        dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"", "DBMAINTAIN_SCRIPTS");
         dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
         dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
         dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
@@ -848,6 +851,7 @@ public class DbSupportTest extends UnitilsJUnit4 {
         configuration.setProperty("dbMaintainer.autoCreateExecutedScriptsTable", "false");
         configuration.setProperty("dbMaintainer.autoCreateDbMaintainScriptsTable", "false");
         configuration.setProperty("updateDataBaseSchema.enabled", "false");
+        configuration.setProperty("dbMaintainer.fromScratch.enabled", "false");
         
         configuration.setProperty("dbMaintainer.updateSequences.enabled", "true");
         configuration.setProperty("dbMaintainer.keepRetryingAfterError.enabled","true");
