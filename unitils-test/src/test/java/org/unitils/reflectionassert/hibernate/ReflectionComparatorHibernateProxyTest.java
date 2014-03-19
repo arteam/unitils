@@ -88,13 +88,12 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
      */
     @Before
     public void setUp() throws Exception {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        Properties configuration = initDatabaseModule();
         this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
         if (disabled) {
             return;
         }
         
-        initDatabaseModule(configuration);
 
         testChild = new Child(1L, new Parent(1L));
         testChild.getParent().setChildren(asList(testChild));
@@ -207,15 +206,22 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
         executeUpdateQuietly("drop table PARENT", dataSource);
     }
     
-    private void initDatabaseModule(Properties configuration) {
+    private Properties initDatabaseModule() {
+        Properties configuration = (Properties) new ConfigurationLoader().loadConfiguration().clone();
         configuration.setProperty("dbMaintainer.autoCreateExecutedScriptsTable", "false");
         configuration.setProperty("dbMaintainer.autoCreateDbMaintainScriptsTable", "false");
         configuration.setProperty("updateDataBaseSchema.enabled", "false");
-        
+        configuration.setProperty("database.userName", "sa");
+        configuration.setProperty("database.password", "");
+        configuration.setProperty("database.schemaNames", "public");
+        configuration.setProperty("database.driverClassName", "org.h2.Driver");
+        configuration.setProperty("database.url", "jdbc:h2:~/test");
+        configuration.setProperty("database.dialect", "h2");
         DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
         databaseModule.init(configuration);
         databaseModule.afterInit();
         
         dataSource = databaseModule.getWrapper("").getTransactionalDataSourceAndActivateTransactionIfNeeded(this);
+        return configuration;
     }
 }

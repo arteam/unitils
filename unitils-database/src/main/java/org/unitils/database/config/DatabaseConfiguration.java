@@ -18,6 +18,8 @@ package org.unitils.database.config;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * @author Tim Ducheyne
  */
@@ -36,7 +38,7 @@ public class DatabaseConfiguration {
 
 
     public DatabaseConfiguration(String databaseName, String dialect, String driverClassName, String url, String userName, String password, String defaultSchemaName, List<String> schemaNames, boolean updateDisabled, boolean defaultDatabase) {
-        this.databaseName = databaseName;
+        this.databaseName = StringUtils.isEmpty(databaseName) ? "" : databaseName;
         this.dialect = dialect;
         this.driverClassName = driverClassName;
         this.url = url;

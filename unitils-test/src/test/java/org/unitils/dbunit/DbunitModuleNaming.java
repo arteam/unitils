@@ -1,7 +1,5 @@
 package org.unitils.dbunit;
 
-import static org.junit.Assert.*;
-
 import java.util.Properties;
 
 import org.junit.Assert;
