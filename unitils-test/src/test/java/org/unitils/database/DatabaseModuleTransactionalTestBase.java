@@ -26,11 +26,9 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import org.junit.Before;
-import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.Unitils;
 import org.unitils.database.config.DataSourceFactory;
 import org.unitils.database.config.DatabaseConfiguration;
-//import org.unitils.database.config.DatabaseConfiguration;
 import org.unitils.spring.SpringModule;
 
 /**
@@ -73,9 +71,6 @@ abstract public class DatabaseModuleTransactionalTestBase {
         expect(mockDataSource.getConnection()).andReturn(mockConnection1);
         expect(mockDataSource.getConnection()).andReturn(mockConnection2);
         replay(mockDataSource);
-
-        configuration = (Properties) new ConfigurationLoader().loadConfiguration().clone();
-        configuration.setProperty("org.unitils.database.config.DataSourceFactory.implClassName", MockDataSourceFactory.class.getName());
     }
 
 
