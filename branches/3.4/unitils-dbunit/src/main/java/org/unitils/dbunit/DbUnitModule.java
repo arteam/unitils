@@ -440,29 +440,6 @@ public class DbUnitModule implements Module {
      * @param testObject The test object, not null
      * @return The dataset, null if no {@link DataSet} annotation is found.
      */
-    /*public MultiSchemaDataSet getDataSet(Method testMethod, Object testObject) {
-        Class<?> testClass = testObject.getClass();
-        DataSet dataSetAnnotation = getMethodOrClassLevelAnnotation(DataSet.class, testMethod, testClass);
-
-        if (dataSetAnnotation == null) {
-            // No @DataSet annotation found
-            return null;
-        }
-        databaseName = dataSetAnnotation.databaseName();
-        // Create configured factory for data sets
-        DataSetFactory dataSetFactory = getDataSetFactory(DataSet.class, testMethod, testClass);
-
-        // Get the dataset file name
-        String[] dataSetFileNames = dataSetAnnotation.value();
-        if (dataSetFileNames.length == 0) {
-            // empty means, use default file name, which is the name of the class + extension
-            dataSetFileNames = new String[]{
-                getCorrectFileName(testClass, testMethod, dataSetFactory.getDataSetFileExtension())
-            };
-        } 
-        return getDataSet(testClass, dataSetFileNames, dataSetFactory);
-    }*/
-
     public MultiSchemaDataSet getDataSet(DataSet dataSet, Method testMethod, Class<?> testClass) {
         databaseName = dataSet.databaseName();
         // Create configured factory for data sets
