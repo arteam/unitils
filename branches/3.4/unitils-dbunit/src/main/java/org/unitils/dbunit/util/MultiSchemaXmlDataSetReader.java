@@ -16,16 +16,14 @@
 package org.unitils.dbunit.util;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-import static org.dbunit.dataset.datatype.DataType.UNKNOWN;
 import static org.dbunit.dataset.ITable.NO_VALUE;
+import static org.dbunit.dataset.datatype.DataType.UNKNOWN;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,21 +32,11 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbunit.dataset.CachedDataSet;
 import org.dbunit.dataset.Column;
-import org.dbunit.dataset.DataSetException;
-import org.dbunit.dataset.DefaultTable;
-import org.dbunit.dataset.DefaultTableMetaData;
-import org.dbunit.dataset.ITableMetaData;
-import org.dbunit.dataset.OrderedTableNameMap;
 import org.dbunit.dataset.ReplacementDataSet;
-import org.dbunit.dataset.datatype.DataType;
 import org.unitils.core.UnitilsException;
-import org.unitils.dbunit.dataset.Row;
-import org.unitils.dbunit.dataset.Table;
 import org.unitils.dbunit.datasetfactory.impl.DbUnitDataSet;
 import org.unitils.dbunit.datasetfactory.impl.DbUnitTable;
-import org.unitils.util.ReflectionUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;

@@ -15,40 +15,37 @@
  */
 package org.unitils.core.dbsupport;
 
-import java.util.ArrayList;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import static org.unitils.core.util.SQLTestUtils.dropTestSequences;
+import static org.unitils.core.util.SQLTestUtils.dropTestSynonyms;
+import static org.unitils.core.util.SQLTestUtils.dropTestTables;
+import static org.unitils.core.util.SQLTestUtils.dropTestTriggers;
+import static org.unitils.core.util.SQLTestUtils.dropTestTypes;
+import static org.unitils.core.util.SQLTestUtils.dropTestViews;
+import static org.unitils.database.SQLUnitils.executeUpdate;
+import static org.unitils.database.SQLUnitils.getItemAsLong;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
+
+import java.util.Properties;
+import java.util.Set;
+
+import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hsqldb.Trigger;
 import org.junit.After;
-
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.Unitils;
-
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
-import static org.unitils.core.util.SQLTestUtils.*;
-import static org.unitils.database.SQLUnitils.executeUpdate;
-import static org.unitils.database.SQLUnitils.getItemAsLong;
-
-import org.unitils.database.DataSourceWrapper;
 import org.unitils.database.DatabaseModule;
-import org.unitils.database.DatabaseUnitils;
 import org.unitils.util.PropertyUtils;
-
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
-
-import javax.sql.DataSource;
-
-import static java.util.Arrays.asList;
-
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * Tests for the db support class. Each type of database has to provide a subclass in which it sets-up the database

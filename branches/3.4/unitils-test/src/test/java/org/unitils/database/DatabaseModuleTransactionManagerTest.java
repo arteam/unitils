@@ -26,6 +26,7 @@ import static org.unitils.database.util.TransactionMode.ROLLBACK;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.util.Properties;
 
 import javax.sql.DataSource;
 
@@ -34,6 +35,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.jdbc.datasource.ConnectionProxy;
+import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.Unitils;
 import org.unitils.database.annotations.Transactional;
 
@@ -52,7 +54,7 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
     private RollbackTest rollbackTest;
 
     private CommitTest commitTest;
-    
+
     private DataSourceWrapper wrapper;
 
 
@@ -103,7 +105,6 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
     /**
      * Tests with a test with transaction rollback configured
      */
-    @Ignore
     @Test
     public void testRollback() throws Exception {
         expect(mockConnection1.getAutoCommit()).andReturn(true).andReturn(false).anyTimes();
@@ -131,7 +132,6 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
     /**
      * Tests with a test with transaction commit configured
      */
-    @Ignore
     @Test
     public void testCommit() throws Exception {
         expect(mockConnection1.getAutoCommit()).andReturn(true).andReturn(false).anyTimes();
@@ -189,22 +189,29 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
         public void test() {
         }
     }
-    
+
     private void initializeDatabaseModule() {
-        configuration.setProperty("unitils.module.spring.enabled", "true");
-        configuration.setProperty("updateDataBaseSchema.enabled", "true");
+        Unitils.getInstance().init();
+        configuration = (Properties) new ConfigurationLoader().loadConfiguration().clone();
         configuration.setProperty("dbMaintainer.autoCreateExecutedScriptsTable", "false");
         configuration.setProperty("dbMaintainer.autoCreateDbMaintainScriptsTable", "true");
         configuration.setProperty("updateDataBaseSchema.enabled", "false");
-        configuration.setProperty("dbMaintainer.generateDataSetStructure.enabled","false");
+        configuration.setProperty("dbMaintainer.fromScratch.enabled", "false");
+
+        configuration.setProperty("dbMaintainer.updateSequences.enabled", "true");
+        configuration.setProperty("dbMaintainer.keepRetryingAfterError.enabled","true");
+        configuration.setProperty("org.unitils.dbmaintainer.script.ScriptSource.implClassName", "org.unitils.dbmaintainer.script.impl.DefaultScriptSource");
+
+        databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+        databaseModule.init(configuration);
+        databaseModule.afterInit();
+
+        configuration.setProperty("org.unitils.database.config.DataSourceFactory.implClassName", MockDataSourceFactory.class.getName());
         databaseModule = getDatabaseModule();
         databaseModule.init(configuration);
         databaseModule.afterInit();
         wrapper = databaseModule.getWrapper("");
-        databaseModule.setWrapper(wrapper);
-        
         databaseModule.getTransactionManager();
-        databaseModule.registerTransactionManagementConfiguration();
     }
 
 }
