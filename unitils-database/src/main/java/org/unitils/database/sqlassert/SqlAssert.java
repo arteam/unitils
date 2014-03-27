@@ -20,12 +20,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
+import org.unitils.database.DataSourceWrapper;
 import org.unitils.database.DatabaseModule;
 import org.unitils.database.SQLUnitils;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
 
 import javax.sql.DataSource;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -210,7 +212,10 @@ public abstract class SqlAssert {
      * @return DataSource
      */
     private static DataSource getDataSourceFromUnitils(String databaseName) {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class).getWrapper(databaseName).getDataSource();
+        Unitils unitils = Unitils.getInstance();
+        DataSourceWrapper wrapper = unitils.getModulesRepository().getModuleOfType(DatabaseModule.class).getWrapper(databaseName);
+        DataSource dataSource = wrapper.getTransactionalDataSourceAndActivateTransactionIfNeeded(unitils.getTestContext().getTestObject());
+        return dataSource;
     }
 
 
