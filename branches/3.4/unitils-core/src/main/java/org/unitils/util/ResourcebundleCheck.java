@@ -31,12 +31,8 @@ public class ResourcebundleCheck {
         //creates the bundles for each locale
         for (int i = 0; i < locales.length; i++) {
             Locale locale = locales[i];
-            ResourceBundle bundle = ResourceBundle.getBundle(bundleName, locale, ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_PROPERTIES));
-            //check if every locale exists (error found with mac)
-            if (!bundle.getLocale().equals(locale)) {
-                throw new MissingResourceException("The resourcebundle is missing: ", bundleName, locale.getLanguage());
-            }
-            bundles[i] = bundle;
+
+            bundles[i] = ResourceBundle.getBundle(bundleName, locale);
         }
         
         

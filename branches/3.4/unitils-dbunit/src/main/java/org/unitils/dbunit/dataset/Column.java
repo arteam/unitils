@@ -93,6 +93,11 @@ public class Column {
             return new ColumnDifference(this, actualColumn);
         }
         Object castedValue = getCastedValue(actualColumn.getType());
+        if (castedValue == null && actualColumn.getValue() == null) {
+            return null;
+        } else if (castedValue == null && actualColumn.getValue() != null) {
+            return new ColumnDifference(this, actualColumn);
+        }
         if (!castedValue.equals(actualColumn.getValue())) {
             return new ColumnDifference(this, actualColumn);
         }
