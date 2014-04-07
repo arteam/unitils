@@ -3,6 +3,7 @@ package org.unitils.core.util;
 import java.util.Locale;
 import java.util.MissingResourceException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.unitils.util.MissingKeysException;
 import org.unitils.util.ResourcebundleCheck;
@@ -32,6 +33,7 @@ public class ResourcebundleCheckTest {
         ResourcebundleCheck.testAllTheKeys("resourcebundle/invoice", new Locale("nl"), new Locale("fr"), new Locale("de"));
     }
     
+    @Ignore
     @Test(expected = MissingResourceException.class)
     public void testBadBundleDoesNotExist() throws Exception {
         ResourcebundleCheck.testAllTheKeys("resourcebundle/invoice", new Locale("fr"), new Locale("nl"), new Locale("de"), new Locale("sq"));
