@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <!-- import applicationcontext of the dao. -->
+    <import resource="classpath:applicationContext-dao.xml" />
+    <!-- override the datasource for tests. -->
+	<bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean" />
+
+  <bean id="lobHandler" class="org.springframework.jdbc.support.lob.OracleLobHandler">
+    <property name="nativeJdbcExtractor" ref="commonsDbcpNativeJdbcExtractor" />
+  </bean>
+  <bean id="commonsDbcpNativeJdbcExtractor" class="org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor" />
+</beans>
