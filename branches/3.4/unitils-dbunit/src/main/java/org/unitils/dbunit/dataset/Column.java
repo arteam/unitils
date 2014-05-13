@@ -1,5 +1,6 @@
 package org.unitils.dbunit.dataset;
 
+import static org.dbunit.dataset.ITable.NO_VALUE;
 import org.dbunit.dataset.datatype.DataType;
 import org.dbunit.dataset.datatype.TypeCastException;
 import org.unitils.core.UnitilsException;
@@ -86,6 +87,9 @@ public class Column {
      * @return The difference, null if none found
      */
     public ColumnDifference compare(Column actualColumn) {
+        if (value == null || value.equals(NO_VALUE)) {
+            return null;
+        }
         if (value == actualColumn.getValue()) {
             return null;
         }

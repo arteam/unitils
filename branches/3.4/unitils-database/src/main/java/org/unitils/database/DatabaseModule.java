@@ -254,7 +254,7 @@ public class DatabaseModule implements Module {
         if (!StringUtils.isEmpty(schema)) {
             DatabaseConfiguration databaseConfiguration = wrapper.getDatabaseConfiguration();
             DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler, databaseConfiguration.getDialect(), databaseConfiguration.getSchemaNames());
-            dbMaintainer.resetDatabaseState();
+            dbMaintainer.resetDatabaseState(schema);
         } else {
             logger.debug("No schema found! The database is not reset!");
         }
@@ -371,7 +371,9 @@ public class DatabaseModule implements Module {
      */
     public void commitTransaction(Object testObject) {
         flushDatabaseUpdates(testObject);
-        getTransactionManager().commit(testObject);
+        UnitilsTransactionManager transactionManager2 = getTransactionManager();
+        transactionManager2.activateTransactionIfNeeded(testObject);
+        transactionManager2.commit(testObject);
     }
 
 
@@ -382,7 +384,9 @@ public class DatabaseModule implements Module {
      */
     public void rollbackTransaction(Object testObject) {
         flushDatabaseUpdates(testObject);
-        getTransactionManager().rollback(testObject);
+        UnitilsTransactionManager transactionManager2 = getTransactionManager();
+        transactionManager2.activateTransactionIfNeeded(testObject);
+        transactionManager2.rollback(testObject);
     }
 
 

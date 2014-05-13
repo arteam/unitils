@@ -32,6 +32,7 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -39,14 +40,21 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.script.ExecutedScript;
 import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.version.Version;
+import org.unitils.reflectionassert.ReflectionAssert;
+import org.unitils.reflectionassert.ReflectionComparatorMode;
 
 /**
  * Tests the DefaultScriptSource
@@ -54,7 +62,11 @@ import org.unitils.dbmaintainer.version.Version;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
+@RunWith(BlockJUnit4ClassRunner.class)
 public class DefaultScriptSourceTest extends UnitilsJUnit4 {
+    
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
 
     /* DataSource for the test database */
     @TestDataSource
@@ -143,7 +155,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
      */
     @Test
     public void testGetAllUpdateScripts() {
-        List<Script> scripts = scriptSource.getAllUpdateScripts(schemas.get(0));
+        List<Script> scripts = scriptSource.getAllUpdateScripts(dialect, schemas.get(0));
 
         assertEquals("1_scripts/001_scriptA.sql", scripts.get(0).getFileName());   // x.1.1
         assertEquals("1_scripts/002_scriptB.sql", scripts.get(1).getFileName());   // x.1.2
@@ -166,7 +178,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
 					+ "/test_scripts/1_scripts/001_duplicateIndexScript.sql");
 			copyFile(scriptA, duplicateIndexScript);
 			try {
-				scriptSource.getAllUpdateScripts(schemas.get(0));
+				scriptSource.getAllUpdateScripts(dialect, schemas.get(0));
 				fail("Expected a UnitilsException because of a duplicate script");
 			} catch (UnitilsException e) {
 				// expected
@@ -189,7 +201,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testGetNewScripts() {
     	alreadyExecutedScripts.set(5, new ExecutedScript(new Script("2_scripts/subfolder/scriptH.sql", 0L, "xxx"), executionDate, true));
     	
-		List<Script> scripts = scriptSource.getNewScripts(new Version("2.x.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts), schemas.get(0));
+		List<Script> scripts = scriptSource.getNewScripts(new Version("2.x.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts),dialect, schemas.get(0));
 		
         assertEquals("1_scripts/scriptD.sql", scripts.get(0).getFileName());       			// x.1.x 		was added
         assertEquals("2_scripts/subfolder/scriptH.sql", scripts.get(1).getFileName());      // x.2.x.x		was changed
@@ -199,7 +211,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
 
     @Test
     public void testIsExistingScriptsModfied_noModifications() {
-        assertFalse(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect));
+        assertFalse(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0)));
     }
     
     
@@ -207,7 +219,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testIsExistingScriptsModfied_modifiedScript() {
     	alreadyExecutedScripts.set(1, new ExecutedScript(new Script("1_scripts/002_scriptB.sql", 0L, "xxx"), executionDate, true));
     	
-        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts),dialect));
+        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts),dialect, schemas.get(0)));
     }
     
     
@@ -215,7 +227,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testIsExistingScriptsModfied_scriptAdded() {
     	alreadyExecutedScripts.remove(1);
     	
-        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect));
+        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0)));
     }
     
     
@@ -223,7 +235,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testIsExistingScriptsModfied_scriptRemoved() {
     	alreadyExecutedScripts.add(new ExecutedScript(new Script("1_scripts/003_scriptB.sql", 0L, "xxx"), executionDate, true));
     	
-        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect));
+        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0)));
     }
     
     
@@ -231,7 +243,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testIsExistingScriptsModfied_newScript() {
     	alreadyExecutedScripts.remove(1);
     	
-        assertFalse(scriptSource.isExistingIndexedScriptModified(new Version("1.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect));
+        assertFalse(scriptSource.isExistingIndexedScriptModified(new Version("1.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0)));
     }
     
     
@@ -239,8 +251,8 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testIsExistingScriptsModfied_higherIndexScriptModified() {
     	alreadyExecutedScripts.set(1, new ExecutedScript(new Script("1_scripts/002_scriptB.sql", 0L, "xxx"), executionDate, true));
     	
-        assertFalse(scriptSource.isExistingIndexedScriptModified(new Version("1.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect));
-        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("1.2"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect));
+        assertFalse(scriptSource.isExistingIndexedScriptModified(new Version("1.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0)));
+        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("1.2"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0)));
     }
 
 
@@ -249,7 +261,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
      */
     @Test
     public void testIsExistingScriptsModfied_noLowerIndex() {
-        boolean result = scriptSource.isExistingIndexedScriptModified(new Version("0"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect);
+        boolean result = scriptSource.isExistingIndexedScriptModified(new Version("0"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0));
         assertFalse(result);
     }
 
@@ -259,8 +271,49 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
      */
     @Test
     public void testGetPostProcessingScripts() {
-        List<Script> scripts = scriptSource.getPostProcessingScripts(schemas.get(0));
+        List<Script> scripts = scriptSource.getPostProcessingScripts(dialect, schemas.get(0));
         assertEquals("postprocessing/post-scriptA.sql", scripts.get(0).getFileName());
         assertEquals("postprocessing/post-scriptB.sql", scripts.get(1).getFileName());
+    }
+    
+    @Test
+    public void testCheckIfFileMustBeAddedToScriptList() throws Exception {
+        String schema1 = "USERS";
+        String schema2 = "pEoplE";
+        Assert.assertTrue(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("test123.sql", "public"));
+        Assert.assertTrue(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("@users_addusers.sql", schema1));
+        Assert.assertFalse(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("@usersaddusers.sql", schema1));
+        Assert.assertFalse(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("1@users_addusers.sql", schema1));
+        Assert.assertTrue(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("1_@users_addusers.sql", schema1));
+        Assert.assertTrue(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("01_@users_addusers.sql", schema1));
+        Assert.assertFalse(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("01@users_addusers.sql", schema1));
+
+        Assert.assertFalse(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("01@users_addpeople.sql", schema2));
+        Assert.assertFalse(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("1@people_addusers.sql", schema1));
+        Assert.assertTrue(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("01_@people_addusers.sql", schema2));
+        Assert.assertTrue(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("01_@people_addUsers.sql", schema2));
+    }
+    
+    @Test
+    public void testGetScriptsAt() throws Exception {
+        File parentFile = tempFolder.newFolder("test1");
+        tempFolder.newFile("test1/file1.txt");
+        tempFolder.newFile("test1/file2.sql");
+        tempFolder.newFile("test1/@users_addusers.sql");
+        tempFolder.newFile("test1/01_@users_addusers.sql");
+        tempFolder.newFile("test1/1@people_addusers.sql");
+        
+        
+        List<Script> actual = new ArrayList<Script>();
+        
+        scriptSource.getScriptsAt(actual, parentFile.getParentFile().getAbsolutePath(), "test1", "users");
+        List<String> actualNames = new ArrayList<String>();
+        for (Script script : actual) {
+            actualNames.add(script.getFileName());
+        }
+        
+        Assert.assertEquals(3, actual.size());
+        ReflectionAssert.assertReflectionEquals(Arrays.asList("test1/file2.sql", "test1/@users_addusers.sql", "test1/01_@users_addusers.sql"), actualNames, ReflectionComparatorMode.LENIENT_ORDER);
+        
     }
 }

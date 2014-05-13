@@ -1,6 +1,5 @@
 package org.unitils.dbmaintainer.script.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -46,7 +45,7 @@ public class ExtendedScriptSourceLoadAllScriptsTest {
         sut.init(config);
         
         
-        List<Script> actual = sut.loadAllScripts("public");
+        List<Script> actual = sut.loadAllScripts("oracle", "public");
         Assert.assertEquals(3, actual.size());
     }
 

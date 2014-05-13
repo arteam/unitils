@@ -126,7 +126,7 @@ public class ColumnComparisonTest {
 
         ColumnDifference result = expectedValue.compare(actualValue);
 
-        assertNotNull(result);
+        assertNull(result);
     }
 
 

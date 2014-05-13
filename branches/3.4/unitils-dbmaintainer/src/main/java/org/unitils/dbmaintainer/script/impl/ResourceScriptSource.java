@@ -11,7 +11,6 @@ import org.unitils.dbmaintainer.locator.ClassPathScriptLocator;
 import org.unitils.dbmaintainer.locator.resourcepickingstrategie.ResourcePickingStrategie;
 import org.unitils.dbmaintainer.locator.resourcepickingstrategie.impl.UniqueMostRecentPickingStrategie;
 import org.unitils.dbmaintainer.script.Script;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import org.unitils.util.PropertyUtils;
 
 /**
@@ -44,7 +43,7 @@ public class ResourceScriptSource extends DefaultScriptSource {
      * @see org.unitils.dbmaintainer.script.impl.DefaultScriptSource#loadAllScripts()
      */
     @Override
-    protected List<Script> loadAllScripts(String dialect) {
+    protected List<Script> loadAllScripts(String dialect, String schema) {
         List<String> scriptLocations = PropertyUtils.getStringList("dbMaintainer.script.locations", configuration);
         //String dbDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
         if(dialect != null) {
@@ -72,7 +71,7 @@ public class ResourceScriptSource extends DefaultScriptSource {
 
         List<Script> scripts = new ArrayList<Script>();
         String scriptLocation;
-        for (Iterator<String> i = scriptLocations.iterator(); i.hasNext(); getScriptsAt(scripts, scriptLocation, "")) {
+        for (Iterator<String> i = scriptLocations.iterator(); i.hasNext(); getScriptsAt(scripts, scriptLocation, "", schema)) {
             scriptLocation = i.next();
         }
 
@@ -96,7 +95,7 @@ public class ResourceScriptSource extends DefaultScriptSource {
      * @see org.unitils.dbmaintainer.script.impl.DefaultScriptSource#getScriptsAt(java.util.List, java.lang.String, java.lang.String)
      */
     @Override
-    protected void getScriptsAt(List<Script> scripts, String scriptRoot, String relativeLocation) {
+    protected void getScriptsAt(List<Script> scripts, String scriptRoot, String relativeLocation, String schemaName) {
 
         if(!scriptRoot.endsWith("/")) {
             // for one reason or another, it doesn't work when there is no / at the end
@@ -107,7 +106,7 @@ public class ResourceScriptSource extends DefaultScriptSource {
         LOGGER.debug("Script location: " + location);
 
         ClassPathScriptLocator classPathScriptLocator = new ClassPathScriptLocator();
-        classPathScriptLocator.loadScripts(scripts, scriptRoot, getResourcePickingStrategie(), getScriptExtensions());
+        classPathScriptLocator.loadScripts(scripts, scriptRoot, getResourcePickingStrategie(), getScriptExtensions(), schemaName);
 
 
     }

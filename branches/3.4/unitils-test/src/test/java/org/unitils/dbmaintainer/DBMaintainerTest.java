@@ -79,6 +79,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
     private List<ExecutedScript> alreadyExecutedScripts;
     private ScriptContentHandle sciptContentHandle1, sciptContentHandle2, postProcessingSciptContentHandle1, postProcessingSciptContentHandle2;
     private String dialect;
+    private String schema;
 
     /**
      * Create an instance of DBMaintainer
@@ -88,6 +89,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         dialect = "hsqldb";
+        schema = "public";
         dbMaintainer = new DBMaintainer();
         dbMaintainer.setDialect(dialect);
         dbMaintainer.fromScratchEnabled = true;
@@ -123,7 +125,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         expectNoScriptModifications();
         expectPostProcessingScripts(postProcessingScripts);
 
-        dbMaintainer.updateDatabase();
+        dbMaintainer.updateDatabase(schema);
 
         assertNoMoreInvocations();
     }
@@ -139,7 +141,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         expectNewScriptsAdded();
         expectPostProcessingScripts(postProcessingScripts);
 
-        dbMaintainer.updateDatabase();
+        dbMaintainer.updateDatabase(schema);
 
         assertScriptsExecutedAndDbVersionSet();
     }
@@ -155,7 +157,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         expectExistingScriptModified();
         expectPostProcessingScripts(postProcessingScripts);
 
-        dbMaintainer.updateDatabase();
+        dbMaintainer.updateDatabase(schema);
 
         mockDbClearer.assertInvoked().clearSchemas();
         mockExecutedScriptInfoSource.assertInvoked().clearAllExecutedScripts();
@@ -168,7 +170,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         expectLastUpdateFailed();
         expectPostProcessingScripts(postProcessingScripts);
 
-        dbMaintainer.updateDatabase();
+        dbMaintainer.updateDatabase(schema);
 
         mockDbClearer.assertInvoked().clearSchemas();
         mockExecutedScriptInfoSource.assertInvoked().clearAllExecutedScripts();
@@ -188,7 +190,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         mockScriptRunner.raises(UnitilsException.class).execute(scripts.get(0).getScriptContentHandle());
 
         try {
-            dbMaintainer.updateDatabase();
+            dbMaintainer.updateDatabase(schema);
             fail("A UnitilsException should have been thrown");
         } catch (UnitilsException e) {
             // expected
@@ -205,7 +207,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         mockScriptRunner.raises(UnitilsException.class).execute(ArgumentMatchers.same(postProcessingScripts.get(1).getScriptContentHandle()));
 
         try {
-            dbMaintainer.updateDatabase();
+            dbMaintainer.updateDatabase(schema);
             fail("A UnitilsException should have been thrown");
         } catch (UnitilsException e) {
             // Expected
@@ -219,7 +221,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         expectFromScratchUpdateRecommended();
         expectPostProcessingScripts(postProcessingScripts);
 
-        dbMaintainer.updateDatabase();
+        dbMaintainer.updateDatabase(schema);
 
         mockDbClearer.assertInvoked().clearSchemas();
         mockExecutedScriptInfoSource.assertInvoked().clearAllExecutedScripts();
@@ -276,7 +278,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 
 
     private void expectNewScripts(List<Script> scripts) {
-        mockScriptSource.returns(scripts).getNewScripts(null, null, dialect);
+        mockScriptSource.returns(scripts).getNewScripts(null, null, dialect, schema);
     }
 
 
@@ -286,17 +288,17 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 
 
     private void expectModifiedScripts(boolean modifiedScripts) {
-        mockScriptSource.returns(modifiedScripts).isExistingIndexedScriptModified(null, null, dialect);
+        mockScriptSource.returns(modifiedScripts).isExistingIndexedScriptModified(null, null, dialect, schema);
     }
 
 
     private void expectPostProcessingScripts(List<Script> postProcessingCodeScripts) {
-        mockScriptSource.returns(postProcessingCodeScripts).getPostProcessingScripts(dialect);
+        mockScriptSource.returns(postProcessingCodeScripts).getPostProcessingScripts(dialect, schema);
     }
 
 
     private void expectAllScripts(List<Script> scripts) {
-        mockScriptSource.returns(scripts).getAllUpdateScripts(dialect);
+        mockScriptSource.returns(scripts).getAllUpdateScripts(dialect, schema);
     }
 
 }
