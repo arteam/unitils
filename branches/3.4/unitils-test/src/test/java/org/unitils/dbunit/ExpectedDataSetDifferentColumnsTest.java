@@ -11,10 +11,10 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.unitils.UnitilsJUnit4TestClassRunner;
+import org.unitils.core.ModulesRepository;
 import org.unitils.core.Unitils;
 import org.unitils.database.DatabaseModule;
 import org.unitils.database.SQLUnitils;
@@ -31,7 +31,6 @@ import org.unitils.dbunit.annotation.ExpectedDataSet;
  * @since 1.3.2
  * 
  */
-@Ignore
 @RunWith(UnitilsJUnit4TestClassRunner.class)
 @DataSet
 public class ExpectedDataSetDifferentColumnsTest {
@@ -39,9 +38,13 @@ public class ExpectedDataSetDifferentColumnsTest {
     @BeforeClass
     public static void beforeClass() {
         Properties prop = getCorrectProperties();
-        DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+        ModulesRepository modulesRepository = Unitils.getInstance().getModulesRepository();
+        DatabaseModule databaseModule = modulesRepository.getModuleOfType(DatabaseModule.class);
         databaseModule.init(prop);
         databaseModule.afterInit();
+        DbUnitModule dbunitModule = modulesRepository.getModuleOfType(DbUnitModule.class);
+        dbunitModule.init(prop);
+        dbunitModule.afterInit();
         DataSource dataSource2 = databaseModule.getWrapper("").getDataSource();
         
         SQLUnitils.executeUpdate("CREATE TABLE fruit (id varchar(50), name varchar(50))", dataSource2);
@@ -88,6 +91,8 @@ public class ExpectedDataSetDifferentColumnsTest {
     }
     
     private static Properties getCorrectProperties() {
+        Unitils.initSingletonInstance();
+        
         Properties config = (Properties) Unitils.getInstance().getConfiguration().clone();
         config.setProperty("database.names", "database1, database2");
         config.setProperty("database.userName", "sa");
