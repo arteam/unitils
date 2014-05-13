@@ -65,7 +65,7 @@ public class ClassPathScriptLocatorTest {
 
         EasyMockUnitils.replay();
         classPathScriptLocator = new ClassPathScriptLocator();
-        classPathScriptLocator.loadScripts(scriptList, path, resourcePickingStrategie, scriptExtensions);
+        classPathScriptLocator.loadScripts(scriptList, path, resourcePickingStrategie, scriptExtensions, "users");
 
 
         Assert.assertTrue(classPathScriptLocator.scriptList.size() == 3);

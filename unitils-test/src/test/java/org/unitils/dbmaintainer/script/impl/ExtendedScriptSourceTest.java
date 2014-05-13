@@ -2,16 +2,22 @@ package org.unitils.dbmaintainer.script.impl;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.forceDeleteOnExit;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.unitils.UnitilsJUnit4TestClassRunner;
 import org.unitils.dbmaintainer.script.ExecutedScript;
+import org.unitils.dbmaintainer.script.Script;
+import org.unitils.reflectionassert.ReflectionAssert;
+import org.unitils.reflectionassert.ReflectionComparatorMode;
 
 
 /**
@@ -22,6 +28,7 @@ import org.unitils.dbmaintainer.script.ExecutedScript;
  * @since 1.0.2
  *
  */
+@Ignore
 @RunWith(UnitilsJUnit4TestClassRunner.class)
 public class ExtendedScriptSourceTest {
 
@@ -64,7 +71,21 @@ public class ExtendedScriptSourceTest {
      */
     @Test
     public void loadAllScriptsTest() {
-        Assert.assertEquals(4 , scriptSource.loadAllScripts("public").size());
+        Assert.assertEquals(7 , scriptSource.loadAllScripts("public", "users").size());
         
+    }
+    
+    @Test
+    public void testGetScriptsAt() throws Exception {
+        List<Script> actual = new ArrayList<Script>();
+        
+        scriptSource.getScriptsAt(actual, "org/unitils/dbunit/testdbscripts/", "", "users");
+        List<String> actualNames = new ArrayList<String>();
+        for (Script script : actual) {
+            actualNames.add(script.getFileName());
+        }
+        
+        Assert.assertEquals(7, actual.size());
+        ReflectionAssert.assertReflectionEquals(Arrays.asList("file2.sql", "@users_addusers.sql", "01_@users_addusers.sql", "testsubpackage/004_Initial_TESTcreate.sql", "001_Initial_TESTcreate.sql", "002_Initial_TESTcreate.sql", "003_Initial_TESTcreate.sql"), actualNames, ReflectionComparatorMode.LENIENT_ORDER);
     }
 }

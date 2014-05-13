@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.dbmaintainer.locator.resourcepickingstrategie.ResourcePickingStrategie;
 import org.unitils.dbmaintainer.script.Script;
+import org.unitils.dbmaintainer.script.impl.DefaultScriptSource;
 
 
 /**
@@ -29,6 +30,8 @@ public class ClassPathScriptLocator extends ClassPathResourceLocator {
     protected String path;
 
     protected List<String> scriptExtensions;
+    
+    protected String schema;
 
     /**
      * @param scriptList1
@@ -36,10 +39,11 @@ public class ClassPathScriptLocator extends ClassPathResourceLocator {
      * @param resourcePickingStrategie
      * @param scriptExtensions1
      */
-    public void loadScripts(List<Script> scriptList1, String path1, ResourcePickingStrategie resourcePickingStrategie, List<String> scriptExtensions1) {
+    public void loadScripts(List<Script> scriptList1, String path1, ResourcePickingStrategie resourcePickingStrategie, List<String> scriptExtensions1, String schema) {
         this.path = path1;
         this.scriptList = scriptList1;
         this.scriptExtensions = scriptExtensions1;
+        this.schema = schema;
         List<URL> matchedResources = loadResources(path1, false);
         List<URL> resourcesF = resourcePickingStrategie.filter(matchedResources, path1);
 
@@ -54,11 +58,15 @@ public class ClassPathScriptLocator extends ClassPathResourceLocator {
 
         for (URL url : resourcesF) {
             if (isScriptFile(url.toString())) {
-                Script script = new Script(url.toString().substring(url.toString().lastIndexOf(path) + path.length()), Long.valueOf(url.openConnection().getLastModified()), new org.unitils.dbmaintainer.script.ScriptContentHandle.UrlScriptContentHandle(url));
+                String scriptName = url.toString().substring(url.toString().lastIndexOf(path) + path.length());
+                if (DefaultScriptSource.checkIfFileMustBeAddedToScriptList(scriptName, schema)) {
+                    Script script = new Script(scriptName, Long.valueOf(url.openConnection().getLastModified()), new org.unitils.dbmaintainer.script.ScriptContentHandle.UrlScriptContentHandle(url));
 
-                logger.debug(" + script added (" + url.toString() + "))");
+                    logger.debug(" + script added (" + url.toString() + "))");
 
-                scriptList.add(script);
+                    scriptList.add(script);
+                }
+                
             }
         }
 
