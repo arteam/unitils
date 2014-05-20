@@ -148,7 +148,7 @@ public class DataSourceWrapper {
     public void updateDatabase(SQLHandler sqlHandler) {
         LOGGER.info("Checking if database has to be updated.");
         DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler, databaseConfiguration.getDialect(), databaseConfiguration.getSchemaNames());
-        dbMaintainer.updateDatabase(databaseConfiguration.getDefaultSchemaName());
+        dbMaintainer.updateDatabase(databaseConfiguration.getDatabaseName());
     }
 
     /**

@@ -95,7 +95,7 @@ public class ResourceScriptSource extends DefaultScriptSource {
      * @see org.unitils.dbmaintainer.script.impl.DefaultScriptSource#getScriptsAt(java.util.List, java.lang.String, java.lang.String)
      */
     @Override
-    protected void getScriptsAt(List<Script> scripts, String scriptRoot, String relativeLocation, String schemaName) {
+    protected void getScriptsAt(List<Script> scripts, String scriptRoot, String relativeLocation, String databaseName) {
 
         if(!scriptRoot.endsWith("/")) {
             // for one reason or another, it doesn't work when there is no / at the end
@@ -106,7 +106,7 @@ public class ResourceScriptSource extends DefaultScriptSource {
         LOGGER.debug("Script location: " + location);
 
         ClassPathScriptLocator classPathScriptLocator = new ClassPathScriptLocator();
-        classPathScriptLocator.loadScripts(scripts, scriptRoot, getResourcePickingStrategie(), getScriptExtensions(), schemaName);
+        classPathScriptLocator.loadScripts(scripts, scriptRoot, getResourcePickingStrategie(), getScriptExtensions(), databaseName);
 
 
     }
