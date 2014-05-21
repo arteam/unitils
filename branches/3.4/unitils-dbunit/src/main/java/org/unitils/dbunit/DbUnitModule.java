@@ -206,27 +206,22 @@ public class DbUnitModule implements Module {
                 } else if (loadStrategy instanceof CleanInsertLoadStrategy && cleanLoadStrategy) {
                      DataSet newDataSet = new DataSet() {
                         
-                        @Override
                         public Class<? extends Annotation> annotationType() {
                             return dataSet.annotationType();
                         }
                         
-                        @Override
                         public String[] value() {
                             return dataSet.value();
                         }
                         
-                        @Override
                         public Class<? extends DataSetLoadStrategy> loadStrategy() {
                             return InsertLoadStrategy.class;
                         }
                         
-                        @Override
                         public Class<? extends DataSetFactory> factory() {
                             return dataSet.factory();
                         }
                         
-                        @Override
                         public String databaseName() {
                             return dataSet.databaseName();
                         }

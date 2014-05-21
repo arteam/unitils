@@ -67,7 +67,7 @@ public class DatabaseModuleMultipleDatabasesTest {
     }
 
     @Test
-    public void testGetDatabase2() throws SQLException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    public void testGetDatabase2() throws SQLException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, InterruptedException {
         TestClassDatabase2 obj = new TestClassDatabase2();
 
         List<String> databaseName = module.getDatabaseName(obj, obj.getClass().getMethod("testMethod"));

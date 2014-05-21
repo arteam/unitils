@@ -52,6 +52,7 @@ public class SQLUnitils {
 
         Connection connection = null;
         Statement statement = null;
+        
         try {
             connection = dataSource.getConnection();
             statement = connection.createStatement();
