@@ -7,7 +7,6 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -75,11 +74,6 @@ public class ExpectedDataSetDifferentColumnsTest {
     @ExpectedDataSet("ExpectedDataSetDifferentColumnsTest-DifferentColumns.xml")
     public void testDifferentColumns() throws Exception {
         Assert.assertTrue(true);
-    }
-
-    @After
-    public void afterTest() {
-        SQLUnitils.executeUpdate("DELETE FROM fruit", dataSource);
     }
     
     @AfterClass
