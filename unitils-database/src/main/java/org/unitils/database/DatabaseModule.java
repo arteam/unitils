@@ -312,13 +312,16 @@ public class DatabaseModule implements Module {
         }
         for (Field field : fields) {
             TestDataSource annotation = field.getAnnotation(TestDataSource.class);
-            if (annotation != null && annotation.value().equals(databaseName)) {
+            String tempDatabaseName = StringUtils.isEmpty(annotation.value()) ? databaseConfigurations.getDatabaseConfiguration().getDatabaseName() : annotation.value();
+            if (annotation != null && tempDatabaseName.equals(databaseName)) {
                 ReflectionUtils.setFieldValue(testObject, field, dataSource);
             }
         }
         for (Method method : methods) {
             TestDataSource annotation = method.getAnnotation(TestDataSource.class);
-            if (annotation != null && annotation.value().equals(databaseName)) {
+            String tempDatabaseName = StringUtils.isEmpty(annotation.value()) ? databaseConfigurations.getDatabaseConfiguration().getDatabaseName() : annotation.value();
+            
+            if (annotation != null && tempDatabaseName.equals(databaseName)) {
                 try {
                     method.invoke(testObject, dataSource);
                 } catch (IllegalAccessException ex) {
@@ -445,33 +448,6 @@ public class DatabaseModule implements Module {
      */
     public TestListener getTestListener() {
         return new DatabaseTestListener();
-    }
-
-    /**
-     * Checks if the {@link DataSet} or the {@link ExpectedDataSet} contains the
-     * name of a database. If this isn't the case, than the default databaseName
-     * of the unitils.properties is used.
-     *
-     * If a {@link DataSet} contains a different
-     *
-     * @param testObject
-     * @param testMethod
-     * @return {@link String}
-     */
-    public List<String> getDatabaseName(Object testObject, Method testMethod) {
-        List<String> dataSources = new ArrayList<String>();
-        TestDataSource dataSource = AnnotationUtils.getMethodOrClassLevelAnnotation(TestDataSource.class, testMethod, testObject.getClass());
-        if (dataSource != null) {
-            dataSources.add(dataSource.value());
-        }
-
-        Set<TestDataSource> lstDataSources = AnnotationUtils.getFieldLevelAnnotations(testObject.getClass(), TestDataSource.class);
-        if (!lstDataSources.isEmpty()) {
-            for (TestDataSource testDataSource : lstDataSources) {
-                dataSources.add(testDataSource.value());
-            }
-        }
-        return dataSources;
     }
 
     /**
