@@ -1,0 +1,25 @@
+Jodatime
+
+* {Installation}
+~~~~~~~~~~~~~~~~
+    If you are using maven, you can add following dependency to your project.
+
+%{include|source=pom.xml|id=jodatime|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+* {Config}
+~~~~~~~~~~
+	Please create unitils-local.properties, and add mail to unitils.modules. Code as following:
+
+%{include|source=org/unitils/jodatime/jodatimeprop.properties|id=jodatimeprop|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+* {Example}
+~~~~~~~~~~~
+
+	<<How does it work?>>
+	There are 2 annotations: 
+	
+	* FixedDateTime: It freezes the date from a specific date.
+	
+	* OffsetDateTime: It freezes the date from a specific amount of days/months/years from now (positive = future, negative = past).
+	
+%{include|source=org/unitils/jodatime/DateTimeExample1Test.java|id=jodatimeExample|verbatim=true|set-first-line=1|pad-line-numbers=2}

@@ -1,0 +1,140 @@
+Objectvalidation
+
+* {Introduction}
+~~~~~~~~~~~~~~~~
+	I often get the question if it is necessary to test simple things as Pojo's or
+	javabeans? The reason I get the question is that those objects are nothing more
+	than simple classes with properties and their necessary accessor methods,
+	respecting the sun javabean specification API. That's correct but how do we know
+	the implementation respects the javabean specification? Right, we test it.
+	In this section we'll show you a generic way to verify that your javabeans / pojo's respect the conventions by sun.
+	We'll start by briefly explaining javabeans and pojo's.
+
+**{JavaBean}
+~~~~~~~~~~~~
+	A javabean is a reusable component that encapsulates other objects, its
+	properties, so that they can be passed around as a single bean object 
+	instead of as multiple individual objects.
+	In order to function as a JavaBean class, an object class must obey certain
+	conventions about method naming, construction, and behavior. 
+	These conventions make it possible to have tools that can use, reuse, replace, and connect JavaBeans.
+
+	The required conventions are:
+	
+	* The class must have a public default constructor (no-argument). This allows easy instantiation within editing and activation frameworks.
+	
+	* The class properties must be accessible using get, set, is (used for boolean properties instead of get) and other methods (so-called accessor methods and mutator methods), following a standard naming-convention. This allows easy automated inspection and updating of bean state within frameworks, many of which include custom editors for various types of properties. 
+
+	* The class should be serializable. This allows applications and frameworks to reliably save, store, and restore the bean's state in a fashion independent of the VM and of the platform.
+
+**{Pojo}
+~~~~~~~~
+	POJOs (Plain Old Java Objects) resemble to javabeans but have less strict
+	conventions to respect. They don't have to be serializable and a default
+	constructor is not mandatory.
+	Because POJOs do not require to adhere to specific external interfaces or
+	third-party APIs it decouples the code from external associations. 
+	One of the primary benefits of this decoupling is the freedom it gives software 
+	developers from ancillary tasks, such as persistence, transaction support, and
+	remoting. \
+	POJOs are often used in a Service Oriented Architecture, they
+	represent the anemic domain objects. All the business logic is embedded in the
+	services.
+	
+**{Test if an object respects javabean / pojo conventions}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	When we want to use Pojo's, for example to represent the anemic domain
+	objects, or we use a set of javabeans we want to be
+	sure that the implementation respects the conventions. Writing a test for each
+	object would mean a serious overhead, so let's try something else.
+	
+* {Installation}
+~~~~~~~~~~~~~~~~
+    If you are using maven, you can add following dependency to your project.
+
+%{include|source=pom.xml|id=objectvalidation|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+* {Config}
+~~~~~~~~~~
+	Please create unitils-local.properties, and add mail to unitils.modules. Code as following:
+
+%{include|source=org/unitils/objectvalidation/objectvalidationprop.properties|id=objectvalidationprop|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+* {Explanation}
+~~~~~~~~~~~~~~~
+
+*-----------------------*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+ 
+|Rule           		|A rule is a java class which purpose is to validate something on another class, it could be verify that the toString method is well written and overriden for instance.	|
+*-----------------------*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|RuleCollection 		|Is a set of rules used as configuration of your project. Out of the box there is the SunBeanRules that verifies that objects are written with Sun compliency.				|
+*-----------------------*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|EqualsHashCodeValidator|Utility that will check that the equals and hashCode uses all the specified fields, it will cover the conditions of the equals and hashCode totally.						|
+*-----------------------*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+	
+	By default there are 2 types of rulescollections:
+	
+	* SunBeanRules
+	
+	* UtilityClassRules: a utility class is:
+	
+		*  a class with only one private constructor.
+		
+		*  a class with only static methods.
+		
+		*  always final.
+		
+**{@ObjectValidationRules}
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+	When a testobject is created, then it will look for a field that is annotated with @ObjectValidationRules. You can alter the rulescollection by adding or replacing rules.
+
++-----+		
+@ObjectValidationRules(replacementRules = {UtilityClassRules.class}, additionalRules={ExtraRules.class} ) 
+private ObjectValidator objectValidator;
++-----+	
+
+**{ObjectValidator}
+~~~~~~~~~~~~~~~~~~~
++-----+	
+ @ObjectValidationRules
+ private ObjectValidator objectValidator;
+
+ @Test 
+ public void validatePersonBean() {
+ 	objectValidator.classToValidate(PersonBean.class).validatingEqualsAndHashCode().withAllFields().validate();
+ }
++-----+	
+	In the previous example we want to validate the PersonBean. So with this info the objectvalidator can create a ValidateEqualsAndHashCode
+	where have the option to validate it with or without equals and hashcode. But in the previous example we choose to validate everything: equals, 
+	hashcode and all the fields.
+	
+*---------------------------*---------------------------------------------------------------------------------------------------------------------------+ 
+|ObjectValidator			|This is created by the module and contains all the rules that you want to use.												|
+*---------------------------*---------------------------------------------------------------------------------------------------------------------------+
+|ValidateEqualsAndHashCode	|Gives us the option to validate the equals and hashcode too or not.														|
+*---------------------------*---------------------------------------------------------------------------------------------------------------------------+
+|ChooseFieldsInEquals		|3 options: ignoringFields, withFieldNames, withAllFields																	|
+*---------------------------*---------------------------------------------------------------------------------------------------------------------------+
+|AddClassToValidate			| 																															|
+|							| * validate(): validates all the classes that you have added to the ObjectValidator										|
+|							|																															|									
+|							| * classToValidate(Class<?> clzz): You can add another class and this method will return a ValidateEqualsAndHashCode object|
+|							|																															|
+*---------------------------*---------------------------------------------------------------------------------------------------------------------------+
+%{include|source=org/unitils/objectvalidation/example1/ObjectValidationExample1.java|id=objectvalidationExample1|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+**{Customizing the objectvalidation module} 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+***{A custom generator}
+~~~~~~~~~~~~~~~~~~~~~~~
+	A generator is an object that creates random objects of a specific type.
+	Everything is already in place for basic validation (f.e.: the validation of
+	primitives, collections, enums\ldots). But if you need something more specific,
+	like validation of jodatime, than you need to write it yourself.
+
+%{include|source=org/unitils/objectvalidation/example2/ObjectValidationExample2.java|id=objectvalidationExample2|verbatim=true|set-first-line=1|pad-line-numbers=2}
+***{Custom rules & custom RuleCollections}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	Every RulesCollections contains a list with rules.
+	You can create your own rules by implementing the interface Rule and by adding them to the RuleCollections.
+	
+%{include|source=org/unitils/objectvalidation/example3/ObjectValidationExample3.java|id=objectvalidationExample3|verbatim=true|set-first-line=1|pad-line-numbers=2}

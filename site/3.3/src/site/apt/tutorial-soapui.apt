@@ -1,0 +1,53 @@
+SoapUI
+
+* {Installation}
+~~~~~~~~~~~~~~~~
+    If you are using maven, you can add following dependency to your project.
+
+%{include|source=pom.xml|id=mail|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+* {Config}
+~~~~~~~~~~
+	Please create unitils-local.properties, and add mail to unitils.modules. Code as following:
+
+%{include|source=org/unitils/mail/mailprop.properties|id=mailprop|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+	To start and use the fake smpt server put this in your test class. 
+	This will start up the SMTP server before a test and cleans up, shuts it down after each test. 
+
+[images/drawingMailModule.png]
+
+	This has a performance cost but is nessacary to avoid any dependencies between tests
+
++-----+
+@TestSmtpServer
+private SmtpServer simpleSmtpServer;
++-----+
+	
+	The SmtpServer comes with 2 methods that allow you to inspect its state:
+
++-----+	
+/**
+ * This method give you the amount of mails that you've sent to the SMTP server.
+ * 
+ */
+int getReceivedEmailSize();
+
+/**
+ * This email sends you a list of all the mails you've sent to the fake SMTP server.
+ * 
+ */
+List<SmtpMessage> getReceivedEmail() throws IOException, MessagingException;
++-----+
+
+	So to use it in your test:
+
+%{include|source=org/unitils/mail/MailModuleTest.java|id=mailExample|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+* {Remarks}
+~~~~~~~~~~~
+	Notice that this will work the best if your test & your SUT (system under test) are running in the same JVM.
+	If your application is deployed in some application server and is on the same machine as from where your test is launched, your test could still work.
+	However because it is no longer running in one thread, hence it is running in different JVM's you will probably have to introduce some Thread.sleep before you do some asserts.
+	If your application is deployed on a different machine as your from where you are launching your test, the test will fail. 
+	The TestSmtpServer is only bound to a port on the machine from where you launch your test.

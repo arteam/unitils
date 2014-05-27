@@ -16,7 +16,7 @@
  * /
  */
 
-package org.unitils.IO.example4;
+package org.unitils.io.example4;
 
 import org.unitils.UnitilsJUnit4;
 import org.unitils.io.annotation.TempDir;

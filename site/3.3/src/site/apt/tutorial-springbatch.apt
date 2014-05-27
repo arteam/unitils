@@ -1,0 +1,57 @@
+Spring Batch
+
+
+	You can find more info on Spring batch on the {{{http://docs.spring.io/spring-batch/2.2.x/reference/html/index.html} Spring website}}.
+
+* {Installation}
+~~~~~~~~~~~~~~~~
+    If you are using maven, you can add following dependency to your project.
+
+%{include|source=pom.xml|id=springbatch|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+* {Config}
+~~~~~~~~~~
+	Please create unitils-local.properties, and add springbatch to unitils.modules. Code as following:
+
+%{include|source=org/unitils/springbatch/springbatchprop.properties|id=springbatchprop|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+* {Learn by example}
+~~~~~~~~~~~~~~~~~~~~
+
+%{include|source=org/unitils/springbatch/example1/SpringBatchTest1.java|id=springBatchExample1|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+	But there is another possibility to use the contextfile:
+
++-----+
+@RunWith(UnitilsJUnit4TestClassRunner.class)
+@SpringApplicationContext(value={"batchTest.xml"})
+public class BatchModuleTest {
+...
+}
++-----+
+
+	If you do it this way, you don't have to give a spring context file for every test.
+
+	With Unitils there are a few annotations:
+	
+	* @BatchTestPlaceHolder: This annotation injects a batch Test in the field.
+	
+	* @BatchTestEnvironment:  You can set a following parameters:
+		
+		* contextFile: You should give the name of the Spring application context.
+		
+		* parameter:  The parameter to send with the job execution, allowing for testing multiple new executions of same job.  If true it will send simply a date to the batch execution. If true and the jobParameters are filled in, then it will take those parameters.
+		
+		* job: You must choose a job out of the Spring application context.
+		
+		* exitCode:  The default is 0 and the test will fail if the expected code doesn’t match the actual code.
+		
+		* jobParameters: The jobParameters to send to the job execution. If they are not empty they will be used.
+ 		
+		* option: The option to send with the job execution, allowing for testing restart for instance, default it is set to none, meaning no options will be sent to the job execution.
+
+	In this example, the field 'batch' will be injected with a new object  of a
+	class that implement the interface BatchTest.  In the first example
+	('testSuccess')  we’ve configured that the Spring context file is
+	batchTest.xml and the job is successfulJob. So when the test begins, the context
+	file will be loaded and when we call the launchJob(), successfulJob will be executed.

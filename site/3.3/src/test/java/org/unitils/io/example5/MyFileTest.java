@@ -16,7 +16,7 @@
  *
  */
 
-package org.unitils.IO.example5;
+package org.unitils.io.example5;
 
 import org.unitils.UnitilsJUnit4;
 import org.unitils.io.annotation.FileContent;

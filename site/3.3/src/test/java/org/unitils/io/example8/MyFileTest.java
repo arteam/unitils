@@ -16,7 +16,7 @@
  *  
  */
 
-package org.unitils.IO.example8;
+package org.unitils.io.example8;
 
 import org.junit.Before;
 import org.unitils.UnitilsJUnit4;

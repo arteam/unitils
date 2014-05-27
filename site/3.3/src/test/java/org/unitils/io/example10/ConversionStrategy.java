@@ -16,7 +16,7 @@
  *
  */
 
-package org.unitils.IO.example10;
+package org.unitils.io.example10;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,0 +1,84 @@
+Selenium
+
+* {Installation}
+~~~~~~~~~~~~~~~~
+    If you are using maven, you can add following dependency to your project.
+
+%{include|source=pom.xml|id=selenium|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+*{GUI testing}
+~~~~~~~~~~~~~~~~~
+	In this chapter we'll talk about automating tests for classic web
+	application. When we talk about classic web application we mean html based applications, so no flash generated sites.
+	The tests we're talking about are not unit tests but system tests. We'll test a whole system. And because the test runs against a gui, the html pages, we'll often use the word Gui tests. You could mock out the backend and just test the frontend but that is an effort we discourage you to do.
+	
+	Two schools:
+	There are mainly two different approaches to create automated Gui test.
+	
+	* You can use a tool to record and playback tests
+	
+	* You can program yourself an automated test using an automation api 
+
+	The reason why there are two approaches is explained by the fact that there are mainly two types of people doing the job.
+	You have functional people who understand the business and are best placed to define the testcases. Often they also execute the testcases to validate that the application acts as they expect. Recording and playback tools will help ease the task of test automation for these people. There are a lot of tools on the market, commercial and opensource.
+	People with a technical background can choose another option: programming the automation scripts. This approach allows you to create much cleaner code. It will also force you to think of scriptcode reusage which will reduce script maintanance. In this chapter we'll defend this statement.
+
+	Record and Playback:
+	Using a tool to record testcases will allow you to create a lot of scripts in a record period of time. In this power lays directly the danger. The more you create the more you have to maintain.
+
+[images/uitesting-danger.png]
+	
+	<<<NOTE: You can download the selenium-ide add-on for Firefox. You can record some moves and than it will replay it. But even when you want to use the unitils-selenium module, it can be handy. When you go to options, then to clipboard format and if you select the option JUnit 4 (Webdriver) than you can copy paste all the commands into your eclipse and you will see that you already have the ids of the different components of your html page. This is one option, but there are other posibilities like firebug.>>>
+	
+[images/picSeleniumIDE.png]
+	
+	<<Domain Specific Language (DSL)>>
+	You can use inheritance & composition to avoid code duplication and to limit the code to maintain to a minimum. You can create a base page with all the items in the header, that all other pages must extend.
+	
+[images/picBasePage.png]
+
+	
+* {Config}
+~~~~~~~~~~
+	Please create unitils-local.properties, and add selenium to unitils.modules. Code as following:
+
+%{include|source=org/unitils/selenium/seleniumprop.properties|id=seleniumprop|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+	<<browser:>>
+	There are several browsers that you can choose from: Internet Explorer (IE), HtmlUnit(HTMLUNIT), firefox (FIREFOX), Chrome (CHROME).
+	
+	<<file types:>>
+	The default value for org.unitils.selenium.filetype: application/pdf, application/vnd.fdf, application/x-msdos-program, application/x-unknown-application-octet-stream, application/vnd.ms-powerpoint, application/excel, application/vnd.ms-publisher, application/x-unknown-message-rfc822, application/vnd.ms-excel, application/msword, application/x-mspublisher, application/x-tar, application/zip, application/x-gzip,application/x-stuffit,application/vnd.ms-works, application/powerpoint, application/rtf, application/postscript, application/x-gtar, video/quicktime, video/x-msvideo, video/mpeg, audio/x-wav, audio/x-midi, audio/x-aiff, application/octet-stream
+	
+	<<How does a test work?>>
+	annotations:
+	
+*---------------*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+ 
+| BaseUrl		|You can define the base url in the unitils.properties or you can define it with this annotation.  																																								|
+*---------------*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+ 
+| TestWebDriver |This annotation creates the driver. With the property "org.unitils.selenium.browser.name" in the unitils.properties file you define which browser you want to use for your tests. So if you define that you want to use firefox, than you get a FirefoxDriver. |
+*---------------*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+ 
+| WebPage       |The field with this annotation represents a web page. this means that it contains the webelements of a webpage.It uses the webdriver (field with @TestWebDriver) to initialize the elements.																	|
+*---------------*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+	
+* {Example}
+~~~~~~~~~~~
+
+	If the webpage has a menu, you should make a base page with all the menu items and all the pages extends this base page. If you know the id, path ... of the webelement, you can use the FindBy annotation.
+	In this example there is a menu with a link to a search page and a create page.
+
+%{include|source=org/unitils/selenium/page/BasePage.java|id=basePageSeleniumExample|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+	The Searchpage of the following example extends from the BasePage and contains all the important web elements of that specific webpage.
+	
+%{include|source=org/unitils/selenium/page/SearchPage.java|id=searchPageSeleniumExample|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+	In the example the nameField and firstName are textboxes and it will put the correct string into the text box.
+	The best way to create your tests, is creating a base web test class. In this class you can put your web driver and base URL.
+
+%{include|source=org/unitils/selenium/scenario/abstractTestSeleniumExample.java|id=abstractTestSeleniumExample|verbatim=true|set-first-line=1|pad-line-numbers=2}
+	
+	All your other tests have to extends this base test class, just like in the following example.
+	
+%{include|source=org/unitils/selenium/scenario/searchTestSeleniumExample.java|id=searchTestSeleniumExample|verbatim=true|set-first-line=1|pad-line-numbers=2}	
+	

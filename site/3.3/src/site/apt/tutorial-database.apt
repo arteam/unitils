@@ -344,5 +344,70 @@ public class UserDaoTest extends UnitilsJUnit4 {
     If you are using unitils' spring support (see {{{Testing with Spring}Testing with spring}}), and you've configured a bean of type <PlatformTransactionManager>
     in your spring configuration, unitils will make use of this transaction manager.
 
+**{Multi-database}
 
+	Multi-database was already possible in {{{http://www.dbmaintain.org/tutorial.html#Multi-database__user_support} dbmaintain }} but not yet in Unitils.
+	This feature is introduced in Unitils 3.4.
+	
+	You should configure it like this:
+	
++-----+
+database.names=database1, database2
+database.userName=sa
+database.password=
+database.schemaNames=public
+database.driverClassName.database1=org.hsqldb.jdbcDriver
+database.driverClassName.database2=org.h2.Driver
+database.url.database1=jdbc:hsqldb:mem:unitils1
+database.url.database2=jdbc:h2:~/test
+database.dialect.database1=hsqldb
+database.dialect.database2=h2
++-----+	
 
+	When you want to use multiple databases, you should take the old property and add the name of the datbase.
+	The first database defined in the property 'database.names' will be the default database. In this case the default database will be 'database1'.
+	
+	In your test you can choose to define a @TestDataSource with the name of the database or without it.
+	If there is no database name defined in the annotation, than the default database will be chosen.
+
++-----+	
+@TestDataSource("database2")
+private DataSource dataSource;
+
+@TestDataSource
+private DataSource defaultDataSource;
++-----+
+
+	The same with the @DataSet and @ExpectedDataSet annotation. In Unitils 3.4 there is an attribute 'databaseName' in those annotations.
+	
++-----+		
+@Test
+@DataSet(value = "MultiDatabaseIntTest.testOneDataSetDatabase1.xml")
+public void testOneDataSetDatabase1() {
+    //This test uses the default database.
+}
+   
+@Test
+@DataSet(value = "MultiDatabaseIntTest.testOneDataSetDatabase2.xml",  databaseName="database2")
+public void testOneDataSetDatabase2() {
+    //'database2' is used in this test.
+}
++-----+		
+	If you want to add multiple datasets to multiple databases in one test, than you can use the @DataSets and @ExpectedDataSets feature.
++-----+	
+@Test
+@DataSets({
+	@DataSet(value = "MultiDatabaseIntTest.testMultipleDataSetsDatabase1_1.xml", databaseName="database1"), 
+    @DataSet(value = "MultiDatabaseIntTest.testMultipleDataSetsDatabase1_2.xml", databaseName="database2")})
+public void testMultipleDataSetsMultipleDatabases() throws Exception {
+    //do some asserts
+}
+    
+@Test
+@ExpectedDataSets({
+	@ExpectedDataSet(databaseName="database1", value = "MultiDatabaseIntTest.testMultipleExpectedDataSetsOnMultipleDatabases_1.xml"), 
+    @ExpectedDataSet(databaseName="database2", value= "MultiDatabaseIntTest.testMultipleExpectedDataSetsOnMultipleDatabases_2.xml")})
+public void testMultipleExpectedDataSetsOnMultipleDatabases() {
+	//do some asserts
+}
++-----+	

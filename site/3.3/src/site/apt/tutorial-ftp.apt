@@ -1,0 +1,29 @@
+FTP
+
+* {Installation}
+~~~~~~~~~~~~~~~~
+    If you are using maven, you can add following dependency to your project.
+
+%{include|source=pom.xml|id=ftp|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+* {Config}
+~~~~~~~~~~
+	Please create unitils-local.properties, and add mail to unitils.modules. Code as following:
+
+%{include|source=org/unitils/ftp/ftpprop.properties|id=ftpprop|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+* {Example}
+~~~~~~~~~~~
+
+%{include|source=org/unitils/ftp/FtpModuleOtherIntTest.java|id=ftpExample|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+	<<So what happens behind this code:>>
+	
+[images/FtpDrawing.png]
+
+	Before each test the module checks if their is a field with @TestFtpServer. If this is true, than a fake FTP server is initialized with the properties out of the unitils.properties.
+	The username and the password are the credentials that are used to logon.
+	The filesystem of the fake server is imitated with the files in the basefolder.
+	After each test the server is stopped.
+	This runs best if the test and the SUT(System Under Test) is on the same JVM.
+	The test will fail if it is on a different machine.

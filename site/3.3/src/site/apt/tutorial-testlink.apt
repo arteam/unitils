@@ -1,0 +1,26 @@
+Testlink
+
+	This unitils module will allow you to push results of automated test results to {{{http://testlink.org/} Testlink}}, an opensource test management software
+to use:
+
+
+* {Installation}
+~~~~~~~~~~~~~~~~
+    If you are using maven, you can add following dependency to your project.
+
+%{include|source=pom.xml|id=testlink|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+* {Config}
+~~~~~~~~~~~~
+	Please create unitils-local.properties, and add testlink to unitils.modules. Code as following:
+
+%{include|source=org/unitils/testlink/testlinkprop.properties|id=testlinkprop|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+*{Example}
+~~~~~~~~~~~~~~
+	Finally add @TestLink in your unit testcases (methods) just like this:
+	
++----+
+@TestLink(value = "testCaseThree", suite = "TestLinkModuleIntTest")
+public void testCaseThree() {
++----+
