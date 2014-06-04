@@ -15,8 +15,13 @@
  */
 package org.unitils.database;
 
+import java.sql.Connection;
+
+import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbcp.DelegatingConnection;
 import org.unitils.core.Unitils;
 import org.unitils.core.dbsupport.SQLHandler;
+
 import javax.sql.DataSource;
 
 /**
@@ -224,5 +229,33 @@ public class DatabaseUnitils {
     private static Object getTestObject() {
         Object testObject = Unitils.getInstance().getTestContext().getTestObject();
         return testObject;
+    }
+    
+    /**
+     * This method gets a {@link Connection} from the {@link DataSource} and checks if it is a {@link oracle.jdbc.driver.OracleConnection}.
+     * There is a bug with commons-dbcp 1.4: if you want to create a {@link oracle.sql.BLOB} or a {@link java.sql.Clob} than you must get the inner {@link Connection} but you get another {@link Connection}.
+     * This is fixed in this method.
+     * @param connection
+     * @param dataSource
+     * @return
+     */
+    public static Connection getGoodConnection(Connection connection, DataSource dataSource) {
+        if (dataSource instanceof BasicDataSource) {
+            BasicDataSource tempDataSource = (BasicDataSource) dataSource;
+            if (tempDataSource.getDriverClassName().toLowerCase().contains("oracle")  && connection instanceof DelegatingConnection) {
+                boolean canAccess = tempDataSource.isAccessToUnderlyingConnectionAllowed();
+                if (!canAccess) {
+                    tempDataSource.setAccessToUnderlyingConnectionAllowed(true);
+                }
+                
+                DelegatingConnection tempConnection = (DelegatingConnection) connection;
+                Connection innermostDelegate = tempConnection.getInnermostDelegate();
+                if (!canAccess) {
+                    tempDataSource.setAccessToUnderlyingConnectionAllowed(false);
+                }
+                return innermostDelegate;
+            }
+        }
+        return connection;
     }
 }

@@ -43,11 +43,11 @@ public class ResourceScriptSource extends DefaultScriptSource {
      * @see org.unitils.dbmaintainer.script.impl.DefaultScriptSource#loadAllScripts()
      */
     @Override
-    protected List<Script> loadAllScripts(String dialect, String schema) {
+    protected List<Script> loadAllScripts(String dialect, String databaseName, boolean defaultDatabase) {
         List<String> scriptLocations = PropertyUtils.getStringList("dbMaintainer.script.locations", configuration);
         //String dbDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
         if(dialect != null) {
-            List<String> dbSpecificLocations = PropertyUtils.getStringList("dbMaintainer.script.locations."+dialect, configuration);
+            List<String> dbSpecificLocations = PropertyUtils.getStringList("dbMaintainer.script.locations." + dialect, configuration);
             scriptLocations.addAll(dbSpecificLocations);
         }
         List<String> scriptIgnoredLocations = PropertyUtils.getStringList("dbMaintainer.script.locations.ignore", configuration);
@@ -71,7 +71,7 @@ public class ResourceScriptSource extends DefaultScriptSource {
 
         List<Script> scripts = new ArrayList<Script>();
         String scriptLocation;
-        for (Iterator<String> i = scriptLocations.iterator(); i.hasNext(); getScriptsAt(scripts, scriptLocation, "", schema)) {
+        for (Iterator<String> i = scriptLocations.iterator(); i.hasNext(); getScriptsAt(scripts, scriptLocation, "", databaseName, defaultDatabase)) {
             scriptLocation = i.next();
         }
 
@@ -95,7 +95,7 @@ public class ResourceScriptSource extends DefaultScriptSource {
      * @see org.unitils.dbmaintainer.script.impl.DefaultScriptSource#getScriptsAt(java.util.List, java.lang.String, java.lang.String)
      */
     @Override
-    protected void getScriptsAt(List<Script> scripts, String scriptRoot, String relativeLocation, String databaseName) {
+    protected void getScriptsAt(List<Script> scripts, String scriptRoot, String relativeLocation, String databaseName, boolean defaultDatabase) {
 
         if(!scriptRoot.endsWith("/")) {
             // for one reason or another, it doesn't work when there is no / at the end
@@ -106,7 +106,7 @@ public class ResourceScriptSource extends DefaultScriptSource {
         LOGGER.debug("Script location: " + location);
 
         ClassPathScriptLocator classPathScriptLocator = new ClassPathScriptLocator();
-        classPathScriptLocator.loadScripts(scripts, scriptRoot, getResourcePickingStrategie(), getScriptExtensions(), databaseName);
+        classPathScriptLocator.loadScripts(scripts, scriptRoot, getResourcePickingStrategie(), getScriptExtensions(), databaseName, defaultDatabase);
 
 
     }

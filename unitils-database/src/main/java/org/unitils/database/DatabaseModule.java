@@ -30,8 +30,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -39,8 +37,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
@@ -48,6 +44,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
@@ -65,7 +62,6 @@ import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfigu
 import org.unitils.database.util.Flushable;
 import org.unitils.database.util.TransactionMode;
 import org.unitils.dbmaintainer.DBMaintainer;
-import org.unitils.util.AnnotationUtils;
 import org.unitils.util.PropertyUtils;
 import org.unitils.util.ReflectionUtils;
 
@@ -273,7 +269,7 @@ public class DatabaseModule implements Module {
         if (!StringUtils.isEmpty(schema)) {
             DatabaseConfiguration databaseConfiguration = wrapper.getDatabaseConfiguration();
             DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler, databaseConfiguration.getDialect(), databaseConfiguration.getSchemaNames());
-            dbMaintainer.resetDatabaseState(schema);
+            dbMaintainer.resetDatabaseState(schema, wrapper.getDatabaseConfiguration().isDefaultDatabase());
         } else {
             logger.debug("No schema found! The database is not reset!");
         }
@@ -481,6 +477,14 @@ public class DatabaseModule implements Module {
         @Override
         public void afterTestTearDown(Object testObject, Method testMethod) {
             endTransactionForTestMethod(testObject, testMethod);
+        
+            //release connections
+            /*for (DataSourceWrapper wrapper : wrappers.values()) {
+                if (wrapper.connection != null) {
+                    DataSourceUtils.releaseConnection(wrapper.connection, wrapper.getDataSource());
+                }
+                
+            }*/
         }
     }
 

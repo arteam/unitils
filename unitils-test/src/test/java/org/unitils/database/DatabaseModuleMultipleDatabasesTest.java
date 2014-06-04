@@ -56,8 +56,7 @@ public class DatabaseModuleMultipleDatabasesTest {
     @Test
     public void testGetDatabase1() throws SQLException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         TestClassDatabase1 obj = new TestClassDatabase1();
-        List<String> databaseName = module.getDatabaseName(obj, obj.getClass().getMethod("testMethod"));
-        DataSourceWrapper wrapper = module.getWrapper(databaseName.get(0));
+        DataSourceWrapper wrapper = module.getWrapper("");
 		module.setWrapper(wrapper);
         module.injectDataSource(obj);
         
@@ -70,8 +69,7 @@ public class DatabaseModuleMultipleDatabasesTest {
     public void testGetDatabase2() throws SQLException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, InterruptedException {
         TestClassDatabase2 obj = new TestClassDatabase2();
 
-        List<String> databaseName = module.getDatabaseName(obj, obj.getClass().getMethod("testMethod"));
-        DataSourceWrapper wrapper = module.getWrapper(databaseName.get(0));
+        DataSourceWrapper wrapper = module.getWrapper("database2");
 		module.setWrapper(wrapper);
         
         module.injectDataSource(obj);

@@ -39,7 +39,7 @@ public class ClassPathScriptLocator extends ClassPathResourceLocator {
      * @param resourcePickingStrategie
      * @param scriptExtensions1
      */
-    public void loadScripts(List<Script> scriptList1, String path1, ResourcePickingStrategie resourcePickingStrategie, List<String> scriptExtensions1, String schema) {
+    public void loadScripts(List<Script> scriptList1, String path1, ResourcePickingStrategie resourcePickingStrategie, List<String> scriptExtensions1, String schema, boolean defaultDatabase) {
         this.path = path1;
         this.scriptList = scriptList1;
         this.scriptExtensions = scriptExtensions1;
@@ -48,18 +48,18 @@ public class ClassPathScriptLocator extends ClassPathResourceLocator {
         List<URL> resourcesF = resourcePickingStrategie.filter(matchedResources, path1);
 
         try {
-            addToScriptList(resourcesF);
+            addToScriptList(resourcesF, defaultDatabase);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
     }
 
-    protected void addToScriptList(List<URL> resourcesF) throws IOException {
+    protected void addToScriptList(List<URL> resourcesF, boolean defaultDatabase) throws IOException {
 
         for (URL url : resourcesF) {
             if (isScriptFile(url.toString())) {
                 String scriptName = url.toString().substring(url.toString().lastIndexOf(path) + path.length());
-                if (DefaultScriptSource.checkIfFileMustBeAddedToScriptList(scriptName, schema)) {
+                if (DefaultScriptSource.checkIfFileMustBeAddedToScriptList(scriptName, schema, defaultDatabase)) {
                     Script script = new Script(scriptName, Long.valueOf(url.openConnection().getLastModified()), new org.unitils.dbmaintainer.script.ScriptContentHandle.UrlScriptContentHandle(url));
 
                     logger.debug(" + script added (" + url.toString() + "))");

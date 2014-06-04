@@ -204,24 +204,24 @@ public class DbUnitModule implements Module {
                     cleanLoadStrategy = true;
                     insertDataSet(dataSet, testObject, testMethod);
                 } else if (loadStrategy instanceof CleanInsertLoadStrategy && cleanLoadStrategy) {
-                     DataSet newDataSet = new DataSet() {
-                        
+                    DataSet newDataSet = new DataSet() {
+
                         public Class<? extends Annotation> annotationType() {
                             return dataSet.annotationType();
                         }
-                        
+
                         public String[] value() {
                             return dataSet.value();
                         }
-                        
+
                         public Class<? extends DataSetLoadStrategy> loadStrategy() {
                             return InsertLoadStrategy.class;
                         }
-                        
+
                         public Class<? extends DataSetFactory> factory() {
                             return dataSet.factory();
                         }
-                        
+
                         public String databaseName() {
                             return dataSet.databaseName();
                         }
@@ -232,13 +232,13 @@ public class DbUnitModule implements Module {
                 }
             }
         }
-        
-        
+
+
     }
-    
+
     protected Map<String, List<DataSet>> getDataSetsSorted(DataSets dataSets) {
         Map<String, List<DataSet>> map = new HashMap<String, List<DataSet>>();
-        
+
         for (DataSet dataSet : dataSets.value()) {
             if (map.containsKey(dataSet.databaseName())) {
                 //add to the list
@@ -251,21 +251,21 @@ public class DbUnitModule implements Module {
                 map.put(dataSet.databaseName(), tempList);
             }
         }
-        
+
         return map;
-        
-        
+
+
     }
 
     public void insertDataSet(DataSet dataset, Object testObject, Method testMethod) {
-            MultiSchemaDataSet multiSchemaDataSet = getDataSet(dataset, testMethod, testObject.getClass());
-            
-            if (multiSchemaDataSet == null) {
-                // no dataset specified
-                return;
-            }
-            DataSetLoadStrategy dataSetLoadStrategy = getDataSetLoadStrategy(testMethod, testObject.getClass(), dataset);
-            insertDataSet(multiSchemaDataSet, dataSetLoadStrategy);
+        MultiSchemaDataSet multiSchemaDataSet = getDataSet(dataset, testMethod, testObject.getClass());
+
+        if (multiSchemaDataSet == null) {
+            // no dataset specified
+            return;
+        }
+        DataSetLoadStrategy dataSetLoadStrategy = getDataSetLoadStrategy(testMethod, testObject.getClass(), dataset);
+        insertDataSet(multiSchemaDataSet, dataSetLoadStrategy);
 
     }
 
@@ -356,31 +356,31 @@ public class DbUnitModule implements Module {
      */
     public void assertDbContentAsExpected(Method testMethod, Object testObject) {
 
-            Class<?> testClass = testObject.getClass();
-            
-            ExpectedDataSets expectedsDataSetAnnotation = getMethodOrClassLevelAnnotation(ExpectedDataSets.class, testMethod, testClass);
-            
-            if (expectedsDataSetAnnotation != null) {
-                assertMultipleExpectedDataSets(expectedsDataSetAnnotation, testObject, testMethod);
-            }
-            ExpectedDataSet expectedDataSetAnnotation = getMethodOrClassLevelAnnotation(ExpectedDataSet.class, testMethod, testClass);
-            if (expectedDataSetAnnotation != null) {
-                assertExpectedDataSets(expectedDataSetAnnotation, testObject, testMethod);
-            }
-            
-            
-        
+        Class<?> testClass = testObject.getClass();
+
+        ExpectedDataSets expectedsDataSetAnnotation = getMethodOrClassLevelAnnotation(ExpectedDataSets.class, testMethod, testClass);
+
+        if (expectedsDataSetAnnotation != null) {
+            assertMultipleExpectedDataSets(expectedsDataSetAnnotation, testObject, testMethod);
+        }
+        ExpectedDataSet expectedDataSetAnnotation = getMethodOrClassLevelAnnotation(ExpectedDataSet.class, testMethod, testClass);
+        if (expectedDataSetAnnotation != null) {
+            assertExpectedDataSets(expectedDataSetAnnotation, testObject, testMethod);
+        }
+
+
+
     }
-    
+
     public void assertMultipleExpectedDataSets(ExpectedDataSets expectedDataSets, Object testObject, Method testMethod) {
         for (ExpectedDataSet expectedDataSet : expectedDataSets.value()) {
             assertExpectedDataSets(expectedDataSet, testObject, testMethod);
         }
     }
-    
+
     public void assertExpectedDataSets(ExpectedDataSet expectedDataSetAnnotation, Object testObject, Method testMethod) {
         try {
-         // get the expected dataset
+            // get the expected dataset
             MultiSchemaDataSet multiSchemaExpectedDataSet = getExpectedDataSet(expectedDataSetAnnotation, testMethod, testObject);
             if (multiSchemaExpectedDataSet == null) {
                 // no data set should be compared
@@ -400,7 +400,7 @@ public class DbUnitModule implements Module {
             closeJdbcConnection();
         }
     }
-    
+
 
 
     /**
@@ -461,7 +461,7 @@ public class DbUnitModule implements Module {
      * @return The dataset, null if there is no data set
      */
     public MultiSchemaDataSet getExpectedDataSet(ExpectedDataSet expectedDataSetAnnotation, Method testMethod, Object testObject) {
-        
+
 
         databaseName = expectedDataSetAnnotation.databaseName();
 
@@ -507,10 +507,22 @@ public class DbUnitModule implements Module {
     }
 
     protected File handleDataSetResource(ClassPathDataLocator locator, String nameResource, ResourcePickingStrategie strategy, Class<?> testClass) {
-        InputStream in = locator.getDataResource(nameResource, strategy);
-
+        //check if the packagename is in the nameResource
+        String cloneResource = new String(nameResource);
+        
+        String packageName = (testClass.getPackage() != null) ? testClass.getPackage().getName() : "";
+        String tempName = "";
+        if (nameResource.startsWith(packageName.replace(".", "/"))) {
+            
+            cloneResource = tempName = cloneResource.substring(packageName.length()) ;
+        } else {
+            tempName = cloneResource;
+        }
+        InputStream in = locator.getDataResource(packageName.replace(".", "/") + "/" + tempName, strategy);
+         
+        //InputStream in = locator.getDataResource(nameResource, strategy);
         if (in == null) {
-            File resolvedFile = getDataSetResolver().resolve(testClass, nameResource);
+            File resolvedFile = getDataSetResolver().resolve(testClass, cloneResource);
             if (resolvedFile == null) {
                 throw new UnitilsException((new StringBuilder()).append("DataSetResource file with name '").append(nameResource).append("' cannot be found").toString());
             }
@@ -521,7 +533,7 @@ public class DbUnitModule implements Module {
             }
         }
 
-        File tempFile = fileHandler.createTempFile(nameResource);
+        File tempFile = fileHandler.createTempFile(cloneResource);
         fileHandler.writeToFile(tempFile, in);
         return tempFile;
     }
@@ -572,16 +584,16 @@ public class DbUnitModule implements Module {
         config.setProperty(FEATURE_BATCHED_STATEMENTS, "true");
         // Make sure that Oracle's recycled tables (BIN$) are ignored (value is used to ensure dbunit-2.2 compliancy)
         config.setProperty("http://www.dbunit.org/features/skipOracleRecycleBinTables", "true");
-        
+
         //set MetaHandler
         config.setProperty(DatabaseConfig.PROPERTY_METADATA_HANDLER, getDefaultDatabaseMetaHandler());
-        
+
         return connection;
     }
 
     protected IMetadataHandler getDefaultDatabaseMetaHandler() {
         return ConfigUtils.getInstanceOf(IMetadataHandler.class, configuration);
-        
+
     }
 
     /**
