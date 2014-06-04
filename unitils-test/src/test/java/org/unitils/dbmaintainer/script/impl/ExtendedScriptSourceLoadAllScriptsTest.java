@@ -45,7 +45,7 @@ public class ExtendedScriptSourceLoadAllScriptsTest {
         sut.init(config);
         
         
-        List<Script> actual = sut.loadAllScripts("oracle", "public");
+        List<Script> actual = sut.loadAllScripts("oracle", "public", true);
         Assert.assertEquals(3, actual.size());
     }
 

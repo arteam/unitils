@@ -71,7 +71,7 @@ public class ExtendedScriptSourceTest {
      */
     @Test
     public void loadAllScriptsTest() {
-        Assert.assertEquals(7 , scriptSource.loadAllScripts("public", "users").size());
+        Assert.assertEquals(7 , scriptSource.loadAllScripts("public", "users", true).size());
         
     }
     
@@ -79,7 +79,7 @@ public class ExtendedScriptSourceTest {
     public void testGetScriptsAt() throws Exception {
         List<Script> actual = new ArrayList<Script>();
         
-        scriptSource.getScriptsAt(actual, "org/unitils/dbunit/testdbscripts/", "", "users");
+        scriptSource.getScriptsAt(actual, "org/unitils/dbunit/testdbscripts/", "", "users", true);
         List<String> actualNames = new ArrayList<String>();
         for (Script script : actual) {
             actualNames.add(script.getFileName());
