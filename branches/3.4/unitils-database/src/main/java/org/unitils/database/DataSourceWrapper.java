@@ -1,14 +1,12 @@
 package org.unitils.database;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Properties;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbunit.ext.oracle.OracleConnection;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
@@ -48,6 +46,8 @@ public class DataSourceWrapper {
     private boolean updateDatabaseSchemaEnabled;
     private Properties configuration;
     private String databaseName;
+    
+    protected Connection connection;
 
     private UnitilsTransactionManager transactionManager;
 
@@ -70,22 +70,14 @@ public class DataSourceWrapper {
     }
 
     /**
+     * 
      * @return A connection from the data source, not null
      */
     public Connection getConnection() {
         try {
-            Connection conn = DataSourceUtils.getConnection(wrappedDataSource);
-            if (databaseConfiguration.getDialect().toLowerCase().equals("oracle")) {
-                if (conn instanceof org.apache.commons.dbcp.DelegatingConnection) {
-                    // This returns a org.apache.commons.dbcp.PoolableConnection
-                    Connection pc = ((org.apache.commons.dbcp.DelegatingConnection)conn).getDelegate();
-
-                    // The PoolableConnection is a DelegatingConnection itself - get the delegate (the Oracle connection)
-                    return ((org.apache.commons.dbcp.DelegatingConnection)pc).getDelegate();
-                }
-
-            }
-            return conn;
+            connection = DataSourceUtils.getConnection(wrappedDataSource);
+            
+            return DatabaseUnitils.getGoodConnection(connection, wrappedDataSource);
         } catch (Exception e) {
             throw new UnitilsException("Unable to connect to database for " + databaseConfiguration + ".", e);
         }
@@ -148,7 +140,7 @@ public class DataSourceWrapper {
     public void updateDatabase(SQLHandler sqlHandler) {
         LOGGER.info("Checking if database has to be updated.");
         DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler, databaseConfiguration.getDialect(), databaseConfiguration.getSchemaNames());
-        dbMaintainer.updateDatabase(databaseConfiguration.getDatabaseName());
+        dbMaintainer.updateDatabase(databaseConfiguration.getDatabaseName(), databaseConfiguration.isDefaultDatabase());
     }
 
     /**

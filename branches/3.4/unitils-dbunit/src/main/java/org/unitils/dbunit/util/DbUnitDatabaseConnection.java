@@ -15,13 +15,15 @@
  */
 package org.unitils.dbunit.util;
 
-import org.dbunit.database.AbstractDatabaseConnection;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
+import org.dbunit.database.AbstractDatabaseConnection;
+import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.unitils.database.DatabaseUnitils;
 
 /**
  * Implementation of DBUnits <code>IDatabaseConnection</code> interface. This implementation returns connections from
@@ -85,7 +87,26 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
             currentlyUsedConnection = DataSourceUtils.getConnection(dataSource);
             currentlyUsedNativeConnection = getNativeConnection(currentlyUsedConnection);
         }
-        return currentlyUsedNativeConnection;
+        
+        
+        /*if (dataSource instanceof BasicDataSource) {
+            BasicDataSource tempDataSource = (BasicDataSource) dataSource;
+            boolean canAccess = tempDataSource.isAccessToUnderlyingConnectionAllowed();
+            if (!canAccess) {
+                tempDataSource.setAccessToUnderlyingConnectionAllowed(true);
+            }
+            if (tempDataSource.getDriverClassName().toLowerCase().contains("oracle")  && currentlyUsedNativeConnection instanceof DelegatingConnection) {
+                DelegatingConnection tempConnection = (DelegatingConnection) currentlyUsedNativeConnection;
+                return tempConnection.getInnermostDelegate();
+            }
+            if (!canAccess) {
+                tempDataSource.setAccessToUnderlyingConnectionAllowed(false);
+            } 
+            
+        }
+        return currentlyUsedNativeConnection;*/
+        
+        return DatabaseUnitils.getGoodConnection(currentlyUsedNativeConnection, dataSource);
     }
 
 

@@ -79,9 +79,9 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
      *
      * @return all available database update scripts, not null
      */
-    public List<Script> getAllUpdateScripts(String dialect, String databaseName) {
+    public List<Script> getAllUpdateScripts(String dialect, String databaseName, boolean defaultDatabase) {
         if (allUpdateScripts == null) {
-            loadAndOrganizeAllScripts(dialect, databaseName);
+            loadAndOrganizeAllScripts(dialect, databaseName, defaultDatabase);
         }
         return allUpdateScripts;
     }
@@ -90,8 +90,8 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
     /**
      * @return All scripts that are incremental, i.e. non-repeatable, i.e. whose file name starts with an index
      */
-    protected List<Script> getIncrementalScripts(String dialect, String databaseName) {
-        List<Script> scripts = getAllUpdateScripts(dialect, databaseName);
+    protected List<Script> getIncrementalScripts(String dialect, String databaseName, boolean defaultDatabase) {
+        List<Script> scripts = getAllUpdateScripts(dialect, databaseName, defaultDatabase);
         List<Script> indexedScripts = new ArrayList<Script>();
         for (Script script : scripts) {
             if (script.isIncremental()) {
@@ -128,12 +128,12 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
      * @param currentVersion The start version, not null
      * @return The scripts that have a higher index of timestamp than the start version, not null.
      */
-    public List<Script> getNewScripts(Version currentVersion, Set<ExecutedScript> alreadyExecutedScripts, String dialect, String databaseName) {
+    public List<Script> getNewScripts(Version currentVersion, Set<ExecutedScript> alreadyExecutedScripts, String dialect, String databaseName, boolean defaultDatabase) {
         Map<String, Script> alreadyExecutedScriptMap = convertToScriptNameScriptMap(alreadyExecutedScripts);
 
         List<Script> result = new ArrayList<Script>();
 
-        List<Script> allScripts = getAllUpdateScripts(dialect, databaseName);
+        List<Script> allScripts = getAllUpdateScripts(dialect, databaseName, defaultDatabase);
         for (Script script : allScripts) {
             Script alreadyExecutedScript = alreadyExecutedScriptMap.get(script.getFileName());
 
@@ -167,9 +167,9 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
      * @param currentVersion The current database version, not null
      * @return True if an existing script has been modified, false otherwise
      */
-    public boolean isExistingIndexedScriptModified(Version currentVersion, Set<ExecutedScript> alreadyExecutedScripts, String dialect, String databaseName) {
+    public boolean isExistingIndexedScriptModified(Version currentVersion, Set<ExecutedScript> alreadyExecutedScripts, String dialect, String databaseName, boolean defaultDatabase) {
         Map<String, Script> alreadyExecutedScriptMap = convertToScriptNameScriptMap(alreadyExecutedScripts);
-        List<Script> incrementalScripts = getIncrementalScripts(dialect, databaseName);
+        List<Script> incrementalScripts = getIncrementalScripts(dialect, databaseName, defaultDatabase);
         // Search for indexed scripts that have been executed but don't appear in the current indexed scripts anymore
         for (ExecutedScript alreadyExecutedScript : alreadyExecutedScripts) {
             if (alreadyExecutedScript.getScript().isIncremental() && Collections.binarySearch(incrementalScripts, alreadyExecutedScript.getScript()) < 0) {
@@ -207,9 +207,9 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
      *
      * @return All the postprocessing code scripts, not null
      */
-    public List<Script> getPostProcessingScripts(String dialect, String databaseName) {
+    public List<Script> getPostProcessingScripts(String dialect, String databaseName, boolean defaultDatabase) {
         if (allPostProcessingScripts == null) {
-            loadAndOrganizeAllScripts(dialect, databaseName);
+            loadAndOrganizeAllScripts(dialect, databaseName, defaultDatabase);
         }
         return allPostProcessingScripts;
     }
@@ -220,8 +220,8 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
      * them in their execution order, and makes sure there are no 2 update or postprocessing scripts with
      * the same index.
      */
-    protected void loadAndOrganizeAllScripts(String dialect, String databaseName) {
-        List<Script> allScripts = loadAllScripts(dialect, databaseName);
+    protected void loadAndOrganizeAllScripts(String dialect, String databaseName, boolean defaultDatabase) {
+        List<Script> allScripts = loadAllScripts(dialect, databaseName, defaultDatabase);
         allUpdateScripts = new ArrayList<Script>();
         allPostProcessingScripts = new ArrayList<Script>();
         for (Script script : allScripts) {
@@ -242,14 +242,14 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
     /**
      * @return A List containing all scripts in the given script locations, not null
      */
-    protected List<Script> loadAllScripts(String dialect, String databaseName) {
+    protected List<Script> loadAllScripts(String dialect, String databaseName, boolean defaultDatabase) {
         List<String> scriptLocations = PropertyUtils.getStringList(PROPKEY_SCRIPT_LOCATIONS, configuration);
         List<Script> scripts = new ArrayList<Script>();
         for (String scriptLocation : scriptLocations) {
             if (!new File(scriptLocation).exists()) {
                 throw new UnitilsException("File location " + scriptLocation + " defined in property " + PROPKEY_SCRIPT_LOCATIONS + " doesn't exist");
             }
-            getScriptsAt(scripts, scriptLocation, "", databaseName);
+            getScriptsAt(scripts, scriptLocation, "", databaseName, defaultDatabase);
         }
         return scripts;
     }
@@ -263,12 +263,12 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
      * @param currentParentIndexes The indexes of the current parent folders, not null
      * @param scriptFiles          The list to which the available script have to be added
      */
-    protected void getScriptsAt(List<Script> scripts, String scriptRoot, String relativeLocation, String databaseName) {
+    protected void getScriptsAt(List<Script> scripts, String scriptRoot, String relativeLocation, String databaseName, boolean defaultDatabase) {
         File currentLocation = new File(scriptRoot + "/" + relativeLocation);
         if (currentLocation.isFile() && isScriptFile(currentLocation)) {
             //check databaseName
             String nameFile = currentLocation.getName();
-            if (checkIfFileMustBeAddedToScriptList(nameFile, databaseName)) {
+            if (checkIfFileMustBeAddedToScriptList(nameFile, databaseName, defaultDatabase)) {
                 Script script = createScript(currentLocation, relativeLocation);
                 scripts.add(script);
                 return;
@@ -277,8 +277,7 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
         // recursively scan sub folders for script files
         if (currentLocation.isDirectory()) {
             for (File subLocation : currentLocation.listFiles()) {
-                getScriptsAt(scripts, scriptRoot,
-                    "".equals(relativeLocation) ? subLocation.getName() : relativeLocation + "/" + subLocation.getName(), databaseName);
+                getScriptsAt(scripts, scriptRoot, "".equals(relativeLocation) ? subLocation.getName() : relativeLocation + "/" + subLocation.getName(), databaseName, defaultDatabase);
             }
         }
     }
@@ -291,10 +290,12 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
      * 
      * @see <a href="http://www.dbmaintain.org/tutorial.html#Multi-database__user_support">more info</a>
      */
-    public static boolean checkIfFileMustBeAddedToScriptList(String nameFile, String databaseName) {
+    public static boolean checkIfFileMustBeAddedToScriptList(String nameFile, String databaseName, boolean defaultDatabase) {
         String temp = nameFile.toLowerCase();
-        return !temp.contains("@") 
-            || temp.startsWith("@" + databaseName.toLowerCase() + "_")
+        if (!temp.contains("@")) {
+            return (defaultDatabase ? true : false);
+        }
+        return temp.startsWith("@" + databaseName.toLowerCase() + "_")
             || temp.matches("[0-9]+_@" + databaseName.toLowerCase() + "_.*");
         
     }

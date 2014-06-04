@@ -47,7 +47,7 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit4 {
     private DbUnitModule dbUnitModule;
 
     @TestDataSource
-    private DataSource dataSource = null;
+    private DataSource dataSource;
 
 
     @Before

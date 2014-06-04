@@ -31,7 +31,7 @@ public class ResourceLoadingDefaultClassTest {
 
     /** */
     @Test
-    @ExpectedDataSet(value = "org/unitils/testdata/exampleResourceLoadingData.xml",factory = ResourceMultiSchemaXmlDataSetFactory.class)
+    @ExpectedDataSet(value = "/org/unitils/testdata/exampleResourceLoadingData.xml",factory = ResourceMultiSchemaXmlDataSetFactory.class)
     public void testLoadingResource() {
         Assert.assertTrue(true);
     }

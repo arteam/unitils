@@ -25,7 +25,7 @@ import org.unitils.dbunit.annotation.ExpectedDataSet;
  * @author tdr
  */
 @RunWith(UnitilsJUnit4TestClassRunner.class)
-@DataSet(value = "org/unitils/testdata/exampleResourceData.xml")
+@DataSet(value = "/org/unitils/testdata/exampleResourceData.xml")
 public class ResourceLoadingClassTest {
     
     @BeforeClass
@@ -36,7 +36,7 @@ public class ResourceLoadingClassTest {
 
     /*** */
     @Test
-    @ExpectedDataSet("org/unitils/testdata/exampleResourceData.xml")
+    @ExpectedDataSet("/org/unitils/testdata/exampleResourceData.xml")
     public void testLoadingResource() {
         //SqlAssert.assertCountSqlResult("select count(*) from dossier", 3L);
         //SqlAssert.assertMultipleRowSqlResult("select * from dossier", new String[]{"DS-1", "TestAppResourcesBlack"}, new String[]{"DS-2", "n"}, new String[]{"DS-3", "decker"});

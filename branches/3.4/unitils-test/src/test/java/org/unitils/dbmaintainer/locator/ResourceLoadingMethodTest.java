@@ -35,7 +35,7 @@ public class ResourceLoadingMethodTest {
     
     
     /** */
-    @DataSet("org/unitils/testdata/exampleResourceData.xml")
+    @DataSet("/org/unitils/testdata/exampleResourceData.xml")
     @Test
     public void testLoadingResource() {
         Assert.assertTrue(true);
@@ -75,7 +75,7 @@ public class ResourceLoadingMethodTest {
     }
 
     /** */
-    @DataSet("org/unitils/testdata/exampleResourceData.xml")
+    @DataSet("/org/unitils/testdata/exampleResourceData.xml")
     public void testLoadingResourceDataFile() {
         Assert.assertTrue(true);
     }
@@ -83,7 +83,7 @@ public class ResourceLoadingMethodTest {
     /** */
     @Test
     @DataSet({
-        "org/unitils/testdata/exampleResourceData.xml", "org/unitils/testdata/exampleResourceData.xml"
+        "/org/unitils/testdata/exampleResourceData.xml", "/org/unitils/testdata/exampleResourceData.xml"
     })
     public void testLoadingResourceMultipleDataFiles() {
         Assert.assertTrue(true);
@@ -93,17 +93,17 @@ public class ResourceLoadingMethodTest {
     @Test
     @Ignore
     @DataSet({
-        "org/unitils/testdata/exampleResourceData.xml", "org/unitils/testdata/exampleResourceData.xml"
+        "/org/unitils/testdata/exampleResourceData.xml", "/org/unitils/testdata/exampleResourceData.xml"
     })
     @ExpectedDataSet({
-        "org/unitils/testdata/exampleResourceData.xml", "org/unitils/testdata/exampleResourceData.xml"
+        "/org/unitils/testdata/exampleResourceData.xml", "/org/unitils/testdata/exampleResourceData.xml"
     })
     public void testLoadingExpectedResourceMultipleDataFiles() {
         Assert.assertTrue(true);
     }
     
     /** */
-    @DataSet("org/unitils/testdata/exampleResourceData.xml/")
+    @DataSet("/org/unitils/testdata/exampleResourceData.xml/")
     @Test
     public void testLoadingResourceWithSlashAtTheEnd() {
         Assert.assertTrue(true);
