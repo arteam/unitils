@@ -155,7 +155,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
      */
     @Test
     public void testGetAllUpdateScripts() {
-        List<Script> scripts = scriptSource.getAllUpdateScripts(dialect, schemas.get(0));
+        List<Script> scripts = scriptSource.getAllUpdateScripts(dialect, schemas.get(0), true);
 
         assertEquals("1_scripts/001_scriptA.sql", scripts.get(0).getFileName());   // x.1.1
         assertEquals("1_scripts/002_scriptB.sql", scripts.get(1).getFileName());   // x.1.2
@@ -178,7 +178,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
 					+ "/test_scripts/1_scripts/001_duplicateIndexScript.sql");
 			copyFile(scriptA, duplicateIndexScript);
 			try {
-				scriptSource.getAllUpdateScripts(dialect, schemas.get(0));
+				scriptSource.getAllUpdateScripts(dialect, schemas.get(0), true);
 				fail("Expected a UnitilsException because of a duplicate script");
 			} catch (UnitilsException e) {
 				// expected
@@ -201,7 +201,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testGetNewScripts() {
     	alreadyExecutedScripts.set(5, new ExecutedScript(new Script("2_scripts/subfolder/scriptH.sql", 0L, "xxx"), executionDate, true));
     	
-		List<Script> scripts = scriptSource.getNewScripts(new Version("2.x.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts),dialect, schemas.get(0));
+		List<Script> scripts = scriptSource.getNewScripts(new Version("2.x.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts),dialect, schemas.get(0), true);
 		
         assertEquals("1_scripts/scriptD.sql", scripts.get(0).getFileName());       			// x.1.x 		was added
         assertEquals("2_scripts/subfolder/scriptH.sql", scripts.get(1).getFileName());      // x.2.x.x		was changed
@@ -211,7 +211,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
 
     @Test
     public void testIsExistingScriptsModfied_noModifications() {
-        assertFalse(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0)));
+        assertFalse(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0), true));
     }
     
     
@@ -219,7 +219,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testIsExistingScriptsModfied_modifiedScript() {
     	alreadyExecutedScripts.set(1, new ExecutedScript(new Script("1_scripts/002_scriptB.sql", 0L, "xxx"), executionDate, true));
     	
-        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts),dialect, schemas.get(0)));
+        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts),dialect, schemas.get(0), true));
     }
     
     
@@ -227,7 +227,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testIsExistingScriptsModfied_scriptAdded() {
     	alreadyExecutedScripts.remove(1);
     	
-        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0)));
+        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0), true));
     }
     
     
@@ -235,7 +235,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testIsExistingScriptsModfied_scriptRemoved() {
     	alreadyExecutedScripts.add(new ExecutedScript(new Script("1_scripts/003_scriptB.sql", 0L, "xxx"), executionDate, true));
     	
-        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0)));
+        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0), true));
     }
     
     
@@ -243,7 +243,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testIsExistingScriptsModfied_newScript() {
     	alreadyExecutedScripts.remove(1);
     	
-        assertFalse(scriptSource.isExistingIndexedScriptModified(new Version("1.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0)));
+        assertFalse(scriptSource.isExistingIndexedScriptModified(new Version("1.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0), true));
     }
     
     
@@ -251,8 +251,8 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testIsExistingScriptsModfied_higherIndexScriptModified() {
     	alreadyExecutedScripts.set(1, new ExecutedScript(new Script("1_scripts/002_scriptB.sql", 0L, "xxx"), executionDate, true));
     	
-        assertFalse(scriptSource.isExistingIndexedScriptModified(new Version("1.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0)));
-        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("1.2"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0)));
+        assertFalse(scriptSource.isExistingIndexedScriptModified(new Version("1.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0), true));
+        assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("1.2"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0), true));
     }
 
 
@@ -261,7 +261,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
      */
     @Test
     public void testIsExistingScriptsModfied_noLowerIndex() {
-        boolean result = scriptSource.isExistingIndexedScriptModified(new Version("0"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0));
+        boolean result = scriptSource.isExistingIndexedScriptModified(new Version("0"), new HashSet<ExecutedScript>(alreadyExecutedScripts), dialect, schemas.get(0), true);
         assertFalse(result);
     }
 
@@ -271,7 +271,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
      */
     @Test
     public void testGetPostProcessingScripts() {
-        List<Script> scripts = scriptSource.getPostProcessingScripts(dialect, schemas.get(0));
+        List<Script> scripts = scriptSource.getPostProcessingScripts(dialect, schemas.get(0), true);
         assertEquals("postprocessing/post-scriptA.sql", scripts.get(0).getFileName());
         assertEquals("postprocessing/post-scriptB.sql", scripts.get(1).getFileName());
     }
@@ -280,18 +280,19 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testCheckIfFileMustBeAddedToScriptList() throws Exception {
         String schema1 = "USERS";
         String schema2 = "pEoplE";
-        Assert.assertTrue(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("test123.sql", "public"));
-        Assert.assertTrue(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("@users_addusers.sql", schema1));
-        Assert.assertFalse(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("@usersaddusers.sql", schema1));
-        Assert.assertFalse(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("1@users_addusers.sql", schema1));
-        Assert.assertTrue(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("1_@users_addusers.sql", schema1));
-        Assert.assertTrue(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("01_@users_addusers.sql", schema1));
-        Assert.assertFalse(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("01@users_addusers.sql", schema1));
+        Assert.assertFalse(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("test123.sql", "public", false));
+        Assert.assertTrue(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("test123.sql", "public", true));
+        Assert.assertTrue(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("@users_addusers.sql", schema1, true));
+        Assert.assertFalse(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("@usersaddusers.sql", schema1, true));
+        Assert.assertFalse(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("1@users_addusers.sql", schema1, true));
+        Assert.assertTrue(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("1_@users_addusers.sql", schema1, true));
+        Assert.assertTrue(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("01_@users_addusers.sql", schema1, true));
+        Assert.assertFalse(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("01@users_addusers.sql", schema1, true));
 
-        Assert.assertFalse(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("01@users_addpeople.sql", schema2));
-        Assert.assertFalse(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("1@people_addusers.sql", schema1));
-        Assert.assertTrue(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("01_@people_addusers.sql", schema2));
-        Assert.assertTrue(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("01_@people_addUsers.sql", schema2));
+        Assert.assertFalse(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("01@users_addpeople.sql", schema2, true));
+        Assert.assertFalse(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("1@people_addusers.sql", schema1, true));
+        Assert.assertTrue(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("01_@people_addusers.sql", schema2, true));
+        Assert.assertTrue(DefaultScriptSource.checkIfFileMustBeAddedToScriptList("01_@people_addUsers.sql", schema2, true));
     }
     
     @Test
@@ -306,7 +307,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
         
         List<Script> actual = new ArrayList<Script>();
         
-        scriptSource.getScriptsAt(actual, parentFile.getParentFile().getAbsolutePath(), "test1", "users");
+        scriptSource.getScriptsAt(actual, parentFile.getParentFile().getAbsolutePath(), "test1", "users", true);
         List<String> actualNames = new ArrayList<String>();
         for (Script script : actual) {
             actualNames.add(script.getFileName());

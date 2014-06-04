@@ -505,7 +505,7 @@ public class DbMaintainerIntegrationTest extends UnitilsJUnit4 {
 
     private void updateDatabase() {
         DBMaintainer dbMaintainer = new DBMaintainer(configuration, new DefaultSQLHandler(dataSource), dialect, schemas);
-        dbMaintainer.updateDatabase(schemas.get(0));
+        dbMaintainer.updateDatabase(schemas.get(0), true);
     }
 
     private void clearTestDatabase() {

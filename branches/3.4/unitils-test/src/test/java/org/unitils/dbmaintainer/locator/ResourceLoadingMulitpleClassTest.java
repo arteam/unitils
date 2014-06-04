@@ -21,7 +21,7 @@ import org.unitils.dbunit.annotation.ExpectedDataSet;
  */
 @RunWith(UnitilsJUnit4TestClassRunner.class)
 @DataSet({
-    "org/unitils/testdata/exampleResourceData.xml", "org/unitils/testdata/exampleResourceData.xml"
+    "/org/unitils/testdata/exampleResourceData.xml", "/org/unitils/testdata/exampleResourceData.xml"
 })
 public class ResourceLoadingMulitpleClassTest {
 
@@ -33,7 +33,7 @@ public class ResourceLoadingMulitpleClassTest {
     
     /** */
     @Test
-    @ExpectedDataSet("org/unitils/testdata/exampleResourceData.xml")
+    @ExpectedDataSet("/org/unitils/testdata/exampleResourceData.xml")
     public void testLoadingResource() {
         Assert.assertTrue(true);
     }

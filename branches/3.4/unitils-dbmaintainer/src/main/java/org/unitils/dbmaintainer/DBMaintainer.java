@@ -228,7 +228,7 @@ public class DBMaintainer {
      * modified, the database is cleared and completely rebuilt from scratch. If an error occurs
      * with one of the scripts, a {@link UnitilsException} is thrown.
      */
-    public void updateDatabase(String schema) {
+    public void updateDatabase(String databaseName, boolean defaultDatabase) {
         // Check if the executed scripts info source recommends a from-scratch update
         boolean fromScratchUpdateRecommended = versionSource.isFromScratchUpdateRecommended();
 
@@ -236,7 +236,7 @@ public class DBMaintainer {
         Version highestExecutedScriptVersion = getHighestExecutedScriptVersion(alreadyExecutedScripts);
 
         // check whether an from scratch update should be performed
-        boolean shouldUpdateFromScratch = shouldUpdateDatabaseFromScratch(highestExecutedScriptVersion, alreadyExecutedScripts, schema);
+        boolean shouldUpdateFromScratch = shouldUpdateDatabaseFromScratch(highestExecutedScriptVersion, alreadyExecutedScripts, databaseName, defaultDatabase);
         if (fromScratchEnabled && (fromScratchUpdateRecommended || shouldUpdateFromScratch)) {
             // From scratch needed, clear the database and retrieve scripts
             // constraints are removed before clearing the database, to be sure there will be no
@@ -246,12 +246,12 @@ public class DBMaintainer {
             // reset the database version
             versionSource.clearAllExecutedScripts();
             // update database with all scripts
-            updateDatabase(scriptSource.getAllUpdateScripts(dialect, schema), schema);
+            updateDatabase(scriptSource.getAllUpdateScripts(dialect, databaseName, defaultDatabase), databaseName, defaultDatabase);
             return;
         }
 
         // perform an incremental update
-        updateDatabase(scriptSource.getNewScripts(highestExecutedScriptVersion, alreadyExecutedScripts, dialect, schema), schema);
+        updateDatabase(scriptSource.getNewScripts(highestExecutedScriptVersion, alreadyExecutedScripts, dialect, databaseName, defaultDatabase), databaseName, defaultDatabase);
     }
 
 
@@ -274,10 +274,10 @@ public class DBMaintainer {
      * knowning that the current state of the database is synchronized with the current state of the
      * scripts.
      */
-    public void resetDatabaseState(String schema) {
+    public void resetDatabaseState(String databaseName, boolean defaultDatabase) {
         versionSource.clearAllExecutedScripts();
 
-        List<Script> allScripts = scriptSource.getAllUpdateScripts(dialect, schema);
+        List<Script> allScripts = scriptSource.getAllUpdateScripts(dialect, databaseName, defaultDatabase);
         for (Script script : allScripts) {
             versionSource.registerExecutedScript(new ExecutedScript(script, new Date(), true));
         }
@@ -289,7 +289,7 @@ public class DBMaintainer {
      *
      * @param scripts The scripts, not null
      */
-    protected void updateDatabase(List<Script> scripts, String schema) {
+    protected void updateDatabase(List<Script> scripts, String schema, boolean defaultDatabase) {
         if (scripts.isEmpty()) {
             // nothing to do
             logger.info("Database is up to date");
@@ -307,7 +307,7 @@ public class DBMaintainer {
         executeScripts(scripts);
 
         // Execute postprocessing scripts, if any
-        executePostProcessingScripts(scriptSource.getPostProcessingScripts(dialect, schema));
+        executePostProcessingScripts(scriptSource.getPostProcessingScripts(dialect, schema, defaultDatabase));
 
         // Disable FK and not null constraints, if enabled
         if (disableConstraintsEnabled) {
@@ -391,9 +391,9 @@ public class DBMaintainer {
      * @param currentVersion The current database version, not null
      * @return True if a from scratch rebuild is needed, false otherwise
      */
-    protected boolean shouldUpdateDatabaseFromScratch(Version currentVersion, Set<ExecutedScript> alreadyExecutedScripts, String schema) {
+    protected boolean shouldUpdateDatabaseFromScratch(Version currentVersion, Set<ExecutedScript> alreadyExecutedScripts, String databaseName, boolean defaultDatabase) {
         // check whether an existing script was updated
-        if (scriptSource.isExistingIndexedScriptModified(currentVersion, alreadyExecutedScripts, dialect, schema)) {
+        if (scriptSource.isExistingIndexedScriptModified(currentVersion, alreadyExecutedScripts, dialect, databaseName, defaultDatabase)) {
             if (!fromScratchEnabled) {
                 throw new UnitilsException("One or more existing incremental database update scripts have been modified, but updating from scratch is disabled. " +
                         "You should either revert to the original version of the modified script and add an new incremental script that performs the desired " +
