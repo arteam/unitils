@@ -512,9 +512,10 @@ public class DbUnitModule implements Module {
         
         String packageName = (testClass.getPackage() != null) ? testClass.getPackage().getName() : "";
         String tempName = "";
-        if (nameResource.startsWith(packageName.replace(".", "/"))) {
-            
+        if (cloneResource.startsWith(packageName.replace(".", "/"))) {
             cloneResource = tempName = cloneResource.substring(packageName.length()) ;
+        } else if (cloneResource.startsWith(packageName)) {
+            cloneResource = tempName = cloneResource.substring(packageName.length() + 1) ;
         } else {
             tempName = cloneResource;
         }
