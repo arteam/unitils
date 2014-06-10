@@ -37,7 +37,7 @@ import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
  * <p/>
  * A test method can also be annotated with DataSet in which case you specify the dataset that needs to be loaded
  * before this test method is run. Again, a file name can explicitly be specified or if not specified, the default will
- * be used: first 'classname'.'methodname'.xml and if that file does not exist 'classname'.xml.
+ * be used: first 'classname'-'methodname'.xml and if that file does not exist 'classname'.xml.
  * <p/>
  * Examples:
  * <pre><code>
