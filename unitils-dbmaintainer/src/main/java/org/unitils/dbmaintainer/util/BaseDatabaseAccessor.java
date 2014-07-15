@@ -20,6 +20,7 @@ import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 
 import java.util.List;
 import java.util.Properties;
+import org.apache.commons.collections.CollectionUtils;
 
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
@@ -66,7 +67,7 @@ abstract public class BaseDatabaseAccessor implements DatabaseAccessing {
         this.configuration = configuration;
         this.sqlHandler = sqlHandler;
         this.dbSupports = getDbSupports(configuration, sqlHandler, dialect, schemaNames);
-        this.defaultDbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect, schemaNames.get(0));
+        this.defaultDbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect, (CollectionUtils.isEmpty(schemaNames) ? "" : schemaNames.get(0)));
         this.dialect = dialect;
         doInit(configuration);
     }

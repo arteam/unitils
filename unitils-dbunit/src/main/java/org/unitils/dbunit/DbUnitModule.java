@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.sql.DataSource;
+import org.apache.commons.collections.CollectionUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -752,7 +753,8 @@ public class DbUnitModule implements Module {
         DataSource dataSource = wrapper.getDataSourceAndActivateTransactionIfNeeded();
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
         DatabaseConfiguration databaseConfiguration = wrapper.getDatabaseConfiguration();
-        return DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler, databaseConfiguration.getDialect(), databaseConfiguration.getSchemaNames().get(0));
+        String schemaName = (CollectionUtils.isEmpty(databaseConfiguration.getSchemaNames()) ? "" : databaseConfiguration.getSchemaNames().get(0));
+        return DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler, databaseConfiguration.getDialect(), schemaName);
     }
 
 

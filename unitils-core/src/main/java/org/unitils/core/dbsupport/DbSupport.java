@@ -26,6 +26,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.Set;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Helper class that implements a number of common operations on a database schema. Operations that can be implemented
@@ -391,7 +392,10 @@ abstract public class DbSupport {
      * @return The qualified database object name
      */
     public String qualified(String databaseObjectName) {
-        return quoted(schemaName) + "." + quoted(databaseObjectName);
+        if (!StringUtils.isEmpty(schemaName)) {
+            return quoted(schemaName) + "." + quoted(databaseObjectName);
+        }
+        return databaseObjectName;
     }
 
 
