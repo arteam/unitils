@@ -45,6 +45,7 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.Unitils;
 import org.unitils.database.DatabaseModule;
+import org.unitils.database.annotations.TestDataSource;
 import org.unitils.util.PropertyUtils;
 
 /**
@@ -80,7 +81,7 @@ public class DbSupportTest extends UnitilsJUnit4 {
         initDatabaseModule(configuration);
         
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect, "PUBLIC");
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler, dialect, "public");
 
         cleanupTestDatabase();
         createTestDatabase();
@@ -93,6 +94,8 @@ public class DbSupportTest extends UnitilsJUnit4 {
     @After
     public void tearDown() throws Exception {
         cleanupTestDatabase();
+        
+        Unitils.getInstance().init();
     }
 
 
@@ -853,6 +856,7 @@ public class DbSupportTest extends UnitilsJUnit4 {
         configuration.setProperty("dbMaintainer.updateSequences.enabled", "true");
         configuration.setProperty("dbMaintainer.keepRetryingAfterError.enabled","true");
         configuration.setProperty("org.unitils.dbmaintainer.script.ScriptSource.implClassName", "org.unitils.dbmaintainer.script.impl.DefaultScriptSource");
+        //configuration.setProperty("database.schemaNames", "");
         
         dialect = PropertyUtils.getString("database.dialect", configuration);
         

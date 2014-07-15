@@ -53,6 +53,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import org.junit.Ignore;
+import org.unitils.core.Unitils;
+import org.unitils.database.DatabaseModule;
 
 /**
  * @author Filip Neven
@@ -71,13 +73,13 @@ public class DbMaintainerIntegrationTest extends UnitilsJUnit4 {
     private static final String SECOND_LOCATION_INCREMENTAL = "second_location_incremental";
     private static final String SECOND_LOCATION_REPEATABLE = "second_location_repeatable";
     private static final String BEFORE_INITIAL_TABLE = "before_initial";
-    private static String dialect = "h2";
+    private static final String dialect = "hsqldb";
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(DbMaintainerIntegrationTest.class);
+    private static final Log logger = LogFactory.getLog(DbMaintainerIntegrationTest.class);
     private List<String> schemas;
 
     /* DataSource for the test database, is injected */
-    @TestDataSource
+    //@TestDataSource
     private DataSource dataSource = null;
 
     private File scriptsLocation1;
@@ -107,7 +109,9 @@ public class DbMaintainerIntegrationTest extends UnitilsJUnit4 {
         configuration.put(PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE, "true");
         configuration.put(PROPKEY_SCRIPT_LOCATIONS, scriptsLocation1.getAbsolutePath());
         configuration.put(PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED, "false");
-
+        DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+        dataSource = databaseModule.getWrapper("").getTransactionalDataSourceAndActivateTransactionIfNeeded(this);
+        
         dbSupport = DbSupportFactory.getDefaultDbSupport(configuration, new DefaultSQLHandler(dataSource), dialect, schemas.get(0));
         clearScriptsDirectory();
         clearTestDatabase();
