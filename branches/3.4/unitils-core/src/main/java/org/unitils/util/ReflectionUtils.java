@@ -17,6 +17,7 @@
  */
 package org.unitils.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.TypeUtils;
 
@@ -431,7 +432,7 @@ public class ReflectionUtils {
 		result = getMethod(clazz, getterName, isStatic);
 
 		try {
-			if (result == null && Boolean.TYPE.equals(clazz.getDeclaredField(propertyName).getType())) {
+		    if (result == null && (Boolean.TYPE.equals(clazz.getDeclaredField(propertyName).getType()) || Boolean.class.equals(clazz.getDeclaredField(propertyName).getType()))) {
 				String isName = "is" + capitalize(propertyName);
 				result = getMethod(clazz, isName, isStatic);
 			}
@@ -497,8 +498,8 @@ public class ReflectionUtils {
 		if (!isSetter(setter)) {
 			return null;
 		}
-		String getterName = "get" + setter.getName().substring(3);
-		return getMethod(setter.getDeclaringClass(), getterName, isStatic);
+
+		return getGetter(setter.getDeclaringClass(), StringUtils.uncapitalize(setter.getName().substring(3)), isStatic);
 	}
 
 	/**
