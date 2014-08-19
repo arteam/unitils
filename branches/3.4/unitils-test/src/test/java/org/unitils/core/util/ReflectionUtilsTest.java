@@ -8,7 +8,7 @@ import org.unitils.util.ReflectionUtils;
 
 
 /**
- * Test <a href="https://jira.smals.be/i#browse/STVE-183">STVE-183</a>.
+ * Test <a href="https://unitils.atlassian.net/browse/UNI-263">STVE-183</a>.
  * 
  * @author Willemijn Wouters
  * 
