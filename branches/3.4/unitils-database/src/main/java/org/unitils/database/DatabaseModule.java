@@ -469,7 +469,7 @@ public class DatabaseModule implements Module {
             try {
                 injectDataSource(testObject);
             } catch (Exception e) {
-                new UnitilsException(e.getMessage(), e);
+                throw new UnitilsException(e.getMessage(), e);
             }
             startTransactionForTestMethod(testObject, testMethod);
         }
@@ -477,14 +477,7 @@ public class DatabaseModule implements Module {
         @Override
         public void afterTestTearDown(Object testObject, Method testMethod) {
             endTransactionForTestMethod(testObject, testMethod);
-        
-            //release connections
-            /*for (DataSourceWrapper wrapper : wrappers.values()) {
-                if (wrapper.connection != null) {
-                    DataSourceUtils.releaseConnection(wrapper.connection, wrapper.getDataSource());
-                }
-                
-            }*/
+
         }
     }
 

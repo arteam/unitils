@@ -59,7 +59,7 @@ public class ClassPathScriptLocator extends ClassPathResourceLocator {
         for (URL url : resourcesF) {
             if (isScriptFile(url.toString())) {
                 String scriptName = url.toString().substring(url.toString().lastIndexOf(path) + path.length());
-                if (DefaultScriptSource.checkIfFileMustBeAddedToScriptList(scriptName, schema, defaultDatabase)) {
+                if (new DefaultScriptSource().checkIfScriptContainsCorrectDatabaseName(scriptName, schema, defaultDatabase)) {
                     Script script = new Script(scriptName, Long.valueOf(url.openConnection().getLastModified()), new org.unitils.dbmaintainer.script.ScriptContentHandle.UrlScriptContentHandle(url));
 
                     logger.debug(" + script added (" + url.toString() + "))");
