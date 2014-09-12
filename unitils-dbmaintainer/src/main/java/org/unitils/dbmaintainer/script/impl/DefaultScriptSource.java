@@ -67,7 +67,13 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
     public static final String PROPKEY_POSTPROCESSINGSCRIPT_DIRNAME = "dbMaintainer.postProcessingScript.directoryName";
 
     public static final String PROPKEY_USESCRIPTFILELASTMODIFICATIONDATES = "dbMaintainer.useScriptFileLastModificationDates.enabled";
-
+    
+    public static final String PROPKEY_EXCLUDE_QUALIFIERS = "dbMaintainer.excludedQualifiers";
+    
+    public static final String PROPKEY_INCLUDE_QUALIFIERS = "dbMaintainer.includedQualifiers";
+    
+    public static final String PROPKEY_QUALIFIERS = "dbMaintainer.qualifiers";
+    
     protected List<Script> allUpdateScripts, allPostProcessingScripts;
 
 
@@ -254,6 +260,7 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
         return scripts;
     }
 
+    
 
     /**
      * Adds all scripts available in the given directory or one of its subdirectories to the
@@ -268,7 +275,7 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
         if (currentLocation.isFile() && isScriptFile(currentLocation)) {
             //check databaseName
             String nameFile = currentLocation.getName();
-            if (checkIfFileMustBeAddedToScriptList(nameFile, databaseName, defaultDatabase)) {
+            if (checkIfScriptContainsCorrectDatabaseName(nameFile, databaseName, defaultDatabase) && containsOneOfQualifiers(nameFile)) {
                 Script script = createScript(currentLocation, relativeLocation);
                 scripts.add(script);
                 return;
@@ -290,14 +297,49 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
      * 
      * @see <a href="http://www.dbmaintain.org/tutorial.html#Multi-database__user_support">more info</a>
      */
-    public static boolean checkIfFileMustBeAddedToScriptList(String nameFile, String databaseName, boolean defaultDatabase) {
+    public boolean checkIfScriptContainsCorrectDatabaseName(String nameFile, String databaseName, boolean defaultDatabase) {
         String temp = nameFile.toLowerCase();
+        
         if (!temp.contains("@")) {
             return (defaultDatabase ? true : false);
         }
-        return temp.startsWith("@" + databaseName.toLowerCase() + "_")
-            || temp.matches("[0-9]+_@" + databaseName.toLowerCase() + "_.*");
+        return temp.matches("(.*_)*@" + databaseName.toLowerCase()+ "_.+");
         
+    }
+    
+    /**
+     * Checks if the name of the script contains one of the qualifiers.
+     * @param fileName
+     * @return {@link Boolean}
+     */
+    public boolean containsOneOfQualifiers(String fileName){
+        List<String> excludes = PropertyUtils.getStringList(PROPKEY_EXCLUDE_QUALIFIERS, configuration);
+        List<String> includes = PropertyUtils.getStringList(PROPKEY_INCLUDE_QUALIFIERS, configuration);
+        List<String> qualifiers = PropertyUtils.getStringList(PROPKEY_QUALIFIERS, configuration);
+
+        if (includes.isEmpty()) {
+            /*
+             * 1. The filename can be without qualifiers.
+             * 2. Or the qualifier must be in the list of qualifiers and not in the exclude list.
+             */
+            return (containsQualifier(fileName, qualifiers) && !containsQualifier(fileName, excludes)) || checkIfThereAreNoQualifiers(fileName);
+        } else {
+            return containsQualifier(fileName, includes) && !containsQualifier(fileName, excludes);
+        }
+        
+    }
+
+    protected boolean containsQualifier(String fileName, List<String> qualifiers){
+        for(String qualifier: qualifiers){
+            if(fileName.contains("#" + qualifier + "_")){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    protected boolean checkIfThereAreNoQualifiers(String fileName) {
+        return !fileName.matches(".+_#\\w+_.+");
     }
 
 
