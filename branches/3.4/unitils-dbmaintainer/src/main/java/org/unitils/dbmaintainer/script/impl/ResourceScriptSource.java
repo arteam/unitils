@@ -106,8 +106,16 @@ public class ResourceScriptSource extends DefaultScriptSource {
         LOGGER.debug("Script location: " + location);
 
         ClassPathScriptLocator classPathScriptLocator = new ClassPathScriptLocator();
-        classPathScriptLocator.loadScripts(scripts, scriptRoot, getResourcePickingStrategie(), getScriptExtensions(), databaseName, defaultDatabase);
-
+        classPathScriptLocator.loadScripts(scripts, scriptRoot, getResourcePickingStrategie(), getScriptExtensions(), databaseName, defaultDatabase, configuration);
+        
+        List<Script> tempScripts = new ArrayList<Script>();
+        for (Script script : scripts) {
+            if (checkIfScriptContainsCorrectDatabaseName(script.getFileName(), databaseName, defaultDatabase) && containsOneOfQualifiers(script.getFileName())) {
+                tempScripts.add(script);
+            }
+        }
+        
+        scripts = tempScripts;
 
     }
 
