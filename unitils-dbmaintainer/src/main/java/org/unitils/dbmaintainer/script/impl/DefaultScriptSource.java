@@ -313,10 +313,13 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
      * @return {@link Boolean}
      */
     public boolean containsOneOfQualifiers(String fileName){
-        List<String> excludes = PropertyUtils.getStringList(PROPKEY_EXCLUDE_QUALIFIERS, configuration);
-        List<String> includes = PropertyUtils.getStringList(PROPKEY_INCLUDE_QUALIFIERS, configuration);
-        List<String> qualifiers = PropertyUtils.getStringList(PROPKEY_QUALIFIERS, configuration);
+        List<String> excludes = PropertyUtils.getStringList(PROPKEY_EXCLUDE_QUALIFIERS, configuration, false);
+        List<String> includes = PropertyUtils.getStringList(PROPKEY_INCLUDE_QUALIFIERS, configuration, false);
+        List<String> qualifiers = PropertyUtils.getStringList(PROPKEY_QUALIFIERS, configuration, false);
 
+        if (excludes.isEmpty() && includes.isEmpty() && qualifiers.isEmpty()) {
+            return true;
+        }
         if (includes.isEmpty()) {
             /*
              * 1. The filename can be without qualifiers.

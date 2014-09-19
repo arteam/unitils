@@ -1,5 +1,6 @@
 package org.unitils.dbmaintainer.locator;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.unitils.core.UnitilsException;
+import org.unitils.thirdparty.org.apache.commons.io.FileUtils;
 
 
 /**
@@ -80,7 +82,7 @@ public abstract class ClassPathResourceLocator {
         List<URL> listScriptResources = new ArrayList<URL>();
 
         for (int i = 0; i < scriptResources.length; i++) {
-            URL urlResource = scriptResources[i].getURL();
+            URL urlResource = FileUtils.toURLs(new File[]{scriptResources[i].getFile()})[0];
             listScriptResources.add(urlResource);
             logger.debug(" Resource '" + urlResource.toString() + "' added to resourcelist ");
 
