@@ -233,7 +233,7 @@ public class ResourceScriptSourceQualifiersMultiSupportTest {
         File baseFile = new File("target/test-classes/");
         String path = "";
         path = file.getAbsolutePath().substring(baseFile.getAbsolutePath().length());
-        path = path.startsWith("\\") ? path.substring(1) : path;
+        path = path.startsWith(File.separator) ? path.substring(1) : path;
         
         path = path.replace("\\", "/");
         
