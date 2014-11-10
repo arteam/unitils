@@ -82,3 +82,54 @@ Selenium
 	
 %{include|source=org/unitils/selenium/scenario/SearchScenarioTest.java|id=searchTestSeleniumExample|verbatim=true|set-first-line=1|pad-line-numbers=2}
 	
+* {Creating screenshots}
+~~~~~~~~~~~~~~~~~~~~~~~~
+	If a selenium test goes wrong than the framework creates automatically a new screenshot of the last screen before it kills the webdriver. 
+	If there is an @Testlink annotation on the test than he will create a screenshot with the Testlink id as name.
+	
+	But if you want to make screenshots while selenium is running your test, than you can create a org.unitils.selenium.ScreenshotTakingWebDriver and call the method saveScreenshot().
+
+%{include|source=org/unitils/selenium/ScreenshotTakingWebdriverExample.java|id=screenshotTakingWebdriverExample|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+	The default location is under target/screenshot/[nameOfTheTest]. \
+	This is a nice feature for analists, they don't need to do stupid activities like taking screenshots anymore.
+	
+* {Drivers}
+~~~~~~~~~~~
+	Sometimes it's possible that you don't use the correct driver for your browser. \
+	Than you get exceptions like f.e. 'The path to the driver executable must be set by the webdriver.ie.driver system property'. \
+	You can find the correct driver on the internet:
+	
+	* {{{http://selenium-release.storage.googleapis.com/index.html}IE drivers}}
+	
+	* {{{http://code.google.com/p/selenium/wiki/ChromeDriver}Chrome drivers}}
+
+	And you can simply add them with a Unitils property.
+	
+%{include|source=org/unitils/selenium/seleniumprop.properties|id=seleniumpropdrivers|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+	The latest drivers are also added to unitils-selenium. If the WebdriverModule
+	cannot find a property or a good driver in your system property than he will use
+	that driver. \
+	
+	Note: You should always close the driver correctly, if you close
+	the screen in the middle of a test, than he won't kill the driver correctly and than
+	you must kill the driver with your taskmanager.
+
+* {Chrome binary}
+~~~~~~~~~~~~~~~~~
+	If you've installed youre browsers with the installer, than youre browsers are
+	on a fixed place and unitils-selenium hasn't got problems with finding the
+	binary (.exe file on windows).  
+	
+	But if youre browser is on a different location or if you use something like
+	f.e. {{{http://www.liberkey.com/en.html}LiberKey}}, than you can set the
+	location of the binary with the following property:
+	
+%{include|source=org/unitils/selenium/seleniumprop.properties|id=seleniumpropchromebinary|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+* {logging}
+~~~~~~~~~~~~~~~~~
+	You can print the selenium logging in a file or in the console.
+
+%{include|source=org/unitils/selenium/seleniumprop.properties|id=seleniumproplogging|verbatim=true|set-first-line=1|pad-line-numbers=2}
