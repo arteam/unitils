@@ -44,6 +44,7 @@
       <item name="mail" href="tutorial-mail.html" />
       <item name="selenium" href="tutorial-selenium.html" />
       <item name="jodatime" href="tutorial-jodatime.html" />
+      <item name="jbehave" href="tutorial-jbehave.html" />
     </menu>
 
     <menu name="Project info">

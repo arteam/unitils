@@ -161,30 +161,37 @@
     <dependency>
       <groupId>org.unitils.selenium</groupId>
       <artifactId>unitils-selenium</artifactId>
-      <version>1.0.1</version>
+      <version>1.0.4</version>
     </dependency>
     <!-- END SNIPPET: selenium -->
     <!-- START SNIPPET: soapui -->
     <dependency>
       <groupId>org.unitils.soapui</groupId>
       <artifactId>unitils-soapui</artifactId>
-      <version>1.0.1</version>
+      <version>1.0.2</version>
     </dependency>
     <!-- END SNIPPET: soapui -->
     <!-- START SNIPPET: objectvalidation -->
     <dependency>
       <groupId>org.unitils.objectvalidation</groupId>
       <artifactId>unitils-objectvalidation</artifactId>
-      <version>1.1.6-SNAPSHOT</version>
+      <version>1.1.5</version>
     </dependency>
     <!-- END SNIPPET: objectvalidation -->
     <!-- START SNIPPET: springbatch -->
     <dependency>
       <groupId>org.unitils.spring.batch</groupId>
       <artifactId>unitils-spring-batch</artifactId>
-      <version>1.0.2-SNAPSHOT</version>
+      <version>1.0.2</version>
     </dependency>
     <!-- END SNIPPET: springbatch -->
+    <!-- START SNIPPET: jbehave -->
+    <dependency>
+      <groupId>org.unitils.jbehave</groupId>
+      <artifactId>unitils-jbehave</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <!-- END SNIPPET: jbehave -->
   </dependencies>
 
   <!-- Report generation -->

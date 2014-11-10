@@ -1,0 +1,33 @@
+JBehave
+
+	JBehave is a framework for Behaviour-Driven Development (BDD). But for more info you should go to the {{{http://jbehave.org/reference/latest/index.html}JBehave website}}.
+	This module is the glue between Unitils and Jbehave.
+	
+* {Installation}
+~~~~~~~~~~~~~~~~
+    If you are using maven, you can add following dependency to your project.
+    
+%{include|source=pom.xml|id=jbehave|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+* {Config}
+~~~~~~~~~~
+	Please create unitils-local.properties, and add jbehave to unitils.modules. Code as following:
+
+%{include|source=org/unitils/jbehave/jbehaveprop.properties|id=jbehaveprop|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+* {How to use it...}
+~~~~~~~~~~~~~~~~~~~~
+	You have f.e. a Mail story with a few scenarios where you want to check if a mail has been sent or not.
+	This is just an example story ...
+	
+%{include|source=org/unitils/jbehave/Mail.story|id=jbehavestory|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+	... with a few fictive steps
+
+%{include|source=org/unitils/jbehave/SimpleMailStep.java|id=jbehavestep|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+	unitils-jbehave does most of the config for you, but you need to give the story(s)/step(s). \
+	For this test I need my Mail.story, SimpleMailStep and SimpleMailStep2.
+
+%{include|source=org/unitils/jbehave/SimpleMailTest.java|id=jbehavetest|verbatim=true|set-first-line=1|pad-line-numbers=2}
+	

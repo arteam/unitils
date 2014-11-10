@@ -8,7 +8,7 @@ FTP
 
 * {Config}
 ~~~~~~~~~~
-	Please create unitils-local.properties, and add mail to unitils.modules. Code as following:
+	Please create unitils-local.properties, and add ftp to unitils.modules. Code as following:
 
 %{include|source=org/unitils/ftp/ftpprop.properties|id=ftpprop|verbatim=true|set-first-line=1|pad-line-numbers=2}
 
