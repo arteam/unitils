@@ -1,6 +1,3 @@
-/*
- * Copyright (c) Smals
- */
 package org.unitils.objectvalidation.example1;
 
 import org.junit.Before;
@@ -15,7 +12,7 @@ import org.unitils.objectvalidation.ObjectValidator;
 /**
  * Example1.
  * 
- * @author wiw
+ * @author Willemijn Wouters
  * 
  * @since 3.3
  * 
@@ -38,9 +35,9 @@ public class ObjectValidationExample1 {
     @Test
     public void test() {
         objectValidator.
-            classToValidate(ValidBean.class).checkingAllPossibilities().withAllFields().
-            classToValidate(ValidBeanWithByteArray.class).checkingAllPossibilities().withAllFields().
-            classToValidate(ValidBeanOnlyId.class).checkingAllPossibilities().withFieldNames("id").
+            classToValidate(ValidBean.class).validatingEqualsAndHashCode().withAllFields().
+            classToValidate(ValidBeanWithByteArray.class).validatingEqualsAndHashCode().withAllFields().
+            classToValidate(ValidBeanOnlyId.class).validatingEqualsAndHashCode().withFieldNames("id").
             validate();
     }
 

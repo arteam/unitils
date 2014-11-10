@@ -1,6 +1,3 @@
-/*
- * Copyright (c) Smals
- */
 package org.unitils.selenium.page;
 
 import java.util.Calendar;

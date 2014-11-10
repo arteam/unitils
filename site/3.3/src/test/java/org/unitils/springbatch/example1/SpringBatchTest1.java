@@ -1,6 +1,3 @@
-/*
- * Copyright (c) Smals
- */
 package org.unitils.springbatch.example1;
 
 import org.junit.Ignore;
@@ -15,7 +12,7 @@ import org.unitils.spring.batch.annotations.BatchTestPlaceHolder;
 /**
  * Example 1.
  * 
- * @author wiw
+ * @author Willemijn Wouters
  * 
  * @since 3.3
  * 
