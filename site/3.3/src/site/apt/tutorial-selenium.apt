@@ -76,9 +76,9 @@ Selenium
 	In the example the nameField and firstName are textboxes and it will put the correct string into the text box.
 	The best way to create your tests, is creating a base web test class. In this class you can put your web driver and base URL.
 
-%{include|source=org/unitils/selenium/scenario/abstractTestSeleniumExample.java|id=abstractTestSeleniumExample|verbatim=true|set-first-line=1|pad-line-numbers=2}
+%{include|source=org/unitils/selenium/scenario/AbstractWebTest.java|id=AbstractWebTest|verbatim=true|set-first-line=1|pad-line-numbers=2}
 	
 	All your other tests have to extends this base test class, just like in the following example.
 	
-%{include|source=org/unitils/selenium/scenario/searchTestSeleniumExample.java|id=searchTestSeleniumExample|verbatim=true|set-first-line=1|pad-line-numbers=2}	
+%{include|source=org/unitils/selenium/scenario/SearchScenarioTest.java|id=searchTestSeleniumExample|verbatim=true|set-first-line=1|pad-line-numbers=2}
 	

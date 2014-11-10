@@ -6,7 +6,7 @@ import org.unitils.selenium.annotation.BaseUrl;
 import org.unitils.selenium.annotation.TestWebDriver;
 import org.unitils.UnitilsJUnit4TestClassRunner;
 
-//START SNIPPET: abstractTestSeleniumExample
+//START SNIPPET: AbstractWebTest
 @RunWith(UnitilsJUnit4TestClassRunner.class)
 public class AbstractWebTest {
 
@@ -31,4 +31,4 @@ public class AbstractWebTest {
 
 
 }
-//END SNIPPET: abstractTestSeleniumExample
+//END SNIPPET: AbstractWebTest

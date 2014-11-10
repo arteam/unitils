@@ -12,7 +12,7 @@ public class SearchScenarioTest extends AbstractWebTest {
         getDriver().get(getBaseUrl());
         
         SearchPage searchPage = PageFactory.initElements(getDriver(), SearchPage.class);
-        Thread.sleep(10000);
+        //Thread.sleep(10000);
         searchPage.gotoCreate();
         searchPage.gotoSearch();
         

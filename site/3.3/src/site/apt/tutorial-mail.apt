@@ -15,7 +15,7 @@ Mail
 	To start and use the fake smpt server put this in your test class. 
 	This will start up the SMTP server before a test and cleans up, shuts it down after each test. 
 
-[images/drawingMailModule.png]
+[images/drawingMailModule.jpg]
 
 	This has a performance cost but is nessacary to avoid any dependencies between tests
 
@@ -42,7 +42,7 @@ List<SmtpMessage> getReceivedEmail() throws IOException, MessagingException;
 
 	So to use it in your test:
 
-%{include|source=org/unitils/mail/MailModuleTest.java|id=mailExample|verbatim=true|set-first-line=1|pad-line-numbers=2}
+%{include|source=org/unitils/mail/MailModuleIntTest.java|id=mailExample|verbatim=true|set-first-line=1|pad-line-numbers=2}
 
 * {Remarks}
 ~~~~~~~~~~~
