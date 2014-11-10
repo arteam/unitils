@@ -4,6 +4,21 @@ Testlink
 to use:
 
 
+* {Installation Testlink}
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+	To install testlink check {{http://teamst.org/}} . \
+	Suppose testlink is situated on "http://localhost/testlink/" 
+	
+	[[1]] Log into testlink with the user you want to user to do automated tests. Suppose the user is "MonkeyUser" 
+	
+	[[2]] Find the "Personal API access key" under My Settings. You'll need it later. Suppose it is "4be86209b7373137663a27715ad9a8a6" 
+	
+	[[3]] Create a testlink project: "My_New_Project" 
+	
+	[[4]] Create a new Testplan "My_Testplan" in the "My_New_Project" 
+	
+
 * {Installation}
 ~~~~~~~~~~~~~~~~
     If you are using maven, you can add following dependency to your project.
