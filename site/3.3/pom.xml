@@ -62,7 +62,7 @@
     <dependency>
       <groupId>org.unitils</groupId>
       <artifactId>unitils-core</artifactId>
-      <version>3.3</version>
+      <version>3.4.2</version>
       <scope>test</scope>
     </dependency>
     <!-- END SNIPPET: core -->
@@ -70,7 +70,7 @@
     <dependency>
       <groupId>org.unitils</groupId>
       <artifactId>unitils-mock</artifactId>
-      <version>3.3</version>
+      <version>3.4.2</version>
       <scope>test</scope>
     </dependency>
     <!-- END SNIPPET: mock -->
@@ -78,7 +78,7 @@
     <dependency>
       <groupId>org.unitils</groupId>
       <artifactId>unitils-inject</artifactId>
-      <version>3.3</version>
+      <version>3.4.2</version>
       <scope>test</scope>
     </dependency>
     <!-- END SNIPPET: inject -->
@@ -86,7 +86,7 @@
     <dependency>
       <groupId>org.unitils</groupId>
       <artifactId>unitils-database</artifactId>
-      <version>3.3</version>
+      <version>3.4.2</version>
       <scope>test</scope>
     </dependency>
     <!-- END SNIPPET: database -->
@@ -94,7 +94,7 @@
     <dependency>
       <groupId>org.unitils</groupId>
       <artifactId>unitils-dbunit</artifactId>
-      <version>3.3</version>
+      <version>3.4.2</version>
       <scope>test</scope>
     </dependency>
     <!-- END SNIPPET: dbunit -->
@@ -102,7 +102,7 @@
     <dependency>
       <groupId>org.unitils</groupId>
       <artifactId>unitils-spring</artifactId>
-      <version>3.3</version>
+      <version>3.4.2</version>
       <scope>test</scope>
     </dependency>
     <!-- END SNIPPET: spring -->
@@ -110,7 +110,7 @@
     <dependency>
       <groupId>org.unitils</groupId>
       <artifactId>unitils-orm</artifactId>
-      <version>3.3</version>
+      <version>3.4.2</version>
       <scope>test</scope>
     </dependency>
     <!-- END SNIPPET: orm -->
@@ -118,7 +118,7 @@
     <dependency>
       <groupId>org.unitils</groupId>
       <artifactId>unitils-easymock</artifactId>
-      <version>3.3</version>
+      <version>3.4.2</version>
       <scope>test</scope>
     </dependency>
     <!-- END SNIPPET: easy -->
@@ -126,7 +126,7 @@
     <dependency>
       <groupId>org.unitils</groupId>
       <artifactId>unitils-io</artifactId>
-      <version>3.3</version>
+      <version>3.4.2</version>
     </dependency>
     <!-- END SNIPPET: io -->
     <!-- START SNIPPET: mail -->
@@ -192,6 +192,19 @@
       <version>1.0.0</version>
     </dependency>
     <!-- END SNIPPET: jbehave -->
+    <!-- START SNIPPET: compositetest -->
+    <dependency>
+      <groupId>org.unitils.compositetest</groupId>
+      <artifactId>unitils-compositeTest</artifactId>
+      <version>1.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.unitils</groupId>
+      <artifactId>unitils-test</artifactId>
+      <version>3.4.2</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- END SNIPPET: compositetest -->
   </dependencies>
 
   <!-- Report generation -->

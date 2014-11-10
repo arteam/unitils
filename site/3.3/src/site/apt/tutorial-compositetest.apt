@@ -1,0 +1,45 @@
+CompositeTest
+
+	When automating complex testscenarios (like end-to-end tests), you may need to execute a combination of batches, webservice calls, web application interactions, etc, maybe even on different points in time. In unitils, we have support for all those components, but you could not orchestrate them easy. That is where the compositeTest module comes in. \ 
+	
+	Now you can define each step as if it was a standalone test : you can specify the time with unitils-jodatime, prepare the database via dbunit, call a batch/send a webservice message/do something in a webpage. In fact, any annotation based module that you use in a normal test also works for the testpart. And of course, you can do the necessary asserts for that part of your complicated scenario directly in the testpart.\ 
+	
+	In the end, you simply specify the sequence in which the parts are executed. This also makes it easy to reuse certain blocks to in multiple scenario's. \ 
+	
+	If you would like to get a report for a testpart, no problem : each step is in fact a standalone test, but not reported as such. In the default behaviour, you will only get a failed/passed for the test(s) that execute the parts. If you want a testpart to report its status as well in a standalone manner, you can specify this in the annotation. 
+	
+* {Installation}
+~~~~~~~~~~~~~~~~
+    If you are using maven, you can add following dependency to your project.
+
+%{include|source=pom.xml|id=compositetest|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+* {Config}
+~~~~~~~~~~~~
+	Please create unitils-local.properties, and add testlink to unitils.modules. Code as following:
+	
+%{include|source=org/unitils/compositetest/compositetestprop.properties|id=compositetestprop|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+* {How to use it...}
+~~~~~~~~~~~~~~~~~~~~
+
+%{include|source=org/unitils/compositetest/CompositeTestJUnit4Test_TestClass.java|id=compositetesttest|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
+	In the previous example there are 5 tests, but only 3 tests are executed:
+		
+	* testPart3
+	
+	* testMain
+	
+	* multi
+	
+	[]
+	
+	But the multi test executes testPart1, testPart2, testPart3 and the multi test itself. \
+	There are 2 ways to execute a test:
+	
+	* @Test without @TestPart
+	
+	* @Test + @TestPart + executeAsSingleTest=true
+	
+	[]

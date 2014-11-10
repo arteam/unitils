@@ -46,6 +46,7 @@
       <item name="jodatime" href="tutorial-jodatime.html" />
       <item name="jbehave" href="tutorial-jbehave.html" />
       <item name="testlink" href="tutorial-testlink.html" />
+      <item name="compositeTest" href="tutorial-compositetest.html" />
     </menu>
 
     <menu name="Project info">
