@@ -37,6 +37,7 @@
                             <artifactId>doxia-include-macro</artifactId>
                             <version>1.0</version>
                         </dependency>
+                        <!-- I needed these extra dependencies on my mac -->
                         <dependency>
                             <groupId>org.mozilla</groupId>
                             <artifactId>rhino</artifactId>
