@@ -12,9 +12,9 @@
 
 
   <scm>
-    <connection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/branches/3.3</connection>
-    <developerConnection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/branches/3.3</developerConnection>
-    <url>https://unitils.svn.sourceforge.net/svnroot/unitils/branches/3.3</url>
+    <connection>scm:svn:https://svn.code.sf.net/p/unitils/code/site/3.3/</connection>
+    <developerConnection>scm:svn:https://svn.code.sf.net/p/unitils/code/site/3.3/</developerConnection>
+    <url>https://svn.code.sf.net/p/unitils/code/site/3.3/</url>
   </scm>
   <licenses>
     <license>
