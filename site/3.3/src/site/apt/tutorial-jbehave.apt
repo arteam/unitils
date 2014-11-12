@@ -1,7 +1,7 @@
 JBehave
 
 	JBehave is a framework for Behaviour-Driven Development (BDD). But for more info you should go to the {{{http://jbehave.org/reference/latest/index.html}JBehave website}}.
-	This module is the glue between Unitils and Jbehave.
+	This module is the glue between Unitils and JBehave.
 	
 * {Installation}
 ~~~~~~~~~~~~~~~~

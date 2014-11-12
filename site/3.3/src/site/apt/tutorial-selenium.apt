@@ -19,6 +19,7 @@ Selenium
 	
 	* You can program yourself an automated test using an automation api 
 
+
 	The reason why there are two approaches is explained by the fact that there are mainly two types of people doing the job.
 	You have functional people who understand the business and are best placed to define the testcases. Often they also execute the testcases to validate that the application acts as they expect. Recording and playback tools will help ease the task of test automation for these people. There are a lot of tools on the market, commercial and opensource.
 	People with a technical background can choose another option: programming the automation scripts. This approach allows you to create much cleaner code. It will also force you to think of scriptcode reusage which will reduce script maintanance. In this chapter we'll defend this statement.
@@ -50,7 +51,7 @@ Selenium
 	<<file types:>>
 	The default value for org.unitils.selenium.filetype: application/pdf, application/vnd.fdf, application/x-msdos-program, application/x-unknown-application-octet-stream, application/vnd.ms-powerpoint, application/excel, application/vnd.ms-publisher, application/x-unknown-message-rfc822, application/vnd.ms-excel, application/msword, application/x-mspublisher, application/x-tar, application/zip, application/x-gzip,application/x-stuffit,application/vnd.ms-works, application/powerpoint, application/rtf, application/postscript, application/x-gtar, video/quicktime, video/x-msvideo, video/mpeg, audio/x-wav, audio/x-midi, audio/x-aiff, application/octet-stream
 	
-	<<How does a test work?>>
+	<<How does a test work?>> \
 	annotations:
 	
 *---------------*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+ 
@@ -122,7 +123,7 @@ Selenium
 	on a fixed place and unitils-selenium hasn't got problems with finding the
 	binary (.exe file on windows).  
 	
-	But if youre browser is on a different location or if you use something like
+	But if your browser is on a different location or if you use something like
 	f.e. {{{http://www.liberkey.com/en.html}LiberKey}}, than you can set the
 	location of the binary with the following property:
 	

@@ -15,7 +15,7 @@ Jodatime
 * {Example}
 ~~~~~~~~~~~
 
-	<<How does it work?>>
+	<<How does it work?>> \
 	There are 2 annotations: 
 	
 	* FixedDateTime: It freezes the date from a specific date.
