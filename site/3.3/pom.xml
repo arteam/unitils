@@ -1,236 +1,265 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.unitils</groupId>
-  <artifactId>unitils-site</artifactId>
-  <version>3.3</version>
-  <packaging>war</packaging>
+    <groupId>org.unitils</groupId>
+    <artifactId>unitils-site</artifactId>
+    <version>3.3</version>
+    <packaging>war</packaging>
 
-  <name>Unitils</name>
-  <url>http://www.unitils.org/</url>
+    <name>Unitils</name>
+    <url>http://www.unitils.org/</url>
 
 
-  <scm>
-    <connection>scm:svn:https://svn.code.sf.net/p/unitils/code/site/3.3/</connection>
-    <developerConnection>scm:svn:https://svn.code.sf.net/p/unitils/code/site/3.3/</developerConnection>
-    <url>https://svn.code.sf.net/p/unitils/code/site/3.3/</url>
-  </scm>
-  <licenses>
-    <license>
-      <name>Apache License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
+    <scm>
+        <connection>scm:svn:https://svn.code.sf.net/p/unitils/code/site/3.3/</connection>
+        <developerConnection>scm:svn:https://svn.code.sf.net/p/unitils/code/site/3.3/</developerConnection>
+        <url>https://svn.code.sf.net/p/unitils/code/site/3.3/</url>
+    </scm>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-site-plugin</artifactId>
-          <dependencies>
-            <dependency>
-              <groupId>org.tinyjee</groupId>
-              <artifactId>doxia-include-macro</artifactId>
-              <version>1.0</version>
-            </dependency>
-          </dependencies>
-          <configuration>
-            <templateFile>${basedir}/maven-site-unitils.mv</templateFile>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.4</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.tinyjee</groupId>
+                            <artifactId>doxia-include-macro</artifactId>
+                            <version>1.0</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.mozilla</groupId>
+                            <artifactId>rhino</artifactId>
+                            <version>1.7R4</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>com.habitsoft</groupId>
+                            <artifactId>html-dtd-cache</artifactId>
+                            <version>1.0</version>
+                        </dependency>
+                        <dependency><!-- add support for ssh/scp -->
+                            <groupId>org.apache.maven.wagon</groupId>
+                            <artifactId>wagon-ssh</artifactId>
+                            <version>1.0</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <templateFile>${basedir}/maven-site-unitils.mv</templateFile>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.8.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context-support</artifactId>
-      <version>3.0.5.RELEASE</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- START SNIPPET: core -->
-    <dependency>
-      <groupId>org.unitils</groupId>
-      <artifactId>unitils-core</artifactId>
-      <version>3.4.2</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- END SNIPPET: core -->
-    <!-- START SNIPPET: mock -->
-    <dependency>
-      <groupId>org.unitils</groupId>
-      <artifactId>unitils-mock</artifactId>
-      <version>3.4.2</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- END SNIPPET: mock -->
-    <!-- START SNIPPET: inject -->
-    <dependency>
-      <groupId>org.unitils</groupId>
-      <artifactId>unitils-inject</artifactId>
-      <version>3.4.2</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- END SNIPPET: inject -->
-    <!-- START SNIPPET: database -->
-    <dependency>
-      <groupId>org.unitils</groupId>
-      <artifactId>unitils-database</artifactId>
-      <version>3.4.2</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- END SNIPPET: database -->
-    <!-- START SNIPPET: dbunit -->
-    <dependency>
-      <groupId>org.unitils</groupId>
-      <artifactId>unitils-dbunit</artifactId>
-      <version>3.4.2</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- END SNIPPET: dbunit -->
-    <!-- START SNIPPET: spring -->
-    <dependency>
-      <groupId>org.unitils</groupId>
-      <artifactId>unitils-spring</artifactId>
-      <version>3.4.2</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- END SNIPPET: spring -->
-    <!-- START SNIPPET: orm -->
-    <dependency>
-      <groupId>org.unitils</groupId>
-      <artifactId>unitils-orm</artifactId>
-      <version>3.4.2</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- END SNIPPET: orm -->
-    <!-- START SNIPPET: easy -->
-    <dependency>
-      <groupId>org.unitils</groupId>
-      <artifactId>unitils-easymock</artifactId>
-      <version>3.4.2</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- END SNIPPET: easy -->
-    <!-- START SNIPPET: io -->
-    <dependency>
-      <groupId>org.unitils</groupId>
-      <artifactId>unitils-io</artifactId>
-      <version>3.4.2</version>
-    </dependency>
-    <!-- END SNIPPET: io -->
-    <!-- START SNIPPET: mail -->
-    <dependency>
-      <groupId>org.unitils.mail</groupId>
-      <artifactId>unitils-mail</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-    <!-- END SNIPPET: mail -->
-    <!-- START SNIPPET: ftp -->
-    <dependency>
-      <groupId>org.unitils.ftp</groupId>
-      <artifactId>unitils-ftp</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-    <!-- END SNIPPET: ftp -->
-    <!-- START SNIPPET: testlink -->
-    <dependency>
-      <groupId>org.unitils.testlink</groupId>
-      <artifactId>unitils-testlink</artifactId>
-      <version>1.0.2</version>
-    </dependency>
-    <!-- END SNIPPET: testlink -->
-    <!-- START SNIPPET: jodatime -->
-    <dependency>
-      <groupId>org.unitils.jodatime</groupId>
-      <artifactId>unitils-jodatime</artifactId>
-      <version>1.0.1</version>
-    </dependency>
-    <!-- END SNIPPET: jodatime -->
-    <!-- START SNIPPET: selenium -->
-    <dependency>
-      <groupId>org.unitils.selenium</groupId>
-      <artifactId>unitils-selenium</artifactId>
-      <version>1.0.4</version>
-    </dependency>
-    <!-- END SNIPPET: selenium -->
-    <!-- START SNIPPET: soapui -->
-    <dependency>
-      <groupId>org.unitils.soapui</groupId>
-      <artifactId>unitils-soapui</artifactId>
-      <version>1.0.2</version>
-    </dependency>
-    <!-- END SNIPPET: soapui -->
-    <!-- START SNIPPET: objectvalidation -->
-    <dependency>
-      <groupId>org.unitils.objectvalidation</groupId>
-      <artifactId>unitils-objectvalidation</artifactId>
-      <version>1.1.5</version>
-    </dependency>
-    <!-- END SNIPPET: objectvalidation -->
-    <!-- START SNIPPET: springbatch -->
-    <dependency>
-      <groupId>org.unitils.spring.batch</groupId>
-      <artifactId>unitils-spring-batch</artifactId>
-      <version>1.0.2</version>
-    </dependency>
-    <!-- END SNIPPET: springbatch -->
-    <!-- START SNIPPET: jbehave -->
-    <dependency>
-      <groupId>org.unitils.jbehave</groupId>
-      <artifactId>unitils-jbehave</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-    <!-- END SNIPPET: jbehave -->
-    <!-- START SNIPPET: compositetest -->
-    <dependency>
-      <groupId>org.unitils.compositetest</groupId>
-      <artifactId>unitils-compositeTest</artifactId>
-      <version>1.0.1</version>
-    </dependency>
-    <!-- END SNIPPET: compositetest -->
-    <dependency>
-      <groupId>org.unitils</groupId>
-      <artifactId>unitils-test</artifactId>
-      <version>3.4.2</version>
-      <scope>test</scope>
-    </dependency> 
-  </dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>3.0.5.RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- START SNIPPET: core -->
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-core</artifactId>
+            <version>3.4.2</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- END SNIPPET: core -->
+        <!-- START SNIPPET: mock -->
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-mock</artifactId>
+            <version>3.4.2</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- END SNIPPET: mock -->
+        <!-- START SNIPPET: inject -->
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-inject</artifactId>
+            <version>3.4.2</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- END SNIPPET: inject -->
+        <!-- START SNIPPET: database -->
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-database</artifactId>
+            <version>3.4.2</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- END SNIPPET: database -->
+        <!-- START SNIPPET: dbunit -->
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-dbunit</artifactId>
+            <version>3.4.2</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- END SNIPPET: dbunit -->
+        <!-- START SNIPPET: spring -->
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-spring</artifactId>
+            <version>3.4.2</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- END SNIPPET: spring -->
+        <!-- START SNIPPET: orm -->
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-orm</artifactId>
+            <version>3.4.2</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- END SNIPPET: orm -->
+        <!-- START SNIPPET: easy -->
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-easymock</artifactId>
+            <version>3.4.2</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- END SNIPPET: easy -->
+        <!-- START SNIPPET: io -->
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-io</artifactId>
+            <version>3.4.2</version>
+        </dependency>
+        <!-- END SNIPPET: io -->
+        <!-- START SNIPPET: mail -->
+        <dependency>
+            <groupId>org.unitils.mail</groupId>
+            <artifactId>unitils-mail</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!-- END SNIPPET: mail -->
+        <!-- START SNIPPET: ftp -->
+        <dependency>
+            <groupId>org.unitils.ftp</groupId>
+            <artifactId>unitils-ftp</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!-- END SNIPPET: ftp -->
+        <!-- START SNIPPET: testlink -->
+        <dependency>
+            <groupId>org.unitils.testlink</groupId>
+            <artifactId>unitils-testlink</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+        <!-- END SNIPPET: testlink -->
+        <!-- START SNIPPET: jodatime -->
+        <dependency>
+            <groupId>org.unitils.jodatime</groupId>
+            <artifactId>unitils-jodatime</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <!-- END SNIPPET: jodatime -->
+        <!-- START SNIPPET: selenium -->
+        <dependency>
+            <groupId>org.unitils.selenium</groupId>
+            <artifactId>unitils-selenium</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+        <!-- END SNIPPET: selenium -->
+        <!-- START SNIPPET: soapui -->
+        <dependency>
+            <groupId>org.unitils.soapui</groupId>
+            <artifactId>unitils-soapui</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+        <!-- END SNIPPET: soapui -->
+        <!-- START SNIPPET: objectvalidation -->
+        <dependency>
+            <groupId>org.unitils.objectvalidation</groupId>
+            <artifactId>unitils-objectvalidation</artifactId>
+            <version>1.1.5</version>
+        </dependency>
+        <!-- END SNIPPET: objectvalidation -->
+        <!-- START SNIPPET: springbatch -->
+        <dependency>
+            <groupId>org.unitils.spring.batch</groupId>
+            <artifactId>unitils-spring-batch</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+        <!-- END SNIPPET: springbatch -->
+        <!-- START SNIPPET: jbehave -->
+        <dependency>
+            <groupId>org.unitils.jbehave</groupId>
+            <artifactId>unitils-jbehave</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!-- END SNIPPET: jbehave -->
+        <!-- START SNIPPET: compositetest -->
+        <dependency>
+            <groupId>org.unitils.compositetest</groupId>
+            <artifactId>unitils-compositeTest</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <!-- END SNIPPET: compositetest -->
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-test</artifactId>
+            <version>3.4.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.tinyjee</groupId>
+            <artifactId>doxia-include-macro</artifactId>
+            <version>1.0</version>
+        </dependency> 
+        
+    </dependencies>
 
-  <!-- Report generation -->
-  <reporting>
-    <plugins>
-      <!-- Disable generation of mailinglist, ci -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>license</report>
-              <report>scm</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
-    </plugins>
-  </reporting>
+    <!-- Report generation -->
+    <reporting>
+        <plugins>
+            <!-- Disable generation of mailinglist, ci -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>license</report>
+                            <report>scm</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
+    
+    <distributionManagement>
+        <site>
+            <id>unitils.sf.net</id>
+            <url>scp://shell.sourceforge.net/home/project-web/unitils/htdocs</url>
+        </site>
+    </distributionManagement>
 
-  <repositories>
-    <repository>
-      <id>maven.tinyjee.org</id>
-      <url>http://maven.tinyjee.org</url>
-    </repository>
-  </repositories>
+    <repositories>
+        <repository>
+            <id>maven.tinyjee.org</id>
+            <url>http://maven.tinyjee.org</url>
+        </repository>
+    </repositories>
 
 </project>

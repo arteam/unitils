@@ -44,7 +44,7 @@ Selenium
 ~~~~~~~~~~
 	Please create unitils-local.properties, and add selenium to unitils.modules. Code as following:
 
-%{include|source=org/unitils/selenium/seleniumprop.properties|id=seleniumprop|verbatim=true|set-first-line=1|pad-line-numbers=2}
+%{include|source=org/unitils/selenium/seleniumprop.properties|id=seleniumpropbasic|verbatim=true|set-first-line=1|pad-line-numbers=2}
 
 	<<browser:>>
 	There are several browsers that you can choose from: Internet Explorer (IE), HtmlUnit(HTMLUNIT), firefox (FIREFOX), Chrome (CHROME).
