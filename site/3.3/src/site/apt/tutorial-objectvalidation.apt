@@ -120,6 +120,7 @@ private ObjectValidator objectValidator;
 |							| * classToValidate(Class<?> clzz): You can add another class and this method will return a ValidateEqualsAndHashCode object|
 |							|																															|
 *---------------------------*---------------------------------------------------------------------------------------------------------------------------+
+
 %{include|source=org/unitils/objectvalidation/example1/ObjectValidationExample1.java|id=objectvalidationExample1|verbatim=true|set-first-line=1|pad-line-numbers=2}
 
 **{Customizing the objectvalidation module} 
@@ -131,10 +132,11 @@ private ObjectValidator objectValidator;
 	primitives, collections, enums\ldots). But if you need something more specific,
 	like validation of jodatime, than you need to write it yourself.
 
-%{include|source=org/unitils/objectvalidation/example2/ObjectValidationExample2.java|id=objectvalidationExample2|verbatim=true|set-first-line=1|pad-line-numbers=2}
+%{include|source=org/unitils/objectvalidation/example2/TimeZoneGenerator.java|id=objectvalidationExample2|verbatim=true|set-first-line=1|pad-line-numbers=2}
+
 ***{Custom rules & custom RuleCollections}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	Every RulesCollections contains a list with rules.
 	You can create your own rules by implementing the interface Rule and by adding them to the RuleCollections.
 	
-%{include|source=org/unitils/objectvalidation/example3/ObjectValidationExample3.java|id=objectvalidationExample3|verbatim=true|set-first-line=1|pad-line-numbers=2}
+%{include|source=org/unitils/objectvalidation/example3/ToStringHasToBeOverridenRule.java|id=objectvalidationExample3|verbatim=true|set-first-line=1|pad-line-numbers=2}

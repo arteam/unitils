@@ -48,6 +48,7 @@
       <item name="jbehave" href="tutorial-jbehave.html" />
       <item name="testlink" href="tutorial-testlink.html" />
       <item name="compositeTest" href="tutorial-compositetest.html" />
+      <item name="objectvalidation" href="tutorial-objectvalidation.html" />
     </menu>
 
     <menu name="Project info">

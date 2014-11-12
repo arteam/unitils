@@ -21,8 +21,5 @@ public class ToStringHasToBeOverridenRule implements Rule {
         // Do something
 
     }
-
-
-
 }
 //END SNIPPET: objectvalidationExample3
