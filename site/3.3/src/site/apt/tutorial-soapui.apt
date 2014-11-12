@@ -4,50 +4,64 @@ SoapUI
 ~~~~~~~~~~~~~~~~
     If you are using maven, you can add following dependency to your project.
 
-%{include|source=pom.xml|id=mail|verbatim=true|set-first-line=1|pad-line-numbers=2}
+%{include|source=pom.xml|id=soapui|verbatim=true|set-first-line=1|pad-line-numbers=2}
 
 * {Config}
 ~~~~~~~~~~
 	Please create unitils-local.properties, and add mail to unitils.modules. Code as following:
 
-%{include|source=org/unitils/mail/mailprop.properties|id=mailprop|verbatim=true|set-first-line=1|pad-line-numbers=2}
+%{include|source=org/unitils/soapui/soapuiprop.properties|id=soapuiprop|verbatim=true|set-first-line=1|pad-line-numbers=2}
 
-	To start and use the fake smpt server put this in your test class. 
-	This will start up the SMTP server before a test and cleans up, shuts it down after each test. 
-
-[images/drawingMailModule.png]
-
-	This has a performance cost but is nessacary to avoid any dependencies between tests
-
-+-----+
-@TestSmtpServer
-private SmtpServer simpleSmtpServer;
-+-----+
+* {How does it work}
+~~~~~~~~~~~~~~~~~~~~~~
 	
-	The SmtpServer comes with 2 methods that allow you to inspect its state:
+[images/webservice-lifecycle.png]
+	Before we explain the lifecycle of the test maybe a good question: Is it the responsiblity of the test to deploy the webservice? 
+	Well the answer is no, use maven (or ant) to deploy the webservice.
+	So the webservice is deployed and ready to be tested. 
+	When writing a test we can talk about 3 phases: setup, call System Under Test, verify
+	To be correct we should add a fourth phase: cleanup.
+	
+	[[1]] setup: In the setup phase we set our SUT and the systems it uses in a known state. We prepare them to be used afterwards. One of the most common things are database setup and loading data in database.
+	
+	[[2]] In this phase we will use our client / tool to create and post a request to the webservice.
+	
+	[[3]] After calling the webservice we could do some assertions on the response but we could also check other things of our SUT, like the state of the database. This is done in the verification phase.
+	
+	
+* {Combining Unitils, SoapUI and jUnit}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-+-----+	
-/**
- * This method give you the amount of mails that you've sent to the SMTP server.
- * 
- */
-int getReceivedEmailSize();
+%{include|source=org/unitils/soapui/SimplePlatformIntegrationConsumerTest.java|id=soapuiTestExample|verbatim=true|set-first-line=1|pad-line-numbers=2}
 
-/**
- * This email sends you a list of all the mails you've sent to the fake SMTP server.
- * 
- */
-List<SmtpMessage> getReceivedEmail() throws IOException, MessagingException;
-+-----+
+	First we define a WebserviceTest property which will hold the configuration of the soapui testcases we want to run. 
+	This property we have to annotate with @WebserviceTestSoapUi which has four values that you can set.
 
-	So to use it in your test:
+*---------------*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+ 
+| testCase		|The soapUi name of the testcase that you want to run. This has no default value.  																																												|
+*---------------*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+ 
+| suite		    |The soapUi name of the suite where the testcase resides. If no value is specified the one you defined in the property file will be taken. 																														|
+*---------------*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+ 
+| endpoint	    |The location for accessing the webservice. If no value is specified the one you defined in the property file will be taken.																																	|
+*---------------*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| projectFile   |The location of the soapUI project file. If no value is specified the one you defined in the property file will be taken. This is a file where SoapUI saves your soap project/testcases/testsuites.															|
+*---------------*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-%{include|source=org/unitils/mail/MailModuleTest.java|id=mailExample|verbatim=true|set-first-line=1|pad-line-numbers=2}
+	If you want to run a lot of testcases in your testclass, than you will have to define a lot of WebserviceTest.
+	
+%{include|source=org/unitils/soapui/MultipleWSSimplePlatformIntegrationConsumerTest.java|id=soapuiMultipleWS|verbatim=true|set-first-line=1|pad-line-numbers=2}
 
-* {Remarks}
-~~~~~~~~~~~
-	Notice that this will work the best if your test & your SUT (system under test) are running in the same JVM.
-	If your application is deployed in some application server and is on the same machine as from where your test is launched, your test could still work.
-	However because it is no longer running in one thread, hence it is running in different JVM's you will probably have to introduce some Thread.sleep before you do some asserts.
-	If your application is deployed on a different machine as your from where you are launching your test, the test will fail. 
-	The TestSmtpServer is only bound to a port on the machine from where you launch your test.
+	Although this approach works you'll remark a performance drawback. For every test all WebserviceTest are recreated and this is a time consuming process. 
+	
+	To solve this problem you can use the @WebserviceTestPlaceHolder on the WebserviceTest and put your WebserviceTestSoapUi configuration on the testmethod itself. This way only the webservicetest you need for the test you want to run is configured, not the other ones. 
+	
+%{include|source=org/unitils/soapui/PlaceholderTest.java|id=soapuiPlaceHolder|verbatim=true|set-first-line=1|pad-line-numbers=2}
+	
+* {Multiple endpoints}
+~~~~~~~~~~~~~~~~~~~~~~
+
+	Often you want to run the same test, or another test, against different endpoints on the same host. \
+	This is done by stripping the last part of the endpoint (org.unitils.soapui.default.project.endpoint) and adding it in the WebserviceTestSoapUi annotation. \
+	This will allow you to test different versions or multiple endpoints on the same server. 
+	
+%{include|source=org/unitils/soapui/MultipleEndpointsTest.java|id=soapuiMultipleEndpoints|verbatim=true|set-first-line=1|pad-line-numbers=2}

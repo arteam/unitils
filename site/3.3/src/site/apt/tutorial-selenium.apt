@@ -19,6 +19,7 @@ Selenium
 	
 	* You can program yourself an automated test using an automation api 
 
+	[]
 
 	The reason why there are two approaches is explained by the fact that there are mainly two types of people doing the job.
 	You have functional people who understand the business and are best placed to define the testcases. Often they also execute the testcases to validate that the application acts as they expect. Recording and playback tools will help ease the task of test automation for these people. There are a lot of tools on the market, commercial and opensource.

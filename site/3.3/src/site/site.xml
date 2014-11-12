@@ -49,6 +49,7 @@
       <item name="testlink" href="tutorial-testlink.html" />
       <item name="compositeTest" href="tutorial-compositetest.html" />
       <item name="objectvalidation" href="tutorial-objectvalidation.html" />
+      <item name="soapui" href="tutorial-soapui.html" />
     </menu>
 
     <menu name="Project info">
