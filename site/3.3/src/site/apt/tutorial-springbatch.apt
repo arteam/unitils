@@ -7,7 +7,7 @@ Spring Batch
 ~~~~~~~~~~~~~~~~
     If you are using maven, you can add following dependency to your project.
 
-%{include|source=pom.xml|id=springbatch|verbatim=true|set-first-line=1|pad-line-numbers=2}
+%{include|source=pom.xml|id=batch|verbatim=true|set-first-line=1|pad-line-numbers=2}
 
 * {Config}
 ~~~~~~~~~~

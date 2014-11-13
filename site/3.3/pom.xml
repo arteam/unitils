@@ -64,6 +64,11 @@
 
     <dependencies>
         <dependency>
+                            <groupId>com.habitsoft</groupId>
+                            <artifactId>html-dtd-cache</artifactId>
+                            <version>1.0</version>
+                        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.8.1</version>
@@ -195,13 +200,13 @@
             <version>1.1.5</version>
         </dependency>
         <!-- END SNIPPET: objectvalidation -->
-        <!-- START SNIPPET: springbatch -->
+        <!-- START SNIPPET: batch -->
         <dependency>
             <groupId>org.unitils.spring.batch</groupId>
             <artifactId>unitils-spring-batch</artifactId>
             <version>1.0.2</version>
         </dependency>
-        <!-- END SNIPPET: springbatch -->
+        <!-- END SNIPPET: batch -->
         <!-- START SNIPPET: jbehave -->
         <dependency>
             <groupId>org.unitils.jbehave</groupId>

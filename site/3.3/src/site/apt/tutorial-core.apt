@@ -103,6 +103,17 @@ public class MyTest {
 }
 +-----+
 
+    or
+
++-----+
+import org.junit.runner.RunWith;
+import org.unitils.UnitilsBlockJUnit4ClassRunner;
+
+@RunWith(UnitilsBlockJUnit4ClassRunner.class)
+public class MyTest {
+}
++-----+
+
     Instead of extending from one of Unitils base classes you could also create a custom Unitils-enabled superclass by copying the source code of 
     the base class (e.g. <UnitilsJUnit3>) to the custom superclass. This superclass can then still extend from another class, e.g.
     from {{{http://www.springframework.org}Spring}}'s AbstractDependencyInjectionSpringContextTests which is already a subclass of JUnit3's 

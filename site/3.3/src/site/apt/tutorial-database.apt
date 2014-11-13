@@ -392,8 +392,10 @@ public void testOneDataSetDatabase1() {
 public void testOneDataSetDatabase2() {
     //'database2' is used in this test.
 }
-+-----+		
++-----+	
+	
 	If you want to add multiple datasets to multiple databases in one test, than you can use the @DataSets and @ExpectedDataSets feature.
+
 +-----+	
 @Test
 @DataSets({
@@ -411,3 +413,21 @@ public void testMultipleExpectedDataSetsOnMultipleDatabases() {
 	//do some asserts
 }
 +-----+	
+
+***{user support}
+
+    In Unitils 3.4.2 it's possible to create scripts for a specific database that you have defined in your unitils.properties. \
+    A non-incremental script starts always with an '@' and the name of the database.
+
++-----+
+@nameDatabase_nameScript.sql
++-----+
+
+    An incremental script always start with the number of the script followed by '@' + name of the database.
+
++-----+
+01_@nameDatabase_nameScript.sql
++-----+
+
+    If the script doesn't contain a name of the database than the script is only executed on the default datbase. \
+    More information can be found on the {{{http://www.dbmaintain.org/tutorial.html#Multi-database__user_support}dbmaintain}} site.
