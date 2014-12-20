@@ -32,6 +32,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 import static java.lang.reflect.Modifier.isStatic;
+import static java.lang.reflect.Modifier.isTransient;
 import static org.unitils.mock.core.proxy.ProxyUtils.isProxy;
 
 /**
@@ -48,7 +49,7 @@ public class CloneUtil {
     private static Log logger = LogFactory.getLog(CloneUtil.class);
 
     /* Objenesis instance for creating new instances of types */
-    private static Objenesis objenesis = new ObjenesisStd();
+    private static Objenesis objenesis = new ObjenesisStd(true);
 
 
     /**
@@ -209,12 +210,18 @@ public class CloneUtil {
         if (clazz == null || Object.class.equals(clazz)) {
             return;
         }
+
+
         Field[] fields = clazz.getDeclaredFields();
         AccessibleObject.setAccessible(fields, true);
 
         for (Field field : fields) {
             // skip static fields
             if (isStatic(field.getModifiers())) {
+                continue;
+            }
+            if (field.getDeclaringClass().getName().startsWith("org.hibernate")
+                    && isTransient(field.getModifiers())) {
                 continue;
             }
 
