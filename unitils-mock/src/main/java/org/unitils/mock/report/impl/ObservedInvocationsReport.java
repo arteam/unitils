@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,19 @@
  */
 package org.unitils.mock.report.impl;
 
+import org.unitils.core.util.ObjectFormatter;
 import org.unitils.mock.core.ObservedInvocation;
+import org.unitils.mock.core.proxy.Argument;
+import org.unitils.mock.core.proxy.ProxyInvocation;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import static org.unitils.core.util.ObjectFormatter.MOCK_NAME_CHAIN_SEPARATOR;
-
+import static org.apache.commons.lang.StringUtils.rightPad;
+import static org.apache.commons.lang.StringUtils.uncapitalize;
+import static org.unitils.core.util.ReflectionUtils.getAllFields;
+import static org.unitils.core.util.ReflectionUtils.getFieldValue;
 
 /**
  * A view that displays the observed invocations and the location where they were invoked.
@@ -34,15 +40,19 @@ import static org.unitils.core.util.ObjectFormatter.MOCK_NAME_CHAIN_SEPARATOR;
  * 3.  mock.anotherMethod(myClass1)  ..... at MyTest.testMethod(MyTest.java:64)
  * <code></pre>
  *
+ * @author Tim Ducheyne
  * @author Kenny Claes
  * @author Filip Neven
- * @author Tim Ducheyne
  */
-public class ObservedInvocationsReport extends ProxyInvocationsReport {
+public class ObservedInvocationsReport {
+
+    protected int maxInlineParameterLength;
+    protected ObjectFormatter objectFormatter;
 
 
-    public ObservedInvocationsReport(Object testedObject) {
-        super(testedObject);
+    public ObservedInvocationsReport(ObjectFormatter objectFormatter, int maxInlineParameterLength) {
+        this.objectFormatter = objectFormatter;
+        this.maxInlineParameterLength = maxInlineParameterLength;
     }
 
 
@@ -50,26 +60,29 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
      * Creates a string representation of the given invocations as described in the class javadoc.
      *
      * @param observedInvocations The invocations for which to create a report, not null
+     * @param testObject          The test instance
      * @return The string representation, not null
      */
-    public String createReport(List<ObservedInvocation> observedInvocations) {
-        StringBuilder result = new StringBuilder();
-
-        List<FormattedObject> currentLargeObjects = new ArrayList<FormattedObject>();
-        Map<Object, FormattedObject> allLargeObjects = new IdentityHashMap<Object, FormattedObject>();
+    public String createReport(List<ObservedInvocation> observedInvocations, Object testObject) {
+        Map<Object, String> largeObjectNames = new IdentityHashMap<Object, String>();
         Map<Class<?>, Integer> largeObjectNameIndexes = new HashMap<Class<?>, Integer>();
+        Map<Object, String> fieldValuesAndNames = getFieldValuesAndNames(testObject);
 
-        // append all invocations
+        return formatObservedInvocations(observedInvocations, largeObjectNames, largeObjectNameIndexes, fieldValuesAndNames);
+    }
+
+
+    protected String formatObservedInvocations(List<ObservedInvocation> observedInvocations, Map<Object, String> largeObjectNames, Map<Class<?>, Integer> largeObjectNameIndexes, Map<Object, String> fieldValuesAndNames) {
+        StringBuilder result = new StringBuilder();
         int invocationIndex = 0;
         for (ObservedInvocation observedInvocation : observedInvocations) {
+            List<FormattedObject> currentLargeObjects = new ArrayList<FormattedObject>();
             result.append(formatInvocationIndex(++invocationIndex, observedInvocations.size()));
-            result.append(formatObservedInvocation(observedInvocation, currentLargeObjects, allLargeObjects, largeObjectNameIndexes));
+            result.append(formatObservedInvocation(observedInvocation, currentLargeObjects, largeObjectNames, largeObjectNameIndexes, fieldValuesAndNames));
             result.append(formatInvokedAt(observedInvocation));
-            result.append("\n");
         }
         return result.toString();
     }
-
 
     /**
      * Creates a string representation of the given invocation.
@@ -78,27 +91,30 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
      *
      * @param observedInvocation     The invocation to format, not null
      * @param currentLargeObjects    The current the large values, not null
-     * @param allLargeObjects        All large values per value, not null
+     * @param largeObjectNames       All large values names per value, not null
      * @param largeObjectNameIndexes The current indexes to use for the large value names (per value type), not null
+     * @param fieldValuesAndNames    The values and name of the instance fields in the test object
      * @return The string representation, not null
      */
-    protected String formatObservedInvocation(ObservedInvocation observedInvocation, List<FormattedObject> currentLargeObjects, Map<Object, FormattedObject> allLargeObjects, Map<Class<?>, Integer> largeObjectNameIndexes) {
+    protected String formatObservedInvocation(ObservedInvocation observedInvocation, List<FormattedObject> currentLargeObjects, Map<Object, String> largeObjectNames, Map<Class<?>, Integer> largeObjectNameIndexes, Map<Object, String> fieldValuesAndNames) {
         StringBuilder result = new StringBuilder();
         Method method = observedInvocation.getMethod();
 
         // append the mock and method name
-        result.append(formatMockName(observedInvocation));
+        result.append(observedInvocation.getProxyName());
         result.append('.');
         result.append(method.getName());
 
         // append the arguments
         result.append('(');
-        Class<?>[] argumentTypes = method.getParameterTypes();
-        if (argumentTypes.length > 0) {
-            Iterator<Object> arguments = observedInvocation.getArguments().iterator();
-            Iterator<Object> argumentsAtInvocationTime = observedInvocation.getArgumentsAtInvocationTime().iterator();
-            for (Class<?> argumentType : argumentTypes) {
-                result.append(formatValue(argumentsAtInvocationTime.next(), arguments.next(), argumentType, currentLargeObjects, allLargeObjects, largeObjectNameIndexes));
+        List<Argument<?>> arguments = observedInvocation.getArguments();
+        if (!arguments.isEmpty()) {
+            for (Argument<?> argument : arguments) {
+                Class<?> argumentType = argument.getType();
+                Object argumentValue = argument.getValue();
+                Object argumentValueAtInvocationTime = argument.getValueAtInvocationTime();
+
+                result.append(formatValue(argumentValueAtInvocationTime, argumentValue, argumentType, currentLargeObjects, largeObjectNames, largeObjectNameIndexes, fieldValuesAndNames));
                 result.append(", ");
             }
             // remove the last comma
@@ -108,18 +124,164 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
 
         // append the result value, if the method is non-void
         Class<?> resultType = method.getReturnType();
-        if (!Void.TYPE.equals(resultType)) {
+        if (Void.TYPE != resultType) {
             result.append(" -> ");
             Object resultValue = observedInvocation.getResult();
             Object resultAtInvocationTime = observedInvocation.getResultAtInvocationTime();
-            result.append(formatValue(resultAtInvocationTime, resultValue, resultType, currentLargeObjects, allLargeObjects, largeObjectNameIndexes));
+            result.append(formatValue(resultAtInvocationTime, resultValue, resultType, currentLargeObjects, largeObjectNames, largeObjectNameIndexes, fieldValuesAndNames));
         }
         return result.toString();
     }
 
-    protected String formatMockName(ObservedInvocation observedInvocation) {
-        String mockName = observedInvocation.getMockName();
-        return mockName.replaceAll(MOCK_NAME_CHAIN_SEPARATOR, ".");
+    /**
+     * Formats the given value. If the value is small enough (length <=20), the value itself is returned, else
+     * a name is returned generated by the {@link #createLargeValueName} method.
+     * <p/>
+     * E.g. string1, myClass1
+     *
+     * @param valueAtInvocationTime  The value to format, not null
+     * @param value                  The value to format by reference, not null
+     * @param type                   The type of the large value, not null
+     * @param currentLargeObjects    The current the large values, not null
+     * @param largeObjectNames       All large values names per value, not null
+     * @param largeObjectNameIndexes The current indexes to use for the large value names (per value type), not null
+     * @param fieldValuesAndNames    The values and name of the instance fields in the test object
+     * @return The value or the replaced name, not null
+     */
+    protected String formatValue(Object valueAtInvocationTime, Object value, Class<?> type, List<FormattedObject> currentLargeObjects, Map<Object, String> largeObjectNames, Map<Class<?>, Integer> largeObjectNameIndexes, Map<Object, String> fieldValuesAndNames) {
+        String valueName = largeObjectNames.get(valueAtInvocationTime);
+        if (valueName == null) {
+            valueName = largeObjectNames.get(value);
+        }
+        if (valueName == null) {
+            valueName = fieldValuesAndNames.get(value);
+        }
+        String objectRepresentation = formatObject(valueAtInvocationTime);
+        if (valueName == null) {
+            if (objectRepresentation.length() <= maxInlineParameterLength) {
+                // The object representation is small enough to be shown inline
+                return objectRepresentation;
+            }
+            valueName = createLargeValueName(type, largeObjectNameIndexes);
+        }
+        FormattedObject formattedObject = new FormattedObject(valueName, objectRepresentation);
+        largeObjectNames.put(valueAtInvocationTime, valueName);
+        largeObjectNames.put(value, valueName);
+        currentLargeObjects.add(formattedObject);
+        return valueName;
     }
 
+    /**
+     * Creates a string representation of the details of the given invocation. This will give information about
+     * where the invocation occurred.
+     *
+     * @param proxyInvocation The invocation to format, not null
+     * @return The string representation, not null
+     */
+    protected String formatInvokedAt(ProxyInvocation proxyInvocation) {
+        StringBuilder result = new StringBuilder();
+        result.append("  .....  at ");
+        result.append(proxyInvocation.getInvokedAt());
+        result.append("\n");
+        return result.toString();
+    }
+
+    /**
+     * Creates a name to replace a large value.
+     * The name is derived from the given type and index. E.g. string1, myClass1
+     *
+     * @param type                   The type of the large value, not null
+     * @param largeObjectNameIndexes The current indexes per type, not null
+     * @return The name, not null
+     */
+    protected String createLargeValueName(Class<?> type, Map<Class<?>, Integer> largeObjectNameIndexes) {
+        Integer index = largeObjectNameIndexes.get(type);
+        if (index == null) {
+            index = 0;
+        }
+        largeObjectNameIndexes.put(type, ++index);
+
+        String result = uncapitalize(type.getSimpleName());
+        return result + index;
+    }
+
+    /**
+     * Formats the invocation number, and adds spaces to make sure everything is formatted
+     * nicely on the same line width.
+     *
+     * @param invocationIndex       The index of the invocation
+     * @param totalInvocationNumber The total number of invocations.
+     * @return The formatted invocation number
+     */
+    protected String formatInvocationIndex(int invocationIndex, int totalInvocationNumber) {
+        int padSize = String.valueOf(totalInvocationNumber).length() + 2;
+        return rightPad(invocationIndex + ".", padSize);
+    }
+
+    /**
+     * @param object The object
+     * @return A string representation of the object, not null
+     */
+    protected String formatObject(Object object) {
+        return objectFormatter.format(object);
+    }
+
+    /**
+     * Gets all the field values in the given test object with their corresponding field names.
+     *
+     * @param testedObject The test object
+     * @return The values and names in an identity map, empty if tested object is null
+     */
+    protected Map<Object, String> getFieldValuesAndNames(Object testedObject) {
+        Map<Object, String> result = new IdentityHashMap<Object, String>();
+        if (testedObject == null) {
+            return result;
+        }
+        Set<Field> fields = getAllFields(testedObject.getClass());
+        for (Field field : fields) {
+            Object value = getFieldValue(testedObject, field);
+            if (value != null) {
+                result.put(value, field.getName());
+            }
+        }
+        return result;
+    }
+
+
+    /**
+     * Class for representing a value that was too large to be displayed inline.
+     */
+    protected static class FormattedObject {
+
+        /* The name used as inline replacement */
+        protected String name;
+        /* The actual string representation of the value */
+        protected String representation;
+
+        /**
+         * Creates a large value
+         *
+         * @param name           The name used as inline replacement, not null
+         * @param representation The actual string representation of the value, not null
+         */
+        public FormattedObject(String name, String representation) {
+            this.name = name;
+            this.representation = representation;
+        }
+
+
+        /**
+         * @return The name used as inline replacement, not null
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * @return The actual string representation of the value, not null
+         */
+        public String getRepresentation() {
+            return representation;
+        }
+    }
 }

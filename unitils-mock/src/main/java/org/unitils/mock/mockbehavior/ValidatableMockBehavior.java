@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,15 @@
  */
 package org.unitils.mock.mockbehavior;
 
-import org.unitils.core.UnitilsException;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 
 
 /**
- * todo javadoc
- *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  * @author Kenny Claes
  */
 public interface ValidatableMockBehavior extends MockBehavior {
-
 
     /**
      * Checks whether the mock behavior can be executed for the given invocation.
@@ -35,6 +31,5 @@ public interface ValidatableMockBehavior extends MockBehavior {
      *
      * @param proxyInvocation The proxy method invocation, not null
      */
-    void assertCanExecute(ProxyInvocation proxyInvocation) throws UnitilsException;
-
+    void assertCanExecute(ProxyInvocation proxyInvocation);
 }

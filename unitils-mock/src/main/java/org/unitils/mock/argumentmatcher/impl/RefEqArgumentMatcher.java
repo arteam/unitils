@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 package org.unitils.mock.argumentmatcher.impl;
 
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+import org.unitils.mock.core.proxy.Argument;
 import org.unitils.reflectionassert.ReflectionComparator;
 
 import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.MATCH;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.NO_MATCH;
-import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 
 /**
@@ -31,40 +31,39 @@ import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRef
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class RefEqArgumentMatcher implements ArgumentMatcher {
+public class RefEqArgumentMatcher<T> extends ArgumentMatcher<T> {
 
     /* The expected value */
-    private final Object value;
+    protected T value;
 
 
     /**
-     * Creates a matcher for the given value. A copy of the value is taken so that it can be compared
-     * even when the value itself was modified later-on.
+     * Creates a matcher for the given value.
      *
      * @param value The expected value
      */
-    public RefEqArgumentMatcher(Object value) {
-        this.value = createDeepClone(value);
+    public RefEqArgumentMatcher(T value) {
+        this.value = value;
     }
 
 
     /**
      * Returns true if the given object matches the expected argument, false otherwise.
-     *
+     * <p/>
      * The argumentAtInvocationTime is a copy (deep clone) of the arguments at the time of
      * the invocation. This way the original values can still be used later-on even when changes
      * occur to the original values (pass-by-value vs pass-by-reference).
      *
-     * @param argument                 The argument that were used by reference, not null
-     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed, not null
+     * @param argument The argument to match, not null
      * @return The match result, not null
      */
-    public MatchResult matches(Object argument, Object argumentAtInvocationTime) {
+    @Override
+    public MatchResult matches(Argument<T> argument) {
         ReflectionComparator reflectionComparator = createRefectionComparator();
-        if (reflectionComparator.isEqual(value, argumentAtInvocationTime)) {
+        T argumentValueAtInvocationTime = argument.getValueAtInvocationTime();
+        if (reflectionComparator.isEqual(value, argumentValueAtInvocationTime)) {
             return MATCH;
         }
         return NO_MATCH;
     }
-
 }

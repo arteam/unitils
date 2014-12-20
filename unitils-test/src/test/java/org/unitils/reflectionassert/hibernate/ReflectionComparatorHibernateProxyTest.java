@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,81 +15,43 @@
  */
 package org.unitils.reflectionassert.hibernate;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.database.annotations.TestDataSource;
-import org.unitils.database.annotations.Transactional;
+import org.unitils.database.annotation.Transactional;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.difference.Difference;
-import org.unitils.util.PropertyUtils;
-
-import javax.annotation.Resource;
-import javax.sql.DataSource;
-import java.util.Properties;
 
 import static java.util.Arrays.asList;
-import static org.dbmaintain.config.DbMaintainProperties.PROPERTY_DIALECT;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.unitils.database.SQLUnitils.executeUpdate;
-import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import static org.unitils.database.SqlUnitils.executeUpdate;
+import static org.unitils.database.SqlUnitils.executeUpdateQuietly;
 import static org.unitils.database.util.TransactionMode.COMMIT;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 
-
 /**
- * Test class for Hibernate proxy related tests of the {@link ReflectionComparator} .
- * <p/>
- * Currently this is only implemented for HsqlDb.
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 @Transactional(COMMIT)
 @ContextConfiguration
-@TestExecutionListeners(DependencyInjectionTestExecutionListener.class)
 public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
 
-    /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(ReflectionComparatorHibernateProxyTest.class);
-
-    /* A test hibernate entity, with a link to a lazily loaded parent class */
-    private Child testChild;
-
-    @TestDataSource
-    protected DataSource dataSource;
-
-    @Resource
-    protected SessionFactory sessionFactory;
-
-    /* Class under test */
     private ReflectionComparator reflectionComparator;
 
-    /* True if current test is not for the current dialect */
-    private boolean disabled;
+    @Autowired
+    protected SessionFactory sessionFactory;
+    private Child testChild;
 
 
-    /**
-     * Initializes the test fixture.
-     */
     @Before
-    public void setUp() throws Exception {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPERTY_DIALECT, configuration));
-        if (disabled) {
-            return;
-        }
-
+    public void initialize() throws Exception {
         testChild = new Child(1L, new Parent(1L));
         testChild.getParent().setChildren(asList(testChild));
 
@@ -98,43 +60,21 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
         createTestTables();
     }
 
-
-    /**
-     * Removes the test database tables from the test database, to avoid inference with other tests
-     */
     @After
-    public void tearDown() throws Exception {
-        if (disabled) {
-            return;
-        }
+    public void cleanUp() throws Exception {
         dropTestTables();
     }
 
 
-    /**
-     * Test comparing 2 values with the right one containing a Hibernate proxy.
-     */
     @Test
-    public void testGetDifference_rightProxy() {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
+    public void nullWhenEqualsAndRightSideIsHibernateProxy() {
         Child childWithParentProxy = (Child) sessionFactory.getCurrentSession().get(Child.class, 1L);
         Difference result = reflectionComparator.getDifference(testChild, childWithParentProxy);
         assertNull(result);
     }
 
-
-    /**
-     * Test comparing 2 values with the left one containing a Hibernate proxy.
-     */
     @Test
-    public void testGetDifference_leftProxy() {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
+    public void nullWhenEqualsAndLeftSideIsHibernateProxy() {
         Child childWithParentProxy = (Child) sessionFactory.getCurrentSession().get(Child.class, 1L);
         Difference result = reflectionComparator.getDifference(childWithParentProxy, testChild);
 
@@ -142,17 +82,8 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
         assertNull(result);
     }
 
-
-    /**
-     * Test comparing 2 values with both containing a Hibernate proxy. The identifiers should have been used
-     * to compare the proxy values.
-     */
     @Test
-    public void testGetDifference_bothProxy() {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
+    public void nullWhenBothSidesAreHibernateProxiesAndIdentifiersAreEqual() {
         // open 2 session two avoid the values being taken from the cache
         Child childWithParentProxy1 = (Child) sessionFactory.openSession().get(Child.class, 1L);
         Child childWithParentProxy2 = (Child) sessionFactory.openSession().get(Child.class, 1L);
@@ -160,17 +91,8 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
         assertNull(result);
     }
 
-
-    /**
-     * Test comparing 2 values with both containing a different hibnerate proxy. The identifiers should have been used
-     * to compare the proxy values.
-     */
     @Test
-    public void testGetDifference_bothProxyDifferentValue() {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
+    public void differenceWhenBothSidesAreHibernateProxiesAndDifferentIdentifiers() {
         // open 2 session two avoid the values being taken from the cache
         Child childWithParentProxy1 = (Child) sessionFactory.openSession().get(Child.class, 1L);
         Child childWithParentProxy2 = (Child) sessionFactory.openSession().get(Child.class, 2L);
@@ -179,25 +101,18 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
     }
 
 
-    /**
-     * Creates the test tables.
-     */
     private void createTestTables() {
-        executeUpdate("create table PARENT (id bigint not null, primary key (id))", dataSource);
-        executeUpdate("create table CHILD (id bigint not null, parent_id bigint not null, primary key (id))", dataSource);
-        executeUpdate("alter table CHILD add constraint CHILDTOPARENT foreign key (parent_id) references PARENT", dataSource);
-        executeUpdate("insert into PARENT (id) values (1)", dataSource);
-        executeUpdate("insert into PARENT (id) values (2)", dataSource);
-        executeUpdate("insert into CHILD (id, parent_id) values (1, 1)", dataSource);
-        executeUpdate("insert into CHILD (id, parent_id) values (2, 2)", dataSource);
+        executeUpdate("create table PARENT (id bigint not null, primary key (id))");
+        executeUpdate("create table CHILD (id bigint not null, parent_id bigint not null, primary key (id))");
+        executeUpdate("alter table CHILD add constraint CHILDTOPARENT foreign key (parent_id) references PARENT");
+        executeUpdate("insert into PARENT (id) values (1)");
+        executeUpdate("insert into PARENT (id) values (2)");
+        executeUpdate("insert into CHILD (id, parent_id) values (1, 1)");
+        executeUpdate("insert into CHILD (id, parent_id) values (2, 2)");
     }
 
-
-    /**
-     * Removes the test tables
-     */
     private void dropTestTables() {
-        executeUpdateQuietly("drop table CHILD", dataSource);
-        executeUpdateQuietly("drop table PARENT", dataSource);
+        executeUpdateQuietly("drop table CHILD");
+        executeUpdateQuietly("drop table PARENT");
     }
 }

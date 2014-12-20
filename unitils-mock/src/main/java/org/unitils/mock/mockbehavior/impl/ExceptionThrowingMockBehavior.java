@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,11 @@ package org.unitils.mock.mockbehavior.impl;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.Mock;
 import org.unitils.mock.core.proxy.ProxyInvocation;
-import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationStackTrace;
+import org.unitils.mock.core.util.StackTraceService;
 import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
 
 import java.util.Arrays;
+
 
 /**
  * Mock behavior that throws a given exception.
@@ -33,7 +34,8 @@ import java.util.Arrays;
 public class ExceptionThrowingMockBehavior implements ValidatableMockBehavior {
 
     /* The exception to throw */
-    private Throwable exceptionToThrow;
+    protected Throwable exceptionToThrow;
+    protected StackTraceService stackTraceService;
 
 
     /**
@@ -41,8 +43,9 @@ public class ExceptionThrowingMockBehavior implements ValidatableMockBehavior {
      *
      * @param exceptionToThrow The exception, not null
      */
-    public ExceptionThrowingMockBehavior(Throwable exceptionToThrow) {
+    public ExceptionThrowingMockBehavior(Throwable exceptionToThrow, StackTraceService stackTraceService) {
         this.exceptionToThrow = exceptionToThrow;
+        this.stackTraceService = stackTraceService;
     }
 
 
@@ -66,7 +69,6 @@ public class ExceptionThrowingMockBehavior implements ValidatableMockBehavior {
                 (exceptionTypes.length > 0 ? ", declared exceptions: " + Arrays.toString(exceptionTypes) : ", no declared exceptions"));
     }
 
-
     /**
      * Executes the mock behavior.
      *
@@ -74,8 +76,10 @@ public class ExceptionThrowingMockBehavior implements ValidatableMockBehavior {
      * @return Nothing
      */
     public Object execute(ProxyInvocation proxyInvocation) throws Throwable {
-        exceptionToThrow.setStackTrace(getInvocationStackTrace(Mock.class, false));
+        StackTraceElement[] invocationStackTraceWithoutMock = stackTraceService.getInvocationStackTrace(Mock.class, false);
+        if (invocationStackTraceWithoutMock != null) {
+            exceptionToThrow.setStackTrace(invocationStackTraceWithoutMock);
+        }
         throw exceptionToThrow;
     }
-
 }

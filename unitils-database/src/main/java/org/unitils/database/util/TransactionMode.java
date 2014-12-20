@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package org.unitils.database.util;
 
 /**
- * Defining the available transaction modes for a test. Defines whether a test must be run in a transaction and, 
+ * Defining the available transaction modes for a test. Defines whether a test must be run in a transaction and,
  * if yes, what is the commit/rollback behavior.
  *
  * @author Filip Neven

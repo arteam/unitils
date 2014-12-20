@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,17 @@
  */
 package org.unitils.mock.mockbehavior.impl;
 
+import org.apache.commons.lang.mutable.MutableByte;
 import org.junit.Test;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Tim Ducheyne
@@ -30,127 +33,179 @@ import static org.junit.Assert.assertTrue;
  */
 public class DefaultValueReturningMockBehaviorExecuteNumbersTest {
 
-    /* Tested object */
     private DefaultValueReturningMockBehavior defaultValueReturningMockBehavior = new DefaultValueReturningMockBehavior();
+
 
     @Test
     public void intPrimitive() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("intPrimitiveMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("intPrimitiveMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Integer);
+        assertEquals(0, ((Integer) result).intValue());
     }
 
     @Test
     public void integerValue() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("integerMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("integerMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Integer);
+        assertEquals(0, ((Integer) result).intValue());
     }
 
     @Test
     public void shortPrimitive() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("shortPrimitiveMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("shortPrimitiveMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Short);
+        assertEquals(0, ((Short) result).intValue());
     }
 
     @Test
     public void shortValue() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("shortMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("shortMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Short);
+        assertEquals(0, ((Short) result).intValue());
     }
 
     @Test
     public void bigIntegerValue() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("bigIntegerMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("bigIntegerMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof BigInteger);
+        assertEquals(0, ((BigInteger) result).intValue());
     }
 
     @Test
     public void longPrimitive() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("longPrimitiveMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("longPrimitiveMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Long);
+        assertEquals(0, ((Long) result).intValue());
     }
 
     @Test
     public void longValue() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("longMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("longMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Long);
+        assertEquals(0, ((Long) result).intValue());
     }
 
     @Test
     public void bigDecimalValue() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("bigDecimalMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("bigDecimalMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof BigDecimal);
+        assertEquals(0, ((BigDecimal) result).intValue());
     }
 
     @Test
     public void doublePrimitive() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("doublePrimitiveMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("doublePrimitiveMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Double);
+        assertEquals(0, ((Double) result).intValue());
     }
 
     @Test
     public void doubleValue() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("doubleMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("doubleMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Double);
+        assertEquals(0, ((Double) result).intValue());
     }
 
     @Test
     public void bytePrimitive() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("bytePrimitiveMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("bytePrimitiveMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Byte);
+        assertEquals(0, ((Byte) result).intValue());
     }
 
     @Test
     public void byteValue() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("byteMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("byteMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Byte);
+        assertEquals(0, ((Byte) result).intValue());
     }
 
     @Test
     public void floatPrimitive() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("floatPrimitiveMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("floatPrimitiveMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Float);
+        assertEquals(0, ((Float) result).intValue());
     }
 
     @Test
     public void floatValue() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("floatMethod"));
+        Method method = TestClass.class.getMethod("floatMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
+
         Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
-
         assertTrue(result instanceof Float);
+        assertEquals(0, ((Float) result).intValue());
     }
 
-    private ProxyInvocation createProxyInvocation(Method method) {
-        return new ProxyInvocation(null, null, method, null, null);
+    @Test
+    public void atomicIntegerValue() throws Exception {
+        Method method = TestClass.class.getMethod("atomicIntegerMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
+
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        assertTrue(result instanceof AtomicInteger);
+        assertEquals(0, ((AtomicInteger) result).intValue());
+    }
+
+    @Test
+    public void atomicLongValue() throws Exception {
+        Method method = TestClass.class.getMethod("atomicLongMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
+
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        assertTrue(result instanceof AtomicLong);
+        assertEquals(0, ((AtomicLong) result).intValue());
+    }
+
+    @Test
+    public void nullWhenUnknownNumberType() throws Exception {
+        Method method = TestClass.class.getMethod("customNumberTypeMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
+
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        assertNull(result);
     }
 
 
-    @SuppressWarnings({"UnusedDeclaration"})
     private static interface TestClass {
 
         int intPrimitiveMethod();
@@ -180,5 +235,12 @@ public class DefaultValueReturningMockBehaviorExecuteNumbersTest {
         float floatPrimitiveMethod();
 
         Float floatMethod();
+
+        AtomicInteger atomicIntegerMethod();
+
+        AtomicLong atomicLongMethod();
+
+        MutableByte customNumberTypeMethod();
+
     }
 }

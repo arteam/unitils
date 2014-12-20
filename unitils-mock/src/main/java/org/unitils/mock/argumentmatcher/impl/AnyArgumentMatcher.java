@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.unitils.mock.argumentmatcher.impl;
 
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+import org.unitils.mock.core.proxy.Argument;
 
 import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.MATCH;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.NO_MATCH;
@@ -26,10 +27,10 @@ import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.NO_MA
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class AnyArgumentMatcher implements ArgumentMatcher {
+public class AnyArgumentMatcher<T> extends ArgumentMatcher<T> {
 
     /* The expected type */
-    private final Class<?> type;
+    protected Class<? extends T> type;
 
 
     /**
@@ -37,7 +38,7 @@ public class AnyArgumentMatcher implements ArgumentMatcher {
      *
      * @param type The expected type, not null
      */
-    public AnyArgumentMatcher(Class<?> type) {
+    public AnyArgumentMatcher(Class<? extends T> type) {
         this.type = type;
     }
 
@@ -45,15 +46,19 @@ public class AnyArgumentMatcher implements ArgumentMatcher {
     /**
      * Returns true if the given argument is of the expected type, false otherwise.
      *
-     * @param argument                 The argument that were used by reference, not null
-     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed, not null
+     * @param argument The argument to match, not null
      * @return The match result, not null
      */
-    public MatchResult matches(Object argument, Object argumentAtInvocationTime) {
-        if (argument != null && argument.getClass().equals(type)) {
+    @Override
+    public MatchResult matches(Argument<T> argument) {
+        T argumentValue = argument.getValue();
+        if (argumentValue == null || type == null) {
+            return NO_MATCH;
+        }
+        Class<?> argumentType = argumentValue.getClass();
+        if (type.isAssignableFrom(argumentType)) {
             return MATCH;
         }
         return NO_MATCH;
     }
-
 }

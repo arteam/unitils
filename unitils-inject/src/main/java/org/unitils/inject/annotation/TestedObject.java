@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,26 @@
  */
 package org.unitils.inject.annotation;
 
-import static java.lang.annotation.ElementType.FIELD;
+import org.unitils.core.annotation.FieldAnnotation;
+import org.unitils.inject.listener.TestedObjectFieldAnnotationListener;
+
 import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 /**
- * Annotation indicating the object under test. The object(s) referenced by the annotated field(s) is (are) used as
- * default target for injection.
+ * Annotation indicating the object under test.
+ * The object(s) referenced by the annotated field(s) is (are) used as default target for injection.
+ * <p/>
+ * Note: static fields are not supported and will be ignored.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 @Target(FIELD)
 @Retention(RUNTIME)
+@FieldAnnotation(TestedObjectFieldAnnotationListener.class)
 public @interface TestedObject {
 }

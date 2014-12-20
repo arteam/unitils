@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,79 +17,60 @@ package org.unitils.mock.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.mock.Mock;
+import org.unitils.mock.annotation.Dummy;
+import org.unitils.mock.core.matching.MatchingInvocationHandler;
+import org.unitils.mock.core.matching.MatchingInvocationHandlerFactory;
+import org.unitils.mock.core.proxy.impl.MatchingProxyInvocationHandler;
+import org.unitils.mock.mockbehavior.MockBehavior;
+import org.unitils.mock.mockbehavior.MockBehaviorFactory;
 
-import java.util.List;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertSame;
 
 /**
- * Tests the mock object functionality for partial mocks that wrap around an existing instance.
- *
  * @author Tim Ducheyne
- * @author Filip Neven
  */
-public class PartialMockObjectStubTest {
+public class PartialMockObjectStubTest extends UnitilsJUnit4 {
 
-    /* Class under test */
-    private PartialMockObject<TestClass> mockObject;
+    private PartialMockObject<Object> partialMockObject;
+
+    private Mock<MockBehaviorFactory> mockBehaviorFactoryMock;
+    private Mock<MatchingInvocationHandlerFactory> matchingInvocationHandlerFactoryMock;
+    private Mock<MatchingProxyInvocationHandler> matchingProxyInvocationHandlerMock;
+    @Dummy
+    private Object matchingProxy;
+    @Dummy
+    private MockBehavior mockBehavior;
+    @Dummy
+    private BehaviorDefiningInvocations behaviorDefiningInvocations;
+    @Dummy
+    private MatchingInvocationHandler matchingInvocationHandler;
 
 
     @Before
-    public void setUp() {
-        mockObject = new PartialMockObject<TestClass>(TestClass.class, this);
-        TestClass.invoked = false;
+    public void initialize() {
+        partialMockObject = new PartialMockObject<Object>("name", Object.class, null, matchingProxy, false, behaviorDefiningInvocations,
+                matchingProxyInvocationHandlerMock.getMock(), mockBehaviorFactoryMock.getMock(), matchingInvocationHandlerFactoryMock.getMock(), null, null);
+
+        mockBehaviorFactoryMock.returns(mockBehavior).createStubMockBehavior();
+        matchingInvocationHandlerFactoryMock.returns(matchingInvocationHandler).createBehaviorDefiningMatchingInvocationHandler(mockBehavior, false, behaviorDefiningInvocations);
     }
 
 
     @Test
-    public void stubMethod() {
-        mockObject.stub().method();
-
-        mockObject.getMock().method();
-        assertFalse(TestClass.invoked);
-        mockObject.assertInvoked().method();
+    public void stub() {
+        Object result = partialMockObject.stub();
+        assertSame(matchingProxy, result);
+        matchingProxyInvocationHandlerMock.assertInvoked().startMatchingInvocation("name", true, matchingInvocationHandler);
     }
 
     @Test
-    public void stubReturnsDefaultValue() {
-        mockObject.stub().methodWithReturnValue();
+    public void chainedStub() {
+        partialMockObject = new PartialMockObject<Object>("name", Object.class, null, matchingProxy, true, behaviorDefiningInvocations,
+                matchingProxyInvocationHandlerMock.getMock(), mockBehaviorFactoryMock.getMock(), matchingInvocationHandlerFactoryMock.getMock(), null, null);
 
-        List<String> result = mockObject.getMock().methodWithReturnValue();
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-        assertFalse(TestClass.invoked);
-        mockObject.assertInvoked().methodWithReturnValue();
-
+        partialMockObject.stub();
+        matchingProxyInvocationHandlerMock.assertInvoked().startMatchingInvocation("name", false, matchingInvocationHandler);
     }
-
-    @Test
-    public void stubMethodCalledFromOtherMethod() {
-        mockObject.stub().method();
-
-        mockObject.getMock().methodThatCallsOtherMethod();
-        assertFalse(TestClass.invoked);
-        mockObject.assertInvoked().method();
-        mockObject.assertInvoked().methodThatCallsOtherMethod();
-    }
-
-
-    public static class TestClass {
-
-        public static boolean invoked;
-
-        public void methodThatCallsOtherMethod() {
-            method();
-        }
-
-        protected void method() {
-            invoked = true;
-        }
-
-        protected List<String> methodWithReturnValue() {
-            invoked = true;
-            return null;
-        }
-
-    }
-
 }

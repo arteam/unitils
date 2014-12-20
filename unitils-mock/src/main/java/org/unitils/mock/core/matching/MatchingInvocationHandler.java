@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,9 @@
  */
 package org.unitils.mock.core.matching;
 
-import org.unitils.mock.argumentmatcher.ArgumentMatcher;
-import org.unitils.mock.core.proxy.ProxyInvocation;
-
-import java.util.List;
+import org.unitils.mock.core.MatchingInvocation;
 
 public interface MatchingInvocationHandler {
 
-    Object handleInvocation(ProxyInvocation proxyInvocation, List<ArgumentMatcher> argumentMatchers) throws Throwable;
+    Object handleInvocation(MatchingInvocation matchingInvocation);
 }

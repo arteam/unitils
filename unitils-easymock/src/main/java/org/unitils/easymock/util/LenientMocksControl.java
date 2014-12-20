@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,16 @@
  */
 package org.unitils.easymock.util;
 
-import java.lang.reflect.Method;
-import java.util.List;
-
 import org.easymock.ArgumentsMatcher;
 import org.easymock.IAnswer;
 import org.easymock.IArgumentMatcher;
 import org.easymock.classextension.internal.MocksClassControl;
-import org.easymock.internal.IMocksControlState;
-import org.easymock.internal.Invocation;
-import org.easymock.internal.LastControl;
-import org.easymock.internal.Range;
-import org.easymock.internal.RecordState;
+import org.easymock.internal.*;
+import org.unitils.core.UnitilsException;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
+
+import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * An EasyMock mock control that uses the reflection argument matcher for all arguments of a method invocation.
@@ -52,12 +49,10 @@ import org.unitils.reflectionassert.ReflectionComparatorMode;
  * @see ReflectionComparatorMode
  * @see org.unitils.reflectionassert.ReflectionComparator
  */
-@SuppressWarnings("deprecation")
 public class LenientMocksControl extends MocksClassControl {
 
-
     /* The interceptor that wraps the record state */
-    private InvocationInterceptor invocationInterceptor;
+    protected InvocationInterceptor invocationInterceptor;
 
 
     /**
@@ -68,7 +63,6 @@ public class LenientMocksControl extends MocksClassControl {
     public LenientMocksControl(ReflectionComparatorMode... modes) {
         this(MockType.DEFAULT, modes);
     }
-
 
     /**
      * Creates a mock control.<ul>
@@ -87,7 +81,7 @@ public class LenientMocksControl extends MocksClassControl {
 
 
     /**
-     * Overriden to be able to replace the record behavior that going to record all method invocations.
+     * Overridden to be able to replace the record behavior that going to record all method invocations.
      * The interceptor will make sure that reflection argument matchers will be reported for the
      * arguments of all recorded method invocations.
      *
@@ -103,7 +97,6 @@ public class LenientMocksControl extends MocksClassControl {
         return mocksControlState;
     }
 
-
     /**
      * A wrapper for the record state in easy mock that will intercept the invoke method
      * so that it can install reflection argument matchers for all arguments of the recorded method invocation.
@@ -114,14 +107,12 @@ public class LenientMocksControl extends MocksClassControl {
      * Because some of the methods are declared final and some classes explicitly cast to subtypes, creating a wrapper
      * seems to be the only way to be able to intercept the matcher behavior.
      */
-    @SuppressWarnings("unchecked")
-    private class InvocationInterceptor implements IMocksControlState {
+    protected class InvocationInterceptor implements IMocksControlState {
 
         /* The wrapped record state */
-        private RecordState recordState;
-
+        protected RecordState recordState;
         /* The modes for the reflection argument matchers */
-        private ReflectionComparatorMode[] modes;
+        protected ReflectionComparatorMode[] modes;
 
 
         /**
@@ -144,9 +135,8 @@ public class LenientMocksControl extends MocksClassControl {
             this.recordState = recordState;
         }
 
-
         /**
-         * Overriden to report reflection argument matchers for all arguments of the given method invocation.
+         * Overridden to report reflection argument matchers for all arguments of the given method invocation.
          *
          * @param invocation the method invocation, not null
          * @return the result of the invocation
@@ -157,19 +147,18 @@ public class LenientMocksControl extends MocksClassControl {
             return recordState.invoke(invocation);
         }
 
-
         /**
          * Reports report reflection argument matchers for all arguments of the given method invocation.
          * An exception will be thrown if there were already matchers reported for the invocation.
          *
          * @param invocation the method invocation, not null
          */
-        private void createMatchers(Invocation invocation) {
+        protected void createMatchers(Invocation invocation) {
             List<IArgumentMatcher> matchers = LastControl.pullMatchers();
             if (matchers != null && !matchers.isEmpty()) {
                 if (matchers.size() != invocation.getArguments().length) {
-                    throw new IllegalStateException("This mock control does not support mixing of no-argument matchers and per-argument matchers. " +
-                            "Either no matchers are defined and the reflection argument matcher is used by default or all matchers are defined explicitly (Eg by using refEq()).");
+                    throw new UnitilsException("This mocks control does not support mixing of no-argument matchers and per-argument matchers.\n" +
+                            "Either no matchers are defined (the reflection argument matcher is then used by default) or all matchers are defined explicitly (Eg by using refEq()).");
                 }
                 // put all matchers back since pull removes them
                 for (IArgumentMatcher matcher : matchers) {
@@ -177,12 +166,7 @@ public class LenientMocksControl extends MocksClassControl {
                 }
                 return;
             }
-            Object[] arguments = invocation.getArguments();
-            if (arguments == null) {
-                return;
-            }
-
-            for (Object argument : arguments) {
+            for (Object argument : invocation.getArguments()) {
                 LastControl.reportMatcher(new ReflectionArgumentMatcher<Object>(argument, modes));
             }
         }
@@ -249,13 +233,14 @@ public class LenientMocksControl extends MocksClassControl {
             recordState.setDefaultVoidCallable();
         }
 
+        @SuppressWarnings("deprecation")
         public void setDefaultMatcher(ArgumentsMatcher matcher) {
             recordState.setDefaultMatcher(matcher);
         }
 
+        @SuppressWarnings("deprecation")
         public void setMatcher(Method method, ArgumentsMatcher matcher) {
             recordState.setMatcher(method, matcher);
         }
     }
-
 }

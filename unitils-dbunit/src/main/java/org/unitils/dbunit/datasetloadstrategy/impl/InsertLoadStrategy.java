@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,33 +15,42 @@
  */
 package org.unitils.dbunit.datasetloadstrategy.impl;
 
-import java.sql.SQLException;
-
-import org.dbunit.DatabaseUnitException;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.operation.DatabaseOperation;
-import org.unitils.dbunit.util.DbUnitDatabaseConnection;
-import org.unitils.dbunit.datasetloadstrategy.impl.BaseDataSetLoadStrategy;
+import org.dbunit.operation.InsertOperation;
+import org.unitils.core.UnitilsException;
+import org.unitils.dbunit.connection.DbUnitConnection;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 
 /**
- * {@link DataSetLoadStrategy} that inserts the contents of the dataset into the database.
+ * {@link DataSetLoadStrategy} that inserts the contents of the data set into the database.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  * @see DatabaseOperation#INSERT
  */
-public class InsertLoadStrategy extends BaseDataSetLoadStrategy {
+public class InsertLoadStrategy implements DataSetLoadStrategy {
+
+    protected InsertOperation insertOperation;
+
+
+    public InsertLoadStrategy(InsertOperation insertOperation) {
+        this.insertOperation = insertOperation;
+    }
+
 
     /**
-     * Executes this DataSetLoadStrategy. This means the given dataset is inserted in the database using the given dbUnit
-     * database connection object.
+     * Loads the data set using DbUnit's insert strategy
      *
-     * @param dbUnitDatabaseConnection DbUnit class providing access to the database
-     * @param dataSet                  The dbunit dataset
+     * @param dbUnitConnection DbUnit class providing access to the database, not null
+     * @param dataSet          The dbunit data set, not null
      */
-    @Override
-    public void doExecute(DbUnitDatabaseConnection dbUnitDatabaseConnection, IDataSet dataSet) throws DatabaseUnitException, SQLException {
-        DatabaseOperation.INSERT.execute(dbUnitDatabaseConnection, dataSet);
+    public void loadDataSet(DbUnitConnection dbUnitConnection, IDataSet dataSet) {
+        try {
+            insertOperation.execute(dbUnitConnection, dataSet);
+
+        } catch (Exception e) {
+            throw new UnitilsException("Unable to insert data set.", e);
+        }
     }
 }

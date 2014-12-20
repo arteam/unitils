@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,112 +15,85 @@
  */
 package org.unitils.mock.core;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.mock.Mock;
+import org.unitils.mock.annotation.Dummy;
+import org.unitils.mock.core.matching.MatchingInvocationHandler;
+import org.unitils.mock.core.matching.MatchingInvocationHandlerFactory;
+import org.unitils.mock.core.proxy.impl.MatchingProxyInvocationHandler;
+import org.unitils.mock.mockbehavior.MockBehavior;
+import org.unitils.mock.mockbehavior.MockBehaviorFactory;
+
+import static org.junit.Assert.assertSame;
 
 /**
- * Tests the mock object functionality.
- *
  * @author Tim Ducheyne
- * @author Filip Neven
  */
-public class MockObjectRaisesTest {
+public class MockObjectRaisesTest extends UnitilsJUnit4 {
 
-    /* Class under test */
-    private MockObject<TestClass> mockObject;
+    private MockObject<Object> mockObject;
+
+    private Mock<MockBehaviorFactory> mockBehaviorFactoryMock;
+    private Mock<MatchingInvocationHandlerFactory> matchingInvocationHandlerFactoryMock;
+    private Mock<MatchingProxyInvocationHandler> matchingProxyInvocationHandlerMock;
+    @Dummy
+    private Object matchingProxy;
+    @Dummy
+    private MockBehavior mockBehavior;
+    @Dummy
+    private BehaviorDefiningInvocations behaviorDefiningInvocations;
+    @Dummy
+    private MatchingInvocationHandler matchingInvocationHandler;
 
 
     @Before
-    public void setUp() {
-        mockObject = new MockObject<TestClass>("testMock", TestClass.class, this);
+    public void initialize() {
+        mockObject = new MockObject<Object>("name", Object.class, null, matchingProxy, false, behaviorDefiningInvocations,
+                matchingProxyInvocationHandlerMock.getMock(), mockBehaviorFactoryMock.getMock(), matchingInvocationHandlerFactoryMock.getMock(), null, null);
     }
 
 
-    /**
-     * Tests setting an exception behavior for the mock. The behavior is an always matching behavior
-     * so the method should keep throwing that same exception.
-     */
     @Test
     public void raises() {
-        mockObject.raises(new ThreadDeath()).testMethodString();
+        mockBehaviorFactoryMock.returns(mockBehavior).createExceptionThrowingMockBehavior(NullPointerException.class);
+        matchingInvocationHandlerFactoryMock.returns(matchingInvocationHandler).createBehaviorDefiningMatchingInvocationHandler(mockBehavior, false, behaviorDefiningInvocations);
 
-        boolean exception1 = false;
-        try {
-            mockObject.getMock().testMethodString();
-        } catch (ThreadDeath e) {
-            exception1 = true;
-        }
-        boolean exception2 = false;
-        try {
-            mockObject.getMock().testMethodString();
-        } catch (ThreadDeath e) {
-            exception2 = true;
-        }
-        assertTrue(exception1);
-        assertTrue(exception2);
+        Object result = mockObject.raises(NullPointerException.class);
+        assertSame(matchingProxy, result);
+        matchingProxyInvocationHandlerMock.assertInvoked().startMatchingInvocation("name", true, matchingInvocationHandler);
     }
-
-
-    /**
-     * Tests setting an once exception behavior for the mock. The behavior should be executed only once, the second time
-     * no exception should be raised.
-     */
-    @Test
-    public void onceRaises() {
-        mockObject.onceRaises(new ThreadDeath()).testMethodString();
-
-        boolean exception1 = false;
-        try {
-            mockObject.getMock().testMethodString();
-        } catch (ThreadDeath e) {
-            exception1 = true;
-        }
-        boolean exception2 = false;
-        try {
-            mockObject.getMock().testMethodString();
-        } catch (ThreadDeath e) {
-            exception2 = true;
-        }
-        assertTrue(exception1);
-        assertFalse(exception2);
-    }
-
 
     @Test
-    public void raisesWithExceptionClass() {
-        mockObject.raises(IllegalArgumentException.class).testMethodString();
+    public void raisesInstance() {
+        mockBehaviorFactoryMock.returns(mockBehavior).createExceptionThrowingMockBehavior(new NullPointerException("expected"));
+        matchingInvocationHandlerFactoryMock.returns(matchingInvocationHandler).createBehaviorDefiningMatchingInvocationHandler(mockBehavior, false, behaviorDefiningInvocations);
 
-        try {
-            mockObject.getMock().testMethodString();
-            fail("Expected exception");
-        } catch (IllegalArgumentException e) {
-            // expected
-        }
+        Object result = mockObject.raises(new NullPointerException("expected"));
+        assertSame(matchingProxy, result);
+        matchingProxyInvocationHandlerMock.assertInvoked().startMatchingInvocation("name", true, matchingInvocationHandler);
     }
-
 
     @Test
-    public void onceRaisesWithexceptionClass() {
-        mockObject.onceRaises(IllegalArgumentException.class).testMethodString();
+    public void chainedRaises() {
+        mockObject = new MockObject<Object>("name", Object.class, null, matchingProxy, true, behaviorDefiningInvocations,
+                matchingProxyInvocationHandlerMock.getMock(), mockBehaviorFactoryMock.getMock(), matchingInvocationHandlerFactoryMock.getMock(), null, null);
+        mockBehaviorFactoryMock.returns(mockBehavior).createExceptionThrowingMockBehavior(NullPointerException.class);
+        matchingInvocationHandlerFactoryMock.returns(matchingInvocationHandler).createBehaviorDefiningMatchingInvocationHandler(mockBehavior, false, behaviorDefiningInvocations);
 
-        try {
-            mockObject.getMock().testMethodString();
-            fail("Expected exception");
-        } catch (IllegalArgumentException e) {
-            // expected
-        }
+        mockObject.raises(NullPointerException.class);
+        matchingProxyInvocationHandlerMock.assertInvoked().startMatchingInvocation("name", false, matchingInvocationHandler);
     }
 
+    @Test
+    public void chainedRaisesInstance() {
+        mockObject = new MockObject<Object>("name", Object.class, null, matchingProxy, true, behaviorDefiningInvocations,
+                matchingProxyInvocationHandlerMock.getMock(), mockBehaviorFactoryMock.getMock(), matchingInvocationHandlerFactoryMock.getMock(), null, null);
+        mockBehaviorFactoryMock.returns(mockBehavior).createExceptionThrowingMockBehavior(new NullPointerException("expected"));
+        matchingInvocationHandlerFactoryMock.returns(matchingInvocationHandler).createBehaviorDefiningMatchingInvocationHandler(mockBehavior, false, behaviorDefiningInvocations);
 
-    /**
-     * Interface that is mocked during the tests
-     */
-    private static interface TestClass {
-
-        public String testMethodString();
-
+        mockObject.raises(new NullPointerException("expected"));
+        matchingProxyInvocationHandlerMock.assertInvoked().startMatchingInvocation("name", false, matchingInvocationHandler);
     }
 }

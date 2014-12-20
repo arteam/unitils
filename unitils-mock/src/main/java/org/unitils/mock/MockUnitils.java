@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,10 @@ package org.unitils.mock;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Unitils;
-import org.unitils.mock.core.MockObject;
-import org.unitils.mock.core.Scenario;
-import org.unitils.mock.dummy.DummyObjectUtil;
+import org.unitils.mock.core.*;
+import org.unitils.mock.report.ScenarioReport;
 
-import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationStackTrace;
+import java.util.List;
 
 /**
  * @author Filip Neven
@@ -32,53 +31,75 @@ import static org.unitils.mock.core.proxy.StackTraceUtils.getInvocationStackTrac
 public class MockUnitils {
 
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(MockModule.class);
+    protected static Log logger = LogFactory.getLog(MockUnitils.class);
 
 
     public static void assertNoMoreInvocations() {
-        MockObject.getCurrentScenario().assertNoMoreInvocations(getInvocationStackTrace(MockUnitils.class, false));
+        getMockService().assertNoMoreInvocations();
+    }
+
+    public static <T> Mock<T> createMock(Class<T> type, Object testObject) {
+        return createMock(null, type, testObject);
+    }
+
+    public static <T> Mock<T> createMock(String name, Class<T> type, Object testObject) {
+        return getMockFactory().createMock(name, type, testObject);
+    }
+
+
+    public static <T> PartialMock<T> createPartialMock(Class<T> type, Object testObject) {
+        return createPartialMock(null, type, testObject);
+    }
+
+    public static <T> PartialMock<T> createPartialMock(String name, Class<T> type, Object testObject) {
+        return getMockFactory().createPartialMock(name, type, testObject);
+    }
+
+    public static <T> PartialMock<T> createPartialMock(T mockPrototype, Object testObject) {
+        return createPartialMock(null, mockPrototype, testObject);
+    }
+
+    public static <T> PartialMock<T> createPartialMock(String name, T mockPrototype, Object testObject) {
+        return getMockFactory().createPartialMock(name, mockPrototype, testObject);
     }
 
 
     public static <T> T createDummy(Class<T> type) {
-        return DummyObjectUtil.createDummy(type);
+        return createDummy(null, type);
+    }
+
+    public static <T> T createDummy(String name, Class<T> type) {
+        return getDummyFactory().createDummy(name, type);
     }
 
 
-    public static void logFullScenarioReport() {
-        Scenario scenario = getScenario();
-        if (scenario != null) {
-            logger.info("\n\n" + scenario.createFullReport());
-        }
+    public static void logScenarioReport() {
+        String report = getScenarioReport().createReport();
+        logger.info(report);
     }
 
-    public static void logObservedScenario() {
-        Scenario scenario = getScenario();
-        if (scenario != null) {
-            logger.info("\n\nObserved scenario:\n\n" + scenario.createObservedInvocationsReport());
-        }
-    }
-
-    public static void logDetailedObservedScenario() {
-        Scenario scenario = getScenario();
-        if (scenario != null) {
-            logger.info("\n\nDetailed observed scenario:\n\n" + scenario.createDetailedObservedInvocationsReport());
-        }
-    }
-
-    public static void logSuggestedAsserts() {
-        Scenario scenario = getScenario();
-        if (scenario != null) {
-            logger.info("\n\nSuggested assert statements:\n\n" + scenario.createSuggestedAssertsReport());
-        }
+    public static List<ObservedInvocation> getObservedInvocations() {
+        return getScenario().getObservedInvocations();
     }
 
 
-    private static Scenario getScenario() {
-        return MockObject.getCurrentScenario();
+    protected static Scenario getScenario() {
+        return Unitils.getInstanceOfType(Scenario.class);
     }
 
-    private static MockModule getMockModule() {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(MockModule.class);
+    protected static MockService getMockService() {
+        return Unitils.getInstanceOfType(MockService.class);
+    }
+
+    protected static MockFactory getMockFactory() {
+        return Unitils.getInstanceOfType(MockFactory.class);
+    }
+
+    protected static DummyFactory getDummyFactory() {
+        return Unitils.getInstanceOfType(DummyFactory.class);
+    }
+
+    protected static ScenarioReport getScenarioReport() {
+        return Unitils.getInstanceOfType(ScenarioReport.class);
     }
 }

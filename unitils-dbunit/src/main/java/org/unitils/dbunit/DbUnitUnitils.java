@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,75 +15,73 @@
  */
 package org.unitils.dbunit;
 
-import org.unitils.core.Unitils;
+import org.unitils.dbunit.connection.DbUnitConnectionManager;
+import org.unitils.dbunit.core.DataSetService;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 
-import java.io.File;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.unitils.core.Unitils.getInstanceOfType;
+import static org.unitils.core.util.ReflectionUtils.getTestClass;
 
 /**
- * Class providing access to the functionality of the dbunit module using static methods. Meant
+ * Class providing access to the functionality of the DbUnit module using static methods. Meant
  * to be used directly in unit tests.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class DbUnitUnitils {
 
+    /**
+     * Inserts the data set consisting of the given list of files into the database
+     *
+     * @param fileNames The names of the files that define the test data
+     */
+    public static void insertDataSet(Object testInstanceOrClass, String... fileNames) {
+        Class<?> testClass = getTestClass(testInstanceOrClass);
+        List<String> dataSetFileNames = fileNames == null ? null : asList(fileNames);
+        getDataSetService().loadDataSets(dataSetFileNames, testClass, null, null);
+    }
 
     /**
-     * Inserts the default dataset for the given test class into the database
+     * Inserts the test data coming from the given DbUnit data set file.
      *
-     * @param testInstance The current test instance (e.g. this if your in the test), not null
+     * @param dataSetFactoryClass      The class of the factory that must be used to read this data set
+     * @param dataSetLoadStrategyClass The class of the load strategy that must be used to load this data set
      */
-    public static void insertDefaultDataSet(Object testInstance) {
-        getDbUnitModule().insertDefaultDataSet(testInstance.getClass());
+    public static void insertDataSet(Object testInstanceOrClass, Class<? extends DataSetLoadStrategy> dataSetLoadStrategyClass, Class<? extends DataSetFactory> dataSetFactoryClass, String... fileNames) {
+        Class<?> testClass = getTestClass(testInstanceOrClass);
+        List<String> dataSetFileNames = fileNames == null ? null : asList(fileNames);
+        getDataSetService().loadDataSets(dataSetFileNames, testClass, dataSetLoadStrategyClass, dataSetFactoryClass);
     }
 
 
-    /**
-     * Inserts the dataset consisting of the given list of files into the database
-     *
-     * @param testInstance     The current test instance (e.g. this if your in the test), not null
-     * @param dataSetFileNames The names of the files that define the test data
-     */
-    public static void insertDataSet(Object testInstance, String... dataSetFileNames) {
-        getDbUnitModule().insertDataSet(testInstance.getClass(), dataSetFileNames);
+    public static void assertExpectedDataSet(Object testInstanceOrClass, String... fileNames) {
+        Class<?> testClass = getTestClass(testInstanceOrClass);
+        List<String> dataSetFileNames = fileNames == null ? null : asList(fileNames);
+        getDataSetService().assertExpectedDataSets(dataSetFileNames, null, testClass, null);
+    }
+
+    public static void assertExpectedDataSet(Object testInstanceOrClass, Class<? extends DataSetFactory> dataSetFactoryClass, String... fileNames) {
+        Class<?> testClass = getTestClass(testInstanceOrClass);
+        List<String> dataSetFileNames = fileNames == null ? null : asList(fileNames);
+        getDataSetService().assertExpectedDataSets(dataSetFileNames, null, testClass, dataSetFactoryClass);
     }
 
 
-    /**
-     * Inserts the test data coming from the given DbUnit dataset file,
-     * using the default {@link DataSetLoadStrategy} and {@link DataSetFactory} class.
-     *
-     * @param dataSetFile The test data set, not null
-     */
-    public static void insertDataSet(File dataSetFile) {
-        getDbUnitModule().insertDataSet(dataSetFile);
+    public static void resetDbUnitConnections() {
+        getDbUnitConnectionManager().resetDbUnitConnections();
     }
 
 
-    /**
-     * Inserts the test data coming from the given DbUnit dataset file.
-     *
-     * @param dataSetFile              The test data set, not null
-     * @param dataSetFactoryClass      The class of the factory that must be used to read this dataset
-     * @param dataSetLoadStrategyClass The class of the load strategy that must be used to load this dataset
-     */
-    public static void insertDataSet(File dataSetFile, Class<? extends DataSetFactory> dataSetFactoryClass, Class<? extends DataSetLoadStrategy> dataSetLoadStrategyClass) {
-        getDbUnitModule().insertDataSet(dataSetFile, dataSetFactoryClass, dataSetLoadStrategyClass);
+    protected static DataSetService getDataSetService() {
+        return getInstanceOfType(DataSetService.class);
     }
 
-
-    /**
-     * Gets the instance DbUnitModule that is registered in the modules repository.
-     * This instance implements the actual behavior of the static methods in this class.
-     * This way, other implementations can be plugged in, while keeping the simplicity of using static methods.
-     *
-     * @return the instance, not null
-     */
-    private static DbUnitModule getDbUnitModule() {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(DbUnitModule.class);
+    protected static DbUnitConnectionManager getDbUnitConnectionManager() {
+        return getInstanceOfType(DbUnitConnectionManager.class);
     }
-
 }

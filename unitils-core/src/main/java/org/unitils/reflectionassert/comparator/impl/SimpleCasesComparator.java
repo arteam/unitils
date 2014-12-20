@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,10 @@ public class SimpleCasesComparator implements Comparator {
         if ((left instanceof Character || left instanceof Number) && (right instanceof Character || right instanceof Number)) {
             return true;
         }
+        if (left instanceof Throwable || right instanceof Throwable) {
+            // use object comparator for exceptions
+            return false;
+        }
         if (left.getClass().getName().startsWith("java.lang") || right.getClass().getName().startsWith("java.lang")) {
             return true;
         }
@@ -66,7 +70,6 @@ public class SimpleCasesComparator implements Comparator {
         }
         return false;
     }
-
 
     /**
      * Compares the given values.
@@ -137,11 +140,10 @@ public class SimpleCasesComparator implements Comparator {
      * @param object the Character or Number, not null
      * @return the value as a Double (this way NaN and infinity can be compared)
      */
-    private Double getDoubleValue(Object object) {
+    protected Double getDoubleValue(Object object) {
         if (object instanceof Number) {
             return ((Number) object).doubleValue();
         }
         return (double) ((Character) object).charValue();
     }
-
 }

@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset xmlns="PUBLIC" xmlns:a="SCHEMA_A" xmlns:b="SCHEMA_B">
+
+    <TEST dataset="111"/>
+    <a:TEST dataset="222"/>
+    <b:TEST dataset="333"/>
+
+</dataset>

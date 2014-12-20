@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,14 @@
  */
 package org.unitils.reflectionassert;
 
-import junit.framework.TestCase;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
-import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 /**
  * Test class for {@link ReflectionAssert} tests for cyclic dependencies between collections.
@@ -30,7 +32,7 @@ import java.util.Set;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ReflectionAssertCyclicCollectionTest extends TestCase {
+public class ReflectionAssertCyclicCollectionTest {
 
     /* Test object containing a collection that contains a loop */
     private TestObject testObjectA;
@@ -42,9 +44,8 @@ public class ReflectionAssertCyclicCollectionTest extends TestCase {
     /**
      * Initializes the test fixture.
      */
-    public void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void initialize() throws Exception {
         testObjectA = createTestObject();
         testObjectB = createTestObject();
     }
@@ -54,6 +55,7 @@ public class ReflectionAssertCyclicCollectionTest extends TestCase {
      * Tests the comparison of objects containing the cyclic dependency.
      * This should pass and should not cause a StackOverflow.
      */
+    @Test
     public void testAssertReflectionEquals_infiniteLoop() {
         assertReflectionEquals(testObjectA, testObjectB);
     }
@@ -63,6 +65,7 @@ public class ReflectionAssertCyclicCollectionTest extends TestCase {
      * Tests the comparison of objects containing the cyclic dependency.
      * This should pass and should not cause a StackOverflow.
      */
+    @Test
     public void testAssertLenientEquals_infiniteLoop() {
         assertLenientEquals(testObjectA, testObjectB);
     }

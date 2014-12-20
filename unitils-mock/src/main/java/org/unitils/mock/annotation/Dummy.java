@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  */
 package org.unitils.mock.annotation;
 
+import org.unitils.core.annotation.FieldAnnotation;
+import org.unitils.mock.listener.DummyFieldAnnotationListener;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -25,14 +28,14 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Annotation that can be used on fields to create dummy objects for these fields. A dummy object is a proxy that will return default values
  * for every method. This can be used to quickly create test objects without having to worry about correctly filling in every field. Even
  * classes with non-public default constructors can be dummyfied by annotating the field.
- *
+ * <p/>
  * Example:
  * <ul>
  * <li>'@Dummy private MyClass myClass; '</li>
  * </ul>
  * This will create a proxy for MyClass that will return default values for all methods. The dummy will be created
  * regardless whether there is a default constructor.
- *
+ * <p/>
  * <p/>
  * Following defaults are used:
  * <ul>
@@ -45,6 +48,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
+@FieldAnnotation(DummyFieldAnnotationListener.class)
 public @interface Dummy {
 
 }

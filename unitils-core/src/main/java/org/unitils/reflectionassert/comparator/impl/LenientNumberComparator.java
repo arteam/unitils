@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,8 +58,8 @@ public class LenientNumberComparator implements Comparator {
     public Difference compare(Object left, Object right, boolean onlyFirstDifference, ReflectionComparator reflectionComparator) {
         // check if right and left have same number value (including NaN and Infinity)
         final String differenceMessage = "Different primitive values";
-        if( left instanceof Long && right instanceof Long){
-            if (!((Long)left).equals(((Long)right))) {
+        if (left instanceof Long && right instanceof Long) {
+            if (!((Long) left).equals(((Long) right))) {
                 return new Difference(differenceMessage, left, right);
             }
         }
@@ -78,7 +78,7 @@ public class LenientNumberComparator implements Comparator {
      * @param object the Character or Number, not null
      * @return the value as a Double (this way NaN and infinity can be compared)
      */
-    private Double getDoubleValue(Object object) {
+    protected Double getDoubleValue(Object object) {
         if (object instanceof Number) {
             return ((Number) object).doubleValue();
         }

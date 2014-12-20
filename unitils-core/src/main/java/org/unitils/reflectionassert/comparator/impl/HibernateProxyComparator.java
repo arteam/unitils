@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.comparator.Comparator;
 import org.unitils.reflectionassert.difference.Difference;
 import org.unitils.reflectionassert.difference.ObjectDifference;
+
 import static org.unitils.reflectionassert.util.HibernateUtil.*;
 
 /**
@@ -60,8 +61,8 @@ public class HibernateProxyComparator implements Comparator {
      */
     public Difference compare(Object left, Object right, boolean onlyFirstDifference, ReflectionComparator reflectionComparator) {
         if (isUninitialized(left) && isUninitialized(right)) {
-            String leftType = getEntitiyName(left);
-            String rightType = getEntitiyName(right);
+            String leftType = getEntityName(left);
+            String rightType = getEntityName(right);
             if (leftType == null || !leftType.equals(rightType)) {
                 return new ObjectDifference("Different hibernate proxy types. Left: " + leftType + ", right: " + rightType, left, right);
             }

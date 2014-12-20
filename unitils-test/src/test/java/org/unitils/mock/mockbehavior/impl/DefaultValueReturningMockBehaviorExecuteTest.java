@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Tim Ducheyne
@@ -34,80 +33,100 @@ import static org.junit.Assert.assertTrue;
  */
 public class DefaultValueReturningMockBehaviorExecuteTest {
 
-    /* Tested object */
     private DefaultValueReturningMockBehavior defaultValueReturningMockBehavior = new DefaultValueReturningMockBehavior();
+
+
+    @Test
+    public void proxyNameForToStringMethod() throws Exception {
+        Method method = Object.class.getMethod("toString");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, "proxy name", null, method, null, null);
+
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        assertEquals("proxy name", result);
+    }
 
     @Test
     public void list() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("listMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("listMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof List);
     }
 
     @Test
     public void set() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("setMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("setMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Set);
     }
 
     @Test
     public void map() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("mapMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("mapMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Map);
     }
 
     @Test
     public void collection() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("collectionMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("collectionMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Collection);
     }
 
     @Test
     public void array() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("arrayMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("arrayMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof String[]);
     }
 
     @Test
     public void booleanPrimitiveValue() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("booleanPrimitiveMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("booleanPrimitiveMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Boolean);
     }
 
     @Test
     public void booleanValue() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("booleanMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("booleanMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertTrue(result instanceof Boolean);
     }
 
     @Test
     public void nullForObject() throws Exception {
-        ProxyInvocation proxyInvocation = createProxyInvocation(TestClass.class.getMethod("dataSourceMethod"));
-        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        Method method = TestClass.class.getMethod("dataSourceMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
 
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
+        assertNull(result);
+    }
+
+    @Test
+    public void nullForVoid() throws Exception {
+        Method method = TestClass.class.getMethod("voidMethod");
+        ProxyInvocation proxyInvocation = new ProxyInvocation(null, null, null, method, null, null);
+
+        Object result = defaultValueReturningMockBehavior.execute(proxyInvocation);
         assertNull(result);
     }
 
 
-    private ProxyInvocation createProxyInvocation(Method method) {
-        return new ProxyInvocation(null, null, method, null, null);
-    }
-
-
-    @SuppressWarnings({"UnusedDeclaration"})
     private static interface TestClass {
 
         List listMethod();
@@ -126,5 +145,6 @@ public class DefaultValueReturningMockBehaviorExecuteTest {
 
         DataSource dataSourceMethod();
 
+        void voidMethod();
     }
 }

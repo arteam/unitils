@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import static java.lang.reflect.Modifier.isAbstract;
 /**
  * Mock behavior that, instead of mocking the method invocation, performs the actual behavior of the mocked class.
  * This is used to implement the partial mock behavior.
- *
+ * <p/>
  * If there is no original behavior, e.g. mocking of an interface or abstract method, an exception is raised.
  *
  * @author Filip Neven
@@ -42,10 +42,11 @@ public class OriginalBehaviorInvokingMockBehavior implements ValidatableMockBeha
      */
     public void assertCanExecute(ProxyInvocation proxyInvocation) throws UnitilsException {
         if (isAbstract(proxyInvocation.getMethod().getModifiers())) {
-            throw new UnitilsException("Unable to invoke the original method behavior: the method is an abstract method.");
+            UnitilsException e = new UnitilsException("Unable to invoke the original method behavior. Invoked method is abstract: " + proxyInvocation.getMethod());
+            e.setStackTrace(proxyInvocation.getInvokedAtTrace());
+            throw e;
         }
     }
-
 
     /**
      * Executes the mock behavior.
@@ -56,5 +57,4 @@ public class OriginalBehaviorInvokingMockBehavior implements ValidatableMockBeha
     public Object execute(ProxyInvocation proxyInvocation) throws Throwable {
         return proxyInvocation.invokeOriginalBehavior();
     }
-
 }

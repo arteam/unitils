@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,9 @@ import java.util.List;
 public class Row {
 
     /* The primary key columns, empty if none defined */
-    private List<Column> primaryKeyColumns = new ArrayList<Column>();
-
+    protected List<Column> primaryKeyColumns = new ArrayList<Column>();
     /* The columns of the row */
-    private List<Column> columns = new ArrayList<Column>();
+    protected List<Column> columns = new ArrayList<Column>();
 
 
     /**
@@ -57,14 +56,12 @@ public class Row {
         return null;
     }
 
-
     /**
      * @return The primary key columns, empty if none defined
      */
     public List<Column> getPrimaryKeyColumns() {
         return primaryKeyColumns;
     }
-
 
     /**
      * @return The columns of the row, not null
@@ -73,7 +70,6 @@ public class Row {
         return columns;
     }
 
-
     /**
      * Adds a column to the row. A column can only be added once.
      *
@@ -81,13 +77,13 @@ public class Row {
      * @throws UnitilsException When a value for the same column was already added
      */
     public void addPrimaryKeyColumn(Column primaryKeyColumn) {
-        Column existingColumn = getColumn(primaryKeyColumn.getName());
+        String name = primaryKeyColumn.getName();
+        Column existingColumn = getColumn(name);
         if (existingColumn != null) {
-            throw new UnitilsException("Unable to add primary column to data set row. Duplicate column name: " + primaryKeyColumn.getName());
+            throw new UnitilsException("Unable to add primary key column to data set row. Column with name '" + name + "' already exists.");
         }
         primaryKeyColumns.add(primaryKeyColumn);
     }
-
 
     /**
      * Adds a column to the row. A column can only be added once.
@@ -96,17 +92,17 @@ public class Row {
      * @throws UnitilsException When a value for the same column was already added
      */
     public void addColumn(Column column) {
-        Column existingColumn = getColumn(column.getName());
+        String name = column.getName();
+        Column existingColumn = getColumn(name);
         if (existingColumn != null) {
-            throw new UnitilsException("Unable to add column to data set row. Duplicate column name: " + column.getName());
+            throw new UnitilsException("Unable to add column to data set row. Column with name '" + name + "' already exists.");
         }
         columns.add(column);
     }
 
-
     /**
      * @param actualRow The row to compare with, not null
-     * @return True if the pk columns did not match
+     * @return True if the pk columns did not match, false when equal or no pk columns
      */
     public boolean hasDifferentPrimaryKeyColumns(Row actualRow) {
         for (Column primaryKeyColumn : actualRow.getPrimaryKeyColumns()) {
@@ -117,7 +113,6 @@ public class Row {
         }
         return false;
     }
-
 
     /**
      * Compares the row with the given actual row.
@@ -135,7 +130,6 @@ public class Row {
         }
         return rowDifference;
     }
-
 
     /**
      * Compares the given columns with the columns of the actual row.
@@ -157,5 +151,4 @@ public class Row {
             }
         }
     }
-
 }

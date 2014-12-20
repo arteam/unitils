@@ -1,0 +1,90 @@
+/*
+ * Copyright 2013,  Unitils.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.unitils.mock.core.proxy.impl;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.core.UnitilsException;
+import org.unitils.mock.Mock;
+import org.unitils.mock.annotation.Dummy;
+import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
+import org.unitils.mock.core.matching.MatchingInvocationHandler;
+import org.unitils.mock.core.util.StackTraceService;
+
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * @author Tim Ducheyne
+ */
+public class MatchingProxyInvocationHandlerStartMatchingInvocationTest extends UnitilsJUnit4 {
+
+    private MatchingProxyInvocationHandler matchingProxyInvocationHandler;
+
+    private Mock<ArgumentMatcherRepository> argumentMatcherRepositoryMock;
+    private Mock<StackTraceService> stackTraceServiceMock;
+    @Dummy
+    private MatchingInvocationHandler matchingInvocationHandler;
+    @Dummy
+    private Map proxy;
+    private StackTraceElement[] stackTrace;
+    private StackTraceElement[] stackTraceWithoutFirst;
+
+
+    @Before
+    public void initialize() {
+        matchingProxyInvocationHandler = new MatchingProxyInvocationHandler(argumentMatcherRepositoryMock.getMock(), stackTraceServiceMock.getMock());
+
+        StackTraceElement stackTraceElement1 = new StackTraceElement("class1", "method1", "file1", 111);
+        StackTraceElement stackTraceElement2 = new StackTraceElement("class2", "method2", "file2", 222);
+        stackTrace = new StackTraceElement[]{stackTraceElement1, stackTraceElement2};
+        stackTraceWithoutFirst = new StackTraceElement[]{stackTraceElement2};
+        stackTraceServiceMock.returns(stackTrace).getInvocationStackTrace(Mock.class);
+        stackTraceServiceMock.returns(stackTraceWithoutFirst).getStackTraceStartingFrom(stackTrace, 1);
+    }
+
+
+    @Test
+    public void startMatchingInvocation() {
+        matchingProxyInvocationHandler.startMatchingInvocation("mockName", false, matchingInvocationHandler);
+        argumentMatcherRepositoryMock.assertInvoked().startMatchingInvocation(222);
+    }
+
+    @Test
+    public void exceptionWhenNotCalledFromMock() {
+        stackTraceServiceMock.returns(null).getInvocationStackTrace(Mock.class);
+        try {
+            matchingProxyInvocationHandler.startMatchingInvocation("mockName", false, matchingInvocationHandler);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Unable to start matching invocation. Matching invocations are only supported from a Mock instance", e.getMessage());
+        }
+    }
+
+    @Test
+    public void exceptionWhenPreviousMatchingInvocationNotFinished() {
+        matchingProxyInvocationHandler.startMatchingInvocation("mockName", true, matchingInvocationHandler);
+        try {
+            matchingProxyInvocationHandler.startMatchingInvocation("mockName", true, matchingInvocationHandler);
+            fail("UnitilsException expected");
+        } catch (UnitilsException e) {
+            assertEquals("Invalid syntax: mockName.method1() must be followed by a method invocation on the returned proxy. E.g. mockName.method1().myMethod();", e.getMessage());
+        }
+    }
+}

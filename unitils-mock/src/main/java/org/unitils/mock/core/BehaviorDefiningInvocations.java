@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,35 +27,45 @@ import java.util.List;
  */
 public class BehaviorDefiningInvocations {
 
-    protected boolean removeWhenUsed;
+    /* Mock behaviors that are removed once they have been matched */
     protected List<BehaviorDefiningInvocation> behaviorDefiningInvocations = new ArrayList<BehaviorDefiningInvocation>();
 
 
-    public BehaviorDefiningInvocations(boolean removeWhenUsed) {
-        this.removeWhenUsed = removeWhenUsed;
+    public List<BehaviorDefiningInvocation> getBehaviorDefiningInvocations() {
+        return behaviorDefiningInvocations;
     }
-
 
     public void addBehaviorDefiningInvocation(BehaviorDefiningInvocation behaviorDefiningInvocation) {
         behaviorDefiningInvocations.add(behaviorDefiningInvocation);
     }
 
-
-    public void clear() {
+    public void reset() {
         behaviorDefiningInvocations.clear();
     }
-
 
     /**
      * First we find all behavior defining invocations that have matching argument matchers and take the one with the highest
      * matching score (identity match scores higher than an equals match). If there are 2 invocations with the same score,
-     * we take the invocation with the lowest nr of not-null (default) arguments. If both have the same nr of not-null
-     * arguments, the first one is returned. E.g.
-     *
+     * we take the invocation with the lowest nr of not-null (default) arguments.  E.g.
+     * <p/>
      * myMethod(null, null);
      * myMethod("a", null);
-     *
+     * <p/>
      * The second one will be returned if the given proxy invocation has the value "a" as first argument.
+     * If both have the same nr of not-null arguments, the last one is returned for always matching behavior.
+     * This way you can still override behavior that was set up before.
+     * For one time matching behavior we always return the first match.
+     * E.g.
+     * <p/>
+     * myMock.returns(1).myMethod();
+     * myMock.returns(2).myMethod();
+     * <p/>
+     * Will always return 2 since the behavior is overridden (last one wins)
+     * <p/>
+     * myMock.onceReturns(1).myMethod();
+     * myMock.onceReturns(2).myMethod();
+     * <p/>
+     * Will first return 1 and then return 2 (order is kept)
      *
      * @param proxyInvocation The actual invocation to match with, not null
      * @return The behavior defining invocation that matches best with the actual invocation, null if none found
@@ -64,7 +74,9 @@ public class BehaviorDefiningInvocations {
         BehaviorDefiningInvocation bestMatchingBehaviorDefiningInvocation = null;
         int bestMatchingScore = -1;
 
-        for (BehaviorDefiningInvocation behaviorDefiningInvocation : behaviorDefiningInvocations) {
+        int count = behaviorDefiningInvocations.size();
+        for (int i = count - 1; i >= 0; i--) {
+            BehaviorDefiningInvocation behaviorDefiningInvocation = behaviorDefiningInvocations.get(i);
             int matchingScore = behaviorDefiningInvocation.matches(proxyInvocation);
             if (matchingScore == -1) {
                 // no match
@@ -85,13 +97,22 @@ public class BehaviorDefiningInvocations {
                 int nrOfNotNullArguments = behaviorDefiningInvocation.getNrOfNotNullArguments();
                 int bestMatchingNrOfNotNullArguments = bestMatchingBehaviorDefiningInvocation.getNrOfNotNullArguments();
                 if (nrOfNotNullArguments > bestMatchingNrOfNotNullArguments) {
-                    bestMatchingScore = matchingScore;
                     bestMatchingBehaviorDefiningInvocation = behaviorDefiningInvocation;
+                    continue;
+                }
+                // same score, one time matcher wins over always matcher + first one time matcher wins
+                if (nrOfNotNullArguments == bestMatchingNrOfNotNullArguments) {
+                    if (behaviorDefiningInvocation.isOneTimeMatch()) {
+                        bestMatchingBehaviorDefiningInvocation = behaviorDefiningInvocation;
+                    }
                 }
             }
         }
-        if (removeWhenUsed && bestMatchingBehaviorDefiningInvocation != null) {
-            behaviorDefiningInvocations.remove(bestMatchingBehaviorDefiningInvocation);
+        if (bestMatchingBehaviorDefiningInvocation != null) {
+            bestMatchingBehaviorDefiningInvocation.matched(proxyInvocation);
+            if (bestMatchingBehaviorDefiningInvocation.isOneTimeMatch()) {
+                behaviorDefiningInvocations.remove(bestMatchingBehaviorDefiningInvocation);
+            }
         }
         return bestMatchingBehaviorDefiningInvocation;
     }

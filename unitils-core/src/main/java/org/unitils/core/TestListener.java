@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,40 +15,95 @@
  */
 package org.unitils.core;
 
+import org.unitils.core.reflect.ClassWrapper;
+
 /**
- * Empty test execution listener implementation. Override methods to add behavior.
+ * Listener for test events. The events must follow following ordering:
+ * <ul>
+ * <li>[Unitils] beforeTestClass   - TestClass1</li>
+ * <li>[Test]    testBeforeClass   - TestClass1  (not for JUnit3)</li>
+ * <li>[Unitils] beforeTestSetUp   - TestClass1</li>
+ * <li>[Test]    testSetUp         - TestClass1</li>
+ * <li>[Unitils] beforeTestMethod  - TestClass1 - test1</li>
+ * <li>[Test]    testMethod        - TestClass1 - test1</li>
+ * <li>[Unitils] afterTestMethod   - TestClass1 - test1</li>
+ * <li>[Test]    testTearDown      - TestClass1</li>
+ * <li>[Unitils] afterTestTearDown - TestClass1</li>
+ * <li>[Unitils] beforeTestSetUp   - TestClass1</li>
+ * <li>[Test]    testSetUp         - TestClass1</li>
+ * <li>[Unitils] beforeTestMethod  - TestClass1 - test2</li>
+ * <li>[Test]    testMethod        - TestClass1 - test2</li>
+ * <li>[Unitils] afterTestMethod   - TestClass1 - test2</li>
+ * <li>[Test]    testTearDown      - TestClass1</li>
+ * <li>[Unitils] afterTestTearDown - TestClass1</li>
+ * <li>[Test]    testAfterClass    - TestClass1 (not for JUnit3)</li>
+ * </ul>
+ * <p/>
+ * The after methods will always when be called the before counterpart has run (or begun). For example if
+ * an exception occurs during the beforeTestSetup method, the afterTestTearDown method will still be called.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public abstract class TestListener {
 
-    /**
-     * Invoked before any BeforeClass method is called on the test. At this moment only the test class is known,
-     * the test instance and test method are not available.
-     * <br/><br/>
-     * Note: for JUnit 3 and also for spring 2.5.6 this method is called just before the {@link #beforeTest}
-     * method because these do not support the before/after test class behavior.
-     *
-     * @param currentTestClass The current test class, not null
-     */
-    public void beforeTestClass(CurrentTestClass currentTestClass) throws Exception {
+    public TestPhase getTestPhase() {
+        return TestPhase.EXECUTION;
     }
 
     /**
-     * Invoked after the Before method but before the actual test method is called on the test.
+     * Invoked before the generic class setup (e.g. @BeforeClass) is performed.
      *
-     * @param currentTestInstance The current test instance, not null
+     * @param classWrapper The test class, not null
      */
-    public void beforeTest(CurrentTestInstance currentTestInstance) throws Exception {
+    public void beforeTestClass(ClassWrapper classWrapper) {
     }
 
     /**
-     * Invoked after all After methods are called on the test.
+     * Invoked before the test setup (eg @Before) is run.
+     * This can be overridden to for example initialize the test-fixture.
      *
-     * @param currentTestInstance The current test class, not null
+     * @param testInstance The test instance, not null
      */
-    public void afterTest(CurrentTestInstance currentTestInstance) throws Exception {
+    public void beforeTestSetUp(TestInstance testInstance) {
     }
 
+    /**
+     * Invoked before the test but after the test setup (eg @Before) is run.
+     * This can be overridden to for example further initialize the test-fixture using values that were set during
+     * the test setup.
+     *
+     * @param testInstance The test instance, not null
+     */
+    public void beforeTestMethod(TestInstance testInstance) {
+    }
+
+    /**
+     * Invoked after the test run but before the test tear down (e.g. @After).
+     * This can be overridden to for example add assertions for testing the result of the test.
+     * It the before method or the test raised an exception, this exception will be passed to the method.
+     *
+     * @param testInstance  The test instance, not null
+     * @param testThrowable The throwable thrown during the test or beforeTestMethod, null if none was thrown
+     */
+    public void afterTestMethod(TestInstance testInstance, Throwable testThrowable) {
+    }
+
+    /**
+     * Invoked after the test tear down (eg @After).
+     * This can be overridden to for example perform extra cleanup after the test.
+     *
+     * @param testInstance  The test instance, not null
+     * @param testThrowable The throwable thrown during the test or beforeTestMethod, null if none was thrown
+     */
+    public void afterTestTearDown(TestInstance testInstance, Throwable testThrowable) {
+    }
+
+    /**
+     * Invoked after the generic class tear down (e.g. @AfterClass) is performed.
+     *
+     * @param classWrapper The test class, not null
+     */
+    public void afterTestClass(ClassWrapper classWrapper) {
+    }
 }

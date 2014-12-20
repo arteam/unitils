@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +19,20 @@ import org.unitils.core.UnitilsException;
 import org.unitils.core.util.ObjectToInjectHolder;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
-import static org.unitils.util.ReflectionUtils.isAssignable;
+
+import static org.unitils.core.util.ReflectionUtils.isAssignable;
 
 /**
  * Mock behavior that returns a given value.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  * @author Kenny Claes
  */
 public class ValueReturningMockBehavior implements ValidatableMockBehavior {
 
     /* The value to return */
-    private Object valueToReturn;
+    protected Object valueToReturn;
 
 
     /**
@@ -53,13 +54,12 @@ public class ValueReturningMockBehavior implements ValidatableMockBehavior {
     public void assertCanExecute(ProxyInvocation proxyInvocation) throws UnitilsException {
         Class<?> returnType = proxyInvocation.getMethod().getReturnType();
         if (returnType == Void.TYPE) {
-            throw new UnitilsException("Trying to make a void method return a value");
+            throw new UnitilsException("Trying to define mock behavior that returns a value for a void method.");
         }
         if (valueToReturn != null && !isAssignable(valueToReturn.getClass(), returnType)) {
-            throw new UnitilsException("Trying to make a method return a value who's type is not compatible with the return type. Value type: " + valueToReturn.getClass() + ", return type: " + returnType);
+            throw new UnitilsException("Trying to make a method return a value that is not assignable to the return type. Return type: " + returnType + ", value type: " + valueToReturn.getClass() + ", value: " + valueToReturn);
         }
     }
-
 
     /**
      * Executes the mock behavior.

@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ public class StubMockBehavior extends DefaultValueReturningMockBehavior {
      *
      * @param proxyInvocation The proxy method invocation, not null
      */
+    @Override
     public void assertCanExecute(ProxyInvocation proxyInvocation) throws UnitilsException {
         // allow void methods
     }

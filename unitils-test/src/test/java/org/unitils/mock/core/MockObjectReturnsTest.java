@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,146 +15,64 @@
  */
 package org.unitils.mock.core;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import org.junit.Before;
 import org.junit.Test;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.mock.Mock;
+import org.unitils.mock.annotation.Dummy;
+import org.unitils.mock.core.matching.MatchingInvocationHandler;
+import org.unitils.mock.core.matching.MatchingInvocationHandlerFactory;
+import org.unitils.mock.core.proxy.impl.MatchingProxyInvocationHandler;
+import org.unitils.mock.mockbehavior.MockBehavior;
+import org.unitils.mock.mockbehavior.MockBehaviorFactory;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import static org.junit.Assert.assertSame;
 
 /**
- * Tests the mock object functionality.
- *
  * @author Tim Ducheyne
- * @author Filip Neven
  */
-public class MockObjectReturnsTest {
+public class MockObjectReturnsTest extends UnitilsJUnit4 {
 
-    /* Class under test */
-    private MockObject<TestClass> mockObject;
+    private MockObject<Object> mockObject;
+
+    private Mock<MockBehaviorFactory> mockBehaviorFactoryMock;
+    private Mock<MatchingInvocationHandlerFactory> matchingInvocationHandlerFactoryMock;
+    private Mock<MatchingProxyInvocationHandler> matchingProxyInvocationHandlerMock;
+    @Dummy
+    private Object matchingProxy;
+    @Dummy
+    private MockBehavior mockBehavior;
+    @Dummy
+    private BehaviorDefiningInvocations behaviorDefiningInvocations;
+    @Dummy
+    private MatchingInvocationHandler matchingInvocationHandler;
+
 
     @Before
-    public void setUp() {
-        mockObject = new MockObject<TestClass>("testMock", TestClass.class, this);
+    public void initialize() {
+        mockObject = new MockObject<Object>("name", Object.class, null, matchingProxy, false, behaviorDefiningInvocations,
+                matchingProxyInvocationHandlerMock.getMock(), mockBehaviorFactoryMock.getMock(), matchingInvocationHandlerFactoryMock.getMock(), null, null);
     }
 
 
-    /**
-     * Tests setting a return behavior for the mock. The behavior is an always matching behavior
-     * so the method should keep returning that same value.
-     */
     @Test
     public void returns() {
-        mockObject.returns("aValue").testMethodString();
+        mockBehaviorFactoryMock.returns(mockBehavior).createValueReturningMockBehavior("value");
+        matchingInvocationHandlerFactoryMock.returns(matchingInvocationHandler).createBehaviorDefiningMatchingInvocationHandler(mockBehavior, false, behaviorDefiningInvocations);
 
-        String result1 = mockObject.getMock().testMethodString();
-        String result2 = mockObject.getMock().testMethodString();
-        assertLenientEquals("aValue", result1);
-        assertLenientEquals("aValue", result2);
+        Object result = mockObject.returns("value");
+        assertSame(matchingProxy, result);
+        matchingProxyInvocationHandlerMock.assertInvoked().startMatchingInvocation("name", true, matchingInvocationHandler);
     }
 
-
-    /**
-     * Tests setting a once return behavior for the mock. The behavior should be executed only once, the second time
-     * the default null value is returned.
-     */
     @Test
-    public void onceReturns() {
-        mockObject.onceReturns("aValue").testMethodString();
+    public void chainedReturns() {
+        mockObject = new MockObject<Object>("name", Object.class, null, matchingProxy, true, behaviorDefiningInvocations,
+                matchingProxyInvocationHandlerMock.getMock(), mockBehaviorFactoryMock.getMock(), matchingInvocationHandlerFactoryMock.getMock(), null, null);
+        mockBehaviorFactoryMock.returns(mockBehavior).createValueReturningMockBehavior("value");
+        matchingInvocationHandlerFactoryMock.returns(matchingInvocationHandler).createBehaviorDefiningMatchingInvocationHandler(mockBehavior, false, behaviorDefiningInvocations);
 
-        String result1 = mockObject.getMock().testMethodString();
-        String result2 = mockObject.getMock().testMethodString();
-        assertLenientEquals("aValue", result1);
-        assertNull(result2);
+        mockObject.returns("value");
+        matchingProxyInvocationHandlerMock.assertInvoked().startMatchingInvocation("name", false, matchingInvocationHandler);
     }
-
-
-    /**
-     * Tests the return behavior when no behavior was defined. The null value should be
-     * returned as default object value.
-     */
-    @Test
-    public void defaultBehaviorObject() {
-        String result = mockObject.getMock().testMethodString();
-        assertLenientEquals(null, result);
-    }
-
-
-    /**
-     * Tests the return behavior when no behavior was defined. The 0 value should be
-     * returned as default number value.
-     */
-    @Test
-    public void defaultBehaviorNumber() {
-        int result = mockObject.getMock().testMethodNumber();
-        assertLenientEquals(0, result);
-    }
-
-
-    /**
-     * Tests the return behavior when no behavior was defined. An empty list should be
-     * returned as default list value.
-     */
-    @Test
-    public void defaultBehaviorList() {
-        List<String> result = mockObject.getMock().testMethodList();
-        assertLenientEquals(0, result.size());
-    }
-
-
-    /**
-     * Tests the return behavior when no behavior was defined. An empty set should be
-     * returned as default set value.
-     */
-    @Test
-    public void defaultBehaviorSet() {
-        Set<String> result = mockObject.getMock().testMethodSet();
-        assertLenientEquals(0, result.size());
-    }
-
-
-    /**
-     * Tests the return behavior when no behavior was defined. An empty map should be
-     * returned as default map value.
-     */
-    @Test
-    public void defaultBehaviorMap() {
-        Map<String, String> result = mockObject.getMock().testMethodMap();
-        assertLenientEquals(0, result.size());
-    }
-
-
-    /**
-     * When a mock instance is given, the mock proxy instance should be returned instead.
-     */
-    @Test
-    public void returnsMock() {
-        MockObject<Set> mockedSet = new MockObject<Set>("mock", Set.class, this);
-        mockObject.returns(mockedSet).testMethodSet();
-
-        Set<String> result = mockObject.getMock().testMethodSet();
-        assertSame(mockedSet.getMock(), result);
-    }
-
-
-    /**
-     * Interface that is mocked during the tests
-     */
-    private static interface TestClass {
-
-        public String testMethodString();
-
-        public int testMethodNumber();
-
-        public List<String> testMethodList();
-
-        public Set<String> testMethodSet();
-
-        public Map<String, String> testMethodMap();
-
-    }
-
 }

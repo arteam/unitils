@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,15 @@
  */
 package org.unitils.inject.annotation;
 
-import static java.lang.annotation.ElementType.FIELD;
+import org.unitils.core.annotation.AnnotationDefault;
+import org.unitils.core.annotation.FieldAnnotation;
+import org.unitils.inject.listener.InjectIntoFieldAnnotationListener;
+
 import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Annotation indicating that the the {@link org.unitils.inject.InjectModule} should try to inject the object assigned to
@@ -33,15 +38,16 @@ import java.lang.annotation.Target;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
+@FieldAnnotation(InjectIntoFieldAnnotationListener.class)
 public @interface InjectInto {
 
     /**
-     * The name of the field that references the object to which the object in the annotated field should be injected.
-     * If not specified, the target is defined by the field annotated with {@link TestedObject}
+     * The name(s) of the field(s) that references the object to which the object in the annotated field should be injected.
+     * If not specified, the targets are defined by the fields annotated with {@link TestedObject}
      *
      * @return the target field, null for tested object
      */
-    String target() default "";
+    String[] target() default {};
 
     /**
      * OGNL expression that defines the property to which the object referenced by the annotated field is injected
@@ -50,4 +56,5 @@ public @interface InjectInto {
      */
     String property();
 
+    @AnnotationDefault("inject.autoCreateInnerFields") boolean autoCreateInnerFields() default true;
 }

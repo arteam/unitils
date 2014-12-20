@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,12 @@
  */
 package org.unitils.reflectionassert;
 
-import junit.framework.TestCase;
-import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
+import org.junit.Before;
+import org.junit.Test;
 import org.unitils.reflectionassert.difference.Difference;
+
+import static org.junit.Assert.*;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import static org.unitils.reflectionassert.util.InnerDifferenceFinder.getInnerDifference;
 
 /**
@@ -28,17 +31,14 @@ import static org.unitils.reflectionassert.util.InnerDifferenceFinder.getInnerDi
  * @author Filip Neven
  */
 @SuppressWarnings({"FieldCanBeLocal"})
-public class ReflectionComparatorEnumsTest extends TestCase {
+public class ReflectionComparatorEnumsTest {
 
     /* Test object */
     private Enums enumsA;
-
     /* Same as A but different instance */
     private Enums enumsB;
-
     /* Same as A and B but different value */
     private Enums enumsDifferentValue;
-
     /* Class under test */
     private ReflectionComparator reflectionComparator;
 
@@ -46,9 +46,8 @@ public class ReflectionComparatorEnumsTest extends TestCase {
     /**
      * Initializes the test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void initialize() throws Exception {
         reflectionComparator = createRefectionComparator();
 
         enumsA = new Enums(Enums.TestEnum.TEST1);
@@ -60,6 +59,7 @@ public class ReflectionComparatorEnumsTest extends TestCase {
     /**
      * Test for two equal enum values.
      */
+    @Test
     public void testGetDifference_equals() {
         Difference result = reflectionComparator.getDifference(enumsA, enumsB);
         assertNull(result);
@@ -69,6 +69,7 @@ public class ReflectionComparatorEnumsTest extends TestCase {
     /**
      * Test for two different enum values
      */
+    @Test
     public void testGetDifference_notEqualsDifferentValues() {
         Difference result = reflectionComparator.getDifference(enumsA, enumsDifferentValue);
 

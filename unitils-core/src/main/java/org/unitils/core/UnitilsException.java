@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package org.unitils.core;
+
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * Exception type, used for all unrecoverable exceptions that occur in unitils.
@@ -31,8 +33,33 @@ public class UnitilsException extends RuntimeException {
         super(message, cause);
     }
 
-    public UnitilsException(Throwable cause) {
-        super(cause);
-    }
 
+    @Override
+    public String getMessage() {
+        String message = super.getMessage();
+        Throwable cause = getCause();
+        if (message == null && cause == null) {
+            return null;
+        }
+        String causeMessage = null;
+        if (cause != null) {
+            causeMessage = cause.getMessage();
+        }
+
+        StringBuilder result = new StringBuilder();
+        if (!isBlank(message)) {
+            result.append(message);
+            if (!isBlank(causeMessage)) {
+                result.append("\nReason: ");
+            }
+        }
+        if (!isBlank(causeMessage)) {
+            if (!(cause instanceof UnitilsException)) {
+                result.append(cause.getClass().getSimpleName());
+                result.append(": ");
+            }
+            result.append(causeMessage);
+        }
+        return result.toString();
+    }
 }

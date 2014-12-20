@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,16 +30,13 @@ import java.util.List;
 public class SchemaDifference {
 
     /* The expected schema, not null */
-    private Schema schema;
-
+    protected Schema schema;
     /* The actual schema, not null */
-    private Schema actualSchema;
-
+    protected Schema actualSchema;
     /* The tables that were not found in the actual schema, empty if none found */
-    private List<Table> missingTables = new ArrayList<Table>();
-
+    protected List<Table> missingTables = new ArrayList<Table>();
     /* The differences between the tables of the schemas, empty if none found */
-    private List<TableDifference> tableDifferences = new ArrayList<TableDifference>();
+    protected List<TableDifference> tableDifferences = new ArrayList<TableDifference>();
 
 
     /**
@@ -61,7 +58,6 @@ public class SchemaDifference {
         return schema;
     }
 
-
     /**
      * @return The actual schema, not null
      */
@@ -69,14 +65,12 @@ public class SchemaDifference {
         return actualSchema;
     }
 
-
     /**
      * @return The differences between the tables of the schema, empty if none found
      */
     public List<TableDifference> getTableDifferences() {
         return tableDifferences;
     }
-
 
     /**
      * @return The tables that were not found in the actual schema, empty if none found
@@ -95,7 +89,6 @@ public class SchemaDifference {
         this.tableDifferences.add(tableDifference);
     }
 
-
     /**
      * Adds a table that was not found in the actual schema
      *
@@ -112,5 +105,4 @@ public class SchemaDifference {
     public boolean isMatch() {
         return missingTables.isEmpty() && tableDifferences.isEmpty();
     }
-
 }

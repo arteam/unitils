@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,11 @@
  */
 package org.unitils.reflectionassert;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 import org.unitils.reflectionassert.difference.Difference;
 
+import static org.junit.Assert.*;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import static org.unitils.reflectionassert.util.InnerDifferenceFinder.getInnerDifference;
 
@@ -28,7 +30,7 @@ import static org.unitils.reflectionassert.util.InnerDifferenceFinder.getInnerDi
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ReflectionComparatorPrimitivesTest extends TestCase {
+public class ReflectionComparatorPrimitivesTest {
 
     /* Test object */
     private Primitives primitivesA;
@@ -58,9 +60,8 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Initializes the test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void initialize() throws Exception {
         primitivesA = new Primitives(1, 2, null);
         primitivesB = new Primitives(1, 2, null);
         primitiveDifferentValue = new Primitives(1, 9999, null);
@@ -76,6 +77,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Test for two unequal but similar longs. (fix of UNI-117)
      */
+    @Test
     public void testGetDifference_longsNearlyTheSame() {
         Difference result = reflectionComparator.getDifference(719108101113563415L, 719108101113563395L);
         assertNotNull(result);
@@ -84,6 +86,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Test for two equal primitives.
      */
+    @Test
     public void testGetDifference_equals() {
         Difference result = reflectionComparator.getDifference(primitivesA, primitivesB);
         assertNull(result);
@@ -92,6 +95,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Test for two equal autoboxing. An autoboxed primitive should be considered equals to the object version.
      */
+    @Test
     @SuppressWarnings({"UnnecessaryBoxing"})
     public void testGetDifference_equalsAutoboxing() {
         Difference result = reflectionComparator.getDifference(5L, new Long(5));
@@ -101,6 +105,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Test for two equal primitives as an inner field of an object.
      */
+    @Test
     public void testGetDifference_equalsInner() {
         Difference result = reflectionComparator.getDifference(primitivesInnerA, primitivesInnerB);
         assertNull(result);
@@ -109,6 +114,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Test for two equal primitives but of different type (int vs long).
      */
+    @Test
     public void testGetDifference_differentTypes() {
         Difference result = reflectionComparator.getDifference(5L, 5);
         assertNull(result);
@@ -117,6 +123,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Test for two primitives that contain different values.
      */
+    @Test
     public void testGetDifference_notEqualsDifferentValues() {
         Difference result = reflectionComparator.getDifference(primitivesA, primitiveDifferentValue);
 
@@ -128,6 +135,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Test for two primitives with right value 0.
      */
+    @Test
     public void testGetDifference_notEqualsRight0() {
         Difference result = reflectionComparator.getDifference(primitivesA, primitives0Value);
 
@@ -139,6 +147,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Test for two primitives with left value 0.
      */
+    @Test
     public void testGetDifference_notEqualsLeft0() {
         Difference result = reflectionComparator.getDifference(primitives0Value, primitivesA);
 
@@ -150,6 +159,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Test for objects with inner primitives that contain different values.
      */
+    @Test
     public void testGetDifference_notEqualsInnerDifferentValues() {
         Difference result = reflectionComparator.getDifference(primitivesInnerA, primitivesInnerDifferentValue);
 
@@ -161,6 +171,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Tests for equality of two NaN values
      */
+    @Test
     public void testNaN() {
         Difference result = reflectionComparator.getDifference(Double.NaN, Float.NaN);
         assertNull(result);
@@ -169,6 +180,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Tests for equality of a NaN with a 0 value
      */
+    @Test
     public void testNaN_notEqual() {
         Difference result = reflectionComparator.getDifference(Double.NaN, 0);
         assertEquals(Double.NaN, result.getLeftValue());
@@ -178,6 +190,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Tests for equality of two NEGATIVE_INFINITY values
      */
+    @Test
     public void testInfinity() {
         Difference result = reflectionComparator.getDifference(Double.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
         assertNull(result);
@@ -186,6 +199,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Tests for equality of a NEGATIVE_INFINITY with a POSITIVE_INFINITY value
      */
+    @Test
     public void testInfinity_notEqual() {
         Difference result = reflectionComparator.getDifference(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
         assertEquals(Double.NEGATIVE_INFINITY, result.getLeftValue());
@@ -232,5 +246,4 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
             return false;
         }
     }
-
 }

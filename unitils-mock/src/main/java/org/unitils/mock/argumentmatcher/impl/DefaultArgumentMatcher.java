@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 package org.unitils.mock.argumentmatcher.impl;
 
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+import org.unitils.mock.core.proxy.Argument;
 import org.unitils.reflectionassert.ReflectionComparator;
 
 import static org.unitils.mock.argumentmatcher.ArgumentMatcher.MatchResult.*;
-import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
@@ -29,17 +29,16 @@ import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDE
  * expected and actual arguments refer to the same object. Otherwise, lenient reflection comparison is used (This means
  * the actual order of collections will be ignored and only fields that have a non default value will be compared)
  *
- * @author Filip Neven
  * @author Tim Ducheyne
- * @since 15-dec-2008
+ * @author Filip Neven
  */
-public class DefaultArgumentMatcher implements ArgumentMatcher {
+public class DefaultArgumentMatcher<T> extends ArgumentMatcher<T> {
 
     /* The original value passed to the argument matcher */
-    private final Object value;
-
+    protected T value;
     /* Copy of the original value */
-    private final Object valueAtInvocationTime;
+    protected T valueAtInvocationTime;
+
 
     /**
      * Creates a matcher for the given value. The original value is stored and a copy of the value is taken so that it
@@ -47,10 +46,11 @@ public class DefaultArgumentMatcher implements ArgumentMatcher {
      *
      * @param value The expected value
      */
-    public DefaultArgumentMatcher(Object value) {
+    public DefaultArgumentMatcher(T value, T valueAtInvocationTime) {
         this.value = value;
-        this.valueAtInvocationTime = createDeepClone(value);
+        this.valueAtInvocationTime = valueAtInvocationTime;
     }
+
 
     /**
      * Returns true if the given object matches the expected argument, false otherwise. If the given argument refers to
@@ -58,12 +58,13 @@ public class DefaultArgumentMatcher implements ArgumentMatcher {
      * value, lenient reflection comparison is used to compare the values. This means that the actual order of collections
      * will be ignored and only fields that have a non default value will be compared.
      *
-     * @param argument                 The argument that was used by reference, not null
-     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed, not null
+     * @param argument The argument to match, not null
      * @return The match result, not null
      */
-    public MatchResult matches(Object argument, Object argumentAtInvocationTime) {
-        if (value == argument) {
+    @Override
+    public MatchResult matches(Argument<T> argument) {
+        T argumentValue = argument.getValue();
+        if (value == argumentValue) {
             return SAME;
         }
         ReflectionComparator reflectionComparator;
@@ -72,7 +73,8 @@ public class DefaultArgumentMatcher implements ArgumentMatcher {
         } else {
             reflectionComparator = createRefectionComparator(LENIENT_ORDER, IGNORE_DEFAULTS);
         }
-        if (reflectionComparator.isEqual(valueAtInvocationTime, argumentAtInvocationTime)) {
+        T argumentValueAtInvocationTime = argument.getValueAtInvocationTime();
+        if (reflectionComparator.isEqual(valueAtInvocationTime, argumentValueAtInvocationTime)) {
             return MATCH;
         }
         return NO_MATCH;

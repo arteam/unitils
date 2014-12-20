@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,17 @@
  */
 package org.unitils.inject.annotation;
 
+import org.unitils.core.annotation.AnnotationDefault;
+import org.unitils.core.annotation.FieldAnnotation;
+import org.unitils.inject.listener.InjectIntoStaticFieldAnnotationListener;
 import org.unitils.inject.util.Restore;
 
-import static java.lang.annotation.ElementType.FIELD;
 import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.unitils.inject.util.Restore.DEFAULT;
 
 /**
  * Annotation indicating that the the {@link org.unitils.inject.InjectModule} should try to inject the object assigned to
@@ -40,6 +45,7 @@ import java.lang.annotation.Target;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
+@FieldAnnotation(InjectIntoStaticFieldAnnotationListener.class)
 public @interface InjectIntoStatic {
 
     /**
@@ -47,10 +53,10 @@ public @interface InjectIntoStatic {
      *
      * @return the target class, null for tested object
      */
-	Class<?> target();
+    Class<?> target();
 
     /**
-     * OGNL expression that defines the property to which the object referenced by the annotated fiel is injected
+     * OGNL expression that defines the property to which the object referenced by the annotated field is injected
      *
      * @return the ognl expression, not null
      */
@@ -62,6 +68,7 @@ public @interface InjectIntoStatic {
      *
      * @return the reset type, not null
      */
-    Restore restore() default Restore.DEFAULT;
+    @AnnotationDefault("inject.defaultRestore") Restore restore() default DEFAULT;
 
+    @AnnotationDefault("inject.autoCreateInnerFields") boolean autoCreateInnerFields() default true;
 }

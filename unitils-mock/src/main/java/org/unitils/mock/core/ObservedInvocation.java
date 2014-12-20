@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,27 +18,21 @@ package org.unitils.mock.core;
 import org.unitils.mock.core.proxy.ProxyInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
 
-import static org.unitils.mock.core.proxy.CloneUtil.createDeepClone;
-
 /**
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  * @author Kenny Claes
  */
 public class ObservedInvocation extends ProxyInvocation {
 
-    private Object result;
-    private Object resultAtInvocationTime;
-    private BehaviorDefiningInvocation behaviorDefiningInvocation;
-    private MockBehavior mockBehavior;
+    protected Object result;
+    protected Object resultAtInvocationTime;
+    protected BehaviorDefiningInvocation behaviorDefiningInvocation;
+    protected MockBehavior mockBehavior;
 
 
     /**
      * Creates a observed invocation for the given prosy invocation.
-     *
-     * The argumentsAtInvocationTime should be copies (deep clones) of the arguments at the time of
-     * the invocation. This way the original values can still be used later-on even when changes
-     * occur to the original values (pass-by-value vs pass-by-reference).
      *
      * @param proxyInvocation            The proxy invocation, not null
      * @param behaviorDefiningInvocation The invocation that defined the behavior, null if there is no behavior
@@ -50,16 +44,18 @@ public class ObservedInvocation extends ProxyInvocation {
         this.mockBehavior = mockBehavior;
     }
 
+
     /**
      * Sets the result of the invocation.
      * This is set afterwards to make it possible to get the correct sequence in the report when there are nested mock
      * invocations.
      *
-     * @param result The result of the invocation
+     * @param result                 The result of the invocation (pass by reference)
+     * @param resultAtInvocationTime A copy of the result at the time of invocation (pass by value)
      */
-    public void setResult(Object result) {
+    public void setResult(Object result, Object resultAtInvocationTime) {
         this.result = result;
-        this.resultAtInvocationTime = createDeepClone(result);
+        this.resultAtInvocationTime = resultAtInvocationTime;
     }
 
     public Object getResult() {
@@ -70,18 +66,11 @@ public class ObservedInvocation extends ProxyInvocation {
         return resultAtInvocationTime;
     }
 
-
     public BehaviorDefiningInvocation getBehaviorDefiningInvocation() {
         return behaviorDefiningInvocation;
     }
 
-
     public MockBehavior getMockBehavior() {
         return mockBehavior;
-    }
-
-
-    public boolean hasMockBehavior() {
-        return mockBehavior != null;
     }
 }

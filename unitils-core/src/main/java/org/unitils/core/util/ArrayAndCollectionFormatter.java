@@ -1,5 +1,5 @@
 /*
- * Copyright Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,7 +125,7 @@ public class ArrayAndCollectionFormatter {
             if (count++ > 0) {
                 result.append(", ");
             }
-            objectFormatter.formatImpl(element.getKey(), currentDepth, result);
+            objectFormatter.formatImpl(element.getKey(), currentDepth + 1, result);
             result.append("=");
             objectFormatter.formatImpl(element.getValue(), currentDepth + 1, result);
 
@@ -274,5 +274,4 @@ public class ArrayAndCollectionFormatter {
         }
         result.append("]");
     }
-
 }

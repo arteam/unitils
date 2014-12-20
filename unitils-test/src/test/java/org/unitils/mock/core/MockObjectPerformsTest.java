@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright 2013,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,78 +17,60 @@ package org.unitils.mock.core;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.mock.core.proxy.ProxyInvocation;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.mock.Mock;
+import org.unitils.mock.annotation.Dummy;
+import org.unitils.mock.core.matching.MatchingInvocationHandler;
+import org.unitils.mock.core.matching.MatchingInvocationHandlerFactory;
+import org.unitils.mock.core.proxy.impl.MatchingProxyInvocationHandler;
 import org.unitils.mock.mockbehavior.MockBehavior;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
+import org.unitils.mock.mockbehavior.MockBehaviorFactory;
+
+import static org.junit.Assert.assertSame;
 
 /**
- * Tests the mock object functionality.
- *
  * @author Tim Ducheyne
- * @author Filip Neven
  */
-public class MockObjectPerformsTest {
+public class MockObjectPerformsTest extends UnitilsJUnit4 {
 
-    /* Class under test */
-    private MockObject<TestClass> mockObject;
+    private MockObject<Object> mockObject;
+
+    private Mock<MockBehaviorFactory> mockBehaviorFactoryMock;
+    private Mock<MatchingInvocationHandlerFactory> matchingInvocationHandlerFactoryMock;
+    private Mock<MatchingProxyInvocationHandler> matchingProxyInvocationHandlerMock;
+    @Dummy
+    private Object matchingProxy;
+    @Dummy
+    private MockBehavior mockBehavior;
+    @Dummy
+    private BehaviorDefiningInvocations behaviorDefiningInvocations;
+    @Dummy
+    private MatchingInvocationHandler matchingInvocationHandler;
 
 
     @Before
-    public void setUp() {
-        mockObject = new MockObject<TestClass>("testMock", TestClass.class, this);
+    public void initialize() {
+        mockObject = new MockObject<Object>("name", Object.class, null, matchingProxy, false, behaviorDefiningInvocations,
+                matchingProxyInvocationHandlerMock.getMock(), mockBehaviorFactoryMock.getMock(), matchingInvocationHandlerFactoryMock.getMock(), null, null);
     }
 
 
-    /**
-     * Tests setting a peforms behavior for the mock. The behavior is an always matching behavior
-     * so the method should keep performing that same behavior.
-     */
     @Test
     public void performs() {
-        TestMockBehavior testMockBehavior = new TestMockBehavior();
-        mockObject.performs(testMockBehavior).testMethodString();
+        matchingInvocationHandlerFactoryMock.returns(matchingInvocationHandler).createBehaviorDefiningMatchingInvocationHandler(mockBehavior, false, behaviorDefiningInvocations);
 
-        mockObject.getMock().testMethodString();
-        mockObject.getMock().testMethodString();
-        assertLenientEquals(2, testMockBehavior.invocationCount);
+        Object result = mockObject.performs(mockBehavior);
+        assertSame(matchingProxy, result);
+        matchingProxyInvocationHandlerMock.assertInvoked().startMatchingInvocation("name", true, matchingInvocationHandler);
     }
 
-
-    /**
-     * Tests setting a once peforms behavior for the mock. The behavior should be executed only once, the second time
-     * nothing should have happened.
-     */
     @Test
-    public void oncePerforms() {
-        TestMockBehavior testMockBehavior = new TestMockBehavior();
-        mockObject.oncePerforms(testMockBehavior).testMethodString();
+    public void chainedPerforms() {
+        mockObject = new MockObject<Object>("name", Object.class, null, matchingProxy, true, behaviorDefiningInvocations,
+                matchingProxyInvocationHandlerMock.getMock(), mockBehaviorFactoryMock.getMock(), matchingInvocationHandlerFactoryMock.getMock(), null, null);
+        matchingInvocationHandlerFactoryMock.returns(matchingInvocationHandler).createBehaviorDefiningMatchingInvocationHandler(mockBehavior, false, behaviorDefiningInvocations);
 
-        mockObject.getMock().testMethodString();
-        mockObject.getMock().testMethodString();
-        assertLenientEquals(1, testMockBehavior.invocationCount);
-    }
-
-
-    /**
-     * Interface that is mocked during the tests
-     */
-    private static interface TestClass {
-
-        public String testMethodString();
-
-    }
-
-
-    /**
-     * Dummy mock behavior that counts how many times it was invoked.
-     */
-    private static class TestMockBehavior implements MockBehavior {
-
-        public int invocationCount = 0;
-
-        public Object execute(ProxyInvocation proxyInvocation) throws Throwable {
-            invocationCount++;
-            return null;
-        }
+        mockObject.performs(mockBehavior);
+        matchingProxyInvocationHandlerMock.assertInvoked().startMatchingInvocation("name", false, matchingInvocationHandler);
     }
 }
