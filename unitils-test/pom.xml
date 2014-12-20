@@ -23,25 +23,20 @@ License. ~ */ -->
 
     <dependencies>
 
-        <!-- There is a mismatch in the version of cglib that hibernate and unitils-mock 
+        <!-- There is a mismatch in the version of cglib that hibernate and unitils-mock
         uses. -->
         <!-- Make sure we use the same version as the unitils-mock module -->
-        <!-- In the final artifacts this mismatch is resolved by bundling and repackaging 
+        <!-- In the final artifacts this mismatch is resolved by bundling and repackaging
         cglib into unitils-mock -->
         <dependency>
-            <groupId>asm</groupId>
+            <groupId>org.ow2.asm</groupId>
             <artifactId>asm</artifactId>
-            <version>3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm-attrs</artifactId>
-            <version>2.2.3</version>
+            <version>5.0.3</version>
         </dependency>
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
-            <version>2.2</version>
+            <version>3.1</version>
         </dependency>
 
         <dependency>
