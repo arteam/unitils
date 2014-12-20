@@ -144,6 +144,10 @@ public class CloneUtil {
         if (instanceToClone instanceof Number || instanceToClone instanceof String || instanceToClone instanceof Character || instanceToClone instanceof Boolean) {
             return true;
         }
+        if (clazz.getName().startsWith("com.google.common.collect") && clazz.getName().contains("Immutable")) {
+            return true;
+        }
+
         return false;
     }
 
