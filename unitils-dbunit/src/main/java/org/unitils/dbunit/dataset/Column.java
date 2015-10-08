@@ -6,6 +6,7 @@ import org.dbunit.dataset.datatype.TypeCastException;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbunit.dataset.comparison.ColumnDifference;
 
+import java.util.Arrays;
 
 /**
  * A column in a data set row
@@ -103,6 +104,11 @@ public class Column {
             return new ColumnDifference(this, actualColumn);
         }
         if (!castedValue.equals(actualColumn.getValue())) {
+            if (castedValue.getClass().isArray()) {
+                if (Arrays.equals((Object[]) castedValue, (Object[]) actualColumn.getValue())) {
+                    return null;
+                }
+            }
             return new ColumnDifference(this, actualColumn);
         }
         return null;
