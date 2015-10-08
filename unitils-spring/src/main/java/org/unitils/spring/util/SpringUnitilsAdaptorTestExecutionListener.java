@@ -11,9 +11,9 @@ public class SpringUnitilsAdaptorTestExecutionListener implements TestExecutionL
 		registerTestContext(testContext);
 		getTestListener().afterCreateTestObject(testContext.getTestInstance());
 	}
-	
 
-	public void beforeTestSetUp(TestContext testContext) throws Exception {
+
+    public void beforeTestSetUp(TestContext testContext) throws Exception {
 		getTestListener().beforeTestSetUp(testContext.getTestInstance(), testContext.getTestMethod());
 	}
 
@@ -56,15 +56,14 @@ public class SpringUnitilsAdaptorTestExecutionListener implements TestExecutionL
     }
 
 
-	public void afterTestClass(TestContext arg0) throws Exception {
-		//do nothing
-		
-	}
+    @Override
+    public void beforeTestClass(TestContext testContext) throws Exception {
+        getTestListener().beforeTestSetUp(testContext.getTestInstance(), testContext.getTestMethod());
+    }
 
-
-	public void beforeTestClass(TestContext arg0) throws Exception {
-		//do nothing
-		
-	}
+    @Override
+    public void afterTestClass(TestContext testContext) throws Exception {
+        getTestListener().afterTestTearDown(testContext.getTestInstance(), testContext.getTestMethod());
+    }
 
 }

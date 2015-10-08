@@ -111,7 +111,8 @@ public class SpringModule implements Module {
                 @SuppressWarnings("unchecked")
                 public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
                     ApplicationContext context = getApplicationContext(testObject);
-                    Class<?> platformTransactionManagerClass = getPlatformTransactionManagerClass();
+                    Class<PlatformTransactionManager> platformTransactionManagerClass =
+                            (Class<PlatformTransactionManager>) getPlatformTransactionManagerClass();
                     Map<String, PlatformTransactionManager> platformTransactionManagers = (Map<String, PlatformTransactionManager>) context.getBeansOfType(platformTransactionManagerClass);
                     if (platformTransactionManagers.size() == 0) {
                         throw new UnitilsException("Could not find a bean of type " + platformTransactionManagerClass.getSimpleName()
